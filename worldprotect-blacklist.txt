@@ -1,0 +1,32 @@
+#
+# This is the blacklist for WorldProtect. Comments start with # and they
+# are ignored so you can put your own notes.
+#
+# Format:
+# [item1,item2,itemN]
+# option1=options
+# event1=action1,action2,actionN
+# eventN=action1,action2,actionN
+#
+# Events/Options:
+# - ignore-groups (comma-delimited list of groups to not affect)
+# - on-destroy (when a block of this type is destroyed)
+# - on-left (when this item is held and the player is left clicking)
+# - on-right (when this item is held and the player is right clicking)
+#
+# Actions:
+# - deny (deny completely)
+# - notify (notify admins)
+# - log (log to console/file)
+# - kick (kick player)
+# - tell (tell a player that that's not allowed)
+#
+# Some examples follow.
+#
+#[lavabucket]
+#on-left=deny,log,kick
+#on-right=deny,tell
+#[coalore,goldore,ironore]
+#on-destroy=notify,deny,log
+#[cobblestone]
+#on-right=deny,tell,log
