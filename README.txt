@@ -19,7 +19,7 @@ use or not:
 - Simulate classic-esque water by letting water infinitely expand in
     area (only if there is a block underneath).
 - Simulate the sponge.
-- Block the use, desturction and/or placement of some items or block types.
+- Block the use, destruction and/or placement of some items or block types.
 - Notify admins when a certain block type or item is used, destroyed,
     or place.
 - Log the use, destruction, and/or placement of some blocks/items.
