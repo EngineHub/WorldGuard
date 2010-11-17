@@ -1,6 +1,6 @@
 // $Id$
 /*
- * WorldProtect
+ * WorldGuard
  * Copyright (C) 2010 sk89q <http://www.sk89q.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,16 +29,16 @@ import java.io.*;
  *
  * @author sk89q
  */
-public class WorldProtect extends Plugin {
+public class WorldGuard extends Plugin {
     /**
      * Logger.
      */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldProtect");
+    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     /**
      * Listener for the plugin system.
      */
-    private static final WorldProtectListener listener =
-            new WorldProtectListener();
+    private static final WorldGuardListener listener =
+            new WorldGuardListener();
 
     /**
      * Initializes the plugin.
@@ -70,7 +70,7 @@ public class WorldProtect extends Plugin {
     public void enable() {
         listener.loadConfiguration();
 
-        logger.log(Level.INFO, "WorldProtect version " + getVersion() + " loaded");
+        logger.log(Level.INFO, "WorldGuard version " + getVersion() + " loaded");
     }
 
     /**
@@ -82,18 +82,18 @@ public class WorldProtect extends Plugin {
     }
 
     /**
-     * Get the WorldProtect version.
+     * Get the WorldGuard version.
      *
      * @return
      */
     private String getVersion() {
         try {
-            String classContainer = WorldProtect.class.getProtectionDomain()
+            String classContainer = WorldGuard.class.getProtectionDomain()
                     .getCodeSource().getLocation().toString();
             URL manifestUrl = new URL("jar:" + classContainer + "!/META-INF/MANIFEST.MF");
             Manifest manifest = new Manifest(manifestUrl.openStream());
             Attributes attrib = manifest.getMainAttributes();
-            String ver = (String)attrib.getValue("WorldProtect-Version");
+            String ver = (String)attrib.getValue("WorldGuard-Version");
             return ver != null ? ver : "(unavailable)";
         } catch (IOException e) {
             return "(unknown)";

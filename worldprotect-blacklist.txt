@@ -1,5 +1,5 @@
 #
-# This is the blacklist for WorldProtect. Comments start with # and they
+# This is the blacklist for WorldGuard. Comments start with # and they
 # are ignored so you can put your own notes.
 #
 # Format:

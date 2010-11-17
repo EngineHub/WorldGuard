@@ -1,6 +1,6 @@
 // $Id$
 /*
- * WorldProtect
+ * WorldGuard
  * Copyright (C) 2010 sk89q <http://www.sk89q.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 import java.io.*;
-import com.sk89q.worldprotect.*;
+import com.sk89q.worldguard.*;
 import java.util.logging.FileHandler;
 
 /**
@@ -37,15 +37,15 @@ import java.util.logging.FileHandler;
  *
  * @author sk89q
  */
-public class WorldProtectListener extends PluginListener {
+public class WorldGuardListener extends PluginListener {
     /**
      * Logger.
      */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldProtect");
+    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     /**
      * Properties file for CraftBook.
      */
-    private PropertiesFile properties = new PropertiesFile("worldprotect.properties");
+    private PropertiesFile properties = new PropertiesFile("worldguard.properties");
     /**
      * Random number generator.
      */
@@ -86,7 +86,7 @@ public class WorldProtectListener extends PluginListener {
                 if (id != 0) {
                     result.add(id);
                 } else {
-                    logger.log(Level.WARNING, "WorldProtect: Unknown block name: "
+                    logger.log(Level.WARNING, "WorldGuard: Unknown block name: "
                             + item);
                 }
             }
@@ -114,15 +114,15 @@ public class WorldProtectListener extends PluginListener {
         blockLagFix = properties.getBoolean("block-lag-fix", false);
 
         try {
-            blacklist = loadBlacklist(new File("worldprotect-blacklist.txt"));
+            blacklist = loadBlacklist(new File("worldguard-blacklist.txt"));
         } catch (FileNotFoundException e) {
-            logger.log(Level.WARNING, "WorldProtect blacklist does not exist.");
+            logger.log(Level.WARNING, "WorldGuard blacklist does not exist.");
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not load WorldProtect blacklist: "
+            logger.log(Level.WARNING, "Could not load WorldGuard blacklist: "
                     + e.getMessage());
         }
 
-        Logger blacklistLogger = Logger.getLogger("WorldProtect.Blacklist");
+        Logger blacklistLogger = Logger.getLogger("WorldGuard.Blacklist");
         blacklistLogger.setUseParentHandlers(false);
         for (Handler handler : blacklistLogger.getHandlers()) {
             blacklistLogger.removeHandler(handler);
@@ -452,7 +452,7 @@ public class WorldProtectListener extends PluginListener {
                         } catch (NumberFormatException e) {
                             id = etc.getDataSource().getItem(item.trim());
                             if (id == 0) {
-                                logger.log(Level.WARNING, "WorldProtect: Unknown block name: "
+                                logger.log(Level.WARNING, "WorldGuard: Unknown block name: "
                                         + item);
                                 break;
                             }

@@ -1,6 +1,6 @@
 // $Id$
 /*
- * WorldProtect
+ * WorldGuard
  * Copyright (C) 2010 sk89q <http://www.sk89q.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ public class BlacklistEntry {
     /**
      * Logger.
      */
-    private static final Logger logger = Logger.getLogger("WorldProtect.Blacklist");
+    private static final Logger logger = Logger.getLogger("WorldGuard.Blacklist");
     /**
      * List of groups to not affect.
      */
@@ -142,7 +142,7 @@ public class BlacklistEntry {
     public void notifyAdmins(String str) {
         for (Player player : etc.getServer().getPlayerList()) {
             if (player.canUseCommand("/wprotectalerts")) {
-                player.sendMessage(Colors.LightPurple + "WorldProtect: " + str);
+                player.sendMessage(Colors.LightPurple + "WorldGuard: " + str);
             }
         }
     }

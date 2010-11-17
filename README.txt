@@ -1,11 +1,11 @@
-WorldProtect
+WorldGuard
 Copyright (c) 2010 sk89q <http://www.sk89q.com>
 Licensed under the GNU Lesser General Public License v3
 
 Introduction
 ------------
 
-WorldProtect has a number of features, any of which you can choose to
+WorldGuard has a number of features, any of which you can choose to
 use or not:
 
 - Enforce only one session for a player on a server (can't login twice).
@@ -25,14 +25,14 @@ use or not:
 - Log the use, destruction, and/or placement of some blocks/items.
 - Kick for the use, destruction, and/or placement of some blocks.
 
-hMod is required as WorldProtect is a plugin for hMod.
+hMod is required as WorldGuard is a plugin for hMod.
 
 Configuration
 -------------
 
-A "worldprotect.properties" will be created the first the time that you load
-WorldProtect on your server. You can either restart your server or use
-/reloadplugin WorldProtect to reload the configuraton file after editing it.
+A "worldguard.properties" will be created the first the time that you load
+WorldGuard on your server. You can either restart your server or use
+/reloadplugin WorldGuard to reload the configuraton file after editing it.
 
 - classic-water (def. false)
     Toggle use of classic water. Be foreward that your world may be
@@ -106,5 +106,5 @@ WorldProtect on your server. You can either restart your server or use
 Blacklists
 ----------
 
-Edit the included worldprotect-blacklist.txt file and follow the
+Edit the included worldguard-blacklist.txt file and follow the
 instructions inside.
