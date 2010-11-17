@@ -100,6 +100,9 @@ WorldProtect on your server. You can either restart your server or use
     to disable this feature. Enabling disable-all-fire-spread will
     override this function.
 
+- block-lag-fix (def. false)
+    Attempts to fix block lag.
+
 Blacklists
 ----------
 
