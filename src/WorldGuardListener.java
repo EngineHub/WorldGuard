@@ -253,7 +253,7 @@ public class WorldGuardListener extends PluginListener {
                 else if (type == 47) { dropped = 0; } // Bookshelves
                 else if (type == 52) { dropped = 0; } // Mob spawner
                 else if (type == 53) { dropped = 5; } // Wooden stairs
-                else if (type == 55) { dropped = 5; } // Redstone wire
+                else if (type == 55) { dropped = 331; } // Redstone wire
                 else if (type == 56) { dropped = 264; } // Diamond ore
                 else if (type == 60) { dropped = 3; } // Soil
                 else if (type == 63) { dropped = 323; } // Sign post
