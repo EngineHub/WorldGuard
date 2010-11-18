@@ -67,6 +67,7 @@ public class WorldGuardListener extends PluginListener {
     private boolean blockLagFix;
     private Set<Integer> fireNoSpreadBlocks;
     private Set<Integer> allowedLavaSpreadOver;
+    private Set<Integer> itemDropBlacklist;
     private boolean classicWater;
     private Map<Integer,BlacklistEntry> blacklist;
 
@@ -113,6 +114,7 @@ public class WorldGuardListener extends PluginListener {
         blockLighter = properties.getBoolean("block-lighter", false);
         preventLavaFire = properties.getBoolean("disable-lava-fire", false);
         disableAllFire = properties.getBoolean("disable-all-fire-spread", false);
+        itemDropBlacklist = toBlockIDSet(properties.getString("item-drop-blacklist", ""));
         fireNoSpreadBlocks = toBlockIDSet(properties.getString("disallowed-fire-spread-blocks", ""));
         allowedLavaSpreadOver = toBlockIDSet(properties.getString("allowed-lava-spread-blocks", ""));
         classicWater = properties.getBoolean("classic-water", false);
@@ -174,6 +176,27 @@ public class WorldGuardListener extends PluginListener {
         }
 
         return null;
+    }
+    
+    /**
+     * Called when a player drops an item.
+     * 
+     * @param player
+     *            player who dropped the item
+     * @param item
+     *            item that was dropped
+     * @return true if you don't want the dropped item to be spawned in the
+     *         world
+     */
+    public boolean onItemDrop(Player player, Item item) {
+        if (itemDropBlacklist.isEmpty()) return false;
+
+		  int n = item.getItemId();
+		  if (itemDropBlacklist.contains(n)) {
+		      player.sendMessage(Colors.Rose+"Item was destroyed!");
+		      return true;
+		  }
+		  return false;
     }
 
     /**
