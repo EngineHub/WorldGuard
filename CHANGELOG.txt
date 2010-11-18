@@ -1,3 +1,7 @@
+1.1.2
+- Block lag fix: Snow and glass should no longer drop items.
+- Block lag fix: Block object now reset after hook call.
+
 1.1.1
 - Fixed redstone wire dropping wood blocks with the block lag fix.
 - The block lag fix now consults other plugins so that ALL protection
