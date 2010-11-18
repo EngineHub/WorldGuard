@@ -74,9 +74,8 @@ public class WorldGuard extends Plugin {
      */
     @Override
     public void enable() {
-        listener.loadConfiguration();
-
         logger.log(Level.INFO, "WorldGuard version " + getVersion() + " loaded");
+        listener.loadConfiguration();
     }
 
     /**
