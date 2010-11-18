@@ -37,8 +37,14 @@ public class WorldGuard extends Plugin {
     /**
      * Listener for the plugin system.
      */
-    private static final WorldGuardListener listener =
-            new WorldGuardListener();
+    private WorldGuardListener listener;
+
+    /**
+     * Initialize the plugin.
+     */
+    public WorldGuard() {
+        listener = new WorldGuardListener(this);
+    }
 
     /**
      * Initializes the plugin.

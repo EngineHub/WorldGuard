@@ -49,6 +49,10 @@ public class WorldGuardListener extends PluginListener {
     private static Random rand = new Random();
 
     /**
+     * Plugin host.
+     */
+    private WorldGuard plugin;
+    /**
      * Properties file for CraftBook.
      */
     private PropertiesFile properties = new PropertiesFile("worldguard.properties");
@@ -69,6 +73,15 @@ public class WorldGuardListener extends PluginListener {
     private Set<Integer> allowedLavaSpreadOver;
     private boolean classicWater;
     private Map<Integer,BlacklistEntry> blacklist;
+
+    /**
+     * Construct the listener.
+     * 
+     * @param plugin
+     */
+    public WorldGuardListener(WorldGuard plugin) {
+        this.plugin = plugin;
+    }
 
     /**
      * Convert a comma-delimited list to a set of integers.
@@ -245,7 +258,7 @@ public class WorldGuardListener extends PluginListener {
                 && type != 50 // Torch
                 && type != 75 // Redstone torch
                 && type != 76 // Redstone torch
-                ) {
+                && canDestroyBlock(player, block)) {
 
             if (block.getStatus() == 3) {
                 int dropped = type;
@@ -421,6 +434,25 @@ public class WorldGuardListener extends PluginListener {
      */
     public void onDisconnect(Player player) {
         BlacklistEntry.forgetPlayer(player);
+    }
+
+    /**
+     * Checks if a block can be destroyed.
+     * 
+     * @param player
+     * @param block
+     * @return
+     */
+    public boolean canDestroyBlock(Player player, Block block) {
+        plugin.toggleEnabled(); // Prevent infinite loop
+        try {
+            return !(Boolean)etc.getLoader().callHook(PluginLoader.Hook.BLOCK_DESTROYED,
+                    new Object[]{ player.getUser(), block });
+        } catch (Throwable t) {
+            return true;
+        } finally {
+            plugin.toggleEnabled();
+        }
     }
 
     /**
