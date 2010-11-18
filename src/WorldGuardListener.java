@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 import java.io.*;
 import com.sk89q.worldguard.*;
@@ -43,13 +44,18 @@ public class WorldGuardListener extends PluginListener {
      */
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     /**
+     * Random number generator.
+     */
+    private static Random rand = new Random();
+
+    /**
      * Properties file for CraftBook.
      */
     private PropertiesFile properties = new PropertiesFile("worldguard.properties");
     /**
-     * Random number generator.
+     * List of blocks to remove when possible.
      */
-    private static Random rand = new Random();
+    private LinkedList<int[]> blockRemoveQueue = new LinkedList<int[]>();
 
     private boolean enforceOneSession;
     private boolean blockCreepers;
@@ -187,6 +193,11 @@ public class WorldGuardListener extends PluginListener {
             BlacklistEntry entry = blacklist.get(itemInHand);
             if (entry != null) {
                 if (!entry.onRightClick(itemInHand, player)) {
+                    // Water/lava bucket fix
+                    if (itemInHand == 326 || itemInHand == 327) {
+                        blockPlaced.setType(0);
+                        blockPlaced.update();
+                    }
                     return true;
                 }
             }
@@ -267,9 +278,9 @@ public class WorldGuardListener extends PluginListener {
                 else if (type == 83) { dropped = 338; count = 4; } // Reed
 		else if (type == 89) { dropped = 348; } // Lightstone
 
-                if (dropped > 0) {
-                    etc.getServer().setBlockAt(0, block.getX(), block.getY(), block.getZ());
+                etc.getServer().setBlockAt(0, block.getX(), block.getY(), block.getZ());
 
+                if (dropped > 0) {
                     for (int i = 0; i < count; i++) {
                         etc.getServer().dropItem(block.getX(), block.getY(), block.getZ(),
                                 dropped, i);
