@@ -277,58 +277,70 @@ public class WorldGuardListener extends PluginListener {
                 && type != 50 // Torch
                 && type != 75 // Redstone torch
                 && type != 76 // Redstone torch
-                && canDestroyBlock(player, block)) {
+                ) {
 
-            if (block.getStatus() == 3) {
-                int dropped = type;
-                int count = 1;
+            // Check other plugins first to see if this block can be
+            // destroyed. Since this causes the hook to eventually call
+            // twice, we try to nullify it below
+            if (canDestroyBlock(player, block)) {
+                if (block.getStatus() == 3) {
+                    int dropped = type;
+                    int count = 1;
 
-                if (type == 1) { dropped = 4; } // Stone
-                else if (type == 2) { dropped = 3; } // Grass
-                else if (type == 16) { dropped = 263; } // Coal ore
-                else if (type == 18) { // Leaves
-                    if (rand.nextDouble() > 0.95) {
-                        dropped = 6;
-                    } else {
-                        dropped = 0;
-                    }
-                }
-                else if (type == 47) { dropped = 0; } // Bookshelves
-                else if (type == 52) { dropped = 0; } // Mob spawner
-                else if (type == 53) { dropped = 5; } // Wooden stairs
-                else if (type == 55) { dropped = 331; } // Redstone wire
-                else if (type == 56) { dropped = 264; } // Diamond ore
-                else if (type == 60) { dropped = 3; } // Soil
-                else if (type == 63) { dropped = 323; } // Sign post
-                else if (type == 67) { dropped = 4; } // Cobblestone stairs
-                else if (type == 68) { dropped = 323; } // Wall sign
-                else if (type == 73) { dropped = 331; count = 4; } // Redstone ore
-                else if (type == 74) { dropped = 331; count = 4; } // Glowing redstone ore
-                else if (type == 75) { dropped = 76; count = 4; } // Redstone torch
-                else if (type == 79) { dropped = 0; count = 4; } // Ice
-                else if (type == 82) { dropped = 337; count = 4; } // Clay
-                else if (type == 83) { dropped = 338; count = 4; } // Reed
-		else if (type == 89) { dropped = 348; } // Lightstone
-
-                etc.getServer().setBlockAt(0, block.getX(), block.getY(), block.getZ());
-
-                if (dropped > 0) {
-                    for (int i = 0; i < count; i++) {
-                        etc.getServer().dropItem(block.getX(), block.getY(), block.getZ(),
-                                dropped, i);
-                    }
-
-                    // Drop flint with gravel
-                    if (type == 13) {
+                    if (type == 1) { dropped = 4; } // Stone
+                    else if (type == 2) { dropped = 3; } // Grass
+                    else if (type == 16) { dropped = 263; } // Coal ore
+                    else if (type == 18) { // Leaves
                         if (rand.nextDouble() > 0.95) {
+                            dropped = 6;
+                        } else {
+                            dropped = 0;
+                        }
+                    }
+                    else if (type == 20) { dropped = 0; } // Glass
+                    else if (type == 47) { dropped = 0; } // Bookshelves
+                    else if (type == 52) { dropped = 0; } // Mob spawner
+                    else if (type == 53) { dropped = 5; } // Wooden stairs
+                    else if (type == 55) { dropped = 331; } // Redstone wire
+                    else if (type == 56) { dropped = 264; } // Diamond ore
+                    else if (type == 60) { dropped = 3; } // Soil
+                    else if (type == 63) { dropped = 323; } // Sign post
+                    else if (type == 67) { dropped = 4; } // Cobblestone stairs
+                    else if (type == 68) { dropped = 323; } // Wall sign
+                    else if (type == 73) { dropped = 331; count = 4; } // Redstone ore
+                    else if (type == 74) { dropped = 331; count = 4; } // Glowing redstone ore
+                    else if (type == 75) { dropped = 76; count = 4; } // Redstone torch
+                    else if (type == 78) { dropped = 0; } // Snow
+                    else if (type == 79) { dropped = 0; count = 4; } // Ice
+                    else if (type == 82) { dropped = 337; count = 4; } // Clay
+                    else if (type == 83) { dropped = 338; count = 4; } // Reed
+                    else if (type == 89) { dropped = 348; } // Lightstone
+
+                    etc.getServer().setBlockAt(0, block.getX(), block.getY(), block.getZ());
+
+                    if (dropped > 0) {
+                        for (int i = 0; i < count; i++) {
                             etc.getServer().dropItem(block.getX(), block.getY(), block.getZ(),
-                                    318, 1);
+                                    dropped, i);
+                        }
+
+                        // Drop flint with gravel
+                        if (type == 13) {
+                            if (rand.nextDouble() > 0.95) {
+                                etc.getServer().dropItem(block.getX(), block.getY(), block.getZ(),
+                                        318, 1);
+                            }
                         }
                     }
                 }
+
+                return true;
             }
 
-            return true;
+            // So we don't have double hook calls caused by the
+            // plugin/protection check
+            block.setType(0);
+            block.setStatus(2);
         }
         
         return false;
