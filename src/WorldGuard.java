@@ -39,6 +39,11 @@ public class WorldGuard extends Plugin {
      */
     private static final WorldGuardListener listener =
             new WorldGuardListener();
+    /**
+     * Low priority version.
+     */
+    private static final WorldGuardListener.LowPriorityListener lowPriorityListener =
+            listener.getLowPriorityListener();
 
     /**
      * Initializes the plugin.
@@ -59,6 +64,8 @@ public class WorldGuard extends Plugin {
                 PluginListener.Priority.HIGH);
         loader.addListener(PluginLoader.Hook.BLOCK_DESTROYED, listener, this,
                 PluginListener.Priority.HIGH);
+        loader.addListener(PluginLoader.Hook.BLOCK_DESTROYED, lowPriorityListener, this,
+                PluginListener.Priority.LOW);
         loader.addListener(PluginLoader.Hook.DISCONNECT, listener, this,
                 PluginListener.Priority.HIGH);
     }
