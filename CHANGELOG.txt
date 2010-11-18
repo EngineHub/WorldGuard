@@ -1,0 +1,10 @@
+1.1.1
+- Fixed redstone wire dropping wood blocks with the block lag fix.
+- The block lag fix now consults other plugins so that ALL protection
+    mechanisms and plugins should work.
+
+1.1
+- Added block lag fix.
+
+1.0
+- Initial release.
