@@ -17,6 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.logging.Handler;
@@ -30,8 +32,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import java.io.*;
-import com.sk89q.worldguard.*;
 import java.util.logging.FileHandler;
+import com.sk89q.worldguard.*;
 
 /**
  * Event listener for Hey0's server mod.
@@ -43,6 +45,10 @@ public class WorldGuardListener extends PluginListener {
      * Logger.
      */
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+    /**
+     * Timer for threading.
+     */
+    private static final Timer timer = new Timer();
     /**
      * Random number generator.
      */
@@ -227,8 +233,19 @@ public class WorldGuardListener extends PluginListener {
                 if (!entry.onRightClick(itemInHand, player)) {
                     // Water/lava bucket fix
                     if (itemInHand == 326 || itemInHand == 327) {
-                        blockPlaced.setType(0);
-                        blockPlaced.update();
+                        final int x = blockPlaced.getX();
+                        final int y = blockPlaced.getY();
+                        final int z = blockPlaced.getZ();
+                        
+                        // This is REALLY BAD, but there's no other choice
+                        // at the moment that is as reliable
+                        timer.schedule(new TimerTask() {
+                            public void run() {
+                                try {
+                                    etc.getServer().setBlockAt(0, x, y, z);
+                                } catch (Throwable t) {}
+                            }
+                        }, 200); // Just in case
                     }
                     return true;
                 }
@@ -313,7 +330,7 @@ public class WorldGuardListener extends PluginListener {
                     else if (type == 78) { dropped = 0; } // Snow
                     else if (type == 79) { dropped = 0; count = 4; } // Ice
                     else if (type == 82) { dropped = 337; count = 4; } // Clay
-                    else if (type == 83) { dropped = 338; count = 4; } // Reed
+                    else if (type == 83) { dropped = 338; } // Reed
                     else if (type == 89) { dropped = 348; } // Lightstone
 
                     etc.getServer().setBlockAt(0, block.getX(), block.getY(), block.getZ());
@@ -423,6 +440,10 @@ public class WorldGuardListener extends PluginListener {
      * @return true if you dont want the substance to flow.
      */
     public boolean onFlow(Block block) {
+        int x = block.getX();
+        int y = block.getY();
+        int z = block.getZ();
+
         if (simulateSponge && (block.getStatus() == 8 || block.getStatus() == 9)) {
             int ox = block.getX();
             int oy = block.getY() + 1;
@@ -430,10 +451,10 @@ public class WorldGuardListener extends PluginListener {
 
             Server server = etc.getServer();
 
-            for (int x = -4; x <= 4; x++) {
-                for (int y = -4; y <= 4; y++) {
-                    for (int z = -4; z <= 4; z++) {
-                        if (server.getBlockIdAt(ox + x, oy + y, oz + z) == 19) {
+            for (int cx = -4; cx <= 4; cx++) {
+                for (int cy = -4; cy <= 4; cy++) {
+                    for (int cz = -4; cz <= 4; cz++) {
+                        if (server.getBlockIdAt(ox + cx, oy + cy, oz + cz) == 19) {
                             return true;
                         }
                     }
