@@ -54,6 +54,10 @@ public class BlacklistEntry {
      * List of actions to perform on right click.
      */
     private String[] rightClickActions;
+    /**
+     * List of actions to perform on right click upon.
+     */
+    private String[] rightClickOnActions;
 
     /**
      * @return the ignoreGroups
@@ -113,6 +117,20 @@ public class BlacklistEntry {
      */
     public void setRightClickActions(String[] rightClickActions) {
         this.rightClickActions = rightClickActions;
+    }
+
+    /**
+     * @return
+     */
+    public String[] getRightClickOnActions() {
+        return rightClickOnActions;
+    }
+
+    /**
+     * @param actions
+     */
+    public void setRightClickOnActions(String[] actions) {
+        this.rightClickOnActions = actions;
     }
 
     /**
@@ -190,7 +208,7 @@ public class BlacklistEntry {
     }
 
     /**
-     * Called on right right. Returns true to let the action pass through.
+     * Called on right click. Returns true to let the action pass through.
      *
      * @param item
      * @param player
@@ -202,6 +220,22 @@ public class BlacklistEntry {
         }
         boolean ret = process(item, player, rightClickActions);
         lastAffected.put(player.getName(), item);
+        return ret;
+    }
+
+    /**
+     * Called on right click upon. Returns true to let the action pass through.
+     *
+     * @param item
+     * @param player
+     * @return
+     */
+    public boolean onRightClickOn(Block block, Player player) {
+        if (rightClickOnActions == null) {
+            return true;
+        }
+        boolean ret = process(block.getType(), player, rightClickOnActions);
+        lastAffected.put(player.getName(), block.getType());
         return ret;
     }
 

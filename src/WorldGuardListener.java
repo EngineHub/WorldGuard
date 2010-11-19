@@ -229,7 +229,7 @@ public class WorldGuardListener extends PluginListener {
             int itemInHand) {
         if (blacklist != null) {
             BlacklistEntry entry = blacklist.get(itemInHand);
-            if (entry != null) {
+            if (entry != null) {                
                 if (!entry.onRightClick(itemInHand, player)) {
                     // Water/lava bucket fix
                     if (itemInHand == 326 || itemInHand == 327) {
@@ -248,6 +248,10 @@ public class WorldGuardListener extends PluginListener {
                             }
                         }, 200); // Just in case
                     }
+                    return true;
+                }
+
+                if (!entry.onRightClickOn(blockClicked, player)) {
                     return true;
                 }
             }
@@ -578,6 +582,8 @@ public class WorldGuardListener extends PluginListener {
                             entry.setLeftClickActions(parts[1].split(","));
                         } else if(parts[0].equalsIgnoreCase("on-right")) {
                             entry.setRightClickActions(parts[1].split(","));
+                        } else if(parts[0].equalsIgnoreCase("on-right-on")) {
+                            entry.setRightClickOnActions(parts[1].split(","));
                         } else {
                             unknownOption = true;
                         }
