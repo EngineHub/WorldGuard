@@ -236,13 +236,14 @@ public class WorldGuardListener extends PluginListener {
                         final int x = blockPlaced.getX();
                         final int y = blockPlaced.getY();
                         final int z = blockPlaced.getZ();
-                        
+                        final int existingID = etc.getServer().getBlockIdAt(x, y, z);
+
                         // This is REALLY BAD, but there's no other choice
                         // at the moment that is as reliable
                         timer.schedule(new TimerTask() {
                             public void run() {
                                 try {
-                                    etc.getServer().setBlockAt(0, x, y, z);
+                                    etc.getServer().setBlockAt(existingID, x, y, z);
                                 } catch (Throwable t) {}
                             }
                         }, 200); // Just in case
