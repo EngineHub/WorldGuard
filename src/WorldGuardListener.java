@@ -349,18 +349,18 @@ public class WorldGuardListener extends PluginListener {
         }
 
         if (blockLagFix
-                && type != 64 // Wooden door
-                && type != 71 // Iron door
-                && type != 77 // Stone button
-                && type != 69 // Lever
                 && type != 7 // Bedrock
-                && type != 51 // Fire
                 && type != 46 // TNT
+                && type != 50 // Torch
+                && type != 51 // Fire
                 && type != 59 // Crops
                 && type != 62 // Burning furnace
-                && type != 50 // Torch
+                && type != 64 // Wooden door
+                && type != 69 // Lever
+                && type != 71 // Iron door
                 && type != 75 // Redstone torch
                 && type != 76 // Redstone torch
+                && type != 77 // Stone button
                 ) {
 
             // Check other plugins first to see if this block can be
@@ -368,49 +368,49 @@ public class WorldGuardListener extends PluginListener {
             // twice, we try to nullify it below
             if (canDestroyBlock(player, block)) {
                 if (block.getStatus() == 3) {
-                    int dropped = type;
+                    int dropItem = type;
                     int count = 1;
 
-                    if (type == 1) { dropped = 4; } // Stone
-                    else if (type == 2) { dropped = 3; } // Grass
-                    else if (type == 16) { dropped = 263; } // Coal ore
+                    if (type == 1) { dropItem = 4; } // Stone
+                    else if (type == 2) { dropItem = 3; } // Grass
+                    else if (type == 16) { dropItem = 263; } // Coal ore
                     else if (type == 18) { // Leaves
                         if (rand.nextDouble() > 0.95) {
-                            dropped = 6;
+                            dropItem = 6;
                         } else {
-                            dropped = 0;
+                            dropItem = 0;
                         }
                     }
-                    else if (type == 20) { dropped = 0; } // Glass
-                    else if (type == 47) { dropped = 0; } // Bookshelves
-                    else if (type == 52) { dropped = 0; } // Mob spawner
-                    else if (type == 53) { dropped = 5; } // Wooden stairs
-                    else if (type == 55) { dropped = 331; } // Redstone wire
-                    else if (type == 56) { dropped = 264; } // Diamond ore
-                    else if (type == 60) { dropped = 3; } // Soil
-                    else if (type == 63) { dropped = 323; } // Sign post
-                    else if (type == 67) { dropped = 4; } // Cobblestone stairs
-                    else if (type == 68) { dropped = 323; } // Wall sign
-                    else if (type == 73) { dropped = 331; count = 4; } // Redstone ore
-                    else if (type == 74) { dropped = 331; count = 4; } // Glowing redstone ore
-                    else if (type == 75) { dropped = 76; count = 4; } // Redstone torch
-                    else if (type == 78) { dropped = 0; } // Snow
-                    else if (type == 79) { dropped = 0; count = 4; } // Ice
-                    else if (type == 82) { dropped = 337; count = 4; } // Clay
-                    else if (type == 83) { dropped = 338; } // Reed
-                    else if (type == 89) { dropped = 348; } // Lightstone
+                    else if (type == 20) { dropItem = 0; } // Glass
+                    else if (type == 43) { dropItem = 44; } // Double step
+                    else if (type == 47) { dropItem = 0; } // Bookshelves
+                    else if (type == 52) { dropItem = 0; } // Mob spawner
+                    else if (type == 53) { dropItem = 5; } // Wooden stairs
+                    else if (type == 55) { dropItem = 331; } // Redstone wire
+                    else if (type == 56) { dropItem = 264; } // Diamond ore
+                    else if (type == 60) { dropItem = 3; } // Soil
+                    else if (type == 63) { dropItem = 323; } // Sign post
+                    else if (type == 67) { dropItem = 4; } // Cobblestone stairs
+                    else if (type == 68) { dropItem = 323; } // Wall sign
+                    else if (type == 73) { dropItem = 331; count = 4; } // Redstone ore
+                    else if (type == 74) { dropItem = 331; count = 4; } // Glowing redstone ore
+                    else if (type == 78) { dropItem = 0; } // Snow
+                    else if (type == 79) { dropItem = 0; } // Ice
+                    else if (type == 82) { dropItem = 337; count = 4; } // Clay
+                    else if (type == 83) { dropItem = 338; } // Reed
+                    else if (type == 89) { dropItem = 348; } // Lightstone
 
                     etc.getServer().setBlockAt(0, block.getX(), block.getY(), block.getZ());
 
-                    if (dropped > 0) {
+                    if (dropItem > 0) {
                         for (int i = 0; i < count; i++) {
                             etc.getServer().dropItem(block.getX(), block.getY(), block.getZ(),
-                                    dropped, i);
+                                    dropItem, i);
                         }
 
                         // Drop flint with gravel
                         if (type == 13) {
-                            if (rand.nextDouble() > 0.95) {
+                            if (rand.nextDouble() >= 0.9) {
                                 etc.getServer().dropItem(block.getX(), block.getY(), block.getZ(),
                                         318, 1);
                             }

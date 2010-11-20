@@ -1,4 +1,5 @@
 1.2
+- Block lag fix slightly improved in accuracy for item drops.
 - Sponge updated to remove water when the sponge block is set. Sponge radius
     can now be controlled using the 'sponge-radius' parameter and the
     default is now set to simulate Classic.
