@@ -550,29 +550,32 @@ public class WorldGuardListener extends PluginListener {
 
         return false;
     }
-
+    
     /*
-     * Called when lava wants to flow to a certain block.
-     * block status represents the type that wants to flow.
+     * Called when fluid wants to flow to a certain block.
      * (10 & 11 for lava and 8 & 9 for water)
      *
-     * @param block
-     *          the block beneath where the substance wants to flow to.
+     * @param blockFrom
+     *              the block where the fluid came from.
+     *              (blocktype = fluid type)
+     * @param blockTo
+     *              the block where fluid wants to flow to.
      *
-     * for example:
-     * lava want to flow to block x,y,z then the param block is the block x,y-1,z.
      *
      * @return true if you dont want the substance to flow.
      */
-    public boolean onFlow(Block block) {
-        int x = block.getX();
-        int y = block.getY();
-        int z = block.getZ();
+    public boolean onFlow(Block blockFrom, Block blockTo) {
+        int x = blockFrom.getX();
+        int y = blockFrom.getY();
+        int z = blockFrom.getZ();
 
-        if (simulateSponge && (block.getStatus() == 8 || block.getStatus() == 9)) {
-            int ox = block.getX();
-            int oy = block.getY() + 1;
-            int oz = block.getZ();
+        boolean isWater = blockFrom.getType() == 8 || blockFrom.getType() == 9;
+        boolean isLava = blockFrom.getType() == 10 || blockFrom.getType() == 11;
+
+        if (simulateSponge && isWater) {
+            int ox = blockFrom.getX();
+            int oy = blockFrom.getY() + 1;
+            int oz = blockFrom.getZ();
 
             Server server = etc.getServer();
 
@@ -587,16 +590,18 @@ public class WorldGuardListener extends PluginListener {
             }
         }
 
-        if (classicWater && (block.getStatus() == 8 || block.getStatus() == 9)) {
-            int blockBelow = etc.getServer().getBlockIdAt(block.getX(), block.getY(), block.getZ());
+        if (classicWater && isWater) {
+            int blockBelow = etc.getServer().getBlockIdAt(blockFrom.getX(), blockFrom.getY(), blockFrom.getZ());
             if (blockBelow != 0 && blockBelow != 8 && blockBelow != 9) {
-                etc.getServer().setBlockAt(9, block.getX(), block.getY() + 1, block.getZ());
+                etc.getServer().setBlockAt(9, blockFrom.getX(), blockFrom.getY() + 1, blockFrom.getZ());
                 return false;
             }
         }
 
-        if (allowedLavaSpreadOver != null && (block.getStatus() == 10 || block.getStatus() == 11)) {
-            if (!allowedLavaSpreadOver.contains(block.getType())) {
+        if (allowedLavaSpreadOver != null && isLava) {
+            int targetId = etc.getServer().getBlockIdAt(
+                    blockTo.getX(), blockTo.getY() - 1, blockTo.getZ());
+            if (!allowedLavaSpreadOver.contains(targetId)) {
                 return true;
             }
         }
