@@ -66,6 +66,11 @@ public class BlacklistEntry {
      * List of actions to perform on drop.
      */
     private String[] dropActions;
+    /**
+     * Comment for the log.
+     */
+    private String message;
+    private String comment;
 
     /**
      * Construct the object.
@@ -179,6 +184,34 @@ public class BlacklistEntry {
     }
 
     /**
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * @param message the message to set
+     */
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    /**
+     * @return the comment
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * @param comment the comment to set
+     */
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    /**
      * Returns true if this player should be ignored.
      *
      * @param player
@@ -206,7 +239,7 @@ public class BlacklistEntry {
         for (Player player : etc.getServer().getPlayerList()) {
             if (player.canUseCommand("/wprotectalerts")
                     || player.canUseCommand("/worldguardnotify")) {
-                player.sendMessage(Colors.LightPurple + "WorldGuard: " + str);
+                player.sendMessage(Colors.LightGray + "WG: " + str);
             }
         }
     }
@@ -242,7 +275,7 @@ public class BlacklistEntry {
 
         ActionHandler handler = new ActionHandler() {
             public void log(String itemName) {
-                blacklist.getLogger().logDestroyAttempt(player, block);
+                blacklist.getLogger().logDestroyAttempt(player, block, comment);
             }
             public void kick(String itemName) {
                 player.kick("You are not allowed to destroy " + itemName);
@@ -251,7 +284,8 @@ public class BlacklistEntry {
                 entry.banPlayer(player, "Banned: You are not allowed to destroy " + itemName);
             }
             public void notifyAdmins(String itemName) {
-                entry.notifyAdmins(player.getName() + " tried to destroy " + itemName + ".");
+                entry.notifyAdmins(player.getName() + " (destroy) " + itemName
+                        + (comment != null ? " (" + comment + ")" : "") + ".");
             }
             public void tell(String itemName) {
                 player.sendMessage(Colors.Yellow + "You are not allowed to destroy " + itemName + ".");
@@ -278,7 +312,7 @@ public class BlacklistEntry {
 
         ActionHandler handler = new ActionHandler() {
             public void log(String itemName) {
-                blacklist.getLogger().logBreakAttempt(player, block);
+                blacklist.getLogger().logBreakAttempt(player, block, comment);
             }
             public void kick(String itemName) {
                 player.kick("You are not allowed to break " + itemName);
@@ -287,7 +321,8 @@ public class BlacklistEntry {
                 entry.banPlayer(player, "Banned: You are not allowed to break " + itemName);
             }
             public void notifyAdmins(String itemName) {
-                entry.notifyAdmins(player.getName() + " tried to break " + itemName + ".");
+                entry.notifyAdmins(player.getName() + " (break) " + itemName
+                        + (comment != null ? " (" + comment + ")" : "") + ".");
             }
             public void tell(String itemName) {
                 player.sendMessage(Colors.Yellow + "You are not allowed to break " + itemName + ".");
@@ -313,7 +348,7 @@ public class BlacklistEntry {
 
         ActionHandler handler = new ActionHandler() {
             public void log(String itemName) {
-                blacklist.getLogger().logDestroyWithAttempt(player, item);
+                blacklist.getLogger().logDestroyWithAttempt(player, item, comment);
             }
             public void kick(String itemName) {
                 player.kick("You can't destroy with " + itemName);
@@ -322,7 +357,8 @@ public class BlacklistEntry {
                 entry.banPlayer(player, "Banned: You can't destroy with " + itemName);
             }
             public void notifyAdmins(String itemName) {
-                entry.notifyAdmins(player.getName() + " tried to destroyed with " + itemName + ".");
+                entry.notifyAdmins(player.getName() + " (destroy w/) " + itemName
+                        + (comment != null ? " (" + comment + ")" : "") + ".");
             }
             public void tell(String itemName) {
                 player.sendMessage(Colors.Yellow + "You can't destroy with " + itemName + ".");
@@ -348,19 +384,20 @@ public class BlacklistEntry {
 
         ActionHandler handler = new ActionHandler() {
             public void log(String itemName) {
-                blacklist.getLogger().logCreateAttempt(player, item);
+                blacklist.getLogger().logCreateAttempt(player, item, comment);
             }
             public void kick(String itemName) {
-                player.kick("You can't create " + itemName);
+                player.kick("You can't place " + itemName);
             }
             public void ban(String itemName) {
-                entry.banPlayer(player, "Banned: You can't create " + itemName);
+                entry.banPlayer(player, "Banned: You can't place " + itemName);
             }
             public void notifyAdmins(String itemName) {
-                entry.notifyAdmins(player.getName() + " tried to create " + itemName + ".");
+                entry.notifyAdmins(player.getName() + " (place) " + itemName
+                        + (comment != null ? " (" + comment + ")" : "") + ".");
             }
             public void tell(String itemName) {
-                player.sendMessage(Colors.Yellow + "You can't create " + itemName + ".");
+                player.sendMessage(Colors.Yellow + "You can't place " + itemName + ".");
             }
         };
 
@@ -383,7 +420,7 @@ public class BlacklistEntry {
 
         ActionHandler handler = new ActionHandler() {
             public void log(String itemName) {
-                blacklist.getLogger().logUseAttempt(player, block);
+                blacklist.getLogger().logUseAttempt(player, block, comment);
             }
             public void kick(String itemName) {
                 player.kick("You can't use " + itemName);
@@ -392,7 +429,8 @@ public class BlacklistEntry {
                 entry.banPlayer(player, "Banned: You can't use " + itemName);
             }
             public void notifyAdmins(String itemName) {
-                entry.notifyAdmins(player.getName() + " tried to use " + itemName + ".");
+                entry.notifyAdmins(player.getName() + " (use) " + itemName
+                        + (comment != null ? " (" + comment + ")" : "") + ".");
             }
             public void tell(String itemName) {
                 player.sendMessage(Colors.Yellow + "You're not allowed to use " + itemName + ".");
@@ -446,7 +484,7 @@ public class BlacklistEntry {
 
         ActionHandler handler = new ActionHandler() {
             public void log(String itemName) {
-                blacklist.getLogger().logDropAttempt(player, item);
+                blacklist.getLogger().logDropAttempt(player, item, comment);
             }
             public void kick(String itemName) {
                 player.kick("You can't drop " + itemName);
@@ -455,7 +493,8 @@ public class BlacklistEntry {
                 entry.banPlayer(player, "Banned: You can't drop " + itemName);
             }
             public void notifyAdmins(String itemName) {
-                entry.notifyAdmins(player.getName() + " tried to drop " + itemName + ".");
+                entry.notifyAdmins(player.getName() + " (drop) " + itemName
+                        + (comment != null ? " (" + comment + ")" : "") + ".");
             }
             public void tell(String itemName) {
                 player.sendMessage(Colors.Yellow + "You're not allowed to drop " + itemName + ".");
@@ -498,19 +537,47 @@ public class BlacklistEntry {
         boolean ret = true;
         
         for (String action : actions) {
+            // Deny
             if (action.equalsIgnoreCase("deny")) {
                 ret = false;
+
+            // Kick
             } else if (action.equalsIgnoreCase("kick")) {
-                handler.kick(etc.getDataSource().getItem(id));
+                if (this.message != null) {
+                    player.kick(String.format(this.message,
+                            etc.getDataSource().getItem(id)));
+                } else {
+                    handler.kick(etc.getDataSource().getItem(id));
+                }
+
+            // Ban
             } else if (action.equalsIgnoreCase("ban")) {
                 handler.ban(etc.getDataSource().getItem(id));
+                if (this.message != null) {
+                    banPlayer(player, "Banned: " + String.format(this.message,
+                            etc.getDataSource().getItem(id)));
+                } else {
+                    handler.ban(etc.getDataSource().getItem(id));
+                }
+            
             } else if (!repeating) {
+                // Notify
                 if (action.equalsIgnoreCase("notify")) {
                     handler.notifyAdmins(etc.getDataSource().getItem(id));
+                
+                // Log
                 } else if (action.equalsIgnoreCase("log")) {
                     handler.log(etc.getDataSource().getItem(id));
+
+                // Tell
                 } else if (!repeating && action.equalsIgnoreCase("tell")) {
-                    handler.tell(etc.getDataSource().getItem(id));
+                    if (this.message != null) {
+                        player.sendMessage(Colors.Yellow +
+                                String.format(message, etc.getDataSource().getItem(id))
+                                + ".");
+                    } else {
+                        handler.tell(etc.getDataSource().getItem(id));
+                    }
                 }
             }
         }

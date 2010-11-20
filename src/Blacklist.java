@@ -304,6 +304,10 @@ public class Blacklist {
                             entry.setUseActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-drop")) {
                             entry.setDropActions(parts[1].split(","));
+                        } else if (parts[0].equalsIgnoreCase("message")) {
+                            entry.setMessage(parts[1].trim());
+                        } else if (parts[0].equalsIgnoreCase("comment")) {
+                            entry.setComment(parts[1].trim());
                         } else {
                             unknownOption = true;
                         }

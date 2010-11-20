@@ -12,5 +12,10 @@ CREATE TABLE `blacklist_events` (
   `z` int(11) NOT NULL,
   `item` int(11) NOT NULL,
   `time` int(11) NOT NULL,
+  `comment` varchar(255) NULL,
   PRIMARY KEY (`id`)
 );
+
+-- Required update if you have an older version of the table:
+
+ALTER TABLE `blacklist_events` ADD `comment` VARCHAR( 255 ) NULL 

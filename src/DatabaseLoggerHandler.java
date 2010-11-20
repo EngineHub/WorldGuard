@@ -91,14 +91,16 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param y
      * @param z
      * @param item
+     * @param comment
      */
-    private void logEvent(String event, String name, int x, int y, int z, int item) {
+    private void logEvent(String event, String name, int x, int y, int z, int item,
+            String comment) {
         try {
             Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO " + table
-                  + "(event, player, x, y, z, item, time) VALUES "
-                  + "(?, ?, ?, ?, ?, ?, ?)");
+                  + "(event, player, x, y, z, item, time, comment) VALUES "
+                  + "(?, ?, ?, ?, ?, ?, ?, ?)");
             stmt.setString(1, event);
             stmt.setString(2, name);
             stmt.setInt(3, x);
@@ -106,6 +108,7 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
             stmt.setInt(5, z);
             stmt.setInt(6, item);
             stmt.setInt(7, (int)(System.currentTimeMillis() / 1000));
+            stmt.setString(8, comment);
             stmt.executeUpdate();
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Failed to log blacklist event to database: "
@@ -119,9 +122,10 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logDestroyAttempt(Player player, Block block) {
+    public void logDestroyAttempt(Player player, Block block, String comment) {
         logEvent("DESTROY", player.getName(),
-                block.getX(), block.getY(), block.getZ(), block.getType());
+                block.getX(), block.getY(), block.getZ(), block.getType(),
+                comment);
     }
 
     /**
@@ -130,9 +134,10 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logBreakAttempt(Player player, Block block) {
+    public void logBreakAttempt(Player player, Block block, String comment) {
         logEvent("BREAK", player.getName(),
-                block.getX(), block.getY(), block.getZ(), block.getType());
+                block.getX(), block.getY(), block.getZ(), block.getType(),
+                comment);
     }
 
     /**
@@ -141,9 +146,10 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block) {
+    public void logUseAttempt(Player player, Block block, String comment) {
         logEvent("USE", player.getName(),
-                block.getX(), block.getY(), block.getZ(), block.getType());
+                block.getX(), block.getY(), block.getZ(), block.getType(),
+                comment);
     }
     
     /**
@@ -152,10 +158,10 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logDestroyWithAttempt(Player player, int item) {
+    public void logDestroyWithAttempt(Player player, int item, String comment) {
         logEvent("DESTROY_WITH", player.getName(),
                 (int)Math.floor(player.getX()), (int)Math.floor(player.getY()),
-                (int)Math.floor(player.getZ()), item);
+                (int)Math.floor(player.getZ()), item, comment);
     }
 
     /**
@@ -164,10 +170,10 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item) {
+    public void logCreateAttempt(Player player, int item, String comment) {
         logEvent("CREATE", player.getName(),
                 (int)Math.floor(player.getX()), (int)Math.floor(player.getY()),
-                (int)Math.floor(player.getZ()), item);
+                (int)Math.floor(player.getZ()), item, comment);
     }
 
     /**
@@ -176,10 +182,10 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logDropAttempt(Player player, int item) {
+    public void logDropAttempt(Player player, int item, String comment) {
         logEvent("DROP", player.getName(),
                 (int)Math.floor(player.getX()), (int)Math.floor(player.getY()),
-                (int)Math.floor(player.getZ()), item);
+                (int)Math.floor(player.getZ()), item, comment);
     }
 
     /**

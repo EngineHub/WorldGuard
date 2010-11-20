@@ -15,6 +15,8 @@
 #
 # Options:
 # - ignore-groups (comma-delimited list of groups to not affect)
+# - comment (message for yourself that is printed with 'log' and 'notify')
+# - message (optional message to show the user instead; %s is the item name)
 #
 # Events:
 # - on-destroy (when a block of this type is being destroyed)
@@ -72,3 +74,8 @@
 
 #[lever]
 #on-break=deny
+
+#[diamondpickaxe,woodpickaxe]
+#on-drop=deny
+#comment=durability cheat
+#message=Your item was destroyed

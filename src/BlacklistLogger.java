@@ -64,9 +64,9 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logDestroyAttempt(Player player, Block block) {
+    public void logDestroyAttempt(Player player, Block block, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {
-            handler.logDestroyAttempt(player, block);
+            handler.logDestroyAttempt(player, block, comment);
         }
     }
 
@@ -76,9 +76,9 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logBreakAttempt(Player player, Block block) {
+    public void logBreakAttempt(Player player, Block block, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {
-            handler.logBreakAttempt(player, block);
+            handler.logBreakAttempt(player, block, comment);
         }
     }
 
@@ -88,9 +88,9 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block) {
+    public void logUseAttempt(Player player, Block block, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {
-            handler.logUseAttempt(player, block);
+            handler.logUseAttempt(player, block, comment);
         }
     }
 
@@ -100,9 +100,9 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logDestroyWithAttempt(Player player, int item) {
+    public void logDestroyWithAttempt(Player player, int item, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {
-            handler.logDestroyWithAttempt(player, item);
+            handler.logDestroyWithAttempt(player, item, comment);
         }
     }
 
@@ -112,9 +112,9 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item) {
+    public void logCreateAttempt(Player player, int item, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {
-            handler.logCreateAttempt(player, item);
+            handler.logCreateAttempt(player, item, comment);
         }
     }
 
@@ -124,9 +124,9 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logDropAttempt(Player player, int item) {
+    public void logDropAttempt(Player player, int item, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {
-            handler.logDropAttempt(player, item);
+            handler.logDropAttempt(player, item, comment);
         }
     }
 

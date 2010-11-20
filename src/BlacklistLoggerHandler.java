@@ -29,42 +29,42 @@ public interface BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logDestroyAttempt(Player player, Block block);
+    public void logDestroyAttempt(Player player, Block block, String comment);
     /**
      * Log a block break attempt.
      *
      * @param player
      * @param block
      */
-    public void logBreakAttempt(Player player, Block block);
+    public void logBreakAttempt(Player player, Block block, String comment);
     /**
      * Log a right click on attempt.
      * 
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block);
+    public void logUseAttempt(Player player, Block block, String comment);
     /**
      * Right a left click attempt.
      * 
      * @param player
      * @param item
      */
-    public void logDestroyWithAttempt(Player player, int item);
+    public void logDestroyWithAttempt(Player player, int item, String comment);
     /**
      * Log a right click attempt.
      * 
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item);
+    public void logCreateAttempt(Player player, int item, String comment);
     /**
      * Log a drop attempt.
      *
      * @param player
      * @param item
      */
-    public void logDropAttempt(Player player, int item);
+    public void logDropAttempt(Player player, int item, String comment);
     /**
      * Close the logger.
      */

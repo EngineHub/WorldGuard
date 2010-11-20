@@ -36,9 +36,10 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logDestroyAttempt(Player player, Block block) {
+    public void logDestroyAttempt(Player player, Block block, String comment) {
         logger.log(Level.INFO, "WorldGuard: " + player.getName()
-                + " tried to destroy " + getFriendlyItemName(block.getType()));
+                + " tried to destroy " + getFriendlyItemName(block.getType())
+                + (comment != null ? " (" + comment + ")" : ""));
     }
 
     /**
@@ -47,9 +48,10 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logBreakAttempt(Player player, Block block) {
+    public void logBreakAttempt(Player player, Block block, String comment) {
         logger.log(Level.INFO, "WorldGuard: " + player.getName()
-                + " tried to break " + getFriendlyItemName(block.getType()));
+                + " tried to break " + getFriendlyItemName(block.getType())
+                + (comment != null ? " (" + comment + ")" : ""));
     }
 
     /**
@@ -58,9 +60,10 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block) {
+    public void logUseAttempt(Player player, Block block, String comment) {
         logger.log(Level.INFO, "WorldGuard: " + player.getName()
-                + " tried to use " + getFriendlyItemName(block.getType()));
+                + " tried to use " + getFriendlyItemName(block.getType())
+                + (comment != null ? " (" + comment + ")" : ""));
     }
     
     /**
@@ -69,9 +72,10 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logDestroyWithAttempt(Player player, int item) {
+    public void logDestroyWithAttempt(Player player, int item, String comment) {
         logger.log(Level.INFO, "WorldGuard: " + player.getName()
-                + " tried to destroy with " + getFriendlyItemName(item));
+                + " tried to destroy with " + getFriendlyItemName(item)
+                + (comment != null ? " (" + comment + ")" : ""));
     }
 
     /**
@@ -80,9 +84,10 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item) {
+    public void logCreateAttempt(Player player, int item, String comment) {
         logger.log(Level.INFO, "WorldGuard: " + player.getName()
-                + " tried to create " + getFriendlyItemName(item));
+                + " tried to create " + getFriendlyItemName(item)
+                + (comment != null ? " (" + comment + ")" : ""));
     }
 
     /**
@@ -91,9 +96,10 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logDropAttempt(Player player, int item) {
+    public void logDropAttempt(Player player, int item, String comment) {
         logger.log(Level.INFO, "WorldGuard: " + player.getName()
-                + " tried to drop " + getFriendlyItemName(item));
+                + " tried to drop " + getFriendlyItemName(item)
+                + (comment != null ? " (" + comment + ")" : ""));
     }
 
     /**

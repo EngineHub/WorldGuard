@@ -143,11 +143,12 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param message
      */
-    private void log(Player player, String message) {
+    private void log(Player player, String message, String comment) {
         String path = buildPath(player.getName());
         try {
             String date = dateFormat.format(new Date());
-            String line = "[" + date + "] " + player.getName() + ": " + message + "\r\n";
+            String line = "[" + date + "] " + player.getName() + ": " + message
+                    + (comment != null ? " (" + comment + ")" : "") + "\r\n";
             
             FileLoggerWriter writer = writers.get(path);
 
@@ -211,8 +212,9 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logDestroyAttempt(Player player, Block block) {
-        log(player, "Tried to destroy " + getFriendlyItemName(block.getType()));
+    public void logDestroyAttempt(Player player, Block block, String comment) {
+        log(player, "Tried to destroy " + getFriendlyItemName(block.getType()),
+                comment);
     }
 
     /**
@@ -221,8 +223,9 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logBreakAttempt(Player player, Block block) {
-        log(player, "Tried to break " + getFriendlyItemName(block.getType()));
+    public void logBreakAttempt(Player player, Block block, String comment) {
+        log(player, "Tried to break " + getFriendlyItemName(block.getType()),
+                comment);
     }
 
     /**
@@ -231,8 +234,9 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block) {
-        log(player, "Tried to use " + getFriendlyItemName(block.getType()));
+    public void logUseAttempt(Player player, Block block, String comment) {
+        log(player, "Tried to use " + getFriendlyItemName(block.getType()),
+                comment);
     }
 
     /**
@@ -241,8 +245,8 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logDestroyWithAttempt(Player player, int item) {
-        log(player, "Tried to destroy with " + getFriendlyItemName(item));
+    public void logDestroyWithAttempt(Player player, int item, String comment) {
+        log(player, "Tried to destroy with " + getFriendlyItemName(item), comment);
     }
 
     /**
@@ -251,8 +255,8 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item) {
-        log(player, "Tried to create " + getFriendlyItemName(item));
+    public void logCreateAttempt(Player player, int item, String comment) {
+        log(player, "Tried to create " + getFriendlyItemName(item), comment);
     }
 
     /**
@@ -261,8 +265,8 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logDropAttempt(Player player, int item) {
-        log(player, "Tried to drop " + getFriendlyItemName(item));
+    public void logDropAttempt(Player player, int item, String comment) {
+        log(player, "Tried to drop " + getFriendlyItemName(item), comment);
     }
 
     /**
