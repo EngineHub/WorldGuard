@@ -18,12 +18,12 @@ use or not:
 - Restrict lava spreading to only some block types.
 - Simulate classic-esque water by letting water infinitely expand in
     area (only if there is a block underneath).
-- Simulate the sponge.
-- Block the use, destruction and/or placement of some items or block types.
-- Notify admins when a certain block type or item is used, destroyed,
-    or place.
-- Log the use, destruction, and/or placement of some blocks/items.
-- Kick for the use, destruction, and/or placement of some blocks.
+- Simulate the function of the sponge from Minecraft Classic.
+- Notify admins, block, log, kick or ban for the use of certain block types
+    or items.
+- Temporarily stop fire globally with some commands.
+- Fix the block lag.
+- Destroy tools on drop to alleviate the durability cheat.
 
 hMod is required as WorldGuard is a plugin for hMod.
 
@@ -169,5 +169,8 @@ Server Commands
 Blacklists
 ----------
 
+Blacklists let you control the use of blocks and items. You can have
+certain rules apply to only some groups.
+
 Edit the included worldguard-blacklist.txt file and follow the
-instructions inside.
+instructions inside. The file comes with the download for WorldGuard.
