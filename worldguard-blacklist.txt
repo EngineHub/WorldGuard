@@ -18,6 +18,7 @@
 #
 # Events:
 # - on-destroy (when a block of this type is being destroyed)
+# - on-break (when a block of this type is about to be broken)
 # - on-destroy-with (the item/block held by the user while destroying)
 # - on-create (the item/block in the user's inventory is being created)
 # - on-use (the block is right clicked)
@@ -68,3 +69,6 @@
 
 #[cobblestone]
 #on-create=deny,tell,log
+
+#[lever]
+#on-break=deny

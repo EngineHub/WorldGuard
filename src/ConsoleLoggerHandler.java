@@ -29,7 +29,7 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * Logger.
      */
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-    
+
     /**
      * Log a block destroy attempt.
      *
@@ -39,6 +39,17 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
     public void logDestroyAttempt(Player player, Block block) {
         logger.log(Level.INFO, "WorldGuard: " + player.getName()
                 + " tried to destroy " + getFriendlyItemName(block.getType()));
+    }
+
+    /**
+     * Log a block break attempt.
+     *
+     * @param player
+     * @param block
+     */
+    public void logBreakAttempt(Player player, Block block) {
+        logger.log(Level.INFO, "WorldGuard: " + player.getName()
+                + " tried to break " + getFriendlyItemName(block.getType()));
     }
 
     /**

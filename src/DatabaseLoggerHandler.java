@@ -112,7 +112,7 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
                     + e.getMessage());
         }
     }
-    
+
     /**
      * Log a block destroy attempt.
      *
@@ -121,6 +121,17 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      */
     public void logDestroyAttempt(Player player, Block block) {
         logEvent("DESTROY", player.getName(),
+                block.getX(), block.getY(), block.getZ(), block.getType());
+    }
+
+    /**
+     * Log a block break attempt.
+     *
+     * @param player
+     * @param block
+     */
+    public void logBreakAttempt(Player player, Block block) {
+        logEvent("BREAK", player.getName(),
                 block.getX(), block.getY(), block.getZ(), block.getType());
     }
 

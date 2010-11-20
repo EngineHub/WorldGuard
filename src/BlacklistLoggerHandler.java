@@ -31,6 +31,13 @@ public interface BlacklistLoggerHandler {
      */
     public void logDestroyAttempt(Player player, Block block);
     /**
+     * Log a block break attempt.
+     *
+     * @param player
+     * @param block
+     */
+    public void logBreakAttempt(Player player, Block block);
+    /**
      * Log a right click on attempt.
      * 
      * @param player

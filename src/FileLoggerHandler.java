@@ -216,6 +216,16 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     }
 
     /**
+     * Log a block break attempt.
+     *
+     * @param player
+     * @param block
+     */
+    public void logBreakAttempt(Player player, Block block) {
+        log(player, "Tried to break " + getFriendlyItemName(block.getType()));
+    }
+
+    /**
      * Log a right click on attempt.
      *
      * @param player

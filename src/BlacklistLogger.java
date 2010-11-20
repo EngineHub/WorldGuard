@@ -71,6 +71,18 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
     }
 
     /**
+     * Log a block break attempt.
+     *
+     * @param player
+     * @param block
+     */
+    public void logBreakAttempt(Player player, Block block) {
+        for (BlacklistLoggerHandler handler : handlers) {
+            handler.logBreakAttempt(player, block);
+        }
+    }
+
+    /**
      * Log a right click on attempt.
      *
      * @param player

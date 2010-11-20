@@ -93,6 +93,28 @@ public class Blacklist {
     }
 
     /**
+     * Called on block break. Returns true to let the action pass
+     * through.
+     *
+     * @param block
+     * @param player
+     * @return
+     */
+    public boolean onBreak(final Block block, final Player player) {
+        List<BlacklistEntry> entries = getEntries(block.getType());
+        if (entries == null) {
+            return true;
+        }
+        boolean ret = true;
+        for (BlacklistEntry entry : entries) {
+            if (!entry.onBreak(block, player)) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Called on left click. Returns true to let the action pass through.
      *
      * @param item
@@ -269,6 +291,8 @@ public class Blacklist {
                             entry.setIgnoreGroups(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-destroy")) {
                             entry.setDestroyActions(parts[1].split(","));
+                        } else if (parts[0].equalsIgnoreCase("on-break")) {
+                            entry.setBreakActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-left")
                                 || parts[0].equalsIgnoreCase("on-destroy-with")) {
                             entry.setDestroyWithActions(parts[1].split(","));

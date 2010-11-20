@@ -47,6 +47,10 @@ public class BlacklistEntry {
      */
     private String[] destroyActions;
     /**
+     * List of actions to perform on break.
+     */
+    private String[] breakActions;
+    /**
      * List of actions to perform on left click.
      */
     private String[] destroyWithActions;
@@ -102,6 +106,20 @@ public class BlacklistEntry {
      */
     public void setDestroyActions(String[] actions) {
         this.destroyActions = actions;
+    }
+
+    /**
+     * @return
+     */
+    public String[] getBreakActions() {
+        return breakActions;
+    }
+
+    /**
+     * @param actions
+     */
+    public void setBreakActions(String[] actions) {
+        this.breakActions = actions;
     }
 
     /**
@@ -241,6 +259,42 @@ public class BlacklistEntry {
         };
 
         return process(block.getType(), player, destroyActions, handler);
+    }
+
+    /**
+     * Called on block break. Returns true to let the action pass
+     * through.
+     *
+     * @param block
+     * @param player
+     * @return
+     */
+    public boolean onBreak(final Block block, final Player player) {
+        if (breakActions == null) {
+            return true;
+        }
+
+        final BlacklistEntry entry = this;
+
+        ActionHandler handler = new ActionHandler() {
+            public void log(String itemName) {
+                blacklist.getLogger().logBreakAttempt(player, block);
+            }
+            public void kick(String itemName) {
+                player.kick("You are not allowed to break " + itemName);
+            }
+            public void ban(String itemName) {
+                entry.banPlayer(player, "Banned: You are not allowed to break " + itemName);
+            }
+            public void notifyAdmins(String itemName) {
+                entry.notifyAdmins(player.getName() + " tried to break " + itemName + ".");
+            }
+            public void tell(String itemName) {
+                player.sendMessage(Colors.Yellow + "You are not allowed to break " + itemName + ".");
+            }
+        };
+
+        return process(block.getType(), player, breakActions, handler);
     }
 
     /**

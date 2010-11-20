@@ -517,6 +517,23 @@ public class WorldGuardListener extends PluginListener {
     }
 
     /**
+     * Called when a person actually breaks the block.
+     *
+     * @param player
+     * @param block
+     * @return
+     */
+    public boolean onBlockBreak(Player player, Block block) {
+        if (blacklist != null) {
+            if (!blacklist.onBreak(block, player)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Called when either a sign, chest or furnace is changed.
      *
      * @param player
