@@ -55,7 +55,7 @@ public class WorldGuardListener extends PluginListener {
      */
     private WorldGuard plugin;
     /**
-     * Properties file for CraftBook.
+     * Properties file for WorldGuard.
      */
     private PropertiesFile properties = new PropertiesFile("worldguard.properties");
     /**
