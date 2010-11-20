@@ -395,6 +395,10 @@ public class WorldGuardListener extends PluginListener {
                             }
                         }
                     }
+
+                    // Now loop this hook back through!
+                    block.setStatus(3); // Block is destroyed
+                    canDestroyBlock(player, block);
                 }
 
                 return true;
