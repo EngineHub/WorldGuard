@@ -585,15 +585,6 @@ public class WorldGuardListener extends PluginListener {
                 if (!blacklist.onSilentUse(block, player)) {
                     return true;
                 }
-            } else if (complexBlock instanceof Sign) {
-                int id = etc.getServer().getBlockIdAt(complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
-                Block block = new Block(id, complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
-
-                if (!blacklist.onSilentUse(block, player)) {
-                    return true;
-                }
             }
         }
         
