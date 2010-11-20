@@ -154,6 +154,11 @@ public class WorldGuardListener extends PluginListener {
 
         // Load the blacklist
         try {
+            // If there was an existing blacklist, close loggers
+            if (blacklist != null) {
+                blacklist.getLogger().close();
+            }
+
             // First load the blacklist data from worldguard-blacklist.txt
             Blacklist blacklist = new Blacklist();
             blacklist.load(new File("worldguard-blacklist.txt"));
@@ -634,6 +639,15 @@ public class WorldGuardListener extends PluginListener {
             return true;
         } finally {
             plugin.toggleEnabled();
+        }
+    }
+
+    /**
+     * Call to disable the plugin.
+     */
+    public void disable() {
+        if (blacklist != null) {
+            blacklist.getLogger().close();
         }
     }
 }

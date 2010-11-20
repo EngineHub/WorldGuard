@@ -90,6 +90,7 @@ public class WorldGuard extends Plugin {
     @Override
     public void disable() {
         try {
+            listener.disable();
             BlacklistEntry.forgetAllPlayers();
         } catch (Throwable t) {
         }
