@@ -1,4 +1,7 @@
 1.3
+- UPGRADE WARNING: If you are using database logging, you must add a
+    NULL 'comment' VARCHAR field to the table. The line of SQL that you
+    can run for MySQL can be found in blacklist_table.sql.
 - Improved plugin compatibility with the block lag fix. For maximum
     compatibility, you must now list WorldGuard as the first plugin in
     server.properties and you cannot reload or enable the plugin
