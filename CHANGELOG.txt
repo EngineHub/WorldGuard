@@ -1,3 +1,33 @@
+1.2
+- Blacklist system has been overhauled. Check README.txt for changed
+    configuration settings!
+- The blacklist's method of preventing notification repeats is now better,
+    instead waiting 3 seconds before notifying again (before it didn't
+    notify again at all unless the user started using another blocked
+    action).
+- To give users the ability to receive notifications, the command to give
+    permission to has been changed to /worldguardnotify, although the
+    old one (that was never mentioned anywhere) still works.
+- Water and lava buckets are now psuedo-blocked using an unreliable
+    method that risks the stability of your server (no other plugin
+    does it better though). Use it as your own risk.
+- Added on item drop and on item use (i.e. chest) events.
+- Chests, signs, and furnaces can now be blocked better with the
+    blacklist system.
+- The event names in the blacklist configuration have changed but the old
+    event names should still work. The new names should make "more sense."
+- A new "ban" action has been added to the blacklist.
+- Action messages have been improved, now longer saying "destroyed"
+    for everything.
+- Logging to file has been completely changed, allowing you to use
+    the date and time and the player's username in the log filename. It
+    no longer rotates log files based on size, however.
+- Logging to database is now supported.
+- Tools can now be destroyed on drop to alleviate the durability cheat.
+    You can do this with either with the blacklist or with the
+    'item-drop-blacklist' configuration option. The configuration option
+    prints more friendly messages than the 'tell' action of blacklists.
+
 1.1.2
 - Block lag fix: Snow and glass should no longer drop items.
 - Block lag fix: Block object now reset after hook call.

@@ -3,30 +3,45 @@
 # are ignored so you can put your own notes.
 #
 # Format:
-# [item1,item2,itemN]
+# [item1,item2]
 # option1=options
-# event1=action1,action2,actionN
-# eventN=action1,action2,actionN
+# event1=whatToDo1,whatToDo2,whatToDo3
+# event2=whatToDo1,whatToDo2
 #
-# Events/Options:
+# Example to block ore and catch some events:
+# [coalore,goldore,ironore]
+# on-destroy-with=deny,log,kick
+# on-create=deny,tell
+#
+# Options:
 # - ignore-groups (comma-delimited list of groups to not affect)
-# - on-destroy (when a block of this type is destroyed)
-# - on-left (when this item is held and the player is left clicking)
-# - on-right (when this item is held and the player is right clicking)
 #
-# Actions:
+# Events:
+# - on-destroy (when a block of this type is being destroyed)
+# - on-destroy-with (the item/block held by the user while destroying)
+# - on-create (the item/block in the user's inventory is being created)
+# - on-use (the block is right clicked)
+# - on-drop (the item is being dropped from the player's inventory)
+#
+# Actions (for events):
 # - deny (deny completely)
 # - notify (notify admins)
-# - log (log to console/file)
-# - kick (kick player)
+# - log (log to console/file/database)
 # - tell (tell a player that that's not allowed)
+# - kick (kick player)
+# - ban (ban player)
 #
-# Some examples follow.
+# Users with the /worldguardnotify permission will be receive notifications.
 #
+# Some examples follow. Remember to remove # in front if you want them
+# to work for you!
+
 #[lavabucket]
-#on-left=deny,log,kick
-#on-right=deny,tell
+#on-destroy-with=deny,log,kick
+#on-create=deny,tell
+
 #[coalore,goldore,ironore]
 #on-destroy=notify,deny,log
+
 #[cobblestone]
-#on-right=deny,tell,log
+#on-create=deny,tell,log

@@ -53,30 +53,11 @@ WorldGuard on your server. You can either restart your server or use
     the server when s/he logs in, the other player will be kicked with
     an informative message. The inventory will have been saved before
     the new session starts.
-
-- blacklist-log-console (def. true)
-    For log actions, print to console as well.
-
-- blacklist-log-file (no default)
-    File to log to. Log files are automatically rotated based on size, and
-    you can use these patterns in the path:
-        %t the system temporary directory
-        %h the value of the "user.home" system property
-        %g the generation number to distinguish rotated logs
-        %u a unique number to resolve conflicts
-        %% translates to a single percent sign "%"
-    There is no way to put the date in the filename or rotate by date.
-
-- blacklist-log-file-limit (def. 5242880)
-    Size in bytes before the log file is rotated.
-
-- blacklist-log-file-count (def. 10)
-    Number of log files to keep in rotation at maximum.
-
+    
 - block-tnt (def. false)
     Block TNT explosions. TNT will still explode client-side but the blocks
     will be "restored" in a few seconds afterwards.
-
+    
 - block-lighter (def. false)
     Block flint and steel fires. Those with access to the commands
     /uselighter or /lighter can bypass this. /uselighter is not a real
@@ -100,8 +81,68 @@ WorldGuard on your server. You can either restart your server or use
     to disable this feature. Enabling disable-all-fire-spread will
     override this function.
 
+- item-drop-blacklist (no default)
+    List of block names/IDs to destroy on drop. This can alleviate the
+    durability cheat that allows you to drop your tools to fix their
+    durability. You can also enforce this with the blacklist but
+    this is an easier way to do it (this way also prints a more
+    friendly message than if you used the 'tell' action of the blacklist).
+
 - block-lag-fix (def. false)
     Attempts to fix block lag.
+
+- log-console (def. true)
+    For blacklist log actions, print to console.
+
+- log-file (def. false)
+    For blacklist log actions, log to file.
+    
+- log-file-path (def. "worldguard/logs/%Y-%m-%d.log")
+    Log blacklist events to file. You can use these patterns in the path:
+        %Y the year (YYYY)
+        %m the month (MM)
+        %d the day (DD)
+        %W the week of the year (00-52)
+        %H 24-hour time (HH)
+        %h 12-hour time (HH)
+        %i the minute (mm)
+        %s the second (ss)
+        %u the user's name
+        %% translates to a single percent sign "%"
+    The files are not automatically rotated if they get large so you should
+    perhaps put a week in the filename at least.
+    
+    Escape backslashes with another backslash, like so:
+    C:\path\to\log.txt -> C:\\path\\to\\log.txt
+
+- log-file-open-files (def. 10)
+    The number of log files to keep open at once. Unless you use dynamic
+    patterns in the path, the value of this variable won't matter. However,
+    if, for example, you use a player's username in the filename and you
+    have many users who cause logged events to occur, files would have
+    to be opened for each user and this parameter would matter.
+
+- log-database (def. false)
+    Log blacklist events to database.
+
+- log-database-dsn (def. "jdbc:mysql://localhost:3306/minecraft")
+    Connection string. A string to use for MySQL would be:
+    jdbc:mysql://localhost:3306/minecraft
+    The "minecraft" part at the end is the database name.
+    
+    Escape colons with a backslash, like so:
+    jdbc:mysql://localhost:3306/minecraft
+    ->
+    jdbc\:mysql\://localhost\:3306/minecraft
+
+- log-database-user (def. "root")
+    Database username.
+
+- log-database-pass (def. "")
+    Database password.
+
+- log-database-table (def. "blacklist_events")
+    Database table to use.
 
 Blacklists
 ----------

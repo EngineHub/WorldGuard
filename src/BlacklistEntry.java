@@ -32,12 +32,12 @@ public class BlacklistEntry {
     /**
      * Used to prevent spamming.
      */
-    private static Map<String,Integer> lastAffected =
-            new HashMap<String,Integer>();
+    private static Map<String,BlacklistTrackedEvent> lastAffected =
+            new HashMap<String,BlacklistTrackedEvent>();
     /**
-     * Logger.
+     * Parent blacklist entry.
      */
-    private static final Logger logger = Logger.getLogger("WorldGuard.Blacklist");
+    private Blacklist blacklist;
     /**
      * List of groups to not affect.
      */
@@ -49,15 +49,28 @@ public class BlacklistEntry {
     /**
      * List of actions to perform on left click.
      */
-    private String[] leftClickActions;
+    private String[] destroyWithActions;
     /**
      * List of actions to perform on right click.
      */
-    private String[] rightClickActions;
+    private String[] createActions;
     /**
      * List of actions to perform on right click upon.
      */
-    private String[] rightClickOnActions;
+    private String[] useActions;
+    /**
+     * List of actions to perform on drop.
+     */
+    private String[] dropActions;
+
+    /**
+     * Construct the object.
+     * 
+     * @param blacklist
+     */
+    public BlacklistEntry(Blacklist blacklist) {
+        this.blacklist = blacklist;
+    }
 
     /**
      * @return the ignoreGroups
@@ -78,59 +91,73 @@ public class BlacklistEntry {
     }
 
     /**
-     * @return the destroyActions
+     * @return
      */
     public String[] getDestroyActions() {
         return destroyActions;
     }
 
     /**
-     * @param destroyActions the destroyActions to set
+     * @param actions
      */
-    public void setDestroyActions(String[] destroyActions) {
-        this.destroyActions = destroyActions;
-    }
-
-    /**
-     * @return the leftClickActions
-     */
-    public String[] getLeftClickActions() {
-        return leftClickActions;
-    }
-
-    /**
-     * @param leftClickActions the leftClickActions to set
-     */
-    public void setLeftClickActions(String[] leftClickActions) {
-        this.leftClickActions = leftClickActions;
-    }
-
-    /**
-     * @return the rightClickActions
-     */
-    public String[] getRightClickActions() {
-        return rightClickActions;
-    }
-
-    /**
-     * @param rightClickActions the rightClickActions to set
-     */
-    public void setRightClickActions(String[] rightClickActions) {
-        this.rightClickActions = rightClickActions;
+    public void setDestroyActions(String[] actions) {
+        this.destroyActions = actions;
     }
 
     /**
      * @return
      */
-    public String[] getRightClickOnActions() {
-        return rightClickOnActions;
+    public String[] getDestroyWithActions() {
+        return destroyWithActions;
+    }
+
+    /**
+     * @param action
+     */
+    public void setDestroyWithActions(String[] actions) {
+        this.destroyWithActions = actions;
+    }
+
+    /**
+     * @return the rightClickActions
+     */
+    public String[] getCreateActions() {
+        return createActions;
     }
 
     /**
      * @param actions
      */
-    public void setRightClickOnActions(String[] actions) {
-        this.rightClickOnActions = actions;
+    public void setCreateActions(String[] actions) {
+        this.createActions = actions;
+    }
+
+    /**
+     * @return
+     */
+    public String[] getUseActions() {
+        return useActions;
+    }
+
+    /**
+     * @param actions
+     */
+    public void setUseActions(String[] actions) {
+        this.useActions = actions;
+    }
+
+    /**
+     * @return
+     */
+    public String[] getDropActions() {
+        return dropActions;
+    }
+
+    /**
+     * @param actions
+     */
+    public void setDropActions(String[] actions) {
+        this.dropActions = actions;
     }
 
     /**
@@ -159,19 +186,25 @@ public class BlacklistEntry {
      */
     public void notifyAdmins(String str) {
         for (Player player : etc.getServer().getPlayerList()) {
-            if (player.canUseCommand("/wprotectalerts")) {
+            if (player.canUseCommand("/wprotectalerts")
+                    || player.canUseCommand("/worldguardnotify")) {
                 player.sendMessage(Colors.LightPurple + "WorldGuard: " + str);
             }
         }
     }
 
     /**
-     * Log a message.
+     * Ban a player.
      * 
-     * @param message
+     * @param player
+     * @param msg
      */
-    public void log(String message) {
-        logger.log(Level.INFO, message);
+    public void banPlayer(Player player, String msg) {
+        etc.getServer().ban(player.getName());
+        etc.getLoader().callHook(PluginLoader.Hook.BAN, new Object[]{
+            player.getUser(), player.getUser(), msg
+        });
+        player.kick(msg);
     }
 
     /**
@@ -182,13 +215,32 @@ public class BlacklistEntry {
      * @param player
      * @return
      */
-    public boolean onDestroy(Block block, Player player) {
+    public boolean onDestroy(final Block block, final Player player) {
         if (destroyActions == null) {
             return true;
         }
-        boolean ret = process(block.getType(), player, destroyActions);
-        lastAffected.put(player.getName(), block.getType());
-        return ret;
+
+        final BlacklistEntry entry = this;
+
+        ActionHandler handler = new ActionHandler() {
+            public void log(String itemName) {
+                blacklist.getLogger().logDestroyAttempt(player, block);
+            }
+            public void kick(String itemName) {
+                player.kick("You are not allowed to destroy " + itemName);
+            }
+            public void ban(String itemName) {
+                entry.banPlayer(player, "Banned: You are not allowed to destroy " + itemName);
+            }
+            public void notifyAdmins(String itemName) {
+                entry.notifyAdmins(player.getName() + " tried to destroy " + itemName + ".");
+            }
+            public void tell(String itemName) {
+                player.sendMessage(Colors.Yellow + "You are not allowed to destroy " + itemName + ".");
+            }
+        };
+
+        return process(block.getType(), player, destroyActions, handler);
     }
 
     /**
@@ -198,13 +250,32 @@ public class BlacklistEntry {
      * @param player
      * @return
      */
-    public boolean onLeftClick(int item, Player player) {
-        if (leftClickActions == null) {
+    public boolean onDestroyWith(final int item, final Player player) {
+        if (destroyWithActions == null) {
             return true;
         }
-        boolean ret = process(item, player, leftClickActions);
-        lastAffected.put(player.getName(), item);
-        return ret;
+
+        final BlacklistEntry entry = this;
+
+        ActionHandler handler = new ActionHandler() {
+            public void log(String itemName) {
+                blacklist.getLogger().logDestroyWithAttempt(player, item);
+            }
+            public void kick(String itemName) {
+                player.kick("You can't destroy with " + itemName);
+            }
+            public void ban(String itemName) {
+                entry.banPlayer(player, "Banned: You can't destroy with " + itemName);
+            }
+            public void notifyAdmins(String itemName) {
+                entry.notifyAdmins(player.getName() + " tried to destroyed with " + itemName + ".");
+            }
+            public void tell(String itemName) {
+                player.sendMessage(Colors.Yellow + "You can't destroy with " + itemName + ".");
+            }
+        };
+
+        return process(item, player, destroyWithActions, handler);
     }
 
     /**
@@ -214,13 +285,32 @@ public class BlacklistEntry {
      * @param player
      * @return
      */
-    public boolean onRightClick(int item, Player player) {
-        if (rightClickActions == null) {
+    public boolean onCreate(final int item, final Player player) {
+        if (createActions == null) {
             return true;
         }
-        boolean ret = process(item, player, rightClickActions);
-        lastAffected.put(player.getName(), item);
-        return ret;
+
+        final BlacklistEntry entry = this;
+
+        ActionHandler handler = new ActionHandler() {
+            public void log(String itemName) {
+                blacklist.getLogger().logCreateAttempt(player, item);
+            }
+            public void kick(String itemName) {
+                player.kick("You can't create " + itemName);
+            }
+            public void ban(String itemName) {
+                entry.banPlayer(player, "Banned: You can't create " + itemName);
+            }
+            public void notifyAdmins(String itemName) {
+                entry.notifyAdmins(player.getName() + " tried to create " + itemName + ".");
+            }
+            public void tell(String itemName) {
+                player.sendMessage(Colors.Yellow + "You can't create " + itemName + ".");
+            }
+        };
+
+        return process(item, player, createActions, handler);
     }
 
     /**
@@ -230,13 +320,95 @@ public class BlacklistEntry {
      * @param player
      * @return
      */
-    public boolean onRightClickOn(Block block, Player player) {
-        if (rightClickOnActions == null) {
+    public boolean onUse(final Block block, final Player player) {
+        if (useActions == null) {
             return true;
         }
-        boolean ret = process(block.getType(), player, rightClickOnActions);
-        lastAffected.put(player.getName(), block.getType());
-        return ret;
+
+        final BlacklistEntry entry = this;
+
+        ActionHandler handler = new ActionHandler() {
+            public void log(String itemName) {
+                blacklist.getLogger().logUseAttempt(player, block);
+            }
+            public void kick(String itemName) {
+                player.kick("You can't use " + itemName);
+            }
+            public void ban(String itemName) {
+                entry.banPlayer(player, "Banned: You can't use " + itemName);
+            }
+            public void notifyAdmins(String itemName) {
+                entry.notifyAdmins(player.getName() + " tried to use " + itemName + ".");
+            }
+            public void tell(String itemName) {
+                player.sendMessage(Colors.Yellow + "You're not allowed to use " + itemName + ".");
+            }
+        };
+
+        return process(block.getType(), player, useActions, handler);
+    }
+
+    /**
+     * Called on right click upon. Returns true to let the action pass through.
+     *
+     * @param item
+     * @param player
+     * @return
+     */
+    public boolean onSilentUse(final Block block, final Player player) {
+        if (useActions == null) {
+            return true;
+        }
+
+        ActionHandler handler = new ActionHandler() {
+            public void log(String itemName) {
+            }
+            public void kick(String itemName) {
+            }
+            public void ban(String itemName) {
+            }
+            public void notifyAdmins(String itemName) {
+            }
+            public void tell(String itemName) {
+            }
+        };
+
+        return process(block.getType(), player, useActions, handler);
+    }
+
+    /**
+     * Called on item drop. Returns true to let the action pass through.
+     *
+     * @param item
+     * @param player
+     * @return
+     */
+    public boolean onDrop(final int item, final Player player) {
+        if (dropActions == null) {
+            return true;
+        }
+
+        final BlacklistEntry entry = this;
+
+        ActionHandler handler = new ActionHandler() {
+            public void log(String itemName) {
+                blacklist.getLogger().logDropAttempt(player, item);
+            }
+            public void kick(String itemName) {
+                player.kick("You can't drop " + itemName);
+            }
+            public void ban(String itemName) {
+                entry.banPlayer(player, "Banned: You can't drop " + itemName);
+            }
+            public void notifyAdmins(String itemName) {
+                entry.notifyAdmins(player.getName() + " tried to drop " + itemName + ".");
+            }
+            public void tell(String itemName) {
+                player.sendMessage(Colors.Yellow + "You're not allowed to drop " + itemName + ".");
+            }
+        };
+
+        return process(item, player, dropActions, handler);
     }
 
     /**
@@ -247,14 +419,27 @@ public class BlacklistEntry {
      * @param actions
      * @return
      */
-    private boolean process(int id, Player player, String[] actions) {
+    private boolean process(int id, Player player, String[] actions, ActionHandler handler) {
         if (shouldIgnore(player)) {
             return true;
         }
 
         String name = player.getName();
-        boolean repeating = lastAffected.containsKey(name)
-                && lastAffected.get(name) == id;
+        long now = System.currentTimeMillis();
+        boolean repeating = false;
+
+        // Check to see whether this event is being repeated
+        BlacklistTrackedEvent tracked = lastAffected.get(name);
+        if (tracked != null) {
+            if (tracked.getId() == id && tracked.getTime() > now - 3000) {
+                repeating = true;
+            } else {
+                tracked.setTime(now);
+                tracked.setId(id);
+            }
+        } else {
+            lastAffected.put(name, new BlacklistTrackedEvent(id, now));
+        }
 
         boolean ret = true;
         
@@ -262,18 +447,16 @@ public class BlacklistEntry {
             if (action.equalsIgnoreCase("deny")) {
                 ret = false;
             } else if (action.equalsIgnoreCase("kick")) {
-                player.kick("Performed disallowed action with "
-                        + etc.getDataSource().getItem(id) + ".");
+                handler.kick(etc.getDataSource().getItem(id));
+            } else if (action.equalsIgnoreCase("ban")) {
+                handler.ban(etc.getDataSource().getItem(id));
             } else if (!repeating) {
                 if (action.equalsIgnoreCase("notify")) {
-                    notifyAdmins(player.getName() + " on destroy: "
-                            + etc.getDataSource().getItem(id));
+                    handler.notifyAdmins(etc.getDataSource().getItem(id));
                 } else if (action.equalsIgnoreCase("log")) {
-                    log(player.getName() + " on destroy: "
-                            + etc.getDataSource().getItem(id));
+                    handler.log(etc.getDataSource().getItem(id));
                 } else if (!repeating && action.equalsIgnoreCase("tell")) {
-                    player.sendMessage("Can't do that with "
-                            + etc.getDataSource().getItem(id) + ".");
+                    handler.tell(etc.getDataSource().getItem(id));
                 }
             }
         }
@@ -296,6 +479,17 @@ public class BlacklistEntry {
      * @param player
      */
     public static void forgetAllPlayers() {
-        lastAffected = new HashMap<String,Integer>();
+        lastAffected.clear();
+    }
+
+    /**
+     * Gets called for actions.
+     */
+    private static interface ActionHandler {
+        public void log(String itemName);
+        public void kick(String itemName);
+        public void ban(String itemName);
+        public void notifyAdmins(String itemName);
+        public void tell(String itemName);
     }
 }

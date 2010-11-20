@@ -25,10 +25,6 @@ import java.util.logging.Handler;
 import java.util.logging.ConsoleHandler;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import java.io.*;
@@ -79,7 +75,7 @@ public class WorldGuardListener extends PluginListener {
     private Set<Integer> allowedLavaSpreadOver;
     private Set<Integer> itemDropBlacklist;
     private boolean classicWater;
-    private Map<Integer,BlacklistEntry> blacklist;
+    private Blacklist blacklist;
 
     /**
      * Construct the listener.
@@ -127,6 +123,7 @@ public class WorldGuardListener extends PluginListener {
     public void loadConfiguration() {
         properties.load();
 
+        // Load basic options
         enforceOneSession = properties.getBoolean("enforce-single-session", true);
         blockCreepers = properties.getBoolean("block-creepers", false);
         blockTNT = properties.getBoolean("block-tnt", false);
@@ -140,8 +137,51 @@ public class WorldGuardListener extends PluginListener {
         simulateSponge = properties.getBoolean("simulate-sponge", false);
         blockLagFix = properties.getBoolean("block-lag-fix", false);
 
+        // Console log configuration
+        boolean logConsole = properties.getBoolean("log-console", true);
+
+        // Database log configuration
+        boolean logDatabase = properties.getBoolean("log-database", false);
+        String dsn = properties.getString("log-database-dsn", "jdbc:mysql://localhost:3306/minecraft");
+        String user = properties.getString("log-database-user", "root");
+        String pass = properties.getString("log-database-pass", "");
+        String table = properties.getString("log-database-table", "blacklist_events");
+
+        // File log configuration
+        boolean logFile = properties.getBoolean("log-file", false);
+        String logFilePattern = properties.getString("log-file-path", "worldguard/logs/%Y-%m-%d.log");
+        int logFileCacheSize = Math.max(1, properties.getInt("log-file-open-files", 10));
+
+        // Load the blacklist
         try {
-            blacklist = loadBlacklist(new File("worldguard-blacklist.txt"));
+            // First load the blacklist data from worldguard-blacklist.txt
+            Blacklist blacklist = new Blacklist();
+            blacklist.load(new File("worldguard-blacklist.txt"));
+
+            // If the blacklist is empty, then set the field to null
+            // and save some resources
+            if (blacklist.isEmpty()) {
+                this.blacklist = null;
+            } else {
+                this.blacklist = blacklist;
+                logger.log(Level.INFO, "WorldGuard: Blacklist loaded.");
+
+                BlacklistLogger blacklistLogger = blacklist.getLogger();
+
+                if (logDatabase) {
+                    blacklistLogger.addHandler(new DatabaseLoggerHandler(dsn, user, pass, table));
+                }
+
+                if (logConsole) {
+                    blacklistLogger.addHandler(new ConsoleLoggerHandler());
+                }
+
+                if (logFile) {
+                    FileLoggerHandler handler =
+                            new FileLoggerHandler(logFilePattern, logFileCacheSize);
+                    blacklistLogger.addHandler(handler);
+                }
+            }
         } catch (FileNotFoundException e) {
             logger.log(Level.WARNING, "WorldGuard blacklist does not exist.");
         } catch (IOException e) {
@@ -149,34 +189,7 @@ public class WorldGuardListener extends PluginListener {
                     + e.getMessage());
         }
 
-        Logger blacklistLogger = Logger.getLogger("WorldGuard.Blacklist");
-        blacklistLogger.setUseParentHandlers(false);
-        for (Handler handler : blacklistLogger.getHandlers()) {
-            blacklistLogger.removeHandler(handler);
-        }
-
-        // Blacklist log to console
-        if (properties.getBoolean("blacklist-log-console", true)) {
-            Handler handler = new ConsoleHandler();
-            handler.setFormatter(new ConsoleLogFormat());
-            blacklistLogger.addHandler(handler);
-        }
-
-        // Blacklist log file
-        String logFile = properties.getString("blacklist-log-file", "").trim();
-        int limit = properties.getInt("blacklist-log-file-limit", 1024 * 1024 * 5);
-        int count = properties.getInt("blacklist-log-file-count", 10);
-        if (logFile.length() > 0) {
-            try {
-                Handler handler = new FileHandler(logFile, limit, count, true);
-                handler.setFormatter(new SimpleLogFormat());
-                blacklistLogger.addHandler(handler);
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not open blacklist log file: "
-                        + e.getMessage());
-            }
-        }
-
+        // Print an overview of settings
         logger.log(Level.INFO, enforceOneSession ? "WorldGuard: Single session is enforced."
                 : "WorldGuard: Single session is NOT ENFORCED.");
         logger.log(Level.INFO, blockTNT ? "WorldGuard: TNT ignition is blocked."
@@ -234,6 +247,12 @@ public class WorldGuardListener extends PluginListener {
                 return true;
             }
         }
+        
+        if (blacklist != null) {
+            if (!blacklist.onDrop(item.getItemId(), player)) {
+                return true;
+            }
+        }
 
         return false;
     }
@@ -252,32 +271,29 @@ public class WorldGuardListener extends PluginListener {
     public boolean onBlockCreate(Player player, Block blockPlaced, Block blockClicked,
             int itemInHand) {
         if (blacklist != null) {
-            BlacklistEntry entry = blacklist.get(itemInHand);
-            if (entry != null) {                
-                if (!entry.onRightClick(itemInHand, player)) {
-                    // Water/lava bucket fix
-                    if (itemInHand == 326 || itemInHand == 327) {
-                        final int x = blockPlaced.getX();
-                        final int y = blockPlaced.getY();
-                        final int z = blockPlaced.getZ();
-                        final int existingID = etc.getServer().getBlockIdAt(x, y, z);
+            if (!blacklist.onCreate(itemInHand, player)) {
+                // Water/lava bucket fix
+                if (itemInHand == 326 || itemInHand == 327) {
+                    final int x = blockPlaced.getX();
+                    final int y = blockPlaced.getY();
+                    final int z = blockPlaced.getZ();
+                    final int existingID = etc.getServer().getBlockIdAt(x, y, z);
 
-                        // This is REALLY BAD, but there's no other choice
-                        // at the moment that is as reliable
-                        timer.schedule(new TimerTask() {
-                            public void run() {
-                                try {
-                                    etc.getServer().setBlockAt(existingID, x, y, z);
-                                } catch (Throwable t) {}
-                            }
-                        }, 200); // Just in case
-                    }
-                    return true;
+                    // This is REALLY BAD, but there's no other choice
+                    // at the moment that is as reliable
+                    timer.schedule(new TimerTask() {
+                        public void run() {
+                            try {
+                                etc.getServer().setBlockAt(existingID, x, y, z);
+                            } catch (Throwable t) {}
+                        }
+                    }, 200); // Just in case
                 }
+                return true;
+            }
 
-                if (!entry.onRightClickOn(blockClicked, player)) {
-                    return true;
-                }
+            if (!blacklist.onUse(blockClicked, player)) {
+                return true;
             }
         }
         
@@ -295,18 +311,12 @@ public class WorldGuardListener extends PluginListener {
         int type = block.getType();
         
         if (blacklist != null) {
-            BlacklistEntry entry = blacklist.get(player.getItemInHand());
-            if (entry != null) {
-                if (entry.onLeftClick(player.getItemInHand(), player)) {
-                    return true;
-                }
+            if (!blacklist.onDestroyWith(player.getItemInHand(), player)) {
+                return true;
             }
-            
-            entry = blacklist.get(block.getType());
-            if (entry != null) {
-                if (!entry.onDestroy(block, player)) {
-                    return true;
-                }
+
+            if (!blacklist.onDestroy(block, player)) {
+                return true;
             }
         }
 
@@ -387,6 +397,90 @@ public class WorldGuardListener extends PluginListener {
             // plugin/protection check
             block.setType(0);
             block.setStatus(2);
+        }
+        
+        return false;
+    }
+
+    /**
+     * Called when either a sign, chest or furnace is changed.
+     *
+     * @param player
+     *            player who changed it
+     * @param complexBlock
+     *            complex block that changed
+     * @return true if you want any changes to be reverted
+     */
+    public boolean onComplexBlockChange(Player player, ComplexBlock complexBlock) {
+        if (blacklist != null) {
+            if (complexBlock instanceof Chest) {
+                Block block = new Block(54, complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+
+                if (!blacklist.onSilentUse(block, player)) {
+                    return true;
+                }
+            } else if (complexBlock instanceof Furnace) {
+                int id = etc.getServer().getBlockIdAt(complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+                Block block = new Block(id, complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+
+                if (!blacklist.onSilentUse(block, player)) {
+                    return true;
+                }
+            } else if (complexBlock instanceof Sign) {
+                int id = etc.getServer().getBlockIdAt(complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+                Block block = new Block(id, complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+
+                if (!blacklist.onSilentUse(block, player)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Called when either a sign, chest or furnace is sent to a player
+     *
+     * @param player
+     *            player who the block is being sent to
+     * @param complexBlock
+     *            complex block that's being sent
+     * @return true if you want the chest, furnace or sign to be empty
+     */
+    public boolean onSendComplexBlock(Player player, ComplexBlock complexBlock) {
+        if (blacklist != null) {
+            if (complexBlock instanceof Chest) {
+                Block block = new Block(54, complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+
+                if (!blacklist.onSilentUse(block, player)) {
+                    return true;
+                }
+            } else if (complexBlock instanceof Furnace) {
+                int id = etc.getServer().getBlockIdAt(complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+                Block block = new Block(id, complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+
+                if (!blacklist.onSilentUse(block, player)) {
+                    return true;
+                }
+            } else if (complexBlock instanceof Sign) {
+                int id = etc.getServer().getBlockIdAt(complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+                Block block = new Block(id, complexBlock.getX(),
+                        complexBlock.getY(), complexBlock.getZ());
+
+                if (!blacklist.onSilentUse(block, player)) {
+                    return true;
+                }
+            }
         }
         
         return false;
@@ -533,104 +627,6 @@ public class WorldGuardListener extends PluginListener {
             return true;
         } finally {
             plugin.toggleEnabled();
-        }
-    }
-
-    /**
-     * Load the blacklist.
-     * 
-     * @param file
-     * @return
-     * @throws IOException
-     */
-    public Map<Integer,BlacklistEntry> loadBlacklist(File file)
-            throws IOException {
-        FileReader input = null;
-        Map<Integer,BlacklistEntry> blacklist = new HashMap<Integer,BlacklistEntry>();
-
-        try {
-            input = new FileReader(file);
-            BufferedReader buff = new BufferedReader(input);
-
-            String line;
-            List<BlacklistEntry> entries = null;
-            while ((line = buff.readLine()) != null) {
-                line = line.trim();
-
-                // Blank line
-                if (line.length() == 0) {
-                    continue;
-                } else if (line.charAt(0) == ';' || line.charAt(0) == '#') {
-                    continue;
-                }
-
-                if (line.matches("^\\[.*\\]$")) {
-                    String[] items = line.substring(1, line.length() - 1).split(",");
-                    entries = new ArrayList<BlacklistEntry>();
-
-                    for (String item : items) {
-                        int id = 0;
-
-                        try {
-                            id = Integer.parseInt(item.trim());
-                        } catch (NumberFormatException e) {
-                            id = etc.getDataSource().getItem(item.trim());
-                            if (id == 0) {
-                                logger.log(Level.WARNING, "WorldGuard: Unknown block name: "
-                                        + item);
-                                break;
-                            }
-                        }
-
-                        BlacklistEntry entry = new BlacklistEntry();
-                        blacklist.put(id, entry);
-                        entries.add(entry);
-                    }
-                } else if (entries != null) {
-                    String[] parts = line.split("=");
-
-                    if (parts.length == 1) {
-                        logger.log(Level.WARNING, "Found option with no value "
-                                + file.getName() + " for '" + line + "'");
-                        continue;
-                    }
-
-                    boolean unknownOption = false;
-
-                    for (BlacklistEntry entry : entries) {
-                        if (parts[0].equalsIgnoreCase("ignore-groups")) {
-                            entry.setIgnoreGroups(parts[1].split(","));
-                        } else if(parts[0].equalsIgnoreCase("on-destroy")) {
-                            entry.setDestroyActions(parts[1].split(","));
-                        } else if(parts[0].equalsIgnoreCase("on-left")) {
-                            entry.setLeftClickActions(parts[1].split(","));
-                        } else if(parts[0].equalsIgnoreCase("on-right")) {
-                            entry.setRightClickActions(parts[1].split(","));
-                        } else if(parts[0].equalsIgnoreCase("on-right-on")) {
-                            entry.setRightClickOnActions(parts[1].split(","));
-                        } else {
-                            unknownOption = true;
-                        }
-                    }
-
-                    if (unknownOption) {
-                        logger.log(Level.WARNING, "Unknown option '" + parts[0]
-                                + "' in " + file.getName() + " for '" + line + "'");
-                    }
-                } else {
-                    logger.log(Level.WARNING, "Found option with no heading "
-                            + file.getName() + " for '" + line + "'");
-                }
-            }
-
-            return blacklist.isEmpty() ? null : blacklist;
-        } finally {
-            try {
-                if (input != null) {
-                    input.close();
-                }
-            } catch (IOException e2) {
-            }
         }
     }
 }

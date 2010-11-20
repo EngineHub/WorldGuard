@@ -69,6 +69,10 @@ public class WorldGuard extends Plugin {
                 PluginListener.Priority.HIGH);
         loader.addListener(PluginLoader.Hook.ITEM_DROP , listener, this,
               PluginListener.Priority.HIGH);
+        loader.addListener(PluginLoader.Hook.COMPLEX_BLOCK_CHANGE, listener, this,
+              PluginListener.Priority.HIGH);
+        loader.addListener(PluginLoader.Hook.COMPLEX_BLOCK_SEND, listener, this,
+              PluginListener.Priority.HIGH);
     }
 
     /**
