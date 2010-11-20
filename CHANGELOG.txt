@@ -1,3 +1,21 @@
+1.3
+- Improved plugin compatibility with the block lag fix. For maximum
+    compatibility, you must now list WorldGuard as the first plugin in
+    server.properties and you cannot reload or enable the plugin
+    while the server is up. This is for bad plugins that unnecessarily
+    use the "critical" priority for its hooks like the LWC. Most plugins
+    don't do that though, so this won't apply for most people.
+- Fixed signs being blank if they were denied via the blacklist.
+- Added on-break event to the blacklist.
+- Added comments and messages. Comments are only for your own use and they
+    are printed with the log and notify actions of the blacklist. The
+    message replaces the message that is shown the user and it is optional.
+- The blacklist notification messages are now more compact and are
+    light grey instead of light purple.
+- The notify, log, and tell actions will now trigger every time for the
+    on-break, on-create, on-drop events rather than wait 3 seconds between
+    events for the same item or block for a player.
+
 1.2
 - /stopfire and /allowfire disable and enable fire spreading globally.
 - Block lag fix slightly improved in accuracy for item drops.

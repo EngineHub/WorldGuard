@@ -92,7 +92,12 @@ WorldGuard on your server. You can either restart your server or use
     friendly message than if you used the 'tell' action of the blacklist).
 
 - block-lag-fix (def. false)
-    Attempts to fix block lag.
+    Attempts to fix block lag. For maximum compatibility with other plugins,
+    you must list WorldGuard as the first plugin in server.properties and
+    you cannot reload or enable WorldGuard while the server is up.
+    This is for bad plugins that unnecessarily use the "critical" priority
+    for its hooks like the LWC. Most plugins, the popular protection ones
+    included, don't do that though so this won't apply for most people.
 
 - log-console (def. true)
     For blacklist log actions, print to console.
