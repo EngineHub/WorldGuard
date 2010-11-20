@@ -33,14 +33,37 @@
 #
 # Users with the /worldguardnotify permission will be receive notifications.
 #
+# -------------
+#
+# You can have the same block or item used in two different sections and
+# they will both apply:
+#
+# [goldblock]
+# ignore-groups=vip
+# on-destroy=deny
+# [goldblock]
+# ignore-groups=admins
+# on-destroy=tell
+#
+# However, some events override others. For example, if you disable both
+# usage of the diamond pickaxe (with the on-destroy-with event) and
+# destruction of gold blocks (with the on-destroy event) and a player tries
+# to destroy a gold block with a diamond pickaxe, because the
+# on-destroy-with event comes first, the rules for the gold block
+# will not be applied (but the player will be denied nevertheless).
+#
+# -------------
+#
 # Some examples follow. Remember to remove # in front if you want them
 # to work for you!
 
 #[lavabucket]
+#ignore-groups=admins,mods
 #on-destroy-with=deny,log,kick
 #on-create=deny,tell
 
 #[coalore,goldore,ironore]
+#ignore-groups=admins,mods,vip
 #on-destroy=notify,deny,log
 
 #[cobblestone]
