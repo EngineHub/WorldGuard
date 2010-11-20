@@ -450,7 +450,7 @@ public class WorldGuardListener extends PluginListener {
             // destroyed. Since this causes the hook to eventually call
             // twice, we try to nullify it below
             if (canDestroyBlock(player, block)) {
-                if (block.getStatus() == 3) {
+                if (block.getStatus() == 3 && canBreakBlock(player, block)) {
                     int dropItem = type;
                     int count = 1;
 
@@ -501,8 +501,7 @@ public class WorldGuardListener extends PluginListener {
                     }
 
                     // Now loop this hook back through!
-                    block.setStatus(3); // Block is destroyed
-                    canDestroyBlock(player, block);
+                    simulateBlockDestroy(player, block);
                 }
 
                 return true;
@@ -736,13 +735,51 @@ public class WorldGuardListener extends PluginListener {
     }
 
     /**
+     * Simulate the block destroy hook.
+     *
+     * @param player
+     * @param block
+     * @return
+     */
+    private boolean simulateBlockDestroy(Player player, Block block) {
+        plugin.toggleEnabled(); // Prevent infinite loop
+        try {
+            block.setStatus(3);;
+            return !(Boolean)etc.getLoader().callHook(PluginLoader.Hook.BLOCK_DESTROYED,
+                    new Object[]{ player.getUser(), block });
+        } catch (Throwable t) {
+            return true;
+        } finally {
+            plugin.toggleEnabled();
+        }
+    }
+
+    /**
+     * Checks if a block can be broken.
+     *
+     * @param player
+     * @param block
+     * @return
+     */
+    private boolean canBreakBlock(Player player, Block orig) {
+        try {
+            Block block = etc.getServer().getBlockAt(
+                    orig.getX(), orig.getY(), orig.getZ());
+            return !(Boolean)etc.getLoader().callHook(PluginLoader.Hook.BLOCK_BROKEN,
+                    new Object[]{ player.getUser(), block });
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    /**
      * Checks if a block can be destroyed.
      * 
      * @param player
      * @param block
      * @return
      */
-    public boolean canDestroyBlock(Player player, Block block) {
+    private boolean canDestroyBlock(Player player, Block block) {
         plugin.toggleEnabled(); // Prevent infinite loop
         try {
             return !(Boolean)etc.getLoader().callHook(PluginLoader.Hook.BLOCK_DESTROYED,
