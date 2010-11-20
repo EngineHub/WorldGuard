@@ -63,6 +63,11 @@ public class WorldGuardListener extends PluginListener {
      */
     private LinkedList<int[]> blockRemoveQueue = new LinkedList<int[]>();
 
+    /**
+     * Stop fire spread mode.
+     */
+    private boolean stopFireSpread = false;
+    
     private boolean enforceOneSession;
     private boolean blockCreepers;
     private boolean blockTNT;
@@ -236,6 +241,84 @@ public class WorldGuardListener extends PluginListener {
         }
 
         return null;
+    }
+
+    /**
+     * Called during the later login process
+     *
+     * @param player
+     */
+    public void onLogin(Player player) {
+        if (stopFireSpread) {
+            player.sendMessage(Colors.Yellow + "Fire spread is currently globally disabled.");
+        }
+    }
+
+    /**
+     * Called before the command is parsed. Return true if you don't want the
+     * command to be parsed.
+     *
+     * @param player
+     * @param split
+     * @return false if you want the command to be parsed.
+     */
+    public boolean onCommand(Player player, String[] split) {
+        if (split[0].equalsIgnoreCase("/stopfire") &&
+                player.canUseCommand("/stopfire")) {
+            if (!stopFireSpread) {
+                etc.getServer().messageAll(Colors.Yellow
+                        + "Fire spread has been globally disabled by " + player.getName() + ".");
+            } else {
+                player.sendMessage(Colors.Yellow + "Fire spread was already globally disabled.");
+            }
+            stopFireSpread = true;
+            return true;
+        } else if (split[0].equalsIgnoreCase("/allowfire")
+                    && player.canUseCommand("/stopfire")) {
+            if (stopFireSpread) {
+                etc.getServer().messageAll(Colors.Yellow
+                        + "Fire spread has been globally re-enabled by " + player.getName() + ".");
+            } else {
+                player.sendMessage(Colors.Yellow + "Fire spread was already globally enabled.");
+            }
+            stopFireSpread = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Called before the console command is parsed. Return true if you don't
+     * want the server command to be parsed by the server.
+     *
+     * @param split
+     * @return false if you want the command to be parsed.
+     */
+    public boolean onConsoleCommand(String[] split) {
+        if (split[0].equalsIgnoreCase("fire-stop")) {
+            if (!stopFireSpread) {
+                etc.getServer().messageAll(Colors.Yellow
+                        + "Fire spread has been globally disabled by server console.");
+                logger.log(Level.INFO, "Fire spread is now globally disabled.");
+            } else {
+                logger.log(Level.INFO, "Fire spread was already globally disabled.");
+            }
+            stopFireSpread = true;
+            return true;
+        } else if (split[0].equalsIgnoreCase("fire-allow")) {
+            if (stopFireSpread) {
+                etc.getServer().messageAll(Colors.Yellow
+                        + "Fire spread has been globally re-enabled by server console.");
+                logger.log(Level.INFO, "Fire spread is now globally enabled.");
+            } else {
+                logger.log(Level.INFO, "Fire spread was already globally enabled.");
+            }
+            stopFireSpread = false;
+            return true;
+        }
+
+        return false;
     }
     
     /**
@@ -537,6 +620,10 @@ public class WorldGuardListener extends PluginListener {
         if (blockLighter && block.getStatus() == 2) {
             return !player.canUseCommand("/uselighter")
                     && !player.canUseCommand("/lighter");
+        }
+
+        if (stopFireSpread && block.getStatus() == 3) {
+            return true;
         }
 
         if (disableAllFire && block.getStatus() == 3) {

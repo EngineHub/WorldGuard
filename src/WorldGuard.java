@@ -53,6 +53,10 @@ public class WorldGuard extends Plugin {
     public void initialize() {
         PluginLoader loader = etc.getLoader();
 
+        loader.addListener(PluginLoader.Hook.COMMAND, listener, this,
+                PluginListener.Priority.MEDIUM);
+        loader.addListener(PluginLoader.Hook.SERVERCOMMAND, listener, this,
+                PluginListener.Priority.MEDIUM);
         loader.addListener(PluginLoader.Hook.EXPLODE, listener, this,
                 PluginListener.Priority.HIGH);
         loader.addListener(PluginLoader.Hook.IGNITE, listener, this,
@@ -61,6 +65,8 @@ public class WorldGuard extends Plugin {
                 PluginListener.Priority.HIGH);
         loader.addListener(PluginLoader.Hook.LOGINCHECK, listener, this,
                 PluginListener.Priority.HIGH);
+        loader.addListener(PluginLoader.Hook.LOGIN, listener, this,
+                PluginListener.Priority.MEDIUM);
         loader.addListener(PluginLoader.Hook.BLOCK_CREATED, listener, this,
                 PluginListener.Priority.HIGH);
         loader.addListener(PluginLoader.Hook.BLOCK_DESTROYED, listener, this,
@@ -68,11 +74,11 @@ public class WorldGuard extends Plugin {
         loader.addListener(PluginLoader.Hook.DISCONNECT, listener, this,
                 PluginListener.Priority.HIGH);
         loader.addListener(PluginLoader.Hook.ITEM_DROP , listener, this,
-              PluginListener.Priority.HIGH);
+                PluginListener.Priority.HIGH);
         loader.addListener(PluginLoader.Hook.COMPLEX_BLOCK_CHANGE, listener, this,
-              PluginListener.Priority.HIGH);
+                PluginListener.Priority.HIGH);
         loader.addListener(PluginLoader.Hook.COMPLEX_BLOCK_SEND, listener, this,
-              PluginListener.Priority.HIGH);
+                PluginListener.Priority.HIGH);
     }
 
     /**
@@ -82,6 +88,9 @@ public class WorldGuard extends Plugin {
     public void enable() {
         logger.log(Level.INFO, "WorldGuard version " + getVersion() + " loaded");
         listener.loadConfiguration();
+
+        etc.getInstance().addCommand("/stopfire", "Globally stop fire spread");
+        etc.getInstance().addCommand("/allowfire", "Globally re-enable fire spread");
     }
 
     /**
@@ -94,6 +103,9 @@ public class WorldGuard extends Plugin {
             BlacklistEntry.forgetAllPlayers();
         } catch (Throwable t) {
         }
+
+        etc.getInstance().removeCommand("/stopfire");
+        etc.getInstance().removeCommand("/allowfire");
     }
 
     /**

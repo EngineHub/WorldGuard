@@ -147,6 +147,25 @@ WorldGuard on your server. You can either restart your server or use
 - log-database-table (def. "blacklist_events")
     Database table to use.
 
+Commands
+--------
+
+- /stopfire and /allowfire
+    Disables and enables fire spread globally. Both commands require the
+    permission to use only "/stopfire. Re-enabling fire spread with this
+    command will not override other fire spread control features of
+    WorldGuard. Note that disabling fire does not disable fire damage
+    but fire at least won't spread.
+
+Server Commands
+---------------
+
+- fire-stop and fire-allow
+    Disables and enables fire spread globally. Re-enabling fire spread
+    with this command will not override other fire spread control features
+    of WorldGuard. Note that disabling fire does not disable fire damage
+    but fire at least won't spread.
+
 Blacklists
 ----------
 
