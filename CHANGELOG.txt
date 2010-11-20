@@ -1,4 +1,6 @@
 1.2
+- A new summary of the status of some core protections is now printed
+    on start. Disable this with 'summary-on-start'.
 - Blacklist system has been overhauled. Check README.txt for changed
     configuration settings!
 - The blacklist's method of preventing notification repeats is now better,

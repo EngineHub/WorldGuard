@@ -190,22 +190,24 @@ public class WorldGuardListener extends PluginListener {
         }
 
         // Print an overview of settings
-        logger.log(Level.INFO, enforceOneSession ? "WorldGuard: Single session is enforced."
-                : "WorldGuard: Single session is NOT ENFORCED.");
-        logger.log(Level.INFO, blockTNT ? "WorldGuard: TNT ignition is blocked."
-                : "WorldGuard: TNT ignition is PERMITTED.");
-        logger.log(Level.INFO, blockLighter ? "WorldGuard: Lighters are blocked."
-                : "WorldGuard: Lighters are PERMITTED.");
-        logger.log(Level.INFO, preventLavaFire ? "WorldGuard: Lava fire is blocked."
-                : "WorldGuard: Lava fire is PERMITTED.");
-        if (disableAllFire) {
-            logger.log(Level.INFO, "WorldGuard: All fire spread is disabled.");
-        } else {
-            if (fireNoSpreadBlocks != null) {
-                logger.log(Level.INFO, "WorldGuard: Fire spread is limited to "
-                        + fireNoSpreadBlocks.size() + " block types.");
+        if (properties.getBoolean("summary-on-start", true)) {
+            logger.log(Level.INFO, enforceOneSession ? "WorldGuard: Single session is enforced."
+                    : "WorldGuard: Single session is NOT ENFORCED.");
+            logger.log(Level.INFO, blockTNT ? "WorldGuard: TNT ignition is blocked."
+                    : "WorldGuard: TNT ignition is PERMITTED.");
+            logger.log(Level.INFO, blockLighter ? "WorldGuard: Lighters are blocked."
+                    : "WorldGuard: Lighters are PERMITTED.");
+            logger.log(Level.INFO, preventLavaFire ? "WorldGuard: Lava fire is blocked."
+                    : "WorldGuard: Lava fire is PERMITTED.");
+            if (disableAllFire) {
+                logger.log(Level.INFO, "WorldGuard: All fire spread is disabled.");
             } else {
-                logger.log(Level.INFO, "WorldGuard: Fire spread is UNRESTRICTED.");
+                if (fireNoSpreadBlocks != null) {
+                    logger.log(Level.INFO, "WorldGuard: Fire spread is limited to "
+                            + fireNoSpreadBlocks.size() + " block types.");
+                } else {
+                    logger.log(Level.INFO, "WorldGuard: Fire spread is UNRESTRICTED.");
+                }
             }
         }
     }
