@@ -292,7 +292,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(block.getType(), player, destroyActions, handler);
+        return process(block.getType(), player, destroyActions, handler, false);
     }
 
     /**
@@ -329,7 +329,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(block.getType(), player, breakActions, handler);
+        return process(block.getType(), player, breakActions, handler, true);
     }
 
     /**
@@ -365,7 +365,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(item, player, destroyWithActions, handler);
+        return process(item, player, destroyWithActions, handler, false);
     }
 
     /**
@@ -401,7 +401,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(item, player, createActions, handler);
+        return process(item, player, createActions, handler, true);
     }
 
     /**
@@ -437,7 +437,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(block.getType(), player, useActions, handler);
+        return process(block.getType(), player, useActions, handler, false);
     }
 
     /**
@@ -465,7 +465,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(block.getType(), player, useActions, handler);
+        return process(block.getType(), player, useActions, handler, false);
     }
 
     /**
@@ -501,7 +501,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(item, player, dropActions, handler);
+        return process(item, player, dropActions, handler, true);
     }
 
     /**
@@ -510,9 +510,13 @@ public class BlacklistEntry {
      * @param id
      * @param player
      * @param actions
+     * @param handler
+     * @param allowRepeat
      * @return
      */
-    private boolean process(int id, Player player, String[] actions, ActionHandler handler) {
+    private boolean process(int id, Player player, String[] actions,
+            ActionHandler handler, boolean allowRepeat) {
+
         if (shouldIgnore(player)) {
             return true;
         }
@@ -560,7 +564,7 @@ public class BlacklistEntry {
                     handler.ban(etc.getDataSource().getItem(id));
                 }
             
-            } else if (!repeating) {
+            } else if (!repeating || allowRepeat) {
                 // Notify
                 if (action.equalsIgnoreCase("notify")) {
                     handler.notifyAdmins(etc.getDataSource().getItem(id));
@@ -570,7 +574,7 @@ public class BlacklistEntry {
                     handler.log(etc.getDataSource().getItem(id));
 
                 // Tell
-                } else if (!repeating && action.equalsIgnoreCase("tell")) {
+                } else if (action.equalsIgnoreCase("tell")) {
                     if (this.message != null) {
                         player.sendMessage(Colors.Yellow +
                                 String.format(message, etc.getDataSource().getItem(id))
