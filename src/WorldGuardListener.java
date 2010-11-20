@@ -600,9 +600,9 @@ public class WorldGuardListener extends PluginListener {
         }
 
         if (classicWater && isWater) {
-            int blockBelow = etc.getServer().getBlockIdAt(blockFrom.getX(), blockFrom.getY(), blockFrom.getZ());
+            int blockBelow = etc.getServer().getBlockIdAt(blockFrom.getX(), blockFrom.getY() - 1, blockFrom.getZ());
             if (blockBelow != 0 && blockBelow != 8 && blockBelow != 9) {
-                etc.getServer().setBlockAt(9, blockFrom.getX(), blockFrom.getY() + 1, blockFrom.getZ());
+                etc.getServer().setBlockAt(9, blockFrom.getX(), blockFrom.getY(), blockFrom.getZ());
                 return false;
             }
         }
