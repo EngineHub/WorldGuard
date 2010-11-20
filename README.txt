@@ -43,10 +43,13 @@ WorldGuard on your server. You can either restart your server or use
     spread (preventing waterfalls from becoming tsunamis).
 
 - simulate-sponge (def. false)
-    Toggle simulation of the sponge. The sponge only prevents water
-    from spreading. It will not take away existing water. Simulation of
-    the sponge requires iterating over a 9x9x9 cuboid around the water
-    block and the resource impact of this has not been quantified.
+    Toggle simulation of the sponge from Classic. It blocks water from
+    flowing near the sponge.
+
+- sponge-radius (def. 3)
+    The radius of the sponge's effect. The default is that of Classic,
+    creating a 5x5x5 cuboid free of water. Increasing the number will
+    increase server load exponentially, although 3-5 has fairly low impact.
 
 - enforce-single-session (def. true)
     Enforce single sessions. If the player is already found to be on

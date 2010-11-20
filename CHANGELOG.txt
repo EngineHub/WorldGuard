@@ -1,4 +1,9 @@
 1.2
+- Sponge updated to remove water when the sponge block is set. Sponge radius
+    can now be controlled using the 'sponge-radius' parameter and the
+    default is now set to simulate Classic.
+- Updated for a newer build of "b126," meaning that lava spread control
+    now works well!
 - A new summary of the status of some core protections is now printed
     on start. Disable this with 'summary-on-start'.
 - Blacklist system has been overhauled. Check README.txt for changed

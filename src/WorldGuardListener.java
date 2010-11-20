@@ -70,6 +70,7 @@ public class WorldGuardListener extends PluginListener {
     private boolean preventLavaFire;
     private boolean disableAllFire;
     private boolean simulateSponge;
+    private int spongeRadius;
     private boolean blockLagFix;
     private Set<Integer> fireNoSpreadBlocks;
     private Set<Integer> allowedLavaSpreadOver;
@@ -135,6 +136,7 @@ public class WorldGuardListener extends PluginListener {
         allowedLavaSpreadOver = toBlockIDSet(properties.getString("allowed-lava-spread-blocks", ""));
         classicWater = properties.getBoolean("classic-water", false);
         simulateSponge = properties.getBoolean("simulate-sponge", false);
+        spongeRadius = Math.max(1, properties.getInt("sponge-radius", 3)) - 1;
         blockLagFix = properties.getBoolean("block-lag-fix", false);
 
         // Console log configuration
@@ -301,6 +303,25 @@ public class WorldGuardListener extends PluginListener {
 
             if (!blacklist.onUse(blockClicked, player)) {
                 return true;
+            }
+        }
+
+        if (simulateSponge && blockPlaced.getType() == 19) {
+            int ox = blockPlaced.getX();
+            int oy = blockPlaced.getY();
+            int oz = blockPlaced.getZ();
+
+            Server server = etc.getServer();
+
+            for (int cx = -spongeRadius; cx <= spongeRadius; cx++) {
+                for (int cy = -spongeRadius; cy <= spongeRadius; cy++) {
+                    for (int cz = -spongeRadius; cz <= spongeRadius; cz++) {
+                        int id = server.getBlockIdAt(ox + cx, oy + cy, oz + cz);
+                        if (id == 8 || id == 9) {
+                            server.setBlockAt(0, ox + cx, oy + cy, oz + cz);
+                        }
+                    }
+                }
             }
         }
         
@@ -582,15 +603,15 @@ public class WorldGuardListener extends PluginListener {
         boolean isLava = blockFrom.getType() == 10 || blockFrom.getType() == 11;
 
         if (simulateSponge && isWater) {
-            int ox = blockFrom.getX();
-            int oy = blockFrom.getY() + 1;
-            int oz = blockFrom.getZ();
+            int ox = blockTo.getX();
+            int oy = blockTo.getY();
+            int oz = blockTo.getZ();
 
             Server server = etc.getServer();
 
-            for (int cx = -4; cx <= 4; cx++) {
-                for (int cy = -4; cy <= 4; cy++) {
-                    for (int cz = -4; cz <= 4; cz++) {
+            for (int cx = -spongeRadius; cx <= spongeRadius; cx++) {
+                for (int cy = -spongeRadius; cy <= spongeRadius; cy++) {
+                    for (int cz = -spongeRadius; cz <= spongeRadius; cz++) {
                         if (server.getBlockIdAt(ox + cx, oy + cy, oz + cz) == 19) {
                             return true;
                         }
