@@ -351,7 +351,7 @@ public class WorldGuardListener extends PluginListener {
         }
 
         if (!itemDurability) {
-            item.setHealth(0);
+            item.setDamage(0);
         }
 
         return false;
