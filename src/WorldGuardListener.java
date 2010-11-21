@@ -544,7 +544,7 @@ public class WorldGuardListener extends PluginListener {
                     if (dropItem > 0) {
                         for (int i = 0; i < count; i++) {
                             etc.getServer().dropItem(block.getX(), block.getY(), block.getZ(),
-                                    dropItem, i);
+                                    dropItem, 1);
                         }
 
                         // Drop flint with gravel
