@@ -46,6 +46,11 @@ public class Blacklist {
     private BlacklistLogger blacklistLogger = new BlacklistLogger();
 
     /**
+     * Blacklist contains on-acquire events.
+     */
+    private boolean hasOnAcquire;
+
+    /**
      * Returns whether the list is empty.
      * 
      * @return
@@ -277,6 +282,8 @@ public class Blacklist {
             input = new FileReader(file);
             BufferedReader buff = new BufferedReader(input);
 
+            hasOnAcquire = false;
+
             String line;
             List<BlacklistEntry> currentEntries = null;
             while ((line = buff.readLine()) != null) {
@@ -347,6 +354,7 @@ public class Blacklist {
                         } else if (parts[0].equalsIgnoreCase("on-drop")) {
                             entry.setDropActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-acquire")) {
+                            hasOnAcquire = true;
                             entry.setAcquireActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("message")) {
                             entry.setMessage(parts[1].trim());
@@ -376,5 +384,14 @@ public class Blacklist {
             } catch (IOException e2) {
             }
         }
+    }
+
+    /**
+     * Blacklist contains on-acquire events.
+     * 
+     * @return
+     */
+    public boolean hasOnAcquire() {
+        return hasOnAcquire;
     }
 }

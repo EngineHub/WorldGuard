@@ -367,8 +367,10 @@ public class WorldGuardListener extends PluginListener {
      * @return true if you want to leave the item where it was
      */
     public boolean onItemPickUp(Player player, Item item) {
-        if (!blacklist.onSilentAcquire(item.getItemId(), player)) {
-            return true;
+        if (blacklist != null && blacklist.hasOnAcquire()) {
+            if (!blacklist.onSilentAcquire(item.getItemId(), player)) {
+                return true;
+            }
         }
 
         return false;
@@ -382,7 +384,7 @@ public class WorldGuardListener extends PluginListener {
      * @return true if you want any changes to be reverted
      */
     public boolean onInventoryChange(Player player) {
-        if (blacklist != null) {
+        if (blacklist != null && blacklist.hasOnAcquire()) {
             hj[] items = player.getInventory().getArray();
             boolean needUpdate = false;
 
