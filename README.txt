@@ -79,7 +79,8 @@ WorldGuard on your server. You can either restart your server or use
     command; it is only used for permissions.
 
 - block-creepers (def. false)
-    Block creeper explosions. They will not explode client-side.
+    Block creeper explosions from destroying terrain (and possibly from
+    causing damage).
 
 - disable-lava-fire (def. false)
     Prevent lava from starting fires.
