@@ -1,3 +1,6 @@
+1.4.1
+- Fixed issue with the block lag fix dropping item stacks of 0 quantity.
+
 1.4
 - New on-acquire hook. This does both a total inventory check on inventory
     change and item pick up denial. The item pick up denial is largely
