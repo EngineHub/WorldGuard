@@ -24,6 +24,9 @@ use or not:
 - Temporarily stop fire globally with some commands.
 - Fix the block lag.
 - Destroy tools on drop to alleviate the durability cheat.
+- OR just fix the durability bug.
+- Prevent gravel and sand from falling.
+- Allow portal blocks to be placed anywhere.
 
 hMod is required as WorldGuard is a plugin for hMod.
 
@@ -192,3 +195,15 @@ certain rules apply to only some groups.
 
 Edit the included worldguard-blacklist.txt file and follow the
 instructions inside. The file comes with the download for WorldGuard.
+
+Thanks
+------
+
+While I would like to thank everyone for their support, I would like to
+say thanks to the following individuals for their direct
+contributions to WorldGuard:
+
+- Sturmeh, for contributing the original durability workaround
+- Meaglin, for changing the on flow hook at my request
+- Dinnerbone, for implementing the on item pick up hook at my request,
+    and also for figuring out the durability bug in the process
