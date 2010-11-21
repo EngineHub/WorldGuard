@@ -54,6 +54,15 @@ WorldGuard on your server. You can either restart your server or use
     creating a 5x5x5 cuboid free of water. Increasing the number will
     increase server load exponentially, although 3-5 has fairly low impact.
 
+- no-physics-gravel (def. false)
+    Prevents gravel from falling due to gravity.
+
+- no-physics-sand (def. false)
+    Prevents sand from falling due to gravity.
+
+- allow-portal-anywhere (def. false)
+    Allows you to place portal blocks anywhere.
+
 - enforce-single-session (def. true)
     Enforce single sessions. If the player is already found to be on
     the server when s/he logs in, the other player will be kicked with

@@ -78,6 +78,9 @@ public class WorldGuardListener extends PluginListener {
     private Set<Integer> allowedLavaSpreadOver;
     private Set<Integer> itemDropBlacklist;
     private boolean classicWater;
+    private boolean noPhysicsGravel;
+    private boolean noPhysicsSand;
+    private boolean allowPortalAnywhere;
     private Blacklist blacklist;
 
     /**
@@ -141,6 +144,9 @@ public class WorldGuardListener extends PluginListener {
         spongeRadius = Math.max(1, properties.getInt("sponge-radius", 3)) - 1;
         blockLagFix = properties.getBoolean("block-lag-fix", false);
         itemDurability = properties.getBoolean("item-durability", true);
+        noPhysicsGravel = properties.getBoolean("no-physics-gravel", false);
+        noPhysicsSand = properties.getBoolean("no-physics-sand", false);
+        allowPortalAnywhere = properties.getBoolean("allow-portal-anywhere", false);
 
         // Console log configuration
         boolean logConsole = properties.getBoolean("log-console", true);
@@ -779,6 +785,34 @@ public class WorldGuardListener extends PluginListener {
         }
 
         return false;
+    }
+
+    /**
+     * Called when the game is checking the physics for a certain block.
+     * This method is called frequently whenever a nearby block is changed,
+     * or if the block has just been placed.
+     * Currently the only supported blocks are sand, gravel and portals.
+     *
+     * @param block Block which requires special physics
+     * @param boolean true if this block has just been placed
+     * @return true if you do want to stop the default physics for this block
+     */
+    public boolean onBlockPhysics(Block block, boolean placed) {
+        int id = block.getType();
+
+        if (id == 13 && noPhysicsGravel) {
+            return true;
+        }
+
+        if (id == 12 && noPhysicsSand) {
+            return true;
+        }
+
+        if (id == 90 && allowPortalAnywhere) {
+            return true;
+        }
+        
+    	return false;
     }
 
     /**
