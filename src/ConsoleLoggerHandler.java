@@ -103,6 +103,18 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
     }
 
     /**
+     * Log an acquire attempt.
+     *
+     * @param player
+     * @param item
+     */
+    public void logAcquireAttempt(Player player, int item, String comment) {
+        logger.log(Level.INFO, "WorldGuard: " + player.getName()
+                + " tried to acquire " + getFriendlyItemName(item)
+                + (comment != null ? " (" + comment + ")" : ""));
+    }
+
+    /**
      * Get an item's friendly name with its ID.
      * 
      * @param id

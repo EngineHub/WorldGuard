@@ -34,6 +34,9 @@ A "worldguard.properties" will be created the first the time that you load
 WorldGuard on your server. You can either restart your server or use
 /reloadplugin WorldGuard to reload the configuraton file after editing it.
 
+- item-durability (def. true)
+    Enables item durability.
+
 - classic-water (def. false)
     Toggle use of classic water. Be foreward that your world may be
     flooded if you are not careful. If you have WorldEdit, you can use

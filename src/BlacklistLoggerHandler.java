@@ -66,6 +66,13 @@ public interface BlacklistLoggerHandler {
      */
     public void logDropAttempt(Player player, int item, String comment);
     /**
+     * Log an acquire attempt.
+     *
+     * @param player
+     * @param item
+     */
+    public void logAcquireAttempt(Player player, int item, String comment);
+    /**
      * Close the logger.
      */
     public void close();

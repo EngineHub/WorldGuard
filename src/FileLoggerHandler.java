@@ -270,6 +270,16 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     }
 
     /**
+     * Log an acquire attempt.
+     *
+     * @param player
+     * @param item
+     */
+    public void logAcquireAttempt(Player player, int item, String comment) {
+        log(player, "Tried to acquire " + getFriendlyItemName(item), comment);
+    }
+
+    /**
      * Get an item's friendly name with its ID.
      *
      * @param id

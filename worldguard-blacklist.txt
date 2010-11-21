@@ -25,6 +25,7 @@
 # - on-create (the item/block in the user's inventory is being created)
 # - on-use (the block is right clicked)
 # - on-drop (the item is being dropped from the player's inventory)
+# - on-acquire (the item enters a player's inventory via some method)
 #
 # Actions (for events):
 # - deny (deny completely)
@@ -33,6 +34,13 @@
 # - tell (tell a player that that's not allowed)
 # - kick (kick player)
 # - ban (ban player)
+#
+# With the on-acquire event, it will completely block item pick ups
+# (the item will still be on the ground) if you use 'deny' but the other
+# actions (notify, log, etc.) won't do anything. However, if the player
+# receives the item via a different method (i.e. from a chest), all actions
+# will work although the item is removed after a short delay rather than
+# blocked from the beginning (as it is part client-side).
 #
 # Users with the /worldguardnotify permission will be receive notifications.
 #

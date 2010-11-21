@@ -189,6 +189,18 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
     }
 
     /**
+     * Log an aquire attempt.
+     *
+     * @param player
+     * @param item
+     */
+    public void logAcquireAttempt(Player player, int item, String comment) {
+        logEvent("AQUIRE", player.getName(),
+                (int)Math.floor(player.getX()), (int)Math.floor(player.getY()),
+                (int)Math.floor(player.getZ()), item, comment);
+    }
+
+    /**
      * Close the connection.
      */
     public void close() {

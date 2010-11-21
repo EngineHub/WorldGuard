@@ -58,10 +58,6 @@ public class WorldGuardListener extends PluginListener {
      * Properties file for WorldGuard.
      */
     private PropertiesFile properties = new PropertiesFile("worldguard.properties");
-    /**
-     * List of blocks to remove when possible.
-     */
-    private LinkedList<int[]> blockRemoveQueue = new LinkedList<int[]>();
 
     /**
      * Stop fire spread mode.
@@ -77,6 +73,7 @@ public class WorldGuardListener extends PluginListener {
     private boolean simulateSponge;
     private int spongeRadius;
     private boolean blockLagFix;
+    private boolean itemDurability;
     private Set<Integer> fireNoSpreadBlocks;
     private Set<Integer> allowedLavaSpreadOver;
     private Set<Integer> itemDropBlacklist;
@@ -143,6 +140,7 @@ public class WorldGuardListener extends PluginListener {
         simulateSponge = properties.getBoolean("simulate-sponge", false);
         spongeRadius = Math.max(1, properties.getInt("sponge-radius", 3)) - 1;
         blockLagFix = properties.getBoolean("block-lag-fix", false);
+        itemDurability = properties.getBoolean("item-durability", true);
 
         // Console log configuration
         boolean logConsole = properties.getBoolean("log-console", true);
@@ -346,6 +344,56 @@ public class WorldGuardListener extends PluginListener {
             }
         }
 
+        if (!itemDurability) {
+            item.setHealth(0);
+        }
+
+        return false;
+    }
+
+    /**
+     * Called when a player picks up an item.
+     *
+     * @param player
+     *            player who picked up the item
+     * @param item
+     *            item that was picked up
+     * @return true if you want to leave the item where it was
+     */
+    public boolean onItemPickUp(Player player, Item item) {
+        if (!blacklist.onSilentAcquire(item.getItemId(), player)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Called when a player's inventory is modified.
+     *
+     * @param player
+     *            player who's inventory was modified
+     * @return true if you want any changes to be reverted
+     */
+    public boolean onInventoryChange(Player player) {
+        if (blacklist != null) {
+            hj[] items = player.getInventory().getArray();
+            boolean needUpdate = false;
+
+            for (int i = 0; i < items.length; i++) {
+                if (items[i] != null) {
+                    if (!blacklist.onAcquire(items[i].c, player)) {
+                        items[i] = null;
+                        needUpdate = true;
+                    }
+                }
+            }
+
+            if (needUpdate) {
+                player.getInventory().updateInventory();
+            }
+        }
+        
         return false;
     }
 

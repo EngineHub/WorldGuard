@@ -119,7 +119,7 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
     }
 
     /**
-     * Log a right click attempt.
+     * Log a drop attempt.
      *
      * @param player
      * @param item
@@ -127,6 +127,18 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
     public void logDropAttempt(Player player, int item, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {
             handler.logDropAttempt(player, item, comment);
+        }
+    }
+
+    /**
+     * Log an acquire attempt.
+     *
+     * @param player
+     * @param item
+     */
+    public void logAcquireAttempt(Player player, int item, String comment) {
+        for (BlacklistLoggerHandler handler : handlers) {
+            handler.logAcquireAttempt(player, item, comment);
         }
     }
 

@@ -67,10 +67,28 @@ public class BlacklistEntry {
      */
     private String[] dropActions;
     /**
-     * Comment for the log.
+     * List of actions to perform on drop.
+     */
+    private String[] acquireActions;
+    /**
+     * Message for users.
      */
     private String message;
+    /**
+     * Comment for administrators.
+     */
     private String comment;
+
+    /**
+     * Used to ignore messages.
+     */
+    private static ActionHandler silentHandler = new ActionHandler() {
+            public void log(String itemName) {}
+            public void kick(String itemName) {}
+            public void ban(String itemName) {}
+            public void notifyAdmins(String itemName) {}
+            public void tell(String itemName) {}
+        };
 
     /**
      * Construct the object.
@@ -184,6 +202,20 @@ public class BlacklistEntry {
     }
 
     /**
+     * @return
+     */
+    public String[] getAcquireActions() {
+        return acquireActions;
+    }
+
+    /**
+     * @param actions
+     */
+    public void setAcquireActions(String[] actions) {
+        this.acquireActions = actions;
+    }
+
+    /**
      * @return the message
      */
     public String getMessage() {
@@ -292,7 +324,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(block.getType(), player, destroyActions, handler, false);
+        return process(block.getType(), player, destroyActions, handler, false, false);
     }
 
     /**
@@ -329,7 +361,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(block.getType(), player, breakActions, handler, true);
+        return process(block.getType(), player, breakActions, handler, true, false);
     }
 
     /**
@@ -365,7 +397,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(item, player, destroyWithActions, handler, false);
+        return process(item, player, destroyWithActions, handler, false, false);
     }
 
     /**
@@ -401,7 +433,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(item, player, createActions, handler, true);
+        return process(item, player, createActions, handler, true, false);
     }
 
     /**
@@ -437,7 +469,7 @@ public class BlacklistEntry {
             }
         };
 
-        return process(block.getType(), player, useActions, handler, false);
+        return process(block.getType(), player, useActions, handler, false, false);
     }
 
     /**
@@ -452,20 +484,7 @@ public class BlacklistEntry {
             return true;
         }
 
-        ActionHandler handler = new ActionHandler() {
-            public void log(String itemName) {
-            }
-            public void kick(String itemName) {
-            }
-            public void ban(String itemName) {
-            }
-            public void notifyAdmins(String itemName) {
-            }
-            public void tell(String itemName) {
-            }
-        };
-
-        return process(block.getType(), player, useActions, handler, false);
+        return process(block.getType(), player, useActions, silentHandler, false, true);
     }
 
     /**
@@ -501,7 +520,58 @@ public class BlacklistEntry {
             }
         };
 
-        return process(item, player, dropActions, handler, true);
+        return process(item, player, dropActions, handler, true, false);
+    }
+
+    /**
+     * Called on item acquire. Returns true to let the action pass through.
+     *
+     * @param item
+     * @param player
+     * @return
+     */
+    public boolean onAcquire(final int item, final Player player) {
+        if (acquireActions == null) {
+            return true;
+        }
+
+        final BlacklistEntry entry = this;
+
+        ActionHandler handler = new ActionHandler() {
+            public void log(String itemName) {
+                blacklist.getLogger().logAcquireAttempt(player, item, comment);
+            }
+            public void kick(String itemName) {
+                player.kick("You can't acquire " + itemName);
+            }
+            public void ban(String itemName) {
+                entry.banPlayer(player, "Banned: You can't acquire " + itemName);
+            }
+            public void notifyAdmins(String itemName) {
+                entry.notifyAdmins(player.getName() + " (acquire) " + itemName
+                        + (comment != null ? " (" + comment + ")" : "") + ".");
+            }
+            public void tell(String itemName) {
+                player.sendMessage(Colors.Yellow + "You're not allowed to acquire " + itemName + ".");
+            }
+        };
+
+        return process(item, player, acquireActions, handler, true, false);
+    }
+
+    /**
+     * Called on item acquire. Returns true to let the action pass through.
+     *
+     * @param item
+     * @param player
+     * @return
+     */
+    public boolean onSilentAcquire(final int item, final Player player) {
+        if (acquireActions == null) {
+            return true;
+        }
+
+        return process(item, player, acquireActions, silentHandler, false, true);
     }
 
     /**
@@ -512,10 +582,11 @@ public class BlacklistEntry {
      * @param actions
      * @param handler
      * @param allowRepeat
+     * @param silent
      * @return
      */
     private boolean process(int id, Player player, String[] actions,
-            ActionHandler handler, boolean allowRepeat) {
+            ActionHandler handler, boolean allowRepeat, boolean silent) {
 
         if (shouldIgnore(player)) {
             return true;
@@ -543,6 +614,9 @@ public class BlacklistEntry {
         for (String action : actions) {
             // Deny
             if (action.equalsIgnoreCase("deny")) {
+                if (silent) {
+                    return false;
+                }
                 ret = false;
 
             // Kick

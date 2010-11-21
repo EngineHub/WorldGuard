@@ -220,6 +220,48 @@ public class Blacklist {
     }
 
     /**
+     * Called on acquire. Returns true to let the action pass through.
+     *
+     * @param item
+     * @param player
+     * @return
+     */
+    public boolean onAcquire(int item, Player player) {
+        List<BlacklistEntry> entries = getEntries(item);
+        if (entries == null) {
+            return true;
+        }
+        boolean ret = true;
+        for (BlacklistEntry entry : entries) {
+            if (!entry.onAcquire(item, player)) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Called on acquire. Returns true to let the action pass through.
+     *
+     * @param item
+     * @param player
+     * @return
+     */
+    public boolean onSilentAcquire(int item, Player player) {
+        List<BlacklistEntry> entries = getEntries(item);
+        if (entries == null) {
+            return true;
+        }
+        boolean ret = true;
+        for (BlacklistEntry entry : entries) {
+            if (!entry.onSilentAcquire(item, player)) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Load the blacklist.
      *
      * @param file
@@ -304,6 +346,8 @@ public class Blacklist {
                             entry.setUseActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-drop")) {
                             entry.setDropActions(parts[1].split(","));
+                        } else if (parts[0].equalsIgnoreCase("on-acquire")) {
+                            entry.setAcquireActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("message")) {
                             entry.setMessage(parts[1].trim());
                         } else if (parts[0].equalsIgnoreCase("comment")) {
