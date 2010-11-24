@@ -120,7 +120,7 @@ public class WorldGuard extends Plugin {
             etc.getLoader().addListener(hook, listener, this, priority);
             return true;
         } catch (IllegalArgumentException e) {
-            logger.log(Level.WARNING, "WorldGuard: Missing hook " + name + "!");
+            //logger.log(Level.WARNING, "WorldGuard: Missing hook " + name + "!");
             return false;
         }
     }
