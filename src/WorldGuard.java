@@ -66,7 +66,8 @@ public class WorldGuard extends Plugin {
             missingFeatures.add("disabling fire or lava fire");
         }
         if (!registerHook("FLOW", PluginListener.Priority.HIGH)) {
-            missingFeatures.add("controlling lava flow or sponges");
+            missingFeatures.add("controlling lava flow");
+            missingFeatures.add("sponges");
         }
         registerHook("LOGINCHECK", PluginListener.Priority.HIGH);
         registerHook("LOGIN", PluginListener.Priority.MEDIUM);
@@ -77,6 +78,7 @@ public class WorldGuard extends Plugin {
         registerHook("ITEM_DROP", PluginListener.Priority.HIGH);
         if (!registerHook("ITEM_PICK_UP", PluginListener.Priority.HIGH)) {
             missingFeatures.add("denying item pickups");
+            missingFeatures.add("item durability fix");
         }
         registerHook("COMPLEX_BLOCK_CHANGE", PluginListener.Priority.HIGH);
         registerHook("COMPLEX_BLOCK_SEND", PluginListener.Priority.HIGH);
