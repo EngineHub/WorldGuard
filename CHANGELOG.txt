@@ -4,7 +4,10 @@
     build of hMod and the unsupported features won't break the entire
     plugin. When WG loads, check the server console for a report of
     features that are not supported by your version of hMod.
-- summary-on-start is now disabled by default.
+- Changed some configuration defaults:
+    disable-lava-fire=true
+    simulate-sponge=true
+    item-durability=false
 
 1.4.1
 - Fixed issue with the block lag fix dropping item stacks of 0 quantity.
