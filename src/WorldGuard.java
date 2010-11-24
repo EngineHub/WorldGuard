@@ -101,6 +101,9 @@ public class WorldGuard extends Plugin {
         if (missingFeatures.size() > 0) {
             logger.log(Level.WARNING, "WorldGuard: Your version of hMod does not support "
                     + concatMissingFeatures(missingFeatures) + ".");
+        } else {
+            logger.log(Level.INFO, "WorldGuard: Your version of hMod appears to"
+                    + " support all features.");
         }
     }
 
