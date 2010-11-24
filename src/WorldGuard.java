@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.net.URL;
 import java.io.*;
+import java.lang.reflect.*;
 
 /**
  * Entry point for the plugin for hey0's mod.
@@ -67,7 +68,7 @@ public class WorldGuard extends Plugin {
         }
         if (!registerHook("FLOW", PluginListener.Priority.HIGH)) {
             missingFeatures.add("controlling lava flow");
-            missingFeatures.add("sponges");
+            missingFeatures.add("sponge simulation");
         }
         registerHook("LOGINCHECK", PluginListener.Priority.HIGH);
         registerHook("LOGIN", PluginListener.Priority.MEDIUM);
@@ -78,18 +79,28 @@ public class WorldGuard extends Plugin {
         registerHook("ITEM_DROP", PluginListener.Priority.HIGH);
         if (!registerHook("ITEM_PICK_UP", PluginListener.Priority.HIGH)) {
             missingFeatures.add("denying item pickups");
-            missingFeatures.add("item durability fix");
+            missingFeatures.add("the item durability fix");
+        } else {
+            try {
+                Method method = 
+                        Item.class.getDeclaredMethod("setDamage", new Class[]{ Integer.class });
+                if (method == null) {
+                    missingFeatures.add("the item durability fix");
+                }
+            } catch (NoSuchMethodException e) {
+                missingFeatures.add("the item durability fix");
+            }
         }
         registerHook("COMPLEX_BLOCK_CHANGE", PluginListener.Priority.HIGH);
         registerHook("COMPLEX_BLOCK_SEND", PluginListener.Priority.HIGH);
         registerHook("INVENTORY_CHANGE", PluginListener.Priority.HIGH);
         if (!registerHook("BLOCK_PHYSICS", PluginListener.Priority.MEDIUM)) {
-            missingFeatures.add("controlling physics on gravel, sand, or portal blocks");
+            missingFeatures.add("controlling the physics of gravel, sand, or portal blocks");
         }
 
         if (missingFeatures.size() > 0) {
             logger.log(Level.WARNING, "WorldGuard: Your version of hMod does not support "
-                    + joinString(missingFeatures, ", ", 0) + ".");
+                    + concatMissingFeatures(missingFeatures) + ".");
         }
     }
 
@@ -164,14 +175,29 @@ public class WorldGuard extends Plugin {
      * @param delimiter
      * @return
      */
-    private static String joinString(List<String> str, String delimiter,
-            int initialIndex) {
-        if (str.size() == 0) {
+    private static String concatMissingFeatures(List<String> str) {
+        if (str.isEmpty()) {
             return "";
         }
-        StringBuilder buffer = new StringBuilder(str.get(0));
-        for (int i = initialIndex + 1; i < str.size(); i++) {
-            buffer.append(delimiter).append(str.get(i));
+
+        int size = str.size();
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("(1) ");
+        buffer.append(str.get(0));
+        for (int i = 1; i < size; i++) {
+            if (i == size - 1) {
+                buffer.append(" or ");
+                buffer.append("(");
+                buffer.append(i + 1);
+                buffer.append(") ");
+                buffer.append(str.get(i));
+            } else {
+                buffer.append(", ");
+                buffer.append("(");
+                buffer.append(i + 1);
+                buffer.append(") ");
+                buffer.append(str.get(i));
+            }
         }
         return buffer.toString();
     }

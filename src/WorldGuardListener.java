@@ -351,7 +351,10 @@ public class WorldGuardListener extends PluginListener {
         }
 
         if (!itemDurability) {
-            item.setDamage(0);
+            try {
+                item.setDamage(0);
+            } catch (java.lang.NoSuchMethodError e) {
+            }
         }
 
         return false;
@@ -385,7 +388,7 @@ public class WorldGuardListener extends PluginListener {
      */
     public boolean onInventoryChange(Player player) {
         if (blacklist != null && blacklist.hasOnAcquire()) {
-            hj[] items = player.getInventory().getArray();
+            hl[] items = player.getInventory().getArray();
             boolean needUpdate = false;
 
             for (int i = 0; i < items.length; i++) {
