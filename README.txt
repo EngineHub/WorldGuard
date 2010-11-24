@@ -41,11 +41,11 @@ NOTE: Some features may require a custom version of hMod. When the server
 is loaded with the plugin, WorldGuard will tell you the features
 unsupported by your version of hMod.
 
-- summary-on-start (def. false)
+- summary-on-start (def. true)
     Print a summary of WorldGuard's protection settings at-a-glance when
     the plugin is loaded.
 
-- item-durability (def. true)
+- item-durability (def. false)
     **Requires special version of hMod
     Enables item durability.
 
@@ -57,7 +57,7 @@ unsupported by your version of hMod.
     ground, but if there are air blocks underneath, the water will not
     spread (preventing waterfalls from becoming tsunamis).
 
-- simulate-sponge (def. false)
+- simulate-sponge (def. true)
     Toggle simulation of the sponge from Classic. It blocks water from
     flowing near the sponge.
 
@@ -97,7 +97,7 @@ unsupported by your version of hMod.
     Block creeper explosions from destroying terrain (and possibly from
     causing damage).
 
-- disable-lava-fire (def. false)
+- disable-lava-fire (def. true)
     Prevent lava from starting fires.
 
 - allowed-lava-spread-blocks (no default)

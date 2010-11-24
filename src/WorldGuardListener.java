@@ -128,15 +128,15 @@ public class WorldGuardListener extends PluginListener {
         blockCreepers = properties.getBoolean("block-creepers", false);
         blockTNT = properties.getBoolean("block-tnt", false);
         blockLighter = properties.getBoolean("block-lighter", false);
-        preventLavaFire = properties.getBoolean("disable-lava-fire", false);
+        preventLavaFire = properties.getBoolean("disable-lava-fire", true);
         disableAllFire = properties.getBoolean("disable-all-fire-spread", false);
         itemDropBlacklist = toBlockIDSet(properties.getString("item-drop-blacklist", ""));
         fireNoSpreadBlocks = toBlockIDSet(properties.getString("disallowed-fire-spread-blocks", ""));
         allowedLavaSpreadOver = toBlockIDSet(properties.getString("allowed-lava-spread-blocks", ""));
         classicWater = properties.getBoolean("classic-water", false);
-        simulateSponge = properties.getBoolean("simulate-sponge", false);
+        simulateSponge = properties.getBoolean("simulate-sponge", true);
         spongeRadius = Math.max(1, properties.getInt("sponge-radius", 3)) - 1;
-        itemDurability = properties.getBoolean("item-durability", true);
+        itemDurability = properties.getBoolean("item-durability", false);
         noPhysicsGravel = properties.getBoolean("no-physics-gravel", false);
         noPhysicsSand = properties.getBoolean("no-physics-sand", false);
         allowPortalAnywhere = properties.getBoolean("allow-portal-anywhere", false);
@@ -199,7 +199,7 @@ public class WorldGuardListener extends PluginListener {
         }
 
         // Print an overview of settings
-        if (properties.getBoolean("summary-on-start", false)) {
+        if (properties.getBoolean("summary-on-start", true)) {
             logger.log(Level.INFO, enforceOneSession ? "WorldGuard: Single session is enforced."
                     : "WorldGuard: Single session is NOT ENFORCED.");
             logger.log(Level.INFO, blockTNT ? "WorldGuard: TNT ignition is blocked."
