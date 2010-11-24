@@ -1,3 +1,7 @@
+1.5.1
+- Removed the 'java.lang.NoSuchMethodError: Item.setDamage(I)V' error
+    generated.
+
 1.5
 - Removed the block lag fix.
 - WorldGuard now conditionally loads features so you can use any up-to-date
