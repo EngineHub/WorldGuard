@@ -37,6 +37,13 @@ A "worldguard.properties" will be created the first the time that you load
 WorldGuard on your server. You can either restart your server or use
 /reloadplugin WorldGuard to reload the configuraton file after editing it.
 
+NOTE: Some features may require a custom version of hMod. When the server
+is loaded with the plugin, WorldGuard will tell you missing features.
+
+- summary-on-start (def. false)
+    Print a summary of WorldGuard's protection settings at-a-glance when
+    the plugin is loaded.
+
 - item-durability (def. true)
     Enables item durability.
 

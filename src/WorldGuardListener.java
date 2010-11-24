@@ -206,7 +206,7 @@ public class WorldGuardListener extends PluginListener {
         }
 
         // Print an overview of settings
-        if (properties.getBoolean("summary-on-start", true)) {
+        if (properties.getBoolean("summary-on-start", false)) {
             logger.log(Level.INFO, enforceOneSession ? "WorldGuard: Single session is enforced."
                     : "WorldGuard: Single session is NOT ENFORCED.");
             logger.log(Level.INFO, blockTNT ? "WorldGuard: TNT ignition is blocked."

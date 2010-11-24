@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.jar.Manifest;
 import java.util.jar.Attributes;
+import java.util.List;
+import java.util.ArrayList;
 import java.net.URL;
 import java.io.*;
 
@@ -53,40 +55,58 @@ public class WorldGuard extends Plugin {
     public void initialize() {
         PluginLoader loader = etc.getLoader();
 
-        loader.addListener(PluginLoader.Hook.COMMAND, listener, this,
-                PluginListener.Priority.MEDIUM);
-        loader.addListener(PluginLoader.Hook.SERVERCOMMAND, listener, this,
-                PluginListener.Priority.MEDIUM);
-        loader.addListener(PluginLoader.Hook.EXPLODE, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.IGNITE, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.FLOW, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.LOGINCHECK, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.LOGIN, listener, this,
-                PluginListener.Priority.MEDIUM);
-        loader.addListener(PluginLoader.Hook.BLOCK_CREATED, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.BLOCK_DESTROYED, listener, this,
-                PluginListener.Priority.CRITICAL);
-        loader.addListener(PluginLoader.Hook.BLOCK_BROKEN, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.DISCONNECT, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.ITEM_DROP, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.ITEM_PICK_UP, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.COMPLEX_BLOCK_CHANGE, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.COMPLEX_BLOCK_SEND, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.INVENTORY_CHANGE, listener, this,
-                PluginListener.Priority.HIGH);
-        loader.addListener(PluginLoader.Hook.BLOCK_PHYSICS, listener, this,
-                PluginListener.Priority.MEDIUM);
+        List<String> missingFeatures = new ArrayList<String>();
+
+        registerHook("COMMAND", PluginListener.Priority.MEDIUM);
+        registerHook("SERVERCOMMAND", PluginListener.Priority.MEDIUM);
+        if (!registerHook("EXPLODE", PluginListener.Priority.HIGH)) {
+            missingFeatures.add("disabling TNT or creeper explosions");
+        }
+        if (!registerHook("IGNITE", PluginListener.Priority.HIGH)) {
+            missingFeatures.add("disabling fire or lava fire");
+        }
+        if (!registerHook("FLOW", PluginListener.Priority.HIGH)) {
+            missingFeatures.add("controlling lava flow or sponges");
+        }
+        registerHook("LOGINCHECK", PluginListener.Priority.HIGH);
+        registerHook("LOGIN", PluginListener.Priority.MEDIUM);
+        registerHook("BLOCK_CREATED", PluginListener.Priority.HIGH);
+        registerHook("BLOCK_DESTROYED", PluginListener.Priority.CRITICAL);
+        registerHook("BLOCK_BROKEN", PluginListener.Priority.HIGH);
+        registerHook("DISCONNECT", PluginListener.Priority.HIGH);
+        registerHook("ITEM_DROP", PluginListener.Priority.HIGH);
+        if (!registerHook("ITEM_PICK_UP", PluginListener.Priority.HIGH)) {
+            missingFeatures.add("denying item pickups");
+        }
+        registerHook("COMPLEX_BLOCK_CHANGE", PluginListener.Priority.HIGH);
+        registerHook("COMPLEX_BLOCK_SEND", PluginListener.Priority.HIGH);
+        registerHook("INVENTORY_CHANGE", PluginListener.Priority.HIGH);
+        if (!registerHook("BLOCK_PHYSICS", PluginListener.Priority.MEDIUM)) {
+            missingFeatures.add("controlling physics on gravel, sand, or portal blocks");
+        }
+
+        if (missingFeatures.size() > 0) {
+            logger.log(Level.WARNING, "WorldGuard: Your version of hMod does not support "
+                    + joinString(missingFeatures, ", ", 0) + ".");
+        }
+    }
+
+    /**
+     * Conditionally registers a hook.
+     *
+     * @param name
+     * @param priority
+     * @return where the hook was registered correctly
+     */
+    public boolean registerHook(String name, PluginListener.Priority priority) {
+        try {
+            PluginLoader.Hook hook = PluginLoader.Hook.valueOf(name);
+            etc.getLoader().addListener(hook, listener, this, priority);
+            return true;
+        } catch (IllegalArgumentException e) {
+            logger.log(Level.WARNING, "WorldGuard: Missing hook " + name + "!");
+            return false;
+        }
     }
 
     /**
@@ -133,5 +153,24 @@ public class WorldGuard extends Plugin {
         } catch (IOException e) {
             return "(unknown)";
         }
+    }
+
+    /**
+     * Joins a string from an array of strings.
+     *
+     * @param str
+     * @param delimiter
+     * @return
+     */
+    private static String joinString(List<String> str, String delimiter,
+            int initialIndex) {
+        if (str.size() == 0) {
+            return "";
+        }
+        StringBuilder buffer = new StringBuilder(str.get(0));
+        for (int i = initialIndex + 1; i < str.size(); i++) {
+            buffer.append(delimiter).append(str.get(i));
+        }
+        return buffer.toString();
     }
 }
