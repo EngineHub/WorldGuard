@@ -22,11 +22,11 @@ use or not:
 - Notify admins, block, log, kick or ban for the use of certain block types
     or items.
 - Temporarily stop fire globally with some commands.
-- Fix the block lag.
 - Destroy tools on drop to alleviate the durability cheat.
-- OR just fix the durability bug.
-- Prevent gravel and sand from falling.
+- OR just fix the durability bug. *Requires special version of hMod
+- Prevent gravel and sand from falling. *Requires special version of hMod
 - Allow portal blocks to be placed anywhere.
+  *Requires special version of hMod
 
 hMod is required as WorldGuard is a plugin for hMod.
 
@@ -38,22 +38,18 @@ WorldGuard on your server. You can either restart your server or use
 /reloadplugin WorldGuard to reload the configuraton file after editing it.
 
 NOTE: Some features may require a custom version of hMod. When the server
-is loaded with the plugin, WorldGuard will tell you missing features. Below
-the required hooks will be mentioned in square brackets below each
-feature, allowing to see what your server has or needs to use a certain
-feature of WorldGuard. A list of missing hooks will be printed when you
-start your server with Worldguard.
+is loaded with the plugin, WorldGuard will tell you the features
+unsupported by your version of hMod.
 
 - summary-on-start (def. false)
     Print a summary of WorldGuard's protection settings at-a-glance when
     the plugin is loaded.
 
 - item-durability (def. true)
-    [Requires ITEM_PICK_UP]
+    **Requires special version of hMod
     Enables item durability.
 
 - classic-water (def. false)
-    [Requires hook FLOW]
     Toggle use of classic water. Be foreward that your world may be
     flooded if you are not careful. If you have WorldEdit, you can use
     //drain in such an event, although that will drain the entire pool
@@ -62,7 +58,6 @@ start your server with Worldguard.
     spread (preventing waterfalls from becoming tsunamis).
 
 - simulate-sponge (def. false)
-    [Requires hook FLOW]
     Toggle simulation of the sponge from Classic. It blocks water from
     flowing near the sponge.
 
@@ -72,15 +67,15 @@ start your server with Worldguard.
     increase server load exponentially, although 3-5 has fairly low impact.
 
 - no-physics-gravel (def. false)
-    [Requires hook BLOCK_PHYSICS]
+    **Requires special version of hMod
     Prevents gravel from falling due to gravity.
 
 - no-physics-sand (def. false)
-    [Requires hook BLOCK_PHYSICS]
+    **Requires special version of hMod
     Prevents sand from falling due to gravity.
 
 - allow-portal-anywhere (def. false)
-    [Requires hook BLOCK_PHYSICS]
+    **Requires special version of hMod
     Allows you to place portal blocks anywhere.
 
 - enforce-single-session (def. true)
@@ -90,36 +85,29 @@ start your server with Worldguard.
     the new session starts.
     
 - block-tnt (def. false)
-    [Requires hook EXPLODE]
     Block TNT explosions. TNT will still explode client-side but the blocks
     will be "restored" in a few seconds afterwards.
     
 - block-lighter (def. false)
-    [Requires hook IGNITE]
     Block flint and steel fires. Those with access to the commands
     /uselighter or /lighter can bypass this. /uselighter is not a real
     command; it is only used for permissions.
 
 - block-creepers (def. false)
-    [Requires hook EXPLODE]
     Block creeper explosions from destroying terrain (and possibly from
     causing damage).
 
 - disable-lava-fire (def. false)
-    [Requires hook IGNITE]
     Prevent lava from starting fires.
 
 - allowed-lava-spread-blocks (no default)
-    [Requires hook FLOW]
     List of block names/IDs to allow lava to spread to. Leave blank
     to disable this feature.
 
 - disable-all-fire-spread (def. false)
-    [Requires hook IGNITE]
     Disable all fire from spreading.
 
 - disallowed-fire-spread-blocks (no default)
-    [Requires hook FLOW]
     List of block names/IDs to prevent fire from spreading to. Leave blank
     to disable this feature. Enabling disable-all-fire-spread will
     override this function.
@@ -188,7 +176,6 @@ Commands
 --------
 
 - /stopfire and /allowfire
-    [Requires hook IGNITE]
     Disables and enables fire spread globally. Both commands require the
     permission to use only "/stopfire. Re-enabling fire spread with this
     command will not override other fire spread control features of
@@ -199,7 +186,6 @@ Server Commands
 ---------------
 
 - fire-stop and fire-allow
-    [Requires hook IGNITE]
     Disables and enables fire spread globally. Re-enabling fire spread
     with this command will not override other fire spread control features
     of WorldGuard. Note that disabling fire does not disable fire damage
