@@ -348,12 +348,9 @@ public class WorldGuardListener extends PluginListener {
             }
         }
 
-        if (!itemDurability) {
-            try {
-                item.setDamage(0);
-            } catch (java.lang.NoSuchMethodError e) {
-            }
-        }
+        /*if (!itemDurability) {
+            item.setDamage(0);
+        }*/
 
         return false;
     }
