@@ -21,15 +21,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import java.util.logging.Handler;
-import java.util.logging.ConsoleHandler;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Random;
 import java.io.*;
-import java.util.logging.FileHandler;
-import com.sk89q.worldguard.*;
 
 /**
  * Event listener for Hey0's server mod.
@@ -72,7 +67,6 @@ public class WorldGuardListener extends PluginListener {
     private boolean disableAllFire;
     private boolean simulateSponge;
     private int spongeRadius;
-    private boolean blockLagFix;
     private boolean itemDurability;
     private Set<Integer> fireNoSpreadBlocks;
     private Set<Integer> allowedLavaSpreadOver;
@@ -142,7 +136,6 @@ public class WorldGuardListener extends PluginListener {
         classicWater = properties.getBoolean("classic-water", false);
         simulateSponge = properties.getBoolean("simulate-sponge", false);
         spongeRadius = Math.max(1, properties.getInt("sponge-radius", 3)) - 1;
-        blockLagFix = properties.getBoolean("block-lag-fix", false);
         itemDurability = properties.getBoolean("item-durability", true);
         noPhysicsGravel = properties.getBoolean("no-physics-gravel", false);
         noPhysicsSand = properties.getBoolean("no-physics-sand", false);
@@ -171,18 +164,18 @@ public class WorldGuardListener extends PluginListener {
             }
 
             // First load the blacklist data from worldguard-blacklist.txt
-            Blacklist blacklist = new Blacklist();
-            blacklist.load(new File("worldguard-blacklist.txt"));
+            Blacklist blist = new Blacklist();
+            blist.load(new File("worldguard-blacklist.txt"));
 
             // If the blacklist is empty, then set the field to null
             // and save some resources
-            if (blacklist.isEmpty()) {
+            if (blist.isEmpty()) {
                 this.blacklist = null;
             } else {
-                this.blacklist = blacklist;
+                this.blacklist = blist;
                 logger.log(Level.INFO, "WorldGuard: Blacklist loaded.");
 
-                BlacklistLogger blacklistLogger = blacklist.getLogger();
+                BlacklistLogger blacklistLogger = blist.getLogger();
 
                 if (logDatabase) {
                     blacklistLogger.addHandler(new DatabaseLoggerHandler(dsn, user, pass, table));
@@ -235,6 +228,7 @@ public class WorldGuardListener extends PluginListener {
      * @param user
      * @return kick reason. null if you don't want to kick the player.
      */
+    @Override
     public String onLoginChecks(String user) {
         if (enforceOneSession) {
             for (Player player : etc.getServer().getPlayerList()) {
@@ -252,6 +246,7 @@ public class WorldGuardListener extends PluginListener {
      *
      * @param player
      */
+    @Override
     public void onLogin(Player player) {
         if (stopFireSpread) {
             player.sendMessage(Colors.Yellow + "Fire spread is currently globally disabled.");
@@ -266,6 +261,7 @@ public class WorldGuardListener extends PluginListener {
      * @param split
      * @return false if you want the command to be parsed.
      */
+    @Override
     public boolean onCommand(Player player, String[] split) {
         if (split[0].equalsIgnoreCase("/stopfire") &&
                 player.canUseCommand("/stopfire")) {
@@ -299,6 +295,7 @@ public class WorldGuardListener extends PluginListener {
      * @param split
      * @return false if you want the command to be parsed.
      */
+    @Override
     public boolean onConsoleCommand(String[] split) {
         if (split[0].equalsIgnoreCase("fire-stop")) {
             if (!stopFireSpread) {
@@ -335,6 +332,7 @@ public class WorldGuardListener extends PluginListener {
      * @return true if you don't want the dropped item to be spawned in the
      *         world
      */
+    @Override
     public boolean onItemDrop(Player player, Item item) {
         if (itemDropBlacklist != null) {
             int n = item.getItemId();
@@ -369,6 +367,7 @@ public class WorldGuardListener extends PluginListener {
      *            item that was picked up
      * @return true if you want to leave the item where it was
      */
+    @Override
     public boolean onItemPickUp(Player player, Item item) {
         if (blacklist != null && blacklist.hasOnAcquire()) {
             if (!blacklist.onSilentAcquire(item.getItemId(), player)) {
@@ -386,6 +385,7 @@ public class WorldGuardListener extends PluginListener {
      *            player who's inventory was modified
      * @return true if you want any changes to be reverted
      */
+    @Override
     public boolean onInventoryChange(Player player) {
         if (blacklist != null && blacklist.hasOnAcquire()) {
             hl[] items = player.getInventory().getArray();
@@ -419,6 +419,7 @@ public class WorldGuardListener extends PluginListener {
      * @param itemInHand
      * @return false if you want the action to go through
      */
+    @Override
     public boolean onBlockCreate(Player player, Block blockPlaced, Block blockClicked,
             int itemInHand) {
         if (blacklist != null) {
@@ -477,6 +478,7 @@ public class WorldGuardListener extends PluginListener {
      * @param block
      * @return
      */
+    @Override
     public boolean onBlockDestroy(Player player, Block block) {
         int type = block.getType();
         
@@ -489,88 +491,6 @@ public class WorldGuardListener extends PluginListener {
                 return true;
             }
         }
-
-        if (blockLagFix
-                && type != 7 // Bedrock
-                && type != 46 // TNT
-                && type != 50 // Torch
-                && type != 51 // Fire
-                && type != 59 // Crops
-                && type != 62 // Burning furnace
-                && type != 64 // Wooden door
-                && type != 69 // Lever
-                && type != 71 // Iron door
-                && type != 75 // Redstone torch
-                && type != 76 // Redstone torch
-                && type != 77 // Stone button
-                ) {
-
-            // Check other plugins first to see if this block can be
-            // destroyed. Since this causes the hook to eventually call
-            // twice, we try to nullify it below
-            if (canDestroyBlock(player, block)) {
-                if (block.getStatus() == 3 && canBreakBlock(player, block)) {
-                    int dropItem = type;
-                    int count = 1;
-
-                    if (type == 1) { dropItem = 4; } // Stone
-                    else if (type == 2) { dropItem = 3; } // Grass
-                    else if (type == 16) { dropItem = 263; } // Coal ore
-                    else if (type == 18) { // Leaves
-                        if (rand.nextDouble() > 0.95) {
-                            dropItem = 6;
-                        } else {
-                            dropItem = 0;
-                        }
-                    }
-                    else if (type == 20) { dropItem = 0; } // Glass
-                    else if (type == 43) { dropItem = 44; } // Double step
-                    else if (type == 47) { dropItem = 0; } // Bookshelves
-                    else if (type == 52) { dropItem = 0; } // Mob spawner
-                    else if (type == 53) { dropItem = 5; } // Wooden stairs
-                    else if (type == 55) { dropItem = 331; } // Redstone wire
-                    else if (type == 56) { dropItem = 264; } // Diamond ore
-                    else if (type == 60) { dropItem = 3; } // Soil
-                    else if (type == 63) { dropItem = 323; } // Sign post
-                    else if (type == 67) { dropItem = 4; } // Cobblestone stairs
-                    else if (type == 68) { dropItem = 323; } // Wall sign
-                    else if (type == 73) { dropItem = 331; count = 4; } // Redstone ore
-                    else if (type == 74) { dropItem = 331; count = 4; } // Glowing redstone ore
-                    else if (type == 78) { dropItem = 0; } // Snow
-                    else if (type == 79) { dropItem = 0; } // Ice
-                    else if (type == 82) { dropItem = 337; count = 4; } // Clay
-                    else if (type == 83) { dropItem = 338; } // Reed
-                    else if (type == 89) { dropItem = 348; } // Lightstone
-
-                    etc.getServer().setBlockAt(0, block.getX(), block.getY(), block.getZ());
-
-                    if (dropItem > 0) {
-                        for (int i = 0; i < count; i++) {
-                            etc.getServer().dropItem(block.getX(), block.getY(), block.getZ(),
-                                    dropItem, 1);
-                        }
-
-                        // Drop flint with gravel
-                        if (type == 13) {
-                            if (rand.nextDouble() >= 0.9) {
-                                etc.getServer().dropItem(block.getX(), block.getY(), block.getZ(),
-                                        318, 1);
-                            }
-                        }
-                    }
-
-                    // Now loop this hook back through!
-                    simulateBlockDestroy(player, block);
-                }
-
-                return true;
-            }
-
-            // So we don't have double hook calls caused by the
-            // plugin/protection check
-            block.setType(0);
-            block.setStatus(2);
-        }
         
         return false;
     }
@@ -582,6 +502,7 @@ public class WorldGuardListener extends PluginListener {
      * @param block
      * @return
      */
+    @Override
     public boolean onBlockBreak(Player player, Block block) {
         if (blacklist != null) {
             if (!blacklist.onBreak(block, player)) {
@@ -601,6 +522,7 @@ public class WorldGuardListener extends PluginListener {
      *            complex block that changed
      * @return true if you want any changes to be reverted
      */
+    @Override
     public boolean onComplexBlockChange(Player player, ComplexBlock complexBlock) {
         if (blacklist != null) {
             if (complexBlock instanceof Chest) {
@@ -643,6 +565,7 @@ public class WorldGuardListener extends PluginListener {
      *            complex block that's being sent
      * @return true if you want the chest, furnace or sign to be empty
      */
+    @Override
     public boolean onSendComplexBlock(Player player, ComplexBlock complexBlock) {
         if (blacklist != null) {
             if (complexBlock instanceof Chest) {
@@ -678,6 +601,7 @@ public class WorldGuardListener extends PluginListener {
      *
      * @return true if you dont want the fire to ignite.
      */
+    @Override
     public boolean onIgnite(Block block, Player player) {
         if (preventLavaFire && block.getStatus() == 1) {
             return true;
@@ -722,6 +646,7 @@ public class WorldGuardListener extends PluginListener {
      *
      * @return true if you dont the block to explode.
      */
+    @Override
     public boolean onExplode(Block block) {
         if (blockCreepers && block.getStatus() == 2) {
             return true;
@@ -747,6 +672,7 @@ public class WorldGuardListener extends PluginListener {
      *
      * @return true if you dont want the substance to flow.
      */
+    @Override
     public boolean onFlow(Block blockFrom, Block blockTo) {
         int x = blockFrom.getX();
         int y = blockFrom.getY();
@@ -825,65 +751,9 @@ public class WorldGuardListener extends PluginListener {
      *
      * @param player
      */
+    @Override
     public void onDisconnect(Player player) {
         BlacklistEntry.forgetPlayer(player);
-    }
-
-    /**
-     * Simulate the block destroy hook.
-     *
-     * @param player
-     * @param block
-     * @return
-     */
-    private boolean simulateBlockDestroy(Player player, Block block) {
-        plugin.toggleEnabled(); // Prevent infinite loop
-        try {
-            block.setStatus(3);;
-            return !(Boolean)etc.getLoader().callHook(PluginLoader.Hook.BLOCK_DESTROYED,
-                    new Object[]{ player.getUser(), block });
-        } catch (Throwable t) {
-            return true;
-        } finally {
-            plugin.toggleEnabled();
-        }
-    }
-
-    /**
-     * Checks if a block can be broken.
-     *
-     * @param player
-     * @param block
-     * @return
-     */
-    private boolean canBreakBlock(Player player, Block orig) {
-        try {
-            Block block = etc.getServer().getBlockAt(
-                    orig.getX(), orig.getY(), orig.getZ());
-            return !(Boolean)etc.getLoader().callHook(PluginLoader.Hook.BLOCK_BROKEN,
-                    new Object[]{ player.getUser(), block });
-        } catch (Throwable t) {
-            return true;
-        }
-    }
-
-    /**
-     * Checks if a block can be destroyed.
-     * 
-     * @param player
-     * @param block
-     * @return
-     */
-    private boolean canDestroyBlock(Player player, Block block) {
-        plugin.toggleEnabled(); // Prevent infinite loop
-        try {
-            return !(Boolean)etc.getLoader().callHook(PluginLoader.Hook.BLOCK_DESTROYED,
-                    new Object[]{ player.getUser(), block });
-        } catch (Throwable t) {
-            return true;
-        } finally {
-            plugin.toggleEnabled();
-        }
     }
 
     /**
