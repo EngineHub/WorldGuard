@@ -307,12 +307,36 @@ public class WorldGuardListener extends PluginListener {
             return true;
         } else if (split[0].equalsIgnoreCase("/god")
                     && player.canUseCommand("/god")) {
-            if (!invinciblePlayers.contains(player.getName())) {
-                invinciblePlayers.add(player.getName());
-                player.sendMessage(Colors.Yellow + "You are now invicible!");
+            // Allow setting other people invincible
+            if (split.length > 1) {
+                if (!player.canUseCommand("/godother")) {
+                    player.sendMessage(Colors.Rose + "You don't have permission to make others invincible.");
+                    return true;
+                }
+
+                Player other = etc.getServer().matchPlayer(split[1]);
+                if (other == null) {
+                    player.sendMessage(Colors.Rose + "Player not found.");
+                } else {
+                    if (!invinciblePlayers.contains(other.getName())) {
+                        invinciblePlayers.add(other.getName());
+                        player.sendMessage(Colors.Yellow + other.getName() + " is now invincible!");
+                        other.sendMessage(Colors.Yellow + player.getName() + " has made you invincible!");
+                    } else {
+                        invinciblePlayers.remove(other.getName());
+                        player.sendMessage(Colors.Yellow + other.getName() + " is no longer invincible.");
+                        other.sendMessage(Colors.Yellow + player.getName() + " has taken away your invincibility.");
+                    }
+                }
+            // Invincibility for one's self
             } else {
-                invinciblePlayers.remove(player.getName());
-                player.sendMessage(Colors.Yellow + "You are no longer invicible.");
+                if (!invinciblePlayers.contains(player.getName())) {
+                    invinciblePlayers.add(player.getName());
+                    player.sendMessage(Colors.Yellow + "You are now invincible!");
+                } else {
+                    invinciblePlayers.remove(player.getName());
+                    player.sendMessage(Colors.Yellow + "You are no longer invincible.");
+                }
             }
             return true;
         }
