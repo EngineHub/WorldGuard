@@ -815,7 +815,7 @@ public class WorldGuardListener extends PluginListener {
         String playerName = player.getName();
 
         if (invinciblePlayers.contains(playerName)) {
-            return true;
+            return oldValue > newValue;
         }
 
         if (loginProtection > 0 || spawnProtection > 0 || kickOnDeath) {
