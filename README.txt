@@ -119,6 +119,17 @@ unsupported by your version of hMod.
     this is an easier way to do it (this way also prints a more
     friendly message than if you used the 'tell' action of the blacklist).
 
+- login-protection (def. 3)
+    Number of seconds to keep a player invincible when the player joins.
+
+- spawn-protection (def. 0)
+    Number of seconds to keep a player invincible when the player spawns.
+    This does not apply to players joining the server.
+
+- kick-on-death (def. false)
+    Kick players when they die (and respawn). This is to work around the
+    issues of invisible players when players die.
+    
 - log-console (def. true)
     For blacklist log actions, print to console.
 
@@ -181,6 +192,10 @@ Commands
     command will not override other fire spread control features of
     WorldGuard. Note that disabling fire does not disable fire damage
     but fire at least won't spread.
+
+- /god
+    Toggles your invincibility. Players must have permission to use "/god"
+    to be able to use this command.
 
 Server Commands
 ---------------
