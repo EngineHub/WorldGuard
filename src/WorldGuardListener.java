@@ -63,6 +63,10 @@ public class WorldGuardListener extends PluginListener {
      * Used to keep recent join times.
      */
     private Map<String,Long> recentLogins = new HashMap<String,Long>();
+    /**
+     * Used to keep recent spawn times.
+     */
+    private Map<String,Long> lastSpawn = new HashMap<String,Long>();
 
     private boolean stopFireSpread = false;
     private boolean enforceOneSession;
@@ -82,6 +86,8 @@ public class WorldGuardListener extends PluginListener {
     private boolean noPhysicsSand;
     private boolean allowPortalAnywhere;
     private int loginProtection;
+    private int spawnProtection;
+    private boolean kickOnDeath;
     private Blacklist blacklist;
 
     /**
@@ -150,6 +156,8 @@ public class WorldGuardListener extends PluginListener {
         noPhysicsSand = properties.getBoolean("no-physics-sand", false);
         allowPortalAnywhere = properties.getBoolean("allow-portal-anywhere", false);
         loginProtection = properties.getInt("login-protection", 3);
+        spawnProtection = properties.getInt("spawn-protection", 0);
+        kickOnDeath = properties.getBoolean("kick-on-death", false);
 
         // Console log configuration
         boolean logConsole = properties.getBoolean("log-console", true);
@@ -262,7 +270,7 @@ public class WorldGuardListener extends PluginListener {
             player.sendMessage(Colors.Yellow + "Fire spread is currently globally disabled.");
         }
 
-        if (loginProtection > 0) {
+        if (loginProtection > 0 || spawnProtection > 0 || kickOnDeath) {
             recentLogins.put(player.getName(), System.currentTimeMillis());
         }
     }
@@ -780,16 +788,50 @@ public class WorldGuardListener extends PluginListener {
      */
     @Override
     public boolean onHealthChange(Player player, int oldValue, int newValue) {
-        if (invinciblePlayers.contains(player.getName())) {
+        String playerName = player.getName();
+
+        if (invinciblePlayers.contains(playerName)) {
             return true;
         }
 
-        if (loginProtection > 0 && recentLogins.containsKey(player.getName())) {
-            Long time = recentLogins.get(player.getName());
-            if (time + loginProtection * 1000 > System.currentTimeMillis()) {
-                return true;
-            } else {
-                recentLogins.remove(player.getName());
+        if (loginProtection > 0 || spawnProtection > 0 || kickOnDeath) {
+            long now = System.currentTimeMillis();
+            boolean recentLogin = false;
+
+            if (recentLogins.containsKey(playerName)) {
+                long time = recentLogins.get(playerName);
+                long elapsed = now - time;
+
+                if (loginProtection > 0 && elapsed <= loginProtection * 1000
+                        && newValue < oldValue) {
+                    return true;
+                }
+
+                recentLogin = elapsed <= 2000;
+
+                if (elapsed > 2000 && elapsed > loginProtection * 1000) {
+                    recentLogins.remove(playerName);
+                }
+            }
+
+            if (kickOnDeath && oldValue == -1 && newValue == 20 && !recentLogin) {
+                player.kick("You died! Rejoin please.");
+                return false;
+            }
+
+            if (spawnProtection > 0) {
+                if (oldValue == -1 && newValue == 20 && !recentLogin) { // Player was just respawned
+                    lastSpawn.put(player.getName(), now);
+                } else if (lastSpawn.containsKey(playerName)) {
+                    long time = lastSpawn.get(playerName);
+                    long elapsed = now - time;
+
+                    if (elapsed < spawnProtection * 1000) {
+                        return newValue < oldValue;
+                    } else {
+                        lastSpawn.remove(playerName);
+                    }
+                }
             }
         }
         
