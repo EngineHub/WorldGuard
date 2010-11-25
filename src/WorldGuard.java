@@ -97,6 +97,9 @@ public class WorldGuard extends Plugin {
         if (!registerHook("BLOCK_PHYSICS", PluginListener.Priority.MEDIUM)) {
             missingFeatures.add("controlling the physics of gravel, sand, or portal blocks");
         }
+        if (!registerHook("HEALTH_CHANGE", PluginListener.Priority.MEDIUM)) {
+            missingFeatures.add("god mode");
+        }
 
         if (missingFeatures.size() > 0) {
             logger.log(Level.WARNING, "WorldGuard: Your version of hMod does not support "

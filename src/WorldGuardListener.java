@@ -53,12 +53,12 @@ public class WorldGuardListener extends PluginListener {
      * Properties file for WorldGuard.
      */
     private PropertiesFile properties = new PropertiesFile("worldguard.properties");
-
     /**
-     * Stop fire spread mode.
+     * List of players with god mode on.
      */
+    private Set<String> invinciblePlayers = new HashSet<String>();
+
     private boolean stopFireSpread = false;
-    
     private boolean enforceOneSession;
     private boolean blockCreepers;
     private boolean blockTNT;
@@ -282,6 +282,16 @@ public class WorldGuardListener extends PluginListener {
                 player.sendMessage(Colors.Yellow + "Fire spread was already globally enabled.");
             }
             stopFireSpread = false;
+            return true;
+        } else if (split[0].equalsIgnoreCase("/god")
+                    && player.canUseCommand("/god")) {
+            if (!invinciblePlayers.contains(player.getName())) {
+                invinciblePlayers.add(player.getName());
+                player.sendMessage(Colors.Yellow + "You are now invicible!");
+            } else {
+                invinciblePlayers.remove(player.getName());
+                player.sendMessage(Colors.Yellow + "You are no longer invicible.");
+            }
             return true;
         }
 
@@ -744,6 +754,26 @@ public class WorldGuardListener extends PluginListener {
     }
 
     /**
+     * Called when a players health changes.
+     * @param player
+     *              the player which health is changed.
+     * @param oldValue
+     *              old lives value
+     * @param newValue
+     *              new lives value
+     * @return
+     *      return true to stop the change.
+     */
+    @Override
+    public boolean onHealthChange(Player player, int oldValue, int newValue) {
+        if (invinciblePlayers.contains(player.getName())) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
      * Called on player disconnect
      *
      * @param player
@@ -751,6 +781,7 @@ public class WorldGuardListener extends PluginListener {
     @Override
     public void onDisconnect(Player player) {
         BlacklistEntry.forgetPlayer(player);
+        invinciblePlayers.remove(player.getName());
     }
 
     /**
