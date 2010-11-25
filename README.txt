@@ -195,7 +195,9 @@ Commands
 
 - /god
     Toggles your invincibility. Players must have permission to use "/god"
-    to be able to use this command.
+    to be able to use this command. You can also use this command to
+    toggle the invincibility of others although you must have the
+    "/godother" permission.
 
 Server Commands
 ---------------
