@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Random;
 import java.io.*;
 
@@ -57,6 +59,10 @@ public class WorldGuardListener extends PluginListener {
      * List of players with god mode on.
      */
     private Set<String> invinciblePlayers = new HashSet<String>();
+    /**
+     * Used to keep recent join times.
+     */
+    private Map<String,Long> recentLogins = new HashMap<String,Long>();
 
     private boolean stopFireSpread = false;
     private boolean enforceOneSession;
@@ -75,6 +81,7 @@ public class WorldGuardListener extends PluginListener {
     private boolean noPhysicsGravel;
     private boolean noPhysicsSand;
     private boolean allowPortalAnywhere;
+    private int loginProtection;
     private Blacklist blacklist;
 
     /**
@@ -123,6 +130,8 @@ public class WorldGuardListener extends PluginListener {
     public void loadConfiguration() {
         properties.load();
 
+        recentLogins.clear();
+
         // Load basic options
         enforceOneSession = properties.getBoolean("enforce-single-session", true);
         blockCreepers = properties.getBoolean("block-creepers", false);
@@ -140,6 +149,7 @@ public class WorldGuardListener extends PluginListener {
         noPhysicsGravel = properties.getBoolean("no-physics-gravel", false);
         noPhysicsSand = properties.getBoolean("no-physics-sand", false);
         allowPortalAnywhere = properties.getBoolean("allow-portal-anywhere", false);
+        loginProtection = properties.getInt("login-protection", 3);
 
         // Console log configuration
         boolean logConsole = properties.getBoolean("log-console", true);
@@ -250,6 +260,10 @@ public class WorldGuardListener extends PluginListener {
     public void onLogin(Player player) {
         if (stopFireSpread) {
             player.sendMessage(Colors.Yellow + "Fire spread is currently globally disabled.");
+        }
+
+        if (loginProtection > 0) {
+            recentLogins.put(player.getName(), System.currentTimeMillis());
         }
     }
 
@@ -769,6 +783,15 @@ public class WorldGuardListener extends PluginListener {
         if (invinciblePlayers.contains(player.getName())) {
             return true;
         }
+
+        if (loginProtection > 0 && recentLogins.containsKey(player.getName())) {
+            Long time = recentLogins.get(player.getName());
+            if (time + loginProtection * 1000 > System.currentTimeMillis()) {
+                return true;
+            } else {
+                recentLogins.remove(player.getName());
+            }
+        }
         
         return false;
     }
@@ -782,6 +805,7 @@ public class WorldGuardListener extends PluginListener {
     public void onDisconnect(Player player) {
         BlacklistEntry.forgetPlayer(player);
         invinciblePlayers.remove(player.getName());
+        recentLogins.remove(player.getName());
     }
 
     /**
