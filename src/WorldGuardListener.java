@@ -344,6 +344,61 @@ public class WorldGuardListener extends PluginListener {
                 }
             }
             return true;
+        } else if ((split[0].equalsIgnoreCase("/stack")
+                || split[0].equalsIgnoreCase("/;"))
+                    && player.canUseCommand("/stack")) {
+            hl[] items = player.getInventory().getArray();
+            int len = items.length;
+
+            int affected = 0;
+            
+            for (int i = 0; i < len; i++) {
+                hl item = items[i];
+
+                // Avoid infinite stacks and stacks with durability
+                if (item == null || item.a <= 0 || item.d > 0) {
+                    continue;
+                }
+
+                if (item.a < 64) {
+                    int needed = 64 - item.a; // Number of needed items until 64
+
+                    // Find another stack of the same type
+                    for (int j = i + 1; j < len; j++) {
+                        hl item2 = items[j];
+
+                        // Avoid infinite stacks and stacks with durability
+                        if (item2 == null || item2.a <= 0 || item2.d > 0) {
+                            continue;
+                        }
+
+                        // Same type?
+                        if (item2.c == item.c) {
+                            // This stack won't fit in the parent stack
+                            if (item2.a > needed) {
+                                item.a = 64;
+                                item2.a -= needed;
+                                break;
+                            // This stack will
+                            } else {
+                                items[j] = null;
+                                item.a += item2.a;
+                                needed = 64 - item.a;
+                            }
+
+                            affected++;
+                        }
+                    }
+                }
+            }
+
+            if (affected > 0) {
+                player.getInventory().updateInventory();
+            }
+
+            player.sendMessage(Colors.Yellow + "Items compacted into stacks!");
+            
+            return true;
         }
 
         return false;
