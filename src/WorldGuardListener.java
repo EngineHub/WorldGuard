@@ -134,7 +134,12 @@ public class WorldGuardListener extends PluginListener {
      * Load the configuration
      */
     public void loadConfiguration() {
-        properties.load();
+        try {
+            properties.load();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "WorldGuard: Failed to load configuration: "
+                    + e.getMessage());
+        }
 
         recentLogins.clear();
 
