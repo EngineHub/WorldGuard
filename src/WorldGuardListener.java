@@ -522,6 +522,23 @@ public class WorldGuardListener extends PluginListener {
     }
 
     /**
+     * Called when a player uses an item (rightclick with item in hand)
+     * @param player the player
+     * @param item the item being used (in hand)
+     * @return true to prevent using the item.
+     */
+    @Override
+    public boolean onItemUse(Player player, Item item) {
+        if (blacklist != null) {
+            if (!blacklist.onCreate(item.getItemId(), player)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
      * Called when someone presses right click. If they right clicked with a
      * block you can return true to cancel that. You can intercept this to add
      * your own right click actions to different item types (see itemInHand)
@@ -537,23 +554,6 @@ public class WorldGuardListener extends PluginListener {
             int itemInHand) {
         if (blacklist != null) {
             if (!blacklist.onCreate(itemInHand, player)) {
-                // Water/lava bucket fix
-                if (itemInHand == 326 || itemInHand == 327) {
-                    final int x = blockPlaced.getX();
-                    final int y = blockPlaced.getY();
-                    final int z = blockPlaced.getZ();
-                    final int existingID = etc.getServer().getBlockIdAt(x, y, z);
-
-                    // This is REALLY BAD, but there's no other choice
-                    // at the moment that is as reliable
-                    timer.schedule(new TimerTask() {
-                        public void run() {
-                            try {
-                                etc.getServer().setBlockAt(existingID, x, y, z);
-                            } catch (Throwable t) {}
-                        }
-                    }, 200); // Just in case
-                }
                 return true;
             }
 

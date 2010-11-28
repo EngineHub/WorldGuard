@@ -77,6 +77,9 @@ public class WorldGuard extends Plugin {
         registerHook("BLOCK_BROKEN", PluginListener.Priority.HIGH);
         registerHook("DISCONNECT", PluginListener.Priority.HIGH);
         registerHook("ITEM_DROP", PluginListener.Priority.HIGH);
+        if (!registerHook("ITEM_USE", PluginListener.Priority.HIGH)) {
+            missingFeatures.add("denying use of the lava or water buckets");
+        }
         if (!registerHook("ITEM_PICK_UP", PluginListener.Priority.HIGH)) {
             missingFeatures.add("denying item pickups");
             missingFeatures.add("the item durability fix");
