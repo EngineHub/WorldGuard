@@ -93,6 +93,7 @@ public class WorldGuardListener extends PluginListener {
     private int spawnProtection;
     private boolean kickOnDeath;
     private Blacklist blacklist;
+    private boolean hasAmphibious;
 
     /**
      * Construct the listener.
@@ -250,6 +251,8 @@ public class WorldGuardListener extends PluginListener {
                 }
             }
         }
+
+        hasAmphibious = etc.getDataSource().getGroup("wg-amphibious") != null;
     }
     
     /**
@@ -285,6 +288,10 @@ public class WorldGuardListener extends PluginListener {
 
         if (loginProtection > 0 || spawnProtection > 0 || kickOnDeath) {
             recentLogins.put(player.getName(), System.currentTimeMillis());
+        }
+
+        if (player.isInGroup("wg-invincible")) {
+            invinciblePlayers.add(player.getName());
         }
     }
 
@@ -948,22 +955,31 @@ public class WorldGuardListener extends PluginListener {
      */
     public boolean onDamage(PluginLoader.DamageType type, BaseEntity attacker,
             BaseEntity defender, int amount) {
-        
-        if (disableFallDamage && type == PluginLoader.DamageType.FALL) {
-            return true;
-        }
 
-        if (disableLavaDamage && type == PluginLoader.DamageType.LAVA) {
-            return true;
-        }
+        if (defender instanceof Player) {
+            Player player = (Player)defender;
+            
+            if (disableFallDamage && type == PluginLoader.DamageType.FALL) {
+                return true;
+            }
 
-        if (disableFireDamage && (type == PluginLoader.DamageType.FIRE
-                || type == PluginLoader.DamageType.FIRE_TICK)) {
-            return true;
-        }
+            if (disableLavaDamage && type == PluginLoader.DamageType.LAVA) {
+                return true;
+            }
 
-        if (disableWaterDamage && type == PluginLoader.DamageType.WATER) {
-            return true;
+            if (disableFireDamage && (type == PluginLoader.DamageType.FIRE
+                    || type == PluginLoader.DamageType.FIRE_TICK)) {
+                return true;
+            }
+
+            if (disableWaterDamage && type == PluginLoader.DamageType.WATER) {
+                return true;
+            }
+
+            if (hasAmphibious && type == PluginLoader.DamageType.WATER
+                    && player.isInGroup("wg-amphibious")) {
+                return true;
+            }
         }
         
         return false;
