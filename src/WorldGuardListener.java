@@ -93,7 +93,8 @@ public class WorldGuardListener extends PluginListener {
     private int spawnProtection;
     private boolean kickOnDeath;
     private Blacklist blacklist;
-    private boolean hasAmphibious;
+    private boolean hasAmphibiousGroup;
+    private boolean hasInvincibleGroup;
 
     /**
      * Construct the listener.
@@ -252,7 +253,15 @@ public class WorldGuardListener extends PluginListener {
             }
         }
 
-        hasAmphibious = etc.getDataSource().getGroup("wg-amphibious") != null;
+        hasAmphibiousGroup = etc.getDataSource().getGroup("wg-amphibious") != null;
+        if (!hasAmphibiousGroup) {
+            logger.log(Level.INFO, "Ignore the error about wg-amphibious.");
+        }
+
+        hasInvincibleGroup = etc.getDataSource().getGroup("wg-invincible") != null;
+        if (!hasInvincibleGroup) {
+            logger.log(Level.INFO, "Ignore the error about wg-invincible.");
+        }
     }
     
     /**
@@ -290,7 +299,7 @@ public class WorldGuardListener extends PluginListener {
             recentLogins.put(player.getName(), System.currentTimeMillis());
         }
 
-        if (player.isInGroup("wg-invincible")) {
+        if (hasInvincibleGroup && player.isInGroup("wg-invincible")) {
             invinciblePlayers.add(player.getName());
         }
     }
@@ -414,6 +423,27 @@ public class WorldGuardListener extends PluginListener {
             player.sendMessage(Colors.Yellow + "Items compacted into stacks!");
             
             return true;
+        } else if (split[0].equalsIgnoreCase("/reload")
+                && player.canUseCommand("/reload")
+                && split.length > 1) {
+            if (split[1].equalsIgnoreCase("WorldGuard")) {
+                LoggerToChatHandler handler = new LoggerToChatHandler(player);
+                handler.setLevel(Level.ALL);
+                Logger minecraftLogger = Logger.getLogger("Minecraft");
+                minecraftLogger.addHandler(handler);
+
+                try {
+                    loadConfiguration();
+                    player.sendMessage("WorldGuard configuration reloaded.");
+                } catch (Throwable t) {
+                    player.sendMessage("Error while reloading: "
+                            + t.getMessage());
+                } finally {
+                    minecraftLogger.removeHandler(handler);
+                }
+
+                return true;
+            }
         }
 
         return false;
@@ -976,7 +1006,7 @@ public class WorldGuardListener extends PluginListener {
                 return true;
             }
 
-            if (hasAmphibious && type == PluginLoader.DamageType.WATER
+            if (hasAmphibiousGroup && type == PluginLoader.DamageType.WATER
                     && player.isInGroup("wg-amphibious")) {
                 return true;
             }
