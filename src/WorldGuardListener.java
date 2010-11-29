@@ -85,6 +85,10 @@ public class WorldGuardListener extends PluginListener {
     private boolean noPhysicsGravel;
     private boolean noPhysicsSand;
     private boolean allowPortalAnywhere;
+    private boolean disableFallDamage;
+    private boolean disableLavaDamage;
+    private boolean disableFireDamage;
+    private boolean disableWaterDamage;
     private int loginProtection;
     private int spawnProtection;
     private boolean kickOnDeath;
@@ -160,6 +164,10 @@ public class WorldGuardListener extends PluginListener {
         noPhysicsGravel = properties.getBoolean("no-physics-gravel", false);
         noPhysicsSand = properties.getBoolean("no-physics-sand", false);
         allowPortalAnywhere = properties.getBoolean("allow-portal-anywhere", false);
+        disableFallDamage = properties.getBoolean("disable-fall-damage", false);
+        disableLavaDamage = properties.getBoolean("disable-lava-damage", false);
+        disableFireDamage = properties.getBoolean("disable-fire-damage", false);
+        disableWaterDamage = properties.getBoolean("disable-water-damage", false);
         loginProtection = properties.getInt("login-protection", 3);
         spawnProtection = properties.getInt("spawn-protection", 0);
         kickOnDeath = properties.getBoolean("kick-on-death", false);
@@ -917,6 +925,45 @@ public class WorldGuardListener extends PluginListener {
                     }
                 }
             }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Called when a living object is attacked.
+     * tip:
+     * Use isMob() and isPlayer() and getPlayer().
+     *
+     * @param type
+     *          type of damage dealt.
+     * @param attacker
+     *          object that is attacking.
+     * @param defender
+     *          object that is defending.
+     * @param amount
+     *          amount of damage dealt.
+     *
+     * @return
+     */
+    public boolean onDamage(PluginLoader.DamageType type, BaseEntity attacker,
+            BaseEntity defender, int amount) {
+        
+        if (disableFallDamage && type == PluginLoader.DamageType.FALL) {
+            return true;
+        }
+
+        if (disableLavaDamage && type == PluginLoader.DamageType.LAVA) {
+            return true;
+        }
+
+        if (disableFireDamage && (type == PluginLoader.DamageType.FIRE
+                || type == PluginLoader.DamageType.FIRE_TICK)) {
+            return true;
+        }
+
+        if (disableWaterDamage && type == PluginLoader.DamageType.WATER) {
+            return true;
         }
         
         return false;

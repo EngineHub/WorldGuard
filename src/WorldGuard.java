@@ -103,6 +103,9 @@ public class WorldGuard extends Plugin {
         if (!registerHook("HEALTH_CHANGE", PluginListener.Priority.MEDIUM)) {
             missingFeatures.add("god mode");
         }
+        if (!registerHook("DAMAGE", PluginListener.Priority.MEDIUM)) {
+            missingFeatures.add("disabling fall, water, lava, and fire damage");
+        }
 
         if (missingFeatures.size() > 0) {
             logger.log(Level.WARNING, "WorldGuard: Your version of hMod does not support "
