@@ -85,6 +85,7 @@ public class WorldGuardListener extends PluginListener {
     private Set<Integer> fireNoSpreadBlocks;
     private Set<Integer> allowedLavaSpreadOver;
     private Set<Integer> itemDropBlacklist;
+    private Set<Integer> preventWaterDamage;
     private boolean classicWater;
     private boolean noPhysicsGravel;
     private boolean noPhysicsSand;
@@ -177,6 +178,7 @@ public class WorldGuardListener extends PluginListener {
         blockLighter = properties.getBoolean("block-lighter", false);
         preventLavaFire = properties.getBoolean("disable-lava-fire", true);
         disableAllFire = properties.getBoolean("disable-all-fire-spread", false);
+        preventWaterDamage = toBlockIDSet(properties.getString("disable-water-damage-blocks", ""));
         itemDropBlacklist = toBlockIDSet(properties.getString("item-drop-blacklist", ""));
         fireNoSpreadBlocks = toBlockIDSet(properties.getString("disallowed-fire-spread-blocks", ""));
         allowedLavaSpreadOver = toBlockIDSet(properties.getString("allowed-lava-spread-blocks", ""));
@@ -1039,6 +1041,28 @@ public class WorldGuardListener extends PluginListener {
         }
         
         return false;
+    }
+
+    /**
+     * Called when water or lava tries to populate a block, you can prevent
+     * crushing of torches, railways, flowers etc. You can alternatively allow
+     * to let normally solid blocks be crushed.
+     *
+     * @param currentState the current tristate, once it's set to a non DEFAULT_ACTION it is final.
+     * @param liquidBlock the type of the attacking block
+     * @param targetBlock the block to be destroyed
+     * @return final after a non DEFAULT_ACTION
+     */
+    @Override
+    public PluginLoader.HookResult onLiquidDestroy(PluginLoader.HookResult currentState,
+            int liquidBlockId, Block targetBlock) {
+        if (preventWaterDamage != null && liquidBlockId <= 9) {
+            if (preventWaterDamage.contains(targetBlock.getType())) {
+                return PluginLoader.HookResult.PREVENT_ACTION;
+            }
+        }
+
+        return PluginLoader.HookResult.DEFAULT_ACTION;
     }
 
     /**

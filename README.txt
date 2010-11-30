@@ -19,15 +19,14 @@ use or not:
 - Restrict lava spreading to only some block types.
 - Simulate classic-esque water by letting water infinitely expand in
     area (only if there is a block underneath).
+- Prevent water from destroying blocks like Redstone wire and flowers.
 - Simulate the function of the sponge from Minecraft Classic.
 - Notify admins, block, log, kick or ban for the use of certain block types
     or items.
 - Temporarily stop fire globally with some commands.
 - Destroy tools on drop to alleviate the durability cheat.
-- OR just fix the durability bug. *Requires special version of hMod
-- Prevent gravel and sand from falling. *Requires special version of hMod
+- Prevent gravel and sand from falling.
 - Allow portal blocks to be placed anywhere.
-  *Requires special version of hMod
 
 hMod is required as WorldGuard is a plugin for hMod.
 
@@ -112,6 +111,10 @@ unsupported by your version of hMod.
     List of block names/IDs to prevent fire from spreading to. Leave blank
     to disable this feature. Enabling disable-all-fire-spread will
     override this function.
+
+- disable-water-damage-blocks (no default)
+    List of blocks that should not be destroyed by water (Redstone wire,
+    minecart tracks, flowers, etc.).
 
 - item-drop-blacklist (no default)
     List of block names/IDs to destroy on drop. This can alleviate the

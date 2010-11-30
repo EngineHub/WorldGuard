@@ -106,6 +106,9 @@ public class WorldGuard extends Plugin {
         if (!registerHook("DAMAGE", PluginListener.Priority.MEDIUM)) {
             missingFeatures.add("disabling fall, water, lava, and fire damage");
         }
+        if (!registerHook("LIQUID_DESTROY", PluginListener.Priority.MEDIUM)) {
+            missingFeatures.add("disabling water damage");
+        }
 
         if (missingFeatures.size() > 0) {
             logger.log(Level.WARNING, "WorldGuard: Your version of hMod does not support "
