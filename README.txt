@@ -13,6 +13,7 @@ use or not:
 - Block TNT explosions.
 - Block lighters from setting fires.
 - Block all fires.
+- Disable fall damage, lava damage, fire damage, and/or water damage.
 - Allow fire but prevent it from burning certain blocks.
 - Prevent lava from starting fires.
 - Restrict lava spreading to only some block types.
@@ -130,6 +131,12 @@ unsupported by your version of hMod.
     Kick players when they die (and respawn). This is to work around the
     issues of invisible players when players die.
     
+- disable-fall-damage (def. false)
+- disable-lava-damage (def. false)
+- disable-fire-damage (def. false)
+- disable-water-damage (def. false)
+    Disable various types of damage.
+    
 - log-console (def. true)
     For blacklist log actions, print to console.
 
@@ -216,6 +223,17 @@ certain rules apply to only some groups.
 
 Edit the included worldguard-blacklist.txt file and follow the
 instructions inside. The file comes with the download for WorldGuard.
+
+Other Features
+--------------
+
+To give someone invincibility every time s/he joins the server, create
+a wg-invincible group and add the group to the user or have the user's
+group inherit this group.
+
+To give someone the ability to breathe under water, create
+a wg-amphibious group and add the group to the user or have the user's
+group inherit this group.
 
 Thanks
 ------
