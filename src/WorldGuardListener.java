@@ -60,6 +60,10 @@ public class WorldGuardListener extends PluginListener {
      */
     private Set<String> invinciblePlayers = new HashSet<String>();
     /**
+     * List of amphibious players.
+     */
+    private Set<String> amphibiousPlayers = new HashSet<String>();
+    /**
      * Used to keep recent join times.
      */
     private Map<String,Long> recentLogins = new HashMap<String,Long>();
@@ -93,8 +97,6 @@ public class WorldGuardListener extends PluginListener {
     private int spawnProtection;
     private boolean kickOnDeath;
     private Blacklist blacklist;
-    private boolean hasAmphibiousGroup;
-    private boolean hasInvincibleGroup;
 
     /**
      * Construct the listener.
@@ -252,16 +254,6 @@ public class WorldGuardListener extends PluginListener {
                 }
             }
         }
-
-        hasAmphibiousGroup = etc.getDataSource().getGroup("wg-amphibious") != null;
-        if (!hasAmphibiousGroup) {
-            logger.log(Level.INFO, "Ignore the error about wg-amphibious.");
-        }
-
-        hasInvincibleGroup = etc.getDataSource().getGroup("wg-invincible") != null;
-        if (!hasInvincibleGroup) {
-            logger.log(Level.INFO, "Ignore the error about wg-invincible.");
-        }
     }
     
     /**
@@ -299,8 +291,12 @@ public class WorldGuardListener extends PluginListener {
             recentLogins.put(player.getName(), System.currentTimeMillis());
         }
 
-        if (hasInvincibleGroup && player.isInGroup("wg-invincible")) {
+        if (player.isInGroup("wg-invincible")) {
             invinciblePlayers.add(player.getName());
+        }
+
+        if (player.isInGroup("wg-amphibious")) {
+            amphibiousPlayers.add(player.getName());
         }
     }
 
@@ -1006,8 +1002,8 @@ public class WorldGuardListener extends PluginListener {
                 return true;
             }
 
-            if (hasAmphibiousGroup && type == PluginLoader.DamageType.WATER
-                    && player.isInGroup("wg-amphibious")) {
+            if (type == PluginLoader.DamageType.WATER
+                    && amphibiousPlayers.contains(player.getName())) {
                 return true;
             }
         }
@@ -1024,6 +1020,7 @@ public class WorldGuardListener extends PluginListener {
     public void onDisconnect(Player player) {
         BlacklistEntry.forgetPlayer(player);
         invinciblePlayers.remove(player.getName());
+        amphibiousPlayers.remove(player.getName());
         recentLogins.remove(player.getName());
     }
 
