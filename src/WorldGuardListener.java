@@ -1005,6 +1005,10 @@ public class WorldGuardListener extends PluginListener {
         
         if (defender.isPlayer()) {
             Player player = defender.getPlayer();
+
+            if (invinciblePlayers.contains(player.getName())) {
+                return true;
+            }
             
             if (disableFallDamage && type == PluginLoader.DamageType.FALL) {
                 return true;
