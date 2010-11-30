@@ -399,6 +399,11 @@ public class WorldGuardListener extends PluginListener {
                     continue;
                 }
 
+                // Ignore buckets
+                if (item.c >= 325 && item.c <= 327) {
+                    continue;
+                }
+
                 if (item.a < 64) {
                     int needed = 64 - item.a; // Number of needed items until 64
 
