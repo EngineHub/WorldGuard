@@ -1,3 +1,18 @@
+1.7
+- Added option to prevent water from damaging particular blocks
+    (Redstone wire, Minecart tracks, etc.). See disable-water-damage-blocks.
+- /reload WorldGuard should now reload WorldGuard's configuration.
+- Added wg-invincible and wg-amphibious groups that let you give certain
+    players invincibility or underwater breathing.
+- Added the ability to disable fall, water, lava, and/or fire damage.
+- Water/lava bucket blocking should now be more reliable.
+- Added /stack (alias /;) commands to stack items in your inventory into
+    piles up to 64 items in size. Even unstackable items like signs can be
+    stacked.
+- /god mode should now let you gain health.
+- /god mode should now work more reliably.
+- Caught an error message for when the configuration file does not exist.
+
 1.6
 - Added spawn protection that prevents damage when a player spawns.
 - Added login protection that prevents damage when a player joins.
