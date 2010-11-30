@@ -105,6 +105,7 @@ public class WorldGuardListener extends PluginListener {
      */
     public WorldGuardListener(WorldGuard plugin) {
         this.plugin = plugin;
+        postReload();
     }
 
     /**
@@ -136,6 +137,24 @@ public class WorldGuardListener extends PluginListener {
         }
 
         return result;
+    }
+
+    /**
+     * Populates various lists.
+     */
+    public void postReload() {
+        invinciblePlayers.clear();
+        amphibiousPlayers.clear();
+        
+        for (Player player : etc.getServer().getPlayerList()) {
+            if (player.isInGroup("wg-invincible")) {
+                invinciblePlayers.add(player.getName());
+            }
+
+            if (player.isInGroup("wg-amphibious")) {
+                amphibiousPlayers.add(player.getName());
+            }
+        }
     }
 
     /**
@@ -430,6 +449,7 @@ public class WorldGuardListener extends PluginListener {
 
                 try {
                     loadConfiguration();
+                    postReload();
                     player.sendMessage("WorldGuard configuration reloaded.");
                 } catch (Throwable t) {
                     player.sendMessage("Error while reloading: "
@@ -979,11 +999,12 @@ public class WorldGuardListener extends PluginListener {
      *
      * @return
      */
+    @Override
     public boolean onDamage(PluginLoader.DamageType type, BaseEntity attacker,
             BaseEntity defender, int amount) {
-
-        if (defender instanceof Player) {
-            Player player = (Player)defender;
+        
+        if (defender.isPlayer()) {
+            Player player = defender.getPlayer();
             
             if (disableFallDamage && type == PluginLoader.DamageType.FALL) {
                 return true;
