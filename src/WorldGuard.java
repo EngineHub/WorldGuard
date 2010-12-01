@@ -75,6 +75,7 @@ public class WorldGuard extends Plugin {
         registerHook("BLOCK_CREATED", PluginListener.Priority.HIGH);
         registerHook("BLOCK_DESTROYED", PluginListener.Priority.CRITICAL);
         registerHook("BLOCK_BROKEN", PluginListener.Priority.HIGH);
+        registerHook("BLOCK_PLACE", PluginListener.Priority.HIGH);
         registerHook("DISCONNECT", PluginListener.Priority.HIGH);
         registerHook("ITEM_DROP", PluginListener.Priority.HIGH);
         if (!registerHook("ITEM_USE", PluginListener.Priority.HIGH)) {

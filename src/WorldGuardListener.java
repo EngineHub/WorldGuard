@@ -598,8 +598,12 @@ public class WorldGuardListener extends PluginListener {
     @Override
     public boolean onItemUse(Player player, Item item) {
         if (blacklist != null) {
-            if (!blacklist.onCreate(item.getItemId(), player)) {
-                return true;
+            int itemId = item.getItemId();
+
+            if (itemId >= 325 && itemId <= 327) {
+                if (!blacklist.onCreate(itemId, player)) {
+                    return true;
+                }
             }
         }
         
@@ -607,22 +611,25 @@ public class WorldGuardListener extends PluginListener {
     }
 
     /**
-     * Called when someone presses right click. If they right clicked with a
-     * block you can return true to cancel that. You can intercept this to add
-     * your own right click actions to different item types (see itemInHand)
+     * Called when someone places a block. Return true to prevent the placement.
      *
      * @param player
      * @param blockPlaced
      * @param blockClicked
      * @param itemInHand
-     * @return false if you want the action to go through
+     * @return true if you want to undo the block placement
      */
     @Override
-    public boolean onBlockCreate(Player player, Block blockPlaced, Block blockClicked,
-            int itemInHand) {
+    public boolean onBlockPlace(Player player, Block blockPlaced,
+            Block blockClicked, Item itemInHand) {
+        
+        int itemId = itemInHand.getItemId();
+
         if (blacklist != null) {
-            if (!blacklist.onCreate(itemInHand, player)) {
-                return true;
+            if (itemId < 325 || itemId > 327) {
+                if (!blacklist.onCreate(itemId, player)) {
+                    return true;
+                }
             }
 
             if (!blacklist.onUse(blockClicked, player)) {
