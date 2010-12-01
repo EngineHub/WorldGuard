@@ -1,4 +1,5 @@
 1.7
+- Updated for v0.2.6_02 and hMod b129.
 - Added option to prevent water from damaging particular blocks
     (Redstone wire, Minecart tracks, etc.). See disable-water-damage-blocks.
 - /reload WorldGuard should now reload WorldGuard's configuration.
