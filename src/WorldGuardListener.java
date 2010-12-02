@@ -146,15 +146,18 @@ public class WorldGuardListener extends PluginListener {
     public void postReload() {
         invinciblePlayers.clear();
         amphibiousPlayers.clear();
-        
-        for (Player player : etc.getServer().getPlayerList()) {
-            if (player.isInGroup("wg-invincible")) {
-                invinciblePlayers.add(player.getName());
-            }
 
-            if (player.isInGroup("wg-amphibious")) {
-                amphibiousPlayers.add(player.getName());
+        try {
+            for (Player player : etc.getServer().getPlayerList()) {
+                if (player.isInGroup("wg-invincible")) {
+                    invinciblePlayers.add(player.getName());
+                }
+
+                if (player.isInGroup("wg-amphibious")) {
+                    amphibiousPlayers.add(player.getName());
+                }
             }
+        } catch (NullPointerException e) { // Thrown if loaded too early
         }
     }
 
