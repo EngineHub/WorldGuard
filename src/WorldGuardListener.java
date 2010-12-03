@@ -595,11 +595,14 @@ public class WorldGuardListener extends PluginListener {
     /**
      * Called when a player uses an item (rightclick with item in hand)
      * @param player the player
+     * @param blockPlaced where a block would end up when the item was a bucket
+     * @param blockClicked
      * @param item the item being used (in hand)
      * @return true to prevent using the item.
      */
     @Override
-    public boolean onItemUse(Player player, Item item) {
+    public boolean onItemUse(Player player, Block blockPlaced,
+            Block blockClicked, Item item) {
         if (blacklist != null) {
             int itemId = item.getItemId();
 
