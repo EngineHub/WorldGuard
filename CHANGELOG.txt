@@ -1,3 +1,6 @@
+1.7.1:
+- Updated for v0.2.8.
+
 1.7
 - Updated for v0.2.6_02 and hMod b129.
 - Added option to prevent water from damaging particular blocks

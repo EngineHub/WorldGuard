@@ -391,13 +391,13 @@ public class WorldGuardListener extends PluginListener {
         } else if ((split[0].equalsIgnoreCase("/stack")
                 || split[0].equalsIgnoreCase("/;"))
                     && player.canUseCommand("/stack")) {
-            hm[] items = player.getInventory().getArray();
+            hn[] items = player.getInventory().getArray();
             int len = items.length;
 
             int affected = 0;
             
             for (int i = 0; i < len; i++) {
-                hm item = items[i];
+                hn item = items[i];
 
                 // Avoid infinite stacks and stacks with durability
                 if (item == null || item.a <= 0 || item.d > 0) {
@@ -414,7 +414,7 @@ public class WorldGuardListener extends PluginListener {
 
                     // Find another stack of the same type
                     for (int j = i + 1; j < len; j++) {
-                        hm item2 = items[j];
+                        hn item2 = items[j];
 
                         // Avoid infinite stacks and stacks with durability
                         if (item2 == null || item2.a <= 0 || item2.d > 0) {
@@ -572,7 +572,7 @@ public class WorldGuardListener extends PluginListener {
     @Override
     public boolean onInventoryChange(Player player) {
         if (blacklist != null && blacklist.hasOnAcquire()) {
-            hm[] items = player.getInventory().getArray();
+            hn[] items = player.getInventory().getArray();
             boolean needUpdate = false;
 
             for (int i = 0; i < items.length; i++) {
