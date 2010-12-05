@@ -96,6 +96,8 @@ public class WorldGuardListener extends PluginListener {
     private boolean disableWaterDamage;
     private int loginProtection;
     private int spawnProtection;
+    private boolean teleportToHome;
+    private boolean exactRespawn;
     private boolean kickOnDeath;
     private Blacklist blacklist;
 
@@ -199,6 +201,8 @@ public class WorldGuardListener extends PluginListener {
         loginProtection = properties.getInt("login-protection", 3);
         spawnProtection = properties.getInt("spawn-protection", 0);
         kickOnDeath = properties.getBoolean("kick-on-death", false);
+        teleportToHome = properties.getBoolean("teleport-to-home-on-death", false);
+        exactRespawn = properties.getBoolean("exact-respawn", false);
 
         // Console log configuration
         boolean logConsole = properties.getBoolean("log-console", true);
@@ -311,7 +315,8 @@ public class WorldGuardListener extends PluginListener {
             player.sendMessage(Colors.Yellow + "Fire spread is currently globally disabled.");
         }
 
-        if (loginProtection > 0 || spawnProtection > 0 || kickOnDeath) {
+        if (loginProtection > 0 || spawnProtection > 0
+                || kickOnDeath || teleportToHome || exactRespawn) {
             recentLogins.put(player.getName(), System.currentTimeMillis());
         }
 
@@ -959,7 +964,8 @@ public class WorldGuardListener extends PluginListener {
             return oldValue > newValue;
         }
 
-        if (loginProtection > 0 || spawnProtection > 0 || kickOnDeath) {
+        if (loginProtection > 0 || spawnProtection > 0
+                || kickOnDeath || teleportToHome || exactRespawn) {
             long now = System.currentTimeMillis();
             boolean recentLogin = false;
 
@@ -979,13 +985,29 @@ public class WorldGuardListener extends PluginListener {
                 }
             }
 
-            if (kickOnDeath && oldValue == -1 && newValue == 20 && !recentLogin) {
+            boolean alreadyMoved = false;
+
+            if (teleportToHome && oldValue <= 0 && newValue == 20 && !recentLogin) {
+                Warp warp = etc.getDataSource().getHome(player.getName());
+                if (warp != null) {
+                    player.teleportTo(warp.Location);
+                    alreadyMoved = true;
+                } else if (player.canUseCommand("/sethome")) {
+                    player.sendMessage(Colors.Yellow + "Use /sethome to set your spawn location.");
+                }
+            }
+
+            if (exactRespawn && !alreadyMoved && oldValue <= 0 && newValue == 20 && !recentLogin) {
+                player.teleportTo(etc.getServer().getSpawnLocation());
+            }
+
+            if (kickOnDeath && oldValue <= 0 && newValue == 20 && !recentLogin) {
                 player.kick("You died! Rejoin please.");
                 return false;
             }
 
             if (spawnProtection > 0) {
-                if (oldValue == -1 && newValue == 20 && !recentLogin) { // Player was just respawned
+                if (oldValue <= 0 && newValue == 20 && !recentLogin) { // Player was just respawned
                     lastSpawn.put(player.getName(), now);
                 } else if (lastSpawn.containsKey(playerName)) {
                     long time = lastSpawn.get(playerName);
