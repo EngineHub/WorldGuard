@@ -207,13 +207,24 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     }
 
     /**
+     * Gets the coordinates of a block in text form for the log.
+     * 
+     * @param block
+     * @return
+     */
+    private String getCoordinates(Block block) {
+        return "@" + block.getX() + "," + block.getY() + "," + block.getZ();
+    }
+
+    /**
      * Log a block destroy attempt.
      *
      * @param player
      * @param block
      */
     public void logDestroyAttempt(Player player, Block block, String comment) {
-        log(player, "Tried to destroy " + getFriendlyItemName(block.getType()),
+        log(player, "Tried to destroy " + getFriendlyItemName(block.getType())
+                + " " + getCoordinates(block),
                 comment);
     }
 
@@ -224,7 +235,8 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param block
      */
     public void logBreakAttempt(Player player, Block block, String comment) {
-        log(player, "Tried to break " + getFriendlyItemName(block.getType()),
+        log(player, "Tried to break " + getFriendlyItemName(block.getType())
+                + " " + getCoordinates(block),
                 comment);
     }
 
@@ -235,7 +247,8 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param block
      */
     public void logUseAttempt(Player player, Block block, String comment) {
-        log(player, "Tried to use " + getFriendlyItemName(block.getType()),
+        log(player, "Tried to use " + getFriendlyItemName(block.getType())
+                + " " + getCoordinates(block),
                 comment);
     }
 
