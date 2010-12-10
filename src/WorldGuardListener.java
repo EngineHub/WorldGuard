@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Random;
 import java.io.*;
+import com.sk89q.worldedit.blocks.BlockType;
 
 /**
  * Event listener for Hey0's server mod.
@@ -94,6 +95,8 @@ public class WorldGuardListener extends PluginListener {
     private boolean disableLavaDamage;
     private boolean disableFireDamage;
     private boolean disableWaterDamage;
+    private boolean disableSuffocationDamage;
+    private boolean teleportOnSuffocation;
     private int loginProtection;
     private int spawnProtection;
     private boolean teleportToHome;
@@ -198,6 +201,8 @@ public class WorldGuardListener extends PluginListener {
         disableLavaDamage = properties.getBoolean("disable-lava-damage", false);
         disableFireDamage = properties.getBoolean("disable-fire-damage", false);
         disableWaterDamage = properties.getBoolean("disable-water-damage", false);
+        disableSuffocationDamage = properties.getBoolean("disable-suffocation-damage", false);
+        teleportOnSuffocation = properties.getBoolean("teleport-on-suffocation", false);
         loginProtection = properties.getInt("login-protection", 3);
         spawnProtection = properties.getInt("spawn-protection", 0);
         kickOnDeath = properties.getBoolean("kick-on-death", false);
@@ -960,6 +965,22 @@ public class WorldGuardListener extends PluginListener {
     public boolean onHealthChange(Player player, int oldValue, int newValue) {
         String playerName = player.getName();
 
+        if (disableSuffocationDamage && oldValue - newValue == 1) {
+            Location loc = player.getLocation();
+            int x = (int)Math.floor(loc.x);
+            int y = (int)Math.floor(loc.y);
+            int z = (int)Math.floor(loc.z);
+            int type = etc.getServer().getBlockIdAt(x, y + 1, z); // Head
+
+            // Assuming that this is suffocation damage
+            if ((type < 8 || type > 11) && !BlockType.canPassThrough(type)) {
+                if (teleportOnSuffocation) {
+                    findFreePosition(player, x, y, z);
+                }
+                return true;
+            }
+        }
+
         if (invinciblePlayers.contains(playerName)) {
             return oldValue > newValue;
         }
@@ -1119,6 +1140,45 @@ public class WorldGuardListener extends PluginListener {
     public void disable() {
         if (blacklist != null) {
             blacklist.getLogger().close();
+        }
+    }
+
+    /**
+     * Find a position for the player to stand that is not inside a block.
+     * Blocks above the player will be iteratively tested until there is
+     * a series of two free blocks. The player will be teleported to
+     * that free position.
+     *
+     * @param player
+     * @param sx
+     * @param sy
+     * @param sz
+     */
+    public void findFreePosition(Player player, int sx, int sy, int sz) {
+        int x = sx;
+        int y = Math.max(0, sy);
+        int origY = y;
+        int z = sz;
+
+        byte free = 0;
+
+        while (y <= 129) {
+            if (BlockType.canPassThrough(etc.getServer().getBlockIdAt(x, y, z))) {
+                free++;
+            } else {
+                free = 0;
+            }
+
+            if (free == 2) {
+                if (y - 1 != origY) {
+                    player.teleportTo(x + 0.5, y, z + 0.5,
+                            player.getRotation(), player.getPitch());
+                }
+
+                return;
+            }
+
+            y++;
         }
     }
 }
