@@ -756,13 +756,15 @@ public class WorldGuardListener extends PluginListener {
      * @return true if you wish to cancel this change
      */
     public boolean onSignChange(Player player, Sign sign) {
-        int id = etc.getServer().getBlockIdAt(sign.getX(),
-                sign.getY(), sign.getZ());
-        Block block = new Block(id, sign.getX(),
-                sign.getY(), sign.getZ());
+        if (blacklist != null) {
+            int id = etc.getServer().getBlockIdAt(sign.getX(),
+                    sign.getY(), sign.getZ());
+            Block block = new Block(id, sign.getX(),
+                    sign.getY(), sign.getZ());
 
-        if (!blacklist.onSilentUse(block, player)) {
-            return true;
+            if (!blacklist.onSilentUse(block, player)) {
+                return true;
+            }
         }
         
         return false;
