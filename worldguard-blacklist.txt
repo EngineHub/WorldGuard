@@ -11,7 +11,7 @@
 # Example to block ore and catch some events:
 # [coalore,goldore,ironore]
 # on-destroy-with=deny,log,kick
-# on-create=deny,tell
+# on-place=deny,tell
 #
 # Options:
 # - ignore-groups (comma-delimited list of groups to not affect)
@@ -22,8 +22,9 @@
 # - on-destroy (when a block of this type is being destroyed)
 # - on-break (when a block of this type is about to be broken)
 # - on-destroy-with (the item/block held by the user while destroying)
-# - on-create (the item/block in the user's inventory is being created)
-# - on-use (the block is right clicked)
+# - on-place (a block is being placed)
+# - on-use (an item like a lighter is being used)
+# - on-right-click (the block is right clicked -- curently INEFFECTIVE)
 # - on-drop (the item is being dropped from the player's inventory)
 # - on-acquire (the item enters a player's inventory via some method)
 #
@@ -68,24 +69,22 @@
 # Some examples follow. Remember to remove # in front if you want them
 # to work for you!
 
+# Deny lava buckets
 #[lavabucket]
 #ignore-groups=admins,mods
-#on-destroy-with=deny,log,kick
-#on-create=deny,tell
+#on-use=deny,tell
 
+# Deny lighter usage
+#[259]
+#on-use=deny,tell
+
+# Deny some ore
 #[coalore,goldore,ironore]
-#ignore-groups=admins,mods,vip
+#ignore-groups=admins,mods
 #on-destroy=notify,deny,log
 
 #[cobblestone]
-#on-create=deny,tell,log
+#on-place=deny,tell,log
 
 #[lever]
-#on-break=deny
-
-# This is an example of the 'durability cheat' workaround that destroys your
-# tool when you drop it
-#[256,257,258,259,267,268,269,270,271,272,273,274,275,276,277,278,279,283,284,285,286,290,291,292,293,294,346]
-#on-drop=deny,tell
-#comment=Durability Hacks
-#message=Your tool was destroyed
+#on-break=deny,tell

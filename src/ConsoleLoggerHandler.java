@@ -60,9 +60,9 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block, String comment) {
+    public void logRightClickAttempt(Player player, Block block, String comment) {
         logger.log(Level.INFO, "WorldGuard: " + player.getName()
-                + " tried to use " + getFriendlyItemName(block.getType())
+                + " tried to right click " + getFriendlyItemName(block.getType())
                 + (comment != null ? " (" + comment + ")" : ""));
     }
     
@@ -84,9 +84,21 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item, String comment) {
+    public void logPlaceAttempt(Player player, int item, String comment) {
         logger.log(Level.INFO, "WorldGuard: " + player.getName()
-                + " tried to create " + getFriendlyItemName(item)
+                + " tried to place " + getFriendlyItemName(item)
+                + (comment != null ? " (" + comment + ")" : ""));
+    }
+
+    /**
+     * Log a use attempt.
+     *
+     * @param player
+     * @param item
+     */
+    public void logUseAttempt(Player player, int item, String comment) {
+        logger.log(Level.INFO, "WorldGuard: " + player.getName()
+                + " tried to use " + getFriendlyItemName(item)
                 + (comment != null ? " (" + comment + ")" : ""));
     }
 

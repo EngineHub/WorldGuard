@@ -38,12 +38,12 @@ public interface BlacklistLoggerHandler {
      */
     public void logBreakAttempt(Player player, Block block, String comment);
     /**
-     * Log a right click on attempt.
+     * Log a use attempt.
      * 
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block, String comment);
+    public void logUseAttempt(Player player, int item, String comment);
     /**
      * Right a left click attempt.
      * 
@@ -52,12 +52,19 @@ public interface BlacklistLoggerHandler {
      */
     public void logDestroyWithAttempt(Player player, int item, String comment);
     /**
-     * Log a right click attempt.
+     * Log a place attempt.
      * 
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item, String comment);
+    public void logPlaceAttempt(Player player, int item, String comment);
+    /**
+     * Log a right click on attempt.
+     * 
+     * @param player
+     * @param item
+     */
+    public void logRightClickAttempt(Player player, Block block, String comment);
     /**
      * Log a drop attempt.
      *

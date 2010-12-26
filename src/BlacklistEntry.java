@@ -55,13 +55,17 @@ public class BlacklistEntry {
      */
     private String[] destroyWithActions;
     /**
-     * List of actions to perform on right click.
+     * List of actions to perform on block placement.
      */
-    private String[] createActions;
+    private String[] placeActions;
+    /**
+     * List of actions to perform on item use.
+     */
+    private String[] useActions;
     /**
      * List of actions to perform on right click upon.
      */
-    private String[] useActions;
+    private String[] rightClickActions;
     /**
      * List of actions to perform on drop.
      */
@@ -160,17 +164,17 @@ public class BlacklistEntry {
     }
 
     /**
-     * @return the rightClickActions
+     * @return
      */
-    public String[] getCreateActions() {
-        return createActions;
+    public String[] getPlaceActions() {
+        return placeActions;
     }
 
     /**
      * @param actions
      */
-    public void setCreateActions(String[] actions) {
-        this.createActions = actions;
+    public void setPlaceActions(String[] actions) {
+        this.placeActions = actions;
     }
 
     /**
@@ -185,6 +189,20 @@ public class BlacklistEntry {
      */
     public void setUseActions(String[] actions) {
         this.useActions = actions;
+    }
+
+    /**
+     * @return
+     */
+    public String[] getRightClickActions() {
+        return rightClickActions;
+    }
+
+    /**
+     * @param actions
+     */
+    public void setRightClickActions(String[] actions) {
+        this.rightClickActions = actions;
     }
 
     /**
@@ -401,14 +419,14 @@ public class BlacklistEntry {
     }
 
     /**
-     * Called on right click. Returns true to let the action pass through.
+     * Called on block placement. Returns true to let the action pass through.
      *
      * @param item
      * @param player
      * @return
      */
-    public boolean onCreate(final int item, final Player player) {
-        if (createActions == null) {
+    public boolean onPlace(final int item, final Player player) {
+        if (placeActions == null) {
             return true;
         }
 
@@ -416,7 +434,7 @@ public class BlacklistEntry {
 
         ActionHandler handler = new ActionHandler() {
             public void log(String itemName) {
-                blacklist.getLogger().logCreateAttempt(player, item, comment);
+                blacklist.getLogger().logPlaceAttempt(player, item, comment);
             }
             public void kick(String itemName) {
                 player.kick("You can't place " + itemName);
@@ -433,7 +451,43 @@ public class BlacklistEntry {
             }
         };
 
-        return process(item, player, createActions, handler, true, false);
+        return process(item, player, placeActions, handler, true, false);
+    }
+
+    /**
+     * Called on use. Returns true to let the action pass through.
+     *
+     * @param item
+     * @param player
+     * @return
+     */
+    public boolean onUse(final int item, final Player player) {
+        if (useActions == null) {
+            return true;
+        }
+
+        final BlacklistEntry entry = this;
+
+        ActionHandler handler = new ActionHandler() {
+            public void log(String itemName) {
+                blacklist.getLogger().logUseAttempt(player, item, comment);
+            }
+            public void kick(String itemName) {
+                player.kick("You can't use " + itemName);
+            }
+            public void ban(String itemName) {
+                entry.banPlayer(player, "Banned: You can't use " + itemName);
+            }
+            public void notifyAdmins(String itemName) {
+                entry.notifyAdmins(player.getName() + " (use) " + itemName
+                        + (comment != null ? " (" + comment + ")" : "") + ".");
+            }
+            public void tell(String itemName) {
+                player.sendMessage(Colors.Yellow + "You're not allowed to use " + itemName + ".");
+            }
+        };
+
+        return process(item, player, useActions, handler, false, false);
     }
 
     /**
@@ -443,7 +497,7 @@ public class BlacklistEntry {
      * @param player
      * @return
      */
-    public boolean onUse(final Block block, final Player player) {
+    public boolean onRightClick(final Block block, final Player player) {
         if (useActions == null) {
             return true;
         }
@@ -452,7 +506,7 @@ public class BlacklistEntry {
 
         ActionHandler handler = new ActionHandler() {
             public void log(String itemName) {
-                blacklist.getLogger().logUseAttempt(player, block, comment);
+                blacklist.getLogger().logRightClickAttempt(player, block, comment);
             }
             public void kick(String itemName) {
                 player.kick("You can't use " + itemName);

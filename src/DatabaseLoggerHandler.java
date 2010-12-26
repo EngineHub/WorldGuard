@@ -146,8 +146,8 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block, String comment) {
-        logEvent("USE", player.getName(),
+    public void logRightClickAttempt(Player player, Block block, String comment) {
+        logEvent("RIGHT_CLICK", player.getName(),
                 block.getX(), block.getY(), block.getZ(), block.getType(),
                 comment);
     }
@@ -165,13 +165,25 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
     }
 
     /**
-     * Log a right click attempt.
+     * Log a place attempt.
      *
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item, String comment) {
-        logEvent("CREATE", player.getName(),
+    public void logPlaceAttempt(Player player, int item, String comment) {
+        logEvent("PLACE", player.getName(),
+                (int)Math.floor(player.getX()), (int)Math.floor(player.getY()),
+                (int)Math.floor(player.getZ()), item, comment);
+    }
+
+    /**
+     * Log a use attempt.
+     *
+     * @param player
+     * @param item
+     */
+    public void logUseAttempt(Player player, int item, String comment) {
+        logEvent("USE", player.getName(),
                 (int)Math.floor(player.getX()), (int)Math.floor(player.getY()),
                 (int)Math.floor(player.getZ()), item, comment);
     }

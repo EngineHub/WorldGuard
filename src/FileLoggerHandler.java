@@ -246,8 +246,8 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block, String comment) {
-        log(player, "Tried to use " + getFriendlyItemName(block.getType())
+    public void logRightClickAttempt(Player player, Block block, String comment) {
+        log(player, "Tried to right click " + getFriendlyItemName(block.getType())
                 + " " + getCoordinates(block),
                 comment);
     }
@@ -268,8 +268,18 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item, String comment) {
-        log(player, "Tried to create " + getFriendlyItemName(item), comment);
+    public void logPlaceAttempt(Player player, int item, String comment) {
+        log(player, "Tried to place " + getFriendlyItemName(item), comment);
+    }
+
+    /**
+     * Log a block use attempt.
+     *
+     * @param player
+     * @param item
+     */
+    public void logUseAttempt(Player player, int item, String comment) {
+        log(player, "Tried to use " + getFriendlyItemName(item), comment);
     }
 
     /**

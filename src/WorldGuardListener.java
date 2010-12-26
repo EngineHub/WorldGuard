@@ -634,10 +634,8 @@ public class WorldGuardListener extends PluginListener {
         if (blacklist != null) {
             int itemId = item.getItemId();
 
-            if (itemId >= 325 && itemId <= 327) {
-                if (!blacklist.onCreate(itemId, player)) {
-                    return true;
-                }
+            if (!blacklist.onUse(itemId, player)) {
+                return true;
             }
         }
         
@@ -660,13 +658,11 @@ public class WorldGuardListener extends PluginListener {
         int itemId = itemInHand.getItemId();
 
         if (blacklist != null) {
-            if (itemId < 325 || itemId > 327) {
-                if (!blacklist.onCreate(itemId, player)) {
-                    return true;
-                }
+            if (!blacklist.onPlace(itemId, player)) {
+                return true;
             }
 
-            if (!blacklist.onUse(blockClicked, player)) {
+            if (!blacklist.onRightClick(blockClicked, player)) {
                 return true;
             }
         }
@@ -702,8 +698,6 @@ public class WorldGuardListener extends PluginListener {
      */
     @Override
     public boolean onBlockDestroy(Player player, Block block) {
-        int type = block.getType();
-        
         if (blacklist != null) {
             if (!blacklist.onDestroyWith(player.getItemInHand(), player)) {
                 return true;
@@ -747,7 +741,7 @@ public class WorldGuardListener extends PluginListener {
         /*Block block = new Block(54, complexBlock.getX(),
                 complexBlock.getY(), complexBlock.getZ());
 
-        if (!blacklist.onSilentUse(block, player)) {
+        if (!blacklist.onRightClick(block, player)) {
             return true;
         }*/
         
@@ -858,10 +852,6 @@ public class WorldGuardListener extends PluginListener {
      */
     @Override
     public boolean onFlow(Block blockFrom, Block blockTo) {
-        int x = blockFrom.getX();
-        int y = blockFrom.getY();
-        int z = blockFrom.getZ();
-
         boolean isWater = blockFrom.getType() == 8 || blockFrom.getType() == 9;
         boolean isLava = blockFrom.getType() == 10 || blockFrom.getType() == 11;
 

@@ -88,9 +88,21 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
      * @param player
      * @param block
      */
-    public void logUseAttempt(Player player, Block block, String comment) {
+    public void logUseAttempt(Player player, int item, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {
-            handler.logUseAttempt(player, block, comment);
+            handler.logUseAttempt(player, item, comment);
+        }
+    }
+
+    /**
+     * Log a right click on attempt.
+     *
+     * @param player
+     * @param block
+     */
+    public void logRightClickAttempt(Player player, Block block, String comment) {
+        for (BlacklistLoggerHandler handler : handlers) {
+            handler.logRightClickAttempt(player, block, comment);
         }
     }
 
@@ -107,14 +119,14 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
     }
 
     /**
-     * Log a right click attempt.
+     * Log a place attempt.
      *
      * @param player
      * @param item
      */
-    public void logCreateAttempt(Player player, int item, String comment) {
+    public void logPlaceAttempt(Player player, int item, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {
-            handler.logCreateAttempt(player, item, comment);
+            handler.logPlaceAttempt(player, item, comment);
         }
     }
 

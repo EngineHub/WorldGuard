@@ -141,20 +141,20 @@ public class Blacklist {
     }
 
     /**
-     * Called on right click. Returns true to let the action pass through.
+     * Called on place. Returns true to let the action pass through.
      *
      * @param item
      * @param player
      * @return
      */
-    public boolean onCreate(int item, Player player) {
+    public boolean onPlace(int item, Player player) {
         List<BlacklistEntry> entries = getEntries(item);
         if (entries == null) {
             return true;
         }
         boolean ret = true;
         for (BlacklistEntry entry : entries) {
-            if (!entry.onCreate(item, player)) {
+            if (!entry.onPlace(item, player)) {
                 ret = false;
             }
         }
@@ -164,18 +164,39 @@ public class Blacklist {
     /**
      * Called on right click upon. Returns true to let the action pass through.
      *
-     * @param item
+     * @param block
      * @param player
      * @return
      */
-    public boolean onUse(Block block, Player player) {
+    public boolean onRightClick(Block block, Player player) {
         List<BlacklistEntry> entries = getEntries(block.getType());
         if (entries == null) {
             return true;
         }
         boolean ret = true;
         for (BlacklistEntry entry : entries) {
-            if (!entry.onUse(block, player)) {
+            if (!entry.onRightClick(block, player)) {
+                ret = false;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Called on item use. Returns true to let the action pass through.
+     *
+     * @param item
+     * @param player
+     * @return
+     */
+    public boolean onUse(int item, Player player) {
+        List<BlacklistEntry> entries = getEntries(item);
+        if (entries == null) {
+            return true;
+        }
+        boolean ret = true;
+        for (BlacklistEntry entry : entries) {
+            if (!entry.onUse(item, player)) {
                 ret = false;
             }
         }
@@ -345,12 +366,12 @@ public class Blacklist {
                         } else if (parts[0].equalsIgnoreCase("on-left")
                                 || parts[0].equalsIgnoreCase("on-destroy-with")) {
                             entry.setDestroyWithActions(parts[1].split(","));
-                        } else if (parts[0].equalsIgnoreCase("on-right")
-                                || parts[0].equalsIgnoreCase("on-create")) {
-                            entry.setCreateActions(parts[1].split(","));
-                        } else if (parts[0].equalsIgnoreCase("on-right-on")
-                                || parts[0].equalsIgnoreCase("on-use")) {
+                        } else if (parts[0].equalsIgnoreCase("on-place")) {
+                            entry.setPlaceActions(parts[1].split(","));
+                        } else if (parts[0].equalsIgnoreCase("on-use")) {
                             entry.setUseActions(parts[1].split(","));
+                        } else if (parts[0].equalsIgnoreCase("on-right-click")) {
+                            entry.setRightClickActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-drop")) {
                             entry.setDropActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-acquire")) {
