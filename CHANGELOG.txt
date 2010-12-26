@@ -1,3 +1,12 @@
+1.8:
+- Updated for Minecraft beta.
+- Blacklist hooks have CHANGED. The new hooks are work better. on-create has
+    been replaced with on-place (for block placement) and on-use
+    (for item usage, light buckets and lighters). The old on-use is now
+    on-right-click although it currently does nothing.
+- Added coordinates to blacklist file logger.
+- Added suffocation damage prevention.
+
 1.7.1:
 - Updated for v0.2.8.
 
