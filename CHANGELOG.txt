@@ -1,4 +1,7 @@
-1.8:
+1.8.1
+- Fixed NullPointerException.
+
+1.8
 - Updated for Minecraft beta.
 - Blacklist hooks have CHANGED. The new hooks are work better. on-create has
     been replaced with on-place (for block placement) and on-use
@@ -7,7 +10,7 @@
 - Added coordinates to blacklist file logger.
 - Added suffocation damage prevention.
 
-1.7.1:
+1.7.1
 - Updated for v0.2.8.
 
 1.7
