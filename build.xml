@@ -51,6 +51,7 @@
       <fileset dir="."/>
       <globmapper from="*.txt" to="*.txt"/>
     </copy>
+    <copy file="worldguard.properties" todir="${release.dir}"/>
     <copy tofile="${release.dir}/WorldGuard.jar" file="${dist.dir}/WorldGuard.jar"/>
     <zip destfile="${release.dir}/worldguard-${version}.zip" basedir="${release.dir}" excludes="*.zip"/>
     <mkdir dir="${release.dir}/src"/>
