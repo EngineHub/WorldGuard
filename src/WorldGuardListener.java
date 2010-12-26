@@ -82,7 +82,6 @@ public class WorldGuardListener extends PluginListener {
     private boolean disableAllFire;
     private boolean simulateSponge;
     private int spongeRadius;
-    private boolean itemDurability;
     private Set<Integer> fireNoSpreadBlocks;
     private Set<Integer> allowedLavaSpreadOver;
     private Set<Integer> itemDropBlacklist;
@@ -193,7 +192,6 @@ public class WorldGuardListener extends PluginListener {
         classicWater = properties.getBoolean("classic-water", false);
         simulateSponge = properties.getBoolean("simulate-sponge", true);
         spongeRadius = Math.max(1, properties.getInt("sponge-radius", 3)) - 1;
-        itemDurability = properties.getBoolean("item-durability", false);
         noPhysicsGravel = properties.getBoolean("no-physics-gravel", false);
         noPhysicsSand = properties.getBoolean("no-physics-sand", false);
         allowPortalAnywhere = properties.getBoolean("allow-portal-anywhere", false);
@@ -401,48 +399,50 @@ public class WorldGuardListener extends PluginListener {
         } else if ((split[0].equalsIgnoreCase("/stack")
                 || split[0].equalsIgnoreCase("/;"))
                     && player.canUseCommand("/stack")) {
-            hn[] items = player.getInventory().getArray();
+            Item[] items = player.getInventory().getContents();
             int len = items.length;
 
             int affected = 0;
             
             for (int i = 0; i < len; i++) {
-                hn item = items[i];
+                Item item = items[i];
 
                 // Avoid infinite stacks and stacks with durability
-                if (item == null || item.a <= 0 || item.d > 0) {
+                if (item == null || item.getAmount() <= 0
+                        || shouldNotStack(item.getItemId())) {
                     continue;
                 }
 
                 // Ignore buckets
-                if (item.c >= 325 && item.c <= 327) {
+                if (item.getItemId() >= 325 && item.getItemId() <= 327) {
                     continue;
                 }
 
-                if (item.a < 64) {
-                    int needed = 64 - item.a; // Number of needed items until 64
+                if (item.getAmount() < 64) {
+                    int needed = 64 - item.getAmount(); // Number of needed items until 64
 
                     // Find another stack of the same type
                     for (int j = i + 1; j < len; j++) {
-                        hn item2 = items[j];
+                        Item item2 = items[j];
 
                         // Avoid infinite stacks and stacks with durability
-                        if (item2 == null || item2.a <= 0 || item2.d > 0) {
+                        if (item2 == null || item2.getAmount() <= 0
+                                || shouldNotStack(item.getItemId())) {
                             continue;
                         }
 
                         // Same type?
-                        if (item2.c == item.c) {
+                        if (item2.getItemId() == item.getItemId()) {
                             // This stack won't fit in the parent stack
-                            if (item2.a > needed) {
-                                item.a = 64;
-                                item2.a -= needed;
+                            if (item2.getAmount() > needed) {
+                                item.setAmount(64);
+                                item2.setAmount(item2.getAmount() - needed);
                                 break;
                             // This stack will
                             } else {
                                 items[j] = null;
-                                item.a += item2.a;
-                                needed = 64 - item.a;
+                                item.setAmount(item.getAmount() + item2.getAmount());
+                                needed = 64 - item.getAmount();
                             }
 
                             affected++;
@@ -452,7 +452,7 @@ public class WorldGuardListener extends PluginListener {
             }
 
             if (affected > 0) {
-                player.getInventory().updateInventory();
+                ItemArrayUtil.setContents((ItemArray<?>)player.getInventory(), items);
             }
 
             player.sendMessage(Colors.Yellow + "Items compacted into stacks!");
@@ -483,6 +483,24 @@ public class WorldGuardListener extends PluginListener {
         }
 
         return false;
+    }
+    
+    /**
+     * Returns true if an item should not be stacked.
+     * 
+     * @param id
+     * @return
+     */
+    private static boolean shouldNotStack(int id) {
+        return (id >= 256 && id <= 259)
+            || id == 261
+            || (id >= 267 && id <= 279)
+            || (id >= 281 && id <= 286)
+            || (id >= 290 && id <= 294)
+            || (id >= 298 && id <= 317)
+            || (id >= 325 && id <= 327)
+            || id == 335
+            || id == 346;
     }
 
     /**
@@ -582,12 +600,12 @@ public class WorldGuardListener extends PluginListener {
     @Override
     public boolean onInventoryChange(Player player) {
         if (blacklist != null && blacklist.hasOnAcquire()) {
-            hn[] items = player.getInventory().getArray();
+            Item[] items = player.getInventory().getContents();
             boolean needUpdate = false;
 
             for (int i = 0; i < items.length; i++) {
                 if (items[i] != null) {
-                    if (!blacklist.onAcquire(items[i].c, player)) {
+                    if (!blacklist.onAcquire(items[i].getItemId(), player)) {
                         items[i] = null;
                         needUpdate = true;
                     }
@@ -595,7 +613,7 @@ public class WorldGuardListener extends PluginListener {
             }
 
             if (needUpdate) {
-                player.getInventory().updateInventory();
+                ItemArrayUtil.setContents((ItemArray<?>)player.getInventory(), items);
             }
         }
         
@@ -718,77 +736,39 @@ public class WorldGuardListener extends PluginListener {
     }
 
     /**
-     * Called when either a sign, chest or furnace is changed.
+     * Called when a player attempts to open an inventory; whether it's a
+     * workbench, a chest or their own player inventory
      *
-     * @param player
-     *            player who changed it
-     * @param complexBlock
-     *            complex block that changed
-     * @return true if you want any changes to be reverted
+     * @param player user who attempted to open the inventory
+     * @param inventory the inventory that they are attempting to open
+     * @return
      */
-    @Override
-    public boolean onComplexBlockChange(Player player, ComplexBlock complexBlock) {
-        if (blacklist != null) {
-            if (complexBlock instanceof Chest) {
-                Block block = new Block(54, complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
+    public boolean onOpenInventory(Player player, Inventory inventory) {
+        /*Block block = new Block(54, complexBlock.getX(),
+                complexBlock.getY(), complexBlock.getZ());
 
-                if (!blacklist.onSilentUse(block, player)) {
-                    return true;
-                }
-            } else if (complexBlock instanceof Furnace) {
-                int id = etc.getServer().getBlockIdAt(complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
-                Block block = new Block(id, complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
-
-                if (!blacklist.onSilentUse(block, player)) {
-                    return true;
-                }
-            } else if (complexBlock instanceof Sign) {
-                int id = etc.getServer().getBlockIdAt(complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
-                Block block = new Block(id, complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
-
-                if (!blacklist.onSilentUse(block, player)) {
-                    return true;
-                }
-            }
-        }
-
+        if (!blacklist.onSilentUse(block, player)) {
+            return true;
+        }*/
+        
         return false;
     }
 
     /**
-     * Called when either a sign, chest or furnace is sent to a player
-     *
-     * @param player
-     *            player who the block is being sent to
-     * @param complexBlock
-     *            complex block that's being sent
-     * @return true if you want the chest, furnace or sign to be empty
+     * Called when a sign is changed by a player (Usually, when they first place it)
+     * 
+     * @param player Player who changed the sign
+     * @param sign Sign which had changed
+     * @return true if you wish to cancel this change
      */
-    @Override
-    public boolean onSendComplexBlock(Player player, ComplexBlock complexBlock) {
-        if (blacklist != null) {
-            if (complexBlock instanceof Chest) {
-                Block block = new Block(54, complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
+    public boolean onSignChange(Player player, Sign sign) {
+        int id = etc.getServer().getBlockIdAt(sign.getX(),
+                sign.getY(), sign.getZ());
+        Block block = new Block(id, sign.getX(),
+                sign.getY(), sign.getZ());
 
-                if (!blacklist.onSilentUse(block, player)) {
-                    return true;
-                }
-            } else if (complexBlock instanceof Furnace) {
-                int id = etc.getServer().getBlockIdAt(complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
-                Block block = new Block(id, complexBlock.getX(),
-                        complexBlock.getY(), complexBlock.getZ());
-
-                if (!blacklist.onSilentUse(block, player)) {
-                    return true;
-                }
-            }
+        if (!blacklist.onSilentUse(block, player)) {
+            return true;
         }
         
         return false;

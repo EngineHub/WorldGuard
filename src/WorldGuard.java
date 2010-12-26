@@ -60,16 +60,9 @@ public class WorldGuard extends Plugin {
 
         registerHook("COMMAND", PluginListener.Priority.MEDIUM);
         registerHook("SERVERCOMMAND", PluginListener.Priority.MEDIUM);
-        if (!registerHook("EXPLODE", PluginListener.Priority.HIGH)) {
-            missingFeatures.add("disabling TNT or creeper explosions");
-        }
-        if (!registerHook("IGNITE", PluginListener.Priority.HIGH)) {
-            missingFeatures.add("disabling fire or lava fire");
-        }
-        if (!registerHook("FLOW", PluginListener.Priority.HIGH)) {
-            missingFeatures.add("controlling lava flow");
-            missingFeatures.add("sponge simulation");
-        }
+        registerHook("EXPLODE", PluginListener.Priority.HIGH);
+        registerHook("IGNITE", PluginListener.Priority.HIGH);
+        registerHook("FLOW", PluginListener.Priority.HIGH);
         registerHook("LOGINCHECK", PluginListener.Priority.HIGH);
         registerHook("LOGIN", PluginListener.Priority.MEDIUM);
         registerHook("BLOCK_CREATED", PluginListener.Priority.HIGH);
@@ -78,38 +71,15 @@ public class WorldGuard extends Plugin {
         registerHook("BLOCK_PLACE", PluginListener.Priority.HIGH);
         registerHook("DISCONNECT", PluginListener.Priority.HIGH);
         registerHook("ITEM_DROP", PluginListener.Priority.HIGH);
-        if (!registerHook("ITEM_USE", PluginListener.Priority.HIGH)) {
-            missingFeatures.add("denying use of the lava or water buckets");
-        }
-        if (!registerHook("ITEM_PICK_UP", PluginListener.Priority.HIGH)) {
-            missingFeatures.add("denying item pickups");
-            missingFeatures.add("the item durability fix");
-        } else {
-            try {
-                Method method = 
-                        Item.class.getDeclaredMethod("setDamage", new Class[]{ Integer.class });
-                if (method == null) {
-                    missingFeatures.add("the item durability fix");
-                }
-            } catch (NoSuchMethodException e) {
-                missingFeatures.add("the item durability fix");
-            }
-        }
-        registerHook("COMPLEX_BLOCK_CHANGE", PluginListener.Priority.HIGH);
-        registerHook("COMPLEX_BLOCK_SEND", PluginListener.Priority.HIGH);
+        registerHook("ITEM_USE", PluginListener.Priority.HIGH);
+        registerHook("ITEM_PICK_UP", PluginListener.Priority.HIGH);
+        registerHook("SIGN_CHANGE", PluginListener.Priority.HIGH);
+        registerHook("OPEN_INVENTORY", PluginListener.Priority.HIGH);
         registerHook("INVENTORY_CHANGE", PluginListener.Priority.HIGH);
-        if (!registerHook("BLOCK_PHYSICS", PluginListener.Priority.MEDIUM)) {
-            missingFeatures.add("controlling the physics of gravel, sand, or portal blocks");
-        }
-        if (!registerHook("HEALTH_CHANGE", PluginListener.Priority.MEDIUM)) {
-            missingFeatures.add("god mode");
-        }
-        if (!registerHook("DAMAGE", PluginListener.Priority.MEDIUM)) {
-            missingFeatures.add("disabling fall, water, lava, and fire damage");
-        }
-        if (!registerHook("LIQUID_DESTROY", PluginListener.Priority.MEDIUM)) {
-            missingFeatures.add("disabling water damage");
-        }
+        registerHook("BLOCK_PHYSICS", PluginListener.Priority.MEDIUM);
+        registerHook("HEALTH_CHANGE", PluginListener.Priority.MEDIUM);
+        registerHook("DAMAGE", PluginListener.Priority.MEDIUM);
+        registerHook("LIQUID_DESTROY", PluginListener.Priority.MEDIUM);
 
         if (missingFeatures.size() > 0) {
             logger.log(Level.WARNING, "WorldGuard: Your version of hMod does not support "
@@ -133,7 +103,7 @@ public class WorldGuard extends Plugin {
             etc.getLoader().addListener(hook, listener, this, priority);
             return true;
         } catch (IllegalArgumentException e) {
-            //logger.log(Level.WARNING, "WorldGuard: Missing hook " + name + "!");
+            logger.log(Level.WARNING, "WorldGuard: Missing hook " + name + "!");
             return false;
         }
     }
