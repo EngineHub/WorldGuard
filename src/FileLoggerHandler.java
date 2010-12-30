@@ -93,8 +93,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     private String buildPath(String playerName) {
         GregorianCalendar calendar = new GregorianCalendar();
 
-        Pattern p = Pattern.compile("%.");
-        Matcher m = p.matcher(pathPattern);
+        Matcher m = pattern.matcher(pathPattern);
         StringBuffer buffer = new StringBuffer();
 
         // Pattern replacements

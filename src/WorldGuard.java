@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.net.URL;
 import java.io.*;
-import java.lang.reflect.*;
 
 /**
  * Entry point for the plugin for hey0's mod.
@@ -54,8 +53,6 @@ public class WorldGuard extends Plugin {
      */
     @Override
     public void initialize() {
-        PluginLoader loader = etc.getLoader();
-
         List<String> missingFeatures = new ArrayList<String>();
 
         registerHook("COMMAND", PluginListener.Priority.MEDIUM);

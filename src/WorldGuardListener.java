@@ -17,15 +17,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Random;
 import java.io.*;
 import com.sk89q.worldedit.blocks.BlockType;
 
@@ -39,19 +36,7 @@ public class WorldGuardListener extends PluginListener {
      * Logger.
      */
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-    /**
-     * Timer for threading.
-     */
-    private static final Timer timer = new Timer();
-    /**
-     * Random number generator.
-     */
-    private static Random rand = new Random();
 
-    /**
-     * Plugin host.
-     */
-    private WorldGuard plugin;
     /**
      * Properties file for WorldGuard.
      */
@@ -109,7 +94,6 @@ public class WorldGuardListener extends PluginListener {
      * @param plugin
      */
     public WorldGuardListener(WorldGuard plugin) {
-        this.plugin = plugin;
         postReload();
     }
 
