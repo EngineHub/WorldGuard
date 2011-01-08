@@ -581,7 +581,7 @@ public class WorldGuardListener extends PluginListener {
      *            player who's inventory was modified
      * @return true if you want any changes to be reverted
      */
-    @Override
+    /*@Override
     public boolean onInventoryChange(Player player) {
         if (blacklist != null && blacklist.hasOnAcquire()) {
             Item[] items = player.getInventory().getContents();
@@ -602,7 +602,7 @@ public class WorldGuardListener extends PluginListener {
         }
         
         return false;
-    }
+    }*/
 
     /**
      * Called when a player uses an item (rightclick with item in hand)
