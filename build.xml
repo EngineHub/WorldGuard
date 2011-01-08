@@ -30,7 +30,7 @@
       <attribute name="Implementation-Title" value="WorldGuard"/>
       <attribute name="Implementation-Version" value="${version}"/>
       <attribute name="WorldGuard-Version" value="${version}"/>
-      <attribute name="Class-Path" value="WorldGuard.jar"/>
+      <attribute name="Class-Path" value="WorldEdit.jar"/>
     </manifest>
     <jar jarfile="${dist.dir}/WorldGuard.jar" basedir="${build.dir}" manifest="manifest.mf"/>
   </target>

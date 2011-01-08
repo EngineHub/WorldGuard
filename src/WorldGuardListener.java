@@ -19,12 +19,22 @@
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.*;
+
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.WorldEditNotInstalled;
 import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.*;
 
 /**
  * Event listener for Hey0's server mod.
@@ -41,23 +51,17 @@ public class WorldGuardListener extends PluginListener {
      * Properties file for WorldGuard.
      */
     private PropertiesFile properties = new PropertiesFile("worldguard.properties");
-    /**
-     * List of players with god mode on.
-     */
+
+    private RegionManager regionManager = new FlatRegionManager();
+    private ProtectionDatabase regionLoader =
+            new CSVDatabase(new File("worldguard-regions.txt"));
+    
     private Set<String> invinciblePlayers = new HashSet<String>();
-    /**
-     * List of amphibious players.
-     */
     private Set<String> amphibiousPlayers = new HashSet<String>();
-    /**
-     * Used to keep recent join times.
-     */
     private Map<String,Long> recentLogins = new HashMap<String,Long>();
-    /**
-     * Used to keep recent spawn times.
-     */
     private Map<String,Long> lastSpawn = new HashMap<String,Long>();
 
+    private boolean useRegions = false;
     private boolean stopFireSpread = false;
     private boolean enforceOneSession;
     private boolean blockCreepers;
@@ -160,9 +164,18 @@ public class WorldGuardListener extends PluginListener {
                     + e.getMessage());
         }
 
+        try {
+            regionLoader.load();
+            regionManager.setRegions(regionLoader.getRegions());
+        } catch (IOException e) {
+            logger.warning("WorldGuard: Failed to load regions: "
+                    + e.getMessage());
+        }
+        
         recentLogins.clear();
 
         // Load basic options
+        useRegions = properties.getBoolean("use-protected-regions", false);
         enforceOneSession = properties.getBoolean("enforce-single-session", true);
         blockCreepers = properties.getBoolean("block-creepers", false);
         blockTNT = properties.getBoolean("block-tnt", false);
@@ -442,6 +455,50 @@ public class WorldGuardListener extends PluginListener {
             player.sendMessage(Colors.Yellow + "Items compacted into stacks!");
             
             return true;
+        } else if (split[0].equalsIgnoreCase("/definearea")
+                && player.canUseCommand("/definearea")) {
+            if (split.length < 3) {
+                player.sendMessage(Colors.Rose + "/definearea <id> <owners...>");
+                return true;
+            }
+
+            try {
+                String id = split[1];
+                BlockVector min = WorldEditBridge.getRegionMinimumPoint(player).toBlockVector();
+                BlockVector max = WorldEditBridge.getRegionMaximumPoint(player).toBlockVector();
+                ProtectedRegion region = new ProtectedCuboidRegion(min, max);
+                region.setOwners(parseDomainString(split, 2));
+                regionManager.addRegion(id, region);
+                regionLoader.save(regionManager);
+                player.sendMessage(Colors.Yellow + "Region saved!");
+            } catch (WorldEditNotInstalled e) {
+                player.sendMessage(Colors.Rose + "WorldEdit must be installed and enabled as a plugin.");
+            } catch (IncompleteRegionException e) {
+                player.sendMessage(Colors.Rose + "You must first define an area in WorldEdit.");
+            } catch (IOException e) {
+                player.sendMessage(Colors.Rose + "Region database failed to save: "
+                        + e.getMessage());
+            }
+            
+            return true;
+        } else if (split[0].equalsIgnoreCase("/delarea")
+                && player.canUseCommand("/definearea")) {
+            if (split.length < 3) {
+                player.sendMessage(Colors.Rose + "/delarea <id>");
+                return true;
+            }
+
+            try {
+                String id = split[1];
+                regionManager.removeRegion(id);
+                regionLoader.save(regionManager);
+                player.sendMessage(Colors.Yellow + "Region removed!");
+            } catch (IOException e) {
+                player.sendMessage(Colors.Rose + "Region database failed to save: "
+                        + e.getMessage());
+            }
+            
+            return true;
         } else if (split[0].equalsIgnoreCase("/reload")
                 && player.canUseCommand("/reload")
                 && split.length > 1) {
@@ -467,6 +524,30 @@ public class WorldGuardListener extends PluginListener {
         }
 
         return false;
+    }
+    
+    /**
+     * Parse a group/player DefaultDomain specification for areas.
+     * 
+     * @param split
+     * @param startIndex
+     * @return
+     */
+    private static DefaultDomain parseDomainString(String[] split, int startIndex) {
+        Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
+        DefaultDomain domain = new DefaultDomain();
+        
+        for (int i = startIndex; i < split.length; i++) {
+            String s = split[i];
+            Matcher m = groupPattern.matcher(s);
+            if (m.matches()) {
+                domain.addGroup(m.group(1));
+            } else {
+                domain.addPlayer(s);
+            }
+        }
+        
+        return domain;
     }
     
     /**
@@ -623,6 +704,16 @@ public class WorldGuardListener extends PluginListener {
             }
         }
         
+        if (useRegions) {
+            Vector pt = new Vector(blockPlaced.getX(),
+                    blockPlaced.getY(), blockPlaced.getZ());
+            LocalPlayer localPlayer = new HMPlayer(player);
+            
+            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                return true;
+            }
+        }
+        
         return false;
     }
 
@@ -640,6 +731,16 @@ public class WorldGuardListener extends PluginListener {
             Block blockClicked, Item itemInHand) {
         
         int itemId = itemInHand.getItemId();
+        
+        if (useRegions) {
+            Vector pt = new Vector(blockPlaced.getX(),
+                    blockPlaced.getY(), blockPlaced.getZ());
+            LocalPlayer localPlayer = new HMPlayer(player);
+            
+            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                return true;
+            }
+        }
 
         if (blacklist != null) {
             if (!blacklist.onPlace(itemId, player)) {
@@ -704,6 +805,16 @@ public class WorldGuardListener extends PluginListener {
      */
     @Override
     public boolean onBlockBreak(Player player, Block block) {
+        if (useRegions) {
+            Vector pt = new Vector(block.getX(),
+                    block.getY(), block.getZ());
+            LocalPlayer localPlayer = new HMPlayer(player);
+            
+            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                return true;
+            }
+        }
+        
         if (blacklist != null) {
             if (!blacklist.onBreak(block, player)) {
                 return true;
@@ -793,6 +904,16 @@ public class WorldGuardListener extends PluginListener {
                     || fireNoSpreadBlocks.contains(etc.getServer().getBlockIdAt(x - 1, y, z))
                     || fireNoSpreadBlocks.contains(etc.getServer().getBlockIdAt(x, y, z - 1))
                     || fireNoSpreadBlocks.contains(etc.getServer().getBlockIdAt(x, y, z + 1))) {
+                return true;
+            }
+        }
+        
+        if (useRegions) {
+            Vector pt = new Vector(block.getX(),
+                    block.getY(), block.getZ());
+            LocalPlayer localPlayer = new HMPlayer(player);
+            
+            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 return true;
             }
         }
