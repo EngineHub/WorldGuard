@@ -175,7 +175,7 @@ public class WorldGuardListener extends PluginListener {
         recentLogins.clear();
 
         // Load basic options
-        useRegions = properties.getBoolean("use-protected-regions", false);
+        useRegions = properties.getBoolean("use-regions", true);
         enforceOneSession = properties.getBoolean("enforce-single-session", true);
         blockCreepers = properties.getBoolean("block-creepers", false);
         blockTNT = properties.getBoolean("block-tnt", false);
@@ -710,6 +710,7 @@ public class WorldGuardListener extends PluginListener {
             LocalPlayer localPlayer = new HMPlayer(player);
             
             if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                player.sendMessage(Colors.Red + "You don't have permission for this area.");
                 return true;
             }
         }
@@ -738,6 +739,7 @@ public class WorldGuardListener extends PluginListener {
             LocalPlayer localPlayer = new HMPlayer(player);
             
             if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                player.sendMessage(Colors.Red + "You don't have permission for this area.");
                 return true;
             }
         }
@@ -811,6 +813,7 @@ public class WorldGuardListener extends PluginListener {
             LocalPlayer localPlayer = new HMPlayer(player);
             
             if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                player.sendMessage(Colors.Red + "You don't have permission for this area.");
                 return true;
             }
         }
@@ -839,6 +842,19 @@ public class WorldGuardListener extends PluginListener {
         if (!blacklist.onRightClick(block, player)) {
             return true;
         }*/
+        
+        if (useRegions && (inventory instanceof Chest
+                || inventory instanceof DoubleChest
+                || inventory instanceof Furnace)) {
+            ComplexBlock chest = (ComplexBlock)inventory;
+            Vector pt = new Vector(chest.getX(), chest.getY(), chest.getZ());
+            LocalPlayer localPlayer = new HMPlayer(player);
+            
+            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                player.sendMessage(Colors.Red + "You don't have permission for this area.");
+                return true;
+            }
+        }
         
         return false;
     }
