@@ -72,7 +72,6 @@ public class WorldGuard extends Plugin {
         registerHook("ITEM_PICK_UP", PluginListener.Priority.HIGH);
         registerHook("SIGN_CHANGE", PluginListener.Priority.HIGH);
         registerHook("OPEN_INVENTORY", PluginListener.Priority.HIGH);
-        registerHook("INVENTORY_CHANGE", PluginListener.Priority.HIGH);
         registerHook("BLOCK_PHYSICS", PluginListener.Priority.MEDIUM);
         registerHook("HEALTH_CHANGE", PluginListener.Priority.MEDIUM);
         registerHook("DAMAGE", PluginListener.Priority.MEDIUM);
