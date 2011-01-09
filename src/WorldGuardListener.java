@@ -960,7 +960,7 @@ public class WorldGuardListener extends PluginListener {
     @Override
     public boolean onItemUse(Player player, Block blockPlaced,
             Block blockClicked, Item item) {
-        if (blacklist != null) {
+        if (blacklist != null && item != null) {
             int itemId = item.getItemId();
 
             if (!blacklist.onUse(itemId, player)) {
@@ -968,7 +968,7 @@ public class WorldGuardListener extends PluginListener {
             }
         }
         
-        if (useRegions) {
+        if (useRegions && blockPlaced != null) {
             Vector pt = new Vector(blockPlaced.getX(),
                     blockPlaced.getY(), blockPlaced.getZ());
             LocalPlayer localPlayer = new HMPlayer(player);
