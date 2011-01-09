@@ -60,7 +60,7 @@ public class ApplicableRegionSet {
         return found ? allowed : true;
     }
     
-    public boolean canPvP(LocalPlayer player) {
+    public boolean allowsPvP() {
         for (ProtectedRegion region : regions.values()) {
             if (!region.contains(pt)) continue;
             if (region.getFlags().allowBuild == State.DENY) return false;

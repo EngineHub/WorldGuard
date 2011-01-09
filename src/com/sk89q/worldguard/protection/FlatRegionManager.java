@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import com.sk89q.worldedit.Vector;
@@ -72,6 +74,25 @@ public class FlatRegionManager implements RegionManager {
     }
     
     /**
+     * Return whether a region exists by an ID.
+     * 
+     * @param id
+     * @return
+     */
+    public boolean hasRegion(String id) {
+        return regions.containsKey(id);
+    }
+    
+    /**
+     * Get a region by its ID.
+     * 
+     * @param id
+     */
+    public ProtectedRegion getRegion(String id) {
+        return regions.get(id);
+    }
+    
+    /**
      * Set a list of protected regions.
      *
      * @return
@@ -81,13 +102,31 @@ public class FlatRegionManager implements RegionManager {
     }
     
     /**
-     * Get a LinkedList of regions that contain a point.
+     * Get an object for a point for rules to be applied with.
      * 
      * @param pt
      * @return
      */
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
         return new ApplicableRegionSet(pt, regions);
+    }
+    
+    /**
+     * Get a list of region IDs that contain a point.
+     * 
+     * @param pt
+     * @return
+     */
+    public List<String> getApplicableRegionsIDs(Vector pt) {
+        List<String> applicable = new ArrayList<String>();
+        
+        for (Map.Entry<String,ProtectedRegion> entry : regions.entrySet()) {
+            if (entry.getValue().contains(pt)) {
+                applicable.add(entry.getKey());
+            }
+        }
+        
+        return applicable;
     }
     
     /**

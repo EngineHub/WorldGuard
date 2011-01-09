@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.domains;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import com.sk89q.worldguard.LocalPlayer;
@@ -34,15 +35,27 @@ public class DefaultDomain implements Domain {
     }
     
     public void addPlayer(String name) {
-        players.add(name);
+        players.add(name.toLowerCase());
     }
     
     public void addPlayer(LocalPlayer player) {
-        players.add(player.getName());
+        players.add(player.getName().toLowerCase());
+    }
+    
+    public void removePlayer(String name) {
+        players.remove(name.toLowerCase());
+    }
+    
+    public void removePlayer(LocalPlayer player) {
+        players.remove(player.getName().toLowerCase());
     }
     
     public void addGroup(String name) {
-        groups.add(name);
+        groups.add(name.toLowerCase());
+    }
+    
+    public void removeGroup(String name) {
+        groups.remove(name.toLowerCase());
     }
     
     public Set<String> getGroups() {
@@ -69,5 +82,27 @@ public class DefaultDomain implements Domain {
     
     public int size() {
         return groups.size();
+    }
+    
+    public String toPlayersString() {
+        StringBuilder str = new StringBuilder();
+        for (Iterator<String> it = players.iterator(); it.hasNext(); ) {
+            str.append(it.next());
+            if (it.hasNext()) {
+                str.append(", ");
+            }
+        }
+        return str.toString();
+    }
+    
+    public String toGroupsString() {
+        StringBuilder str = new StringBuilder();
+        for (Iterator<String> it = groups.iterator(); it.hasNext(); ) {
+            str.append(it.next());
+            if (it.hasNext()) {
+                str.append(", ");
+            }
+        }
+        return str.toString();
     }
 }

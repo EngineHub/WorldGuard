@@ -76,6 +76,7 @@ public class WorldGuard extends Plugin {
         registerHook("HEALTH_CHANGE", PluginListener.Priority.MEDIUM);
         registerHook("DAMAGE", PluginListener.Priority.MEDIUM);
         registerHook("LIQUID_DESTROY", PluginListener.Priority.MEDIUM);
+        registerHook("BLOCK_RIGHTCLICKED", PluginListener.Priority.MEDIUM);
 
         if (missingFeatures.size() > 0) {
             logger.log(Level.WARNING, "WorldGuard: Your version of hMod does not support "

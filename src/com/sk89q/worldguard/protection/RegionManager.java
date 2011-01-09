@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection;
 
+import java.util.List;
 import java.util.Map;
 import com.sk89q.worldedit.Vector;
 
@@ -54,19 +55,42 @@ public interface RegionManager {
     public void addRegion(String id, ProtectedRegion region);
     
     /**
+     * Return whether a region exists by an ID.
+     * 
+     * @param id
+     * @return
+     */
+    public boolean hasRegion(String id);
+    
+    /**
+     * Get a region by its ID.
+     * 
+     * @param id
+     */
+    public ProtectedRegion getRegion(String id);
+    
+    /**
      * Removes a region.
      * 
      * @param id
      */
     public void removeRegion(String id);
-    
+
     /**
-     * Get a LinkedList of regions that contain a point.
+     * Get an object for a point for rules to be applied with.
      * 
      * @param pt
      * @return
      */
     public ApplicableRegionSet getApplicableRegions(Vector pt);
+    
+    /**
+     * Get a list of region IDs that contain a point.
+     * 
+     * @param pt
+     * @return
+     */
+    public List<String> getApplicableRegionsIDs(Vector pt);
     
     /**
      * Get the number of regions.

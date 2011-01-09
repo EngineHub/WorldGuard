@@ -21,12 +21,14 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.*;
-
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.Vector;
@@ -51,6 +53,9 @@ public class WorldGuardListener extends PluginListener {
      * Properties file for WorldGuard.
      */
     private PropertiesFile properties = new PropertiesFile("worldguard.properties");
+
+    private static int CMD_LIST_SIZE = 9;
+    private static Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
 
     private RegionManager regionManager = new FlatRegionManager();
     private ProtectionDatabase regionLoader =
@@ -90,6 +95,7 @@ public class WorldGuardListener extends PluginListener {
     private boolean teleportToHome;
     private boolean exactRespawn;
     private boolean kickOnDeath;
+    private int regionWand = 287; 
     private Blacklist blacklist;
 
     /**
@@ -203,6 +209,7 @@ public class WorldGuardListener extends PluginListener {
         kickOnDeath = properties.getBoolean("kick-on-death", false);
         teleportToHome = properties.getBoolean("teleport-to-home-on-death", false);
         exactRespawn = properties.getBoolean("exact-respawn", false);
+        regionWand = properties.getInt("regions-wand", 287);
 
         // Console log configuration
         boolean logConsole = properties.getBoolean("log-console", true);
@@ -455,48 +462,18 @@ public class WorldGuardListener extends PluginListener {
             player.sendMessage(Colors.Yellow + "Items compacted into stacks!");
             
             return true;
-        } else if (split[0].equalsIgnoreCase("/definearea")
-                && player.canUseCommand("/definearea")) {
-            if (split.length < 3) {
-                player.sendMessage(Colors.Rose + "/definearea <id> <owners...>");
+        } else if (split[0].equalsIgnoreCase("/rg")
+                || split[0].equalsIgnoreCase("/region")) {
+            if (split.length < 2) {
+                player.sendMessage(Colors.Rose + "/rg <define|flag|delete|info|add|remove|list|save|load> ...");
                 return true;
-            }
-
-            try {
-                String id = split[1];
-                BlockVector min = WorldEditBridge.getRegionMinimumPoint(player).toBlockVector();
-                BlockVector max = WorldEditBridge.getRegionMaximumPoint(player).toBlockVector();
-                ProtectedRegion region = new ProtectedCuboidRegion(min, max);
-                region.setOwners(parseDomainString(split, 2));
-                regionManager.addRegion(id, region);
-                regionLoader.save(regionManager);
-                player.sendMessage(Colors.Yellow + "Region saved!");
-            } catch (WorldEditNotInstalled e) {
-                player.sendMessage(Colors.Rose + "WorldEdit must be installed and enabled as a plugin.");
-            } catch (IncompleteRegionException e) {
-                player.sendMessage(Colors.Rose + "You must first define an area in WorldEdit.");
-            } catch (IOException e) {
-                player.sendMessage(Colors.Rose + "Region database failed to save: "
-                        + e.getMessage());
             }
             
-            return true;
-        } else if (split[0].equalsIgnoreCase("/delarea")
-                && player.canUseCommand("/delarea")) {
-            if (split.length < 2) {
-                player.sendMessage(Colors.Rose + "/delarea <id>");
-                return true;
-            }
-
-            try {
-                String id = split[1];
-                regionManager.removeRegion(id);
-                regionLoader.save(regionManager);
-                player.sendMessage(Colors.Yellow + "Region removed!");
-            } catch (IOException e) {
-                player.sendMessage(Colors.Rose + "Region database failed to save: "
-                        + e.getMessage());
-            }
+            String action = split[1];
+            String[] args = new String[split.length - 1];
+            System.arraycopy(split, 1, args, 0, split.length - 1);
+            
+            handleRegionCommand(player, action, args);
             
             return true;
         } else if (split[0].equalsIgnoreCase("/reload")
@@ -527,6 +504,294 @@ public class WorldGuardListener extends PluginListener {
     }
     
     /**
+     * Handles a region command.
+     * 
+     * @param player
+     * @param action
+     * @param args
+     */
+    private void handleRegionCommand(Player player, String action, String[] args) {
+        if (action.equalsIgnoreCase("define")
+                && canUseRegionCommand(player, "/regiondefine")) {
+            if (args.length < 2) {
+                player.sendMessage(Colors.Rose + "/rg define <id> [owner1 [owner2 [owners...]]]");
+                return;
+            }
+            
+            try {
+                String id = args[1].toLowerCase();
+                BlockVector min = WorldEditBridge.getRegionMinimumPoint(player).toBlockVector();
+                BlockVector max = WorldEditBridge.getRegionMaximumPoint(player).toBlockVector();
+                ProtectedRegion region = new ProtectedCuboidRegion(min, max);
+                if (args.length >= 3) {
+                    region.setOwners(parseDomainString(args, 2));
+                }
+                regionManager.addRegion(id, region);
+                regionLoader.save(regionManager);
+                player.sendMessage(Colors.Yellow + "Region saved as " + id + ".");
+            } catch (WorldEditNotInstalled e) {
+                player.sendMessage(Colors.Rose + "WorldEdit must be installed and enabled as a plugin.");
+            } catch (IncompleteRegionException e) {
+                player.sendMessage(Colors.Rose + "You must first define an area in WorldEdit.");
+            } catch (IOException e) {
+                player.sendMessage(Colors.Rose + "Region database failed to save: "
+                        + e.getMessage());
+            }
+        } else if (action.equalsIgnoreCase("flag")
+                && canUseRegionCommand(player, "/regiondefine")) {
+            if (args.length < 4) {
+                player.sendMessage(Colors.Rose + "/rg flag <id> <build|pvp|tnt|lighter> <none|allow|deny>");
+                return;
+            }
+            
+            try {
+                String id = args[1].toLowerCase();
+                String flagStr = args[2];
+                String stateStr = args[3];
+                ProtectedRegion region = regionManager.getRegion(id);
+                
+                if (region == null) {
+                    player.sendMessage(Colors.Rose + "Could not find a region by that ID.");
+                    return;
+                }
+                
+                AreaFlags.State state = null;
+    
+                if (stateStr.equalsIgnoreCase("allow")) {
+                    state = AreaFlags.State.ALLOW;
+                } else if (stateStr.equalsIgnoreCase("deny")) {
+                    state = AreaFlags.State.DENY;
+                } else if (stateStr.equalsIgnoreCase("none")) {
+                    state = AreaFlags.State.NONE;
+                } else {
+                    player.sendMessage(Colors.Rose + "Acceptable states: allow, deny, none");
+                    return;
+                }
+                
+                AreaFlags flags = region.getFlags();
+                
+                if (flagStr.equalsIgnoreCase("build")) {
+                    flags.allowBuild = state;
+                } else if (flagStr.equalsIgnoreCase("pvp")) {
+                    flags.allowPvP = state;
+                } else if (flagStr.equalsIgnoreCase("tnt")) {
+                    flags.allowTNT = state;
+                } else if (flagStr.equalsIgnoreCase("lighter")) {
+                    flags.allowLighter = state;
+                } else {
+                    player.sendMessage(Colors.Rose + "Acceptable flags: build, pvp, tnt, lighter");
+                    return;
+                }
+                
+                regionLoader.save(regionManager);
+                player.sendMessage(Colors.Yellow + "Region '" + id + "' updated.");
+            } catch (IOException e) {
+                player.sendMessage(Colors.Rose + "Region database failed to save: "
+                        + e.getMessage());
+            }
+        } else if (action.equalsIgnoreCase("info")
+                && canUseRegionCommand(player, "/regioninfo")) {
+            if (args.length < 2) {
+                player.sendMessage(Colors.Rose + "/rg info <id>");
+                return;
+            }
+    
+            String id = args[1].toLowerCase();
+            if (!regionManager.hasRegion(id)) {
+                player.sendMessage(Colors.Rose + "A region with ID '"
+                        + id + "' doesn't exist.");
+                return;
+            }
+    
+            ProtectedRegion region = regionManager.getRegion(id);
+            AreaFlags flags = region.getFlags();
+            DefaultDomain domain = region.getOwners();
+            
+            player.sendMessage(Colors.Yellow + "Region ID: " + id);
+            player.sendMessage(Colors.LightGray + "Type: " + region.getClass().getCanonicalName());
+            player.sendMessage(Colors.LightBlue + "Build: " + flags.allowBuild.name());
+            player.sendMessage(Colors.LightBlue + "PvP: " + flags.allowPvP.name());
+            player.sendMessage(Colors.LightBlue + "TNT: " + flags.allowTNT.name());
+            player.sendMessage(Colors.LightBlue + "Lighter: " + flags.allowLighter.name());
+            player.sendMessage(Colors.LightPurple + "Players: " + domain.toPlayersString());
+            player.sendMessage(Colors.LightPurple + "Groups: " + domain.toGroupsString());
+        } else if (action.equalsIgnoreCase("add")
+                && canUseRegionCommand(player, "/regiondefine")) {
+            if (args.length < 2) {
+                player.sendMessage(Colors.Rose + "/rg add <id>");
+                return;
+            }
+    
+            try {
+                String id = args[1].toLowerCase();
+                if (!regionManager.hasRegion(id)) {
+                    player.sendMessage(Colors.Rose + "A region with ID '"
+                            + id + "' doesn't exist.");
+                    return;
+                }
+                
+                addToDomain(regionManager.getRegion(id).getOwners(), args, 1);
+                
+                regionLoader.save(regionManager);
+                player.sendMessage(Colors.Yellow + "Region updated!");
+            } catch (IOException e) {
+                player.sendMessage(Colors.Rose + "Region database failed to save: "
+                        + e.getMessage());
+            }
+        } else if (action.equalsIgnoreCase("remove")
+                && canUseRegionCommand(player, "/regiondefine")) {
+            if (args.length < 2) {
+                player.sendMessage(Colors.Rose + "/rg remove <id>");
+                return;
+            }
+    
+            try {
+                String id = args[1].toLowerCase();
+                if (!regionManager.hasRegion(id)) {
+                    player.sendMessage(Colors.Rose + "A region with ID '"
+                            + id + "' doesn't exist.");
+                    return;
+                }
+                
+                removeFromDomain(regionManager.getRegion(id).getOwners(), args, 1);
+                
+                regionLoader.save(regionManager);
+                player.sendMessage(Colors.Yellow + "Region updated!");
+            } catch (IOException e) {
+                player.sendMessage(Colors.Rose + "Region database failed to save: "
+                        + e.getMessage());
+            }
+        } else if (action.equalsIgnoreCase("list")
+                && canUseRegionCommand(player, "/regionlist")) {
+            int page = 0;
+            
+            if (args.length >= 2) {
+                try {
+                    page = Math.max(0, Integer.parseInt(args[1]) - 1);
+                } catch (NumberFormatException e) {
+                    page = 0;
+                }
+            }
+    
+            Map<String,ProtectedRegion> regions = regionManager.getRegions();
+            int size = regions.size();
+            int pages = (int)Math.ceil(size / (float)CMD_LIST_SIZE);
+            
+            String[] regionIDList = new String[size];
+            int index = 0;
+            for (String id : regions.keySet()) {
+                regionIDList[index] = id;
+                index++;
+            }
+            Arrays.sort(regionIDList);
+            
+            
+            player.sendMessage(Colors.Rose + "Regions (page "
+                    + (page + 1) + " of " + pages + "):");
+            
+            if (page < pages) {
+                for (int i = page * CMD_LIST_SIZE; i < page * CMD_LIST_SIZE + CMD_LIST_SIZE; i++) {
+                    if (i >= size) break;
+                    player.sendMessage(Colors.Yellow + (i + 1) + ". " + regionIDList[i]);
+                }
+            }
+        } else if (action.equalsIgnoreCase("delete")
+                && canUseRegionCommand(player, "/regiondelete")) {
+            if (args.length < 2) {
+                player.sendMessage(Colors.Rose + "/rg delete <id>");
+                return;
+            }
+    
+            try {
+                String id = args[1].toLowerCase();
+                if (!regionManager.hasRegion(id)) {
+                    player.sendMessage(Colors.Rose + "A region with ID '"
+                            + id + "' doesn't exist.");
+                    return;
+                }
+                regionManager.removeRegion(id);
+                regionLoader.save(regionManager);
+                player.sendMessage(Colors.Yellow + "Region removed!");
+            } catch (IOException e) {
+                player.sendMessage(Colors.Rose + "Region database failed to save: "
+                        + e.getMessage());
+            }
+        } else if (action.equalsIgnoreCase("save")
+                && canUseRegionCommand(player, "/regionsave")) {
+            try {
+                regionLoader.save(regionManager);
+                player.sendMessage(Colors.Yellow + "Region database saved to file!");
+            } catch (IOException e) {
+                player.sendMessage(Colors.Rose + "Region database failed to save: "
+                        + e.getMessage());
+            }
+        } else if (action.equalsIgnoreCase("load")
+                && canUseRegionCommand(player, "/regionload")) {
+            try {
+                regionLoader.load(regionManager);
+                player.sendMessage(Colors.Yellow + "Region database loaded from file!");
+            } catch (IOException e) {
+                player.sendMessage(Colors.Rose + "Region database failed to load: "
+                        + e.getMessage());
+            }
+        } else {
+            player.sendMessage(Colors.Rose + "/rg <define|flag|delete|info|add|remove|list|save|load> ...");
+        }
+    }
+    
+    /**
+     * Checks for the command or /region.
+     * 
+     * @param player
+     * @param cmd
+     * @return
+     */
+    private static boolean canUseRegionCommand(Player player, String cmd) {
+        return player.canUseCommand("/region")
+                || player.canUseCommand(cmd);
+    }
+    
+    /**
+     * Parse a group/player DefaultDomain specification for areas.
+     * 
+     * @param domain
+     * @param split
+     * @param startIndex
+     */
+    private static void addToDomain(DefaultDomain domain,
+            String[] split, int startIndex) {        
+        for (int i = startIndex; i < split.length; i++) {
+            String s = split[i];
+            Matcher m = groupPattern.matcher(s);
+            if (m.matches()) {
+                domain.addGroup(m.group(1));
+            } else {
+                domain.addPlayer(s);
+            }
+        }
+    }
+    
+    /**
+     * Parse a group/player DefaultDomain specification for areas.
+     * 
+     * @param domain
+     * @param split
+     * @param startIndex
+     */
+    private static void removeFromDomain(DefaultDomain domain,
+            String[] split, int startIndex) {        
+        for (int i = startIndex; i < split.length; i++) {
+            String s = split[i];
+            Matcher m = groupPattern.matcher(s);
+            if (m.matches()) {
+                domain.removeGroup(m.group(1));
+            } else {
+                domain.removePlayer(s);
+            }
+        }
+    }
+    
+    /**
      * Parse a group/player DefaultDomain specification for areas.
      * 
      * @param split
@@ -534,7 +799,6 @@ public class WorldGuardListener extends PluginListener {
      * @return
      */
     private static DefaultDomain parseDomainString(String[] split, int startIndex) {
-        Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
         DefaultDomain domain = new DefaultDomain();
         
         for (int i = startIndex; i < split.length; i++) {
@@ -709,7 +973,8 @@ public class WorldGuardListener extends PluginListener {
                     blockPlaced.getY(), blockPlaced.getZ());
             LocalPlayer localPlayer = new HMPlayer(player);
             
-            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+            if (!player.canUseCommand("/regionbypass")
+                    && !regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 player.sendMessage(Colors.Red + "You don't have permission for this area.");
                 return true;
             }
@@ -738,7 +1003,8 @@ public class WorldGuardListener extends PluginListener {
                     blockPlaced.getY(), blockPlaced.getZ());
             LocalPlayer localPlayer = new HMPlayer(player);
             
-            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+            if (!player.canUseCommand("/regionbypass")
+                    && !regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 player.sendMessage(Colors.Red + "You don't have permission for this area.");
                 return true;
             }
@@ -812,7 +1078,8 @@ public class WorldGuardListener extends PluginListener {
                     block.getY(), block.getZ());
             LocalPlayer localPlayer = new HMPlayer(player);
             
-            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+            if (!player.canUseCommand("/regionbypass")
+                    && !regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 player.sendMessage(Colors.Red + "You don't have permission for this area.");
                 return true;
             }
@@ -850,7 +1117,8 @@ public class WorldGuardListener extends PluginListener {
             Vector pt = new Vector(chest.getX(), chest.getY(), chest.getZ());
             LocalPlayer localPlayer = new HMPlayer(player);
             
-            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+            if (!player.canUseCommand("/regionbypass")
+                    && !regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 player.sendMessage(Colors.Red + "You don't have permission for this area.");
                 return true;
             }
@@ -924,12 +1192,18 @@ public class WorldGuardListener extends PluginListener {
             }
         }
         
-        if (useRegions) {
+        if (useRegions && !player.canUseCommand("/regionbypass")) {
             Vector pt = new Vector(block.getX(),
                     block.getY(), block.getZ());
             LocalPlayer localPlayer = new HMPlayer(player);
             
-            if (!regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+            if (block.getStatus() == 2
+                    && !regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                return true;
+            }
+            
+            if (block.getStatus() == 2
+                    && !regionManager.getApplicableRegions(pt).allowsLighter()) {
                 return true;
             }
         }
@@ -955,6 +1229,18 @@ public class WorldGuardListener extends PluginListener {
 
         if (blockTNT && block.getStatus() == 1) {
             return true;
+        }
+        
+        Vector pt = new Vector(block.getX(), block.getY(), block.getZ());
+        
+        if (useRegions) {
+            if (block.getStatus() == 1) {
+                if (!regionManager.getApplicableRegions(pt).allowsTNT()) {
+                    return true;
+                }
+                
+                // TODO: TNT check to see if it would hit a region
+            }
         }
 
         return false;
@@ -1187,9 +1473,56 @@ public class WorldGuardListener extends PluginListener {
                     && amphibiousPlayers.contains(player.getName())) {
                 return true;
             }
+            
+            if (attacker.isPlayer()) {
+                if (useRegions) {
+                    Vector pt = new Vector(defender.getX(),
+                            defender.getY(), defender.getZ());
+                    
+                    if (!regionManager.getApplicableRegions(pt).allowsPvP()) {
+                        player.sendMessage(Colors.Red + "You are in a no-PvP area.");
+                        return true;
+                    }
+                }
+            }
         }
         
         return false;
+    }
+
+    /**
+     * Called when someone presses right click aimed at a block.
+     * You can intercept this to add your own right click actions
+     * to different item types (see itemInHand)
+     * 
+     * @param player
+     * @param blockClicked
+     * @param itemInHand
+     */
+    public void onBlockRightClicked(Player player, Block blockClicked, Item item) {
+        if (useRegions && item.getType().getId() == regionWand) {
+            Vector pt = new Vector(blockClicked.getX(),
+                    blockClicked.getY(), blockClicked.getZ());
+            ApplicableRegionSet app = regionManager.getApplicableRegions(pt);
+            List<String> regions = regionManager.getApplicableRegionsIDs(pt);
+            
+            if (regions.size() > 0) {
+                player.sendMessage(Colors.Yellow + "Can you build? "
+                        + (app.canBuild(new HMPlayer(player)) ? "Yes" : "No"));
+                
+                StringBuilder str = new StringBuilder();
+                for (Iterator<String> it = regions.iterator(); it.hasNext(); ) {
+                    str.append(it.next());
+                    if (it.hasNext()) {
+                        str.append(", ");
+                    }
+                }
+                
+                player.sendMessage(Colors.Yellow + "Applicable regions: " + str.toString());
+            } else {
+                player.sendMessage(Colors.Yellow + "WorldGuard: No defined regions here!");
+            }
+        }
     }
 
     /**
