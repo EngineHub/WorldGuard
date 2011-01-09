@@ -482,8 +482,8 @@ public class WorldGuardListener extends PluginListener {
             
             return true;
         } else if (split[0].equalsIgnoreCase("/delarea")
-                && player.canUseCommand("/definearea")) {
-            if (split.length < 3) {
+                && player.canUseCommand("/delarea")) {
+            if (split.length < 2) {
                 player.sendMessage(Colors.Rose + "/delarea <id>");
                 return true;
             }
