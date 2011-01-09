@@ -1,4 +1,4 @@
-2.0:
+2.0beta1:
 - Added area protection. Use /region or /rg to define regions.
 
 1.8.1
