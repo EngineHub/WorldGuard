@@ -1,3 +1,6 @@
+2.0:
+- Added area protection. Use /region or /rg to define regions.
+
 1.8.1
 - Fixed NullPointerException.
 
