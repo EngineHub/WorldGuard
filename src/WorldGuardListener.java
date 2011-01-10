@@ -1474,7 +1474,7 @@ public class WorldGuardListener extends PluginListener {
                 return true;
             }
             
-            if (attacker.isPlayer()) {
+            if (attacker != null && attacker.isPlayer()) {
                 if (useRegions) {
                     Vector pt = new Vector(defender.getX(),
                             defender.getY(), defender.getZ());
