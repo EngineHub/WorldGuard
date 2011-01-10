@@ -1,3 +1,6 @@
+2.0beta2:
+- Fixed a NullPointerException in the damage hook.
+
 2.0beta1:
 - Added area protection. Use /region or /rg to define regions.
 
