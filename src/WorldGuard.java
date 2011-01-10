@@ -45,7 +45,14 @@ public class WorldGuard extends Plugin {
      * Initialize the plugin.
      */
     public WorldGuard() {
-        listener = new WorldGuardListener(this);
+        try {
+            listener = new WorldGuardListener(this);
+        } catch (NoClassDefFoundError e) {
+            logger.severe("*** WORLDGUARD FAILED TO LOAD. ALL PROTECTION IS DISABLED!");
+            logger.severe("*** YOUR SERVER WILL BE SAVED AND STOPPED TO PREVENT DAMAGE TO YOUR WORLD. DISABLE WORLDGUARD OR CORRECT THE PROBLEM.");
+            logger.severe("*** WorldEdit must be placed into the plugins/ directory");
+            etc.getServer().useConsoleCommand("stop");
+        }
     }
 
     /**
@@ -53,6 +60,10 @@ public class WorldGuard extends Plugin {
      */
     @Override
     public void initialize() {
+        if (listener == null) {
+            return;
+        }
+        
         List<String> missingFeatures = new ArrayList<String>();
 
         registerHook("COMMAND", PluginListener.Priority.MEDIUM);
@@ -110,6 +121,10 @@ public class WorldGuard extends Plugin {
      */
     @Override
     public void enable() {
+        if (listener == null) {
+            return;
+        }
+        
         logger.log(Level.INFO, "WorldGuard version " + getVersion() + " loaded");
         listener.loadConfiguration();
 
