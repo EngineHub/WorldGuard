@@ -1,0 +1,5 @@
+name = WorldGuard
+version = %version%
+url = updatr.update.sk89q.com/worldguard.updatr
+file = cloud.github.com/downloads/sk89q/worldguard/worldguard-%version%.zip
+notes =
