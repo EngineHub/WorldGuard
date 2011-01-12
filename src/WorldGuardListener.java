@@ -1192,7 +1192,7 @@ public class WorldGuardListener extends PluginListener {
             }
         }
         
-        if (useRegions && !player.canUseCommand("/regionbypass")) {
+        if (useRegions && player != null && !player.canUseCommand("/regionbypass")) {
             Vector pt = new Vector(block.getX(),
                     block.getY(), block.getZ());
             LocalPlayer localPlayer = new HMPlayer(player);
