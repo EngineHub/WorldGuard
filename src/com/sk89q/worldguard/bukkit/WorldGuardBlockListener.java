@@ -33,6 +33,7 @@ import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
@@ -73,6 +74,24 @@ public class WorldGuardBlockListener extends BlockListener {
             if (!plugin.hasPermission(player, "/regionbypass")
                     && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                event.setCancelled(true);
+                return;
+            }
+        }
+        
+        if (plugin.blacklist != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
+            if (!plugin.blacklist.check(
+                    new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                            toVector(event.getBlock()),
+                            event.getBlock().getTypeId()), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (!plugin.blacklist.check(
+                    new DestroyWithBlacklistEvent(plugin.wrapPlayer(player),
+                            toVector(event.getBlock()),
+                            player.getItemInHand().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -241,7 +260,6 @@ public class WorldGuardBlockListener extends BlockListener {
         
         if (entity instanceof Player && block.getType() == Material.CHEST) {
             Player player = (Player)entity;
-            
             if (plugin.useRegions) {
                 Vector pt = toVector(block);
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
@@ -252,6 +270,17 @@ public class WorldGuardBlockListener extends BlockListener {
                     event.setCancelled(true);
                     return;
                 }
+            }
+        }
+        
+        if (plugin.blacklist != null && entity instanceof Player) {
+            Player player = (Player)entity;
+            
+            if (!plugin.blacklist.check(
+                    new BlockInteractBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
+                            block.getTypeId()), false, false)) {
+                event.setCancelled(true);
+                return;
             }
         }
     }
@@ -274,6 +303,15 @@ public class WorldGuardBlockListener extends BlockListener {
             if (!plugin.hasPermission(player, "/regionbypass")
                     && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                event.setCancelled(true);
+                return;
+            }
+        }
+        
+        if (plugin.blacklist != null) {
+            if (!plugin.blacklist.check(
+                    new BlockPlaceBlacklistEvent(plugin.wrapPlayer(player), toVector(blockPlaced),
+                            blockPlaced.getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }

@@ -60,6 +60,13 @@ public abstract class LocalPlayer {
     public abstract void ban(String msg);
     
     /**
+     * Send the player a message;
+     * 
+     * @param msg
+     */
+    public abstract void printRaw(String msg);
+    
+    /**
      * Get the player's list of groups.
      * 
      * @return

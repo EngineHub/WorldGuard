@@ -39,6 +39,8 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.*;
+import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.domains.*;
 import com.sk89q.worldguard.protection.*;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
@@ -109,9 +111,10 @@ public class WorldGuardPlayerListener extends PlayerListener {
      */
     @Override
     public void onPlayerItem(PlayerItemEvent event) {
+        Player player = event.getPlayer();
+        Block block = event.getBlockClicked();
+        
         if (plugin.useRegions && !event.isBlock() && event.getBlockClicked() != null) {
-            Player player = event.getPlayer();
-            Block block = event.getBlockClicked();
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
             
@@ -119,6 +122,15 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 player.sendMessage(ChatColor.DARK_RED
                         + "You don't have permission for this area.");
+                event.setCancelled(true);
+                return;
+            }
+        }
+        
+        if (plugin.blacklist != null) {
+            if (!plugin.blacklist.check(
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
+                            block.getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }

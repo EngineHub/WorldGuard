@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,6 +37,9 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
+import com.sk89q.worldguard.blacklist.Blacklist;
+import com.sk89q.worldguard.blacklist.BlacklistLogger;
+import com.sk89q.worldguard.blacklist.loggers.*;
 import com.sk89q.worldguard.protection.*;
 
 /**
@@ -52,6 +56,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         new WorldGuardBlockListener(this);
     private final WorldGuardEntityListener entityListener =
         new WorldGuardEntityListener(this);
+    
+    Blacklist blacklist;
 
     RegionManager regionManager = new FlatRegionManager();
     ProtectionDatabase regionLoader;
@@ -191,6 +197,63 @@ public class WorldGuardPlugin extends JavaPlugin {
             regionManager.setRegions(regionLoader.getRegions());
         } catch (IOException e) {
             logger.warning("WorldGuard: Failed to load regions: "
+                    + e.getMessage());
+        }
+        
+        // Console log configuration
+        boolean logConsole = config.getBoolean("blacklist.logging.console.enable", true);
+
+        // Database log configuration
+        boolean logDatabase = config.getBoolean("blacklist.logging.database.enable", false);
+        String dsn = config.getString("blacklist.logging.database.dsn", "jdbc:mysql://localhost:3306/minecraft");
+        String user = config.getString("blacklist.logging.database.user", "root");
+        String pass = config.getString("blacklist.logging.database.pass", "");
+        String table = config.getString("blacklist.logging.database.table", "blacklist_events");
+
+        // File log configuration
+        boolean logFile = config.getBoolean("blacklist.logging.file.enable", false);
+        String logFilePattern = config.getString("blacklist.logging.file.path", "worldguard/logs/%Y-%m-%d.log");
+        int logFileCacheSize = Math.max(1, config.getInt("blacklist.logging.file.open-files", 10));
+        
+        // Load the blacklist
+        try {
+            // If there was an existing blacklist, close loggers
+            if (blacklist != null) {
+                blacklist.getLogger().close();
+            }
+
+            // First load the blacklist data from worldguard-blacklist.txt
+            Blacklist blist = new BukkitBlacklist(this);
+            blist.load(new File(getDataFolder(), "blacklist.txt"));
+
+            // If the blacklist is empty, then set the field to null
+            // and save some resources
+            if (blist.isEmpty()) {
+                this.blacklist = null;
+            } else {
+                this.blacklist = blist;
+                logger.log(Level.INFO, "WorldGuard: Blacklist loaded.");
+
+                BlacklistLogger blacklistLogger = blist.getLogger();
+
+                if (logDatabase) {
+                    blacklistLogger.addHandler(new DatabaseLoggerHandler(dsn, user, pass, table));
+                }
+
+                if (logConsole) {
+                    blacklistLogger.addHandler(new ConsoleLoggerHandler());
+                }
+
+                if (logFile) {
+                    FileLoggerHandler handler =
+                            new FileLoggerHandler(logFilePattern, logFileCacheSize);
+                    blacklistLogger.addHandler(handler);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            logger.log(Level.WARNING, "WorldGuard blacklist does not exist.");
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not load WorldGuard blacklist: "
                     + e.getMessage());
         }
 

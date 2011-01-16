@@ -65,4 +65,9 @@ public class BukkitPlayer extends LocalPlayer {
         return plugin.getGroups(player);
     }
 
+    @Override
+    public void printRaw(String msg) {
+        player.sendMessage(msg);
+    }
+
 }
