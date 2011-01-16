@@ -101,7 +101,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         plugin.invinciblePlayers.remove(player.getName());
         plugin.amphibiousPlayers.remove(player.getName());
-        plugin.blacklist.forgetPlayer(plugin.wrapPlayer(player));
+        if (plugin.blacklist != null) {
+            plugin.blacklist.forgetPlayer(plugin.wrapPlayer(player));
+        }
     }
     
     /**
@@ -406,10 +408,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 
                 ProtectedRegion region = new ProtectedCuboidRegion(min, max);
                 
-                if (!plugin.regionManager.overlapsUnownedRegion(region, plugin.wrapPlayer(player))) {
+                if (plugin.regionManager.overlapsUnownedRegion(region, plugin.wrapPlayer(player))) {
                     player.sendMessage(ChatColor.RED + "This region overlaps with someone else's region.");
                     return;
                 }
+                
+                region.getOwners().addPlayer(player.getName());
                 
                 plugin.regionManager.addRegion(id, region);
                 plugin.regionLoader.save(plugin.regionManager);
@@ -666,8 +670,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                         + e.getMessage());
             }
         } else if (action.equalsIgnoreCase("load")) {
-            if (!canUseRegionCommand(player, "/regiondelete")) {
-                player.sendMessage(ChatColor.RED + "You don't have the /regiondelete permission.");
+            if (!canUseRegionCommand(player, "/regionload")) {
+                player.sendMessage(ChatColor.RED + "You don't have the /regionload permission.");
                 return;
             }
             

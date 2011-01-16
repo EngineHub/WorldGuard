@@ -285,7 +285,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
     
     boolean hasPermission(Player player, String perm) {
-        return perm.equals("/regionclaim");
+        return perm.equals("/regionclaim") || perm.equals("/regionload") || perm.equals("/regionsave");
     }
     
     List<String> getGroups(Player player) {

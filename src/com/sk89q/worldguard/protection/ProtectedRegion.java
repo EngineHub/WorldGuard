@@ -142,9 +142,9 @@ public abstract class ProtectedRegion {
             ProtectedCuboidRegion r1 = (ProtectedCuboidRegion)region1;
             ProtectedCuboidRegion r2 = (ProtectedCuboidRegion)region2;
             BlockVector min1 = r1.getMinimumPoint();
-            BlockVector max1 = r1.getMinimumPoint();
+            BlockVector max1 = r1.getMaximumPoint();
             BlockVector min2 = r2.getMinimumPoint();
-            BlockVector max2 = r2.getMinimumPoint(); 
+            BlockVector max2 = r2.getMaximumPoint(); 
             
             return !(min1.getBlockX() > max2.getBlockX()
                     || min1.getBlockY() > max2.getBlockY()
