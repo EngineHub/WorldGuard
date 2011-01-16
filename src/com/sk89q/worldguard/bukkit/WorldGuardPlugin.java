@@ -125,6 +125,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         registerEvent(Event.Type.BLOCK_FLOW, blockListener, Priority.Normal);
         registerEvent(Event.Type.BLOCK_IGNITE, blockListener, Priority.Normal);
         registerEvent(Event.Type.BLOCK_PHYSICS, blockListener, Priority.Normal);
+        registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.Normal);
         registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal);
         registerEvent(Event.Type.BLOCK_RIGHTCLICKED, blockListener, Priority.Normal);
 

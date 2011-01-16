@@ -24,6 +24,8 @@ import java.util.List;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockDamageLevel;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.World;
 import org.bukkit.event.block.*;
@@ -227,6 +229,32 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
     }
+    
+    /**
+     * Called when a block is interacted with
+     * 
+     * @param event Relevant event details
+     */
+    public void onBlockInteract(BlockInteractEvent event) {
+        Block block = event.getBlock();
+        LivingEntity entity = event.getEntity();
+        
+        if (entity instanceof Player && block.getType() == Material.CHEST) {
+            Player player = (Player)entity;
+            
+            if (plugin.useRegions) {
+                Vector pt = toVector(block);
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+    
+                if (!plugin.hasPermission(player, "/regionbypass")
+                        && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
 
     /**
      * Called when a player places a block
@@ -240,8 +268,7 @@ public class WorldGuardBlockListener extends BlockListener {
         World world = blockPlaced.getWorld();
         
         if (plugin.useRegions) {
-            Vector pt = new Vector(blockPlaced.getX(),
-                    blockPlaced.getY(), blockPlaced.getZ());
+            Vector pt = toVector(blockPlaced);
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
             if (!plugin.hasPermission(player, "/regionbypass")
