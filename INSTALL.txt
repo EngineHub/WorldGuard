@@ -1,7 +1,20 @@
 Installation
 ------------
 
-This plugin requires Hey0's server modification.
+Bukkit:
+
+** Make sure you first install the WorldEdit plugin. **
+
+  1. Create a "plugins" folder inside your server folder.
+
+  2. Copy WorldGuard.jar into "plugins".
+  
+  3. Restart your server.
+
+You may want to copy config.yml into plugins/WorldGuard/config.yml
+(you will have to create that folder). Edit it to fit your needs.
+
+hMod:
 
   1. Create a "plugins" folder inside your "bin" folder.
 

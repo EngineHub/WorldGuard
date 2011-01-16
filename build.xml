@@ -55,6 +55,7 @@
     <copy tofile="${release.dir}/worldguard.updatr" file="worldguard.updatr"/>
     <replace file="${release.dir}/worldguard.updatr" token="%version%" value="${version}"/>
     <copy tofile="${release.dir}/plugin.yml" file="plugin.yml"/>
+    <copy tofile="${release.dir}/config.yml" file="config.yml"/>
     <replace file="${release.dir}/plugin.yml" token="WGVERSIONMACRO" value="${version}"/>
     <copy file="worldguard.properties" todir="${release.dir}"/>
     <copy tofile="${release.dir}/WorldGuard.jar" file="${dist.dir}/WorldGuard.jar"/>

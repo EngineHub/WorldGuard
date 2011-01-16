@@ -1,14 +1,14 @@
-summary-on-start: false
+summary-on-start: true
 protection:
     enforce-single-session: true
-    item-drop-blacklist: []
-    item-durability: false
+    item-durability: true
 simulation:
     classic-water: false
     sponge:
         enable: true
         radius: 3
 physics:
+    # Doesn't work in Bukkit yet
     no-physics-gravel: false
     no-physics-sand: false
     allow-portal-anywhere: false
@@ -17,25 +17,47 @@ ignition:
     block-tnt: false
     block-lighter: false
 fire:
-    disable-fire-spread: false
+    disable-all-fire-spread: false
     disable-fire-spread-blocks: []
     disable-lava-fire-spread: true
     lava-spread-blocks: []
 mobs:
+    # Doesn't work in Bukkit yet
     block-creeper-explosions: false
 spawn:
+    # Doesn't work in Bukkit yet
     login-protection: 3
     spawn-protection: 0
     kick-on-death: false
     exact-respawn: false
     teleport-to-home-on-death: false
 player-damage:
-    disable-fall-damage: false
-    disable-lava-damage: false
-    disable-fire-damage: false
-    disable-water-damage: false
-    disable-suffocation-damage: false
-    teleport-on-suffocation: false
+    # Doesn't work in Bukkit yet
+    disable-fall-damage: true
+    disable-lava-damage: true
+    disable-fire-damage: true
+    disable-drowning-damage: true
+    disable-suffocation-damage: true
+    teleport-on-suffocation: true
 regions:
     enable: true
     wand: 287
+blacklist:
+    logging:
+        console:
+            enable: true
+        database:
+            enable: false
+            dsn: jdbc:mysql://localhost:3306/minecraft
+            user: root
+            password: pass
+            table: blacklist_events
+        file:
+            enable: true
+            path: worldguard/logs/%Y-%m-%d.log
+            open-files: 10
+permissions:
+    groups:
+        default:
+            permissions:
+    users:
