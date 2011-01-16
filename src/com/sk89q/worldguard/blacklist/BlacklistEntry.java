@@ -41,11 +41,6 @@ import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
  */
 public class BlacklistEntry {
     /**
-     * Used to prevent flooding.
-     */
-    private static Map<String,BlacklistTrackedEvent> lastAffected =
-            new HashMap<String,BlacklistTrackedEvent>();
-    /**
      * Parent blacklist entry.
      */
     private Blacklist blacklist;
@@ -290,13 +285,13 @@ public class BlacklistEntry {
         boolean repeating = false;
 
         // Check to see whether this event is being repeated
-        BlacklistTrackedEvent tracked = lastAffected.get(name);
+        BlacklistTrackedEvent tracked = blacklist.lastAffected.get(name);
         if (tracked != null) {
             if (tracked.matches(event, now)) {
                 repeating = true;
             }
         } else {
-            lastAffected.put(name, new BlacklistTrackedEvent(event, now));
+            blacklist.lastAffected.put(name, new BlacklistTrackedEvent(event, now));
         }
 
         String actions[] = getActions(event);
@@ -370,24 +365,6 @@ public class BlacklistEntry {
         }
 
         return ret;
-    }
-
-    /**
-     * Forget a player.
-     *
-     * @param player
-     */
-    public static void forgetPlayer(LocalPlayer player) {
-        lastAffected.remove(player.getName());
-    }
-
-    /**
-     * Forget all players.
-     *
-     * @param player
-     */
-    public static void forgetAllPlayers() {
-        lastAffected.clear();
     }
 
     /**

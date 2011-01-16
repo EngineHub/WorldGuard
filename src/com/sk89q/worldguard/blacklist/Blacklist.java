@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.io.*;
 import org.bukkit.ChatColor;
 import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
 
 /**
@@ -53,6 +54,11 @@ public abstract class Blacklist {
      * Last event.
      */
     private BlacklistEvent lastEvent;
+    /**
+     * Used to prevent flooding.
+     */
+    Map<String,BlacklistTrackedEvent> lastAffected =
+            new HashMap<String,BlacklistTrackedEvent>();
 
     /**
      * Returns whether the list is empty.
@@ -246,6 +252,24 @@ public abstract class Blacklist {
      * @param msg
      */
     public abstract void broadcastNotification(String msg);
+
+    /**
+     * Forget a player.
+     *
+     * @param player
+     */
+    public void forgetPlayer(LocalPlayer player) {
+        lastAffected.remove(player.getName());
+    }
+
+    /**
+     * Forget all players.
+     *
+     * @param player
+     */
+    public void forgetAllPlayers() {
+        lastAffected.clear();
+    }
 
     /**
      * Get an item's ID from its name.

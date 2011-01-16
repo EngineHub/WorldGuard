@@ -39,7 +39,6 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.*;
-import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.domains.*;
 import com.sk89q.worldguard.protection.*;
@@ -102,6 +101,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         plugin.invinciblePlayers.remove(player.getName());
         plugin.amphibiousPlayers.remove(player.getName());
+        plugin.blacklist.forgetPlayer(plugin.wrapPlayer(player));
     }
     
     /**
