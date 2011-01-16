@@ -64,7 +64,6 @@ public class WorldGuardPlugin extends JavaPlugin {
     
     boolean enforceOneSession;
     boolean itemDurability;
-    Set<Integer> itemDropBlacklist;
 
     boolean classicWater;
     boolean simulateSponge;
@@ -151,7 +150,6 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         enforceOneSession = config.getBoolean("protection.enforce-single-session", true);
         itemDurability = config.getBoolean("protection.item-durability", true);
-        itemDropBlacklist = new HashSet<Integer>(config.getIntList("protection.item-drop-blacklist", null));
         
         classicWater = config.getBoolean("simulation.classic-water", false);
         simulateSponge = config.getBoolean("simulation.sponge.enable", true);
