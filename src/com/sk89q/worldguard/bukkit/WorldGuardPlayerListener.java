@@ -269,7 +269,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                         // Same type?
                         // Blocks store their color in the damage value
                         if (item2.getTypeId() == item.getTypeId() &&
-                                (item.getTypeId() != 35 || item.getDamage() == item2.getDamage())) {
+                                (!ItemType.usesDamageValue(item.getTypeId())
+                                        || item.getDamage() == item2.getDamage())) {
                             // This stack won't fit in the parent stack
                             if (item2.getAmount() > needed) {
                                 item.setAmount(64);
