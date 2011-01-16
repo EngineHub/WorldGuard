@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.LocalPlayer;
 
 /**
  * A very simple implementation of the region manager that uses a flat list
@@ -127,6 +128,32 @@ public class FlatRegionManager implements RegionManager {
         }
         
         return applicable;
+    }
+    
+    /**
+     * Returns true if the provided region overlaps with any other region that
+     * is not owned by the player.
+     * 
+     * @param region
+     * @param player
+     * @return
+     */
+    public boolean overlapsUnownedRegion(ProtectedRegion region, LocalPlayer player) {
+        for (ProtectedRegion other : regions.values()) {
+            if (other.getOwners().contains(player)) {
+                continue;
+            }
+            
+            try {
+                if (ProtectedRegion.intersects(region, other)) {
+                    return true;
+                }
+            } catch (UnsupportedIntersectionException e) {
+                // TODO: Maybe do something here
+            }
+        }
+        
+        return false;
     }
     
     /**

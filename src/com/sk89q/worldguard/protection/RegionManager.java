@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection;
 import java.util.List;
 import java.util.Map;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.LocalPlayer;
 
 /**
  * An interface for getting, setting, and looking up regions. The most
@@ -91,6 +92,16 @@ public interface RegionManager {
      * @return
      */
     public List<String> getApplicableRegionsIDs(Vector pt);
+    
+    /**
+     * Returns true if the provided region overlaps with any other region that
+     * is not owned by the player.
+     * 
+     * @param region
+     * @param player
+     * @return
+     */
+    public boolean overlapsUnownedRegion(ProtectedRegion region, LocalPlayer player);
     
     /**
      * Get the number of regions.
