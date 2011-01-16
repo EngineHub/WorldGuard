@@ -157,6 +157,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public void loadConfiguration() {
         Configuration config = getConfiguration();
+        config.load();
 
         enforceOneSession = config.getBoolean("protection.enforce-single-session", true);
         itemDurability = config.getBoolean("protection.item-durability", true);
