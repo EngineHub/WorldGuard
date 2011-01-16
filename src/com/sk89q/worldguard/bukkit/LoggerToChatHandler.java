@@ -1,3 +1,4 @@
+package com.sk89q.worldguard.bukkit;
 // $Id$
 /*
  * WorldGuard
@@ -17,50 +18,48 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
 /**
+ * Sends all logger messages to a player.
  *
  * @author sk89q
  */
-public class BlacklistTrackedEvent {
-    private int id;
-    private long time;
+public class LoggerToChatHandler extends Handler {
+    /**
+     * Player.
+     */
+    private Player player;
 
     /**
      * Construct the object.
      * 
-     * @param id
-     * @param time
+     * @param player
      */
-    public BlacklistTrackedEvent(int id, long time) {
-        this.id = id;
-        this.time = time;
+    public LoggerToChatHandler(Player player) {
+        this.player = player;
     }
 
     /**
-     * @return the id
+     * Close the handler.
      */
-    public int getId() {
-        return id;
+    public void close() {
     }
 
     /**
-     * @param id the id to set
+     * Flush the output.
      */
-    public void setId(int id) {
-        this.id = id;
+    public void flush() {
     }
 
     /**
-     * @return the time
+     * Publish a log record.
      */
-    public long getTime() {
-        return time;
-    }
-
-    /**
-     * @param time the time to set
-     */
-    public void setTime(long time) {
-        this.time = time;
+    public void publish(LogRecord record) {
+        player.sendMessage(ChatColor.GRAY + record.getLevel().getName() + ": "
+                + ChatColor.WHITE + record.getMessage());
     }
 }

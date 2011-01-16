@@ -1,0 +1,41 @@
+summary-on-start: false
+protection:
+    enforce-single-session: true
+    item-drop-blacklist: []
+    item-durability: false
+simulation:
+    classic-water: false
+    sponge:
+        enable: true
+        radius: 3
+physics:
+    no-physics-gravel: false
+    no-physics-sand: false
+    allow-portal-anywhere: false
+    disable-water-damage-blocks: []
+ignition:
+    block-tnt: false
+    block-lighter: false
+fire:
+    disable-fire-spread: false
+    disable-fire-spread-blocks: []
+    disable-lava-fire-spread: true
+    lava-spread-blocks: []
+mobs:
+    block-creeper-explosions: false
+spawn:
+    login-protection: 3
+    spawn-protection: 0
+    kick-on-death: false
+    exact-respawn: false
+    teleport-to-home-on-death: false
+player-damage:
+    disable-fall-damage: false
+    disable-lava-damage: false
+    disable-fire-damage: false
+    disable-water-damage: false
+    disable-suffocation-damage: false
+    teleport-on-suffocation: false
+regions:
+    enable: true
+    wand: 287

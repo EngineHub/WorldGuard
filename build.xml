@@ -32,6 +32,7 @@
       <attribute name="WorldGuard-Version" value="${version}"/>
       <attribute name="Class-Path" value="WorldEdit.jar"/>
     </manifest>
+    <copy tofile="${build.dir}/plugin.yml" file="plugin.yml"/>
     <jar jarfile="${dist.dir}/WorldGuard.jar" basedir="${build.dir}" manifest="manifest.mf"/>
   </target>
 
@@ -53,14 +54,16 @@
     </copy>
     <copy tofile="${release.dir}/worldguard.updatr" file="worldguard.updatr"/>
     <replace file="${release.dir}/worldguard.updatr" token="%version%" value="${version}"/>
+    <copy tofile="${release.dir}/plugin.yml" file="plugin.yml"/>
+    <replace file="${release.dir}/plugin.yml" token="WGVERSIONMACRO" value="${version}"/>
     <copy file="worldguard.properties" todir="${release.dir}"/>
     <copy tofile="${release.dir}/WorldGuard.jar" file="${dist.dir}/WorldGuard.jar"/>
-    <zip destfile="${release.dir}/worldguard-${version}.zip" basedir="${release.dir}" excludes="*.zip"/>
+    <zip destfile="${release.dir}/worldguard-${version}.zip" basedir="${release.dir}" excludes="*.zip plugin.yml"/>
     <mkdir dir="${release.dir}/src"/>
     <copy todir="${release.dir}/src">
       <fileset dir="${src.dir}"/>
     </copy>
-    <zip destfile="${release.dir}/worldguard-${version}-source.zip" basedir="${release.dir}" excludes="*.zip"/>
+    <zip destfile="${release.dir}/worldguard-${version}-src.zip" basedir="${release.dir}" excludes="*.zip plugin.yml"/>
   </target>
 
   <!-- Clean the output -->

@@ -17,12 +17,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+package com.sk89q.worldguard.bukkit;
+
+import java.util.List;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 
-public class HMPlayer extends LocalPlayer {
+public class BukkitPlayer extends LocalPlayer {
     private Player player;
+    private WorldGuardPlugin plugin;
     
-    public HMPlayer(Player player) {
+    public BukkitPlayer(WorldGuardPlugin plugin, Player player) {
+        this.plugin = plugin;
         this.player = player;
     }
 
@@ -33,6 +41,28 @@ public class HMPlayer extends LocalPlayer {
 
     @Override
     public boolean hasGroup(String group) {
-        return player.isInGroup(group);
+        return plugin.inGroup(player, group);
     }
+
+    @Override
+    public Vector getPosition() {
+        Location loc = player.getLocation();
+        return new Vector(loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    @Override
+    public void kick(String msg) {
+        player.kickPlayer(msg);
+    }
+
+    @Override
+    public void ban(String msg) {
+        player.kickPlayer(msg);
+    }
+
+    @Override
+    public List<String> getGroups() {
+        return plugin.getGroups(player);
+    }
+
 }

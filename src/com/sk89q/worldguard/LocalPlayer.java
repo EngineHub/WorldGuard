@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard;
 
+import java.util.List;
+import com.sk89q.worldedit.Vector;
+
 public abstract class LocalPlayer {
     /**
      * Get a player's name.
@@ -34,6 +37,34 @@ public abstract class LocalPlayer {
      * @return
      */
     public abstract boolean hasGroup(String group);
+    
+    /**
+     * Get the player's position.
+     * 
+     * @return
+     */
+    public abstract Vector getPosition();
+    
+    /**
+     * Kick the player.
+     * 
+     * @param msg
+     */
+    public abstract void kick(String msg);
+    
+    /**
+     * Ban the player.
+     * 
+     * @param msg
+     */
+    public abstract void ban(String msg);
+    
+    /**
+     * Get the player's list of groups.
+     * 
+     * @return
+     */
+    public abstract List<String> getGroups();
     
     @Override
     public boolean equals(Object obj) {
