@@ -22,11 +22,13 @@ package com.sk89q.worldguard.bukkit;
 import java.util.Iterator;
 import java.util.List;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockDamageLevel;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.World;
 import org.bukkit.event.block.*;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -52,10 +54,17 @@ public class WorldGuardBlockListener extends BlockListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onBlockDamage(BlockDamageEvent event) {
         Player player = event.getPlayer();
+
+        if (!plugin.itemDurability && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
+            ItemStack held = player.getItemInHand();
+            held.setDamage((byte)-1);
+            player.setItemInHand(held);
+        }
         
-        if (plugin.useRegions) {
+        if (plugin.useRegions && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
             Vector pt = BukkitUtil.toVector(event.getBlock());
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
             
@@ -73,10 +82,11 @@ public class WorldGuardBlockListener extends BlockListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onBlockFlow(BlockFromToEvent event) {
         World world = event.getBlock().getWorld();
-        Block blockFrom = event.getFromBlock();
-        Block blockTo = event.getBlock();
+        Block blockFrom = event.getBlock();
+        Block blockTo = event.getToBlock();
         
         boolean isWater = blockFrom.getTypeId() == 8 || blockFrom.getTypeId() == 9;
         boolean isLava = blockFrom.getTypeId() == 10 || blockFrom.getTypeId() == 11;
@@ -107,7 +117,16 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (plugin.allowedLavaSpreadOver != null && isLava) {
+        if (plugin.preventWaterDamage.size() > 0 && isWater) {
+            int targetId = world.getBlockTypeIdAt(
+                    blockTo.getX(), blockTo.getY(), blockTo.getZ());
+            if (plugin.preventWaterDamage.contains(targetId)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if (plugin.allowedLavaSpreadOver.size() > 0 && isLava) {
             int targetId = world.getBlockTypeIdAt(
                     blockTo.getX(), blockTo.getY() - 1, blockTo.getZ());
             if (!plugin.allowedLavaSpreadOver.contains(targetId)) {
@@ -122,6 +141,7 @@ public class WorldGuardBlockListener extends BlockListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onBlockIgnite(BlockIgniteEvent event) {
         IgniteCause cause = event.getCause();
         Block block = event.getBlock();
@@ -135,32 +155,31 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        if (plugin.disableAllFire) {
+        if (plugin.disableFireSpread) {
             event.setCancelled(true);
             return;
         }
         
         if (plugin.blockLighter && cause == IgniteCause.FLINT_AND_STEEL) {
-            event.setCancelled(!plugin.hasPermission(player, "/uselighter")
-                    && !plugin.hasPermission(player, "/lighter"));
-            return;
-        }
-
-        if (plugin.stopFireSpread && isFireSpread) {
             event.setCancelled(true);
             return;
         }
 
-        if (plugin.fireNoSpreadBlocks.size() > 0 && isFireSpread) {
+        if (plugin.fireSpreadDisableToggle && isFireSpread) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (plugin.disableFireSpreadBlocks.size() > 0 && isFireSpread) {
             int x = block.getX();
             int y = block.getY();
             int z = block.getZ();
             
-            if (plugin.fireNoSpreadBlocks.contains(world.getBlockAt(x, y - 1, z))
-                    || plugin.fireNoSpreadBlocks.contains(world.getBlockAt(x + 1, y, z))
-                    || plugin.fireNoSpreadBlocks.contains(world.getBlockAt(x - 1, y, z))
-                    || plugin.fireNoSpreadBlocks.contains(world.getBlockAt(x, y, z - 1))
-                    || plugin.fireNoSpreadBlocks.contains(world.getBlockAt(x, y, z + 1))) {
+            if (plugin.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x, y - 1, z))
+                    || plugin.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x + 1, y, z))
+                    || plugin.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x - 1, y, z))
+                    || plugin.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x, y, z - 1))
+                    || plugin.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x, y, z + 1))) {
                 event.setCancelled(true);
                 return;
             }
@@ -189,6 +208,7 @@ public class WorldGuardBlockListener extends BlockListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onBlockPhysics(BlockPhysicsEvent event) {
         int id = event.getChangedTypeId();
 
@@ -213,6 +233,7 @@ public class WorldGuardBlockListener extends BlockListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onBlockPlace(BlockPlaceEvent event) {
         Block blockPlaced = event.getBlock();
         Player player = event.getPlayer();
@@ -222,7 +243,7 @@ public class WorldGuardBlockListener extends BlockListener {
             Vector pt = new Vector(blockPlaced.getX(),
                     blockPlaced.getY(), blockPlaced.getZ());
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
-            
+
             if (!plugin.hasPermission(player, "/regionbypass")
                     && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
@@ -255,6 +276,7 @@ public class WorldGuardBlockListener extends BlockListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onBlockRightClick(BlockRightClickEvent event) {
         Player player = event.getPlayer();
         

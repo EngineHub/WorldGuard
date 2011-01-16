@@ -41,7 +41,8 @@ public class WorldGuardEntityListener extends EntityListener {
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
+    @Override
     public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
@@ -70,7 +71,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
 
-            if (plugin.disableWaterDamage && type == DamageCause.DROWNING) {
+            if (plugin.disableDrowningDamage && type == DamageCause.DROWNING) {
                 event.setCancelled(true);
                 return;
             }
@@ -83,6 +84,7 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
+    @Override
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();

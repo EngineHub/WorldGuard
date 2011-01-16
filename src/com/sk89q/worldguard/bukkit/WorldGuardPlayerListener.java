@@ -22,8 +22,6 @@ package com.sk89q.worldguard.bukkit;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.*;
@@ -32,7 +30,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
@@ -41,7 +38,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEditNotInstalled;
 import com.sk89q.worldguard.*;
 import com.sk89q.worldguard.domains.*;
 import com.sk89q.worldguard.protection.*;
@@ -76,17 +72,13 @@ public class WorldGuardPlayerListener extends PlayerListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onPlayerJoin(PlayerEvent event) {
         Player player = event.getPlayer();
         
-        if (plugin.stopFireSpread) {
+        if (plugin.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW
                     + "Fire spread is currently globally disabled.");
-        }
-
-        if (plugin.loginProtection > 0 || plugin.spawnProtection > 0
-                || plugin.kickOnDeath || plugin.teleportToHome || plugin.exactRespawn) {
-            plugin.recentLogins.put(player.getName(), System.currentTimeMillis());
         }
 
         if (plugin.inGroup(player, "wg-invincible")) {
@@ -103,11 +95,11 @@ public class WorldGuardPlayerListener extends PlayerListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onPlayerQuit(PlayerEvent event) {
         Player player = event.getPlayer();
         plugin.invinciblePlayers.remove(player.getName());
         plugin.amphibiousPlayers.remove(player.getName());
-        plugin.recentLogins.remove(player.getName());
     }
     
     /**
@@ -115,11 +107,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * 
      * @param event Relevant event details
      */
+    @Override
     public void onPlayerItem(PlayerItemEvent event) {
-        if (plugin.useRegions && event.isBlock()) {
+        if (plugin.useRegions && !event.isBlock() && event.getBlockClicked() != null) {
             Player player = event.getPlayer();
             Block block = event.getBlockClicked();
-            Vector pt = toVector(block);
+            Vector pt = toVector(block.getRelative(event.getBlockFace()));
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
             
             if (!plugin.hasPermission(player, "/regionbypass")
@@ -137,6 +130,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         
@@ -156,6 +150,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onPlayerCommand(PlayerChatEvent event) {
         if (handleCommand(event)) {
             event.setCancelled(true);
@@ -173,22 +168,24 @@ public class WorldGuardPlayerListener extends PlayerListener {
         
         if (split[0].equalsIgnoreCase("/stopfire") &&
                 plugin.hasPermission(player, "/stopfire")) {
-            if (!plugin.stopFireSpread) {
+            if (!plugin.fireSpreadDisableToggle) {
                 plugin.getServer().broadcastMessage(ChatColor.YELLOW
                         + "Fire spread has been globally disabled by " + player.getName() + ".");
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Fire spread was already globally disabled.");
             }
+            
+            plugin.fireSpreadDisableToggle = true;
         } else if (split[0].equalsIgnoreCase("/allowfire")
                     && plugin.hasPermission(player, "/stopfire")) {
-            if (plugin.stopFireSpread) {
+            if (plugin.fireSpreadDisableToggle) {
                 plugin.getServer().broadcastMessage(ChatColor.YELLOW
                         + "Fire spread has been globally re-enabled by " + player.getName() + ".");
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Fire spread was already globally enabled.");
             }
             
-            plugin.stopFireSpread = false;
+            plugin.fireSpreadDisableToggle = false;
         } else if (split[0].equalsIgnoreCase("/god")
                     && plugin.hasPermission(player, "/god")) {
             // Allow setting other people invincible
@@ -258,7 +255,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
                         }
 
                         // Same type?
-                        if (item2.getTypeId() == item.getTypeId()) {
+                        // Blocks store their color in the damage value
+                        if (item2.getTypeId() == item.getTypeId() &&
+                                (item.getTypeId() != 35 || item.getDamage() == item2.getDamage())) {
                             // This stack won't fit in the parent stack
                             if (item2.getAmount() > needed) {
                                 item.setAmount(64);
