@@ -22,6 +22,8 @@ package com.sk89q.worldguard.bukkit;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.*;
@@ -308,6 +310,28 @@ public class WorldGuardPlayerListener extends PlayerListener {
             System.arraycopy(split, 1, args, 0, split.length - 1);
             
             handleRegionCommand(player, action, args);
+        } else if (split[0].equalsIgnoreCase("/reload")
+                && plugin.hasPermission(player, "/reload")
+                && split.length > 1) {
+            if (split[1].equalsIgnoreCase("WorldGuard")) {
+                LoggerToChatHandler handler = new LoggerToChatHandler(player);
+                handler.setLevel(Level.ALL);
+                Logger minecraftLogger = Logger.getLogger("Minecraft");
+                minecraftLogger.addHandler(handler);
+
+                try {
+                    plugin.loadConfiguration();
+                    plugin.postReload();
+                    player.sendMessage("WorldGuard configuration reloaded.");
+                } catch (Throwable t) {
+                    player.sendMessage("Error while reloading: "
+                            + t.getMessage());
+                } finally {
+                    minecraftLogger.removeHandler(handler);
+                }
+
+                return true;
+            }
         } else {
             return false;
         }

@@ -37,6 +37,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
+import com.sk89q.bukkit.migration.ConfigurationPermissionsResolver;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.blacklist.BlacklistLogger;
 import com.sk89q.worldguard.blacklist.loggers.*;
@@ -56,6 +57,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         new WorldGuardBlockListener(this);
     private final WorldGuardEntityListener entityListener =
         new WorldGuardEntityListener(this);
+    private final ConfigurationPermissionsResolver perms;
     
     Blacklist blacklist;
 
@@ -115,7 +117,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         folder.mkdirs();
 
         regionLoader = new CSVDatabase(new File(folder, "regions.txt"));
+        perms = new ConfigurationPermissionsResolver(getConfiguration());
         loadConfiguration();
+        postReload();
         registerEvents();
     }
 
@@ -278,14 +282,38 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
             }
         }
+        
+        // Temporary
+        perms.load();
+    }
+    
+    /**
+     * Populates various lists.
+     */
+    public void postReload() {
+        invinciblePlayers.clear();
+        amphibiousPlayers.clear();
+
+        try {
+            for (Player player : getServer().getOnlinePlayers()) {
+                if (inGroup(player, "wg-invincible")) {
+                    invinciblePlayers.add(player.getName());
+                }
+
+                if (inGroup(player, "wg-amphibious")) {
+                    amphibiousPlayers.add(player.getName());
+                }
+            }
+        } catch (NullPointerException e) { // Thrown if loaded too early
+        }
     }
     
     boolean inGroup(Player player, String group) {
-        return true;
+        return perms.inGroup(player.getName(), group);
     }
     
     boolean hasPermission(Player player, String perm) {
-        return perm.equals("/regionclaim") || perm.equals("/regionload") || perm.equals("/regionsave");
+        return perms.hasPermission(player.getName(), perm);
     }
     
     List<String> getGroups(Player player) {
