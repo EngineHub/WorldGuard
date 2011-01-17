@@ -28,6 +28,7 @@ import java.io.*;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.AreaFlags.State;
 
@@ -126,14 +127,18 @@ public class CSVDatabase implements ProtectionDatabase {
                     }
                     
                     String id = line[0];
-                    BlockVector min = new BlockVector(
+                    Vector pt1 = new Vector(
                             Integer.parseInt(line[2]),
                             Integer.parseInt(line[3]),
                             Integer.parseInt(line[4]));
-                    BlockVector max = new BlockVector(
+                    Vector pt2 = new Vector(
                             Integer.parseInt(line[5]),
                             Integer.parseInt(line[6]),
                             Integer.parseInt(line[7]));
+
+                    BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
+                    BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
+                    
                     int priority = Integer.parseInt(line[8]);
                     String ownersData = line[9];
                     String flagsData = line[10];
@@ -146,7 +151,7 @@ public class CSVDatabase implements ProtectionDatabase {
                     region.setFlags(parseFlags(flagsData));
                     regions.put(id, region);
                 } else {
-                    logger.warning("Line has invalid: " + line);
+                    logger.warning("Line is invalid: " + line);
                 }
             }
         } finally {

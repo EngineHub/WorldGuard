@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.protection;
 
-import java.util.Map;
+import java.util.SortedMap;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.AreaFlags.State;
@@ -31,93 +31,172 @@ import com.sk89q.worldguard.protection.AreaFlags.State;
  */
 public class ApplicableRegionSet {
     private Vector pt;
-    private Map<String,ProtectedRegion> regions;
+    private SortedMap<String,ProtectedRegion> regions;
     
-    public ApplicableRegionSet(Vector pt, Map<String,ProtectedRegion> regions) {
+    public ApplicableRegionSet(Vector pt, SortedMap<String,ProtectedRegion> regions) {
         this.pt = pt;
         this.regions = regions;
     }
     
     public boolean canBuild(LocalPlayer player) {
-        boolean allowed = false;
         boolean found = false;
+        int lastPriority = 0;
         
         for (ProtectedRegion region : regions.values()) {
+            if (region.getFlags().allowBuild == State.ALLOW) continue;
             if (!region.contains(pt)) continue;
-            if (region.getFlags().allowBuild == State.DENY) return false;
+            
+            // Ignore lower priority regions
+            if (found && region.getPriority() < lastPriority) {
+                break;
+            }
+            
+            if (!region.getOwners().contains(player)) {
+                return false;
+            }
             
             found = true;
-
-            if (!allowed && region.getFlags().allowBuild == State.ALLOW) {
-                allowed = true;
-            }
-            
-            if (!allowed && region.getOwners().contains(player)) {
-                allowed = true;
-            }
+            lastPriority = region.getPriority();
         }
         
-        return found ? allowed : true;
+        return true;
     }
     
     public boolean allowsPvP() {
+        boolean found = false;
+        int lastPriority = 0;
+        
         for (ProtectedRegion region : regions.values()) {
             if (!region.contains(pt)) continue;
-            if (region.getFlags().allowBuild == State.DENY) return false;
+            if (region.getFlags().allowPvP == State.DENY) return false;
+            
+            // Ignore lower priority regions
+            if (found && region.getPriority() < lastPriority) {
+                break;
+            }
+            
+            found = true;
+            lastPriority = region.getPriority();
         }
         
         return true;
     }
     
     public boolean allowsMobDamage() {
+        boolean found = false;
+        int lastPriority = 0;
+        
         for (ProtectedRegion region : regions.values()) {
             if (!region.contains(pt)) continue;
             if (region.getFlags().allowMobDamage == State.DENY) return false;
+            
+            // Ignore lower priority regions
+            if (found && region.getPriority() < lastPriority) {
+                break;
+            }
+            
+            found = true;
+            lastPriority = region.getPriority();
         }
         
         return true;
     }
     
     public boolean allowsCreeperExplosions() {
+        boolean found = false;
+        int lastPriority = 0;
+        
         for (ProtectedRegion region : regions.values()) {
             if (!region.contains(pt)) continue;
             if (region.getFlags().allowCreeperExplosions == State.DENY) return false;
+            
+            // Ignore lower priority regions
+            if (found && region.getPriority() < lastPriority) {
+                break;
+            }
+            
+            found = true;
+            lastPriority = region.getPriority();
         }
         
         return true;
     }
     
     public boolean allowsTNT() {
+        boolean found = false;
+        int lastPriority = 0;
+        
         for (ProtectedRegion region : regions.values()) {
             if (!region.contains(pt)) continue;
             if (region.getFlags().allowTNT == State.DENY) return false;
+            
+            // Ignore lower priority regions
+            if (found && region.getPriority() < lastPriority) {
+                break;
+            }
+            
+            found = true;
+            lastPriority = region.getPriority();
         }
         
         return true;
     }
     
     public boolean allowsLighter() {
+        boolean found = false;
+        int lastPriority = 0;
+        
         for (ProtectedRegion region : regions.values()) {
             if (!region.contains(pt)) continue;
             if (region.getFlags().allowLighter == State.DENY) return false;
+            
+            // Ignore lower priority regions
+            if (found && region.getPriority() < lastPriority) {
+                break;
+            }
+            
+            found = true;
+            lastPriority = region.getPriority();
         }
         
         return true;
     }
     
     public boolean allowsFireSpread() {
+        boolean found = false;
+        int lastPriority = 0;
+        
         for (ProtectedRegion region : regions.values()) {
             if (!region.contains(pt)) continue;
             if (region.getFlags().allowFireSpread == State.DENY) return false;
+            
+            // Ignore lower priority regions
+            if (found && region.getPriority() < lastPriority) {
+                break;
+            }
+            
+            found = true;
+            lastPriority = region.getPriority();
         }
         
         return true;
     }
     
     public boolean allowsLavaFire() {
+        boolean found = false;
+        int lastPriority = 0;
+        
         for (ProtectedRegion region : regions.values()) {
             if (!region.contains(pt)) continue;
             if (region.getFlags().allowLavaFire == State.DENY) return false;
+            
+            // Ignore lower priority regions
+            if (found && region.getPriority() < lastPriority) {
+                break;
+            }
+            
+            found = true;
+            lastPriority = region.getPriority();
         }
         
         return true;

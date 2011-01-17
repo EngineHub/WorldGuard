@@ -301,7 +301,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         } else if (split[0].equalsIgnoreCase("/rg")
                 || split[0].equalsIgnoreCase("/region")) {
             if (split.length < 2) {
-                player.sendMessage(ChatColor.RED + "/region <define|flag|delete|info|add|remove|list|save|load> ...");
+                player.sendMessage(ChatColor.RED + "/region <define|claim|flag|delete|info|add|remove|list|save|load> ...");
                 return true;
             }
             
@@ -455,8 +455,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
             
             if (args.length < 4) {
-                player.sendMessage(ChatColor.RED + "/region flag <id> <lighter> <none|allow|deny>");
-                player.sendMessage(ChatColor.RED + "Other flags not supported in Bukkit at the moment.");
+                player.sendMessage(ChatColor.RED + "/region flag <id> <flag> <none|allow|deny>");
                 return;
             }
             
@@ -486,13 +485,13 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 
                 AreaFlags flags = region.getFlags();
                 
-                /*if (flagStr.equalsIgnoreCase("build")) {
+                if (flagStr.equalsIgnoreCase("build")) {
                     flags.allowBuild = state;
                 } else if (flagStr.equalsIgnoreCase("pvp")) {
                     flags.allowPvP = state;
                 } else if (flagStr.equalsIgnoreCase("tnt")) {
                     flags.allowTNT = state;
-                } else*/ if (flagStr.equalsIgnoreCase("lighter")) {
+                } else if (flagStr.equalsIgnoreCase("lighter")) {
                     flags.allowLighter = state;
                 } else {
                     player.sendMessage(ChatColor.RED + "Acceptable flags: build, pvp, tnt, lighter");
@@ -505,6 +504,42 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 player.sendMessage(ChatColor.RED + "Region database failed to save: "
                         + e.getMessage());
             }
+        /*} else if (action.equalsIgnoreCase("priority")) {
+            if (!canUseRegionCommand(player, "/regiondefine")) {
+                player.sendMessage(ChatColor.RED + "You don't have the /regiondefine permission.");
+                return;
+            }
+            
+            if (args.length < 3) {
+                player.sendMessage(ChatColor.RED + "/region priority <id> <priority>");
+                return;
+            }
+            
+            try {
+                String id = args[1].toLowerCase();
+                int priority = 0;
+                try {
+                    priority = Integer.parseInt(args[2]);
+                } catch (NumberFormatException e) {
+                    player.sendMessage(ChatColor.RED + "The priority must be a number.");
+                    return;
+                }
+                
+                ProtectedRegion region = plugin.regionManager.getRegion(id);
+                
+                if (region == null) {
+                    player.sendMessage(ChatColor.RED + "Could not find a region by that ID.");
+                    return;
+                }
+                
+                region.setPriority(priority);
+                
+                plugin.regionLoader.save(plugin.regionManager);
+                player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated.");
+            } catch (IOException e) {
+                player.sendMessage(ChatColor.RED + "Region database failed to save: "
+                        + e.getMessage());
+            }*/
         } else if (action.equalsIgnoreCase("info")) {
             if (!canUseRegionCommand(player, "/regioninfo")) {
                 player.sendMessage(ChatColor.RED + "You don't have the /regioninfo permission.");
@@ -529,6 +564,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             
             player.sendMessage(ChatColor.YELLOW + "Region ID: " + id);
             player.sendMessage(ChatColor.GRAY + "Type: " + region.getClass().getCanonicalName());
+            player.sendMessage(ChatColor.GRAY + "Priority: " + region.getPriority());
             player.sendMessage(ChatColor.BLUE + "Build: " + flags.allowBuild.name());
             player.sendMessage(ChatColor.BLUE + "PvP: " + flags.allowPvP.name());
             player.sendMessage(ChatColor.BLUE + "TNT: " + flags.allowTNT.name());

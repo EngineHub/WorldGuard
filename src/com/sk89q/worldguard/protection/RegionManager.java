@@ -38,7 +38,7 @@ public interface RegionManager {
      *
      * @return
      */
-    public Map<String,ProtectedRegion> getRegions();
+    public Map<String, ProtectedRegion> getRegions();
     
     /**
      * Set a list of protected regions.

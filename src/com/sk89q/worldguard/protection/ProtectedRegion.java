@@ -28,7 +28,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
  * 
  * @author sk89q
  */
-public abstract class ProtectedRegion {
+public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Area message.
      */
@@ -47,7 +47,7 @@ public abstract class ProtectedRegion {
     private AreaFlags flags = new AreaFlags();
 
     /**
-     * Construct a new instance of this cuboid region.
+     * Construct a new instance of this region.
      *
      * @param id
      * @param priority
@@ -126,6 +126,22 @@ public abstract class ProtectedRegion {
      * @return
      */
     public abstract boolean contains(Vector pt);
+    
+    /**
+     * Compares to another region.
+     * 
+     * @param other
+     * @return
+     */
+    public int compareTo(ProtectedRegion other) {
+        if (priority == other.priority) {
+            return 0;
+        } else if (priority > other.priority) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
     
     /**
      * Checks if two region intersects.

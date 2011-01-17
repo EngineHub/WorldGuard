@@ -22,7 +22,8 @@ package com.sk89q.worldguard.protection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 
@@ -37,13 +38,13 @@ public class FlatRegionManager implements RegionManager {
     /**
      * List of protected regions.
      */
-    private Map<String,ProtectedRegion> regions;
+    private SortedMap<String,ProtectedRegion> regions;
     
     /**
      * Construct the manager.
      */
     public FlatRegionManager() {
-        regions = new LinkedHashMap<String,ProtectedRegion>();
+        regions = new TreeMap<String,ProtectedRegion>();
     }
     
     /**
@@ -54,7 +55,16 @@ public class FlatRegionManager implements RegionManager {
     public Map<String,ProtectedRegion> getRegions() {
         return regions;
     }
+
     
+    /**
+     * Set a list of protected regions.
+     *
+     * @return
+     */
+    public void setRegions(Map<String,ProtectedRegion> regions) {
+        this.regions = new TreeMap<String,ProtectedRegion>(regions);
+    }
     /**
      * Adds a region.
      * 
@@ -91,15 +101,6 @@ public class FlatRegionManager implements RegionManager {
      */
     public ProtectedRegion getRegion(String id) {
         return regions.get(id);
-    }
-    
-    /**
-     * Set a list of protected regions.
-     *
-     * @return
-     */
-    public void setRegions(Map<String,ProtectedRegion> regions) {
-        this.regions = regions;
     }
     
     /**
