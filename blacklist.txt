@@ -1,6 +1,15 @@
 #
-# This is the blacklist for WorldGuard. Comments start with # and they
+# This is the blacklist for WorldGuard. The blacklist allows you to perform
+# actions depending on an item or block ID. Comments start with # and they
 # are ignored so you can put your own notes.
+#
+# --------------------------------------------------------------------------
+#
+# WARNING:
+# Remember to check the compatibility spreadsheet for WorldGuard to see
+# if any events or actions are currently broken in your version of Bukkit.
+#
+# --------------------------------------------------------------------------
 #
 # Format:
 # [item1,item2]
@@ -8,25 +17,24 @@
 # event1=whatToDo1,whatToDo2,whatToDo3
 # event2=whatToDo1,whatToDo2
 #
-# Example to block ore and catch some events:
+# Example to block some ore mining and placement:
 # [coalore,goldore,ironore]
-# on-destroy-with=deny,log,kick
+# on-break=deny,log,kick
 # on-place=deny,tell
 #
 # Options:
-# - ignore-groups (comma-delimited list of groups to not affect)
+# - ignore-groups (comma-separated list of groups to not affect)
 # - comment (message for yourself that is printed with 'log' and 'notify')
 # - message (optional message to show the user instead; %s is the item name)
 #
 # Events:
-# - on-destroy (when a block of this type is being destroyed)
 # - on-break (when a block of this type is about to be broken)
 # - on-destroy-with (the item/block held by the user while destroying)
 # - on-place (a block is being placed)
-# - on-use (an item like a lighter is being used)
-# - on-right-click (the block is right clicked -- curently INEFFECTIVE)
-# - on-drop (the item is being dropped from the player's inventory)
-# - on-acquire (the item enters a player's inventory via some method)
+# - on-use (an item like flint and steel or a bucket is being used)
+# - on-interact (when a block in used (doors, chests, etc.))
+# - on-drop (an item is being dropped from the player's inventory)
+# - on-acquire (an item enters a player's inventory via some method)
 #
 # Actions (for events):
 # - deny (deny completely)
@@ -36,14 +44,7 @@
 # - kick (kick player)
 # - ban (ban player)
 #
-# With the on-acquire event, it will completely block item pick ups
-# (the item will still be on the ground) if you use 'deny' but the other
-# actions (notify, log, etc.) won't do anything. However, if the player
-# receives the item via a different method (i.e. from a chest), all actions
-# will work although the item is removed after a short delay rather than
-# blocked from the beginning (as it is part client-side).
-#
-# Users with the /worldguardnotify permission will be receive notifications.
+# Users with the /worldguardnotify permission will receive notifications.
 #
 # -------------
 #
@@ -52,39 +53,32 @@
 #
 # [goldblock]
 # ignore-groups=vip
-# on-destroy=deny
+# on-break=deny
 # [goldblock]
 # ignore-groups=admins
-# on-destroy=tell
+# on-break=tell
 #
 # However, some events override others. For example, if you disable both
 # usage of the diamond pickaxe (with the on-destroy-with event) and
-# destruction of gold blocks (with the on-destroy event) and a player tries
+# destruction of gold blocks (with the on-break event) and a player tries
 # to destroy a gold block with a diamond pickaxe, because the
 # on-destroy-with event comes first, the rules for the gold block
 # will not be applied (but the player will be denied nevertheless).
 #
-# -------------
+# --------------------------------------------------------------------------
 #
-# Some examples follow. Remember to remove # in front if you want them
-# to work for you!
+# Some examples follow.
+#
+# REMEMBER: If a line has # in front, it will be ignored.
+#
+# --------------------------------------------------------------------------
 
 # Deny lava buckets
 #[lavabucket]
 #ignore-groups=admins,mods
 #on-use=deny,tell
 
-# Deny lighter usage
-#[259]
-#on-use=deny,tell
-
 # Deny some ore
 #[coalore,goldore,ironore]
 #ignore-groups=admins,mods
-#on-destroy=notify,deny,log
-
-#[cobblestone]
-#on-place=deny,tell,log
-
-#[lever]
-#on-break=deny,tell
+#on-break=notify,deny,log

@@ -1,63 +1,94 @@
-summary-on-start: true
+#
+# WorldGuard's configuration file
+#
+# About editing this file:
+# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If
+#   you use an editor like Notepad++ (recommended for Windows users), you
+#   must configure it to "replace tabs with spaces." In Notepad++, this can
+#   be changed in Settings > Preferences > Language Menu.
+# - Don't get rid of the indents. They are indented so some entries are
+#   in categories (like "enforce-single-session" is in the "protection"
+#   category.
+# - If you want to check the format of this file before putting it
+#   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/
+#   and see if it gives "ERROR:".
+# - Lines starting with # are commentsand so they are ignored.
+#
+# WARNING:
+# Remember to check the compatibility spreadsheet for WorldGuard to see
+# if any features are currently broken in your version of Bukkit.
+#
+
+summary-on-start: on
+
 protection:
-    enforce-single-session: true
-    item-durability: true
+    enforce-single-session: on
+    item-durability: on
+
 simulation:
-    classic-water: false
+    classic-water: off
     sponge:
-        enable: true
+        enable: on
         radius: 3
+
 physics:
-    # Doesn't work in Bukkit yet
-    no-physics-gravel: false
-    no-physics-sand: false
-    allow-portal-anywhere: false
+    no-physics-gravel: off
+    no-physics-sand: off
+    allow-portal-anywhere: off
     disable-water-damage-blocks: []
+
 ignition:
-    block-tnt: false
-    block-lighter: false
+    block-tnt: off
+    block-lighter: off
+
 fire:
-    disable-all-fire-spread: false
+    disable-all-fire-spread: off
     disable-fire-spread-blocks: []
-    disable-lava-fire-spread: true
+    disable-lava-fire-spread: on
     lava-spread-blocks: []
+
 mobs:
-    # Doesn't work in Bukkit yet
-    block-creeper-explosions: false
+    block-creeper-explosions: off
+
 spawn:
-    # Doesn't work in Bukkit yet
     login-protection: 3
     spawn-protection: 0
-    kick-on-death: false
-    exact-respawn: false
-    teleport-to-home-on-death: false
+    kick-on-death: off
+    exact-respawn: off
+    teleport-to-home-on-death: off
+
 player-damage:
-    # Doesn't work in Bukkit yet
-    disable-fall-damage: true
-    disable-lava-damage: true
-    disable-fire-damage: true
-    disable-drowning-damage: true
-    disable-suffocation-damage: true
-    teleport-on-suffocation: true
+    disable-fall-damage: on
+    disable-lava-damage: on
+    disable-fire-damage: on
+    disable-drowning-damage: on
+    disable-suffocation-damage: on
+    teleport-on-suffocation: on
+
 regions:
-    enable: true
+    enable: on
     wand: 287
+
 blacklist:
     logging:
         console:
-            enable: true
+            enable: on
         database:
-            enable: false
+            enable: off
             dsn: jdbc:mysql://localhost:3306/minecraft
             user: root
             password: pass
             table: blacklist_events
         file:
-            enable: true
+            enable: on
             path: worldguard/logs/%Y-%m-%d.log
             open-files: 10
+
+# Change sk89q to your name (or sk89q will be able to change regions
+# on your server!). Check the documentation to see how to configure this
 permissions:
-    groups:
-        default:
-            permissions:
     users:
+        sk89q:
+            permissions:
+                - /region
+                - /reload

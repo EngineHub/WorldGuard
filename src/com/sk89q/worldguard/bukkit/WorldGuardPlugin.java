@@ -21,7 +21,10 @@ package com.sk89q.worldguard.bukkit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -116,6 +119,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         
         folder.mkdirs();
 
+        createDefaultConfiguration("config.yml");
+        createDefaultConfiguration("blacklist.txt");
+        
         regionLoader = new CSVDatabase(new File(folder, "regions.txt"));
         perms = new ConfigurationPermissionsResolver(getConfiguration());
         loadConfiguration();
@@ -150,6 +156,42 @@ public class WorldGuardPlugin extends JavaPlugin {
     
     private void registerEvent(Event.Type type, Listener listener, Priority priority) {
         getServer().getPluginManager().registerEvent(type, listener, priority, this);
+    }
+    
+    private void createDefaultConfiguration(String name) {
+        File actual = new File(getDataFolder(), name);
+        if (!actual.exists()) {
+            
+            InputStream input =
+                    WorldGuardPlugin.class.getResourceAsStream("/defaults/" + name);
+            if (input != null) {
+                FileOutputStream output = null;
+
+                try {
+                    output = new FileOutputStream(actual);
+                    byte[] buf = new byte[8192];
+                    int length = 0;
+                    while ((length = input.read(buf)) > 0) {
+                        output.write(buf, 0, length);
+                    }
+                    
+                    logger.info("WorldGuard: Default configuration file written: "
+                            + name);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (input != null)
+                            input.close();
+                    } catch (IOException e) {}
+
+                    try {
+                        if (output != null)
+                            output.close();
+                    } catch (IOException e) {}
+                }
+            }
+        }
     }
 
     /**
@@ -200,6 +242,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             regionLoader.load();
             regionManager.setRegions(regionLoader.getRegions());
+        } catch (FileNotFoundException e) {
         } catch (IOException e) {
             logger.warning("WorldGuard: Failed to load regions: "
                     + e.getMessage());
@@ -275,7 +318,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             if (disableFireSpread) {
                 logger.log(Level.INFO, "WorldGuard: All fire spread is disabled.");
             } else {
-                if (disableFireSpreadBlocks != null) {
+                if (disableFireSpreadBlocks.size() > 0) {
                     logger.log(Level.INFO, "WorldGuard: Fire spread is limited to "
                             + disableFireSpreadBlocks.size() + " block types.");
                 } else {
