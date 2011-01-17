@@ -86,7 +86,15 @@ blacklist:
 
 # Change sk89q to your name (or sk89q will be able to change regions
 # on your server!). Check the documentation to see how to configure this
+# 
+# NOTE: The /reload permission is given to everyone below (only applies to
+# WorldGuard) so that you can reload WorldGuard with /reload WorldGuard
+# until your configuration work is done
 permissions:
+    groups:
+        default:
+            permissions:
+                - /reload
     users:
         sk89q:
             permissions:

@@ -16,8 +16,9 @@ Bukkit:
   3. Restart your server.
 
 Default configuration files will be created in plugins/WorldGuard/
-when WorldGuard is first started. Be sure to edit them and then re-restart
-your server.
+when WorldGuard is first started. Be sure to edit them and use
+/reload WorldGuard until you are satisfied (remember to remove the
+/reload permission from everyome when you are done).
 
 Thanks
 ------
