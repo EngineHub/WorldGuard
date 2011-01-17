@@ -176,7 +176,7 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        if (plugin.disableFireSpread) {
+        if (plugin.disableFireSpread && isFireSpread) {
             event.setCancelled(true);
             return;
         }
