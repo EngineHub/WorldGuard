@@ -131,7 +131,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
         
-        if (plugin.blacklist != null) {
+        if (block != null && plugin.blacklist != null) {
             if (!plugin.blacklist.check(
                     new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
                             block.getTypeId()), false, false)) {
