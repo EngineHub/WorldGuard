@@ -18,7 +18,7 @@ Bukkit:
 Default configuration files will be created in plugins/WorldGuard/
 when WorldGuard is first started. Be sure to edit them and use
 /reload WorldGuard until you are satisfied (remember to remove the
-/reload permission from everyome when you are done).
+/reload permission from everyone when you are done).
 
 Thanks
 ------
