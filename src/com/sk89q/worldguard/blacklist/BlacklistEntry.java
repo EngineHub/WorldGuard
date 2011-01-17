@@ -21,8 +21,6 @@ package com.sk89q.worldguard.blacklist;
 
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
 import org.bukkit.ChatColor;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
