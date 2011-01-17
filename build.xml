@@ -52,13 +52,13 @@
     <antcall target="jar"/>
     <delete dir="${release.dir}"/>
     <mkdir dir="${release.dir}"/>
-    <copy todir="${release.dir}">
-      <fileset dir="."/>
-      <globmapper from="*.txt" to="*.txt"/>
-    </copy>
-    <copy tofile="${release.dir}/plugin.yml" file="plugin.yml"/>
+    <copy tofile="${release.dir}/README.txt" file="README.txt"/>
+    <copy tofile="${release.dir}/LICENSE.txt" file="LICENSE.txt"/>
+    <copy tofile="${release.dir}/CHANGELOG.txt" file="CHANGELOG.txt"/>
+    <copy tofile="${release.dir}/blacklist_table.sql" file="blacklist_table.sql"/>
+    <!-- <copy tofile="${release.dir}/plugin.yml" file="plugin.yml"/>
     <copy tofile="${release.dir}/config.yml" file="config.yml"/>
-    <replace file="${release.dir}/plugin.yml" token="WGVERSIONMACRO" value="${version}"/>
+    <replace file="${release.dir}/plugin.yml" token="WGVERSIONMACRO" value="${version}"/>-->
     <copy tofile="${release.dir}/WorldGuard.jar" file="${dist.dir}/WorldGuard.jar"/>
     <zip destfile="${release.dir}/worldguard-${version}.zip" basedir="${release.dir}" excludes="*.zip plugin.yml"/>
     <mkdir dir="${release.dir}/src"/>
