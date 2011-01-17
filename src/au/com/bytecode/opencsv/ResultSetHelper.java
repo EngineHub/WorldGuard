@@ -1,4 +1,3 @@
-package au.com.bytecode.opencsv;
 /**
  Copyright 2005 Bytecode Pty Ltd.
 
@@ -14,6 +13,8 @@ package au.com.bytecode.opencsv;
  See the License for the specific language governing permissions and
  limitations under the License.
  */
+
+package au.com.bytecode.opencsv;
 
 import java.io.IOException;
 import java.sql.ResultSet;

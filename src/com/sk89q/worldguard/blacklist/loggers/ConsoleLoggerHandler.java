@@ -1,4 +1,3 @@
-package com.sk89q.worldguard.blacklist.loggers;
 // $Id$
 /*
  * WorldGuard
@@ -17,6 +16,8 @@ package com.sk89q.worldguard.blacklist.loggers;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
+
+package com.sk89q.worldguard.blacklist.loggers;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;

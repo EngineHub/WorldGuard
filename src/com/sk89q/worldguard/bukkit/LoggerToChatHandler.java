@@ -1,4 +1,3 @@
-package com.sk89q.worldguard.bukkit;
 // $Id$
 /*
  * WorldGuard
@@ -17,6 +16,8 @@ package com.sk89q.worldguard.bukkit;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
+
+package com.sk89q.worldguard.bukkit;
 
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
