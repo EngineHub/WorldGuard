@@ -32,6 +32,7 @@
       <attribute name="WorldGuard-Version" value="${version}"/>
       <attribute name="Class-Path" value="WorldEdit.jar WorldGuard/WorldEdit.jar"/>
     </manifest>
+    <delete file="${build.dir}/plugin.yml"/>
     <copy tofile="${build.dir}/plugin.yml" file="plugin.yml"/>
     <replace file="${build.dir}/plugin.yml" token="WGVERSIONMACRO" value="${version}"/>
     <mkdir dir="${build.dir}/defaults"/>
