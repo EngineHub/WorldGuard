@@ -19,8 +19,10 @@
 
 package com.sk89q.worldguard;
 
+import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 
 public class TestPlayer extends LocalPlayer {
@@ -43,5 +45,35 @@ public class TestPlayer extends LocalPlayer {
     @Override
     public boolean hasGroup(String group) {
         return groups.contains(group.toLowerCase());
+    }
+
+    @Override
+    public Vector getPosition() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void kick(String msg) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void ban(String msg) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void printRaw(String msg) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public List<String> getGroups() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
