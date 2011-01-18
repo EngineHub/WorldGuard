@@ -39,7 +39,8 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
-import com.sk89q.bukkit.migration.ConfigurationPermissionsResolver;
+import com.sk89q.bukkit.migration.PermissionsResolverManager;
+import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.blacklist.BlacklistLogger;
 import com.sk89q.worldguard.blacklist.loggers.*;
@@ -59,7 +60,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         new WorldGuardBlockListener(this);
     private final WorldGuardEntityListener entityListener =
         new WorldGuardEntityListener(this);
-    private final ConfigurationPermissionsResolver perms;
+    private final PermissionsResolverServerListener permsListener;
+    
+    private final PermissionsResolverManager perms;
     
     Blacklist blacklist;
 
@@ -122,7 +125,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         createDefaultConfiguration("blacklist.txt");
         
         regionLoader = new CSVDatabase(new File(folder, "regions.txt"));
-        perms = new ConfigurationPermissionsResolver(getConfiguration());
+        perms = new PermissionsResolverManager(getConfiguration(), getServer(),
+                "WorldGuard", logger);
+        permsListener = new PermissionsResolverServerListener(perms);
         loadConfiguration();
         postReload();
         registerEvents();
@@ -151,6 +156,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal);
         registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal);
+        
+        permsListener.register(this);
     }
     
     private void registerEvent(Event.Type type, Listener listener, Priority priority) {
