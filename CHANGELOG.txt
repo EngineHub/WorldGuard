@@ -1,6 +1,8 @@
 2.2:
 - Now supports GroupUsers.
 - Added support for blocking creeper explosions.
+- Fixed a bug where a player's groups were not being loaded correctly,
+    causing the blacklist group ignore option to not work.
 
 2.1.1:
 - Fixed fire spread disable preventing flint and steel too.
