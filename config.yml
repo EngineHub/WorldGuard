@@ -49,6 +49,7 @@ fire:
 
 mobs:
     block-creeper-explosions: off
+    block-creeper-block-damage: off
 
 spawn:
     login-protection: 3
@@ -84,12 +85,7 @@ blacklist:
             path: worldguard/logs/%Y-%m-%d.log
             open-files: 10
 
-# Change sk89q to your name (or sk89q will be able to change regions
-# on your server!). Check the documentation to see how to configure this
-# 
-# NOTE: The /reload permission is given to everyone below (only applies to
-# WorldGuard) so that you can reload WorldGuard with /reload WorldGuard
-# until your configuration work is done
+# See http://wiki.sk89q.com/wiki/WorldGuard/Permissions/Bukkit
 permissions:
     groups:
         default:

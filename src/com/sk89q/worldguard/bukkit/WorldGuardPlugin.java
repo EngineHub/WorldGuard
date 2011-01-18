@@ -96,6 +96,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     Set<Integer> allowedLavaSpreadOver;
     
     boolean blockCreeperExplosions;
+    boolean blockCreeperBlockDamage;
 
     int loginProtection;
     int spawnProtection;
@@ -150,6 +151,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         registerEvent(Event.Type.ENTITY_DAMAGEDBY_BLOCK, entityListener, Priority.Normal);
         registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal);
+        registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal);
 
         registerEvent(Event.Type.PLAYER_COMMAND, playerListener, Priority.Normal);
         registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.Normal);
@@ -228,6 +230,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         allowedLavaSpreadOver = new HashSet<Integer>(config.getIntList("fire.lava-spread-blocks", null));
         
         blockCreeperExplosions = config.getBoolean("mobs.block-creeper-explosions", false);
+        blockCreeperBlockDamage = config.getBoolean("mobs.block-creeper-block-damage", false);
         
         loginProtection = config.getInt("spawn.login-protection", 3);
         spawnProtection = config.getInt("spawn.spawn-protection", 0);

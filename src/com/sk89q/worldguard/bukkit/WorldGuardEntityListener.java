@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -106,6 +107,30 @@ public class WorldGuardEntityListener extends EntityListener {
                         event.setCancelled(true);
                         return;
                     }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onEntityExplode(EntityExplodeEvent event) {
+        if (event.getEntity() instanceof LivingEntity) {
+            if (plugin.blockCreeperBlockDamage) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (plugin.blockCreeperExplosions) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (plugin.useRegions) {
+                Vector pt = toVector(event.getEntity().getLocation());
+                
+                if (!plugin.regionManager.getApplicableRegions(pt).allowsCreeperExplosions()) {
+                    event.setCancelled(true);
+                    return;
                 }
             }
         }
