@@ -71,7 +71,7 @@ public abstract class LocalPlayer {
      * 
      * @return
      */
-    public abstract List<String> getGroups();
+    public abstract String[] getGroups();
     
     @Override
     public boolean equals(Object obj) {

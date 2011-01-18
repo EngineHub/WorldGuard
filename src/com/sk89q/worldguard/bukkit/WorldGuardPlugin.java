@@ -24,9 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -369,8 +367,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         return perms.hasPermission(player.getName(), perm);
     }
     
-    List<String> getGroups(Player player) {
-        return new ArrayList<String>();
+    String[] getGroups(Player player) {
+        return perms.getGroups(player.getName());
     }
 
     BukkitPlayer wrapPlayer(Player player) {

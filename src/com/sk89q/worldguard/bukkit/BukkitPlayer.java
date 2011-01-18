@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import com.sk89q.worldedit.Vector;
@@ -61,7 +60,7 @@ public class BukkitPlayer extends LocalPlayer {
     }
 
     @Override
-    public List<String> getGroups() {
+    public String[] getGroups() {
         return plugin.getGroups(player);
     }
 
