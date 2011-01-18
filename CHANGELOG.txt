@@ -1,3 +1,7 @@
+2.2:
+- Now supports GroupUsers.
+- Added support for blocking creeper explosions.
+
 2.1.1:
 - Fixed fire spread disable preventing flint and steel too.
 - Fixed NullPointerException related to the player item event.

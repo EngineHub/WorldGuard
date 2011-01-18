@@ -2,23 +2,13 @@ WorldGuard
 Copyright (c) 2010, 2011 sk89q <http://www.sk89q.com>
 Licensed under the GNU Lesser General Public License v3
 
-Installation
+Introduction
 ------------
 
-Bukkit:
+WorldGuard protects your server!
 
-** Make sure you first install the WorldEdit plugin. **
-
-  1. Create a "plugins" folder inside your server folder.
-
-  2. Copy WorldGuard.jar into "plugins".
-  
-  3. Restart your server.
-
-Default configuration files will be created in plugins/WorldGuard/
-when WorldGuard is first started. Be sure to edit them and use
-/reload WorldGuard until you are satisfied (remember to remove the
-/reload permission from everyone when you are done).
+Documentation can be found at:
+http://wiki.sk89q.com/wiki/WorldGuard
 
 Thanks
 ------
