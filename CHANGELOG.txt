@@ -1,3 +1,9 @@
+2.3.1:
+- Fixed various cast exceptions with the blacklist loggers.
+- Added checks for unchecked exceptions when resolving permissions.
+- Fixed the item durability disable setting changing the damage value on
+    an empty hand.
+
 2.3:
 - /god now works very well.
 - Item (TNT, flint and steel, etc.) blocking should now work.
