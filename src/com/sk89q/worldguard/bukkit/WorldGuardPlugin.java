@@ -1207,15 +1207,30 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
     
     boolean inGroup(Player player, String group) {
-        return perms.inGroup(player.getName(), group);
+        try {
+            return perms.inGroup(player.getName(), group);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
     }
     
     boolean hasPermission(Player player, String perm) {
-        return player.isOp() || perms.hasPermission(player.getName(), perm);
+        try {
+            return player.isOp() || perms.hasPermission(player.getName(), perm);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
     }
     
     String[] getGroups(Player player) {
-        return perms.getGroups(player.getName());
+        try {
+            return perms.getGroups(player.getName());
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return new String[0];
+        }
     }
 
     BukkitPlayer wrapPlayer(Player player) {
