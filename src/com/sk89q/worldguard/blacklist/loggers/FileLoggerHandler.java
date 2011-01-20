@@ -255,12 +255,12 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
         
         // Drop
         } else if (event instanceof ItemDropBlacklistEvent) {
-            ItemAcquireBlacklistEvent evt = (ItemAcquireBlacklistEvent)event;
+            ItemDropBlacklistEvent evt = (ItemDropBlacklistEvent)event;
             logEvent(event, "drop", evt.getType(), evt.getPosition(), comment);
             
         // Use
         } else if (event instanceof ItemUseBlacklistEvent) {
-            ItemDropBlacklistEvent evt = (ItemDropBlacklistEvent)event;
+            ItemUseBlacklistEvent evt = (ItemUseBlacklistEvent)event;
             logEvent(event, "use", evt.getType(), evt.getPosition(), comment);
         
         // Unknown

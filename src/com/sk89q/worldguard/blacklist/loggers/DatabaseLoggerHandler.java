@@ -172,7 +172,7 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
         
         // Use
         } else if (event instanceof ItemUseBlacklistEvent) {
-            ItemDropBlacklistEvent evt = (ItemDropBlacklistEvent)event;
+            ItemUseBlacklistEvent evt = (ItemUseBlacklistEvent)event;
             logEvent("USE", evt.getPlayer(), evt.getPlayer().getPosition(),
                     evt.getType(), comment);
         

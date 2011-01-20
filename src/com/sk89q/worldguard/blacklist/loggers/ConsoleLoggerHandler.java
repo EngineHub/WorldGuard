@@ -56,8 +56,8 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
                     + (comment != null ? " (" + comment + ")" : ""));
         
         // Block interact
-        } else if (event instanceof BlockPlaceBlacklistEvent) {
-            BlockPlaceBlacklistEvent evt = (BlockPlaceBlacklistEvent)event;
+        } else if (event instanceof BlockInteractBlacklistEvent) {
+            BlockInteractBlacklistEvent evt = (BlockInteractBlacklistEvent)event;
             logger.log(Level.INFO, "WorldGuard: " + event.getPlayer().getName()
                     + " tried to interact with " + getFriendlyItemName(evt.getType())
                     + (comment != null ? " (" + comment + ")" : ""));
