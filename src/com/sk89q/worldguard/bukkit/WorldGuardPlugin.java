@@ -512,6 +512,60 @@ public class WorldGuardPlugin extends JavaPlugin {
             return true;
         }
         
+        if (cmd.equalsIgnoreCase("heal")) {
+            checkPermission(player, "/heal");
+            checkArgs(args, 0, 1);
+            
+            // Allow healing other people
+            if (args.length > 1) {
+                if (!hasPermission(player, "/healother")) {
+                    player.sendMessage(ChatColor.RED + "You don't have permission to heal others.");
+                    return true;
+                }
+
+                Player other = matchSinglePlayer(getServer(), args[1]);
+                if (other == null) {
+                    player.sendMessage(ChatColor.RED + "Player not found.");
+                } else {
+                    other.setHealth(20);
+                    player.sendMessage(ChatColor.YELLOW + other.getName() + " has been healed!");
+                    other.sendMessage(ChatColor.YELLOW + player.getName() + " has healed you!");
+                }
+            } else {
+                player.setHealth(20);
+                player.sendMessage(ChatColor.YELLOW + "You have been healed!");
+            }
+            
+            return true;
+        }
+        
+        if (cmd.equalsIgnoreCase("slay")) {
+            checkPermission(player, "/slay");
+            checkArgs(args, 0, 1);
+            
+            // Allow killing other people
+            if (args.length > 1) {
+                if (!hasPermission(player, "/slayother")) {
+                    player.sendMessage(ChatColor.RED + "You don't have permission to kill others.");
+                    return true;
+                }
+
+                Player other = matchSinglePlayer(getServer(), args[1]);
+                if (other == null) {
+                    player.sendMessage(ChatColor.RED + "Player not found.");
+                } else {
+                    other.setHealth(0);
+                    player.sendMessage(ChatColor.YELLOW + other.getName() + " has been killed!");
+                    other.sendMessage(ChatColor.YELLOW + player.getName() + " has killed you!");
+                }
+            } else {
+                player.setHealth(0);
+                player.sendMessage(ChatColor.YELLOW + "You have committed suicide!");
+            }
+            
+            return true;
+        }
+        
         if (cmd.equalsIgnoreCase("stack")) {
             checkPermission(player, "stack");
             checkArgs(args, 0, 0);

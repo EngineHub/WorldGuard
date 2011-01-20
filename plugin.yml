@@ -11,6 +11,12 @@ commands:
     god:
         description: Toggles god mode
         usage: /<command> [other player]
+    heal:
+        description: Heal yourself or another
+        usage: /<command> [other player]
+    slay:
+        description: Slay yourself or another
+        usage: /<command> [other player]
     stack:
         description: Stacks items in the player's inventory
         usage: /<command>
