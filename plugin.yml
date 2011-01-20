@@ -25,6 +25,9 @@ commands:
         description: Adjust protected regions
         usage: /<command> <define|claim|flag|delete|info|addowner|removeowner|list|save|load> ...
         aliases: rg, regions
+    locate:
+        description: Set your compass towards a person
+        usage: /<command> <target>
     reloadwg:
         description: Reload WorldGuard's configuration
         usage: /<command>

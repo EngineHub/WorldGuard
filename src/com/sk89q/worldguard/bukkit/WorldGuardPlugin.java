@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
@@ -635,6 +636,45 @@ public class WorldGuardPlugin extends JavaPlugin {
 
             player.sendMessage(ChatColor.YELLOW + "Items compacted into stacks!");
             
+            return true;
+        }
+        
+        if (cmd.equalsIgnoreCase("locate")) {
+            checkPermission(player, "locate");
+            checkArgs(args, 0, 3);
+
+            if (args.length == 2) {
+                String name = args[1];
+                Player target = BukkitUtil.matchSinglePlayer(getServer(), name);
+                if (target != null) {
+                    player.setCompassTarget(target.getLocation());
+                    player.sendMessage(ChatColor.YELLOW + "Compass target set to " + player.getName() + ".");
+                } else {
+                    player.sendMessage(ChatColor.RED + "Could not find player.");
+                }
+            } else if (args.length == 4) {
+                try {
+                    Location loc = new Location(
+                            player.getWorld(),
+                            Integer.parseInt(args[1]),
+                            Integer.parseInt(args[2]),
+                            Integer.parseInt(args[3])
+                            );
+                    player.setCompassTarget(loc);
+                    player.sendMessage(ChatColor.YELLOW + "Compass target set to "
+                            +  loc.getBlockX() + ","
+                            + loc.getBlockY() + ","
+                            + loc.getBlockZ() + ".");
+                } catch (NumberFormatException e) {
+                    player.sendMessage(ChatColor.RED + "Invalid number specified");
+                }
+            } else if (args.length == 1) {
+                player.setCompassTarget(player.getWorld().getSpawnLocation());
+                player.sendMessage(ChatColor.YELLOW + "Compass reset to the spawn location.");
+            } else {
+                return false;
+            }
+
             return true;
         }
         
