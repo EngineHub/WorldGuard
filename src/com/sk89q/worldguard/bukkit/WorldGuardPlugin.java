@@ -648,7 +648,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 Player target = BukkitUtil.matchSinglePlayer(getServer(), name);
                 if (target != null) {
                     player.setCompassTarget(target.getLocation());
-                    player.sendMessage(ChatColor.YELLOW + "Compass target set to " + player.getName() + ".");
+                    player.sendMessage(ChatColor.YELLOW + "Compass target set to " + target.getName() + ".");
                 } else {
                     player.sendMessage(ChatColor.RED + "Could not find player.");
                 }
