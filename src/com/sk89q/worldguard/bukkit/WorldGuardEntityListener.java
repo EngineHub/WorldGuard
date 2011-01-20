@@ -20,12 +20,15 @@
 package com.sk89q.worldguard.bukkit;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BlockType;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class WorldGuardEntityListener extends EntityListener {
@@ -131,6 +134,12 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
+            
+            if (plugin.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
+                findFreePosition(player);
+                event.setCancelled(true);
+                return;
+            }
 
             if (plugin.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
                 event.setCancelled(true);
@@ -185,6 +194,46 @@ public class WorldGuardEntityListener extends EntityListener {
                     return;
                 }
             }
+        }
+    }
+    
+    /**
+     * Find a position for the player to stand that is not inside a block.
+     * Blocks above the player will be iteratively tested until there is
+     * a series of two free blocks. The player will be teleported to
+     * that free position.
+     *
+     * @param player
+     */
+    public void findFreePosition(Player player) {
+        Location loc = player.getLocation();
+        int x = loc.getBlockX();
+        int y = Math.max(0, loc.getBlockY());
+        int origY = y;
+        int z = loc.getBlockZ();
+        World world = player.getWorld();
+
+        byte free = 0;
+
+        while (y <= 129) {
+            if (BlockType.canPassThrough(world.getBlockTypeIdAt(x, y, z))) {
+                free++;
+            } else {
+                free = 0;
+            }
+
+            if (free == 2) {
+                if (y - 1 != origY) {
+                    loc.setX(x + 0.5);
+                    loc.setY(y);
+                    loc.setZ(z + 0.5);
+                    player.teleportTo(loc);
+                }
+
+                return;
+            }
+
+            y++;
         }
     }
 }
