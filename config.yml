@@ -88,12 +88,8 @@ blacklist:
 
 # See http://wiki.sk89q.com/wiki/WorldGuard/Permissions/Bukkit
 permissions:
-    groups:
-        default:
-            permissions:
-                - /reload
     users:
         sk89q:
             permissions:
                 - /region
-                - /reload
+                - /reloadwg
