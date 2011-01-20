@@ -117,8 +117,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerItem(PlayerItemEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlockClicked();
+        ItemStack item = event.getItem();
         
-        if (plugin.useRegions && !event.isBlock() && event.getBlockClicked() != null) {
+        if (plugin.useRegions && !event.isBlock() && block != null) {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
             
@@ -131,10 +132,11 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
         
-        if (block != null && plugin.blacklist != null) {
+        if (item != null && plugin.blacklist != null && block != null) {
             if (!plugin.blacklist.check(
-                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
-                            block.getTypeId()), false, false)) {
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
+                            toVector(block.getRelative(event.getBlockFace())),
+                            item.getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
