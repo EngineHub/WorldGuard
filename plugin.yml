@@ -1,3 +1,24 @@
 name: WorldGuard
 main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
 version: WGVERSIONMACRO
+commands:
+    stopfire:
+        description: Halts all fire spread until it is disabled or the server is restarted
+        usage: /<command>
+    allowfire:
+        description: Re-enables fire spread if he has been disabled with /stopfire
+        usage: /<command>
+    god:
+        description: Toggles god mode
+        usage: /<command> [other player]
+    stack:
+        description: Stacks items in the player's inventory
+        usage: /<command>
+        aliases: ;
+    region:
+        description: Adjust protected regions
+        usage: /<command> <define|claim|flag|delete|info|addowner|removeowner|list|save|load> ...
+        aliases: rg, regions
+    reloadwg:
+        description: Reload WorldGuard's configuration
+        usage: /<command>
