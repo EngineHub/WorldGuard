@@ -1,3 +1,16 @@
+2.3:
+- /god now works very well.
+- Item (TNT, flint and steel, etc.) blocking should now work.
+- The TNT blocking configuration variable should now work.
+- Re-added /heal (not sure where that went), added /slay.
+- Implemented contact damage disable toggle.
+- Made all player damage disabling configuration parameters work.
+- Fixed teleport-on-suffocation setting.
+- Added /locate <name>, /locate <x> <y> <z>, and /locate that lets you
+    program/change your compass bearing to point to a player's position
+    (not yet live), a position, or back to spawn.
+- Fixed CSVDatabase spitting an error if the owners list was empty.
+
 2.2:
 - Now supports GroupUsers.
 - Added support for blocking creeper explosions.
