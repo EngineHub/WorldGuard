@@ -48,7 +48,7 @@ public class WorldGuardEntityListener extends EntityListener {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
         
-        if (defender instanceof Player) {
+        if (defender instanceof Player) {            
             Player player = (Player)defender;
 
             if (plugin.invinciblePlayers.contains(player.getName())) {
@@ -129,6 +129,20 @@ public class WorldGuardEntityListener extends EntityListener {
                 Vector pt = toVector(event.getEntity().getLocation());
                 
                 if (!plugin.regionManager.getApplicableRegions(pt).allowsCreeperExplosions()) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        } else { // Shall assume that this is TNT
+            if (plugin.blockTNT) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (plugin.useRegions) {
+                Vector pt = toVector(event.getEntity().getLocation());
+                
+                if (!plugin.regionManager.getApplicableRegions(pt).allowsTNT()) {
                     event.setCancelled(true);
                     return;
                 }
