@@ -59,12 +59,13 @@ spawn:
     teleport-to-home-on-death: off
 
 player-damage:
-    disable-fall-damage: on
-    disable-lava-damage: on
-    disable-fire-damage: on
-    disable-drowning-damage: on
-    disable-suffocation-damage: on
-    teleport-on-suffocation: on
+    disable-fall-damage: off
+    disable-lava-damage: off
+    disable-fire-damage: off
+    disable-drowning-damage: off
+    disable-suffocation-damage: off
+    disable-contact-damage: off
+    teleport-on-suffocation: off
 
 regions:
     enable: on

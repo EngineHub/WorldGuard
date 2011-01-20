@@ -55,30 +55,8 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
-            
-            if (plugin.disableFallDamage && type == DamageCause.FALL) {
-                event.setCancelled(true);
-                return;
-            }
 
             if (plugin.disableLavaDamage && type == DamageCause.LAVA) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (plugin.disableFireDamage && (type == DamageCause.FIRE
-                    || type == DamageCause.FIRE_TICK)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (plugin.disableDrowningDamage && type == DamageCause.DROWNING) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (type == DamageCause.DROWNING
-                    && plugin.amphibiousPlayers.contains(player.getName())) {
                 event.setCancelled(true);
                 return;
             }
@@ -108,6 +86,66 @@ public class WorldGuardEntityListener extends EntityListener {
                         return;
                     }
                 }
+            }
+        }
+    }
+    
+    public void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
+        Entity defender = event.getEntity();
+        
+        if (defender instanceof Player) {            
+            Player player = (Player)defender;
+
+            if (plugin.invinciblePlayers.contains(player.getName())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+    }
+
+    public void onEntityDamage(EntityDamageEvent event) {
+        Entity defender = event.getEntity();
+        DamageCause type = event.getCause();
+        
+        if (defender instanceof Player) {            
+            Player player = (Player)defender;
+
+            if (plugin.invinciblePlayers.contains(player.getName())) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (plugin.disableFallDamage && type == DamageCause.FALL) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (plugin.disableFireDamage && (type == DamageCause.FIRE
+                    || type == DamageCause.FIRE_TICK)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (plugin.disableDrowningDamage && type == DamageCause.DROWNING) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (plugin.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (plugin.disableContactDamage && type == DamageCause.CONTACT) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (type == DamageCause.DROWNING
+                    && plugin.amphibiousPlayers.contains(player.getName())) {
+                event.setCancelled(true);
+                return;
             }
         }
     }

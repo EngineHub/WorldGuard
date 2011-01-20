@@ -121,7 +121,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     boolean kickOnDeath;
     boolean exactRespawn;
     boolean teleportToHome;
-    
+
+    boolean disableContactDamage;
     boolean disableFallDamage;
     boolean disableLavaDamage;
     boolean disableFireDamage;
@@ -186,6 +187,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal);
         registerEvent(Event.Type.BLOCK_RIGHTCLICKED, blockListener, Priority.Normal);
 
+        registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Normal);
+        registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.Normal);
         registerEvent(Event.Type.ENTITY_DAMAGEDBY_BLOCK, entityListener, Priority.Normal);
         registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal);
         registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal);
@@ -291,6 +294,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         disableFireDamage = config.getBoolean("player-damage.disable-fire-damage", false);
         disableDrowningDamage = config.getBoolean("player-damage.disable-water-damage", false);
         disableSuffocationDamage = config.getBoolean("player-damage.disable-suffocation-damage", false);
+        disableContactDamage = config.getBoolean("player-damage.disable-contact-damage", false);
         teleportOnSuffocation = config.getBoolean("player-damage.teleport-on-suffocation", false);
         
         useRegions = config.getBoolean("regions.enable", true);
