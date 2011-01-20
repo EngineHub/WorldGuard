@@ -197,6 +197,10 @@ public class CSVDatabase implements ProtectionDatabase {
         String[] parts = data.split(",");
         
         for (String part : parts) {
+            if (part.trim().length() == 0) {
+                continue;
+            }
+            
             Matcher matcher = pattern.matcher(part);
             
             if (!matcher.matches()) {
