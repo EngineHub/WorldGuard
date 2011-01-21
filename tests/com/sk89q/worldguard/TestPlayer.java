@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard;
 
-import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import com.sk89q.worldedit.Vector;
@@ -72,7 +71,7 @@ public class TestPlayer extends LocalPlayer {
     }
 
     @Override
-    public List<String> getGroups() {
+    public String[] getGroups() {
         // TODO Auto-generated method stub
         return null;
     }
