@@ -1,3 +1,11 @@
+3.0:
+- Added parent-child relationships to regions.
+- Added global build flag.
+- Improved flag support.
+- Fixed no-PvP zone messages being sent to the wrong person.
+- Fixed commands so that they work in a recent version of Bukkit.
+- Fixed NullPointerException in explode hook.
+
 2.3.1:
 - Fixed various cast exceptions with the blacklist loggers.
 - Added checks for unchecked exceptions when resolving permissions.
