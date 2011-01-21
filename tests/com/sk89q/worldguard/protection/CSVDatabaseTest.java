@@ -28,6 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.AreaFlags.State;
 
 public class CSVDatabaseTest {
     @Before
@@ -63,9 +64,9 @@ public class CSVDatabaseTest {
     
     private void checkTestRegion1(ProtectedRegion region) {
         AreaFlags flags = new AreaFlags();
-        flags.allowFireSpread = AreaFlags.State.ALLOW;
-        flags.allowPvP = AreaFlags.State.DENY;
-        flags.allowLighter = AreaFlags.State.DENY;
+        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
+        flags.set(AreaFlags.FLAG_PVP, State.DENY);
+        flags.set(AreaFlags.FLAG_LIGHTER, State.DENY);
         region.setFlags(flags);
         
         assertEquals(region.getFlags(), flags);
@@ -75,12 +76,12 @@ public class CSVDatabaseTest {
         BlockVector min = new BlockVector(1, 2, 3);
         BlockVector max = new BlockVector(4, 5, 6);
         
-        ProtectedRegion region = new ProtectedCuboidRegion(min, max);
+        ProtectedRegion region = new ProtectedCuboidRegion("test2", min, max);
         
         AreaFlags flags = new AreaFlags();
-        flags.allowFireSpread = AreaFlags.State.ALLOW;
-        flags.allowPvP = AreaFlags.State.DENY;
-        flags.allowLighter = AreaFlags.State.DENY;
+        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
+        flags.set(AreaFlags.FLAG_PVP, State.DENY);
+        flags.set(AreaFlags.FLAG_LIGHTER, State.DENY);
         region.setFlags(flags);
         
         DefaultDomain domain = new DefaultDomain();
@@ -101,12 +102,12 @@ public class CSVDatabaseTest {
         BlockVector min = new BlockVector(7, 8, 9);
         BlockVector max = new BlockVector(10, 11, 12);
         
-        ProtectedRegion region = new ProtectedCuboidRegion(min, max);
+        ProtectedRegion region = new ProtectedCuboidRegion("test2", min, max);
         
         AreaFlags flags = new AreaFlags();
-        flags.allowFireSpread = AreaFlags.State.DENY;
-        flags.allowPvP = AreaFlags.State.ALLOW;
-        flags.allowMobDamage = AreaFlags.State.DENY;
+        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
+        flags.set(AreaFlags.FLAG_PVP, State.ALLOW);
+        flags.set(AreaFlags.FLAG_LIGHTER, State.DENY);
         region.setFlags(flags);
         
         DefaultDomain domain = new DefaultDomain();

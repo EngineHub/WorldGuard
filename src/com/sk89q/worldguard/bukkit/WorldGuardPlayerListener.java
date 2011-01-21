@@ -27,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.*;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.protection.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 /**
@@ -109,11 +110,21 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
         
-        if (item != null && plugin.blacklist != null && block != null) {
+        if (plugin.blacklist != null && item != null && block != null) {
             if (!plugin.blacklist.check(
                     new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
                             toVector(block.getRelative(event.getBlockFace())),
                             item.getTypeId()), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    
+        if (plugin.useRegions && item != null && block != null && item.getTypeId() == 259) {
+            Vector pt = toVector(block.getRelative(event.getBlockFace()));
+            
+            if (!plugin.regionManager.getApplicableRegions(pt)
+                    .allowsFlag(AreaFlags.FLAG_LIGHTER)) {
                 event.setCancelled(true);
                 return;
             }

@@ -98,11 +98,29 @@ public class DefaultDomain implements Domain {
     public String toGroupsString() {
         StringBuilder str = new StringBuilder();
         for (Iterator<String> it = groups.iterator(); it.hasNext(); ) {
+            str.append("*");
             str.append(it.next());
             if (it.hasNext()) {
                 str.append(", ");
             }
         }
+        return str.toString();
+    }
+    
+    public String toUserFriendlyString() {
+        StringBuilder str = new StringBuilder();
+        if (players.size() > 0) {
+            str.append(toPlayersString());
+        }
+        
+        if (groups.size() > 0) {
+            if (str.length() > 0) {
+                str.append("; ");
+            }
+            
+            str.append(toGroupsString());
+        }
+        
         return str.toString();
     }
 }

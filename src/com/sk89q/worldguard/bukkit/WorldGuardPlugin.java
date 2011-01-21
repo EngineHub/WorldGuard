@@ -23,7 +23,6 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.matchSinglePlayer;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.command.Command;
@@ -53,6 +52,8 @@ import com.sk89q.worldguard.blacklist.*;
 import com.sk89q.worldguard.blacklist.loggers.*;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.*;
+import com.sk89q.worldguard.protection.AreaFlags.State;
+import com.sk89q.worldguard.protection.ProtectedRegion.CircularInheritanceException;
 
 /**
  * Plugin for Bukkit.
@@ -77,7 +78,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     
     Blacklist blacklist;
 
-    RegionManager regionManager = new FlatRegionManager();
+    GlobalFlags globalFlags = new GlobalFlags();
+    RegionManager regionManager = new FlatRegionManager(globalFlags);
     ProtectionDatabase regionLoader;
     
     Set<String> invinciblePlayers = new HashSet<String>();
@@ -289,9 +291,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         disableSuffocationDamage = config.getBoolean("player-damage.disable-suffocation-damage", false);
         disableContactDamage = config.getBoolean("player-damage.disable-contact-damage", false);
         teleportOnSuffocation = config.getBoolean("player-damage.teleport-on-suffocation", false);
-        
+
         useRegions = config.getBoolean("regions.enable", true);
         regionWand = config.getInt("regions.wand", 287);
+        globalFlags.canBuild = config.getBoolean("regions.default.build", true);
 
         try {
             regionLoader.load();
@@ -422,6 +425,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         } catch (InsufficientPermissionsException e) {
             player.sendMessage(ChatColor.RED + "You don't have sufficient permission.");
             return true;
+        } catch (CommandHandlingException e) {
+            return true;
+        } catch (Throwable t) {
+            player.sendMessage(ChatColor.RED + "ERROR: " + t.getMessage());
+            t.printStackTrace();
+            return true;
         }
     }
     
@@ -432,11 +441,10 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param cmd
      * @param args
      * @return
-     * @throws InsufficientArgumentsException
-     * @throws InsufficientPermissionsException
+     * @throws CommandHandlingException
      */
     private boolean handleCommand(Player player, String cmd, String[] args)
-            throws InsufficientArgumentsException, InsufficientPermissionsException {
+            throws CommandHandlingException {
         
         if (cmd.equalsIgnoreCase("stopfire")) {
             checkPermission(player, "/stopfire");
@@ -711,11 +719,10 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param player
      * @param action
      * @param args
-     * @throws InsufficientPermissionsException 
-     * @throws InsufficientArgumentsException 
+     * @throws CommandHandlingException
      */
     private boolean handleRegionCommand(Player player, String action, String[] args)
-            throws InsufficientPermissionsException, InsufficientArgumentsException {
+            throws CommandHandlingException {
         if (!useRegions) {
             player.sendMessage(ChatColor.RED + "Regions are disabled.");
             return true;
@@ -743,11 +750,11 @@ public class WorldGuardPlugin extends JavaPlugin {
                 BlockVector min = weRegion.getMinimumPoint().toBlockVector();
                 BlockVector max = weRegion.getMaximumPoint().toBlockVector();
                 
-                ProtectedRegion region = new ProtectedCuboidRegion(min, max);
+                ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
                 if (args.length >= 2) {
                     region.setOwners(parseDomainString(args, 1));
                 }
-                regionManager.addRegion(id, region);
+                regionManager.addRegion(region);
                 regionLoader.save(regionManager);
                 player.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
             } catch (IncompleteRegionException e) {
@@ -785,7 +792,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 BlockVector min = weRegion.getMinimumPoint().toBlockVector();
                 BlockVector max = weRegion.getMaximumPoint().toBlockVector();
                 
-                ProtectedRegion region = new ProtectedCuboidRegion(min, max);
+                ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
                 
                 if (regionManager.overlapsUnownedRegion(region, wrapPlayer(player))) {
                     player.sendMessage(ChatColor.RED + "This region overlaps with someone else's region.");
@@ -794,7 +801,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 
                 region.getOwners().addPlayer(player.getName());
                 
-                regionManager.addRegion(id, region);
+                regionManager.addRegion(region);
                 regionLoader.save(regionManager);
                 player.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
             } catch (IncompleteRegionException e) {
@@ -835,23 +842,78 @@ public class WorldGuardPlugin extends JavaPlugin {
                     return true;
                 }
                 
-                AreaFlags flags = region.getFlags();
-                
-                if (flagStr.equalsIgnoreCase("build")) {
-                    flags.allowBuild = state;
-                } else if (flagStr.equalsIgnoreCase("pvp")) {
-                    flags.allowPvP = state;
-                } else if (flagStr.equalsIgnoreCase("tnt")) {
-                    flags.allowTNT = state;
-                } else if (flagStr.equalsIgnoreCase("lighter")) {
-                    flags.allowLighter = state;
+                if (flagStr.length() == 0) {
+                    player.sendMessage(ChatColor.RED + "A flag must be specified.");
+                    return true;
+                    // Custom flag
+                } else if (flagStr.length() == 2 && flagStr.matches("^_[A-Za-z0-0]$")) {
                 } else {
-                    player.sendMessage(ChatColor.RED + "Acceptable flags: build, pvp, tnt, lighter");
+                    flagStr = AreaFlags.fromAlias(flagStr);
+                    if (flagStr == null) {
+                        player.sendMessage(ChatColor.RED + "Unknown flag specified.");
+                        return true;
+                    }
+                }
+
+                AreaFlags flags = region.getFlags();
+                flags.set(flagStr, state);
+                regionLoader.save(regionManager);
+                player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated.");
+            } catch (IOException e) {
+                player.sendMessage(ChatColor.RED + "Region database failed to save: "
+                        + e.getMessage());
+            }
+            
+            return true;
+        }
+
+        if (action.equalsIgnoreCase("setparent")) {
+            if (!hasPermission(player, "/regionclaim")) {
+                checkRegionPermission(player, "/regiondefine");
+            }
+            checkArgs(args, 1, 2, "/region setparent <id> <parent-id>");
+            
+            String id = args[0].toLowerCase();
+            String parentId = args.length > 1 ? args[1].toLowerCase() : null;
+            
+            ProtectedRegion region = regionManager.getRegion(id);
+            
+            if (region == null) {
+                player.sendMessage(ChatColor.RED + "Could not find a region with ID: " + id);
+                return true;
+            }
+            
+            if (!canUseRegionCommand(player, "/regiondefine")
+                    && !region.isOwner(wrapPlayer(player))) {
+                player.sendMessage(ChatColor.RED + "You need to own the target regions");
+                return true;
+            }
+            
+            ProtectedRegion parent = null;
+            
+            // Set a parent
+            if (parentId != null) {
+                parent = regionManager.getRegion(parentId);
+                
+                if (parent == null) {
+                    player.sendMessage(ChatColor.RED + "Could not find a region with ID: " + parentId);
                     return true;
                 }
                 
+                if (!canUseRegionCommand(player, "/regiondefine")
+                        && !parent.isOwner(wrapPlayer(player))) {
+                    player.sendMessage(ChatColor.RED + "You need to own the parent region.");
+                    return true;
+                }
+            }
+            
+            try {
+                region.setParent(parent);
+                
                 regionLoader.save(regionManager);
                 player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated.");
+            } catch (CircularInheritanceException e) {
+                player.sendMessage(ChatColor.RED + "Circular inheritance detected. The operation failed.");
             } catch (IOException e) {
                 player.sendMessage(ChatColor.RED + "Region database failed to save: "
                         + e.getMessage());
@@ -873,47 +935,74 @@ public class WorldGuardPlugin extends JavaPlugin {
     
             ProtectedRegion region = regionManager.getRegion(id);
             AreaFlags flags = region.getFlags();
-            DefaultDomain domain = region.getOwners();
+            DefaultDomain owners = region.getOwners();
+            DefaultDomain members = region.getMembers();
             
-            player.sendMessage(ChatColor.YELLOW + "Region ID: " + id);
-            player.sendMessage(ChatColor.GRAY + "Type: " + region.getClass().getCanonicalName());
-            player.sendMessage(ChatColor.GRAY + "Priority: " + region.getPriority());
-            player.sendMessage(ChatColor.BLUE + "Build: " + flags.allowBuild.name());
-            player.sendMessage(ChatColor.BLUE + "PvP: " + flags.allowPvP.name());
-            player.sendMessage(ChatColor.BLUE + "TNT: " + flags.allowTNT.name());
-            player.sendMessage(ChatColor.BLUE + "Lighter: " + flags.allowLighter.name());
-            player.sendMessage(ChatColor.LIGHT_PURPLE + "Players: " + domain.toPlayersString());
-            player.sendMessage(ChatColor.LIGHT_PURPLE + "Groups: " + domain.toGroupsString());
+            player.sendMessage(ChatColor.YELLOW + "Region: " + id
+                    + ChatColor.GRAY + " (type: " + region.getTypeName() + ")");
+            player.sendMessage(ChatColor.BLUE + "Priority: " + region.getPriority());
             
+            StringBuilder s = new StringBuilder();
+            for (Map.Entry<String, State> entry : flags.entrySet()) {
+                if (s.length() > 0) {
+                    s.append(", ");
+                }
+                
+                if (entry.getValue() == State.ALLOW) {
+                    s.append("+");
+                    s.append(AreaFlags.getFlagName(entry.getKey()));
+                } else if (entry.getValue() == State.DENY) {
+                    s.append("-");
+                    s.append(AreaFlags.getFlagName(entry.getKey()));
+                }
+            }
+            
+            player.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());
+            player.sendMessage(ChatColor.BLUE + "Parent: "
+                    + (region.getParent() == null ? "(none)" : region.getParent().getId()));
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "Owners: "
+                    + owners.toUserFriendlyString());
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "Members: "
+                    + members.toUserFriendlyString());
             return true;
         }
 
-        if (action.equalsIgnoreCase("addowner")) {
+        if (action.equalsIgnoreCase("addowner") || action.equalsIgnoreCase("addmember")) {
             if (!hasPermission(player, "/regionclaim")) {
                 checkRegionPermission(player, "/regiondefine");
             }
-            checkArgs(args, 2, -1, "/region addowner <id> [owner1 [owner2 [owners...]]]");
-    
-            try {
-                String id = args[0].toLowerCase();
-                if (!regionManager.hasRegion(id)) {
-                    player.sendMessage(ChatColor.RED + "A region with ID '"
-                            + id + "' doesn't exist.");
-                    return true;
-                }
-                
-                ProtectedRegion existing = regionManager.getRegion(id);
-                
-                if (!canUseRegionCommand(player, "/regiondefine")
-                        && !existing.getOwners().contains(wrapPlayer(player))) {
-                    player.sendMessage(ChatColor.RED + "You don't own this region.");
-                    return true;
-                }
-                
+            checkArgs(args, 2, -1, "/region add[member|owner] <id> [player1 [group1 [players/groups...]]]");
+            
+            boolean isOwner = action.equalsIgnoreCase("addowner");
+
+            String id = args[0].toLowerCase();
+            if (!regionManager.hasRegion(id)) {
+                player.sendMessage(ChatColor.RED + "A region with ID '"
+                        + id + "' doesn't exist.");
+                return true;
+            }
+            
+            ProtectedRegion existing = regionManager.getRegion(id);
+            
+            if (!canUseRegionCommand(player, "/regiondefine")
+                    && !existing.isOwner(wrapPlayer(player))) {
+                player.sendMessage(ChatColor.RED + "You don't own this region.");
+                return true;
+            }
+            
+            if (isOwner) {
                 addToDomain(existing.getOwners(), args, 1);
-                
+            } else {
+                addToDomain(existing.getMembers(), args, 1);
+            }
+
+            try {
                 regionLoader.save(regionManager);
                 player.sendMessage(ChatColor.YELLOW + "Region updated!");
+                player.sendMessage(ChatColor.GRAY + "Current owners: "
+                        + existing.getOwners().toUserFriendlyString());
+                player.sendMessage(ChatColor.GRAY + "Current members: "
+                        + existing.getMembers().toUserFriendlyString());
             } catch (IOException e) {
                 player.sendMessage(ChatColor.RED + "Region database failed to save: "
                         + e.getMessage());
@@ -922,32 +1011,42 @@ public class WorldGuardPlugin extends JavaPlugin {
             return true;
         }
 
-        if (action.equalsIgnoreCase("removeowner")) {
+        if (action.equalsIgnoreCase("removeowner") || action.equalsIgnoreCase("removemember")) {
             if (!hasPermission(player, "/regionclaim")) {
                 checkRegionPermission(player, "/regiondefine");
             }
             checkArgs(args, 2, -1, "/region removeowner <id> [owner1 [owner2 [owners...]]]");
-    
-            try {
-                String id = args[0].toLowerCase();
-                if (!regionManager.hasRegion(id)) {
-                    player.sendMessage(ChatColor.RED + "A region with ID '"
-                            + id + "' doesn't exist.");
-                    return true;
-                }
-                
-                ProtectedRegion existing = regionManager.getRegion(id);
-                
-                if (!canUseRegionCommand(player, "/regiondefine")
-                        && !existing.getOwners().contains(wrapPlayer(player))) {
-                    player.sendMessage(ChatColor.RED + "You don't own this region.");
-                    return true;
-                }
-                
+            
+            boolean isOwner = action.equalsIgnoreCase("removeowner");
+            
+            String id = args[0].toLowerCase();
+            if (!regionManager.hasRegion(id)) {
+                player.sendMessage(ChatColor.RED + "A region with ID '"
+                        + id + "' doesn't exist.");
+                return true;
+            }
+            
+            ProtectedRegion existing = regionManager.getRegion(id);
+            
+            if (!canUseRegionCommand(player, "/regiondefine")
+                    && !existing.isOwner(wrapPlayer(player))) {
+                player.sendMessage(ChatColor.RED + "You don't own this region.");
+                return true;
+            }
+
+            if (isOwner) {
                 removeFromDomain(existing.getOwners(), args, 1);
+            } else {
+                removeFromDomain(existing.getMembers(), args, 1);
+            }
                 
+            try {
                 regionLoader.save(regionManager);
                 player.sendMessage(ChatColor.YELLOW + "Region updated!");
+                player.sendMessage(ChatColor.GRAY + "Current owners: "
+                        + existing.getOwners().toUserFriendlyString());
+                player.sendMessage(ChatColor.GRAY + "Current members: "
+                        + existing.getMembers().toUserFriendlyString());
             } catch (IOException e) {
                 player.sendMessage(ChatColor.RED + "Region database failed to save: "
                         + e.getMessage());
@@ -1013,7 +1112,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 ProtectedRegion existing = regionManager.getRegion(id);
                 
                 if (!canUseRegionCommand(player, "/regiondelete")
-                        && !existing.getOwners().contains(wrapPlayer(player))) {
+                        && !existing.isOwner(wrapPlayer(player))) {
                     player.sendMessage(ChatColor.RED + "You don't own this region.");
                     return true;
                 }
@@ -1230,11 +1329,20 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
 
     /**
+     * Thrown when command handling has raised an exception.
+     * 
+     * @author sk89q
+     */
+    private static class CommandHandlingException extends Exception {
+        private static final long serialVersionUID = 7912130636812036780L;
+    }
+
+    /**
      * Thrown when a player has insufficient permissions.
      * 
      * @author sk89q
      */
-    private static class InsufficientPermissionsException extends Exception {
+    private static class InsufficientPermissionsException extends CommandHandlingException {
         private static final long serialVersionUID = 9087662707619954750L;
     }
     
@@ -1243,7 +1351,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * 
      * @author sk89q
      */
-    private static class InsufficientArgumentsException extends Exception {
+    private static class InsufficientArgumentsException extends CommandHandlingException {
         private static final long serialVersionUID = 4153597953889773788L;
         private final String help;
         

@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.protection;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -31,6 +32,8 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.AreaFlags.State;
+import com.sk89q.worldguard.protection.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.util.ArrayReader;
 
 /**
  * Represents a protected area database that uses CSV files.
@@ -82,7 +85,7 @@ public class CSVDatabase implements ProtectionDatabase {
                 
                 writer.writeNext(new String[] {
                         id,
-                        "cuboid",
+                        "cuboid.2",
                         String.valueOf(min.getBlockX()),
                         String.valueOf(min.getBlockY()),
                         String.valueOf(min.getBlockZ()),
@@ -90,9 +93,12 @@ public class CSVDatabase implements ProtectionDatabase {
                         String.valueOf(max.getBlockY()),
                         String.valueOf(max.getBlockZ()),
                         String.valueOf(cuboid.getPriority()),
+                        cuboid.getParent() != null ? cuboid.getParent().getId() : "",
                         writeDomains(cuboid.getOwners()),
+                        writeDomains(cuboid.getMembers()),
                         writeFlags(cuboid.getFlags()),
-                        cuboid.getEnterMessage(),
+                        cuboid.getEnterMessage() != null ? cuboid.getEnterMessage() : "",
+                        cuboid.getLeaveMessage() != null ? cuboid.getLeaveMessage() : "",
                         });
             }
         } finally {
@@ -110,6 +116,8 @@ public class CSVDatabase implements ProtectionDatabase {
     public void load() throws IOException {
         Map<String,ProtectedRegion> regions =
                 new HashMap<String,ProtectedRegion>();
+        Map<ProtectedRegion,String> parentSets =
+                new LinkedHashMap<ProtectedRegion, String>();
         
         CSVReader reader = new CSVReader(new FileReader(file));
         
@@ -117,16 +125,21 @@ public class CSVDatabase implements ProtectionDatabase {
             String[] line;
             
             while ((line = reader.readNext()) != null) {
-                if (line.length >= 12) {
-                    String type = line[1];
-                    if (!type.equalsIgnoreCase("cuboid")) {
-                        logger.warning("Only cuboid region types are supported: "
-                                + line);
-                        break;
-                        
+                if (line.length < 2) {
+                    logger.warning("Invalid region definition: " + line);
+                    continue;
+                }
+                
+                String id = line[0].toLowerCase();
+                String type = line[1];
+                ArrayReader<String> entries = new ArrayReader<String>(line);
+                
+                if (type.equalsIgnoreCase("cuboid")) {
+                    if (line.length < 8) {
+                        logger.warning("Invalid region definition: " + line);
+                        continue;
                     }
                     
-                    String id = line[0];
                     Vector pt1 = new Vector(
                             Integer.parseInt(line[2]),
                             Integer.parseInt(line[3]),
@@ -139,25 +152,71 @@ public class CSVDatabase implements ProtectionDatabase {
                     BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
                     BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
                     
-                    int priority = Integer.parseInt(line[8]);
-                    String ownersData = line[9];
-                    String flagsData = line[10];
-                    String enterMessage = line[11];
+                    int priority = entries.get(8) == null ? 0 : Integer.parseInt(entries.get(8));
+                    String ownersData = entries.get(9);
+                    String flagsData = entries.get(10);
+                    String enterMessage = nullEmptyString(entries.get(11));
                     
-                    ProtectedRegion region = new ProtectedCuboidRegion(min, max);
+                    ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
                     region.setPriority(priority);
+                    region.setFlags(parseFlags(flagsData));
                     region.setOwners(this.parseDomains(ownersData));
                     region.setEnterMessage(enterMessage);
-                    region.setFlags(parseFlags(flagsData));
                     regions.put(id, region);
-                } else {
-                    logger.warning("Line is invalid: " + line);
+                } else if (type.equalsIgnoreCase("cuboid.2")) {
+                    Vector pt1 = new Vector(
+                            Integer.parseInt(line[2]),
+                            Integer.parseInt(line[3]),
+                            Integer.parseInt(line[4]));
+                    Vector pt2 = new Vector(
+                            Integer.parseInt(line[5]),
+                            Integer.parseInt(line[6]),
+                            Integer.parseInt(line[7]));
+
+                    BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
+                    BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
+                    
+                    int priority = entries.get(8) == null ? 0 : Integer.parseInt(entries.get(8));
+                    String parentId = entries.get(9);
+                    String ownersData = entries.get(10);
+                    String membersData = entries.get(11);
+                    String flagsData = entries.get(12);
+                    String enterMessage = nullEmptyString(entries.get(13));
+                    String leaveMessage = nullEmptyString(entries.get(14));
+                    
+                    ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
+                    region.setPriority(priority);
+                    region.setFlags(parseFlags(flagsData));
+                    region.setOwners(this.parseDomains(ownersData));
+                    region.setMembers(this.parseDomains(membersData));
+                    region.setEnterMessage(enterMessage);
+                    region.setLeaveMessage(leaveMessage);
+                    regions.put(id, region);
+                    
+                    // Link children to parents later
+                    if (parentId.length() > 0) {
+                        parentSets.put(region, parentId);
+                    }
                 }
             }
         } finally {
             try {
                 reader.close();
             } catch (IOException e) {
+            }
+        }
+        
+        for (Map.Entry<ProtectedRegion, String> entry : parentSets.entrySet()) {
+            ProtectedRegion parent = regions.get(entry.getValue());
+            if (parent != null) {
+                try {
+                    entry.getKey().setParent(parent);
+                } catch (CircularInheritanceException e) {
+                    logger.warning("Circular inheritance detect with '"
+                            + entry.getValue() + "' detected as a parent");
+                }
+            } else {
+                logger.warning("Unknown region parent: " + entry.getValue());
             }
         }
         
@@ -191,6 +250,10 @@ public class CSVDatabase implements ProtectionDatabase {
      * @return
      */
     private DefaultDomain parseDomains(String data) {
+        if (data == null) {
+            return new DefaultDomain();
+        }
+        
         DefaultDomain domain = new DefaultDomain();
         Pattern pattern = Pattern.compile("^([A-Za-z]):(.*)$");
         
@@ -230,33 +293,32 @@ public class CSVDatabase implements ProtectionDatabase {
      * @return
      */
     private AreaFlags parseFlags(String data) {
+        if (data == null) {
+            return new AreaFlags();
+        }
+        
         AreaFlags flags = new AreaFlags();
         State curState = State.ALLOW;
         
         for (int i = 0; i < data.length(); i++) {
-            char flag = data.charAt(i);
-            if (flag == '+') {
+            char k = data.charAt(i);
+            if (k == '+') {
                 curState = State.ALLOW;
-            } else if (flag == '-') {
+            } else if (k == '-') {
                 curState = State.DENY;
-            } else if (flag == 'b') {
-                flags.allowBuild = curState;
-            } else if (flag == 'p') {
-                flags.allowPvP = curState;
-            } else if (flag == 'm') {
-                flags.allowMobDamage = curState;
-            } else if (flag == 'c') {
-                flags.allowCreeperExplosions = curState;
-            } else if (flag == 't') {
-                flags.allowTNT = curState;
-            } else if (flag == 'l') {
-                flags.allowLighter = curState;
-            } else if (flag == 'f') {
-                flags.allowFireSpread = curState;
-            } else if (flag == 'F') {
-                flags.allowLavaFire = curState;
             } else {
-                logger.warning("Unknown area flag/flag modifier: " + flag);
+                String flag;
+                if (k == '_') {
+                    if (i == data.length() - 1) {
+                        logger.warning("_ read ahead fail");
+                        break;
+                    }
+                    flag = "_" + data.charAt(i + 1);
+                    i++;
+                } else {
+                    flag = String.valueOf(k);
+                }
+                flags.set(flag, curState);
             }
         }
         
@@ -303,6 +365,22 @@ public class CSVDatabase implements ProtectionDatabase {
     }
     
     /**
+     * Returns a null if a string is null or empty.
+     * 
+     * @param str
+     * @return
+     */
+    private String nullEmptyString(String str) {
+        if (str == null) {
+            return null;
+        } else if (str.length() == 0) {
+            return null;
+        } else {
+            return str;
+        }
+    }
+    
+    /**
      * Used to write the list of flags.
      * 
      * @param flags
@@ -310,14 +388,9 @@ public class CSVDatabase implements ProtectionDatabase {
      */
     private String writeFlags(AreaFlags flags) {
         StringBuilder str = new StringBuilder();
-        str.append(writeFlag(flags.allowBuild, "b"));
-        str.append(writeFlag(flags.allowPvP, "p"));
-        str.append(writeFlag(flags.allowMobDamage, "m"));
-        str.append(writeFlag(flags.allowCreeperExplosions, "c"));
-        str.append(writeFlag(flags.allowTNT, "t"));
-        str.append(writeFlag(flags.allowLighter, "l"));
-        str.append(writeFlag(flags.allowFireSpread, "f"));
-        str.append(writeFlag(flags.allowLavaFire, "F"));
+        for (Map.Entry<String, State> entry : flags.entrySet()) {
+            str.append(writeFlag(entry.getValue(), entry.getKey()));
+        }
         return str.toString();
     }
 

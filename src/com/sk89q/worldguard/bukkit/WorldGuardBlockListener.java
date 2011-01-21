@@ -168,7 +168,7 @@ public class WorldGuardBlockListener extends BlockListener {
     public void onBlockIgnite(BlockIgniteEvent event) {
         IgniteCause cause = event.getCause();
         Block block = event.getBlock();
-        Player player = event.getPlayer();
+        //Player player = event.getPlayer();
         World world = block.getWorld();
         boolean isFireSpread = cause == IgniteCause.SLOW_SPREAD
                 || cause == IgniteCause.SPREAD;
@@ -208,22 +208,38 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
         
-        if (plugin.useRegions && player != null && !plugin.hasPermission(player, "/regionbypass")) {
+        /*if (plugin.useRegions) {
             Vector pt = toVector(block);
-            LocalPlayer localPlayer = plugin.wrapPlayer(player);
             
-            if (cause == IgniteCause.FLINT_AND_STEEL
-                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+            if (player != null && !plugin.hasPermission(player, "/regionbypass")) {
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                
+                if (cause == IgniteCause.FLINT_AND_STEEL
+                        && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                    event.setCancelled(true);
+                    return;
+                }
+                
+                if (cause == IgniteCause.FLINT_AND_STEEL
+                        && !plugin.regionManager.getApplicableRegions(pt)
+                        .allowsFlag(AreaFlags.FLAG_LIGHTER)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+            
+            f (isFireSpread && !plugin.regionManager.getApplicableRegions(pt)
+                    .allowsFlag(AreaFlags.FLAG_FIRE_SPREAD)) {
                 event.setCancelled(true);
                 return;
             }
             
-            if (cause == IgniteCause.FLINT_AND_STEEL
-                    && !plugin.regionManager.getApplicableRegions(pt).allowsLighter()) {
+            if (cause == IgniteCause.LAVA && !plugin.regionManager.getApplicableRegions(pt)
+                    .allowsFlag(AreaFlags.FLAG_LAVA_FIRE)) {
                 event.setCancelled(true);
                 return;
             }
-        }
+        }*/
     }
 
     /**
@@ -260,7 +276,12 @@ public class WorldGuardBlockListener extends BlockListener {
         Block block = event.getBlock();
         LivingEntity entity = event.getEntity();
         
-        if (entity instanceof Player && block.getType() == Material.CHEST) {
+        if (entity instanceof Player
+                && (block.getType() == Material.CHEST
+                        || block.getType() == Material.DISPENSER
+                        || block.getType() == Material.FURNACE
+                        || block.getType() == Material.BURNING_FURNACE
+                        || block.getType() == Material.NOTE_BLOCK)) {
             Player player = (Player)entity;
             if (plugin.useRegions) {
                 Vector pt = toVector(block);

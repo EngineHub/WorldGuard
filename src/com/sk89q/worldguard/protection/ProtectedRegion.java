@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 
 /**
@@ -30,34 +31,52 @@ import com.sk89q.worldguard.domains.DefaultDomain;
  */
 public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
-     * Area message.
+     * Holds the region's ID.
      */
-    private String enterMessage;
-    /**
-     * List of owners.
-     */
-    private DefaultDomain owners = new DefaultDomain();
+    private String id;
     /**
      * Priority.
      */
     private int priority = 0;
     /**
+     * Parent region.
+     */
+    private ProtectedRegion parent;
+    /**
+     * List of owners.
+     */
+    private DefaultDomain owners = new DefaultDomain();
+    /**
+     * List of members.
+     */
+    private DefaultDomain members = new DefaultDomain();
+    /**
      * Area flags.
      */
     private AreaFlags flags = new AreaFlags();
+    /**
+     * Area message.
+     */
+    private String enterMessage;
+    /**
+     * Area message.
+     */
+    private String leaveMessage;
 
     /**
      * Construct a new instance of this region.
      *
      * @param id
-     * @param priority
-     * @param owners
-     * @param enterMessage
      */
-    public ProtectedRegion() {
-        this.priority = 0;
-        this.owners = new DefaultDomain();
-        this.enterMessage = null;
+    public ProtectedRegion(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
     }
 
     /**
@@ -74,6 +93,41 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         this.priority = priority;
     }
     
+    /**
+     * @return the parent
+     */
+    public ProtectedRegion getParent() {
+        return parent;
+    }
+
+    /**
+     * Set the parent. This checks to make sure that it will not result
+     * in circular inheritance.
+     * 
+     * @param parent the parent to set
+     * @throws CircularInheritanceException 
+     */
+    public void setParent(ProtectedRegion parent) throws CircularInheritanceException {
+        if (parent == null) {
+            this.parent = null;
+            return;
+        }
+        
+        if (parent == this) {
+            throw new CircularInheritanceException();
+        }
+        
+        ProtectedRegion p = parent.getParent();
+        while (p != null) {
+            if (p == this) {
+                throw new CircularInheritanceException();
+            }
+            p = p.getParent();
+        }
+        
+        this.parent = parent;
+    }
+
     /**
      * Se flags.
      * @param flags
@@ -95,6 +149,20 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public void setEnterMessage(String enterMessage) {
         this.enterMessage = enterMessage;
     }
+    
+    /**
+     * @return the leaveMessage
+     */
+    public String getLeaveMessage() {
+        return leaveMessage;
+    }
+
+    /**
+     * @param leaveMessage the leaveMessage to set
+     */
+    public void setLeaveMessage(String leaveMessage) {
+        this.leaveMessage = leaveMessage;
+    }
 
     /**
      * @return the owners
@@ -108,6 +176,67 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      */
     public void setOwners(DefaultDomain owners) {
         this.owners = owners;
+    }
+
+    /**
+     * @return the members
+     */
+    public DefaultDomain getMembers() {
+        return members;
+    }
+
+    /**
+     * @param owners the owners to set
+     */
+    public void setMembers(DefaultDomain members) {
+        this.members = members;
+    }
+    
+    /**
+     * Checks whether a player is an owner of region or any of its parents.
+     * 
+     * @param player
+     * @return
+     */
+    public boolean isOwner(LocalPlayer player) {
+        if (owners.contains(player)) {
+            return true;
+        }
+        
+        ProtectedRegion parent = getParent();
+        while (parent != null) {
+            if (parent.getOwners().contains(player)) {
+                return true;
+            }
+            
+            parent = parent.getParent();
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Checks whether a player is a member of the region or any of its parents.
+     * 
+     * @param player
+     * @return
+     */
+    public boolean isMember(LocalPlayer player) {
+        if (owners.contains(player) || members.contains(player)) {
+            return true;
+        }
+        
+        ProtectedRegion parent = getParent();
+        while (parent != null) {
+            if (parent.getOwners().contains(player)
+                    || parent.getMembers().contains(player)) {
+                return true;
+            }
+            
+            parent = parent.getParent();
+        }
+        
+        return false;
     }
 
     /**
@@ -144,6 +273,13 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
     
     /**
+     * Return the type of region as a user-friendly, lowercase name.
+     * 
+     * @return type of region
+     */
+    public abstract String getTypeName();
+    
+    /**
      * Checks if two region intersects.
      * 
      * @param region1
@@ -171,5 +307,14 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         } else {
             throw new UnsupportedIntersectionException();
         }
+    }
+    
+    /**
+     * Thrown when setting a parent would create a circular inheritance
+     * situation.
+     * 
+     */
+    public static class CircularInheritanceException extends Exception {
+        private static final long serialVersionUID = 7479613488496776022L;
     }
 }

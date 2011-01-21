@@ -70,6 +70,8 @@ player-damage:
 regions:
     enable: on
     wand: 287
+    default:
+        build: true
 
 blacklist:
     logging:

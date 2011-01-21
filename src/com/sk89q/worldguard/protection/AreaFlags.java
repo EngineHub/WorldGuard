@@ -19,7 +19,12 @@
 
 package com.sk89q.worldguard.protection;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
+ * Holds the flags for a region.
  * 
  * @author sk89q
  */
@@ -30,14 +35,98 @@ public class AreaFlags {
         DENY,
     };
 
-    public State allowBuild = State.NONE;
-    public State allowPvP = State.NONE;
-    public State allowMobDamage = State.NONE;
-    public State allowCreeperExplosions = State.NONE;
-    public State allowTNT = State.NONE;
-    public State allowLighter = State.NONE;
-    public State allowFireSpread = State.NONE;
-    public State allowLavaFire = State.NONE;
+    public static final String FLAG_PASSTHROUGH = "z";
+    public static final String FLAG_BUILD = "b";
+    public static final String FLAG_PVP = "p";
+    public static final String FLAG_MOB_DAMAGE = "m";
+    public static final String FLAG_CREEPER_EXPLOSION = "c";
+    public static final String FLAG_TNT = "t";
+    public static final String FLAG_LIGHTER = "l";
+    public static final String FLAG_FIRE_SPREAD = "f";
+    public static final String FLAG_LAVA_FIRE = "F";
+    
+    /**
+     * Get the user-friendly name of a flag. If a name isn't known, then
+     * the flag is returned unchanged.
+     * 
+     * @param flag
+     * @return
+     */
+    public static String getFlagName(String flag) {
+        if (flag.equals(FLAG_PASSTHROUGH)) {
+            return "passthrough";
+        } else if (flag.equals(FLAG_BUILD)) {
+            return "build";
+        } else if (flag.equals(FLAG_PVP)) {
+            return "PvP";
+        } else if (flag.equals(FLAG_MOB_DAMAGE)) {
+            return "mob damage";
+        } else if (flag.equals(FLAG_CREEPER_EXPLOSION)) {
+            return "creeper explosion";
+        } else if (flag.equals(FLAG_TNT)) {
+            return "TNT";
+        } else if (flag.equals(FLAG_LIGHTER)) {
+            return "lighter";
+        } else if (flag.equals(FLAG_FIRE_SPREAD)) {
+            return "fire spread";
+        } else if (flag.equals(FLAG_LAVA_FIRE)) {
+            return "lava fire spread";
+        } else {
+            return flag;
+        }
+    }
+    
+    /**
+     * Gets a flag from an alias. May return null.
+     * 
+     * @param name
+     * @return
+     */
+    public static String fromAlias(String name) {
+        if (name.equalsIgnoreCase("passthrough")) {
+            return FLAG_PASSTHROUGH;
+        } else if (name.equalsIgnoreCase("build")) {
+            return FLAG_BUILD;
+        } else if (name.equalsIgnoreCase("pvp")) {
+            return FLAG_PVP;
+        } else if (name.equalsIgnoreCase("mobdamage")) {
+            return FLAG_MOB_DAMAGE;
+        } else if (name.equalsIgnoreCase("creeper")) {
+            return FLAG_CREEPER_EXPLOSION;
+        } else if (name.equalsIgnoreCase("tnt")) {
+            return FLAG_TNT;
+        } else if (name.equalsIgnoreCase("lighter")) {
+            return FLAG_LIGHTER;
+        } else if (name.equalsIgnoreCase("firespread")) {
+            return FLAG_FIRE_SPREAD;
+        } else if (name.equalsIgnoreCase("lavafirespread")) {
+            return FLAG_LAVA_FIRE;
+        } else {
+            return null;
+        }
+    }
+    
+    private Map<String, State> states = new HashMap<String, State>();
+    
+    public State get(String flag) {
+        State state = states.get(flag);
+        if (state == null) {
+            return State.NONE;
+        }
+        return state;
+    }
+    
+    public void set(String flag, State state) {
+        if (state == State.NONE) {
+            states.remove(flag);
+        } else {
+            states.put(flag, state);
+        }
+    }
+    
+    public Set<Map.Entry<String, State>> entrySet() {
+        return states.entrySet();
+    }
     
     @Override
     public boolean equals(Object obj) {
@@ -46,14 +135,6 @@ public class AreaFlags {
         }
         
         AreaFlags other = (AreaFlags)obj;
-        
-        return other.allowBuild == allowBuild
-                && other.allowPvP == allowPvP
-                && other.allowMobDamage == allowMobDamage
-                && other.allowCreeperExplosions == allowCreeperExplosions
-                && other.allowTNT == allowTNT
-                && other.allowLighter == allowLighter
-                && other.allowFireSpread == allowFireSpread
-                && other.allowLavaFire == allowLavaFire;
+        return other.states.equals(this);
     }
 }

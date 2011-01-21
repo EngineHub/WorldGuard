@@ -22,13 +22,16 @@ package com.sk89q.worldguard.bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldguard.protection.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class WorldGuardEntityListener extends EntityListener {
@@ -78,17 +81,44 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (attacker != null && attacker instanceof Player) {
                 if (plugin.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     
-                    if (!plugin.regionManager.getApplicableRegions(pt).allowsPvP()) {
+                    if (!plugin.regionManager.getApplicableRegions(pt)
+                            .allowsFlag(AreaFlags.FLAG_PVP)) {
                         ((Player)attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
                         return;
                     }
                 }
+            }
+            
+            if (attacker != null && attacker instanceof Monster) {
+                if (attacker instanceof Creeper && plugin.blockCreeperExplosions) {
+                    event.setCancelled(true);
+                    return;
+                }
+                
+                if (plugin.useRegions) {
+                    Vector pt = toVector(defender.getLocation());
+                    
+                    if (!plugin.regionManager.getApplicableRegions(pt)
+                            .allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                    
+                    if (attacker instanceof Creeper) {
+                        if (!plugin.regionManager.getApplicableRegions(pt)
+                                .allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+                
             }
         }
     }
@@ -172,10 +202,17 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
             
+            if (!plugin.regionManager.getApplicableRegions(BukkitUtil.toVector(event.getEntity().getLocation()))
+                    .allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
+                event.setCancelled(true);
+                return;
+            }
+            
             if (plugin.useRegions) {
                 Vector pt = toVector(event.getEntity().getLocation());
                 
-                if (!plugin.regionManager.getApplicableRegions(pt).allowsCreeperExplosions()) {
+                if (!plugin.regionManager.getApplicableRegions(pt)
+                        .allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -189,7 +226,8 @@ public class WorldGuardEntityListener extends EntityListener {
             if (plugin.useRegions && event.getEntity() != null) {
                 Vector pt = toVector(event.getEntity().getLocation());
                 
-                if (!plugin.regionManager.getApplicableRegions(pt).allowsTNT()) {
+                if (!plugin.regionManager.getApplicableRegions(pt)
+                        .allowsFlag(AreaFlags.FLAG_TNT)) {
                     event.setCancelled(true);
                     return;
                 }

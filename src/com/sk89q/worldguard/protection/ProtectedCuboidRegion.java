@@ -39,12 +39,13 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     /**
      * Construct a new instance of this cuboid region.
      *
+     * @param id
      * @param pos1
      * @param pos2
      * @param priority
      */
-    public ProtectedCuboidRegion(BlockVector min, BlockVector max) {
-        super();
+    public ProtectedCuboidRegion(String id, BlockVector min, BlockVector max) {
+        super(id);
         this.min = min;
         this.max = max;
     }
@@ -85,6 +86,9 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         max = pt;
     }
 
+    /**
+     * Checks to see if a point is inside this region.
+     */
     @Override
     public boolean contains(Vector pt) {
         int x = pt.getBlockX();
@@ -93,5 +97,14 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         return x >= min.getBlockX() && x <= max.getBlockX()
                 && y >= min.getBlockY() && y <= max.getBlockY()
                 && z >= min.getBlockZ() && z <= max.getBlockZ();
+    }
+    
+    /**
+     * Return the type of region as a user-friendly name.
+     * 
+     * @return type of region
+     */
+    public String getTypeName() {
+        return "cuboid";
     }
 }

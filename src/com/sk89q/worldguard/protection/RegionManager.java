@@ -53,7 +53,7 @@ public interface RegionManager {
      * @param id
      * @param region
      */
-    public void addRegion(String id, ProtectedRegion region);
+    public void addRegion(ProtectedRegion region);
     
     /**
      * Return whether a region exists by an ID.
@@ -71,7 +71,7 @@ public interface RegionManager {
     public ProtectedRegion getRegion(String id);
     
     /**
-     * Removes a region.
+     * Removes a region, including inheriting children.
      * 
      * @param id
      */

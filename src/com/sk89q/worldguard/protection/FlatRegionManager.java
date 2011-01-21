@@ -39,12 +39,17 @@ public class FlatRegionManager implements RegionManager {
      * List of protected regions.
      */
     private SortedMap<String,ProtectedRegion> regions;
+    /**
+     * Global flags.
+     */
+    private GlobalFlags global;
     
     /**
      * Construct the manager.
      */
-    public FlatRegionManager() {
+    public FlatRegionManager(GlobalFlags global) {
         regions = new TreeMap<String,ProtectedRegion>();
+        this.global = global;
     }
     
     /**
@@ -71,17 +76,27 @@ public class FlatRegionManager implements RegionManager {
      * @param id
      * @param region
      */
-    public void addRegion(String id, ProtectedRegion region) {
-        regions.put(id, region);
+    public void addRegion(ProtectedRegion region) {
+        regions.put(region.getId(), region);
     }
     
     /**
-     * Removes a region.
+     * Removes a region and its children.
      * 
      * @param id
      */
     public void removeRegion(String id) {
+        ProtectedRegion region = regions.get(id);
+        
         regions.remove(id);
+        
+        if (region != null) {
+            for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
+                if (entry.getValue().getParent() == region) {
+                    removeRegion(entry.getKey());
+                }
+            }
+        }
     }
     
     /**
@@ -110,7 +125,7 @@ public class FlatRegionManager implements RegionManager {
      * @return
      */
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
-        return new ApplicableRegionSet(pt, regions);
+        return new ApplicableRegionSet(pt, regions, global);
     }
     
     /**

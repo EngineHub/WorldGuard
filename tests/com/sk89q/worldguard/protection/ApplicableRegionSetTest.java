@@ -26,17 +26,22 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.AreaFlags.State;
 
 public class ApplicableRegionSetTest {
     static String COURTYARD_ID = "courtyard";
     static String FOUNTAIN_ID = "fountain";
+    static String NO_FIRE_ID = "nofire";
     static String MEMBER_GROUP = "member";
     static String COURTYARD_GROUP = "courtyard";
 
     Vector inFountain = new Vector(2, 2, 2);
     Vector inCourtyard = new Vector(7, 7, 7);
     Vector outside = new Vector(15, 15, 15);
+    Vector inNoFire = new Vector(150, 150, 150);
     RegionManager manager;
+    ProtectedRegion courtyard;
+    ProtectedRegion fountain;
     TestPlayer player1;
     TestPlayer player2;
 
@@ -47,6 +52,7 @@ public class ApplicableRegionSetTest {
         setUpPlayers();
         setUpCourtyardRegion();
         setUpFountainRegion();
+        setUpNoFireRegion();
     }
     
     void setUpPlayers() {
@@ -62,24 +68,41 @@ public class ApplicableRegionSetTest {
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup(COURTYARD_GROUP);
         
-        ProtectedRegion region = new ProtectedCuboidRegion(
+        ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID,
                 new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));
         AreaFlags flags = new AreaFlags();
-        flags.allowBuild = AreaFlags.State.NONE;
-        flags.allowFireSpread = AreaFlags.State.ALLOW;
+        flags.set(AreaFlags.FLAG_BUILD, State.NONE);
+        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
         region.setFlags(flags);
         region.setOwners(domain);
-        manager.addRegion(COURTYARD_ID, region);
+        manager.addRegion(region);
+        
+        courtyard = region;
     }
     
-    void setUpFountainRegion() {
-        ProtectedRegion region = new ProtectedCuboidRegion(
+    void setUpFountainRegion() throws Exception {
+        DefaultDomain domain = new DefaultDomain();
+        domain.addGroup(MEMBER_GROUP);
+        
+        ProtectedRegion region = new ProtectedCuboidRegion(FOUNTAIN_ID,
                 new BlockVector(0, 0, 0), new BlockVector(5, 5, 5));
         AreaFlags flags = new AreaFlags();
-        flags.allowBuild = AreaFlags.State.ALLOW;
-        flags.allowFireSpread = AreaFlags.State.DENY;
+        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.DENY);
         region.setFlags(flags);
-        manager.addRegion(FOUNTAIN_ID, region);
+        region.setMembers(domain);
+        manager.addRegion(region);
+
+        fountain = region;
+        fountain.setParent(courtyard);
+    }
+    
+    void setUpNoFireRegion() throws Exception {
+        ProtectedRegion region = new ProtectedCuboidRegion(NO_FIRE_ID,
+                new BlockVector(100, 100, 100), new BlockVector(200, 200, 200));
+        AreaFlags flags = new AreaFlags();
+        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.DENY);
+        region.setFlags(flags);
+        manager.addRegion(region);
     }
     
     @Test
@@ -88,13 +111,17 @@ public class ApplicableRegionSetTest {
         
         // Outside
         appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.allowsFireSpread());
+        assertTrue(appl.allowsFlag(AreaFlags.FLAG_FIRE_SPREAD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allowsFireSpread());
+        assertTrue(appl.allowsFlag(AreaFlags.FLAG_FIRE_SPREAD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allowsFireSpread());
+        assertFalse(appl.allowsFlag(AreaFlags.FLAG_FIRE_SPREAD));
+
+        // Inside no fire zone
+        appl = manager.getApplicableRegions(inNoFire);
+        assertFalse(appl.allowsFlag(AreaFlags.FLAG_FIRE_SPREAD));
     }
     
     @Test

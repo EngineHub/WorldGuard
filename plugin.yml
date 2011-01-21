@@ -23,7 +23,7 @@ commands:
         aliases: ;
     region:
         description: Adjust protected regions
-        usage: /<command> <define|claim|flag|delete|info|addowner|removeowner|list|save|load> ...
+        usage: /<command> <define|claim|setparent|flag|delete|info|addowner|removeowner|addmember|removemember|list|save|load> ...
         aliases: rg, regions
     locate:
         description: Set your compass towards a person

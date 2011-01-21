@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedMap;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
@@ -30,175 +32,139 @@ import com.sk89q.worldguard.protection.AreaFlags.State;
  * @author sk89q
  */
 public class ApplicableRegionSet {
+    private GlobalFlags global;
     private Vector pt;
     private SortedMap<String,ProtectedRegion> regions;
     
-    public ApplicableRegionSet(Vector pt, SortedMap<String,ProtectedRegion> regions) {
+    /**
+     * Construct the object.
+     * 
+     * @param pt
+     * @param regions
+     * @param global
+     */
+    public ApplicableRegionSet(Vector pt, SortedMap<String,ProtectedRegion> regions,
+            GlobalFlags global) {
         this.pt = pt;
         this.regions = regions;
+        this.global = global;
     }
     
+    /**
+     * Checks if a player can build in an area.
+     * 
+     * @param player
+     * @return
+     */
     public boolean canBuild(LocalPlayer player) {
+        return isFlagAllowed(AreaFlags.FLAG_BUILD, global.canBuild, player);
+    }
+    
+    /**
+     * Checks a flag.
+     * 
+     * @param player
+     * @return
+     */
+    public boolean allowsFlag(String flag) {
+        return isFlagAllowed(flag, true, null);
+    }
+    
+    /**
+     * Checks to see if a flag is permitted.
+     * 
+     * @param def default state if there are no regions defined
+     * @param player null to not check owners and members
+     * @return
+     */
+    private boolean isFlagAllowed(String flag, boolean def, LocalPlayer player) {
         boolean found = false;
+        boolean allowed = false; // Used for ALLOW override
         int lastPriority = 0;
+
+        // The algorithm is as follows:
+        // While iterating through the list of regions, if an entry disallows
+        // the flag, then put it into the needsClear set. If an entry allows
+        // the flag and it has a parent, then its parent is put into hasCleared.
+        // In the situation that the child is reached before the parent, upon
+        // the parent being reached, even if the parent disallows, because the
+        // parent will be in hasCleared, permission will be allowed. In the
+        // other case, where the parent is reached first, if it does not allow
+        // permissions, it will be placed into needsClear. If a child of
+        // the parent is reached later, the parent will be removed from
+        // needsClear. At the end, if needsClear is not empty, that means that
+        // permission should not be given. If a parent has multiple children
+        // and one child does not allow permissions, then it will be placed into
+        // needsClear just like as if was a parent.
+        
+        Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
+        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
         
         for (ProtectedRegion region : regions.values()) {
-            if (region.getFlags().allowBuild == State.ALLOW) continue;
-            if (!region.contains(pt)) continue;
-            
-            // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
-                break;
+            // Ignore non-build regions
+            if (player != null && region.getFlags().get(AreaFlags.FLAG_PASSTHROUGH) == State.ALLOW) {
+                continue;
             }
             
-            if (!region.getOwners().contains(player)) {
+            // Forget about regions that are not covered
+            if (!region.contains(pt)) {
+                continue;
+            }
+            
+            // Allow DENY to override everything
+            if (region.getFlags().get(flag) == State.DENY) {
                 return false;
             }
             
-            found = true;
-            lastPriority = region.getPriority();
-        }
-        
-        return true;
-    }
-    
-    public boolean allowsPvP() {
-        boolean found = false;
-        int lastPriority = 0;
-        
-        for (ProtectedRegion region : regions.values()) {
-            if (!region.contains(pt)) continue;
-            if (region.getFlags().allowPvP == State.DENY) return false;
+            // Forget about regions that allow it, although make sure the
+            // default state is now to allow
+            if (region.getFlags().get(flag) == State.ALLOW) {
+                allowed = true;
+                continue;
+            }
             
             // Ignore lower priority regions
             if (found && region.getPriority() < lastPriority) {
                 break;
             }
             
-            found = true;
-            lastPriority = region.getPriority();
-        }
-        
-        return true;
-    }
-    
-    public boolean allowsMobDamage() {
-        boolean found = false;
-        int lastPriority = 0;
-        
-        for (ProtectedRegion region : regions.values()) {
-            if (!region.contains(pt)) continue;
-            if (region.getFlags().allowMobDamage == State.DENY) return false;
-            
-            // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
-                break;
+            if (player != null) {
+                if (hasCleared.contains(region)) {
+                    // Already cleared, so do nothing
+                } else {
+                    if (!region.isMember(player)) {
+                        needsClear.add(region);
+                    } else {
+                        // Need to clear all parents
+                        clearParents(needsClear, hasCleared, region);
+                    }
+                }
             }
             
             found = true;
             lastPriority = region.getPriority();
         }
         
-        return true;
+        return found == false ? def : allowed || needsClear.size() == 0;
     }
     
-    public boolean allowsCreeperExplosions() {
-        boolean found = false;
-        int lastPriority = 0;
+    /**
+     * Clear a region's parents for isFlagAllowed().
+     * 
+     * @param needsClear
+     * @param hasCleared
+     * @param region
+     */
+    private void clearParents(Set<ProtectedRegion> needsClear,
+            Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
+        ProtectedRegion parent = region.getParent();
         
-        for (ProtectedRegion region : regions.values()) {
-            if (!region.contains(pt)) continue;
-            if (region.getFlags().allowCreeperExplosions == State.DENY) return false;
-            
-            // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
-                break;
+        while (parent != null) {
+            if (!needsClear.remove(parent)) {
+                hasCleared.add(parent);
             }
             
-            found = true;
-            lastPriority = region.getPriority();
+            parent = parent.getParent();
         }
-        
-        return true;
-    }
-    
-    public boolean allowsTNT() {
-        boolean found = false;
-        int lastPriority = 0;
-        
-        for (ProtectedRegion region : regions.values()) {
-            if (!region.contains(pt)) continue;
-            if (region.getFlags().allowTNT == State.DENY) return false;
-            
-            // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
-                break;
-            }
-            
-            found = true;
-            lastPriority = region.getPriority();
-        }
-        
-        return true;
-    }
-    
-    public boolean allowsLighter() {
-        boolean found = false;
-        int lastPriority = 0;
-        
-        for (ProtectedRegion region : regions.values()) {
-            if (!region.contains(pt)) continue;
-            if (region.getFlags().allowLighter == State.DENY) return false;
-            
-            // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
-                break;
-            }
-            
-            found = true;
-            lastPriority = region.getPriority();
-        }
-        
-        return true;
-    }
-    
-    public boolean allowsFireSpread() {
-        boolean found = false;
-        int lastPriority = 0;
-        
-        for (ProtectedRegion region : regions.values()) {
-            if (!region.contains(pt)) continue;
-            if (region.getFlags().allowFireSpread == State.DENY) return false;
-            
-            // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
-                break;
-            }
-            
-            found = true;
-            lastPriority = region.getPriority();
-        }
-        
-        return true;
-    }
-    
-    public boolean allowsLavaFire() {
-        boolean found = false;
-        int lastPriority = 0;
-        
-        for (ProtectedRegion region : regions.values()) {
-            if (!region.contains(pt)) continue;
-            if (region.getFlags().allowLavaFire == State.DENY) return false;
-            
-            // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
-                break;
-            }
-            
-            found = true;
-            lastPriority = region.getPriority();
-        }
-        
-        return true;
     }
 }
