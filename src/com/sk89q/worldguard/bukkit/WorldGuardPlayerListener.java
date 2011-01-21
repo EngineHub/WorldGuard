@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;

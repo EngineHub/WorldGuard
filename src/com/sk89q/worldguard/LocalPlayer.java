@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard;
 
-import java.util.List;
 import com.sk89q.worldedit.Vector;
 
 public abstract class LocalPlayer {
