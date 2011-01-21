@@ -186,7 +186,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
             
-            if (plugin.useRegions) {
+            if (plugin.useRegions && event.getEntity() != null) {
                 Vector pt = toVector(event.getEntity().getLocation());
                 
                 if (!plugin.regionManager.getApplicableRegions(pt).allowsTNT()) {
