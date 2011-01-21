@@ -481,7 +481,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     return true;
                 }
 
-                Player other = matchSinglePlayer(getServer(), args[1]);
+                Player other = matchSinglePlayer(getServer(), args[0]);
                 if (other == null) {
                     player.sendMessage(ChatColor.RED + "Player not found.");
                 } else {
@@ -514,13 +514,13 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 0, 1);
             
             // Allow healing other people
-            if (args.length > 1) {
+            if (args.length > 0) {
                 if (!hasPermission(player, "/healother")) {
                     player.sendMessage(ChatColor.RED + "You don't have permission to heal others.");
                     return true;
                 }
 
-                Player other = matchSinglePlayer(getServer(), args[1]);
+                Player other = matchSinglePlayer(getServer(), args[0]);
                 if (other == null) {
                     player.sendMessage(ChatColor.RED + "Player not found.");
                 } else {
@@ -541,13 +541,13 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 0, 1);
             
             // Allow killing other people
-            if (args.length > 1) {
+            if (args.length > 0) {
                 if (!hasPermission(player, "/slayother")) {
                     player.sendMessage(ChatColor.RED + "You don't have permission to kill others.");
                     return true;
                 }
 
-                Player other = matchSinglePlayer(getServer(), args[1]);
+                Player other = matchSinglePlayer(getServer(), args[0]);
                 if (other == null) {
                     player.sendMessage(ChatColor.RED + "Player not found.");
                 } else {
@@ -635,8 +635,8 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkPermission(player, "locate");
             checkArgs(args, 0, 3);
 
-            if (args.length == 2) {
-                String name = args[1];
+            if (args.length == 1) {
+                String name = args[0];
                 Player target = BukkitUtil.matchSinglePlayer(getServer(), name);
                 if (target != null) {
                     player.setCompassTarget(target.getLocation());
@@ -644,13 +644,13 @@ public class WorldGuardPlugin extends JavaPlugin {
                 } else {
                     player.sendMessage(ChatColor.RED + "Could not find player.");
                 }
-            } else if (args.length == 4) {
+            } else if (args.length == 3) {
                 try {
                     Location loc = new Location(
                             player.getWorld(),
+                            Integer.parseInt(args[0]),
                             Integer.parseInt(args[1]),
-                            Integer.parseInt(args[2]),
-                            Integer.parseInt(args[3])
+                            Integer.parseInt(args[2])
                             );
                     player.setCompassTarget(loc);
                     player.sendMessage(ChatColor.YELLOW + "Compass target set to "
@@ -660,7 +660,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 } catch (NumberFormatException e) {
                     player.sendMessage(ChatColor.RED + "Invalid number specified");
                 }
-            } else if (args.length == 1) {
+            } else if (args.length == 0) {
                 player.setCompassTarget(player.getWorld().getSpawnLocation());
                 player.sendMessage(ChatColor.YELLOW + "Compass reset to the spawn location.");
             } else {
@@ -673,7 +673,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         if (cmd.equalsIgnoreCase("region")) {
             checkArgs(args, 1, -1);
             
-            String action = args[1];
+            String action = args[0];
             String[] subArgs = new String[args.length - 1];
             System.arraycopy(args, 1, subArgs, 0, args.length - 1);
             return handleRegionCommand(player, action, subArgs);
@@ -732,7 +732,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 1, -1, "/region define <id> [owner1 [owner2 [owners...]]]");
             
             try {
-                String id = args[1].toLowerCase();
+                String id = args[0].toLowerCase();
                 
                 WorldEditPlugin worldEdit = (WorldEditPlugin)wePlugin;
                 WorldEditAPI api = worldEdit.getAPI();
@@ -745,7 +745,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 
                 ProtectedRegion region = new ProtectedCuboidRegion(min, max);
                 if (args.length >= 2) {
-                    region.setOwners(parseDomainString(args, 2));
+                    region.setOwners(parseDomainString(args, 1));
                 }
                 regionManager.addRegion(id, region);
                 regionLoader.save(regionManager);
@@ -765,7 +765,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 1, 1, "/region claim <id>");
             
             try {
-                String id = args[1].toLowerCase();
+                String id = args[0].toLowerCase();
 
                 ProtectedRegion existing = regionManager.getRegion(id);
                 
@@ -812,9 +812,9 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 3, 3, "/region flag <id> <flag> <none|allow|deny>");
             
             try {
-                String id = args[1].toLowerCase();
-                String flagStr = args[2];
-                String stateStr = args[3];
+                String id = args[0].toLowerCase();
+                String flagStr = args[1];
+                String stateStr = args[2];
                 ProtectedRegion region = regionManager.getRegion(id);
                 
                 if (region == null) {
@@ -864,7 +864,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkRegionPermission(player, "/regioninfo");
             checkArgs(args, 1, 1, "/region info <id>");
     
-            String id = args[1].toLowerCase();
+            String id = args[0].toLowerCase();
             if (!regionManager.hasRegion(id)) {
                 player.sendMessage(ChatColor.RED + "A region with ID '"
                         + id + "' doesn't exist.");
@@ -895,7 +895,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 2, -1, "/region addowner <id> [owner1 [owner2 [owners...]]]");
     
             try {
-                String id = args[1].toLowerCase();
+                String id = args[0].toLowerCase();
                 if (!regionManager.hasRegion(id)) {
                     player.sendMessage(ChatColor.RED + "A region with ID '"
                             + id + "' doesn't exist.");
@@ -910,7 +910,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     return true;
                 }
                 
-                addToDomain(existing.getOwners(), args, 2);
+                addToDomain(existing.getOwners(), args, 1);
                 
                 regionLoader.save(regionManager);
                 player.sendMessage(ChatColor.YELLOW + "Region updated!");
@@ -929,7 +929,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 2, -1, "/region removeowner <id> [owner1 [owner2 [owners...]]]");
     
             try {
-                String id = args[1].toLowerCase();
+                String id = args[0].toLowerCase();
                 if (!regionManager.hasRegion(id)) {
                     player.sendMessage(ChatColor.RED + "A region with ID '"
                             + id + "' doesn't exist.");
@@ -944,7 +944,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     return true;
                 }
                 
-                removeFromDomain(existing.getOwners(), args, 2);
+                removeFromDomain(existing.getOwners(), args, 1);
                 
                 regionLoader.save(regionManager);
                 player.sendMessage(ChatColor.YELLOW + "Region updated!");
@@ -962,9 +962,9 @@ public class WorldGuardPlugin extends JavaPlugin {
             
             int page = 0;
             
-            if (args.length >= 2) {
+            if (args.length >= 1) {
                 try {
-                    page = Math.max(0, Integer.parseInt(args[1]) - 1);
+                    page = Math.max(0, Integer.parseInt(args[0]) - 1);
                 } catch (NumberFormatException e) {
                     page = 0;
                 }
@@ -1003,7 +1003,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 0, 1, "/region delete <id>");
     
             try {
-                String id = args[1].toLowerCase();
+                String id = args[0].toLowerCase();
                 if (!regionManager.hasRegion(id)) {
                     player.sendMessage(ChatColor.RED + "A region with ID '"
                             + id + "' doesn't exist.");
@@ -1177,7 +1177,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     private void checkArgs(String[] args, int min, int max)
             throws InsufficientArgumentsException {
-        if (args.length <= min || (max != -1 && args.length - 1 > max)) {
+        if (args.length < min || (max != -1 && args.length > max)) {
             throw new InsufficientArgumentsException();
         }
     }
@@ -1193,7 +1193,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     private void checkArgs(String[] args, int min, int max, String help)
             throws InsufficientArgumentsException {
-        if (args.length <= min || (max != -1 && args.length - 1 > max)) {
+        if (args.length < min || (max != -1 && args.length > max)) {
             throw new InsufficientArgumentsException(help);
         }
     }
