@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public" author="true" classpath="P:\Projects\Minecraft\Libraries\GroupUsers.jar;P:\Projects\Minecraft\Libraries\jnbt.jar;P:\Projects\Minecraft\hMod\build\classes;P:\Projects\Minecraft\WorldEdit\build\classes;P:\Projects\Minecraft\Libraries\snakeyaml.jar;P:\Projects\Minecraft\Libraries\jopt-simple-3.2.jar;P:\Projects\Minecraft\Libraries\Permissions.jar;C:\Program Files\eclipse\plugins\org.hamcrest.core_1.1.0.v20090501071000.jar;P:\Projects\Minecraft\Libraries\json_simple-1.1.jar;P:\Projects\Minecraft\CraftBukkit\bin;P:\Projects\Minecraft\Libraries\truezip.jar;C:\Program Files\eclipse\plugins\org.junit_4.8.1.v4_8_1_v20100427-1100\junit.jar;P:\Projects\Minecraft\Bukkit\bin;P:\Projects\Minecraft\mc-dev" destdir="doc" doctitle="Worldguard API" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="com.sk89q.worldguard.blacklist,com.sk89q.worldguard.domains,com.sk89q.worldguard.bukkit,com.sk89q.worldguard.protection,com.sk89q.worldguard.util,au.com.bytecode.opencsv,com.sk89q.worldguard,com.sk89q.worldguard.blacklist.loggers,com.sk89q.worldguard.blacklist.events" source="1.6" sourcepath="tests;src" splitindex="true" use="true" version="true"/>
+    </target>
+</project>
