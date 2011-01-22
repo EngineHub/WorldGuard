@@ -484,7 +484,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 0, 1);
             
             // Allow setting other people invincible
-            if (args.length > 1) {
+            if (args.length > 0) {
                 if (!hasPermission(player, "/godother")) {
                     player.sendMessage(ChatColor.RED + "You don't have permission to make others invincible.");
                     return true;
