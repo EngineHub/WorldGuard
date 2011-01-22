@@ -572,7 +572,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         
         if (cmd.equalsIgnoreCase("stack")) {
-            checkPermission(player, "stack");
+            checkPermission(player, "/stack");
             checkArgs(args, 0, 0);
             
             ItemStack[] items = player.getInventory().getContents();
@@ -640,7 +640,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         
         if (cmd.equalsIgnoreCase("locate")) {
-            checkPermission(player, "locate");
+            checkPermission(player, "/locate");
             checkArgs(args, 0, 3);
 
             if (args.length == 1) {
@@ -688,7 +688,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         
         if (cmd.equalsIgnoreCase("reloadwg")) {
-            checkPermission(player, "reloadwg");
+            checkPermission(player, "/reloadwg");
             checkArgs(args, 0, 0);
             
             LoggerToChatHandler handler = new LoggerToChatHandler(player);
