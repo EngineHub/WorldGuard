@@ -1298,6 +1298,15 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
     }
     
+    /**
+     * Get the region manager.
+     * 
+     * @return
+     */
+    public RegionManager getRegionManager() {
+        return regionManager;
+    }
+    
     boolean inGroup(Player player, String group) {
         try {
             return perms.inGroup(player.getName(), group);
