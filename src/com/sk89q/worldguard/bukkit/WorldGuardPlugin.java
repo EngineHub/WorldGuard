@@ -1307,6 +1307,15 @@ public class WorldGuardPlugin extends JavaPlugin {
         return regionManager;
     }
     
+    /**
+     * Get the region loader.
+     * 
+     * @return
+     */
+    public ProtectionDatabase getRegionLoader() {
+        return regionLoader;
+    }
+    
     boolean inGroup(Player player, String group) {
         try {
             return perms.inGroup(player.getName(), group);
