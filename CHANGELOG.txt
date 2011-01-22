@@ -1,3 +1,6 @@
+3.0b2:
+- Fixed issue where built-in permissions were not (re)loaded.
+
 3.0b1:
 - Added parent-child relationships to regions.
 - Added global build flag.
