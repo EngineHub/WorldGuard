@@ -26,4 +26,5 @@ package com.sk89q.worldguard.protection;
  */
 public class GlobalFlags {
     public boolean canBuild = true;
+    public boolean canAccessChests = false;
 }

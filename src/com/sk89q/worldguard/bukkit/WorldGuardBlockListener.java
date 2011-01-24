@@ -35,6 +35,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class WorldGuardBlockListener extends BlockListener {
@@ -288,6 +289,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
     
                 if (!plugin.hasPermission(player, "/regionbypass")
+                        && !plugin.regionManager.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_CHEST_ACCESS)
                         && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                     event.setCancelled(true);

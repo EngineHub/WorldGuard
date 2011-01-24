@@ -44,6 +44,7 @@ public class AreaFlags {
     public static final String FLAG_LIGHTER = "l";
     public static final String FLAG_FIRE_SPREAD = "f";
     public static final String FLAG_LAVA_FIRE = "F";
+    public static final String FLAG_CHEST_ACCESS = "c";
     
     /**
      * Get the user-friendly name of a flag. If a name isn't known, then
@@ -71,6 +72,8 @@ public class AreaFlags {
             return "fire spread";
         } else if (flag.equals(FLAG_LAVA_FIRE)) {
             return "lava fire spread";
+        } else if (flag.equals(FLAG_CHEST_ACCESS)) {
+            return "chest access";
         } else {
             return flag;
         }
@@ -101,6 +104,8 @@ public class AreaFlags {
             return FLAG_FIRE_SPREAD;
         } else if (name.equalsIgnoreCase("lavafirespread")) {
             return FLAG_LAVA_FIRE;
+        } else if (name.equalsIgnoreCase("chest")) {
+            return FLAG_CHEST_ACCESS;
         } else {
             return null;
         }

@@ -296,6 +296,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         useRegions = config.getBoolean("regions.enable", true);
         regionWand = config.getInt("regions.wand", 287);
         globalFlags.canBuild = config.getBoolean("regions.default.build", true);
+        globalFlags.canAccessChests = config.getBoolean("regions.default.chest-access", false);
 
         try {
             regionLoader.load();

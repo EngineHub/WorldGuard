@@ -67,7 +67,13 @@ public class ApplicableRegionSet {
      * @return
      */
     public boolean allowsFlag(String flag) {
-        return isFlagAllowed(flag, true, null);
+        boolean def = true;
+        
+        if (flag.equals(AreaFlags.FLAG_CHEST_ACCESS)) {
+            def = global.canAccessChests;
+        }
+        
+        return isFlagAllowed(flag, def, null);
     }
     
     /**
@@ -80,6 +86,9 @@ public class ApplicableRegionSet {
     private boolean isFlagAllowed(String flag, boolean def, LocalPlayer player) {
         boolean found = false;
         boolean allowed = false; // Used for ALLOW override
+        if (player == null) {
+            allowed = def;
+        }
         int lastPriority = 0;
 
         // The algorithm is as follows:
@@ -120,6 +129,7 @@ public class ApplicableRegionSet {
             // default state is now to allow
             if (region.getFlags().get(flag) == State.ALLOW) {
                 allowed = true;
+                found = true;
                 continue;
             }
             
@@ -145,7 +155,8 @@ public class ApplicableRegionSet {
             lastPriority = region.getPriority();
         }
         
-        return found == false ? def : allowed || needsClear.size() == 0;
+        return (found == false ? def : allowed)
+                || (player != null && needsClear.size() == 0);
     }
     
     /**
