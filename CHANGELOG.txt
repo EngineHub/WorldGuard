@@ -1,3 +1,6 @@
+3.1.1:
+- Fixed creeper and chest flag conflicting.
+
 3.1:
 - Added ability to disable chest protection. New configuration setting
     (regions.build.chest-access) and new chest flag.
