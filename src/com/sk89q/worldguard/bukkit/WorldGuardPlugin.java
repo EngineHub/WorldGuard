@@ -970,7 +970,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         if (action.equalsIgnoreCase("addowner") || action.equalsIgnoreCase("addmember")) {
-            if (!hasPermission(player, "/regionclaim")) {
+            if (!hasPermission(player, "/regionclaim") && !hasPermission(player, "/regionmembership")) {
                 checkRegionPermission(player, "/regiondefine");
             }
             checkArgs(args, 2, -1, "/region add[member|owner] <id> [player1 [group1 [players/groups...]]]");
@@ -1014,7 +1014,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         if (action.equalsIgnoreCase("removeowner") || action.equalsIgnoreCase("removemember")) {
-            if (!hasPermission(player, "/regionclaim")) {
+            if (!hasPermission(player, "/regionclaim") && !hasPermission(player, "/regionmembership")) {
                 checkRegionPermission(player, "/regiondefine");
             }
             checkArgs(args, 2, -1, "/region removeowner <id> [owner1 [owner2 [owners...]]]");
