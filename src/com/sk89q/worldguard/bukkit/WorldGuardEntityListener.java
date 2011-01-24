@@ -125,6 +125,7 @@ public class WorldGuardEntityListener extends EntityListener {
     
     public void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
         Entity defender = event.getEntity();
+        Entity attacker = event.getDamager();
         
         if (defender instanceof Player) {            
             Player player = (Player)defender;
@@ -132,6 +133,19 @@ public class WorldGuardEntityListener extends EntityListener {
             if (plugin.invinciblePlayers.contains(player.getName())) {
                 event.setCancelled(true);
                 return;
+            }
+
+            if (attacker != null && attacker instanceof Player) {
+                if (plugin.useRegions) {
+                    Vector pt = toVector(defender.getLocation());
+                    
+                    if (!plugin.regionManager.getApplicableRegions(pt)
+                            .allowsFlag(AreaFlags.FLAG_PVP)) {
+                        ((Player)attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
         }
 
