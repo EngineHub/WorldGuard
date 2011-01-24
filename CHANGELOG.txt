@@ -1,3 +1,10 @@
+3.1:
+- Added ability to disable chest protection. New configuration setting
+    (regions.build.chest-access) and new chest flag.
+- Possibly fixed projectile blocking in no-PvP zones.
+- Added /regionmembership permission that lets people only change
+    the owners and members of regions they own.
+
 3.0b2:
 - Fixed issue where built-in permissions were not (re)loaded.
 - Fixed /god not working for others.
