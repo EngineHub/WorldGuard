@@ -44,7 +44,7 @@ public class AreaFlags {
     public static final String FLAG_LIGHTER = "l";
     public static final String FLAG_FIRE_SPREAD = "f";
     public static final String FLAG_LAVA_FIRE = "F";
-    public static final String FLAG_CHEST_ACCESS = "c";
+    public static final String FLAG_CHEST_ACCESS = "C";
     
     /**
      * Get the user-friendly name of a flag. If a name isn't known, then
