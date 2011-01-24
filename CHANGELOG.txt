@@ -1,3 +1,6 @@
+3.1.2:
+- Increased the priority of WorldGuard's event handling.
+
 3.1.1:
 - Fixed creeper and chest flag conflicting.
 

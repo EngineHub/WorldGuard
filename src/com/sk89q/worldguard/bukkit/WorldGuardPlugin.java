@@ -174,21 +174,21 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Register used events.
      */
     private void registerEvents() {
-        registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal);
+        registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.High);
         registerEvent(Event.Type.BLOCK_FLOW, blockListener, Priority.Normal);
-        registerEvent(Event.Type.BLOCK_IGNITE, blockListener, Priority.Normal);
+        registerEvent(Event.Type.BLOCK_IGNITE, blockListener, Priority.High);
         registerEvent(Event.Type.BLOCK_PHYSICS, blockListener, Priority.Normal);
-        registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.Normal);
-        registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal);
-        registerEvent(Event.Type.BLOCK_RIGHTCLICKED, blockListener, Priority.Normal);
+        registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.High);
+        registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.High);
+        registerEvent(Event.Type.BLOCK_RIGHTCLICKED, blockListener, Priority.High);
 
-        registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Normal);
-        registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.Normal);
-        registerEvent(Event.Type.ENTITY_DAMAGEDBY_BLOCK, entityListener, Priority.Normal);
-        registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal);
-        registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal);
+        registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High);
+        registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.High);
+        registerEvent(Event.Type.ENTITY_DAMAGEDBY_BLOCK, entityListener, Priority.High);
+        registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.High);
+        registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.High);
 
-        registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.Normal);
+        registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.High);
         registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal);
         registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal);
