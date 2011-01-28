@@ -96,6 +96,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Block block = event.getBlockClicked();
         ItemStack item = event.getItem();
+
+        if (!plugin.itemDurability) {
+            // Hoes
+            if (item.getTypeId() >= 290 && item.getTypeId() <= 294) {
+                item.setDamage((byte)-1);
+                player.setItemInHand(item);
+            }
+        }
         
         if (plugin.useRegions && !event.isBlock() && block != null) {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
