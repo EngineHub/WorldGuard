@@ -123,7 +123,9 @@ public class WorldGuardBlockListener extends BlockListener {
             for (int cx = -plugin.spongeRadius; cx <= plugin.spongeRadius; cx++) {
                 for (int cy = -plugin.spongeRadius; cy <= plugin.spongeRadius; cy++) {
                     for (int cz = -plugin.spongeRadius; cz <= plugin.spongeRadius; cz++) {
-                        if (world.getBlockTypeIdAt(ox + cx, oy + cy, oz + cz) == 19) {
+                        Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
+                        if (sponge.getTypeId() == 19
+                                && (!plugin.redstoneSponges || !sponge.isBlockIndirectlyPowered())) {
                             event.setCancelled(true);
                             return;
                         }
@@ -132,14 +134,16 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (plugin.classicWater && isWater) {
-            int blockBelow = world.getBlockTypeIdAt(blockFrom.getX(), blockFrom.getY() - 1, blockFrom.getZ());
+        /*if (plugin.classicWater && isWater) {
+            int blockBelow = blockFrom.getRelative(0, -1, 0).getTypeId();
             if (blockBelow != 0 && blockBelow != 8 && blockBelow != 9) {
-                world.getBlockAt(blockFrom.getX(), blockFrom.getY(), blockFrom.getZ()).setTypeId(9);
-                event.setCancelled(true);
+                blockFrom.setTypeId(9);
+                if (blockTo.getTypeId() == 0) {
+                    blockTo.setTypeId(9);
+                }
                 return;
             }
-        }
+        }*/
 
         if (plugin.preventWaterDamage.size() > 0 && isWater) {
             int targetId = world.getBlockTypeIdAt(
@@ -343,21 +347,15 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         if (plugin.simulateSponge && blockPlaced.getTypeId() == 19) {
+            if (plugin.redstoneSponges && blockPlaced.isBlockIndirectlyPowered()) {
+                return;
+            }
+            
             int ox = blockPlaced.getX();
             int oy = blockPlaced.getY();
             int oz = blockPlaced.getZ();
 
-            for (int cx = -plugin.spongeRadius; cx <= plugin.spongeRadius; cx++) {
-                for (int cy = -plugin.spongeRadius; cy <= plugin.spongeRadius; cy++) {
-                    for (int cz = -plugin.spongeRadius; cz <= plugin.spongeRadius; cz++) {
-                        int id = world.getBlockTypeIdAt(ox + cx, oy + cy, oz + cz);
-                        if (id == 8 || id == 9) {
-                            world.getBlockAt(ox + cx, oy + cy, oz + cz)
-                                    .setTypeId(0);
-                        }
-                    }
-                }
-            }
+            clearSpongeWater(world, ox, oy, oz);
         }
     }
 
@@ -390,6 +388,63 @@ public class WorldGuardBlockListener extends BlockListener {
                 player.sendMessage(ChatColor.YELLOW + "Applicable regions: " + str.toString());
             } else {
                 player.sendMessage(ChatColor.YELLOW + "WorldGuard: No defined regions here!");
+            }
+        }
+    }
+
+
+    /**
+     * Called when redstone changes
+     * From: the source of the redstone change
+     * To: The redstone dust that changed
+     *
+     * @param event Relevant event details
+     */
+    @Override
+    public void onBlockRedstoneChange(BlockFromToEvent event) {
+        World world = event.getBlock().getWorld();
+        Block blockTo = event.getToBlock();
+
+        if (plugin.simulateSponge && plugin.redstoneSponges) {
+            int ox = blockTo.getX();
+            int oy = blockTo.getY();
+            int oz = blockTo.getZ();
+            
+            for (int cx = -1; cx <= 1; cx++) {
+                for (int cy = -1; cy <= 1; cy++) {
+                    for (int cz = -1; cz <= 1; cz++) {
+                        Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
+                        if (sponge.getTypeId() == 19
+                                && sponge.isBlockIndirectlyPowered()) {
+                            clearSpongeWater(world, ox + cx, oy + cy, oz + cz);
+                        }
+                    }
+                }
+            }
+            
+            return;
+        }
+    }
+    
+    /**
+     * Remove water around a sponge.
+     * 
+     * @param world
+     * @param ox
+     * @param oy
+     * @param oz
+     */
+    private void clearSpongeWater(World world, int ox, int oy, int oz) {
+        for (int cx = -plugin.spongeRadius; cx <= plugin.spongeRadius; cx++) {
+            for (int cy = -plugin.spongeRadius; cy <= plugin.spongeRadius; cy++) {
+                for (int cz = -plugin.spongeRadius; cz <= plugin.spongeRadius; cz++) {
+                    Block block = world.getBlockAt(ox + cx, oy + cy, oz + cz);
+                    int id = block.getTypeId();
+                    if (id == 8 || id == 9) {
+                        world.getBlockAt(ox + cx, oy + cy, oz + cz)
+                                .setTypeId(0);
+                    }
+                }
             }
         }
     }

@@ -94,6 +94,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     boolean classicWater;
     boolean simulateSponge;
     int spongeRadius;
+    boolean redstoneSponges;
 
     boolean noPhysicsGravel;
     boolean noPhysicsSand;
@@ -181,6 +182,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.High);
         registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.High);
         registerEvent(Event.Type.BLOCK_RIGHTCLICKED, blockListener, Priority.High);
+        registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Priority.High);
 
         registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High);
         registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.High);
@@ -262,6 +264,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         classicWater = config.getBoolean("simulation.classic-water", false);
         simulateSponge = config.getBoolean("simulation.sponge.enable", true);
         spongeRadius = Math.max(1, config.getInt("simulation.sponge.radius", 3)) - 1;
+        redstoneSponges = config.getBoolean("simulation.sponge.redstone", false);
         
         noPhysicsGravel = config.getBoolean("physics.no-physics-gravel", false);
         noPhysicsSand = config.getBoolean("physics.no-physics-sand", false);

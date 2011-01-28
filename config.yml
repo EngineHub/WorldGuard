@@ -26,9 +26,9 @@ protection:
     item-durability: on
 
 simulation:
-    classic-water: off
     sponge:
         enable: on
+        redstone: off
         radius: 3
 
 physics:
