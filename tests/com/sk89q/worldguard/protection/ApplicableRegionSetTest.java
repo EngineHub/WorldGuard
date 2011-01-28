@@ -47,7 +47,7 @@ public class ApplicableRegionSetTest {
 
     @Before
     public void setUp() throws Exception {
-        manager = new FlatRegionManager();
+        manager = new FlatRegionManager(new GlobalFlags());
 
         setUpPlayers();
         setUpCourtyardRegion();
