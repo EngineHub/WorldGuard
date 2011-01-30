@@ -1,3 +1,11 @@
+3.2:
+- Added regions.default.pvp to control default PvP setting.
+- Updated WorldGuard for the newer builds of Bukkit.
+- Fixed creeper explosion blocking.
+- Added redstone support to sponges, removed classic water.
+- Fixed item durability disable for hoes.
+
+
 3.1.2:
 - Increased the priority of WorldGuard's event handling.
 
