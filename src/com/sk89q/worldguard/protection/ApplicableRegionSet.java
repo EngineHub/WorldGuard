@@ -68,9 +68,11 @@ public class ApplicableRegionSet {
      */
     public boolean allowsFlag(String flag) {
         boolean def = true;
-        
+
         if (flag.equals(AreaFlags.FLAG_CHEST_ACCESS)) {
             def = global.canAccessChests;
+        } else if (flag.equals(AreaFlags.FLAG_PVP)) {
+            def = global.canPvP;
         }
         
         return isFlagAllowed(flag, def, null);

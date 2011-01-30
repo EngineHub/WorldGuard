@@ -73,6 +73,7 @@ regions:
     default:
         build: true
         chest-access: false
+        pvp: true
 
 blacklist:
     logging:
