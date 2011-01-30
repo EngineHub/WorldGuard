@@ -26,6 +26,7 @@ import java.util.logging.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -417,7 +418,14 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Handles a command.
      */
-    public boolean onCommand(Player player, Command cmd, String commandLabel, String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd,
+            String commandLabel, String[] args) {
+        if (!sender.isPlayer()) {
+            return true;
+        }
+        
+        Player player = (Player)sender;
+        
         try {
             return handleCommand(player, cmd.getName(), args);
         } catch (InsufficientArgumentsException e) {
