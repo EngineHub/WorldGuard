@@ -216,12 +216,6 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
             
-            if (!plugin.regionManager.getApplicableRegions(BukkitUtil.toVector(event.getEntity().getLocation()))
-                    .allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
-                event.setCancelled(true);
-                return;
-            }
-            
             if (plugin.useRegions) {
                 Vector pt = toVector(event.getEntity().getLocation());
                 
