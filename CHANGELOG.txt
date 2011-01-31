@@ -1,3 +1,6 @@
+3.2.1:
+- Updated for recent Bukkit ItemStack change.
+
 3.2:
 - Added regions.default.pvp to control default PvP setting.
 - Updated WorldGuard for the newer builds of Bukkit.
