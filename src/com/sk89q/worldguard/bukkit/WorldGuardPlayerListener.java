@@ -100,7 +100,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         if (!plugin.itemDurability) {
             // Hoes
             if (item.getTypeId() >= 290 && item.getTypeId() <= 294) {
-                item.setDamage((byte)-1);
+                item.setDurability((byte)-1);
                 player.setItemInHand(item);
             }
         }

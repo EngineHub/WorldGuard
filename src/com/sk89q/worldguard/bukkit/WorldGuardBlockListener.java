@@ -65,7 +65,7 @@ public class WorldGuardBlockListener extends BlockListener {
         if (!plugin.itemDurability && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
             ItemStack held = player.getItemInHand();
             if (held.getTypeId() > 0) {
-                held.setDamage((byte)-1);
+                held.setDurability((short) -1);
                 player.setItemInHand(held);
             }
         }

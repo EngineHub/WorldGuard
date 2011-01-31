@@ -625,7 +625,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                         // Blocks store their color in the damage value
                         if (item2.getTypeId() == item.getTypeId() &&
                                 (!ItemType.usesDamageValue(item.getTypeId())
-                                        || item.getDamage() == item2.getDamage())) {
+                                        || item.getDurability() == item2.getDurability())) {
                             // This stack won't fit in the parent stack
                             if (item2.getAmount() > needed) {
                                 item.setAmount(64);
