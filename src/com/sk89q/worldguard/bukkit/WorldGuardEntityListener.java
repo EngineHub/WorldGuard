@@ -66,6 +66,11 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
+
+            if (plugin.disableContactDamage && type == DamageCause.CONTACT) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -186,11 +191,6 @@ public class WorldGuardEntityListener extends EntityListener {
             }
 
             if (plugin.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (plugin.disableContactDamage && type == DamageCause.CONTACT) {
                 event.setCancelled(true);
                 return;
             }
