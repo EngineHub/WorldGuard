@@ -422,28 +422,22 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public boolean onCommand(CommandSender sender, Command cmd,
             String commandLabel, String[] args) {
-        if (!sender.isPlayer()) {
-            return true;
-        }
-        
-        Player player = (Player)sender;
-        
         try {
-            return handleCommand(player, cmd.getName(), args);
+            return handleCommand(sender, cmd.getName(), args);
         } catch (InsufficientArgumentsException e) {
             if (e.getHelp() != null) {
-                player.sendMessage(ChatColor.RED + e.getHelp());
+                sender.sendMessage(ChatColor.RED + e.getHelp());
                 return true;
             } else {
                 return false;
             }
         } catch (InsufficientPermissionsException e) {
-            player.sendMessage(ChatColor.RED + "You don't have sufficient permission.");
+            sender.sendMessage(ChatColor.RED + "You don't have sufficient permission.");
             return true;
         } catch (CommandHandlingException e) {
             return true;
         } catch (Throwable t) {
-            player.sendMessage(ChatColor.RED + "ERROR: " + t.getMessage());
+            sender.sendMessage(ChatColor.RED + "ERROR: " + t.getMessage());
             t.printStackTrace();
             return true;
         }
@@ -458,18 +452,20 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return
      * @throws CommandHandlingException
      */
-    private boolean handleCommand(Player player, String cmd, String[] args)
+    private boolean handleCommand(CommandSender sender, String cmd, String[] args)
             throws CommandHandlingException {
         
+        String senderName = sender instanceof Player ? ((Player)sender).getName() : "Console";
+        
         if (cmd.equalsIgnoreCase("stopfire")) {
-            checkPermission(player, "/stopfire");
+            checkPermission(sender, "/stopfire");
             checkArgs(args, 0, 0);
             
             if (!fireSpreadDisableToggle) {
                 getServer().broadcastMessage(ChatColor.YELLOW
-                        + "Fire spread has been globally disabled by " + player.getName() + ".");
+                        + "Fire spread has been globally disabled by " + senderName + ".");
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Fire spread was already globally disabled.");
+                sender.sendMessage(ChatColor.YELLOW + "Fire spread was already globally disabled.");
             }
             
             fireSpreadDisableToggle = true;
@@ -478,20 +474,26 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         
         if (cmd.equalsIgnoreCase("allowfire")) {
-            checkPermission(player, "/stopfire");
+            checkPermission(sender, "/stopfire");
             checkArgs(args, 0, 0);
             
             if (fireSpreadDisableToggle) {
                 getServer().broadcastMessage(ChatColor.YELLOW
-                        + "Fire spread has been globally re-enabled by " + player.getName() + ".");
+                        + "Fire spread has been globally re-enabled by " + senderName + ".");
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Fire spread was already globally enabled.");
+                sender.sendMessage(ChatColor.YELLOW + "Fire spread was already globally enabled.");
             }
             
             fireSpreadDisableToggle = false;
             
             return true;
         }
+        
+        if (!(sender instanceof Player)) {
+            return false;
+        }
+        
+        Player player = (Player)sender;
         
         if (cmd.equalsIgnoreCase("god")) {
             checkPermission(player, "/god");
@@ -1270,13 +1272,16 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Checks to see if there are sufficient permissions, otherwise an exception
      * is raised in that case.
      * 
-     * @param player
+     * @param sender
      * @param permission
      * @throws InsufficientPermissionsException
      */
-    private void checkPermission(Player player, String permission)
+    private void checkPermission(CommandSender sender, String permission)
             throws InsufficientPermissionsException {
-        if (!hasPermission(player, permission)) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+        if (!hasPermission((Player)sender, permission)) {
             throw new InsufficientPermissionsException();
         }
     }

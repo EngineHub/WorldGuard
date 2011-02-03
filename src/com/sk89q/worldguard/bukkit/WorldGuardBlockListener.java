@@ -264,7 +264,6 @@ public class WorldGuardBlockListener extends BlockListener {
 
         if (plugin.disableFireSpreadBlocks.size() > 0) {
             Block block = event.getBlock();
-            World world = block.getWorld();
 
             if (plugin.disableFireSpreadBlocks.contains(block.getTypeId())) {
                 event.setCancelled(true);
