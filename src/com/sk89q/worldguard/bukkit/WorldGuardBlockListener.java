@@ -175,8 +175,7 @@ public class WorldGuardBlockListener extends BlockListener {
         Block block = event.getBlock();
         //Player player = event.getPlayer();
         World world = block.getWorld();
-        boolean isFireSpread = cause == IgniteCause.SLOW_SPREAD
-                || cause == IgniteCause.SPREAD;
+        boolean isFireSpread = cause == IgniteCause.SPREAD;
         
         if (plugin.preventLavaFire && cause == IgniteCause.LAVA) {
             event.setCancelled(true);
@@ -245,6 +244,33 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }*/
+    }
+
+    /**
+     * Called when a block is destroyed from burning
+     *
+     * @param event Relevant event details
+     */
+    public void onBlockBurn(BlockBurnEvent event) {
+        if (plugin.disableFireSpread) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (plugin.fireSpreadDisableToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (plugin.disableFireSpreadBlocks.size() > 0) {
+            Block block = event.getBlock();
+            World world = block.getWorld();
+
+            if (plugin.disableFireSpreadBlocks.contains(block.getTypeId())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     /**
