@@ -292,7 +292,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         disableFallDamage = config.getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = config.getBoolean("player-damage.disable-lava-damage", false);
         disableFireDamage = config.getBoolean("player-damage.disable-fire-damage", false);
-        disableDrowningDamage = config.getBoolean("player-damage.disable-water-damage", false);
+        disableDrowningDamage = config.getBoolean("player-damage.disable-drowning-damage", false);
         disableSuffocationDamage = config.getBoolean("player-damage.disable-suffocation-damage", false);
         disableContactDamage = config.getBoolean("player-damage.disable-contact-damage", false);
         teleportOnSuffocation = config.getBoolean("player-damage.teleport-on-suffocation", false);
