@@ -51,7 +51,7 @@
   </target>
 
   <!-- Build a release -->
-  <target name="release">
+  <target name="release" depends="clean">
     <input message="Enter version:" addproperty="version"/>
     <antcall target="jar"/>
     <delete dir="${release.dir}"/>
