@@ -1,3 +1,9 @@
+3.2.2:
+- Changed disable-water-damage to disable-drowning-damage.
+- Fixed suffocation disable option.
+- Fixed fire spread blocking.
+- stopfire and allowfire now work in server console, just like in hMod.
+
 3.2.1:
 - Updated for recent Bukkit ItemStack change.
 
