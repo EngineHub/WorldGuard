@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.matchSinglePlayer;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
@@ -45,10 +46,12 @@ import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.*;
 import com.sk89q.worldguard.blacklist.loggers.*;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -1333,6 +1336,22 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public ProtectionDatabase getRegionLoader() {
         return regionLoader;
+    }
+    
+    public boolean canBuild(Player player, int x, int y, int z) {
+        if (useRegions) {
+            Vector pt = new Vector(x, y, z);
+            LocalPlayer localPlayer = wrapPlayer(player);
+
+            if (!hasPermission(player, "/regionbypass")
+                    && !regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                return false;
+            }
+            
+            return true;
+        } else {
+            return true;
+        }
     }
     
     boolean inGroup(Player player, String group) {
