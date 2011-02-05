@@ -52,6 +52,7 @@ import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
 import com.sk89q.worldguard.blacklist.*;
 import com.sk89q.worldguard.blacklist.loggers.*;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -91,6 +92,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     boolean fireSpreadDisableToggle;
     
     // Configuration follows
+    
+    boolean suppressTickSyncWarnings;
     
     boolean enforceOneSession;
     boolean itemDurability;
@@ -161,6 +164,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         loadConfiguration();
         postReload();
         registerEvents();
+
+        if (suppressTickSyncWarnings) {
+            Logger.getLogger("Minecraft").setFilter(new TickSyncDelayLoggerFilter());
+        }
     }
 
     /**
@@ -262,6 +269,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         Configuration config = getConfiguration();
         config.load();
         perms.load();
+        
+        suppressTickSyncWarnings = config.getBoolean("suppress-tick-sync-warnings", false);
 
         enforceOneSession = config.getBoolean("protection.enforce-single-session", true);
         itemDurability = config.getBoolean("protection.item-durability", true);

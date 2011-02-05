@@ -21,6 +21,8 @@
 
 summary-on-start: on
 
+suppress-tick-sync-warnings: false
+
 protection:
     enforce-single-session: on
     item-durability: on
