@@ -25,8 +25,8 @@ import java.util.logging.LogRecord;
 
 public class TickSyncDelayLoggerFilter implements Filter {
     public boolean isLoggable(LogRecord record) {
-        if (record.getMessage().equals("Can't keep up! Did the system time change, or is the server overloaded?")
-                && record.getLevel() == Level.WARNING) {
+        if (record.getLevel() == Level.WARNING
+                && record.getMessage().equals("Can't keep up! Did the system time change, or is the server overloaded?")) {
             return false;
         }
         

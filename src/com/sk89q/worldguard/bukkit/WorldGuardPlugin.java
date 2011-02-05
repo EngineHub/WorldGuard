@@ -167,6 +167,11 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         if (suppressTickSyncWarnings) {
             Logger.getLogger("Minecraft").setFilter(new TickSyncDelayLoggerFilter());
+        } else {
+            Filter filter = Logger.getLogger("Minecraft").getFilter();
+            if (filter != null && filter instanceof TickSyncDelayLoggerFilter) {
+                Logger.getLogger("Minecraft").setFilter(null);
+            }
         }
     }
 
