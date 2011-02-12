@@ -20,8 +20,9 @@
 package com.sk89q.worldguard.protection;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.AreaFlags.State;
@@ -34,7 +35,7 @@ import com.sk89q.worldguard.protection.AreaFlags.State;
 public class ApplicableRegionSet {
     private GlobalFlags global;
     private Vector pt;
-    private SortedMap<String,ProtectedRegion> regions;
+    private Iterator<ProtectedRegion> applicable;
     
     /**
      * Construct the object.
@@ -43,10 +44,10 @@ public class ApplicableRegionSet {
      * @param regions
      * @param global
      */
-    public ApplicableRegionSet(Vector pt, SortedMap<String,ProtectedRegion> regions,
+    public ApplicableRegionSet(Vector pt, Iterator<ProtectedRegion> applicable,
             GlobalFlags global) {
         this.pt = pt;
-        this.regions = regions;
+        this.applicable = applicable;
         this.global = global;
     }
     
@@ -111,7 +112,9 @@ public class ApplicableRegionSet {
         Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
         Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
         
-        for (ProtectedRegion region : regions.values()) {
+        while (applicable.hasNext()) {
+            ProtectedRegion region = applicable.next();
+            
             // Ignore non-build regions
             if (player != null && region.getFlags().get(AreaFlags.FLAG_PASSTHROUGH) == State.ALLOW) {
                 continue;

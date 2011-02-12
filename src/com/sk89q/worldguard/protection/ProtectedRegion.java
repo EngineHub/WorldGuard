@@ -80,6 +80,20 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
+     * Get the lower point of the cuboid.
+     *
+     * @return min point
+     */
+    public abstract BlockVector getMinimumPoint();
+
+    /**
+     * Get the upper point of the cuboid.
+     *
+     * @return max point
+     */
+    public abstract BlockVector getMaximumPoint();
+
+    /**
      * @return the priority
      */
     public int getPriority() {

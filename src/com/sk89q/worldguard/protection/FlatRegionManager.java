@@ -38,7 +38,7 @@ public class FlatRegionManager implements RegionManager {
     /**
      * List of protected regions.
      */
-    private SortedMap<String,ProtectedRegion> regions;
+    private Map<String,ProtectedRegion> regions;
     /**
      * Global flags.
      */
@@ -60,7 +60,6 @@ public class FlatRegionManager implements RegionManager {
     public Map<String,ProtectedRegion> getRegions() {
         return regions;
     }
-
     
     /**
      * Set a list of protected regions.
@@ -70,6 +69,7 @@ public class FlatRegionManager implements RegionManager {
     public void setRegions(Map<String,ProtectedRegion> regions) {
         this.regions = new TreeMap<String,ProtectedRegion>(regions);
     }
+    
     /**
      * Adds a region.
      * 
@@ -125,7 +125,7 @@ public class FlatRegionManager implements RegionManager {
      * @return
      */
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
-        return new ApplicableRegionSet(pt, regions, global);
+        return new ApplicableRegionSet(pt, regions.values().iterator(), global);
     }
     
     /**
