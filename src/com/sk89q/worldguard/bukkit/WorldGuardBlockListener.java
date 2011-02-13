@@ -426,9 +426,9 @@ public class WorldGuardBlockListener extends BlockListener {
      * @param event Relevant event details
      */
     @Override
-    public void onBlockRedstoneChange(BlockFromToEvent event) {
+    public void onBlockRedstoneChange(BlockRedstoneEvent event) {
         World world = event.getBlock().getWorld();
-        Block blockTo = event.getToBlock();
+        Block blockTo = event.getBlock();
 
         if (plugin.simulateSponge && plugin.redstoneSponges) {
             int ox = blockTo.getX();
