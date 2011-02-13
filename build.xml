@@ -10,7 +10,11 @@
   <property name="docs.dir" location="docs"/>
 
   <fileset id="libs" dir="${lib.dir}">
-    <include name="*.jar"/>
+    <include name="truezip.jar" />
+    <include name="Bukkit.jar" />
+    <include name="Craftbukkit.jar" />
+    <include name="WorldEdit.jar" />
+    <include name="prtree.jar" />
   </fileset>
 
   <target name="init">
@@ -41,7 +45,9 @@
     <mkdir dir="${build.dir}/defaults"/>
     <copy tofile="${build.dir}/defaults/config.yml" file="config.yml"/>
     <copy tofile="${build.dir}/defaults/blacklist.txt" file="blacklist.txt"/>
-    <jar jarfile="${dist.dir}/WorldGuard.jar" basedir="${build.dir}" manifest="manifest.mf"/>
+    <jar jarfile="${dist.dir}/WorldGuard.jar" basedir="${build.dir}" manifest="manifest.mf">
+        <zipgroupfileset dir="lib" includes="prtree.jar" />
+    </jar>
   </target>
 
   <!-- Create the .jar -->
