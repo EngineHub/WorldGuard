@@ -1,3 +1,7 @@
+3.2.3:
+- Updated for recent Bukkit builds. Thank Zenexer for changes.
+- Added suppress-tick-sync-warnings.
+
 3.2.2:
 - Changed disable-water-damage to disable-drowning-damage.
 - Fixed suffocation disable option.
