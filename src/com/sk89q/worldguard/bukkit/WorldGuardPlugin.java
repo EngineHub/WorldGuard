@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.matchSinglePlayer;
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
@@ -31,14 +30,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Server;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
@@ -71,15 +67,15 @@ public final class WorldGuardPlugin extends JavaPlugin {
     private static Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
     private static int CMD_LIST_SIZE = 9;
     
-    private final WorldGuardPlayerListener playerListener =
+    private WorldGuardPlayerListener playerListener =
         new WorldGuardPlayerListener(this);
-    private final WorldGuardBlockListener blockListener =
+    private WorldGuardBlockListener blockListener =
         new WorldGuardBlockListener(this);
-    private final WorldGuardEntityListener entityListener =
+    private WorldGuardEntityListener entityListener =
         new WorldGuardEntityListener(this);
-    private final PermissionsResolverServerListener permsListener;
+    private PermissionsResolverServerListener permsListener;
     
-    private final PermissionsResolverManager perms;
+    private PermissionsResolverManager perms;
     
     Blacklist blacklist;
 
@@ -135,20 +131,11 @@ public final class WorldGuardPlugin extends JavaPlugin {
 
     boolean useRegions;
     int regionWand = 287; 
-    
-    /**
-     * Construct the plugin.
-     * 
-     * @param pluginLoader
-     * @param instance
-     * @param desc
-     * @param folder
-     * @param plugin
-     * @param cLoader
-     */
-    public WorldGuardPlugin() {
-        super();
 
+    /**
+     * Called on plugin enable.
+     */
+    public void onEnable() {
         logger.info("WorldGuard " + getDescription().getVersion() + " loaded.");
         
         getDataFolder().mkdirs();
@@ -172,12 +159,6 @@ public final class WorldGuardPlugin extends JavaPlugin {
                 Logger.getLogger("Minecraft").setFilter(null);
             }
         }
-    }
-
-    /**
-     * Called on plugin enable.
-     */
-    public void onEnable() {
     }
 
     /**
