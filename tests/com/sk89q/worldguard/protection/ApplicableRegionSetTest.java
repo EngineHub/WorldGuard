@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -68,8 +69,17 @@ public class ApplicableRegionSetTest {
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup(COURTYARD_GROUP);
         
-        ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID,
-                new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));
+        BlockVector2D[] points = new BlockVector2D[] {
+                new BlockVector2D(0, 0),
+                new BlockVector2D(10, 0),
+                new BlockVector2D(10, 10),
+                new BlockVector2D(0, 10),
+            };
+        
+        /*ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID,
+                new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));*/
+        ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID,
+                points, 0, 10);
         AreaFlags flags = new AreaFlags();
         flags.set(AreaFlags.FLAG_BUILD, State.NONE);
         flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
