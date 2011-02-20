@@ -65,7 +65,7 @@ import com.sk89q.worldguard.protection.ProtectedRegion.CircularInheritanceExcept
  * 
  * @author sk89qs
  */
-public class WorldGuardPlugin extends JavaPlugin {
+public final class WorldGuardPlugin extends JavaPlugin {
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
     private static Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
@@ -146,18 +146,17 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param plugin
      * @param cLoader
      */
-    public WorldGuardPlugin(PluginLoader pluginLoader, Server instance,
-            PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
-        super(pluginLoader, instance, desc, folder, plugin, cLoader);
+    public WorldGuardPlugin() {
+        super();
 
-        logger.info("WorldGuard " + desc.getVersion() + " loaded.");
+        logger.info("WorldGuard " + getDescription().getVersion() + " loaded.");
         
-        folder.mkdirs();
+        getDataFolder().mkdirs();
 
         createDefaultConfiguration("config.yml");
         createDefaultConfiguration("blacklist.txt");
         
-        regionLoader = new CSVDatabase(new File(folder, "regions.txt"));
+        regionLoader = new CSVDatabase(new File(getDataFolder(), "regions.txt"));
         perms = new PermissionsResolverManager(getConfiguration(), getServer(),
                 "WorldGuard", logger);
         permsListener = new PermissionsResolverServerListener(perms);
@@ -202,9 +201,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Priority.High);
 
         registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High);
-        registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.High);
-        registerEvent(Event.Type.ENTITY_DAMAGEDBY_BLOCK, entityListener, Priority.High);
-        registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.High);
         registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.High);
 
         registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.High);
