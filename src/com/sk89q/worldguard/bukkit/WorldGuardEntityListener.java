@@ -49,7 +49,7 @@ public class WorldGuardEntityListener extends EntityListener {
         this.plugin = plugin;
     }
 
-    @Override
+
     public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
@@ -74,7 +74,7 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
-    @Override
+
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
@@ -156,7 +156,20 @@ public class WorldGuardEntityListener extends EntityListener {
 
     }
 
+    @Override
     public void onEntityDamage(EntityDamageEvent event) {
+
+        if (event instanceof EntityDamageByProjectileEvent) {
+            this.onEntityDamageByProjectile((EntityDamageByProjectileEvent) event);
+            return;
+        } else if (event instanceof EntityDamageByEntityEvent) {
+            this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
+            return;
+        } else if (event instanceof EntityDamageByBlockEvent) {
+            this.onEntityDamageByBlock((EntityDamageByBlockEvent) event);
+            return;
+        }
+
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
         

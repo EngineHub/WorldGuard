@@ -202,9 +202,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Priority.High);
 
         registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High);
-        registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.High);
-        registerEvent(Event.Type.ENTITY_DAMAGEDBY_BLOCK, entityListener, Priority.High);
-        registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.High);
         registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.High);
 
         registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.High);
