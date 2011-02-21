@@ -152,6 +152,17 @@ public class WorldGuardEntityListener extends EntityListener {
                     }
                 }
             }
+            if (attacker != null && attacker instanceof Skeleton) {
+            	if (plugin.useRegions) {
+            		Vector pt = toVector(defender.getLocation());
+            		
+            		if (!plugin.regionManager.getApplicableRegions(pt)
+            				.allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
+            			event.setCancelled(true);
+            			return;
+            		}
+            	}
+            }
         }
 
     }
