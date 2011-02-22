@@ -174,6 +174,16 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }*/
 
+        // Check the fluid block (from) whether it is air. If so and the target block is protected, cancel the event
+        if(plugin.preventWaterDamage.size() > 0 && blockFrom.getTypeId() == 0) {
+            int targetId = world.getBlockTypeIdAt(
+                    blockTo.getX(), blockTo.getY(), blockTo.getZ());
+            if (plugin.preventWaterDamage.contains(targetId)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        
         if (plugin.preventWaterDamage.size() > 0 && isWater) {
             int targetId = world.getBlockTypeIdAt(
                     blockTo.getX(), blockTo.getY(), blockTo.getZ());
