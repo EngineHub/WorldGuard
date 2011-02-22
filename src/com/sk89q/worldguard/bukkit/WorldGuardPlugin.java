@@ -139,17 +139,10 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Construct the plugin.
      * 
-     * @param pluginLoader
-     * @param instance
-     * @param desc
-     * @param folder
-     * @param plugin
-     * @param cLoader
      */
-    public WorldGuardPlugin(PluginLoader pluginLoader, Server instance,
-            PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
-      
-        logger.info("WorldGuard " + desc.getVersion() + " loaded.");
+    public WorldGuardPlugin() {
+    	super();
+        logger.info("WorldGuard loaded.");
     }
 
     /**
