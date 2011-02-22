@@ -19,8 +19,9 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import org.bukkit.craftbukkit.entity.CraftItem;
+import org.bukkit.entity.Item;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
-import org.bukkit.entity.ItemDrop;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -180,9 +181,10 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
 
         if (plugin.blacklist != null) {
-            ItemDrop id = event.getItemDrop();
-            if (!plugin.blacklist.check(new ItemDropBlacklistEvent(plugin.wrapPlayer(event.getPlayer()), toVector(id.getLocation()),
-                    id.getItemStack().getTypeId()), false, false)) {
+            CraftItem ci = (CraftItem)event.getItemDrop();
+
+            if (!plugin.blacklist.check(new ItemDropBlacklistEvent(plugin.wrapPlayer(event.getPlayer()), toVector(ci.getLocation()),
+                    ci.getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }

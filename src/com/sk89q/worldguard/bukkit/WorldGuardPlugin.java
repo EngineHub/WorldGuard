@@ -48,6 +48,7 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.Region;
@@ -433,6 +434,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Handles a command.
      */
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd,
             String commandLabel, String[] args) {
         try {
@@ -772,10 +774,9 @@ public class WorldGuardPlugin extends JavaPlugin {
                 String id = args[0].toLowerCase();
                 
                 WorldEditPlugin worldEdit = (WorldEditPlugin)wePlugin;
-                WorldEditAPI api = worldEdit.getAPI();
                 
-                LocalSession session = api.getSession(player);
-                Region weRegion = session.getRegion();
+                LocalSession session = worldEdit.getSession(player);
+                Region weRegion = session.getSelection(new BukkitWorld(player.getWorld()));
                 
                 BlockVector min = weRegion.getMinimumPoint().toBlockVector();
                 BlockVector max = weRegion.getMaximumPoint().toBlockVector();
@@ -814,10 +815,9 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
                 
                 WorldEditPlugin worldEdit = (WorldEditPlugin)wePlugin;
-                WorldEditAPI api = worldEdit.getAPI();
                 
-                LocalSession session = api.getSession(player);
-                Region weRegion = session.getRegion();
+                LocalSession session = worldEdit.getSession(player);
+                Region weRegion = session.getSelection(new BukkitWorld(player.getWorld()));
                 
                 BlockVector min = weRegion.getMinimumPoint().toBlockVector();
                 BlockVector max = weRegion.getMaximumPoint().toBlockVector();
