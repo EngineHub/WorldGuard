@@ -78,7 +78,7 @@ public class ApplicableRegionSetTest {
         points.add(new BlockVector2D(0, 10));
         
         //ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID, new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));
-        ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID, new ArrayList<BlockVector2D>(), 0, 10);
+        ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID, points, 0, 10);
         
         AreaFlags flags = new AreaFlags();
         flags.set(AreaFlags.FLAG_BUILD, State.NONE);
