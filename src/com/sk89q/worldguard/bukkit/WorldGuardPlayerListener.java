@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
+import org.bukkit.entity.ItemDrop;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -93,6 +95,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
      */
     @Override
     public void onPlayerItem(PlayerItemEvent event) {
+
+        if(event.isCancelled())
+        {
+            return;
+        }
+        
         Player player = event.getPlayer();
         Block block = event.getBlockClicked();
         ItemStack item = event.getItem();
@@ -155,6 +163,28 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 if (pl.getName().equalsIgnoreCase(name)) {
                     pl.kickPlayer("Logged in from another location.");
                 }
+            }
+        }
+    }
+
+    /**
+     * Called when a player attempts to drop an item
+     *
+     * @param event Relevant event details
+     */
+    @Override
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+
+        if (event.isCancelled()) {
+            return;
+        }
+
+        if (plugin.blacklist != null) {
+            ItemDrop id = event.getItemDrop();
+            if (!plugin.blacklist.check(new ItemDropBlacklistEvent(plugin.wrapPlayer(event.getPlayer()), toVector(id.getLocation()),
+                    id.getItemStack().getTypeId()), false, false)) {
+                event.setCancelled(true);
+                return;
             }
         }
     }

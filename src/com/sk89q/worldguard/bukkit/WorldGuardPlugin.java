@@ -203,6 +203,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.High);
 
         registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.High);
+        registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.High);
         registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal);
         registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal);
