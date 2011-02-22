@@ -28,6 +28,8 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.AreaFlags.State;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApplicableRegionSetTest {
     static String COURTYARD_ID = "courtyard";
@@ -69,17 +71,15 @@ public class ApplicableRegionSetTest {
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup(COURTYARD_GROUP);
         
-        BlockVector2D[] points = new BlockVector2D[] {
-                new BlockVector2D(0, 0),
-                new BlockVector2D(10, 0),
-                new BlockVector2D(10, 10),
-                new BlockVector2D(0, 10),
-            };
+        ArrayList<BlockVector2D> points = new ArrayList<BlockVector2D>();
+        points.add(new BlockVector2D(0, 0));
+        points.add(new BlockVector2D(10, 0));
+        points.add(new BlockVector2D(10, 10));
+        points.add(new BlockVector2D(0, 10));
         
-        /*ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID,
-                new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));*/
-        ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID,
-                points, 0, 10);
+        //ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID, new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));
+        ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID, new ArrayList<BlockVector2D>(), 0, 10);
+        
         AreaFlags flags = new AreaFlags();
         flags.set(AreaFlags.FLAG_BUILD, State.NONE);
         flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
