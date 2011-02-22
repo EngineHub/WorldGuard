@@ -437,9 +437,10 @@ public class WorldGuardBlockListener extends BlockListener {
     public void onBlockRightClick(BlockRightClickEvent event) {
 
         Player player = event.getPlayer();
+        Block blockClicked = event.getBlock();
         
         if (plugin.useRegions && event.getItemInHand().getTypeId() == plugin.regionWand) {
-            Vector pt = toVector(event.getBlock());
+            Vector pt = toVector(blockClicked);
             ApplicableRegionSet app = plugin.regionManager.getApplicableRegions(pt);
             List<String> regions = plugin.regionManager.getApplicableRegionsIDs(pt);
             
@@ -458,6 +459,24 @@ public class WorldGuardBlockListener extends BlockListener {
                 player.sendMessage(ChatColor.YELLOW + "Applicable regions: " + str.toString());
             } else {
                 player.sendMessage(ChatColor.YELLOW + "WorldGuard: No defined regions here!");
+            }
+        }
+
+        Material type = blockClicked.getType();
+
+        if (plugin.useRegions && type == Material.CAKE_BLOCK) {
+
+            Vector pt = toVector(blockClicked);
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+            if (!plugin.hasPermission(player, "/regionbypass")
+                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+
+                blockClicked.setData((byte) (blockClicked.getData() - 1));
+                player.setHealth(player.getHealth() - 3);
+
+                return;
             }
         }
     }
