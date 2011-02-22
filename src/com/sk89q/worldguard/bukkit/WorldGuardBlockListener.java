@@ -60,6 +60,12 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     @Override
     public void onBlockDamage(BlockDamageEvent event) {
+
+        if(event.isCancelled())
+        {
+            return;
+        }
+
         Player player = event.getPlayer();
 
         if (!plugin.itemDurability && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
@@ -108,6 +114,12 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     @Override
     public void onBlockFlow(BlockFromToEvent event) {
+
+        if(event.isCancelled())
+        {
+            return;
+        }
+
         World world = event.getBlock().getWorld();
         Block blockFrom = event.getBlock();
         Block blockTo = event.getToBlock();
@@ -171,6 +183,12 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     @Override
     public void onBlockIgnite(BlockIgniteEvent event) {
+
+        if(event.isCancelled())
+        {
+            return;
+        }
+
         IgniteCause cause = event.getCause();
         Block block = event.getBlock();
         //Player player = event.getPlayer();
@@ -251,7 +269,14 @@ public class WorldGuardBlockListener extends BlockListener {
      *
      * @param event Relevant event details
      */
+    @Override
     public void onBlockBurn(BlockBurnEvent event) {
+
+        if(event.isCancelled())
+        {
+            return;
+        }
+
         if (plugin.disableFireSpread) {
             event.setCancelled(true);
             return;
@@ -279,6 +304,12 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     @Override
     public void onBlockPhysics(BlockPhysicsEvent event) {
+
+        if(event.isCancelled())
+        {
+            return;
+        }
+
         int id = event.getChangedTypeId();
 
         if (id == 13 && plugin.noPhysicsGravel) {
@@ -302,7 +333,14 @@ public class WorldGuardBlockListener extends BlockListener {
      * 
      * @param event Relevant event details
      */
+    @Override
     public void onBlockInteract(BlockInteractEvent event) {
+
+        if(event.isCancelled())
+        {
+            return;
+        }
+
         Block block = event.getBlock();
         LivingEntity entity = event.getEntity();
         
@@ -346,6 +384,12 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     @Override
     public void onBlockPlace(BlockPlaceEvent event) {
+
+        if(event.isCancelled())
+        {
+            return;
+        }
+
         Block blockPlaced = event.getBlock();
         Player player = event.getPlayer();
         World world = blockPlaced.getWorld();
@@ -391,6 +435,7 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     @Override
     public void onBlockRightClick(BlockRightClickEvent event) {
+
         Player player = event.getPlayer();
         
         if (plugin.useRegions && event.getItemInHand().getTypeId() == plugin.regionWand) {
@@ -427,6 +472,7 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     @Override
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
+
         World world = event.getBlock().getWorld();
         Block blockTo = event.getBlock();
 

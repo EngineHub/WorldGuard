@@ -171,6 +171,11 @@ public class WorldGuardEntityListener extends EntityListener {
     @Override
     public void onEntityDamage(EntityDamageEvent event) {
 
+        if(event.isCancelled())
+        {
+            return;
+        }
+        
         if (event instanceof EntityDamageByProjectileEvent) {
             this.onEntityDamageByProjectile((EntityDamageByProjectileEvent) event);
             return;
@@ -230,6 +235,12 @@ public class WorldGuardEntityListener extends EntityListener {
 
     @Override
     public void onEntityExplode(EntityExplodeEvent event) {
+
+        if(event.isCancelled())
+        {
+            return;
+        }
+
         if (event.getEntity() instanceof LivingEntity) {
             if (plugin.blockCreeperBlockDamage) {
                 event.setCancelled(true);
