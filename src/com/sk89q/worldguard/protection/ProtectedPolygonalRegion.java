@@ -71,20 +71,23 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      */
     @Override
     public boolean contains(Vector pt) {
-        int targetX = pt.getBlockX();
-        int targetY = pt.getBlockY();
-        int targetZ = pt.getBlockZ();
+        int targetX = pt.getBlockX(); //wide
+        int targetY = pt.getBlockY(); //height
+        int targetZ = pt.getBlockZ(); //depth
         
         if (targetY < minY || targetY > maxY) {
             return false;
         }
-        
+        //Quick and dirty check.
+        if(targetX < min.getBlockX() || targetX > max.getBlockX() || targetZ < min.getBlockZ() || targetZ > max.getBlockZ()){
+        	return false;
+        }
         boolean inside = false;
         int npoints = points.size();
         int xNew, zNew;
         int xOld, zOld;
-        int x1, y1;
-        int x2, y2;
+        int x1, z1;
+        int x2, z2;
         int i;
 
         xOld = points.get(npoints - 1).getBlockX();
@@ -96,16 +99,16 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
             if (xNew > xOld) {
                 x1 = xOld;
                 x2 = xNew;
-                y1 = zOld;
-                y2 = zNew;
+                z1 = zOld;
+                z2 = zNew;
             } else {
                 x1 = xNew;
                 x2 = xOld;
-                y1 = zNew;
-                y2 = zOld;
+                z1 = zNew;
+                z2 = zOld;
             }
             if ((xNew < targetX) == (targetX <= xOld)
-                    && ((long) targetZ - (long) y1) * (long) (x2 - x1) < ((long) y2 - (long) y1)
+                    && ((long) targetZ - (long) z1) * (long) (x2 - x1) <= ((long) z2 - (long) z1)
                             * (long) (targetX - x1)) {
                 inside = !inside;
             }
