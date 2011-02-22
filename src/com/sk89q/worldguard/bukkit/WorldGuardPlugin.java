@@ -77,9 +77,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         new WorldGuardBlockListener(this);
     private final WorldGuardEntityListener entityListener =
         new WorldGuardEntityListener(this);
-    private final PermissionsResolverServerListener permsListener;
-    
-    private final PermissionsResolverManager perms;
+
+    private PermissionsResolverServerListener permsListener;
+    private PermissionsResolverManager perms;
     
     Blacklist blacklist;
 
@@ -148,19 +148,27 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public WorldGuardPlugin(PluginLoader pluginLoader, Server instance,
             PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
-        super(pluginLoader, instance, desc, folder, plugin, cLoader);
-
+      
         logger.info("WorldGuard " + desc.getVersion() + " loaded.");
-        
+    }
+
+    /**
+     * Called on plugin enable.
+     */
+    public void onEnable() {
+        PluginDescriptionFile desc = this.getDescription();
+        File folder = this.getDataFolder();
+
         folder.mkdirs();
 
         createDefaultConfiguration("config.yml");
         createDefaultConfiguration("blacklist.txt");
-        
+
         regionLoader = new CSVDatabase(new File(folder, "regions.txt"));
         perms = new PermissionsResolverManager(getConfiguration(), getServer(),
                 "WorldGuard", logger);
         permsListener = new PermissionsResolverServerListener(perms);
+        
         loadConfiguration();
         postReload();
         registerEvents();
@@ -173,18 +181,15 @@ public class WorldGuardPlugin extends JavaPlugin {
                 Logger.getLogger("Minecraft").setFilter(null);
             }
         }
-    }
 
-    /**
-     * Called on plugin enable.
-     */
-    public void onEnable() {
+        logger.info("WorldGuard " + desc.getVersion() + " enabled.");
     }
 
     /**
      * Called on plugin disable.
      */
     public void onDisable() {
+        logger.info("WorldGuard " + this.getDescription().getVersion() + " disabled.");
     }
 
     /**

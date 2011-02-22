@@ -1,0 +1,13 @@
+/bin
+/build
+/dist
+/release
+/store
+/test
+/lib/Bukkit.jar
+/lib/Craftbukkit.jar
+/lib/truezip.jar
+/lib/WorldEdit.jar
+.classpath
+.project
+manifest.mf
