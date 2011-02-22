@@ -537,6 +537,9 @@ public class WorldGuardBlockListener extends BlockListener {
                         if (sponge.getTypeId() == 19
                                 && sponge.isBlockIndirectlyPowered()) {
                             clearSpongeWater(world, ox + cx, oy + cy, oz + cz);
+                        } else if (sponge.getTypeId() == 19
+                                && ! sponge.isBlockIndirectlyPowered()) {
+                            addSpongeWater(world, ox + cx, oy + cy, oz + cz);
                         }
                     }
                 }
@@ -558,14 +561,116 @@ public class WorldGuardBlockListener extends BlockListener {
         for (int cx = -plugin.spongeRadius; cx <= plugin.spongeRadius; cx++) {
             for (int cy = -plugin.spongeRadius; cy <= plugin.spongeRadius; cy++) {
                 for (int cz = -plugin.spongeRadius; cz <= plugin.spongeRadius; cz++) {
-                    Block block = world.getBlockAt(ox + cx, oy + cy, oz + cz);
-                    int id = block.getTypeId();
-                    if (id == 8 || id == 9) {
+                    if (isBlockWater(world, ox + cx, oy + cy, oz + cz)) {
                         world.getBlockAt(ox + cx, oy + cy, oz + cz)
                                 .setTypeId(0);
                     }
                 }
             }
+        }
+    }
+    
+    /**
+     * Add water around a sponge.
+     * 
+     * @param world
+     * @param ox
+     * @param oy
+     * @param oz
+     */
+    private void addSpongeWater(World world, int ox, int oy, int oz) {
+        // The negative x edge
+        int cx = ox - plugin.spongeRadius - 1;
+        for (int cy = oy - plugin.spongeRadius - 1; cy <= oy + plugin.spongeRadius + 1; cy++) {
+            for (int cz = oz - plugin.spongeRadius - 1; cz <= oz + plugin.spongeRadius + 1; cz++) {
+                if (isBlockWater(world, cx, cy, cz)) {
+                    setBlockToWater(world, cx + 1, cy, cz);
+                }
+            }
+        }
+        
+        // The positive x edge
+        cx = ox + plugin.spongeRadius + 1;
+        for (int cy = oy - plugin.spongeRadius - 1; cy <= oy + plugin.spongeRadius + 1; cy++) {
+            for (int cz = oz - plugin.spongeRadius - 1; cz <= oz + plugin.spongeRadius + 1; cz++) {
+                if (isBlockWater(world, cx, cy, cz)) {
+                    setBlockToWater(world, cx - 1, cy, cz);
+                }
+            }
+        }
+
+        // The negative y edge
+        int cy = oy - plugin.spongeRadius - 1;
+        for (cx = ox - plugin.spongeRadius - 1; cx <= ox + plugin.spongeRadius + 1; cx++) {
+            for (int cz = oz - plugin.spongeRadius - 1; cz <= oz + plugin.spongeRadius + 1; cz++) {
+                if (isBlockWater(world, cx, cy, cz)) {
+                    setBlockToWater(world, cx, cy + 1, cz);
+                }
+            }
+        }
+        
+        // The positive y edge
+        cy = oy + plugin.spongeRadius + 1;
+        for (cx = ox - plugin.spongeRadius - 1; cx <= ox + plugin.spongeRadius + 1; cx++) {
+            for (int cz = oz - plugin.spongeRadius - 1; cz <= oz + plugin.spongeRadius + 1; cz++) {
+                if (isBlockWater(world, cx, cy, cz)) {
+                    setBlockToWater(world, cx, cy - 1, cz);
+                }
+            }
+        }
+        
+        // The negative z edge
+        int cz = oz - plugin.spongeRadius - 1;
+        for (cx = ox - plugin.spongeRadius - 1; cx <= ox + plugin.spongeRadius + 1; cx++) {
+            for (cy = oy - plugin.spongeRadius - 1; cy <= oy + plugin.spongeRadius + 1; cy++) {
+                if (isBlockWater(world, cx, cy, cz)) {
+                    setBlockToWater(world, cx, cy, cz + 1);
+                }
+            }
+        }
+        
+        // The positive z edge
+        cz = oz + plugin.spongeRadius + 1;
+        for (cx = ox - plugin.spongeRadius - 1; cx <= ox + plugin.spongeRadius + 1; cx++) {
+            for (cy = oy - plugin.spongeRadius - 1; cy <= oy + plugin.spongeRadius + 1; cy++) {
+                if (isBlockWater(world, cx, cy, cz)) {
+                    setBlockToWater(world, cx, cy, cz - 1);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Sets the given block to fluid water.
+     * Used by addSpongeWater()
+     * 
+     * @see addSpongeWater()
+     * 
+     * @param world
+     * @param ox
+     * @param oy
+     * @param oz
+     */
+    private void setBlockToWater(World world, int ox, int oy, int oz) {
+        world.getBlockAt(ox, oy, oz)
+        .setTypeId( 8 );
+    }
+    
+    /**
+     * Checks if the given block is water
+     * 
+     * @param world
+     * @param ox
+     * @param oy
+     * @param oz
+     */
+    private boolean isBlockWater(World world, int ox, int oy, int oz) {
+        Block block = world.getBlockAt(ox, oy, oz);
+        int id = block.getTypeId();
+        if (id == 8 || id == 9) {
+            return true;
+        } else {
+            return false;
         }
     }
 }
