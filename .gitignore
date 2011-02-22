@@ -8,6 +8,7 @@
 /lib/Craftbukkit.jar
 /lib/truezip.jar
 /lib/WorldEdit.jar
+/nbproject/private
 .classpath
 .project
 manifest.mf
