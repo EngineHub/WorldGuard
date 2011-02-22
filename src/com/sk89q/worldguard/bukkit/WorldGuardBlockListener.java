@@ -39,6 +39,7 @@ import com.sk89q.worldguard.protection.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class WorldGuardBlockListener extends BlockListener {
+
     /**
      * Plugin.
      */
@@ -101,6 +102,22 @@ public class WorldGuardBlockListener extends BlockListener {
                     new DestroyWithBlacklistEvent(plugin.wrapPlayer(player),
                             toVector(event.getBlock()),
                             player.getItemInHand().getTypeId()), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        Block blockDamaged = event.getBlock();
+        if (plugin.useRegions && blockDamaged.getType() == Material.CAKE_BLOCK) {
+
+
+            Vector pt = toVector(blockDamaged);
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+            if (!plugin.hasPermission(player, "/regionbypass")
+                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+
                 event.setCancelled(true);
                 return;
             }
@@ -473,7 +490,10 @@ public class WorldGuardBlockListener extends BlockListener {
                     && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
 
-                blockClicked.setData((byte) (blockClicked.getData() - 1));
+                byte newData = (byte) (blockClicked.getData() - 1);
+                newData = newData < 0 ? 0 : newData;
+
+                blockClicked.setData(newData);
                 player.setHealth(player.getHealth() - 3);
 
                 return;
