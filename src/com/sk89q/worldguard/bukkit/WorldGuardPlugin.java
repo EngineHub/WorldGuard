@@ -318,6 +318,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         globalFlags.canBuild = config.getBoolean("regions.default.build", true);
         globalFlags.canAccessChests = config.getBoolean("regions.default.chest-access", false);
         globalFlags.canPvP = config.getBoolean("regions.default.pvp", true);
+        globalFlags.canLighter = config.getBoolean("regions.default.lighter", true);
+        globalFlags.canTnt = config.getBoolean("regions.default.tnt", true);
+        globalFlags.allowCreeper = config.getBoolean("regions.default.creeper", true);
+        globalFlags.allowMobDamage = config.getBoolean("regions.default.mobdamage", true);
 
         try {
             regionLoader.load();

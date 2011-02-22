@@ -76,6 +76,10 @@ regions:
         build: true
         chest-access: false
         pvp: true
+        lighter: true
+        tnt: true
+        creeper: true
+        mobdamage: true
 
 blacklist:
     logging:

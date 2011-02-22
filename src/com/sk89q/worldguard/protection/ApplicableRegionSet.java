@@ -74,7 +74,15 @@ public class ApplicableRegionSet {
             def = global.canAccessChests;
         } else if (flag.equals(AreaFlags.FLAG_PVP)) {
             def = global.canPvP;
-        }
+        } else if (flag.equals(AreaFlags.FLAG_LIGHTER)) {
+        	def = global.canLighter;
+    	} else if (flag.equals(AreaFlags.FLAG_TNT)) {
+    		def = global.canTnt;
+    	} else if (flag.equals(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
+    		def = global.allowCreeper;
+		} else if (flag.equals(AreaFlags.FLAG_MOB_DAMAGE)) {
+			def = global.allowMobDamage;
+		}
         
         return isFlagAllowed(flag, def, null);
     }
