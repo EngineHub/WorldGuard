@@ -652,8 +652,11 @@ public class WorldGuardBlockListener extends BlockListener {
      * @param oz
      */
     private void setBlockToWater(World world, int ox, int oy, int oz) {
-        world.getBlockAt(ox, oy, oz)
-        .setTypeId( 8 );
+        Block block = world.getBlockAt(ox, oy, oz);
+        int id = block.getTypeId();
+        if (id == 0) {
+            block.setTypeId( 8 );
+        }
     }
     
     /**
