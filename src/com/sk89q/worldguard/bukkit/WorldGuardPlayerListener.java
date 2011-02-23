@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
-import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
 import org.bukkit.*;
@@ -182,10 +181,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
 
         if (plugin.blacklist != null) {
-            CraftItem ci = (CraftItem)event.getItemDrop();
+            Item ci = event.getItemDrop();
 
-            if (!plugin.blacklist.check(new ItemDropBlacklistEvent(plugin.wrapPlayer(event.getPlayer()), toVector(ci.getLocation()),
-                    ci.getItemStack().getTypeId()), false, false)) {
+            if (!plugin.blacklist.check(
+                    new ItemDropBlacklistEvent(plugin.wrapPlayer(event
+                            .getPlayer()), toVector(ci.getLocation()), ci
+                            .getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -194,8 +195,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
     /**
      * Called when a player attempts to pickup an item
-     *
-     * @param event Relevant event details
+     * 
+     * @param event
+     *            Relevant event details
      */
     @Override
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
@@ -205,10 +207,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
 
         if (plugin.blacklist != null) {
-            CraftItem ci = (CraftItem)event.getItem();
+            Item ci = event.getItem();
 
-            if (!plugin.blacklist.check(new ItemAcquireBlacklistEvent(plugin.wrapPlayer(event.getPlayer()), toVector(ci.getLocation()),
-                    ci.getItemStack().getTypeId()), false, false)) {
+            if (!plugin.blacklist.check(
+                    new ItemAcquireBlacklistEvent(plugin.wrapPlayer(event
+                            .getPlayer()), toVector(ci.getLocation()), ci
+                            .getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
