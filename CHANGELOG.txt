@@ -1,3 +1,7 @@
+4.0-alpha1:
+- This release is only to fix WorldGuard for Bukkit. Ignore the 4.0
+    label. Just move along. Nothing to see.
+
 3.2.2:
 - Changed disable-water-damage to disable-drowning-damage.
 - Fixed suffocation disable option.
