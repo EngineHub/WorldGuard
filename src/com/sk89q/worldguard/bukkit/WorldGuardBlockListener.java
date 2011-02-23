@@ -61,15 +61,41 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     @Override
     public void onBlockDamage(BlockDamageEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
 
-        if(event.isCancelled())
-        {
+        Player player = event.getPlayer();
+        Block blockDamaged = event.getBlock();
+        
+        if (plugin.useRegions && blockDamaged.getType() == Material.CAKE_BLOCK) {
+            Vector pt = toVector(blockDamaged);
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+            if (!plugin.hasPermission(player, "/regionbypass")
+                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
+
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Called when a block is destroyed by a player.
+     *
+     * @param event Relevant event details
+     */
+    @Override
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (event.isCancelled()) {
             return;
         }
 
         Player player = event.getPlayer();
 
-        if (!plugin.itemDurability && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
+        if (!plugin.itemDurability) {
             ItemStack held = player.getItemInHand();
             if (held.getTypeId() > 0) {
                 held.setDurability((short) -1);
@@ -77,7 +103,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
         
-        if (plugin.useRegions && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
+        if (plugin.useRegions) {
             Vector pt = BukkitUtil.toVector(event.getBlock());
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
             
@@ -89,7 +115,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
         
-        if (plugin.blacklist != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
+        if (plugin.blacklist != null) {
             if (!plugin.blacklist.check(
                     new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
                             toVector(event.getBlock()),
@@ -102,22 +128,6 @@ public class WorldGuardBlockListener extends BlockListener {
                     new DestroyWithBlacklistEvent(plugin.wrapPlayer(player),
                             toVector(event.getBlock()),
                             player.getItemInHand().getTypeId()), false, false)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        Block blockDamaged = event.getBlock();
-        if (plugin.useRegions && blockDamaged.getType() == Material.CAKE_BLOCK) {
-
-
-            Vector pt = toVector(blockDamaged);
-            LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-            if (!plugin.hasPermission(player, "/regionbypass")
-                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-
                 event.setCancelled(true);
                 return;
             }
