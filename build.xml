@@ -12,7 +12,6 @@
   <fileset id="libs" dir="${lib.dir}">
     <include name="truezip.jar" />
     <include name="Bukkit.jar" />
-    <include name="Craftbukkit.jar" />
     <include name="WorldEdit.jar" />
     <include name="prtree.jar" />
   </fileset>
