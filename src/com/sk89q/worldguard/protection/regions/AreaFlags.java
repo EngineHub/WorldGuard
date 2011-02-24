@@ -234,46 +234,56 @@ public class AreaFlags {
         return getFlagData(name).get(subname);
     }
 
+    public String getFlag(String name, String subname, String defaultValue)
+    {
+        String data = getFlagData(name).get(subname);
+        return data != null ? data : defaultValue;
+    }
+
     public Boolean getBooleanFlag(String name, String subname)
     {
         String data = getFlagData(name).get(subname);
-        if(data == null)
-        {
-            return null;
-        }
-        return Boolean.valueOf(data);
+        return data != null ? Boolean.valueOf(data) : null;
+    }
+
+    public Boolean getBooleanFlag(String name, String subname, boolean defaultValue)
+    {
+        String data = getFlagData(name).get(subname);
+        return data != null ? Boolean.valueOf(data) : defaultValue;
     }
 
     public Integer getIntFlag(String name, String subname)
     {
         String data = getFlagData(name).get(subname);
-        if(data == null)
-        {
-            return null;
-        }
-        return Integer.valueOf(data);
+        return data != null ? Integer.valueOf(data) : null;
+    }
+
+    public Integer getIntFlag(String name, String subname, int defaultValue)
+    {
+        String data = getFlagData(name).get(subname);
+        return data != null ? Integer.valueOf(data) : defaultValue;
     }
 
     public Float getFloatFlag(String name, String subname)
     {
         String data = getFlagData(name).get(subname);
-        if(data == null)
-        {
-            return null;
-        }
-        return Float.valueOf(data);
+        return data != null ? Float.valueOf(data) : null;
     }
 
-    public Double getDoubleFlag(String name, String subname)
+    public Float getFloatFlag(String name, String subname, float defaultValue)
     {
         String data = getFlagData(name).get(subname);
-        if(data == null)
-        {
-            return null;
-        }
-        return Double.valueOf(data);
+        return data != null ? Float.valueOf(data) : defaultValue;
     }
 
-    
+    public Double getDoubleFlag(String name, String subname) {
+        String data = getFlagData(name).get(subname);
+        return data != null ? Double.valueOf(data) : null;
+    }
+
+    public Double getDoubleFlag(String name, String subname, double defaultValue) {
+        String data = getFlagData(name).get(subname);
+        return data != null ? Double.valueOf(data) : defaultValue;
+    }
 
 }

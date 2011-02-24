@@ -261,44 +261,56 @@ public class ApplicableRegionSet {
 
     }
 
+    public String getAreaFlag(String name, String subname, String defaultValue, Boolean inherit, LocalPlayer player)
+    {
+        String data = getAreaFlag(name, subname, inherit, player);
+        return data != null ? data : defaultValue;
+    }
+
     public Boolean getBooleanAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player)
     {
         String data = getAreaFlag(name, subname, inherit, player);
-        if(data == null)
-        {
-            return null;
-        }
-        return Boolean.valueOf(data);
+        return data != null ? Boolean.valueOf(data) : null;
+    }
+
+    public Boolean getBooleanAreaFlag(String name, String subname, boolean defaultValue, Boolean inherit, LocalPlayer player)
+    {
+        String data = getAreaFlag(name, subname, inherit, player);
+        return data != null ? Boolean.valueOf(data) : defaultValue;
     }
 
     public Integer getIntAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player)
     {
         String data = getAreaFlag(name, subname, inherit, player);
-        if(data == null)
-        {
-            return null;
-        }
-        return Integer.valueOf(data);
+        return data != null ? Integer.valueOf(data) : null;
+    }
+
+    public Integer getIntAreaFlag(String name, String subname, int defaultValue, Boolean inherit, LocalPlayer player)
+    {
+        String data = getAreaFlag(name, subname, inherit, player);
+        return data != null ? Integer.valueOf(data) : defaultValue;
     }
 
     public Float getFloatAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player)
     {
         String data = getAreaFlag(name, subname, inherit, player);
-        if(data == null)
-        {
-            return null;
-        }
-        return Float.valueOf(data);
+        return data != null ? Float.valueOf(data) : null;
     }
 
-    public Double getDoubleAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player)
+    public Float getFloatAreaFlag(String name, String subname, float defaultValue, Boolean inherit, LocalPlayer player)
     {
         String data = getAreaFlag(name, subname, inherit, player);
-        if(data == null)
-        {
-            return null;
-        }
-        return Double.valueOf(data);
+        return data != null ? Float.valueOf(data) : defaultValue;
+    }
+
+    public Double getDoubleAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
+        String data = getAreaFlag(name, subname, inherit, player);
+        return data != null ? Double.valueOf(data) : null;
+    }
+
+    public Double getDoubleAreaFlag(String name, String subname, double defaultValue, Boolean inherit, LocalPlayer player) {
+        String data = getAreaFlag(name, subname, inherit, player);
+        return data != null ? Double.valueOf(data) : defaultValue;
     }
 
     /**
