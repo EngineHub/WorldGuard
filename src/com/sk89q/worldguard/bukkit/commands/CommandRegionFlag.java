@@ -90,6 +90,30 @@ public class CommandRegionFlag extends WgCommand {
                         flags.setFlag("spawn", "world", (String)null);
                         player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag spawn removed.");
                     }
+                }else if(nameStr.equals("teleport"))
+                {
+                    if (valueStr.equals("set")){
+                        player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag teleport set to current location");
+                        AreaFlags flags = region.getFlags();
+                        Location l = player.getLocation();
+                        flags.setFlag("teleport", "x", l.getX());
+                        flags.setFlag("teleport", "y", l.getY());
+                        flags.setFlag("teleport", "z", l.getZ());
+                        flags.setFlag("teleport", "yaw", l.getYaw());
+                        flags.setFlag("teleport", "pitch", l.getPitch());
+                        flags.setFlag("teleport", "world", l.getWorld().getName());
+                    }else if (valueStr.equals("delete")){
+                        AreaFlags flags = region.getFlags();
+                        flags.setFlag("spawn", "x", (String)null);
+                        flags.setFlag("spawn", "y", (String)null);
+                        flags.setFlag("spawn", "z", (String)null);
+                        flags.setFlag("spawn", "yaw", (String)null);
+                        flags.setFlag("spawn", "pitch", (String)null);
+                        flags.setFlag("spawn", "world", (String)null);
+                        player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag teleport removed.");
+                    }else{
+                        player.sendMessage(ChatColor.RED + "Usage: /region flag <regionid> teleport <set|delete>");
+                    }
                 }
                 else 
                 {
