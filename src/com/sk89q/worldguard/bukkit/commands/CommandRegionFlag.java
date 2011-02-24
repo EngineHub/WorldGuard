@@ -85,7 +85,7 @@ public class CommandRegionFlag extends WgCommand {
                         }else{
                             player.sendMessage(ChatColor.RED + "You must set the spawn location inside the region it belongs to.");
                         }
-                    } else {
+                    } else if (nameStr.equals("delete")){
                         AreaFlags flags = region.getFlags();
                         flags.setFlag("spawn", "x", (String)null);
                         flags.setFlag("spawn", "y", (String)null);
@@ -94,6 +94,8 @@ public class CommandRegionFlag extends WgCommand {
                         flags.setFlag("spawn", "pitch", (String)null);
                         flags.setFlag("spawn", "world", (String)null);
                         player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag spawn removed.");
+                    }else{
+                        player.sendMessage(ChatColor.RED + "Usage: /region flag <regionid> spawn <set|delete>");
                     }
                 }else if(nameStr.equals("teleport"))
                 {

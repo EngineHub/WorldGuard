@@ -41,7 +41,7 @@ public class CommandTpRegion extends WgCommand {
         String id = args[0];
        Boolean spawn = false;
         if(args.length==2 && args[1].equals("spawn")){
-            ch.checkPermission(player, "spawn");
+            ch.checkPermission(player, "/tpregion.spawn");
             spawn = true;
         } 
         RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
