@@ -96,7 +96,6 @@ public class CSVDatabaseTest {
         domain.addPlayer("tetsu");
         region.setOwners(domain);
         
-        region.setEnterMessage("hello there!");
         region.setPriority(444);
         
         return region;
@@ -120,8 +119,7 @@ public class CSVDatabaseTest {
         domain.addPlayer("ester");
         domain.addPlayer("amy");
         region.setOwners(domain);
-        
-        region.setEnterMessage("Testing");
+
         region.setPriority(555);
         
         return region;
