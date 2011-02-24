@@ -17,8 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.protection;
+package com.sk89q.worldguard.protection.dbs;
 
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,8 +33,10 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.AreaFlags.State;
-import com.sk89q.worldguard.protection.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.protection.regions.AreaFlags;
+import com.sk89q.worldguard.protection.regions.AreaFlags.State;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.util.ArrayReader;
 
 /**

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.util.Iterator;
 import java.util.List;
 import org.bukkit.block.Block;
@@ -35,7 +36,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.AreaFlags;
+import com.sk89q.worldguard.protection.regions.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class WorldGuardBlockListener extends BlockListener {
@@ -70,10 +71,8 @@ public class WorldGuardBlockListener extends BlockListener {
         
         if (plugin.useRegions && blockDamaged.getType() == Material.CAKE_BLOCK) {
             Vector pt = toVector(blockDamaged);
-            LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-            if (!plugin.hasPermission(player, "/regionbypass")
-                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+            if (!plugin.canBuild(player, pt)) {
                 player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
 
                 event.setCancelled(true);
@@ -105,10 +104,8 @@ public class WorldGuardBlockListener extends BlockListener {
         
         if (plugin.useRegions) {
             Vector pt = BukkitUtil.toVector(event.getBlock());
-            LocalPlayer localPlayer = plugin.wrapPlayer(player);
-            
-            if (!plugin.hasPermission(player, "/regionbypass")
-                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+
+            if (!plugin.canBuild(player, pt)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
@@ -274,26 +271,26 @@ public class WorldGuardBlockListener extends BlockListener {
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
                 
                 if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                        && !plugin.globalRegionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
                     event.setCancelled(true);
                     return;
                 }
                 
                 if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !plugin.regionManager.getApplicableRegions(pt)
+                        && !plugin.globalRegionManager.getApplicableRegions(pt)
                         .allowsFlag(AreaFlags.FLAG_LIGHTER)) {
                     event.setCancelled(true);
                     return;
                 }
             }
             
-            f (isFireSpread && !plugin.regionManager.getApplicableRegions(pt)
+            f (isFireSpread && !plugin.globalRegionManager.getApplicableRegions(pt)
                     .allowsFlag(AreaFlags.FLAG_FIRE_SPREAD)) {
                 event.setCancelled(true);
                 return;
             }
             
-            if (cause == IgniteCause.LAVA && !plugin.regionManager.getApplicableRegions(pt)
+            if (cause == IgniteCause.LAVA && !plugin.globalRegionManager.getApplicableRegions(pt)
                     .allowsFlag(AreaFlags.FLAG_LAVA_FIRE)) {
                 event.setCancelled(true);
                 return;
@@ -391,10 +388,11 @@ public class WorldGuardBlockListener extends BlockListener {
             if (plugin.useRegions) {
                 Vector pt = toVector(block);
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
-    
+                RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(player.getWorld().getName());
+
                 if (!plugin.hasPermission(player, "/regionbypass")
-                        && !plugin.regionManager.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_CHEST_ACCESS)
-                        && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+                        && !mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_CHEST_ACCESS)
+                        && !mgr.getApplicableRegions(pt).canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                     event.setCancelled(true);
                     return;
@@ -433,10 +431,8 @@ public class WorldGuardBlockListener extends BlockListener {
         
         if (plugin.useRegions) {
             Vector pt = toVector(blockPlaced);
-            LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-            if (!plugin.hasPermission(player, "/regionbypass")
-                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+            if (!plugin.canBuild(player, pt)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
@@ -478,8 +474,10 @@ public class WorldGuardBlockListener extends BlockListener {
         
         if (plugin.useRegions && event.getItemInHand().getTypeId() == plugin.regionWand) {
             Vector pt = toVector(blockClicked);
-            ApplicableRegionSet app = plugin.regionManager.getApplicableRegions(pt);
-            List<String> regions = plugin.regionManager.getApplicableRegionsIDs(pt);
+
+            RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(player.getWorld().getName());
+            ApplicableRegionSet app = mgr.getApplicableRegions(pt);
+            List<String> regions = mgr.getApplicableRegionsIDs(pt);
             
             if (regions.size() > 0) {
                 player.sendMessage(ChatColor.YELLOW + "Can you build? "
@@ -504,10 +502,8 @@ public class WorldGuardBlockListener extends BlockListener {
         if (plugin.useRegions && type == Material.CAKE_BLOCK) {
 
             Vector pt = toVector(blockClicked);
-            LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-            if (!plugin.hasPermission(player, "/regionbypass")
-                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+            if (!plugin.canBuild(player, pt)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
 
                 byte newData = (byte) (blockClicked.getData() - 1);

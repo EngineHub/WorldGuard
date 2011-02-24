@@ -19,6 +19,11 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.regionmanager.FlatRegionManager;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -27,7 +32,8 @@ import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.AreaFlags.State;
+import com.sk89q.worldguard.protection.regions.AreaFlags;
+import com.sk89q.worldguard.protection.regions.AreaFlags.State;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +56,7 @@ public class ApplicableRegionSetTest {
 
     @Before
     public void setUp() throws Exception {
-        manager = new FlatRegionManager(new GlobalFlags());
+        manager = new FlatRegionManager(new GlobalFlags(), null);
 
         setUpPlayers();
         setUpCourtyardRegion();

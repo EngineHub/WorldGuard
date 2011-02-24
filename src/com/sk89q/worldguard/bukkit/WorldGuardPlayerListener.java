@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import org.bukkit.entity.Item;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
@@ -30,7 +31,7 @@ import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.*;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
-import com.sk89q.worldguard.protection.AreaFlags;
+import com.sk89q.worldguard.protection.regions.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 /**
@@ -116,10 +117,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         
         if (plugin.useRegions && !event.isBlock() && block != null) {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
-            LocalPlayer localPlayer = plugin.wrapPlayer(player);
-            
-            if (!plugin.hasPermission(player, "/regionbypass")
-                    && !plugin.regionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
+
+            if (!plugin.canBuild(player, pt)) {
                 player.sendMessage(ChatColor.DARK_RED
                         + "You don't have permission for this area.");
                 event.setCancelled(true);
@@ -139,8 +138,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
     
         if (plugin.useRegions && item != null && block != null && item.getTypeId() == 259) {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
-            
-            if (!plugin.regionManager.getApplicableRegions(pt)
+            RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(player.getWorld().getName());
+
+            if (!mgr.getApplicableRegions(pt)
                     .allowsFlag(AreaFlags.FLAG_LIGHTER)) {
                 event.setCancelled(true);
                 return;

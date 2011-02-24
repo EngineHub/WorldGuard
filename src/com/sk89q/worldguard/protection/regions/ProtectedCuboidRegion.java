@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.protection;
+package com.sk89q.worldguard.protection.regions;
 
 import com.sk89q.worldedit.*;
 

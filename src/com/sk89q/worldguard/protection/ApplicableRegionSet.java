@@ -19,13 +19,15 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.AreaFlags.State;
+import com.sk89q.worldguard.protection.regions.AreaFlags;
+import com.sk89q.worldguard.protection.regions.AreaFlags.State;
 
 /**
  * Represents a set of regions and their rules as applied to one point.

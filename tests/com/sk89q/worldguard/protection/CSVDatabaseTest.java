@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldguard.protection.dbs.CSVDatabase;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import java.io.*;
 import java.util.Map;
 import java.util.HashMap;
@@ -28,7 +31,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.AreaFlags.State;
+import com.sk89q.worldguard.protection.regions.AreaFlags;
+import com.sk89q.worldguard.protection.regions.AreaFlags.State;
 
 public class CSVDatabaseTest {
     @Before

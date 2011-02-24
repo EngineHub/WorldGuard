@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.util.Comparator;
 
 class DescendingPriorityComparator implements Comparator<ProtectedRegion> {
