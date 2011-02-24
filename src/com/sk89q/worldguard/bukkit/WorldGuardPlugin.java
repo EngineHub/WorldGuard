@@ -113,7 +113,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public boolean teleportOnSuffocation;
     public boolean useRegions;
     public int regionWand = 287;
-    
+    public String blockCreatureSpawn;
     /**
      * Construct the plugin.
      * 
@@ -183,6 +183,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High);
         registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.High);
+        registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.High);
 
         registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.High);
         registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.High);
@@ -300,6 +301,10 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         useRegions = config.getBoolean("regions.enable", true);
         regionWand = config.getInt("regions.wand", 287);
+
+        for (String creature : config.getStringList("mobs.block-creature-spawn", null)) {
+            blockCreatureSpawn += creature.toLowerCase() + " ";
+        }
 
         GlobalFlags globalFlags = new GlobalFlags();
         globalFlags.canBuild = config.getBoolean("regions.default.build", true);
