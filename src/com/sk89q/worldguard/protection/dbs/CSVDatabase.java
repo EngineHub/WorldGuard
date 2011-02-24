@@ -101,8 +101,8 @@ public class CSVDatabase implements ProtectionDatabase {
                         writeDomains(cuboid.getOwners()),
                         writeDomains(cuboid.getMembers()),
                         writeFlags(cuboid.getFlags()),
-                        cuboid.getEnterMessage() != null ? cuboid.getEnterMessage() : "",
-                        cuboid.getLeaveMessage() != null ? cuboid.getLeaveMessage() : "",
+                        cuboid.getFlags().getFlag("msg", "g") != null ? cuboid.getFlags().getFlag("msg", "g") : "",
+                        cuboid.getFlags().getFlag("msg", "l") != null ? cuboid.getFlags().getFlag("msg", "l") : "",
                         });
             }
         } finally {
@@ -165,7 +165,7 @@ public class CSVDatabase implements ProtectionDatabase {
                     region.setPriority(priority);
                     region.setFlags(parseFlags(flagsData));
                     region.setOwners(this.parseDomains(ownersData));
-                    region.setEnterMessage(enterMessage);
+                    region.getFlags().setFlag("msg", "g", enterMessage);
                     regions.put(id, region);
                 } else if (type.equalsIgnoreCase("cuboid.2")) {
                     Vector pt1 = new Vector(
@@ -193,8 +193,8 @@ public class CSVDatabase implements ProtectionDatabase {
                     region.setFlags(parseFlags(flagsData));
                     region.setOwners(this.parseDomains(ownersData));
                     region.setMembers(this.parseDomains(membersData));
-                    region.setEnterMessage(enterMessage);
-                    region.setLeaveMessage(leaveMessage);
+                    region.getFlags().setFlag("msg", "g", enterMessage);
+                    region.getFlags().setFlag("msg", "l", leaveMessage);
                     regions.put(id, region);
                     
                     // Link children to parents later

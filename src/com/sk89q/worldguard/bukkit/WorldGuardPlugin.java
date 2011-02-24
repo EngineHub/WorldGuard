@@ -219,6 +219,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal);
         
         permsListener.register(this);
+
+        // 25 equals about 1s real time
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25*5, 25*5);
+
     }
     
     /**
@@ -303,7 +307,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         disableFireSpread = config.getBoolean("fire.disable-all-fire-spread", false);
         disableFireSpreadBlocks = new HashSet<Integer>(config.getIntList("fire.disable-fire-spread-blocks", null));
         allowedLavaSpreadOver = new HashSet<Integer>(config.getIntList("fire.lava-spread-blocks", null));
-        
+
         blockCreeperExplosions = config.getBoolean("mobs.block-creeper-explosions", false);
         blockCreeperBlockDamage = config.getBoolean("mobs.block-creeper-block-damage", false);
         for (String creature: config.getStringList("mobs.block-creature-spawn", null)) {
@@ -1472,7 +1476,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
     }
 
-    BukkitPlayer wrapPlayer(Player player) {
+    public BukkitPlayer wrapPlayer(Player player) {
         return new BukkitPlayer(this, player);
     }
 

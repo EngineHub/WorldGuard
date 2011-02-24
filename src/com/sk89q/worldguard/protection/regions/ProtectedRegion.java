@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import org.bukkit.Location;
-
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
@@ -61,19 +59,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * Area flags.
      */
     private AreaFlags flags = new AreaFlags();
-    /**
-     * Area message.
-     */
-    private String enterMessage;
-    /**
-     * Area message.
-     */
-    private String leaveMessage;
-    
-    /**
-     * Point of region teleport.
-     */
-    private Location teleportLocation;
+
 
     /**
      * Construct a new instance of this region.
@@ -175,34 +161,6 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         this.flags = flags;
     }
     
-    /**
-     * @return the enterMessage
-     */
-    public String getEnterMessage() {
-        return enterMessage;
-    }
-
-    /**
-     * @param enterMessage the enterMessage to set
-     */
-    public void setEnterMessage(String enterMessage) {
-        this.enterMessage = enterMessage;
-    }
-    
-    /**
-     * @return the leaveMessage
-     */
-    public String getLeaveMessage() {
-        return leaveMessage;
-    }
-
-    /**
-     * @param leaveMessage the leaveMessage to set
-     */
-    public void setLeaveMessage(String leaveMessage) {
-        this.leaveMessage = leaveMessage;
-    }
-
     /**
      * @return the owners
      */
@@ -358,19 +316,4 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public static class CircularInheritanceException extends Exception {
         private static final long serialVersionUID = 7479613488496776022L;
     }
-    
-    /**
-     * Return the teleport location for this region.
-     */
-    public Location getTeleportLocation() {
-	return teleportLocation;
-    }
-    
-    /**
-     * Set the teleport location for this region.
-     */
-    public void setTeleportLocation(Location teleportLocation){
-	this.teleportLocation = teleportLocation;
-    }
-    
 }
