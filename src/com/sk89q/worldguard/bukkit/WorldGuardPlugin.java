@@ -73,7 +73,7 @@ import org.bukkit.World;
  * @author sk89qs
  */
 public class WorldGuardPlugin extends JavaPlugin {
-    public static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
     private static Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
     private static int CMD_LIST_SIZE = 9;
