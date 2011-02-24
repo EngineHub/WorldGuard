@@ -51,6 +51,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
@@ -61,6 +62,7 @@ import com.sk89q.worldguard.protection.*;
 import com.sk89q.worldguard.protection.regionmanager.GlobalRegionManager;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.AreaFlags.State;
+import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import org.bukkit.World;
@@ -808,11 +810,20 @@ public class WorldGuardPlugin extends JavaPlugin {
                 
                 LocalSession session = worldEdit.getSession(player);
                 Region weRegion = session.getSelection(new BukkitWorld(w));
-                
-                BlockVector min = weRegion.getMinimumPoint().toBlockVector();
-                BlockVector max = weRegion.getMaximumPoint().toBlockVector();
-                
-                ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
+
+                ProtectedRegion region;
+
+                if (weRegion instanceof Polygonal2DRegion) {
+                    Polygonal2DRegion pweRegion = (Polygonal2DRegion) weRegion;
+                    int minY = pweRegion.getMinimumPoint().getBlockY();
+                    int maxY = pweRegion.getMaximumPoint().getBlockY();
+                    region = new ProtectedPolygonalRegion(id, pweRegion.getPoints(), minY, maxY);
+                } else {
+                    BlockVector min = weRegion.getMinimumPoint().toBlockVector();
+                    BlockVector max = weRegion.getMaximumPoint().toBlockVector();
+                    region = new ProtectedCuboidRegion(id, min, max);
+                }
+
                 if (args.length >= 2) {
                     region.setOwners(parseDomainString(args, 1));
                 }
@@ -851,12 +862,20 @@ public class WorldGuardPlugin extends JavaPlugin {
                 
                 LocalSession session = worldEdit.getSession(player);
                 Region weRegion = session.getSelection(new BukkitWorld(player.getWorld()));
-                
-                BlockVector min = weRegion.getMinimumPoint().toBlockVector();
-                BlockVector max = weRegion.getMaximumPoint().toBlockVector();
-                
-                ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
-                
+
+                ProtectedRegion region;
+
+                if (weRegion instanceof Polygonal2DRegion) {
+                    Polygonal2DRegion pweRegion = (Polygonal2DRegion)weRegion;        
+                    int minY =  pweRegion.getMinimumPoint().getBlockY();
+                    int maxY = pweRegion.getMaximumPoint().getBlockY();
+                    region = new ProtectedPolygonalRegion(id, pweRegion.getPoints(), minY, maxY);
+                } else {
+                    BlockVector min = weRegion.getMinimumPoint().toBlockVector();
+                    BlockVector max = weRegion.getMaximumPoint().toBlockVector();
+                    region = new ProtectedCuboidRegion(id, min, max);
+                }
+
                 if (mgr.overlapsUnownedRegion(region, wrapPlayer(player))) {
                     player.sendMessage(ChatColor.RED + "This region overlaps with someone else's region.");
                     return true;

@@ -34,6 +34,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.dbs.ProtectionDatabase;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class PRTreeRegionManager extends RegionManager {
     private static final int BRANCH_FACTOR = 30;
@@ -144,7 +145,19 @@ public class PRTreeRegionManager extends RegionManager {
      * @return
      */
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
-        return new ApplicableRegionSet(pt, regions.values().iterator(), global);
+
+        List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
+
+        int x = pt.getBlockX();
+        int z = pt.getBlockZ();
+
+        for (ProtectedRegion region : tree.find(x, z, x, z)) {
+            if (region.contains(pt)) {
+                appRegions.add(region);
+            }
+        }
+
+        return new ApplicableRegionSet(pt, appRegions, global);
     }
 
     /**

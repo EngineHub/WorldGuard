@@ -76,10 +76,10 @@ public class JSONContainer {
             String id = entry.getKey();
             ProtectedRegion region = entry.getValue();
 
-            String parentId = region.getParentId();
-            if (parentId != null) {
+            ProtectedRegion parent = region.getParent();
+            if (parent != null) {
                 try {
-                    region.setParent(ret.get(parentId));
+                    region.setParent(ret.get(parent.getId()));
                 } catch (CircularInheritanceException ex) {
                 }
             } else {

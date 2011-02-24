@@ -31,6 +31,7 @@ import com.sk89q.worldguard.protection.GlobalFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.dbs.ProtectionDatabase;
+import java.util.HashMap;
 
 
 /**
@@ -130,7 +131,16 @@ public class FlatRegionManager extends RegionManager {
      * @return
      */
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
-        return new ApplicableRegionSet(pt, regions.values().iterator(), global);
+
+        List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
+
+        for (Map.Entry<String,ProtectedRegion> entry : regions.entrySet()) {
+            if (entry.getValue().contains(pt)) {
+                appRegions.add(entry.getValue());
+            }
+        }     
+
+        return new ApplicableRegionSet(pt, appRegions, global);
     }
     
     /**

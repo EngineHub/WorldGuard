@@ -84,13 +84,6 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         return id;
     }
 
-    /**
-     * @return the parentId.
-     */
-    public String getParentId() {
-        this.setParentId();
-        return parentId;
-    }
 
     /**
      * @set the parentId. Used for serialization, don't touch it.
