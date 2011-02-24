@@ -113,7 +113,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public boolean teleportOnSuffocation;
     public boolean useRegions;
     public int regionWand = 287;
-    public String blockCreatureSpawn;
+    public String blockCreatureSpawn = "";
     /**
      * Construct the plugin.
      * 
@@ -314,6 +314,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         globalFlags.canTnt = config.getBoolean("regions.default.tnt", true);
         globalFlags.allowCreeper = config.getBoolean("regions.default.creeper", true);
         globalFlags.allowMobDamage = config.getBoolean("regions.default.mobdamage", true);
+        globalFlags.allowWaterflow = config.getBoolean("regions.default.waterflow", true);
         globalRegionManager.setGlobalFlags(globalFlags);
 
         try {

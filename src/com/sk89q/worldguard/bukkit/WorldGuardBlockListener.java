@@ -34,6 +34,7 @@ import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
+import com.sk89q.worldguard.protection.GlobalFlags;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
@@ -203,6 +204,17 @@ public class WorldGuardBlockListener extends BlockListener {
             int targetId = world.getBlockTypeIdAt(
                     blockTo.getX(), blockTo.getY() - 1, blockTo.getZ());
             if (!plugin.allowedLavaSpreadOver.contains(targetId)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if (plugin.useRegions) {
+            Vector pt = toVector(blockFrom.getLocation());
+            RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(world.getName());
+
+            if (!mgr.getApplicableRegions(pt)
+                    .allowsFlag("waterflow")) {
                 event.setCancelled(true);
                 return;
             }

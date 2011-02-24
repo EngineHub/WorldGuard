@@ -32,4 +32,5 @@ public class GlobalFlags {
     public boolean canTnt = true;
     public boolean allowCreeper = true;
     public boolean allowMobDamage = true;
+    public boolean allowWaterflow = true;
 }

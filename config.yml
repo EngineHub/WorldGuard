@@ -74,13 +74,14 @@ regions:
     enable: on
     wand: 287
     default:
-        build: true
-        chest-access: false
-        pvp: true
-        lighter: true
-        tnt: true
-        creeper: true
-        mobdamage: true
+        build: on
+        chest-access: off
+        pvp: on
+        lighter: on
+        tnt: on
+        creeper: on
+        mobdamage: on
+        waterflow: on
 
 blacklist:
     logging:

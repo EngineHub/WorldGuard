@@ -85,6 +85,8 @@ public class ApplicableRegionSet {
     		def = global.allowCreeper;
 		} else if (flag.equals(AreaFlags.FLAG_MOB_DAMAGE)) {
 			def = global.allowMobDamage;
+		} else if (flag.equals(AreaFlags.FLAG_WATER_FLOW)) {
+		    def = global.allowWaterflow;
 		}
         
         return isFlagAllowed(flag, def, null);

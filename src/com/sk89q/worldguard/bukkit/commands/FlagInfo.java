@@ -55,6 +55,7 @@ public class FlagInfo {
         flagList.add(new FlagInfo("firespread", null, FlagValueType.STATE, "states", "firespread"));
         flagList.add(new FlagInfo("lavafirespread", null, FlagValueType.STATE, "states", "lavafirespread"));
         flagList.add(new FlagInfo("chest", null, FlagValueType.STATE, "states", "chest"));
+        flagList.add(new FlagInfo("waterflow", null, FlagValueType.STATE, "states", "waterflow"));
     }
 
     public static FlagInfo getFlagInfo(String name, String subName) {
