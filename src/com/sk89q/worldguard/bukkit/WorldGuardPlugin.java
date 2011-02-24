@@ -123,7 +123,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     
     boolean blockCreeperExplosions;
     boolean blockCreeperBlockDamage;
-    String blockCreatureSpawn;
+    String blockCreatureSpawn = "";
 
     int loginProtection;
     int spawnProtection;
