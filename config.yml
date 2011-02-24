@@ -52,6 +52,7 @@ fire:
 mobs:
     block-creeper-explosions: off
     block-creeper-block-damage: off
+    block-creature-spawn: []
 
 spawn:
     login-protection: 3

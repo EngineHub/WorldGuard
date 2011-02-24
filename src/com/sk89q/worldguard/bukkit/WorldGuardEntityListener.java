@@ -23,6 +23,7 @@ import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Entity;
@@ -280,6 +281,51 @@ public class WorldGuardEntityListener extends EntityListener {
 
                 if (!mgr.getApplicableRegions(pt)
                         .allowsFlag(AreaFlags.FLAG_TNT)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        CreatureType creaType = (CreatureType)CreatureType.valueOf(event.getMobType().toString());
+        String creaName = "";
+        Boolean cancelEvent = false;
+
+        switch(creaType) {
+            case SPIDER:     if (plugin.blockCreatureSpawn.contains("spider")) { cancelEvent = true; } creaName = "spider";       break;
+            case ZOMBIE:     if (plugin.blockCreatureSpawn.contains("zombie")) { cancelEvent = true; } creaName = "zombie";       break;
+            case CREEPER:    if (plugin.blockCreatureSpawn.contains("creeper")) { cancelEvent = true; } creaName = "creeper";     break;
+            case SKELETON:   if (plugin.blockCreatureSpawn.contains("skeleton")) { cancelEvent = true; } creaName = "skeleton";   break;
+            case SQUID:      if (plugin.blockCreatureSpawn.contains("squid")) { cancelEvent = true; } creaName = "squid";         break;
+            case PIG_ZOMBIE: if (plugin.blockCreatureSpawn.contains("pigzombie")) { cancelEvent = true; } creaName = "pigzombie"; break;
+            case GHAST:      if (plugin.blockCreatureSpawn.contains("ghast")) { cancelEvent = true; } creaName = "ghast";         break;
+            case SLIME:      if (plugin.blockCreatureSpawn.contains("slime")) { cancelEvent = true; } creaName = "slime";         break;
+            case PIG:        if (plugin.blockCreatureSpawn.contains("pig")) { cancelEvent = true; } creaName = "pig";             break;
+            case COW:        if (plugin.blockCreatureSpawn.contains("cow")) { cancelEvent = true; } creaName = "cow";             break;
+            case SHEEP:      if (plugin.blockCreatureSpawn.contains("sheep")) { cancelEvent = true; } creaName = "sheep";         break;
+            case CHICKEN:    if (plugin.blockCreatureSpawn.contains("chicken")) { cancelEvent = true; } creaName = "chicken";     break;
+        }
+
+        if (cancelEvent) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (plugin.useRegions && creaName != "") {
+            Vector pt = toVector(event.getEntity().getLocation());
+            RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
+
+            Boolean flagValue = mgr.getApplicableRegions(pt)
+                                    .getBooleanAreaFlag("creaturespawn", creaName, true, null);
+            if (flagValue != null) {
+                if (!flagValue) {
                     event.setCancelled(true);
                     return;
                 }

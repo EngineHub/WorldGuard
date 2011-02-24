@@ -73,7 +73,7 @@ import org.bukkit.World;
  * @author sk89qs
  */
 public class WorldGuardPlugin extends JavaPlugin {
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+    public static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
     private static Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
     private static int CMD_LIST_SIZE = 9;
@@ -123,6 +123,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     
     boolean blockCreeperExplosions;
     boolean blockCreeperBlockDamage;
+    String blockCreatureSpawn;
 
     int loginProtection;
     int spawnProtection;
@@ -208,6 +209,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High);
         registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.High);
+        registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.High);
 
         registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.High);
         registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.High);
@@ -304,6 +306,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         
         blockCreeperExplosions = config.getBoolean("mobs.block-creeper-explosions", false);
         blockCreeperBlockDamage = config.getBoolean("mobs.block-creeper-block-damage", false);
+        for (String creature: config.getStringList("mobs.block-creature-spawn", null)) {
+            blockCreatureSpawn += creature.toLowerCase() + " ";
+        }
         
         loginProtection = config.getInt("spawn.login-protection", 3);
         spawnProtection = config.getInt("spawn.spawn-protection", 0);
