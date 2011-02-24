@@ -31,3 +31,8 @@ commands:
     reloadwg:
         description: Reload WorldGuard's configuration
         usage: /<command>
+    tpregion:
+        description: Ports you to the region
+        usage: /<command> <region id> ...
+        aliases: tpr
+  
