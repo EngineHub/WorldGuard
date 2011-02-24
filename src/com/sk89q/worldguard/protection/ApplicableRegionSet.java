@@ -191,6 +191,7 @@ public class ApplicableRegionSet {
      * @param player null to not check owners and members
      * @return
      */
+    // todo : check priorities
     private String getAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
 
         int appSize = applicable.size();
@@ -222,35 +223,38 @@ public class ApplicableRegionSet {
             }
         }
 
-        ProtectedRegion region = null;
+        ProtectedRegion childRegion = null;
         iter = applicable.iterator();
 
         while (iter.hasNext()) {
-            region = iter.next();
+            ProtectedRegion region = iter.next();
             if(!parents.contains(region.getId()))
             {
-                break;
+                if(childRegion == null || childRegion.getPriority() < region.getPriority())
+                {
+                    childRegion = region;
+                }
             }
         }
 
 
-        if (player != null && !region.isMember(player)) {
+        if (player != null && !childRegion.isMember(player)) {
             return null;
         }
 
         if(!inherit)
         {
-            return region.getFlags().getFlag(name, subname);
+            return childRegion.getFlags().getFlag(name, subname);
         }
         else
         {
             String value;
             do
             {
-                value = region.getFlags().getFlag(name, subname);
-                region = region.getParent();
+                value = childRegion.getFlags().getFlag(name, subname);
+                childRegion = childRegion.getParent();
 
-            } while(value == null && region != null);
+            } while(value == null && childRegion != null);
 
             return value;
         }
