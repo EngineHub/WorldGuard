@@ -126,6 +126,12 @@ public class AreaFlags {
         return ret;
     }
 
+    /**
+     * Gets the State value of a state flag
+     *
+     * @param flag
+     * @return State
+     */
     public State get(String flag) {
         State state = State.valueOf(getFlagData("states").get(flag));
         if (state == null) {
@@ -133,7 +139,13 @@ public class AreaFlags {
         }
         return state;
     }
-    
+
+    /**
+     * Sets the State value of a state flag
+     * 
+     * @param flag
+     * @param state
+     */
     public void set(String flag, State state) {
         if (state == State.NONE) {
             getFlagData("states").remove(flag);

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.khelekore.prtree.MBRConverter;
 
 public class ProtectedRegionMBRConverter implements MBRConverter<ProtectedRegion> {

@@ -29,7 +29,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.*;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;

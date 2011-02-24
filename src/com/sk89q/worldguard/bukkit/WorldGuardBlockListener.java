@@ -23,7 +23,6 @@ import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.util.Iterator;
 import java.util.List;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockDamageLevel;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;

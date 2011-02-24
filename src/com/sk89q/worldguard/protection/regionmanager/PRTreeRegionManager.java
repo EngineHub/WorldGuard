@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.protection.regionmanager;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -35,7 +34,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.dbs.ProtectionDatabase;
 import java.io.IOException;
-import java.util.HashMap;
 
 public class PRTreeRegionManager extends RegionManager {
     private static final int BRANCH_FACTOR = 30;

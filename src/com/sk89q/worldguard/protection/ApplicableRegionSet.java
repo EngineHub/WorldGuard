@@ -22,7 +22,6 @@ package com.sk89q.worldguard.protection;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;

@@ -23,7 +23,7 @@ import java.util.List;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
+
 
 public class ProtectedPolygonalRegion extends ProtectedRegion {
     protected List<BlockVector2D> points;

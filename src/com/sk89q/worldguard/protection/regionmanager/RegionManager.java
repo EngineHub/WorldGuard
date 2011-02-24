@@ -29,7 +29,6 @@ import com.sk89q.worldguard.protection.dbs.ProtectionDatabase;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 /**
