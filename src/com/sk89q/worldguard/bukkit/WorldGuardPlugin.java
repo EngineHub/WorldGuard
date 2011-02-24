@@ -337,7 +337,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 logger.info("WorldGuard: Converting old regions.txt to new format....");
 
                 World w = this.getServer().getWorlds().get(0);
-                RegionManager mgr = globalRegionManager.getRegionmanager(w.getName());
+                RegionManager mgr = globalRegionManager.getRegionManager(w.getName());
 
                 CSVDatabase db = new CSVDatabase(CSVfile);
                 db.load();
@@ -816,7 +816,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 if (args.length >= 2) {
                     region.setOwners(parseDomainString(args, 1));
                 }
-                RegionManager mgr = globalRegionManager.getRegionmanager(w.getName());
+                RegionManager mgr = globalRegionManager.getRegionManager(w.getName());
                 mgr.addRegion(region);
                 mgr.save();
                 player.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
@@ -836,7 +836,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             
             try {
                 String id = args[0].toLowerCase();
-                RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+                RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
 
                 ProtectedRegion existing = mgr.getRegion(id);
                 
@@ -885,7 +885,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 String id = args[0].toLowerCase();
                 String flagStr = args[1];
                 String stateStr = args[2];
-                RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+                RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
                 ProtectedRegion region = mgr.getRegion(id);
                 
                 if (region == null) {
@@ -939,7 +939,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             
             String id = args[0].toLowerCase();
             String parentId = args.length > 1 ? args[1].toLowerCase() : null;
-            RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+            RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
 
             ProtectedRegion region = mgr.getRegion(id);
             
@@ -991,7 +991,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkRegionPermission(player, "/regioninfo");
             checkArgs(args, 1, 1, "/region info <id>");
 
-            RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+            RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
             String id = args[0].toLowerCase();
             if (!mgr.hasRegion(id)) {
                 player.sendMessage(ChatColor.RED + "A region with ID '"
@@ -1040,7 +1040,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 2, -1, "/region add[member|owner] <id> [player1 [group1 [players/groups...]]]");
             
             boolean isOwner = action.equalsIgnoreCase("addowner");
-            RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+            RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
 
             String id = args[0].toLowerCase();
             if (!mgr.hasRegion(id)) {
@@ -1085,7 +1085,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 2, -1, "/region removeowner <id> [owner1 [owner2 [owners...]]]");
             
             boolean isOwner = action.equalsIgnoreCase("removeowner");
-            RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+            RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
 
             String id = args[0].toLowerCase();
             if (!mgr.hasRegion(id)) {
@@ -1137,7 +1137,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
             }
 
-            RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+            RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
             Map<String,ProtectedRegion> regions = mgr.getRegions();
             int size = regions.size();
             int pages = (int)Math.ceil(size / (float)CMD_LIST_SIZE);
@@ -1172,7 +1172,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     
             try {
                 String id = args[0].toLowerCase();
-                RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+                RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
 
                 if (!mgr.hasRegion(id)) {
                     player.sendMessage(ChatColor.RED + "A region with ID '"
@@ -1204,7 +1204,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 0, 0, "/region save");
             
             try {
-                RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+                RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
                 mgr.save();
                 player.sendMessage(ChatColor.YELLOW + "Region database saved to file!");
             } catch (IOException e) {
@@ -1220,7 +1220,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             checkArgs(args, 0, 0, "/region load");
             
             try {
-                RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+                RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
                 mgr.load();
                 player.sendMessage(ChatColor.YELLOW + "Region database loaded from file!");
             } catch (IOException e) {
@@ -1389,7 +1389,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             LocalPlayer localPlayer = wrapPlayer(player);
 
             if (!hasPermission(player, "/regionbypass")) {
-                RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+                RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
 
                 if (!mgr.getApplicableRegions(pt).canBuild(localPlayer)) {
                     return false;
@@ -1408,7 +1408,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             LocalPlayer localPlayer = wrapPlayer(player);
 
             if (!hasPermission(player, "/regionbypass")) {
-                RegionManager mgr = globalRegionManager.getRegionmanager(player.getWorld().getName());
+                RegionManager mgr = globalRegionManager.getRegionManager(player.getWorld().getName());
 
                 if (!mgr.getApplicableRegions(pt).canBuild(localPlayer)) {
                     return false;

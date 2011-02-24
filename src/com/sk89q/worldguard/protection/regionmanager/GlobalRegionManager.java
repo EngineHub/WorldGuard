@@ -63,7 +63,7 @@ public class GlobalRegionManager {
         }
     }
 
-    public RegionManager getRegionmanager(String worldName) {
+    public RegionManager getRegionManager(String worldName) {
 
         RegionManager ret = this.managers.get(worldName);
 

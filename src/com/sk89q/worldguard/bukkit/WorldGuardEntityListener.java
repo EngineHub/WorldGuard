@@ -53,6 +53,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
 
     public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
+
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
         
@@ -92,7 +93,7 @@ public class WorldGuardEntityListener extends EntityListener {
             if (attacker != null && attacker instanceof Player) {
                 if (plugin.useRegions) {
                     Vector pt = toVector(defender.getLocation());
-                    RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(player.getWorld().getName());
+                    RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
                     if (!mgr.getApplicableRegions(pt)
                             .allowsFlag(AreaFlags.FLAG_PVP)) {
@@ -111,7 +112,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 
                 if (plugin.useRegions) {
                     Vector pt = toVector(defender.getLocation());
-                    RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(player.getWorld().getName());
+                    RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
                     if (!mgr.getApplicableRegions(pt)
                             .allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
@@ -147,7 +148,7 @@ public class WorldGuardEntityListener extends EntityListener {
             if (attacker != null && attacker instanceof Player) {
                 if (plugin.useRegions) {
                     Vector pt = toVector(defender.getLocation());
-                    RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(player.getWorld().getName());
+                    RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
                     if (!mgr.getApplicableRegions(pt)
                             .allowsFlag(AreaFlags.FLAG_PVP)) {
@@ -160,7 +161,7 @@ public class WorldGuardEntityListener extends EntityListener {
             if (attacker != null && attacker instanceof Skeleton) {
             	if (plugin.useRegions) {
             		Vector pt = toVector(defender.getLocation());
-            		RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(player.getWorld().getName());
+            		RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
             		if (!mgr.getApplicableRegions(pt)
             				.allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
@@ -259,7 +260,7 @@ public class WorldGuardEntityListener extends EntityListener {
             
             if (plugin.useRegions) {
                 Vector pt = toVector(event.getEntity().getLocation());
-                RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(event.getEntity().getWorld().getName());
+                RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
                 
                 if (!mgr.getApplicableRegions(pt)
                         .allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
@@ -275,7 +276,7 @@ public class WorldGuardEntityListener extends EntityListener {
             
             if (plugin.useRegions && event.getEntity() != null) {
                 Vector pt = toVector(event.getEntity().getLocation());
-                RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(event.getEntity().getWorld().getName());
+                RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
 
                 if (!mgr.getApplicableRegions(pt)
                         .allowsFlag(AreaFlags.FLAG_TNT)) {

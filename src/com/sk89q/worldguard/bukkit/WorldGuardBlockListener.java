@@ -387,7 +387,7 @@ public class WorldGuardBlockListener extends BlockListener {
             if (plugin.useRegions) {
                 Vector pt = toVector(block);
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
-                RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(player.getWorld().getName());
+                RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
                 if (!plugin.hasPermission(player, "/regionbypass")
                         && !mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_CHEST_ACCESS)
@@ -474,7 +474,7 @@ public class WorldGuardBlockListener extends BlockListener {
         if (plugin.useRegions && event.getItemInHand().getTypeId() == plugin.regionWand) {
             Vector pt = toVector(blockClicked);
 
-            RegionManager mgr = plugin.getGlobalRegionManager().getRegionmanager(player.getWorld().getName());
+            RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
             ApplicableRegionSet app = mgr.getApplicableRegions(pt);
             List<String> regions = mgr.getApplicableRegionsIDs(pt);
             
