@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.regions;
 
+import org.bukkit.Location;
+
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
@@ -67,6 +69,11 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * Area message.
      */
     private String leaveMessage;
+    
+    /**
+     * Point of region teleport.
+     */
+    private Location teleportLocation;
 
     /**
      * Construct a new instance of this region.
@@ -351,4 +358,19 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public static class CircularInheritanceException extends Exception {
         private static final long serialVersionUID = 7479613488496776022L;
     }
+    
+    /**
+     * Return the teleport location for this region.
+     */
+    public Location getTeleportLocation() {
+	return teleportLocation;
+    }
+    
+    /**
+     * Set the teleport location for this region.
+     */
+    public void setTeleportLocation(Location teleportLocation){
+	this.teleportLocation = teleportLocation;
+    }
+    
 }
