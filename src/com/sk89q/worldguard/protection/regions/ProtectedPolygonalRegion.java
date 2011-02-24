@@ -96,6 +96,10 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         for (i = 0; i < npoints; i++) {
             xNew = points.get(i).getBlockX();
             zNew = points.get(i).getBlockZ();
+            //Check for corner
+            if(xNew == targetX && zNew == targetZ){
+        	return true;
+            }
             if (xNew > xOld) {
                 x1 = xOld;
                 x2 = xNew;
