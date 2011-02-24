@@ -347,7 +347,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
 
                 mgr.save();
-                CSVfile.renameTo(new File(this.getDataFolder(), "region.txt.old"));
+                CSVfile.renameTo(new File(this.getDataFolder(), "regions.txt.old"));
                 
                 logger.info("WorldGuard: Done.");
             }

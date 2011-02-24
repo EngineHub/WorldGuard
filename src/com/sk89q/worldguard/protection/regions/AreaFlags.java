@@ -111,10 +111,23 @@ public class AreaFlags {
         }
     }
     
-    private Map<String, State> states = new HashMap<String, State>();
-    
+    private Map<String, Map<String, String>> flags = new HashMap<String, Map<String, String>>();
+
+
+    private Map<String, String> getFlagData(String name)
+    {
+        Map<String, String> ret = flags.get(name);
+        if(ret == null)
+        {
+            ret = new HashMap<String, String>();
+            flags.put(name, ret);
+        }
+
+        return ret;
+    }
+
     public State get(String flag) {
-        State state = states.get(flag);
+        State state = State.valueOf(getFlagData("states").get(flag));
         if (state == null) {
             return State.NONE;
         }
@@ -123,14 +136,22 @@ public class AreaFlags {
     
     public void set(String flag, State state) {
         if (state == State.NONE) {
-            states.remove(flag);
+            getFlagData("states").remove(flag);
         } else {
-            states.put(flag, state);
+            getFlagData("states").put(flag, state.toString());
         }
     }
     
     public Set<Map.Entry<String, State>> entrySet() {
-        return states.entrySet();
+
+        Map<String, State> ret = new HashMap<String, State>();
+
+        for(Map.Entry<String, String> entry : getFlagData("states").entrySet())
+        {
+            ret.put(entry.getKey(), State.valueOf(entry.getValue()));
+        }
+        
+        return ret.entrySet();
     }
     
     @Override
@@ -140,6 +161,107 @@ public class AreaFlags {
         }
         
         AreaFlags other = (AreaFlags)obj;
-        return other.states.equals(this);
+        return other.flags.equals(this.flags);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + (this.flags != null ? this.flags.hashCode() : 0);
+        return hash;
+    }
+
+
+    public void setFlag(String name, String subname, String value)
+    {
+        if (value == null) {
+            getFlagData(name).remove(subname);
+        } else {
+            getFlagData(name).put(subname, value);
+        }
+    }
+
+    public void setFlag(String name, String subname, Boolean value)
+    {
+        if (value == null) {
+            getFlagData(name).remove(subname);
+        } else {
+            getFlagData(name).put(subname, value.toString());
+        }
+    }
+
+    public void setFlag(String name, String subname, Integer value)
+    {
+        if (value == null) {
+            getFlagData(name).remove(subname);
+        } else {
+            getFlagData(name).put(subname, value.toString());
+        }
+    }
+
+    public void setFlag(String name, String subname, Float value)
+    {
+        if (value == null) {
+            getFlagData(name).remove(subname);
+        } else {
+            getFlagData(name).put(subname, value.toString());
+        }
+    }
+
+    public void setFlag(String name, String subname, Double value)
+    {
+        if (value == null) {
+            getFlagData(name).remove(subname);
+        } else {
+            getFlagData(name).put(subname, value.toString());
+        }
+    }
+
+    public String getFlag(String name, String subname)
+    {
+        return getFlagData(name).get(subname);
+    }
+
+    public Boolean getBooleanFlag(String name, String subname)
+    {
+        String data = getFlagData(name).get(subname);
+        if(data == null)
+        {
+            return null;
+        }
+        return Boolean.valueOf(data);
+    }
+
+    public Integer getIntFlag(String name, String subname)
+    {
+        String data = getFlagData(name).get(subname);
+        if(data == null)
+        {
+            return null;
+        }
+        return Integer.valueOf(data);
+    }
+
+    public Float getFloatFlag(String name, String subname)
+    {
+        String data = getFlagData(name).get(subname);
+        if(data == null)
+        {
+            return null;
+        }
+        return Float.valueOf(data);
+    }
+
+    public Double getDoubleFlag(String name, String subname)
+    {
+        String data = getFlagData(name).get(subname);
+        if(data == null)
+        {
+            return null;
+        }
+        return Double.valueOf(data);
+    }
+
+    
+
 }
