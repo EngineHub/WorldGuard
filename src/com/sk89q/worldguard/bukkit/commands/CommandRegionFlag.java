@@ -75,12 +75,16 @@ public class CommandRegionFlag extends WgCommand {
                         player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag spawn set to current location");
                         AreaFlags flags = region.getFlags();
                         Location l = player.getLocation();
-                        flags.setFlag("spawn", "x", l.getX());
-                        flags.setFlag("spawn", "y", l.getY());
-                        flags.setFlag("spawn", "z", l.getZ());
-                        flags.setFlag("spawn", "yaw", l.getYaw());
-                        flags.setFlag("spawn", "pitch", l.getPitch());
-                        flags.setFlag("spawn", "world", l.getWorld().getName());
+                        if(region.contains(BukkitUtil.toVector(l))){
+                            flags.setFlag("spawn", "x", l.getX());
+                            flags.setFlag("spawn", "y", l.getY());
+                            flags.setFlag("spawn", "z", l.getZ());
+                            flags.setFlag("spawn", "yaw", l.getYaw());
+                            flags.setFlag("spawn", "pitch", l.getPitch());
+                            flags.setFlag("spawn", "world", l.getWorld().getName());
+                        }else{
+                            player.sendMessage(ChatColor.RED + "You must set the spawn location inside the region it belongs to.");
+                        }
                     } else {
                         AreaFlags flags = region.getFlags();
                         flags.setFlag("spawn", "x", (String)null);
@@ -103,7 +107,7 @@ public class CommandRegionFlag extends WgCommand {
                             flags.setFlag("teleport", "z", l.getZ());
                             flags.setFlag("teleport", "world", l.getWorld().getName());
                         }else{
-                            player.sendMessage(ChatColor.RED + "You cannot set a teleport location for a region outside of the region");
+                            player.sendMessage(ChatColor.RED + "You must set the teleport location inside the region it belongs to.");
                         }
                     }else if (valueStr.equals("delete")){
                         AreaFlags flags = region.getFlags();
