@@ -313,11 +313,6 @@ public class WorldGuardEntityListener extends EntityListener {
             case CHICKEN:    if (plugin.blockCreatureSpawn.contains("chicken")) { cancelEvent = true; } creaName = "chicken";     break;
         }
 
-        if (cancelEvent) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (plugin.useRegions && creaName != "") {
             Vector pt = toVector(event.getEntity().getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
@@ -326,10 +321,16 @@ public class WorldGuardEntityListener extends EntityListener {
                                     .getBooleanAreaFlag("creaturespawn", creaName, true, null);
             if (flagValue != null) {
                 if (!flagValue) {
-                    event.setCancelled(true);
-                    return;
+                    cancelEvent = true;
+                } else {
+                    cancelEvent = false;
                 }
             }
+        }
+        
+        if (cancelEvent) {
+            event.setCancelled(true);
+            return;
         }
     }
     
