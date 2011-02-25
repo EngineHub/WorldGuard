@@ -205,6 +205,7 @@ public class WorldGuardWorldConfiguration {
         buyOnClaim = config.getBoolean("iconomy.buy-on-claim", false);
         buyOnClaimPrice = config.getInt("iconomy.buy-on-claim-price", 1);
 
+        blockCreatureSpawn = "";
         for (String creature : config.getStringList("mobs.block-creature-spawn", null)) {
             blockCreatureSpawn += creature.toLowerCase() + " ";
         }
