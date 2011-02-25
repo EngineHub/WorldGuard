@@ -13,6 +13,7 @@
     <include name="truezip.jar" />
     <include name="Bukkit.jar" />
     <include name="WorldEdit.jar" />
+  	<include name="iConomy.jar" />
     <include name="prtree.jar" />
     <include name="gson-1.7-SNAPSHOT.jar" />    
   </fileset>
