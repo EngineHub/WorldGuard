@@ -75,6 +75,15 @@ public class JSONDatabase implements ProtectionDatabase {
                 }
             }
         }
+
+        for(int i = 0; i < buffer.length; i++)
+        {
+            if(buffer[i] < 0x20 || buffer[i] > 0x126)
+            {
+                buffer[i] = 0x20;
+            }
+        }
+
         return new String(buffer);
     }
 

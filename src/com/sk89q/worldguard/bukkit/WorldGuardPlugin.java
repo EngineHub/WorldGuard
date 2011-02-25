@@ -18,7 +18,6 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import com.nijikokun.bukkit.iConomy.iConomy;
 import java.util.logging.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
