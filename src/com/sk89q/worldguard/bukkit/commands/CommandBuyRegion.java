@@ -22,6 +22,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.nijikokun.bukkit.iConomy.Account;
 import com.nijikokun.bukkit.iConomy.iConomy;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -58,9 +59,11 @@ public class CommandBuyRegion extends WgCommand {
                     if (args[1] == "info") {
                         player.sendMessage(ChatColor.YELLOW + "Region " + id + " costs " + 
                                 iConomy.Misc.formatCurrency(flags.getIntFlag("iconomy", "price"), iConomy.currency));
-                        if (iConomy.database.hasBalance(player.getName())) {
+                        if (iConomy.getBank().hasAccount(player.getName())) {
                             player.sendMessage(ChatColor.YELLOW + "You have " +
-                                    iConomy.Misc.formatCurrency((int)Math.round(iConomy.database.getBalance(player.getName())), iConomy.currency));
+                                    iConomy.Misc.formatCurrency(
+                                            (int)Math.round(iConomy.getBank().getAccount(player.getName()).getBalance()),
+                                            iConomy.currency));
                         } else {
                             player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
                         }
@@ -68,18 +71,20 @@ public class CommandBuyRegion extends WgCommand {
                         player.sendMessage(ChatColor.RED + "Usage: /buyregion <region id> (info)");
                     }
                 } else {
-                    if (iConomy.database.hasBalance(player.getName())) {
-                        double balance = iConomy.database.getBalance(player.getName());
+                    if (iConomy.getBank().hasAccount(player.getName())) {
+                        Account account = iConomy.getBank().getAccount(player.getName());
+                        double balance = account.getBalance();
                         int regionPrice = flags.getIntFlag("iconomy", "price");
 
                         if (balance >= regionPrice) {
-                            iConomy.database.setBalance(player.getName(), balance - regionPrice);
+                            account.subtract(regionPrice);
                             player.sendMessage(ChatColor.YELLOW + "You have bought the region " + id + " for " +
                                     iConomy.Misc.formatCurrency(regionPrice, iConomy.currency));
                             DefaultDomain owners = region.getOwners();
                             owners.addPlayer(player.getName());
                             region.setOwners(owners);
                             flags.setFlag("iconomy", "buyable", false);
+                            account.save();
                         }
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
