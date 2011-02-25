@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 
 import com.nijikokun.bukkit.iConomy.iConomy;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
@@ -75,6 +76,9 @@ public class CommandBuyRegion extends WgCommand {
                             iConomy.database.setBalance(player.getName(), balance - regionPrice);
                             player.sendMessage(ChatColor.YELLOW + "You have bought the region " + id + " for " +
                                     iConomy.Misc.formatCurrency(regionPrice, iConomy.currency));
+                            DefaultDomain owners = region.getOwners();
+                            owners.addPlayer(player.getName());
+                            region.setOwners(owners);
                         }
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
