@@ -15,14 +15,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
+import com.sk89q.worldguard.bukkit.commands.FlagInfo.FlagValueType;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
@@ -56,17 +56,13 @@ public class CommandRegionInfo extends WgRegionCommand {
 
             if (region.isOwner(BukkitPlayer.wrapPlayer(cfg, player))) {
                 cfg.checkRegionPermission(sender, "region.info.ownregions");
-            }
-            else if(region.isMember(BukkitPlayer.wrapPlayer(cfg, player))) {
+            } else if (region.isMember(BukkitPlayer.wrapPlayer(cfg, player))) {
                 cfg.checkRegionPermission(sender, "region.info.memberregions");
-            }
-            else {
+            } else {
                 cfg.checkRegionPermission(sender, "region.info.foreignregions");
             }
-        }
-        else
-        {
-           cfg.checkRegionPermission(sender, "region.info.foreignregions");
+        } else {
+            cfg.checkRegionPermission(sender, "region.info.foreignregions");
         }
 
         AreaFlags flags = region.getFlags();
@@ -79,25 +75,32 @@ public class CommandRegionInfo extends WgRegionCommand {
 
         StringBuilder s = new StringBuilder();
         for (FlagInfo nfo : FlagInfo.getFlagInfoList()) {
+            if (s.length() > 0) {
+                s.append(", ");
+            }
+
             String fullName = nfo.name;
-            if (nfo.subName != null) {
+            if (nfo.subName != null && nfo.subName != "*") {
                 fullName += " " + nfo.subName;
             }
 
-            String value = flags.getFlag(nfo.flagName, nfo.flagSubName);
-            if (value != null) {
-                s.append(fullName + ": " + value + ", ");
+            String value;
+            if (nfo.type == FlagValueType.LOCATION) {
+                value = flags.getFlag(nfo.flagName, "x");
+                if (value != null) {
+                    s.append(fullName + ": set");
+                } else {
+                    s.append(fullName + ": -");
+                }
+            } else {
+                value = flags.getFlag(nfo.flagName, nfo.flagSubName);
+                if (value != null) {
+                    s.append(fullName + ": " + value);
+                } else {
+                    s.append(fullName + ": -");
+                }
             }
-        }
 
-        String spawnTest = flags.getFlag("spawn", "x");
-        if(spawnTest != null)
-        {
-            s.append("spawn: set");
-        }
-        else
-        {
-            s.append("spawn: not set");
         }
 
         sender.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());
