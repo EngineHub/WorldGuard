@@ -38,10 +38,10 @@ import org.bukkit.event.server.PluginEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
-import com.nijiko.iConomy.configuration.PropertyHandler;
 import com.nijikokun.bukkit.iConomy.iConomy;
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
 import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
+import com.sk89q.worldguard.bukkit.WorldGuardServerListener;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
@@ -69,6 +69,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         new WorldGuardBlockListener(this);
     private final WorldGuardEntityListener entityListener =
         new WorldGuardEntityListener(this);
+    private final WorldGuardServerListener serverListener =
+        new WorldGuardServerListener(this);
 
     private PermissionsResolverServerListener permsListener;
     private PermissionsResolverManager perms;
@@ -199,22 +201,14 @@ public class WorldGuardPlugin extends JavaPlugin {
         registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal);
         registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal);
         registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal);
-        
+
+        this.getServer().getPluginManager().registerEvent(Event.Type.PLUGIN_ENABLE, serverListener, Priority.Monitor, this);
+
         permsListener.register(this);
 
         // 25 equals about 1s real time
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25*5, 25*5);
 
-    }
-
-    /**
-     * Check if iConomy is enabled on this server
-     */
-    public void onPluginEnabled(PluginEvent event) {
-        if(event.getPlugin().getDescription().getName().equals("iConomy")) {
-            this.iConomy = (iConomy)event.getPlugin();
-            logger.info("WorldGuard: Attached to iConomy.");
-        }
     }
     
     /**

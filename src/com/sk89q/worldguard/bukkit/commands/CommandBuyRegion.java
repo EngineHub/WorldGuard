@@ -18,11 +18,7 @@
 */
 package com.sk89q.worldguard.bukkit.commands;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.matchSinglePlayer;
-
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
