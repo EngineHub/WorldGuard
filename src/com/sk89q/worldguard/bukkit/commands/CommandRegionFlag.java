@@ -80,68 +80,7 @@ public class CommandRegionFlag extends WgRegionCommand {
             FlagInfo nfo = FlagInfo.getFlagInfo(nameStr, subnameStr);
 
             if (nfo == null) {
-
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "Unknown flag, or not supported in console mode.");
-                    return true;
-                }
-                Player player = (Player) sender;
-
-                if (nameStr.equals("spawn")) {
-                    if (valueStr.equals("set")) {
-                        Location l = player.getLocation();
-                        if (region.contains(BukkitUtil.toVector(l))) {
-                            AreaFlags flags = region.getFlags();
-                            flags.setFlag("spawn", "x", l.getX());
-                            flags.setFlag("spawn", "y", l.getY());
-                            flags.setFlag("spawn", "z", l.getZ());
-                            flags.setFlag("spawn", "yaw", l.getYaw());
-                            flags.setFlag("spawn", "pitch", l.getPitch());
-                            flags.setFlag("spawn", "world", l.getWorld().getName());
-                            sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag spawn set to current location");
-
-                        } else {
-                            player.sendMessage(ChatColor.RED + "You must set the teleport location inside the region it belongs to.");
-                        }
-                    } else if (valueStr.equals("delete")) {
-                        AreaFlags flags = region.getFlags();
-                        flags.setFlag("spawn", "x", (String) null);
-                        flags.setFlag("spawn", "y", (String) null);
-                        flags.setFlag("spawn", "z", (String) null);
-                        flags.setFlag("spawn", "yaw", (String) null);
-                        flags.setFlag("spawn", "pitch", (String) null);
-                        flags.setFlag("spawn", "world", (String) null);
-                        sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag spawn removed.");
-                    } else {
-                        player.sendMessage(ChatColor.RED + "Usage: /region flag <regionid> spawn <set|delete>");
-                    }
-                } else if (nameStr.equals("teleport")) {
-                    if (valueStr.equals("set")) {
-                        Location l = player.getLocation();
-                        if (region.contains(BukkitUtil.toVector(l))) {
-                            AreaFlags flags = region.getFlags();
-                            flags.setFlag("teleport", "x", l.getX());
-                            flags.setFlag("teleport", "y", l.getY());
-                            flags.setFlag("teleport", "z", l.getZ());
-                            flags.setFlag("teleport", "world", l.getWorld().getName());
-                            player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag teleport set to current location");
-                        } else {
-                            player.sendMessage(ChatColor.RED + "You must set the teleport location inside the region it belongs to.");
-                        }
-                    } else if (valueStr.equals("delete")) {
-                        AreaFlags flags = region.getFlags();
-                        flags.setFlag("teleport", "x", (String) null);
-                        flags.setFlag("teleport", "y", (String) null);
-                        flags.setFlag("teleport", "z", (String) null);
-                        flags.setFlag("teleport", "world", (String) null);
-                        player.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag teleport removed.");
-                    } else {
-                        player.sendMessage(ChatColor.RED + "Usage: /region flag <regionid> teleport <set|delete>");
-                    }
-                } else {
-                    player.sendMessage(ChatColor.RED + "Unknown flag specified.");
-                }
-                return true;
+                sender.sendMessage(ChatColor.RED + "Unknown flag specified.");
             }
 
             boolean validValue = false;
@@ -199,6 +138,40 @@ public class CommandRegionFlag extends WgRegionCommand {
                     } else {
                         validValue = false;
                     }
+                    break;
+                }
+                case LOCATION: {
+                    if (!(sender instanceof Player)) {
+                        sender.sendMessage(ChatColor.RED + "Flag not supported in console mode.");
+                        return true;
+                    }
+                    Player player = (Player) sender;
+
+                    Location l = player.getLocation();
+
+                    if (valueStr.equals("set")) {
+
+                        if (region.contains(BukkitUtil.toVector(l))) {
+                            region.getFlags().setLocationFlag("spawn", l);
+                            validValue = true;
+                            sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " set to current location");
+
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You must set the " + nameStr + " location inside the region it belongs to.");
+                        }
+
+                    } else if (valueStr.equals("delete")) {
+                        region.getFlags().setLocationFlag("spawn", null);
+                        validValue = true;
+                        sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " removed.");
+                    }
+
+
+                    if (validValue) {
+                        mgr.save();
+                        return true;
+                    }
+
                     break;
                 }
                 default: {

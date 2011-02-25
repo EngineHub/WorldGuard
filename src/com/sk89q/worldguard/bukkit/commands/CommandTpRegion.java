@@ -6,13 +6,11 @@ package com.sk89q.worldguard.bukkit.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**
@@ -41,22 +39,14 @@ public class CommandTpRegion extends WgCommand {
         RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
         ProtectedRegion region = mgr.getRegion(id);
         if (region != null) {
-            AreaFlags flags = region.getFlags();
-            Double x, y, z;
-            World world;
+            Location location = null;
+
             if (spawn) {
-                x = flags.getDoubleFlag("spawn", "x");
-                y = flags.getDoubleFlag("spawn", "y");
-                z = flags.getDoubleFlag("spawn", "z");
-                world = cfg.getWorldGuardPlugin().getServer().getWorld(flags.getFlag("teleport", "world"));
+                location = region.getFlags().getLocationFlag(cfg.getWorldGuardPlugin().getServer(), "spawn");
             } else {
-                x = flags.getDoubleFlag("teleport", "x");
-                y = flags.getDoubleFlag("teleport", "y");
-                z = flags.getDoubleFlag("teleport", "z");
-                world = cfg.getWorldGuardPlugin().getServer().getWorld(flags.getFlag("teleport", "world"));
+                location = region.getFlags().getLocationFlag(cfg.getWorldGuardPlugin().getServer(), "teleport");
             }
-            if (x != null && y != null && z != null && world != null) {
-                Location location = new Location(world, x, y, z);
+            if (location != null) {
                 player.teleportTo(location);
                 return true;
             } else {

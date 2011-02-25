@@ -29,6 +29,8 @@ import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.AreaFlags.State;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Location;
+import org.bukkit.Server;
 
 /**
  * Represents a set of regions and their rules as applied to one point.
@@ -327,6 +329,40 @@ public class ApplicableRegionSet {
         String data = getAreaFlag(name, subname, inherit, player);
         return data != null ? Double.valueOf(data) : defaultValue;
     }
+
+
+    
+    public Location getLocationFlag(String name, Server server, Boolean inherit, LocalPlayer player) {
+
+        ProtectedRegion childRegion = getChildRegion();
+        if(childRegion == null)
+        {
+            return null;
+        }
+
+        if (player != null && !childRegion.isMember(player)) {
+            return null;
+        }
+
+        if(!inherit)
+        {
+            return childRegion.getFlags().getLocationFlag(server, name);
+        }
+        else
+        {
+            Location value;
+            do
+            {
+                value = childRegion.getFlags().getLocationFlag(server, name);
+                childRegion = childRegion.getParent();
+
+            } while(value == null && childRegion != null);
+
+            return value;
+        }
+
+    }
+
 
     /**
      * Clear a region's parents for isFlagAllowed().

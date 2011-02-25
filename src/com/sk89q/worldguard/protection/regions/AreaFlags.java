@@ -15,13 +15,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.protection.regions;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import org.bukkit.Location;
+import org.bukkit.Server;
 
 /**
  * Holds the flags for a region.
@@ -29,12 +30,13 @@ import java.util.Set;
  * @author sk89q
  */
 public class AreaFlags {
+
     public enum State {
+
         NONE,
         ALLOW,
         DENY,
     };
-
     public static final String FLAG_PASSTHROUGH = "z";
     public static final String FLAG_BUILD = "b";
     public static final String FLAG_PVP = "p";
@@ -46,7 +48,7 @@ public class AreaFlags {
     public static final String FLAG_LAVA_FIRE = "F";
     public static final String FLAG_CHEST_ACCESS = "C";
     public static final String FLAG_WATER_FLOW = "w";
-    
+
     /**
      * Get the user-friendly name of a flag. If a name isn't known, then
      * the flag is returned unchanged.
@@ -81,7 +83,7 @@ public class AreaFlags {
             return flag;
         }
     }
-    
+
     /**
      * Gets a flag from an alias. May return null.
      * 
@@ -115,15 +117,11 @@ public class AreaFlags {
             return null;
         }
     }
-    
     private Map<String, Map<String, String>> flags = new HashMap<String, Map<String, String>>();
 
-
-    private Map<String, String> getFlagData(String name)
-    {
+    private Map<String, String> getFlagData(String name) {
         Map<String, String> ret = flags.get(name);
-        if(ret == null)
-        {
+        if (ret == null) {
             ret = new HashMap<String, String>();
             flags.put(name, ret);
         }
@@ -139,8 +137,7 @@ public class AreaFlags {
      */
     public State get(String flag) {
         String value = getFlagData("states").get(flag);
-        if(value == null)
-        {
+        if (value == null) {
             return State.NONE;
         }
         State state = State.valueOf(value);
@@ -163,26 +160,25 @@ public class AreaFlags {
             getFlagData("states").put(flag, state.toString());
         }
     }
-    
+
     public Set<Map.Entry<String, State>> entrySet() {
 
         Map<String, State> ret = new HashMap<String, State>();
 
-        for(Map.Entry<String, String> entry : getFlagData("states").entrySet())
-        {
+        for (Map.Entry<String, String> entry : getFlagData("states").entrySet()) {
             ret.put(entry.getKey(), State.valueOf(entry.getValue()));
         }
-        
+
         return ret.entrySet();
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof AreaFlags)) {
             return false;
         }
-        
-        AreaFlags other = (AreaFlags)obj;
+
+        AreaFlags other = (AreaFlags) obj;
         return other.flags.equals(this.flags);
     }
 
@@ -193,9 +189,7 @@ public class AreaFlags {
         return hash;
     }
 
-
-    public void setFlag(String name, String subname, String value)
-    {
+    public void setFlag(String name, String subname, String value) {
         if (value == null) {
             getFlagData(name).remove(subname);
         } else {
@@ -203,8 +197,7 @@ public class AreaFlags {
         }
     }
 
-    public void setFlag(String name, String subname, Boolean value)
-    {
+    public void setFlag(String name, String subname, Boolean value) {
         if (value == null) {
             getFlagData(name).remove(subname);
         } else {
@@ -212,8 +205,7 @@ public class AreaFlags {
         }
     }
 
-    public void setFlag(String name, String subname, Integer value)
-    {
+    public void setFlag(String name, String subname, Integer value) {
         if (value == null) {
             getFlagData(name).remove(subname);
         } else {
@@ -221,8 +213,7 @@ public class AreaFlags {
         }
     }
 
-    public void setFlag(String name, String subname, Float value)
-    {
+    public void setFlag(String name, String subname, Float value) {
         if (value == null) {
             getFlagData(name).remove(subname);
         } else {
@@ -230,8 +221,7 @@ public class AreaFlags {
         }
     }
 
-    public void setFlag(String name, String subname, Double value)
-    {
+    public void setFlag(String name, String subname, Double value) {
         if (value == null) {
             getFlagData(name).remove(subname);
         } else {
@@ -239,49 +229,41 @@ public class AreaFlags {
         }
     }
 
-    public String getFlag(String name, String subname)
-    {
+    public String getFlag(String name, String subname) {
         return getFlagData(name).get(subname);
     }
 
-    public String getFlag(String name, String subname, String defaultValue)
-    {
+    public String getFlag(String name, String subname, String defaultValue) {
         String data = getFlagData(name).get(subname);
         return data != null ? data : defaultValue;
     }
 
-    public Boolean getBooleanFlag(String name, String subname)
-    {
+    public Boolean getBooleanFlag(String name, String subname) {
         String data = getFlagData(name).get(subname);
         return data != null ? Boolean.valueOf(data) : null;
     }
 
-    public Boolean getBooleanFlag(String name, String subname, boolean defaultValue)
-    {
+    public Boolean getBooleanFlag(String name, String subname, boolean defaultValue) {
         String data = getFlagData(name).get(subname);
         return data != null ? Boolean.valueOf(data) : defaultValue;
     }
 
-    public Integer getIntFlag(String name, String subname)
-    {
+    public Integer getIntFlag(String name, String subname) {
         String data = getFlagData(name).get(subname);
         return data != null ? Integer.valueOf(data) : null;
     }
 
-    public Integer getIntFlag(String name, String subname, int defaultValue)
-    {
+    public Integer getIntFlag(String name, String subname, int defaultValue) {
         String data = getFlagData(name).get(subname);
         return data != null ? Integer.valueOf(data) : defaultValue;
     }
 
-    public Float getFloatFlag(String name, String subname)
-    {
+    public Float getFloatFlag(String name, String subname) {
         String data = getFlagData(name).get(subname);
         return data != null ? Float.valueOf(data) : null;
     }
 
-    public Float getFloatFlag(String name, String subname, float defaultValue)
-    {
+    public Float getFloatFlag(String name, String subname, float defaultValue) {
         String data = getFlagData(name).get(subname);
         return data != null ? Float.valueOf(data) : defaultValue;
     }
@@ -296,4 +278,37 @@ public class AreaFlags {
         return data != null ? Double.valueOf(data) : defaultValue;
     }
 
+    public Location getLocationFlag(Server server, String name) {
+        try {
+            Double x = Double.valueOf(getFlagData(name).get("x"));
+            Double y = Double.valueOf(getFlagData(name).get("y"));
+            Double z = Double.valueOf(getFlagData(name).get("z"));
+            Float yaw = Float.valueOf(getFlagData(name).get("yaw"));
+            Float pitch = Float.valueOf(getFlagData(name).get("pitch"));
+            String worldName = getFlagData(name).get("world");
+
+            Location l = new Location(server.getWorld(worldName), x, y, z, yaw, pitch);
+            return l;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void setLocationFlag(String name, Location l) {
+        if (l != null) {
+            getFlagData(name).put("x", new Double(l.getX()).toString());
+            getFlagData(name).put("y", new Double(l.getY()).toString());
+            getFlagData(name).put("z", new Double(l.getZ()).toString());
+            getFlagData(name).put("yaw", new Float(l.getYaw()).toString());
+            getFlagData(name).put("pitch", new Float(l.getPitch()).toString());
+            getFlagData(name).put("world", l.getWorld().getName());
+        } else {
+            getFlagData(name).put("x", null);
+            getFlagData(name).put("y", null);
+            getFlagData(name).put("z", null);
+            getFlagData(name).put("yaw", null);
+            getFlagData(name).put("pitch", null);
+            getFlagData(name).put("world", null);
+        }
+    }
 }
