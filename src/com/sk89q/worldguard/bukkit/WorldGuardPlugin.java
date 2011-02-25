@@ -34,9 +34,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
+import com.nijiko.iConomy.configuration.PropertyHandler;
+import com.nijikokun.bukkit.iConomy.iConomy;
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
 import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.worldedit.Vector;
@@ -79,7 +82,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public Set<String> amphibiousPlayers = new HashSet<String>();
     public boolean fireSpreadDisableToggle;
 
-    public boolean isiConomyEnabled = false;
+    public static iConomy iConomy;
     
     // Configuration follows
     public boolean suppressTickSyncWarnings;
@@ -151,7 +154,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         loadConfiguration();
         postReload();
         registerEvents();
-        checkiConomy();
 
         if (suppressTickSyncWarnings) {
             Logger.getLogger("Minecraft").setFilter(new TickSyncDelayLoggerFilter());
@@ -208,16 +210,11 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Check if iConomy is enabled on this server
      */
-    public boolean checkiConomy() {
-        Plugin test = this.getServer().getPluginManager().getPlugin("iConomy");
-
-        if (test != null) {
-            this.isiConomyEnabled = true;
-        } else {
-            this.isiConomyEnabled = false;
+    public void onPluginEnabled(PluginEvent event) {
+        if(event.getPlugin().getDescription().getName().equals("iConomy")) {
+            this.iConomy = (iConomy)event.getPlugin();
+            logger.info("WorldGuard: Attached to iConomy.");
         }
-
-        return isiConomyEnabled;
     }
     
     /**

@@ -45,6 +45,10 @@ public class CommandBuyRegion extends WgCommand {
             sender.sendMessage("Only players may use this command");
             return true;
         }
+        if (wg.iConomy == null) {
+            sender.sendMessage("iConomy is not installed on this Server.");
+            return true;
+        }
         String id = args[0];
         Player player = (Player) sender;
         RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
@@ -57,9 +61,9 @@ public class CommandBuyRegion extends WgCommand {
                     if (args[1] == "info") {
                         player.sendMessage(ChatColor.YELLOW + "Region " + id + " costs " + 
                                 iConomy.Misc.formatCurrency(flags.getIntFlag("iconomy", "price"), iConomy.currency));
-                        if (iConomy.db.has_balance(player.getName())) {
+                        if (iConomy.database.hasBalance(player.getName())) {
                             player.sendMessage(ChatColor.YELLOW + "You have " +
-                                    iConomy.Misc.formatCurrency(iConomy.db.get_balance(player.getName()), iConomy.currency));
+                                    iConomy.Misc.formatCurrency((int)Math.round(iConomy.database.getBalance(player.getName())), iConomy.currency));
                         } else {
                             player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
                         }
@@ -67,12 +71,12 @@ public class CommandBuyRegion extends WgCommand {
                         player.sendMessage(ChatColor.RED + "Usage: /buyregion <region id> (info)");
                     }
                 } else {
-                    if (iConomy.db.has_balance(player.getName())) {
-                        int balance = iConomy.db.get_balance(player.getName());
+                    if (iConomy.database.hasBalance(player.getName())) {
+                        double balance = iConomy.database.getBalance(player.getName());
                         int regionPrice = flags.getIntFlag("iconomy", "price");
 
                         if (balance >= regionPrice) {
-                            iConomy.db.set_balance(player.getName(), balance - regionPrice);
+                            iConomy.database.setBalance(player.getName(), balance - regionPrice);
                             player.sendMessage(ChatColor.YELLOW + "You have bought the region " + id + " for " +
                                     iConomy.Misc.formatCurrency(regionPrice, iConomy.currency));
                         }
