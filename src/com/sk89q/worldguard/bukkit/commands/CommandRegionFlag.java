@@ -81,6 +81,7 @@ public class CommandRegionFlag extends WgRegionCommand {
 
             if (nfo == null) {
                 sender.sendMessage(ChatColor.RED + "Unknown flag specified.");
+                return true;
             }
 
             boolean validValue = false;
@@ -158,6 +159,7 @@ public class CommandRegionFlag extends WgRegionCommand {
 
                         } else {
                             player.sendMessage(ChatColor.RED + "You must set the " + nameStr + " location inside the region it belongs to.");
+                            return true;
                         }
 
                     } else if (valueStr.equals("delete")) {
@@ -182,7 +184,7 @@ public class CommandRegionFlag extends WgRegionCommand {
 
             String fullFlagname = nameStr;
             if (subnameStr != null) {
-                nameStr += " " + subnameStr;
+                fullFlagname += " " + subnameStr;
             }
 
             if (!validValue) {
