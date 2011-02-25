@@ -54,6 +54,7 @@ public class RegionCommandHandler extends WgCommand {
         this.commandMap.put("delete", new CommandRegionDelete());
         this.commandMap.put("addmember", addmember);
         this.commandMap.put("addowner", addmember);
+        this.commandMap.put("priority", new CommandRegionPriority());
 
         // commands that DO NOT support console as sender
         this.commandMap.put("define", new CommandRegionDefine());

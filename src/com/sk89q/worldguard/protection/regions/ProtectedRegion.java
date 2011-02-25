@@ -78,6 +78,15 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
 
+    public String getParentId() {
+
+        if (this.parent != null) {
+            this.parentId = parent.getId();
+        }
+
+        return this.parentId;
+    }
+
     /**
      * @setFlag the parentId. Used for serialization, don't touch it.
      */
