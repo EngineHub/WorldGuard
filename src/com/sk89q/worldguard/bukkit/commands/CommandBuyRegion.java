@@ -79,6 +79,7 @@ public class CommandBuyRegion extends WgCommand {
                             DefaultDomain owners = region.getOwners();
                             owners.addPlayer(player.getName());
                             region.setOwners(owners);
+                            flags.setFlag("iconomy", "buyable", false);
                         }
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
