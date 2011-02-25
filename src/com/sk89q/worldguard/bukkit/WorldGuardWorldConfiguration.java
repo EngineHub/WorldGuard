@@ -89,6 +89,9 @@ public class WorldGuardWorldConfiguration {
     public boolean useRegions;
     public int regionWand = 287;
     public String blockCreatureSpawn;
+    public boolean useiConomy;
+    public boolean buyOnClaim;
+    public int buyOnClaimPrice;
     /* Configuration data end */
 
 
@@ -197,6 +200,10 @@ public class WorldGuardWorldConfiguration {
 
         useRegions = config.getBoolean("regions.enable", true);
         regionWand = config.getInt("regions.wand", 287);
+
+        useiConomy = config.getBoolean("iconomy.enable", false);
+        buyOnClaim = config.getBoolean("iconomy.buy-on-claim", false);
+        buyOnClaimPrice = config.getInt("iconomy.buy-on-claim-price", 1);
 
         for (String creature : config.getStringList("mobs.block-creature-spawn", null)) {
             blockCreatureSpawn += creature.toLowerCase() + " ";

@@ -46,3 +46,8 @@ worldguard.region.delete.all
 worldguard.region.define
 
 worldguard.region.claim
+
+worldguard.tpregion
+worldguard.tpregion.spawn
+
+worldguard.buyregion

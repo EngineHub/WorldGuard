@@ -106,11 +106,11 @@ public class CommandRegionClaim extends WgRegionCommand {
 
             region.getOwners().addPlayer(player.getName());
 
-            if (wg.iConomy != null && wg.useiConomy && wg.buyOnClaim) {
+            if (cfg.getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
                 if (iConomy.getBank().hasAccount(player.getName())) {
                     Account account = iConomy.getBank().getAccount(player.getName());
                     double balance = account.getBalance();
-                    int regionCosts = region.countBlocks() * wg.buyOnClaimPrice; 
+                    int regionCosts = region.countBlocks() * wcfg.buyOnClaimPrice;
                     if (balance >= regionCosts) {
                         account.subtract(regionCosts);
                         player.sendMessage(ChatColor.YELLOW + "You have bought that region for " +

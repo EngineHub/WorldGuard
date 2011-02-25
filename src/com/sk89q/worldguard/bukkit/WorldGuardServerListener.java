@@ -22,9 +22,8 @@ package com.sk89q.worldguard.bukkit;
 import org.bukkit.event.server.PluginEvent;
 import org.bukkit.event.server.ServerListener;
 
-import com.nijiko.iConomy.configuration.PropertyHandler;
 import com.nijikokun.bukkit.iConomy.iConomy;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
 
 /**
  * 
@@ -48,7 +47,7 @@ public class WorldGuardServerListener extends ServerListener {
     @Override
     public void onPluginEnabled(PluginEvent event) {
         if(event.getPlugin().getDescription().getName().equals("iConomy")) {
-            WorldGuardPlugin.iConomy = (iConomy)event.getPlugin();
+           plugin.getWgConfiguration().setiConomy((iConomy)event.getPlugin());
         }
     }
 }

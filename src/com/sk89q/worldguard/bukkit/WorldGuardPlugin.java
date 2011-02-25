@@ -18,8 +18,8 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import com.nijikokun.bukkit.iConomy.iConomy;
 import java.util.logging.*;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
@@ -38,7 +38,7 @@ import org.bukkit.plugin.PluginManager;
 public class WorldGuardPlugin extends JavaPlugin {
 
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-
+    
     private final WorldGuardPlayerListener playerListener =
             new WorldGuardPlayerListener(this);
     private final WorldGuardBlockListener blockListener =
@@ -46,17 +46,18 @@ public class WorldGuardPlugin extends JavaPlugin {
     private final WorldGuardEntityListener entityListener =
             new WorldGuardEntityListener(this);
     private final WorldGuardServerListener serverListener =
-        new WorldGuardServerListener(this);
-
+            new WorldGuardServerListener(this);
+    
     private final CommandHandler commandHandler = new CommandHandler(this);
-    private final GlobalRegionManager globalRegionManager =  new GlobalRegionManager(this);
+    private final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this);
     private final WorldGuardConfiguration configuration = new WorldGuardConfiguration(this);
+
 
     /**
      * Called on plugin enable.
      */
     public void onEnable() {
-        
+
         getDataFolder().mkdirs();
         globalRegionManager.onEnable();
         registerEvents();
@@ -68,9 +69,9 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Called on plugin disable.
      */
     public void onDisable() {
-        
+
         globalRegionManager.onDisable();
-        
+
         logger.info("WorldGuard " + this.getDescription().getVersion() + " disabled.");
     }
 
@@ -102,6 +103,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
         pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
         pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
+
+        pm.registerEvent(Event.Type.PLUGIN_ENABLE, serverListener, Priority.Monitor, this);
 
         // 25 equals about 1s real time
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);

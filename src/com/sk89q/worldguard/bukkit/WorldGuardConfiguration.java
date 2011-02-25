@@ -18,6 +18,7 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import com.nijikokun.bukkit.iConomy.iConomy;
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
 import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.worldedit.Vector;
@@ -61,10 +62,12 @@ public class WorldGuardConfiguration {
     private boolean suppressTickSyncWarnings;
 
     private static Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
+    private iConomy iConomy;
 
     public WorldGuardConfiguration(WorldGuardPlugin wg) {
         this.wg = wg;
         this.worldConfig = new HashMap<String, WorldGuardWorldConfiguration>();
+        this.iConomy = null;
     }
 
     public WorldGuardWorldConfiguration getWorldConfig(String worldName) {
@@ -415,5 +418,15 @@ public class WorldGuardConfiguration {
     {
         return this.wg;
     }
-    
+
+
+    public iConomy getiConomy()
+    {
+        return this.iConomy;
+    }
+
+    public void setiConomy(iConomy newVal)
+    {
+         this.iConomy = newVal;
+    }
 }

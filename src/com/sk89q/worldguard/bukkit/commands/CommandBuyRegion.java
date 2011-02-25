@@ -24,7 +24,7 @@ import org.bukkit.entity.Player;
 
 import com.nijikokun.bukkit.iConomy.Account;
 import com.nijikokun.bukkit.iConomy.iConomy;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
@@ -37,19 +37,24 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
  */
 public class CommandBuyRegion extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may use this command");
             return true;
         }
-        if (wg.iConomy == null) {
+        Player player = (Player) sender;
+
+        if (cfg.getiConomy() == null) {
             sender.sendMessage("iConomy is not installed on this Server.");
             return true;
         }
+
+        cfg.checkRegionPermission(player, "buyregion");
+
         String id = args[0];
-        Player player = (Player) sender;
-        RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+
+        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
         ProtectedRegion region = mgr.getRegion(id);
         if (region != null) {
             AreaFlags flags = region.getFlags();
