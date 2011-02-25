@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.nijikokun.bukkit.iConomy.iConomy;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import org.bukkit.entity.Item;
@@ -32,6 +33,8 @@ import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 /**
@@ -246,6 +249,37 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 return;
             }
         }
+    }
+    
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        Location location = player.getLocation();
+        
+        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        
+        ApplicableRegionSet regions = plugin.getGlobalRegionManager().getRegionManager(
+                        player.getWorld().getName()).getApplicableRegions(
+                                BukkitUtil.toVector(location));
+        
+        BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
+        ProtectedRegion childRegion = regions.getChildRegion();
+        
+        AreaFlags flags = childRegion.getFlags();
+        
+        Boolean owner = flags.getBooleanFlag("spawn", "settings.owner", true);
+        Boolean member = flags.getBooleanFlag("spawn", "settings.owner", true);
+        Boolean all = flags.getBooleanFlag("spawn", "settings.owner", false);
+        
+        Location spawn = flags.getLocationFlag(player.getServer(), "spawn");
+        
+        if(childRegion.isOwner(localPlayer) && owner ){
+            player.teleportTo(spawn);
+        } else if (childRegion.isMember(localPlayer) && member) {
+            player.teleportTo(spawn);
+        } else if (all){
+            player.teleportTo(spawn);
+        }
+        
     }
 
 }

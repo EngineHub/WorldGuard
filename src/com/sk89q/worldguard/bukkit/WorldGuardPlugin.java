@@ -44,6 +44,8 @@ public class WorldGuardPlugin extends JavaPlugin {
             new WorldGuardBlockListener(this);
     private final WorldGuardEntityListener entityListener =
             new WorldGuardEntityListener(this);
+    private final WorldGuardServerListener serverListener =
+            new WorldGuardServerListener(this);
     
     private final CommandHandler commandHandler = new CommandHandler(this);
     private final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this);
@@ -100,6 +102,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
         pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
         pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Priority.High, this);
+
+        pm.registerEvent(Event.Type.PLUGIN_ENABLE, serverListener, Priority.Monitor, this);
 
         // 25 equals about 1s real time
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);
@@ -130,5 +135,4 @@ public class WorldGuardPlugin extends JavaPlugin {
     public WorldGuardConfiguration getWgConfiguration() {
         return configuration;
     }
-
 }
