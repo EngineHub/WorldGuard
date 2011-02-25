@@ -36,6 +36,6 @@ commands:
         usage: /<command> <region id> ...
         aliases: tpr
     buyregion:
-    	description: Buy a buyable region
-    	usage: /<command> <region id> [info]
+        description: Buy a buyable region
+        usage: /<command> <region id> [info]
   
