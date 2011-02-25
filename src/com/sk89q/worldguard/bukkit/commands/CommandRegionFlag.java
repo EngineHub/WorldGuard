@@ -89,33 +89,7 @@ public class CommandRegionFlag extends WgRegionCommand {
             boolean validValue = false;
             switch (nfo.type) {
                 case STRING: {
-                    validValue = true;
-                    if(nfo.name.equals("teleport") || nfo.name.equals("spawn")){
-                        if (valueStr.equals("all")) {
-                            if(nfo.subName.equals("allow")){
-                                region.getFlags().setFlag(nfo.flagName, nfo.flagSubName+"."+valueStr, true);
-                            }else if(nfo.subName.equals("deny")){
-                                region.getFlags().setFlag(nfo.flagName, nfo.flagSubName+"."+valueStr, false);
-                            }
-                            
-                        } else if (valueStr.equals("owner")){
-                            if(nfo.subName.equals("allow")){
-                                region.getFlags().setFlag(nfo.flagName, nfo.flagSubName+"."+valueStr, true);
-                            }else if(nfo.subName.equals("deny")){
-                                region.getFlags().setFlag(nfo.flagName, nfo.flagSubName+"."+valueStr, false);
-                            }
-                        } else if (valueStr.equals("member")){
-                            if(nfo.subName.equals("allow")){
-                                region.getFlags().setFlag(nfo.flagName, nfo.flagSubName+"."+valueStr, true);
-                            }else if(nfo.subName.equals("deny")){
-                                region.getFlags().setFlag(nfo.flagName, nfo.flagSubName+"."+valueStr, false);
-                            } 
-                        } else {
-                            sender.sendMessage(ChatColor.RED + "Usage: /region flag "+id+" "+nfo.name+" "+nfo.subName+" (all|owner|member)");
-                            validValue=false;
-                        }
-                    }
-                    
+                    validValue = true;                   
                     break;
                 }
                 case INT: {
@@ -135,14 +109,6 @@ public class CommandRegionFlag extends WgRegionCommand {
                         valueStr = "true";
                     } else if (valueStr.equals("1")) {
                         valueStr = "true";
-                    } else if (valueStr.equals("off")){
-                        valueStr="false";
-                    } else if (valueStr.equals("deny")){
-                        valueStr="false";
-                    }else if(valueStr.equals("0")){
-                        valueStr="false";
-                    } else{
-                        validValue = false;
                     }
                     validValue = true;
                     break;

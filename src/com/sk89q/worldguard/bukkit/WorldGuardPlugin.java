@@ -92,9 +92,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         pm.registerEvent(Event.Type.BLOCK_BURN, blockListener, Priority.High, this);
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Priority.High, this);
 
-     //   pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High, this);
-     //   pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.High, this);
-     //   pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.High, this);
+        pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High, this);
+        pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.High, this);
+        pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.High, this);
 
         pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.High, this);
         pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.High, this);
@@ -107,7 +107,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         pm.registerEvent(Event.Type.PLUGIN_ENABLE, serverListener, Priority.Monitor, this);
 
         // 25 equals about 1s real time
-       // this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);
     }
 
     /**

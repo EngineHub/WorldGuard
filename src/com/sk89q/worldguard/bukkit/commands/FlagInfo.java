@@ -60,12 +60,12 @@ public class FlagInfo {
         flagList.add(new FlagInfo("iconomy", "price", FlagValueType.INT, "iconomy", "price"));
         flagList.add(new FlagInfo("spawn", "set", FlagValueType.LOCATION, "spawn", ""));
         flagList.add(new FlagInfo("spawn", "delete", FlagValueType.LOCATION, "spawn", ""));
-        flagList.add(new FlagInfo("spawn", "allow", FlagValueType.STRING, "spawn", "settings"));
-        flagList.add(new FlagInfo("spawn", "deny", FlagValueType.STRING, "spawn", "settings"));
+        flagList.add(new FlagInfo("spawn", "allow", FlagValueType.STRING, "spawn", "allow"));
+        flagList.add(new FlagInfo("spawn", "deny", FlagValueType.STRING, "spawn", "deny"));
         flagList.add(new FlagInfo("teleport", "set", FlagValueType.LOCATION, "teleport", ""));
         flagList.add(new FlagInfo("teleport", "delete", FlagValueType.LOCATION, "teleport", ""));
-        flagList.add(new FlagInfo("teleport", "allow", FlagValueType.STRING, "teleport", "settings"));
-        flagList.add(new FlagInfo("teleport", "deny", FlagValueType.STRING, "teleport", "settings"));
+        flagList.add(new FlagInfo("teleport", "allow", FlagValueType.STRING, "teleport", "allow"));
+        flagList.add(new FlagInfo("teleport", "deny", FlagValueType.STRING, "teleport", "deny"));
     }
 
     public static FlagInfo getFlagInfo(String name, String subName) {

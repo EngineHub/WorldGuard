@@ -19,17 +19,12 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.AreaFlags.State;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.bukkit.Location;
 import org.bukkit.Server;
 
@@ -43,6 +38,7 @@ public class ApplicableRegionSet {
     private GlobalFlags global;
     private Vector pt;
     private List<ProtectedRegion> applicable;
+    private ProtectedRegion affectedRegion;
 
     /**
      * Construct the object.
@@ -56,6 +52,8 @@ public class ApplicableRegionSet {
         this.pt = pt;
         this.applicable = applicable;
         this.global = global;
+        
+        determineAffectedRegion();
     }
 
     /**
@@ -70,12 +68,9 @@ public class ApplicableRegionSet {
             return global.canBuild;
         }
 
-        ProtectedRegion affectedRegion = getAffectedRegion();
-
         if (affectedRegion == null) {
             return global.canBuild;
         }
-
 
         String data = getAreaFlag("states", AreaFlags.FLAG_BUILD, true, null, affectedRegion);
 
@@ -252,12 +247,22 @@ public class ApplicableRegionSet {
     }
 
     /**
-     * Gets the region with the hightest priority that is not a parent.
+     * Gets the region with the hightest priority.
      *
      */
-    public ProtectedRegion getAffectedRegion() {
+    private ProtectedRegion getAffectedRegion() {
 
-        ProtectedRegion affectedRegion = null;
+        return affectedRegion;
+    }
+
+
+    /**
+     * Determines the region with the hightest priority that is not a parent.
+     *
+     */
+    private void determineAffectedRegion() {
+
+        affectedRegion = null;
         Iterator<ProtectedRegion> iter = applicable.iterator();
 
         while (iter.hasNext()) {
@@ -267,9 +272,8 @@ public class ApplicableRegionSet {
                 affectedRegion = region;
             }
         }
-
-        return affectedRegion;
     }
+
 
     public String getAreaFlag(String name, String subname, String defaultValue, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
@@ -385,6 +389,26 @@ public class ApplicableRegionSet {
         }
 
     }
+
+     public boolean isOwner(LocalPlayer player) {
+        return affectedRegion != null ? affectedRegion.isOwner(player) : false;
+    }
+
+    /**
+     * Checks whether a player is a member of the region or any of its parents.
+     *
+     * @param player
+     * @return
+     */
+    public boolean isMember(LocalPlayer player) {
+        return affectedRegion != null ? affectedRegion.isMember(player) : false;
+    }
+
+    public String getAffectedRegionId() {
+        return affectedRegion != null ?  affectedRegion.getId() : "";
+    }
+
+
     /**
      * Clear a region's parents for isFlagAllowed().
      * 

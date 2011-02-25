@@ -251,6 +251,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
     }
     
+    @Override
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         Location location = player.getLocation();
@@ -262,21 +263,15 @@ public class WorldGuardPlayerListener extends PlayerListener {
                                 BukkitUtil.toVector(location));
         
         BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
-        ProtectedRegion childRegion = regions.getChildRegion();
-        
-        AreaFlags flags = childRegion.getFlags();
-        
-        Boolean owner = flags.getBooleanFlag("spawn", "settings.owner", true);
-        Boolean member = flags.getBooleanFlag("spawn", "settings.owner", true);
-        Boolean all = flags.getBooleanFlag("spawn", "settings.owner", false);
-        
-        Location spawn = flags.getLocationFlag(player.getServer(), "spawn");
-        
-        if(childRegion.isOwner(localPlayer) && owner ){
+     
+        String spawnconfig = regions.getAreaFlag("spawn", "settings", true, null);
+        Location spawn = regions.getLocationAreaFlag("spawn", player.getServer(), true, null);
+
+        if(spawnconfig.equals("owner") && regions.isOwner(localPlayer)){
             player.teleportTo(spawn);
-        } else if (childRegion.isMember(localPlayer) && member) {
+        } else if (spawnconfig.equals("member") && regions.isMember(localPlayer)) {
             player.teleportTo(spawn);
-        } else if (all){
+        } else {
             player.teleportTo(spawn);
         }
         
