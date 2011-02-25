@@ -87,8 +87,8 @@ public class ApplicableRegionSetTest {
         ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID, points, 0, 10);
         
         AreaFlags flags = new AreaFlags();
-        flags.set(AreaFlags.FLAG_BUILD, State.NONE);
-        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
+        flags.setFlag(AreaFlags.FLAG_BUILD, State.NONE);
+        flags.setFlag(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
         region.setFlags(flags);
         region.setOwners(domain);
         manager.addRegion(region);
@@ -103,7 +103,7 @@ public class ApplicableRegionSetTest {
         ProtectedRegion region = new ProtectedCuboidRegion(FOUNTAIN_ID,
                 new BlockVector(0, 0, 0), new BlockVector(5, 5, 5));
         AreaFlags flags = new AreaFlags();
-        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.DENY);
+        flags.setFlag(AreaFlags.FLAG_FIRE_SPREAD, State.DENY);
         region.setFlags(flags);
         region.setMembers(domain);
         manager.addRegion(region);
@@ -116,7 +116,7 @@ public class ApplicableRegionSetTest {
         ProtectedRegion region = new ProtectedCuboidRegion(NO_FIRE_ID,
                 new BlockVector(100, 100, 100), new BlockVector(200, 200, 200));
         AreaFlags flags = new AreaFlags();
-        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.DENY);
+        flags.setFlag(AreaFlags.FLAG_FIRE_SPREAD, State.DENY);
         region.setFlags(flags);
         manager.addRegion(region);
     }

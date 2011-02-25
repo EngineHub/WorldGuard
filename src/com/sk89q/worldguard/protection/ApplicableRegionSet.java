@@ -15,8 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -29,19 +28,22 @@ import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.AreaFlags.State;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.bukkit.Location;
 import org.bukkit.Server;
 
 /**
- * Represents a set of regions and their rules as applied to one point.
+ * Represents a setFlag of regions and their rules as applied to one point.
  * 
  * @author sk89q
  */
 public class ApplicableRegionSet {
+
     private GlobalFlags global;
     private Vector pt;
-    private List<ProtectedRegion> applicable;
-    
+    private Map<String, ProtectedRegion> applicable;
+
     /**
      * Construct the object.
      * 
@@ -49,13 +51,13 @@ public class ApplicableRegionSet {
      * @param regions
      * @param global
      */
-    public ApplicableRegionSet(Vector pt,  List<ProtectedRegion> applicable,
+    public ApplicableRegionSet(Vector pt, Map<String, ProtectedRegion> applicable,
             GlobalFlags global) {
         this.pt = pt;
         this.applicable = applicable;
         this.global = global;
     }
-    
+
     /**
      * Checks if a player can build in an area.
      * 
@@ -65,7 +67,7 @@ public class ApplicableRegionSet {
     public boolean canBuild(LocalPlayer player) {
         return isFlagAllowed(AreaFlags.FLAG_BUILD, global.canBuild, player);
     }
-    
+
     /**
      * Checks a flag.
      * 
@@ -80,20 +82,24 @@ public class ApplicableRegionSet {
         } else if (flag.equals(AreaFlags.FLAG_PVP)) {
             def = global.canPvP;
         } else if (flag.equals(AreaFlags.FLAG_LIGHTER)) {
-        	def = global.canLighter;
-    	} else if (flag.equals(AreaFlags.FLAG_TNT)) {
-    		def = global.canTnt;
-    	} else if (flag.equals(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
-    		def = global.allowCreeper;
-		} else if (flag.equals(AreaFlags.FLAG_MOB_DAMAGE)) {
-			def = global.allowMobDamage;
-		} else if (flag.equals(AreaFlags.FLAG_WATER_FLOW)) {
-		    def = global.allowWaterflow;
-		}
-        
+            def = global.canLighter;
+        } else if (flag.equals(AreaFlags.FLAG_TNT)) {
+            def = global.canTnt;
+        } else if (flag.equals(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
+            def = global.allowCreeper;
+        } else if (flag.equals(AreaFlags.FLAG_MOB_DAMAGE)) {
+            def = global.allowMobDamage;
+        } else if (flag.equals(AreaFlags.FLAG_WATER_FLOW)) {
+            def = global.allowWaterflow;
+        }
+
         return isFlagAllowed(flag, def, null);
     }
-    
+
+    private boolean isFlagAllowed(String flag, boolean def, LocalPlayer player) {
+        return getStateAreaFlag("states", flag, def, player) == State.ALLOW;
+    }
+
     /**
      * Checks to see if a flag is permitted.
      * 
@@ -101,92 +107,89 @@ public class ApplicableRegionSet {
      * @param player null to not check owners and members
      * @return
      */
+    /*
     private boolean isFlagAllowed(String flag, boolean def, LocalPlayer player) {
-        boolean found = false;
-        boolean allowed = false; // Used for ALLOW override
-        if (player == null) {
-            allowed = def;
-        }
-        int lastPriority = 0;
+    boolean found = false;
+    boolean allowed = false; // Used for ALLOW override
+    if (player == null) {
+    allowed = def;
+    }
+    int lastPriority = 0;
 
-        // The algorithm is as follows:
-        // While iterating through the list of regions, if an entry disallows
-        // the flag, then put it into the needsClear set. If an entry allows
-        // the flag and it has a parent, then its parent is put into hasCleared.
-        // In the situation that the child is reached before the parent, upon
-        // the parent being reached, even if the parent disallows, because the
-        // parent will be in hasCleared, permission will be allowed. In the
-        // other case, where the parent is reached first, if it does not allow
-        // permissions, it will be placed into needsClear. If a child of
-        // the parent is reached later, the parent will be removed from
-        // needsClear. At the end, if needsClear is not empty, that means that
-        // permission should not be given. If a parent has multiple children
-        // and one child does not allow permissions, then it will be placed into
-        // needsClear just like as if was a parent.
-        
-        Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
-        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
-        
-        Iterator<ProtectedRegion> iter = applicable.iterator();
+    // The algorithm is as follows:
+    // While iterating through the list of regions, if an entry disallows
+    // the flag, then put it into the needsClear setFlag. If an entry allows
+    // the flag and it has a parent, then its parent is put into hasCleared.
+    // In the situation that the child is reached before the parent, upon
+    // the parent being reached, even if the parent disallows, because the
+    // parent will be in hasCleared, permission will be allowed. In the
+    // other case, where the parent is reached first, if it does not allow
+    // permissions, it will be placed into needsClear. If a child of
+    // the parent is reached later, the parent will be removed from
+    // needsClear. At the end, if needsClear is not empty, that means that
+    // permission should not be given. If a parent has multiple children
+    // and one child does not allow permissions, then it will be placed into
+    // needsClear just like as if was a parent.
 
-        while (iter.hasNext()) {
-            ProtectedRegion region = iter.next();
-            
-            // Ignore non-build regions
-            if (player != null && region.getFlags().get(AreaFlags.FLAG_PASSTHROUGH) == State.ALLOW) {
-                continue;
-            }
+    Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
+    Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
 
-            /*
-             * No longer required.
-             * A RegionManager now only supplies regions containing pt.
-             *
-            // Forget about regions that are not covered
-            if (!region.contains(pt)) {
-                continue;
-            }
-            */
+    Iterator<Entry<String, ProtectedRegion>> iter = applicable.entrySet().iterator();
 
-            // Allow DENY to override everything
-            if (region.getFlags().get(flag) == State.DENY) {
-                return false;
-            }
-            
-            // Forget about regions that allow it, although make sure the
-            // default state is now to allow
-            if (region.getFlags().get(flag) == State.ALLOW) {
-                allowed = true;
-                found = true;
-                continue;
-            }
-            
-            // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
-                break;
-            }
-            
-            if (player != null) {
-                if (hasCleared.contains(region)) {
-                    // Already cleared, so do nothing
-                } else {
-                    if (!region.isMember(player)) {
-                        needsClear.add(region);
-                    } else {
-                        // Need to clear all parents
-                        clearParents(needsClear, hasCleared, region);
-                    }
-                }
-            }
-            
-            found = true;
-            lastPriority = region.getPriority();
-        }
-        
-        return (found == false ? def : allowed)
-                || (player != null && needsClear.size() == 0);
+    while (iter.hasNext()) {
+    ProtectedRegion region = iter.next().getValue();
+
+    // Ignore non-build regions
+    if (player != null && region.getFlags().getStateFlag(AreaFlags.FLAG_PASSTHROUGH) == State.ALLOW) {
+    continue;
     }
 
-     /**
+
+    // Forget about regions that are not covered
+    if (!region.contains(pt)) {
+    continue;
+    }
+
+    // Allow DENY to override everything
+    if (region.getFlags().getStateFlag(flag) == State.DENY) {
+    return false;
+    }
+
+    // Forget about regions that allow it, although make sure the
+    // default state is now to allow
+    if (region.getFlags().getStateFlag(flag) == State.ALLOW) {
+    allowed = true;
+    found = true;
+    continue;
+    }
+
+    // Ignore lower priority regions
+    if (found && region.getPriority() < lastPriority) {
+    break;
+    }
+
+    if (player != null) {
+    if (hasCleared.contains(region)) {
+    // Already cleared, so do nothing
+    } else {
+    if (!region.isMember(player)) {
+    needsClear.add(region);
+    } else {
+    // Need to clear all parents
+    clearParents(needsClear, hasCleared, region);
+    }
+    }
+    }
+
+    found = true;
+    lastPriority = region.getPriority();
+    }
+
+    return (found == false ? def : allowed)
+    || (player != null && needsClear.size() == 0);
+    }
+     */
+    /**
      * Get an area flag
      *
      * @param name flag name
@@ -198,8 +201,7 @@ public class ApplicableRegionSet {
     public String getAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
 
         ProtectedRegion childRegion = getChildRegion();
-        if(childRegion == null)
-        {
+        if (childRegion == null) {
             return null;
         }
 
@@ -207,26 +209,22 @@ public class ApplicableRegionSet {
             return null;
         }
 
-        if(!inherit)
-        {
+        if (!inherit) {
             return childRegion.getFlags().getFlag(name, subname);
-        }
-        else
-        {
+        } else {
             String value;
-            do
-            {
+            do {
                 value = childRegion.getFlags().getFlag(name, subname);
                 childRegion = childRegion.getParent();
 
-            } while(value == null && childRegion != null);
+            } while (value == null && childRegion != null);
 
             return value;
         }
 
     }
 
-     /**
+    /**
      * Gets the region with the hightest priority that is not a parent.
      *
      */
@@ -234,42 +232,35 @@ public class ApplicableRegionSet {
 
         int appSize = applicable.size();
 
-        if(appSize < 1)
-        {
+        if (appSize < 1) {
             return null;
-        }
-
-        else if(appSize < 2)
-        {
-            return applicable.get(0);
+        } else if (appSize < 2) {
+            for (Entry<String, ProtectedRegion> entry : applicable.entrySet()) {
+                return entry.getValue();
+            }
         }
 
         List<String> parents = new ArrayList<String>();
-        Iterator<ProtectedRegion> iter = applicable.iterator();
+        Iterator<Entry<String, ProtectedRegion>> iter = applicable.entrySet().iterator();
 
         while (iter.hasNext()) {
-            ProtectedRegion region = iter.next();
+            ProtectedRegion region = iter.next().getValue();
             ProtectedRegion parent = region.getParent();
 
-            if(parent == null)
-            {
-              parents.add(region.getId());
-            }
-            else
-            {
-              parents.add(parent.getId());
+            if (parent == null) {
+                parents.add(region.getId());
+            } else {
+                parents.add(parent.getId());
             }
         }
 
         ProtectedRegion childRegion = null;
-        iter = applicable.iterator();
+        iter = applicable.entrySet().iterator();
 
         while (iter.hasNext()) {
-            ProtectedRegion region = iter.next();
-            if(!parents.contains(region.getId()))
-            {
-                if(childRegion == null || childRegion.getPriority() < region.getPriority())
-                {
+            ProtectedRegion region = iter.next().getValue();
+            if (!parents.contains(region.getId())) {
+                if (childRegion == null || childRegion.getPriority() < region.getPriority()) {
                     childRegion = region;
                 }
             }
@@ -278,65 +269,99 @@ public class ApplicableRegionSet {
         return childRegion;
     }
 
-    public String getAreaFlag(String name, String subname, String defaultValue, Boolean inherit, LocalPlayer player)
-    {
+    public String getAreaFlag(String name, String subname, String defaultValue, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
         return data != null ? data : defaultValue;
     }
 
-    public Boolean getBooleanAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player)
-    {
+    public Boolean getBooleanAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
         return data != null ? Boolean.valueOf(data) : null;
     }
 
-    public Boolean getBooleanAreaFlag(String name, String subname, boolean defaultValue, Boolean inherit, LocalPlayer player)
-    {
+    public Boolean getBooleanAreaFlag(String name, String subname, boolean defaultValue, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
         return data != null ? Boolean.valueOf(data) : defaultValue;
     }
 
-    public Integer getIntAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player)
-    {
+    public Integer getIntAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
-        return data != null ? Integer.valueOf(data) : null;
+        try {
+            return data != null ? Integer.valueOf(data) : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    public Integer getIntAreaFlag(String name, String subname, int defaultValue, Boolean inherit, LocalPlayer player)
-    {
+    public Integer getIntAreaFlag(String name, String subname, int defaultValue, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
-        return data != null ? Integer.valueOf(data) : defaultValue;
+        try {
+            return data != null ? Integer.valueOf(data) : defaultValue;
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
-    public Float getFloatAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player)
-    {
+    public Float getFloatAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
-        return data != null ? Float.valueOf(data) : null;
+        try {
+            return data != null ? Float.valueOf(data) : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    public Float getFloatAreaFlag(String name, String subname, float defaultValue, Boolean inherit, LocalPlayer player)
-    {
+    public Float getFloatAreaFlag(String name, String subname, float defaultValue, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
-        return data != null ? Float.valueOf(data) : defaultValue;
+        try {
+            return data != null ? Float.valueOf(data) : defaultValue;
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     public Double getDoubleAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
-        return data != null ? Double.valueOf(data) : null;
+        try {
+            return data != null ? Double.valueOf(data) : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Double getDoubleAreaFlag(String name, String subname, double defaultValue, Boolean inherit, LocalPlayer player) {
         String data = getAreaFlag(name, subname, inherit, player);
-        return data != null ? Double.valueOf(data) : defaultValue;
+        try {
+            return data != null ? Double.valueOf(data) : defaultValue;
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
+    public State getStateAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
+        String data = getAreaFlag(name, subname, inherit, player);
 
-    
-    public Location getLocationFlag(String name, Server server, Boolean inherit, LocalPlayer player) {
+        try {
+            return data != null ? State.valueOf(data) : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public State getStateAreaFlag(String name, String subname, State defaultValue, Boolean inherit, LocalPlayer player) {
+        String data = getAreaFlag(name, subname, inherit, player);
+
+        try {
+            return data != null ? State.valueOf(data) : defaultValue;
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    public Location getLocationAreaFlag(String name, Server server, Boolean inherit, LocalPlayer player) {
 
         ProtectedRegion childRegion = getChildRegion();
-        if(childRegion == null)
-        {
+        if (childRegion == null) {
             return null;
         }
 
@@ -344,26 +369,20 @@ public class ApplicableRegionSet {
             return null;
         }
 
-        if(!inherit)
-        {
+        if (!inherit) {
             return childRegion.getFlags().getLocationFlag(server, name);
-        }
-        else
-        {
+        } else {
             Location value;
-            do
-            {
+            do {
                 value = childRegion.getFlags().getLocationFlag(server, name);
                 childRegion = childRegion.getParent();
 
-            } while(value == null && childRegion != null);
+            } while (value == null && childRegion != null);
 
             return value;
         }
 
     }
-
-
     /**
      * Clear a region's parents for isFlagAllowed().
      * 
@@ -371,16 +390,18 @@ public class ApplicableRegionSet {
      * @param hasCleared
      * @param region
      */
+    /*
     private void clearParents(Set<ProtectedRegion> needsClear,
-            Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
-        ProtectedRegion parent = region.getParent();
-        
-        while (parent != null) {
-            if (!needsClear.remove(parent)) {
-                hasCleared.add(parent);
-            }
-            
-            parent = parent.getParent();
-        }
+    Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
+    ProtectedRegion parent = region.getParent();
+
+    while (parent != null) {
+    if (!needsClear.remove(parent)) {
+    hasCleared.add(parent);
     }
+
+    parent = parent.getParent();
+    }
+    }
+     */
 }

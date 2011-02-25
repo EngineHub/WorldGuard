@@ -42,7 +42,7 @@ public class FlagInfo {
         flagList = new ArrayList<FlagInfo>();
         flagList.add(new FlagInfo("msg", "g", FlagValueType.STRING, "msg", "g"));
         flagList.add(new FlagInfo("msg", "f", FlagValueType.STRING, "msg", "f"));
-        flagList.add(new FlagInfo("cspawn", "*", FlagValueType.STRING, "creaturespawn", "*"));
+        flagList.add(new FlagInfo("denyspawn", "*", FlagValueType.STRING, "creaturespawn", "*"));
         flagList.add(new FlagInfo("heal", "delay", FlagValueType.INT, "heal", "delay"));
         flagList.add(new FlagInfo("heal", "amount", FlagValueType.INT, "heal", "amount"));
         flagList.add(new FlagInfo("passthrough", null, FlagValueType.STATE, "states", "passthrough"));

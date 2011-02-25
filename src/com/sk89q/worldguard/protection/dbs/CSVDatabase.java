@@ -322,7 +322,7 @@ public class CSVDatabase implements ProtectionDatabase {
                 } else {
                     flag = String.valueOf(k);
                 }
-                flags.set(flag, curState);
+                flags.setFlag(flag, curState);
             }
         }
         

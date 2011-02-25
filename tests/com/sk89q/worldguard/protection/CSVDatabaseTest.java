@@ -68,9 +68,9 @@ public class CSVDatabaseTest {
     
     private void checkTestRegion1(ProtectedRegion region) {
         AreaFlags flags = new AreaFlags();
-        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
-        flags.set(AreaFlags.FLAG_PVP, State.DENY);
-        flags.set(AreaFlags.FLAG_LIGHTER, State.DENY);
+        flags.setFlag(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
+        flags.setFlag(AreaFlags.FLAG_PVP, State.DENY);
+        flags.setFlag(AreaFlags.FLAG_LIGHTER, State.DENY);
         region.setFlags(flags);
         
         assertEquals(region.getFlags(), flags);
@@ -83,9 +83,9 @@ public class CSVDatabaseTest {
         ProtectedRegion region = new ProtectedCuboidRegion("test2", min, max);
         
         AreaFlags flags = new AreaFlags();
-        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
-        flags.set(AreaFlags.FLAG_PVP, State.DENY);
-        flags.set(AreaFlags.FLAG_LIGHTER, State.DENY);
+        flags.setFlag(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
+        flags.setFlag(AreaFlags.FLAG_PVP, State.DENY);
+        flags.setFlag(AreaFlags.FLAG_LIGHTER, State.DENY);
         region.setFlags(flags);
         
         DefaultDomain domain = new DefaultDomain();
@@ -108,9 +108,9 @@ public class CSVDatabaseTest {
         ProtectedRegion region = new ProtectedCuboidRegion("test2", min, max);
         
         AreaFlags flags = new AreaFlags();
-        flags.set(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
-        flags.set(AreaFlags.FLAG_PVP, State.ALLOW);
-        flags.set(AreaFlags.FLAG_LIGHTER, State.DENY);
+        flags.setFlag(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
+        flags.setFlag(AreaFlags.FLAG_PVP, State.ALLOW);
+        flags.setFlag(AreaFlags.FLAG_LIGHTER, State.DENY);
         region.setFlags(flags);
         
         DefaultDomain domain = new DefaultDomain();

@@ -79,7 +79,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
 
     /**
-     * @set the parentId. Used for serialization, don't touch it.
+     * @setFlag the parentId. Used for serialization, don't touch it.
      */
     public void setParentId() {
         
@@ -112,7 +112,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
-     * @param priority the priority to set
+     * @param priority the priority to setFlag
      */
     public void setPriority(int priority) {
         this.priority = priority;
@@ -129,7 +129,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * Set the parent. This checks to make sure that it will not result
      * in circular inheritance.
      * 
-     * @param parent the parent to set
+     * @param parent the parent to setFlag
      * @throws CircularInheritanceException 
      */
     public void setParent(ProtectedRegion parent) throws CircularInheritanceException {
@@ -170,7 +170,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
-     * @param owners the owners to set
+     * @param owners the owners to setFlag
      */
     public void setOwners(DefaultDomain owners) {
         this.owners = owners;
@@ -185,7 +185,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
-     * @param owners the owners to set
+     * @param owners the owners to setFlag
      */
     public void setMembers(DefaultDomain members) {
         this.members = members;

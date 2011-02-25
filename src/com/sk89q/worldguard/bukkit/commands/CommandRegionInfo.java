@@ -27,6 +27,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -92,6 +93,14 @@ public class CommandRegionInfo extends WgRegionCommand {
                 } else {
                     s.append(fullName + ": -");
                 }
+            } else if ((nfo.subName != null && nfo.subName.equals("*"))) {
+                StringBuilder ret = new StringBuilder();
+                for (Map.Entry<String, String> entry : flags.getFlagData(nfo.flagName).entrySet()) {
+                    if (Boolean.valueOf(entry.getValue())) {
+                        ret.append(entry.getKey() + " ");
+                    }
+                }
+                s.append(fullName + ": " + ret);
             } else {
                 value = flags.getFlag(nfo.flagName, nfo.flagSubName);
                 if (value != null) {

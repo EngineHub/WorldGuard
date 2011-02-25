@@ -38,7 +38,6 @@ import org.bukkit.entity.Player;
  */
 public class CommandRegionFlag extends WgRegionCommand {
 
-    // to-do only allow owners to change flags
     public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
         CommandHandler.checkArgs(args, 3, 4, "/region flag <regionid> <name> (<subname>) <value>");
@@ -153,7 +152,7 @@ public class CommandRegionFlag extends WgRegionCommand {
                     if (valueStr.equals("set")) {
 
                         if (region.contains(BukkitUtil.toVector(l))) {
-                            region.getFlags().setLocationFlag("spawn", l);
+                            region.getFlags().setLocationFlag(nfo.flagName, l);
                             validValue = true;
                             sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " set to current location");
 
@@ -163,7 +162,7 @@ public class CommandRegionFlag extends WgRegionCommand {
                         }
 
                     } else if (valueStr.equals("delete")) {
-                        region.getFlags().setLocationFlag("spawn", null);
+                        region.getFlags().setLocationFlag(nfo.flagName, null);
                         validValue = true;
                         sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " removed.");
                     }

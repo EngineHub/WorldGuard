@@ -119,7 +119,7 @@ public class AreaFlags {
     }
     private Map<String, Map<String, String>> flags = new HashMap<String, Map<String, String>>();
 
-    private Map<String, String> getFlagData(String name) {
+    public Map<String, String> getFlagData(String name) {
         Map<String, String> ret = flags.get(name);
         if (ret == null) {
             ret = new HashMap<String, String>();
@@ -127,38 +127,6 @@ public class AreaFlags {
         }
 
         return ret;
-    }
-
-    /**
-     * Gets the State value of a state flag
-     *
-     * @param flag
-     * @return State
-     */
-    public State get(String flag) {
-        String value = getFlagData("states").get(flag);
-        if (value == null) {
-            return State.NONE;
-        }
-        State state = State.valueOf(value);
-        if (state == null) {
-            return State.NONE;
-        }
-        return state;
-    }
-
-    /**
-     * Sets the State value of a state flag
-     * 
-     * @param flag
-     * @param state
-     */
-    public void set(String flag, State state) {
-        if (state == State.NONE) {
-            getFlagData("states").remove(flag);
-        } else {
-            getFlagData("states").put(flag, state.toString());
-        }
     }
 
     public Set<Map.Entry<String, State>> entrySet() {
@@ -170,6 +138,64 @@ public class AreaFlags {
         }
 
         return ret.entrySet();
+    }
+
+    /**
+     * Gets the State value of a state flag
+     *
+     * @param name
+     * @param subname
+     * @return State
+     */
+    public State getStateFlag(String name, String subname) {
+        String value = getFlagData(name).get(subname);
+        if (value == null) {
+            return State.NONE;
+        }
+        State state = State.NONE;
+        try {
+            state = State.valueOf(value);
+            if (state == null) {
+                return State.NONE;
+            }
+        } catch (Exception e) {
+            return State.NONE;
+        }
+        return state;
+    }
+
+    /**
+     * Gets the State value of a state flag
+     *
+     * @param flag
+     * @return State
+     */
+    public State getStateFlag(String flag) {
+        return getStateFlag("states", flag);
+    }
+
+    /**
+     * Sets the State value of a state flag
+     *
+     * @param flag
+     * @param state
+     */
+    public void setFlag(String name, String subname, State state) {
+        if (state == State.NONE) {
+            getFlagData(name).remove(subname);
+        } else {
+            getFlagData(name).put(subname, state.toString());
+        }
+    }
+
+    /**
+     * Sets the State value of a state flag
+     * 
+     * @param flag
+     * @param state
+     */
+    public void setFlag(String flag, State state) {
+        setFlag("states", flag, state);
     }
 
     @Override
@@ -250,32 +276,56 @@ public class AreaFlags {
 
     public Integer getIntFlag(String name, String subname) {
         String data = getFlagData(name).get(subname);
-        return data != null ? Integer.valueOf(data) : null;
+        try {
+            return data != null ? Integer.valueOf(data) : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Integer getIntFlag(String name, String subname, int defaultValue) {
         String data = getFlagData(name).get(subname);
-        return data != null ? Integer.valueOf(data) : defaultValue;
+        try {
+            return data != null ? Integer.valueOf(data) : defaultValue;
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     public Float getFloatFlag(String name, String subname) {
         String data = getFlagData(name).get(subname);
-        return data != null ? Float.valueOf(data) : null;
+        try {
+            return data != null ? Float.valueOf(data) : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Float getFloatFlag(String name, String subname, float defaultValue) {
         String data = getFlagData(name).get(subname);
-        return data != null ? Float.valueOf(data) : defaultValue;
+        try {
+            return data != null ? Float.valueOf(data) : defaultValue;
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     public Double getDoubleFlag(String name, String subname) {
         String data = getFlagData(name).get(subname);
-        return data != null ? Double.valueOf(data) : null;
+        try {
+            return data != null ? Double.valueOf(data) : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Double getDoubleFlag(String name, String subname, double defaultValue) {
         String data = getFlagData(name).get(subname);
-        return data != null ? Double.valueOf(data) : defaultValue;
+        try {
+            return data != null ? Double.valueOf(data) : defaultValue;
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     public Location getLocationFlag(Server server, String name) {
