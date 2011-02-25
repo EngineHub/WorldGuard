@@ -257,14 +257,6 @@ public class ApplicableRegionSet {
      */
     public ProtectedRegion getAffectedRegion() {
 
-        int appSize = applicable.size();
-
-        if (appSize < 1) {
-            return null;
-        } else if (appSize < 2) {
-            return applicable.get(0);
-        }
-
         ProtectedRegion affectedRegion = null;
         Iterator<ProtectedRegion> iter = applicable.iterator();
 
