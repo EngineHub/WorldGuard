@@ -38,4 +38,3 @@ commands:
     buyregion:
         description: Buy a buyable region
         usage: /<command> <region id> [info]
-  

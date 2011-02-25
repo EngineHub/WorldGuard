@@ -68,7 +68,7 @@ public class WorldGuardBlockListener extends BlockListener {
 
         Player player = event.getPlayer();
         Block blockDamaged = event.getBlock();
-        
+
         if (plugin.useRegions && blockDamaged.getType() == Material.CAKE_BLOCK) {
             Vector pt = toVector(blockDamaged);
 

@@ -84,10 +84,10 @@ regions:
         waterflow: on
 
 iconomy:
-	enable: on
-	buy-on-claim: on
-	# Price per Block for buying on claim
-	buy-on-claim-price: 2
+    enable: on
+    buy-on-claim: on
+    # Price per Block for buying on claim
+    buy-on-claim-price: 2
 
 blacklist:
     logging:

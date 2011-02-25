@@ -138,7 +138,12 @@ public class AreaFlags {
      * @return State
      */
     public State get(String flag) {
-        State state = State.valueOf(getFlagData("states").get(flag));
+        String value = getFlagData("states").get(flag);
+        if(value == null)
+        {
+            return State.NONE;
+        }
+        State state = State.valueOf(value);
         if (state == null) {
             return State.NONE;
         }
