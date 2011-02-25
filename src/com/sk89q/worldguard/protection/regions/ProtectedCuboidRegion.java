@@ -107,4 +107,13 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     public String getTypeName() {
         return "cuboid";
     }
+
+    /**
+     * Get the number of Blocks in this region
+     * 
+     * @return
+     */
+    public int countBlocks() {
+        return 1;
+    }
 }

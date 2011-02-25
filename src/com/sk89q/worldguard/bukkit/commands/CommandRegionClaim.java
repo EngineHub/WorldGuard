@@ -32,6 +32,7 @@ import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.nijikokun.bukkit.iConomy.iConomy;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -103,6 +104,27 @@ public class CommandRegionClaim extends WgCommand {
             }
 
             region.getOwners().addPlayer(player.getName());
+
+            if (wg.useiConomy && wg.buyOnClaim) {
+                if (iConomy.db.has_balance(player.getName())) {
+                    int balance = iConomy.db.get_balance(player.getName());
+                    int regionCosts = region.countBlocks() * wg.buyOnClaimPrice; 
+                    if (balance >= regionCosts) {
+                        iConomy.db.set_balance(player.getName(), balance - regionCosts);
+                        player.sendMessage(ChatColor.YELLOW + "You have bought that region for " +
+                                iConomy.Misc.formatCurrency(regionCosts, iConomy.currency));
+                    } else {
+                        player.sendMessage(ChatColor.RED + "You have not enough money.");
+                        player.sendMessage(ChatColor.RED + "The region you want to claim costs " +
+                                iConomy.Misc.formatCurrency(regionCosts, iConomy.currency));
+                        player.sendMessage(ChatColor.RED + "You have " + iConomy.Misc.formatCurrency(balance, iConomy.currency));
+                        return true;
+                    }
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
+                    return true;
+                }
+            }
 
             mgr.addRegion(region);
             mgr.save();

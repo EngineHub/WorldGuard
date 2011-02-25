@@ -133,4 +133,12 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         return "polygon";
     }
 
+    /**
+     * Get the number of Blocks in this region
+     * 
+     * @return
+     */
+    public int countBlocks() {
+        return 1;
+    }
 }

@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -74,10 +75,11 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     Blacklist blacklist;
 
-    
     public Set<String> invinciblePlayers = new HashSet<String>();
     public Set<String> amphibiousPlayers = new HashSet<String>();
     public boolean fireSpreadDisableToggle;
+
+    public boolean isiConomyEnabled = false;
     
     // Configuration follows
     public boolean suppressTickSyncWarnings;
@@ -112,6 +114,9 @@ public class WorldGuardPlugin extends JavaPlugin {
     public boolean disableSuffocationDamage;
     public boolean teleportOnSuffocation;
     public boolean useRegions;
+    public boolean useiConomy;
+    public boolean buyOnClaim;
+    public int buyOnClaimPrice;
     public int regionWand = 287;
     public String blockCreatureSpawn = "";
     /**
@@ -146,6 +151,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         loadConfiguration();
         postReload();
         registerEvents();
+        checkiConomy();
 
         if (suppressTickSyncWarnings) {
             Logger.getLogger("Minecraft").setFilter(new TickSyncDelayLoggerFilter());
@@ -197,6 +203,21 @@ public class WorldGuardPlugin extends JavaPlugin {
         // 25 equals about 1s real time
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25*5, 25*5);
 
+    }
+
+    /**
+     * Check if iConomy is enabled on this server
+     */
+    public boolean checkiConomy() {
+        Plugin test = this.getServer().getPluginManager().getPlugin("iConomy");
+
+        if (test != null) {
+            this.isiConomyEnabled = true;
+        } else {
+            this.isiConomyEnabled = false;
+        }
+
+        return isiConomyEnabled;
     }
     
     /**
@@ -305,6 +326,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         for (String creature : config.getStringList("mobs.block-creature-spawn", null)) {
             blockCreatureSpawn += creature.toLowerCase() + " ";
         }
+
+        useiConomy = config.getBoolean("iconomy.enable", false);
+        buyOnClaim = config.getBoolean("iconomy.buy-on-claim", false);
+        buyOnClaimPrice = config.getInt("iconomy.buy-on-claim-price", 1);
 
         GlobalFlags globalFlags = new GlobalFlags();
         globalFlags.canBuild = config.getBoolean("regions.default.build", true);

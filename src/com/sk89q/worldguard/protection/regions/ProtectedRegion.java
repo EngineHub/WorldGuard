@@ -246,6 +246,13 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public AreaFlags getFlags() {
         return flags;
     }
+
+    /**
+     * Get the number of Blocks in this region
+     * 
+     * @return
+     */
+    public abstract int countBlocks();
     
     /**
      * Check to see if a point is inside this region.

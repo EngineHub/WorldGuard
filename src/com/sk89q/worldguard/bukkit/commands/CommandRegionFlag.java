@@ -121,8 +121,7 @@ public class CommandRegionFlag extends WgCommand {
                     }else{
                         player.sendMessage(ChatColor.RED + "Usage: /region flag <regionid> teleport <set|delete>");
                     }
-                }
-                else 
+                } else 
                 {
                     player.sendMessage(ChatColor.RED + "Unknown flag specified.");
                 }

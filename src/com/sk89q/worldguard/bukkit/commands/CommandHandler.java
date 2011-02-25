@@ -58,6 +58,7 @@ public class CommandHandler {
         this.commandMap.put("stack", new CommandStack());
         this.commandMap.put("stopfire", new CommandStopFire());
         this.commandMap.put("tpregrion", new CommandTpRegion());
+        this.commandMap.put("buyregion", new CommandBuyRegion());
     }
     
     
