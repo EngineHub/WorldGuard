@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,46 +32,37 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
  */
 public class CommandGod extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
-            return true;
-        }
-
-        Player player = (Player) sender;
-
-        ch.checkPermission(player, "/god");
-        ch.checkArgs(args, 0, 1);
+        CommandHandler.checkArgs(args, 0, 1);
 
         // Allow setting other people invincible
         if (args.length > 0) {
-            if (!wg.hasPermission(player, "/godother")) {
-                player.sendMessage(ChatColor.RED + "You don't have permission to make others invincible.");
-                return true;
-            }
+            cfg.checkPermission(sender, "god.other");
 
-            Player other = matchSinglePlayer(wg.getServer(), args[0]);
+            Player other = matchSinglePlayer(cfg.getWorldGuardPlugin().getServer(), args[0]);
             if (other == null) {
-                player.sendMessage(ChatColor.RED + "Player not found.");
+                sender.sendMessage(ChatColor.RED + "Player not found.");
             } else {
-                if (!wg.invinciblePlayers.contains(other.getName())) {
-                    wg.invinciblePlayers.add(other.getName());
-                    player.sendMessage(ChatColor.YELLOW + other.getName() + " is now invincible!");
-                    other.sendMessage(ChatColor.YELLOW + player.getName() + " has made you invincible!");
+                if (!cfg.isInvinciblePlayer(other.getName())) {
+                    cfg.addInvinciblePlayer(other.getName());
+                    sender.sendMessage(ChatColor.YELLOW + other.getName() + " is now invincible!");
+                    other.sendMessage(ChatColor.YELLOW + senderName + " has made you invincible!");
                 } else {
-                    wg.invinciblePlayers.remove(other.getName());
-                    player.sendMessage(ChatColor.YELLOW + other.getName() + " is no longer invincible.");
-                    other.sendMessage(ChatColor.YELLOW + player.getName() + " has taken away your invincibility.");
+                    cfg.removeInvinciblePlayer(other.getName());
+                    sender.sendMessage(ChatColor.YELLOW + other.getName() + " is no longer invincible.");
+                    other.sendMessage(ChatColor.YELLOW + senderName + " has taken away your invincibility.");
                 }
             }
             // Invincibility for one's self
-        } else {
-            if (!wg.invinciblePlayers.contains(player.getName())) {
-                wg.invinciblePlayers.add(player.getName());
+        } else if(sender instanceof Player) {
+            cfg.checkPermission(sender, "god.self");
+            Player player = (Player)sender;
+            if (!cfg.isInvinciblePlayer(player.getName())) {
+                cfg.addInvinciblePlayer(player.getName());
                 player.sendMessage(ChatColor.YELLOW + "You are now invincible!");
             } else {
-                wg.invinciblePlayers.remove(player.getName());
+                cfg.removeInvinciblePlayer(player.getName());
                 player.sendMessage(ChatColor.YELLOW + "You are no longer invincible.");
             }
         }

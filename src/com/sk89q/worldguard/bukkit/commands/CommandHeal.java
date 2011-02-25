@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,32 +32,25 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
  */
 public class CommandHeal extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
-            return true;
-        }
-        Player player = (Player) sender;
-        ch.checkPermission(player, "/heal");
-        ch.checkArgs(args, 0, 1);
+        CommandHandler.checkArgs(args, 0, 1);
 
         // Allow healing other people
         if (args.length > 0) {
-            if (!wg.hasPermission(player, "/healother")) {
-                player.sendMessage(ChatColor.RED + "You don't have permission to heal others.");
-                return true;
-            }
+            cfg.checkPermission(sender, "heal.other");
 
-            Player other = matchSinglePlayer(wg.getServer(), args[0]);
+            Player other = matchSinglePlayer(cfg.getWorldGuardPlugin().getServer(), args[0]);
             if (other == null) {
-                player.sendMessage(ChatColor.RED + "Player not found.");
+                sender.sendMessage(ChatColor.RED + "Player not found.");
             } else {
                 other.setHealth(20);
-                player.sendMessage(ChatColor.YELLOW + other.getName() + " has been healed!");
-                other.sendMessage(ChatColor.YELLOW + player.getName() + " has healed you!");
+                sender.sendMessage(ChatColor.YELLOW + other.getName() + " has been healed!");
+                other.sendMessage(ChatColor.YELLOW + senderName + " has healed you!");
             }
-        } else {
+        } else if (sender instanceof Player){
+            cfg.checkPermission(sender, "heal.self");
+            Player player = (Player)sender;
             player.setHealth(20);
             player.sendMessage(ChatColor.YELLOW + "You have been healed!");
         }

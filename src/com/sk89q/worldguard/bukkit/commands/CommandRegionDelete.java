@@ -15,11 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -32,45 +33,41 @@ import org.bukkit.entity.Player;
  *
  * @author Michael
  */
-public class CommandRegionDelete extends WgCommand {
+public class CommandRegionDelete extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
-            return true;
-        }
-        Player player = (Player) sender;
-
-
-        if (!wg.hasPermission(player, "/regionclaim")) {
-            ch.checkRegionPermission(player, "/regiondelete");
-        }
-        ch.checkArgs(args, 0, 1, "/region delete <id>");
+        CommandHandler.checkArgs(args, 0, 1, "/region delete <id>");
 
         try {
             String id = args[0].toLowerCase();
-            RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
 
             if (!mgr.hasRegion(id)) {
-                player.sendMessage(ChatColor.RED + "A region with ID '"
+                sender.sendMessage(ChatColor.RED + "A region with ID '"
                         + id + "' doesn't exist.");
                 return true;
             }
 
             ProtectedRegion existing = mgr.getRegion(id);
 
-            if (!ch.canUseRegionCommand(player, "/regiondelete")
-                    && !existing.isOwner(wg.wrapPlayer(player))) {
-                player.sendMessage(ChatColor.RED + "You don't own this region.");
-                return true;
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+
+                if (existing.isOwner(BukkitPlayer.wrapPlayer(cfg, player))) {
+                    cfg.checkRegionPermission(sender, "region.delete.own");
+                } else {
+                    cfg.checkRegionPermission(sender, "region.delete.all");
+                }
+            } else {
+                cfg.checkRegionPermission(sender, "region.delete.all");
             }
 
             mgr.removeRegion(id);
             mgr.save();
-            player.sendMessage(ChatColor.YELLOW + "Region removed!");
+            sender.sendMessage(ChatColor.YELLOW + "Region removed!");
         } catch (IOException e) {
-            player.sendMessage(ChatColor.RED + "Region database failed to save: "
+            sender.sendMessage(ChatColor.RED + "Region database failed to save: "
                     + e.getMessage());
         }
 

@@ -26,7 +26,9 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -35,8 +37,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.nijikokun.bukkit.iConomy.Account;
 import com.nijikokun.bukkit.iConomy.iConomy;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -46,9 +46,9 @@ import org.bukkit.plugin.Plugin;
  *
  * @author Michael
  */
-public class CommandRegionClaim extends WgCommand {
+public class CommandRegionClaim extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may use this command");
@@ -56,23 +56,23 @@ public class CommandRegionClaim extends WgCommand {
         }
         Player player = (Player) sender;
 
-        Plugin wePlugin = wg.getServer().getPluginManager().getPlugin("WorldEdit");
+        Plugin wePlugin = cfg.getWorldGuardPlugin().getServer().getPluginManager().getPlugin("WorldEdit");
         if (wePlugin == null) {
             player.sendMessage(ChatColor.RED + "WorldEdit must be installed and enabled!");
             return true;
         }
 
-        ch.checkRegionPermission(player, "/regionclaim");
-        ch.checkArgs(args, 1, 1, "/region claim <id>");
+        cfg.checkRegionPermission(player, "region.claim");
+        CommandHandler.checkArgs(args, 1, 1, "/region claim <id>");
 
         try {
             String id = args[0].toLowerCase();
-            RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
             ProtectedRegion existing = mgr.getRegion(id);
 
             if (existing != null) {
-                if (!existing.getOwners().contains(wg.wrapPlayer(player))) {
+                if (!existing.getOwners().contains(BukkitPlayer.wrapPlayer(cfg, player))) {
                     player.sendMessage(ChatColor.RED + "You don't own this region.");
                     return true;
                 }
@@ -99,7 +99,7 @@ public class CommandRegionClaim extends WgCommand {
                 region = new ProtectedCuboidRegion(id, min, max);
             }
 
-            if (mgr.overlapsUnownedRegion(region, wg.wrapPlayer(player))) {
+            if (mgr.overlapsUnownedRegion(region, BukkitPlayer.wrapPlayer(cfg, player))) {
                 player.sendMessage(ChatColor.RED + "This region overlaps with someone else's region.");
                 return true;
             }

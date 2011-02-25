@@ -19,7 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -27,23 +28,17 @@ import java.util.Arrays;
 import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 /**
  *
  * @author Michael
  */
-public class CommandRegionList extends WgCommand {
+public class CommandRegionList extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
-            return true;
-        }
-        Player player = (Player) sender;
-        ch.checkRegionPermission(player, "/regionlist");
-        ch.checkArgs(args, 0, 1, "/region list [page]");
+        cfg.checkRegionPermission(sender, "region.list");
+        CommandHandler.checkArgs(args, 0, 1, "/region list [page]");
 
         int page = 0;
 
@@ -55,10 +50,10 @@ public class CommandRegionList extends WgCommand {
             }
         }
 
-        RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
         Map<String, ProtectedRegion> regions = mgr.getRegions();
         int size = regions.size();
-        int pages = (int) Math.ceil(size / (float) ch.CMD_LIST_SIZE);
+        int pages = (int) Math.ceil(size / (float) CommandHandler.CMD_LIST_SIZE);
 
         String[] regionIDList = new String[size];
         int index = 0;
@@ -68,16 +63,15 @@ public class CommandRegionList extends WgCommand {
         }
         Arrays.sort(regionIDList);
 
-
-        player.sendMessage(ChatColor.RED + "Regions (page "
+        sender.sendMessage(ChatColor.RED + "Regions (page "
                 + (page + 1) + " of " + pages + "):");
 
         if (page < pages) {
-            for (int i = page * ch.CMD_LIST_SIZE; i < page * ch.CMD_LIST_SIZE + ch.CMD_LIST_SIZE; i++) {
+            for (int i = page * CommandHandler.CMD_LIST_SIZE; i < page * CommandHandler.CMD_LIST_SIZE + CommandHandler.CMD_LIST_SIZE; i++) {
                 if (i >= size) {
                     break;
                 }
-                player.sendMessage(ChatColor.YELLOW.toString() + (i + 1) + ". " + regionIDList[i]);
+                sender.sendMessage(ChatColor.YELLOW.toString() + (i + 1) + ". " + regionIDList[i]);
             }
         }
 

@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldedit.blocks.ItemType;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -33,15 +33,15 @@ import org.bukkit.inventory.ItemStack;
  */
 public class CommandStack extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may use this command");
             return true;
         }
         Player player = (Player) sender;
-        ch.checkPermission(player, "/stack");
-        ch.checkArgs(args, 0, 0);
+        cfg.checkPermission(player, "stack");
+        CommandHandler.checkArgs(args, 0, 0);
 
         ItemStack[] items = player.getInventory().getContents();
         int len = items.length;

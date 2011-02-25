@@ -58,6 +58,10 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      */
     private String pathPattern;
     /**
+     * World name.
+     */
+    private String worldName;
+    /**
      * Cache of writers.
      */
     private TreeMap<String,FileLoggerWriter> writers =
@@ -68,8 +72,9 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      *
      * @param pathPattern
      */
-    public FileLoggerHandler(String pathPattern) {
+    public FileLoggerHandler(String pathPattern, String worldName) {
         this.pathPattern = pathPattern;
+        this.worldName = worldName;
     }
 
     /**
@@ -78,12 +83,13 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param pathPattern
      * @param cacheSize
      */
-    public FileLoggerHandler(String pathPattern, int cacheSize) {
+    public FileLoggerHandler(String pathPattern, int cacheSize, String worldName) {
         if (cacheSize < 1) {
             throw new IllegalArgumentException("Cache size cannot be less than 1");
         }
         this.pathPattern = pathPattern;
         this.cacheSize = cacheSize;
+        this.worldName = worldName;
     }
 
     /**
@@ -106,6 +112,12 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
                 rep = "%";
             } else if (group.matches("%u")) {
                 rep = playerName.toLowerCase().replaceAll("[^A-Za-z0-9_]", "_");
+                if (rep.length() > 32) { // Actual max length is 16
+                    rep = rep.substring(0, 32);
+                }
+
+            }else if (group.matches("%w")) {
+                rep = worldName.toLowerCase().replaceAll("[^A-Za-z0-9_]", "_");
                 if (rep.length() > 32) { // Actual max length is 16
                     rep = rep.substring(0, 32);
                 }

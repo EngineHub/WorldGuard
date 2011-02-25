@@ -15,12 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
-
+ */
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -33,59 +33,70 @@ import org.bukkit.entity.Player;
  *
  * @author Michael
  */
-public class CommandRegionAddMember extends WgCommand {
+public class CommandRegionAddMember extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
+
+        boolean cmdIsOwner = command.equalsIgnoreCase("addowner");
+
+        String permOwn;
+        String permAll;
+
+        if (cmdIsOwner) {
+            CommandHandler.checkArgs(args, 2, -1, "/region addowner <id> [player1 [group1 [players/groups...]]]");
+            permOwn = "region.addowner.own";
+            permAll = "region.addowner.all";
+        } else {
+            CommandHandler.checkArgs(args, 2, -1, "/region addmember <id> [player1 [group1 [players/groups...]]]");
+            permOwn = "region.addmember.own";
+            permAll = "region.addmember.all";
+        }
+
+        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
+
+        String id = args[0].toLowerCase();
+        if (!mgr.hasRegion(id)) {
+            sender.sendMessage(ChatColor.RED + "A region with ID '"
+                    + id + "' doesn't exist.");
             return true;
         }
-        Player player = (Player) sender;
 
-            if (!wg.hasPermission(player, "/regionclaim") && !wg.hasPermission(player, "/regionmembership")) {
-                ch.checkRegionPermission(player, "/regiondefine");
+        ProtectedRegion existing = mgr.getRegion(id);
+
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+
+            if (existing.isOwner(BukkitPlayer.wrapPlayer(cfg, player))) {
+                cfg.checkRegionPermission(sender, permOwn);
             }
-            ch.checkArgs(args, 2, -1, "/region add[member|owner] <id> [player1 [group1 [players/groups...]]]");
-
-            String action = command;
-
-            boolean isOwner = action.equalsIgnoreCase("addowner");
-            RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
-
-            String id = args[0].toLowerCase();
-            if (!mgr.hasRegion(id)) {
-                player.sendMessage(ChatColor.RED + "A region with ID '"
-                        + id + "' doesn't exist.");
-                return true;
+            else {
+                cfg.checkRegionPermission(sender, permAll);
             }
-
-            ProtectedRegion existing = mgr.getRegion(id);
-
-            if (!ch.canUseRegionCommand(player, "/regiondefine")
-                    && !existing.isOwner(wg.wrapPlayer(player))) {
-                player.sendMessage(ChatColor.RED + "You don't own this region.");
-                return true;
-            }
-
-            if (isOwner) {
-                ch.addToDomain(existing.getOwners(), args, 1);
-            } else {
-                ch.addToDomain(existing.getMembers(), args, 1);
-            }
-
-            try {
-                mgr.save();
-                player.sendMessage(ChatColor.YELLOW + "Region updated!");
-                player.sendMessage(ChatColor.GRAY + "Current owners: "
-                        + existing.getOwners().toUserFriendlyString());
-                player.sendMessage(ChatColor.GRAY + "Current members: "
-                        + existing.getMembers().toUserFriendlyString());
-            } catch (IOException e) {
-                player.sendMessage(ChatColor.RED + "Region database failed to save: "
-                        + e.getMessage());
-            }
-
-            return true;
         }
+        else
+        {
+           cfg.checkRegionPermission(sender, permAll);
+        }
+
+        if (cmdIsOwner) {
+            WorldGuardConfiguration.addToDomain(existing.getOwners(), args, 1);
+        } else {
+            WorldGuardConfiguration.addToDomain(existing.getMembers(), args, 1);
+        }
+
+        try {
+            mgr.save();
+            sender.sendMessage(ChatColor.YELLOW + "Region updated!");
+            sender.sendMessage(ChatColor.GRAY + "Current owners: "
+                    + existing.getOwners().toUserFriendlyString());
+            sender.sendMessage(ChatColor.GRAY + "Current members: "
+                    + existing.getMembers().toUserFriendlyString());
+        } catch (IOException e) {
+            sender.sendMessage(ChatColor.RED + "Region database failed to save: "
+                    + e.getMessage());
+        }
+
+        return true;
+    }
 }

@@ -20,10 +20,13 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -31,20 +34,38 @@ import org.bukkit.command.CommandSender;
  */
 public class CommandAllowFire extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException
-    {
-            ch.checkPermission(sender, "/stopfire");
-            ch.checkArgs(args, 0, 0);
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
-            if (wg.fireSpreadDisableToggle) {
-                wg.getServer().broadcastMessage(ChatColor.YELLOW
-                        + "Fire spread has been globally re-enabled by " + senderName + ".");
-            } else {
-                sender.sendMessage(ChatColor.YELLOW + "Fire spread was already globally enabled.");
-            }
+        cfg.checkPermission(sender, "allowfire");
 
-            wg.fireSpreadDisableToggle = false;
+        String worldName;
 
+        if (sender instanceof Player) {
+            CommandHandler.checkArgs(args, 0, 0);
+            worldName = ((Player)sender).getWorld().getName();
+        } else {
+            CommandHandler.checkArgs(args, 1, 1);
+            worldName = args[0];
+        }
+
+        Server server = cfg.getWorldGuardPlugin().getServer();
+        if(server.getWorld(worldName) == null)
+        {
+            sender.sendMessage("Invalid world specified.");
             return true;
+        }
+
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(worldName);
+
+        if (wcfg.fireSpreadDisableToggle) {
+            server.broadcastMessage(ChatColor.YELLOW
+                    + "Fire spread has been globally re-enabled by " + senderName + ".");
+        } else {
+            sender.sendMessage(ChatColor.YELLOW + "Fire spread was already globally enabled.");
+        }
+
+        wcfg.fireSpreadDisableToggle = false;
+
+        return true;
     }
 }

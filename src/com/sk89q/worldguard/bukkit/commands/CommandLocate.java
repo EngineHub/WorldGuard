@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -33,19 +33,20 @@ import org.bukkit.entity.Player;
  */
 public class CommandLocate extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may use this command");
             return true;
         }
+
         Player player = (Player) sender;
-        ch.checkPermission(player, "/locate");
-        ch.checkArgs(args, 0, 3);
+        cfg.checkPermission(player, "locate");
+        CommandHandler.checkArgs(args, 0, 3);
 
         if (args.length == 1) {
             String name = args[0];
-            Player target = BukkitUtil.matchSinglePlayer(wg.getServer(), name);
+            Player target = BukkitUtil.matchSinglePlayer(cfg.getWorldGuardPlugin().getServer(), name);
             if (target != null) {
                 player.setCompassTarget(target.getLocation());
                 player.sendMessage(ChatColor.YELLOW + "Compass target set to " + target.getName() + ".");

@@ -19,14 +19,14 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
-import com.sk89q.worldguard.protection.regions.AreaFlags.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -35,36 +35,47 @@ import org.bukkit.entity.Player;
  *
  * @author Michael
  */
-public class CommandRegionInfo extends WgCommand {
+public class CommandRegionInfo extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
-            return true;
-        }
-        Player player = (Player) sender;
+        CommandHandler.checkArgs(args, 1, 1, "/region info <id>");
 
-
-        ch.checkRegionPermission(player, "/regioninfo");
-        ch.checkArgs(args, 1, 1, "/region info <id>");
-
-        RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
         String id = args[0].toLowerCase();
         if (!mgr.hasRegion(id)) {
-            player.sendMessage(ChatColor.RED + "A region with ID '"
+            sender.sendMessage(ChatColor.RED + "A region with ID '"
                     + id + "' doesn't exist.");
             return true;
         }
 
         ProtectedRegion region = mgr.getRegion(id);
+
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+
+            if (region.isOwner(BukkitPlayer.wrapPlayer(cfg, player))) {
+                cfg.checkRegionPermission(sender, "region.info.ownregions");
+            }
+            else if(region.isMember(BukkitPlayer.wrapPlayer(cfg, player))) {
+                cfg.checkRegionPermission(sender, "region.info.memberregions");
+            }
+            else {
+                cfg.checkRegionPermission(sender, "region.info.foreignregions");
+            }
+        }
+        else
+        {
+           cfg.checkRegionPermission(sender, "region.info.foreignregions");
+        }
+
         AreaFlags flags = region.getFlags();
         DefaultDomain owners = region.getOwners();
         DefaultDomain members = region.getMembers();
 
-        player.sendMessage(ChatColor.YELLOW + "Region: " + id
+        sender.sendMessage(ChatColor.YELLOW + "Region: " + id
                 + ChatColor.GRAY + " (type: " + region.getTypeName() + ")");
-        player.sendMessage(ChatColor.BLUE + "Priority: " + region.getPriority());
+        sender.sendMessage(ChatColor.BLUE + "Priority: " + region.getPriority());
 
         StringBuilder s = new StringBuilder();
         for (FlagInfo nfo : FlagInfo.getFlagInfoList()) {
@@ -89,12 +100,12 @@ public class CommandRegionInfo extends WgCommand {
             s.append("spawn: not set");
         }
 
-        player.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());
-        player.sendMessage(ChatColor.BLUE + "Parent: "
+        sender.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());
+        sender.sendMessage(ChatColor.BLUE + "Parent: "
                 + (region.getParent() == null ? "(none)" : region.getParent().getId()));
-        player.sendMessage(ChatColor.LIGHT_PURPLE + "Owners: "
+        sender.sendMessage(ChatColor.LIGHT_PURPLE + "Owners: "
                 + owners.toUserFriendlyString());
-        player.sendMessage(ChatColor.LIGHT_PURPLE + "Members: "
+        sender.sendMessage(ChatColor.LIGHT_PURPLE + "Members: "
                 + members.toUserFriendlyString());
         return true;
     }

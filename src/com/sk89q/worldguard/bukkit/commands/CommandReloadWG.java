@@ -15,12 +15,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.bukkit.LoggerToChatHandler;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,31 +32,33 @@ import org.bukkit.entity.Player;
  */
 public class CommandReloadWG extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
-            return true;
+        cfg.checkPermission(sender, "reloadwg");
+        CommandHandler.checkArgs(args, 0, 0);
+
+        LoggerToChatHandler handler = null;
+        Logger minecraftLogger = null;
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            handler = new LoggerToChatHandler(player);
+            handler.setLevel(Level.ALL);
+            minecraftLogger = Logger.getLogger("Minecraft");
+            minecraftLogger.addHandler(handler);
         }
 
-        Player player = (Player) sender;
-        ch.checkPermission(player, "/reloadwg");
-        ch.checkArgs(args, 0, 0);
-
-        LoggerToChatHandler handler = new LoggerToChatHandler(player);
-        handler.setLevel(Level.ALL);
-        Logger minecraftLogger = Logger.getLogger("Minecraft");
-        minecraftLogger.addHandler(handler);
-
         try {
-            wg.loadConfiguration();
-            wg.postReload();
-            player.sendMessage("WorldGuard configuration reloaded.");
+            cfg.onDisable();
+            cfg.onEnable();
+
+            sender.sendMessage("WorldGuard configuration reloaded.");
         } catch (Throwable t) {
-            player.sendMessage("Error while reloading: "
+            sender.sendMessage("Error while reloading: "
                     + t.getMessage());
         } finally {
-            minecraftLogger.removeHandler(handler);
+            if (handler != null) {
+                minecraftLogger.removeHandler(handler);
+            }
         }
 
         return true;

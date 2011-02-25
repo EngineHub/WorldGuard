@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,34 +32,26 @@ import org.bukkit.entity.Player;
  */
 public class CommandSlay extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
-            return true;
-        }
-        Player player = (Player) sender;
-
-
-        ch.checkPermission(player, "/slay");
-        ch.checkArgs(args, 0, 1);
+        CommandHandler.checkArgs(args, 0, 1);
 
         // Allow killing other people
         if (args.length > 0) {
-            if (!wg.hasPermission(player, "/slayother")) {
-                player.sendMessage(ChatColor.RED + "You don't have permission to kill others.");
-                return true;
-            }
+            cfg.checkPermission(sender, "slay.others");
 
-            Player other = BukkitUtil.matchSinglePlayer(wg.getServer(), args[0]);
+            Player other = BukkitUtil.matchSinglePlayer(cfg.getWorldGuardPlugin().getServer(), args[0]);
             if (other == null) {
-                player.sendMessage(ChatColor.RED + "Player not found.");
+                sender.sendMessage(ChatColor.RED + "Player not found.");
             } else {
                 other.setHealth(0);
-                player.sendMessage(ChatColor.YELLOW + other.getName() + " has been killed!");
-                other.sendMessage(ChatColor.YELLOW + player.getName() + " has killed you!");
+                sender.sendMessage(ChatColor.YELLOW + other.getName() + " has been killed!");
+                other.sendMessage(ChatColor.YELLOW + senderName + " has killed you!");
             }
-        } else {
+        } else if (sender instanceof Player) {
+            cfg.checkPermission(sender, "slay.self");
+            
+            Player player = (Player)sender;
             player.setHealth(0);
             player.sendMessage(ChatColor.YELLOW + "You have committed suicide!");
         }

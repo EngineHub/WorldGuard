@@ -21,8 +21,6 @@
 
 summary-on-start: on
 
-suppress-tick-sync-warnings: false
-
 protection:
     enforce-single-session: on
     item-durability: on
@@ -101,7 +99,7 @@ blacklist:
             table: blacklist_events
         file:
             enable: on
-            path: worldguard/logs/%Y-%m-%d.log
+            path: worldguard/logs/%w-%Y-%m-%d.log
             open-files: 10
 
 # See http://wiki.sk89q.com/wiki/WorldGuard/Permissions/Bukkit

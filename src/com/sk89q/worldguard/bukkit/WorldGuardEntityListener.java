@@ -61,17 +61,20 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {            
             Player player = (Player)defender;
 
-            if (plugin.invinciblePlayers.contains(player.getName())) {
+            WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+            WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+
+            if (cfg.isInvinciblePlayer(player.getName())) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (plugin.disableLavaDamage && type == DamageCause.LAVA) {
+            if (wcfg.disableLavaDamage && type == DamageCause.LAVA) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (plugin.disableContactDamage && type == DamageCause.CONTACT) {
+            if (wcfg.disableContactDamage && type == DamageCause.CONTACT) {
                 event.setCancelled(true);
                 return;
             }
@@ -86,13 +89,16 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player)defender;
 
-            if (plugin.invinciblePlayers.contains(player.getName())) {
+            WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+            WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+
+            if (cfg.isInvinciblePlayer(player.getName())) {
                 event.setCancelled(true);
                 return;
             }
 
             if (attacker != null && attacker instanceof Player) {
-                if (plugin.useRegions) {
+                if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
@@ -106,12 +112,12 @@ public class WorldGuardEntityListener extends EntityListener {
             }
             
             if (attacker != null && attacker instanceof Monster) {
-                if (attacker instanceof Creeper && plugin.blockCreeperExplosions) {
+                if (attacker instanceof Creeper && wcfg.blockCreeperExplosions) {
                     event.setCancelled(true);
                     return;
                 }
                 
-                if (plugin.useRegions) {
+                if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
@@ -141,13 +147,16 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {            
             Player player = (Player)defender;
 
-            if (plugin.invinciblePlayers.contains(player.getName())) {
+            WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+            WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+
+            if (cfg.isInvinciblePlayer(player.getName())) {
                 event.setCancelled(true);
                 return;
             }
 
             if (attacker != null && attacker instanceof Player) {
-                if (plugin.useRegions) {
+                if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
@@ -160,7 +169,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
             if (attacker != null && attacker instanceof Skeleton) {
-            	if (plugin.useRegions) {
+            	if (wcfg.useRegions) {
             		Vector pt = toVector(defender.getLocation());
             		RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
@@ -200,40 +209,43 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {            
             Player player = (Player)defender;
 
-            if (plugin.invinciblePlayers.contains(player.getName())) {
+            WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+            WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+
+            if (cfg.isInvinciblePlayer(player.getName())) {
                 event.setCancelled(true);
                 return;
             }
             
-            if (plugin.disableFallDamage && type == DamageCause.FALL) {
+            if (wcfg.disableFallDamage && type == DamageCause.FALL) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (plugin.disableFireDamage && (type == DamageCause.FIRE
+            if (wcfg.disableFireDamage && (type == DamageCause.FIRE
                     || type == DamageCause.FIRE_TICK)) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (plugin.disableDrowningDamage && type == DamageCause.DROWNING) {
+            if (wcfg.disableDrowningDamage && type == DamageCause.DROWNING) {
                 event.setCancelled(true);
                 return;
             }
             
-            if (plugin.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
+            if (wcfg.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
                 findFreePosition(player);
                 event.setCancelled(true);
                 return;
             }
 
-            if (plugin.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
+            if (wcfg.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
                 event.setCancelled(true);
                 return;
             }
 
             if (type == DamageCause.DROWNING
-                    && plugin.amphibiousPlayers.contains(player.getName())) {
+                    && cfg.isAmphibiousPlayer(player.getName())) {
                 event.setCancelled(true);
                 return;
             }
@@ -248,18 +260,23 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
+        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getEntity().getWorld().getName());
+
         if (event.getEntity() instanceof LivingEntity) {
-            if (plugin.blockCreeperBlockDamage) {
+
+
+            if (wcfg.blockCreeperBlockDamage) {
                 event.setCancelled(true);
                 return;
             }
             
-            if (plugin.blockCreeperExplosions) {
+            if (wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
                 return;
             }
             
-            if (plugin.useRegions) {
+            if (wcfg.useRegions) {
                 Vector pt = toVector(event.getEntity().getLocation());
                 RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
                 
@@ -270,12 +287,12 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
         } else { // Shall assume that this is TNT
-            if (plugin.blockTNT) {
+            if (wcfg.blockTNT) {
                 event.setCancelled(true);
                 return;
             }
             
-            if (plugin.useRegions && event.getEntity() != null) {
+            if (wcfg.useRegions && event.getEntity() != null) {
                 Vector pt = toVector(event.getEntity().getLocation());
                 RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
 
@@ -294,26 +311,29 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
+        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getEntity().getWorld().getName());
+
         CreatureType creaType = (CreatureType)CreatureType.valueOf(event.getMobType().toString());
         String creaName = "";
         Boolean cancelEvent = false;
 
         switch(creaType) {
-            case SPIDER:     if (plugin.blockCreatureSpawn.contains("spider")) { cancelEvent = true; } creaName = "spider";       break;
-            case ZOMBIE:     if (plugin.blockCreatureSpawn.contains("zombie")) { cancelEvent = true; } creaName = "zombie";       break;
-            case CREEPER:    if (plugin.blockCreatureSpawn.contains("creeper")) { cancelEvent = true; } creaName = "creeper";     break;
-            case SKELETON:   if (plugin.blockCreatureSpawn.contains("skeleton")) { cancelEvent = true; } creaName = "skeleton";   break;
-            case SQUID:      if (plugin.blockCreatureSpawn.contains("squid")) { cancelEvent = true; } creaName = "squid";         break;
-            case PIG_ZOMBIE: if (plugin.blockCreatureSpawn.contains("pigzombie")) { cancelEvent = true; } creaName = "pigzombie"; break;
-            case GHAST:      if (plugin.blockCreatureSpawn.contains("ghast")) { cancelEvent = true; } creaName = "ghast";         break;
-            case SLIME:      if (plugin.blockCreatureSpawn.contains("slime")) { cancelEvent = true; } creaName = "slime";         break;
-            case PIG:        if (plugin.blockCreatureSpawn.contains("pig")) { cancelEvent = true; } creaName = "pig";             break;
-            case COW:        if (plugin.blockCreatureSpawn.contains("cow")) { cancelEvent = true; } creaName = "cow";             break;
-            case SHEEP:      if (plugin.blockCreatureSpawn.contains("sheep")) { cancelEvent = true; } creaName = "sheep";         break;
-            case CHICKEN:    if (plugin.blockCreatureSpawn.contains("chicken")) { cancelEvent = true; } creaName = "chicken";     break;
+            case SPIDER:     if (wcfg.blockCreatureSpawn.contains("spider")) { cancelEvent = true; } creaName = "spider";       break;
+            case ZOMBIE:     if (wcfg.blockCreatureSpawn.contains("zombie")) { cancelEvent = true; } creaName = "zombie";       break;
+            case CREEPER:    if (wcfg.blockCreatureSpawn.contains("creeper")) { cancelEvent = true; } creaName = "creeper";     break;
+            case SKELETON:   if (wcfg.blockCreatureSpawn.contains("skeleton")) { cancelEvent = true; } creaName = "skeleton";   break;
+            case SQUID:      if (wcfg.blockCreatureSpawn.contains("squid")) { cancelEvent = true; } creaName = "squid";         break;
+            case PIG_ZOMBIE: if (wcfg.blockCreatureSpawn.contains("pigzombie")) { cancelEvent = true; } creaName = "pigzombie"; break;
+            case GHAST:      if (wcfg.blockCreatureSpawn.contains("ghast")) { cancelEvent = true; } creaName = "ghast";         break;
+            case SLIME:      if (wcfg.blockCreatureSpawn.contains("slime")) { cancelEvent = true; } creaName = "slime";         break;
+            case PIG:        if (wcfg.blockCreatureSpawn.contains("pig")) { cancelEvent = true; } creaName = "pig";             break;
+            case COW:        if (wcfg.blockCreatureSpawn.contains("cow")) { cancelEvent = true; } creaName = "cow";             break;
+            case SHEEP:      if (wcfg.blockCreatureSpawn.contains("sheep")) { cancelEvent = true; } creaName = "sheep";         break;
+            case CHICKEN:    if (wcfg.blockCreatureSpawn.contains("chicken")) { cancelEvent = true; } creaName = "chicken";     break;
         }
 
-        if (plugin.useRegions && creaName != "") {
+        if (wcfg.useRegions && creaName != "") {
             Vector pt = toVector(event.getEntity().getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
 

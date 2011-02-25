@@ -26,11 +26,15 @@ import com.sk89q.worldguard.LocalPlayer;
 
 public class BukkitPlayer extends LocalPlayer {
     private Player player;
-    private WorldGuardPlugin plugin;
+    private WorldGuardConfiguration config;
     
-    public BukkitPlayer(WorldGuardPlugin plugin, Player player) {
-        this.plugin = plugin;
+    public BukkitPlayer(WorldGuardConfiguration config, Player player) {
+        this.config = config;
         this.player = player;
+    }
+    
+    public static BukkitPlayer wrapPlayer(WorldGuardConfiguration config, Player player) {
+        return new BukkitPlayer(config, player);
     }
 
     @Override
@@ -40,7 +44,7 @@ public class BukkitPlayer extends LocalPlayer {
 
     @Override
     public boolean hasGroup(String group) {
-        return plugin.inGroup(player, group);
+        return config.inGroup(player, group);
     }
 
     @Override
@@ -61,7 +65,7 @@ public class BukkitPlayer extends LocalPlayer {
 
     @Override
     public String[] getGroups() {
-        return plugin.getGroups(player);
+        return config.getGroups(player);
     }
 
     @Override

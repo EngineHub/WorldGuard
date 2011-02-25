@@ -15,16 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -32,47 +34,76 @@ import org.bukkit.command.CommandSender;
  */
 public class RegionCommandHandler extends WgCommand {
 
-    private Map<String, WgCommand> commandMap;
+    private Map<String, WgRegionCommand> commandMap;
 
-    public RegionCommandHandler()
-    {
-        this.commandMap = new HashMap<String, WgCommand>();
+    public RegionCommandHandler() {
+        this.commandMap = new HashMap<String, WgRegionCommand>();
 
-        this.commandMap.put("addmember", new CommandRegionAddMember());
-        this.commandMap.put("addowner", new CommandRegionAddMember());
-        this.commandMap.put("claim", new CommandRegionClaim());
-        this.commandMap.put("define", new CommandRegionDefine());
-        this.commandMap.put("delete", new CommandRegionDelete());
-        this.commandMap.put("flag", new CommandRegionFlag());
-        this.commandMap.put("info", new CommandRegionInfo());
-        this.commandMap.put("list", new CommandRegionList());
-        this.commandMap.put("load", new CommandRegionLoad());
-        this.commandMap.put("removemember", new CommandRegionRemoveMember());
-        this.commandMap.put("removeowner", new CommandRegionRemoveMember());
+        WgRegionCommand addmember = new CommandRegionAddMember();
+        WgRegionCommand removemember = new CommandRegionRemoveMember();
+
+        // commands that DO support console as sender
         this.commandMap.put("save", new CommandRegionSave());
+        this.commandMap.put("load", new CommandRegionLoad());
+        this.commandMap.put("list", new CommandRegionList());
+        this.commandMap.put("info", new CommandRegionInfo());
+        this.commandMap.put("flag", new CommandRegionFlag());
+        this.commandMap.put("removemember", removemember);
+        this.commandMap.put("removeowner", removemember);
         this.commandMap.put("setparent", new CommandRegionSetParent());
+        this.commandMap.put("delete", new CommandRegionDelete());
+        this.commandMap.put("addmember", addmember);
+        this.commandMap.put("addowner", addmember);
+
+        // commands that DO NOT support console as sender
+        this.commandMap.put("define", new CommandRegionDefine());
+        this.commandMap.put("claim", new CommandRegionClaim());
+
     }
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
-        if (!wg.useRegions) {
-            sender.sendMessage(ChatColor.RED + "Regions are disabled.");
+        String worldName;
+        String subCommand;
+
+        if (sender instanceof Player) {
+            CommandHandler.checkArgs(args, 1, -1);
+            worldName = ((Player) sender).getWorld().getName();
+            subCommand = args[0].toLowerCase();
+        } else {
+            CommandHandler.checkArgs(args, 2, -1);
+            worldName = args[0];
+            subCommand = args[1].toLowerCase();
+        }
+
+        Server server = cfg.getWorldGuardPlugin().getServer();
+        if (server.getWorld(worldName) == null) {
+            sender.sendMessage("Invalid world specified.");
             return true;
         }
 
-        ch.checkArgs(args, 1, -1);           
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(worldName);
 
-        String subCommand = args[0].toLowerCase();
+        if (!wcfg.useRegions) {
+            sender.sendMessage(ChatColor.RED + "Regions are disabled in this world.");
+            return true;
+        }
 
-        WgCommand wgcmd = commandMap.get(subCommand);
+        WgRegionCommand wgcmd = commandMap.get(subCommand);
         if (wgcmd == null) {
             return false;
         }
 
-        String[] subArgs = new String[args.length - 1];
-        System.arraycopy(args, 1, subArgs, 0, args.length - 1);
+        String[] subArgs;
+        if (sender instanceof Player) {
+            subArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, subArgs, 0, args.length - 1);
+        } else {
+            subArgs = new String[args.length - 2];
+            System.arraycopy(args, 2, subArgs, 0, args.length - 2);
+        }
 
-        wgcmd.handle(sender, senderName, subCommand, subArgs, ch, wg);
+        wgcmd.handle(sender, senderName, subCommand, subArgs, cfg, wcfg);
 
         return true;
     }

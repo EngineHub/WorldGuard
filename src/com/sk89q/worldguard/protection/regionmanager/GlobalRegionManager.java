@@ -37,25 +37,35 @@ public class GlobalRegionManager {
 
     private WorldGuardPlugin wg;
     private HashMap<String, RegionManager> managers;
-    private GlobalFlags globalFlags;
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     public GlobalRegionManager(WorldGuardPlugin wg) {
 
         this.wg = wg;
         this.managers = new HashMap<String, RegionManager>();
-        this.globalFlags = new GlobalFlags();
+    }
+
+    public void onEnable() {
+
+        this.managers.clear();
 
         for (World w : wg.getServer().getWorlds()) {
             loadWorld(w.getName());
         }
+
+        wg.getWgConfiguration().onEnable();
+    }
+
+    public void onDisable()
+    {
+        wg.getWgConfiguration().onDisable();
     }
 
     private void loadWorld(String name) {
 
         String filename = name + ".regions.json";
         try {
-            managers.put(name, new FlatRegionManager(globalFlags, new JSONDatabase(new File(wg.getDataFolder(), filename))));
+            managers.put(name, new FlatRegionManager(new GlobalFlags(), new JSONDatabase(new File(wg.getDataFolder(), filename))));
         } catch (FileNotFoundException e) {
         } catch (IOException e) {
             logger.warning("WorldGuard: Failed to load regions from file " + filename + " : "
@@ -76,12 +86,14 @@ public class GlobalRegionManager {
         return ret;
     }
 
-    public void setGlobalFlags(GlobalFlags globalflags) {
+
+    public void setGlobalFlags(String worldName, GlobalFlags globalflags) {
 
         if (globalflags != null) {
-            this.globalFlags = globalflags;
-            for (Map.Entry<String, RegionManager> entry : managers.entrySet()) {
-                entry.getValue().setGlobalFlags(globalflags);
+            RegionManager ret = this.managers.get(worldName);
+
+            if (ret == null) {
+                ret.setGlobalFlags(globalflags);
             }
         }
 

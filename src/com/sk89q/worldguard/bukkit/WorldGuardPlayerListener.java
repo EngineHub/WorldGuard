@@ -59,18 +59,21 @@ public class WorldGuardPlayerListener extends PlayerListener {
     @Override
     public void onPlayerJoin(PlayerEvent event) {
         Player player = event.getPlayer();
-        
-        if (plugin.fireSpreadDisableToggle) {
+
+        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+
+        if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW
                     + "Fire spread is currently globally disabled.");
         }
 
-        if (plugin.inGroup(player, "wg-invincible")) {
-            plugin.invinciblePlayers.add(player.getName());
+        if (cfg.inGroup(player, "wg-invincible")) {
+            cfg.addInvinciblePlayer(player.getName());
         }
 
-        if (plugin.inGroup(player, "wg-amphibious")) {
-            plugin.amphibiousPlayers.add(player.getName());
+        if (cfg.inGroup(player, "wg-amphibious")) {
+            cfg.addAmphibiousPlayer(player.getName());
         }
     }
 
@@ -82,11 +85,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
     @Override
     public void onPlayerQuit(PlayerEvent event) {
         Player player = event.getPlayer();
-        plugin.invinciblePlayers.remove(player.getName());
-        plugin.amphibiousPlayers.remove(player.getName());
-        if (plugin.blacklist != null) {
-            plugin.blacklist.forgetPlayer(plugin.wrapPlayer(player));
-        }
+
+        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+
+        cfg.removeInvinciblePlayer(player.getName());
+        cfg.removeAmphibiousPlayer(player.getName());
+
+        cfg.forgetPlayerAllBlacklists(BukkitPlayer.wrapPlayer(cfg, player));
     }
     
     /**
@@ -106,7 +112,10 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Block block = event.getBlockClicked();
         ItemStack item = event.getItem();
 
-        if (!plugin.itemDurability) {
+        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+
+        if (!wcfg.itemDurability) {
             // Hoes
             if (item.getTypeId() >= 290 && item.getTypeId() <= 294) {
                 item.setDurability((byte)-1);
@@ -114,10 +123,10 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
         
-        if (plugin.useRegions && !event.isBlock() && block != null) {
+        if (wcfg.useRegions && !event.isBlock() && block != null) {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
 
-            if (!plugin.canBuild(player, pt)) {
+            if (!cfg.canBuild(player, pt)) {
                 player.sendMessage(ChatColor.DARK_RED
                         + "You don't have permission for this area.");
                 event.setCancelled(true);
@@ -125,9 +134,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
         
-        if (plugin.blacklist != null && item != null && block != null) {
-            if (!plugin.blacklist.check(
-                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
+        if (wcfg.getBlacklist() != null && item != null && block != null) {
+            if (!wcfg.getBlacklist().check(
+                    new ItemUseBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, player),
                             toVector(block.getRelative(event.getBlockFace())),
                             item.getTypeId()), false, false)) {
                 event.setCancelled(true);
@@ -135,7 +144,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
     
-        if (plugin.useRegions && item != null && block != null && item.getTypeId() == 259) {
+        if (wcfg.useRegions && item != null && block != null && item.getTypeId() == 259) {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
@@ -155,8 +164,11 @@ public class WorldGuardPlayerListener extends PlayerListener {
     @Override
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        
-        if (plugin.enforceOneSession) {
+
+        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+ 
+        if (wcfg.enforceOneSession) {
             String name = player.getName();
             
             for (Player pl : plugin.getServer().getOnlinePlayers()) {
@@ -179,11 +191,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
             return;
         }
 
-        if (plugin.blacklist != null) {
+        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getPlayer().getWorld().getName());
+
+        if (wcfg.getBlacklist() != null) {
             Item ci = event.getItemDrop();
 
-            if (!plugin.blacklist.check(
-                    new ItemDropBlacklistEvent(plugin.wrapPlayer(event
+            if (!wcfg.getBlacklist().check(
+                    new ItemDropBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, event
                             .getPlayer()), toVector(ci.getLocation()), ci
                             .getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);
@@ -205,11 +220,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
             return;
         }
 
-        if (plugin.blacklist != null) {
+        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getPlayer().getWorld().getName());
+
+        if (wcfg.getBlacklist() != null) {
             Item ci = event.getItem();
 
-            if (!plugin.blacklist.check(
-                    new ItemAcquireBlacklistEvent(plugin.wrapPlayer(event
+            if (!wcfg.getBlacklist().check(
+                    new ItemAcquireBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, event
                             .getPlayer()), toVector(ci.getLocation()), ci
                             .getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);

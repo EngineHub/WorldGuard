@@ -62,6 +62,10 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      */
     private String table;
     /**
+     * World name.
+     */
+    private String worldName;
+    /**
      * Database connection.
      */
     private Connection conn;
@@ -73,11 +77,12 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param user
      * @param pass
      */
-    public DatabaseLoggerHandler(String dsn, String user, String pass, String table) {
+    public DatabaseLoggerHandler(String dsn, String user, String pass, String table, String worldName) {
         this.dsn = dsn;
         this.user = user;
         this.pass = pass;
         this.table = table;
+        this.worldName = worldName;
     }
 
     /**
@@ -110,16 +115,17 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
             Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO " + table
-                  + "(event, player, x, y, z, item, time, comment) VALUES "
-                  + "(?, ?, ?, ?, ?, ?, ?, ?)");
+                  + "(event, world, player, x, y, z, item, time, comment) VALUES "
+                  + "(?, ?, ?, ?, ?, ?, ?, ?, ?)");
             stmt.setString(1, event);
-            stmt.setString(2, player.getName());
-            stmt.setInt(3, pos.getBlockX());
-            stmt.setInt(4, pos.getBlockY());
-            stmt.setInt(5, pos.getBlockZ());
-            stmt.setInt(6, item);
-            stmt.setInt(7, (int)(System.currentTimeMillis() / 1000));
-            stmt.setString(8, comment);
+            stmt.setString(2, worldName);
+            stmt.setString(3, player.getName());
+            stmt.setInt(4, pos.getBlockX());
+            stmt.setInt(5, pos.getBlockY());
+            stmt.setInt(6, pos.getBlockZ());
+            stmt.setInt(7, item);
+            stmt.setInt(8, (int)(System.currentTimeMillis() / 1000));
+            stmt.setString(9, comment);
             stmt.executeUpdate();
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Failed to log blacklist event to database: "

@@ -19,9 +19,11 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -31,25 +33,40 @@ import org.bukkit.entity.Player;
  */
 public class CommandStopFire extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
+        cfg.checkPermission(sender, "stopfire");
+        CommandHandler.checkArgs(args, 0, 0);
+
+        String worldName;
+
+        if (sender instanceof Player) {
+            CommandHandler.checkArgs(args, 0, 0);
+            worldName = ((Player)sender).getWorld().getName();
+        } else {
+            CommandHandler.checkArgs(args, 1, 1);
+            worldName = args[0];
+        }
+
+        Server server = cfg.getWorldGuardPlugin().getServer();
+        if(server.getWorld(worldName) == null)
+        {
+            sender.sendMessage("Invalid world specified.");
             return true;
         }
 
-        Player player = (Player) sender;
-        ch.checkPermission(sender, "/stopfire");
-        ch.checkArgs(args, 0, 0);
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(worldName);
 
-        if (!wg.fireSpreadDisableToggle) {
-            wg.getServer().broadcastMessage(ChatColor.YELLOW
+
+
+        if (!wcfg.fireSpreadDisableToggle) {
+            cfg.getWorldGuardPlugin().getServer().broadcastMessage(ChatColor.YELLOW
                     + "Fire spread has been globally disabled by " + senderName + ".");
         } else {
             sender.sendMessage(ChatColor.YELLOW + "Fire spread was already globally disabled.");
         }
 
-        wg.fireSpreadDisableToggle = true;
+        wcfg.fireSpreadDisableToggle = true;
 
         return true;
     }

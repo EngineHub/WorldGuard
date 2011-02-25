@@ -26,7 +26,8 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -43,23 +44,23 @@ import org.bukkit.plugin.Plugin;
  *
  * @author Michael
  */
-public class CommandRegionDefine extends WgCommand {
+public class CommandRegionDefine extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may use this command");
             return true;
         }
         Player player = (Player) sender;
-
-        Plugin wePlugin = wg.getServer().getPluginManager().getPlugin("WorldEdit");
+        
+        Plugin wePlugin = cfg.getWorldGuardPlugin().getServer().getPluginManager().getPlugin("WorldEdit");
         if (wePlugin == null) {
-            player.sendMessage(ChatColor.RED + "WorldEdit must be installed and enabled!");
+            sender.sendMessage(ChatColor.RED + "WorldEdit must be installed and enabled!");
             return true;
         }
-        ch.checkRegionPermission(player, "/regiondefine");
-        ch.checkArgs(args, 1, -1, "/region define <id> [owner1 [owner2 [owners...]]]");
+        cfg.checkRegionPermission(sender, "region.define");
+        CommandHandler.checkArgs(args, 1, -1, "/region define <id> [owner1 [owner2 [owners...]]]");
 
         try {
             String id = args[0].toLowerCase();
@@ -84,16 +85,16 @@ public class CommandRegionDefine extends WgCommand {
             }
 
             if (args.length >= 2) {
-                region.setOwners(ch.parseDomainString(args, 1));
+                region.setOwners(WorldGuardConfiguration.parseDomainString(args, 1));
             }
-            RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(w.getName());
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(w.getName());
             mgr.addRegion(region);
             mgr.save();
-            player.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
+            sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
         } catch (IncompleteRegionException e) {
-            player.sendMessage(ChatColor.RED + "You must first define an area in WorldEdit.");
+            sender.sendMessage(ChatColor.RED + "You must first define an area in WorldEdit.");
         } catch (IOException e) {
-            player.sendMessage(ChatColor.RED + "Region database failed to save: "
+            sender.sendMessage(ChatColor.RED + "Region database failed to save: "
                     + e.getMessage());
         }
 

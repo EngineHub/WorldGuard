@@ -19,36 +19,31 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 /**
  *
  * @author Michael
  */
-public class CommandRegionSave extends WgCommand {
+public class CommandRegionSave extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, CommandHandler ch, WorldGuardPlugin wg) throws CommandHandlingException {
+    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players may use this command");
-            return true;
-        }
-        Player player = (Player) sender;
-        ch.checkRegionPermission(player, "/regionsave");
-        ch.checkArgs(args, 0, 0, "/region save");
+        cfg.checkRegionPermission(sender, "region.save");
+        CommandHandler.checkArgs(args, 0, 0, "/region save");
 
         try {
-            RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
             mgr.save();
-            player.sendMessage(ChatColor.YELLOW + "Region database saved to file!");
+            sender.sendMessage(ChatColor.YELLOW + "Region database saved to file!");
         } catch (IOException e) {
-            player.sendMessage(ChatColor.RED + "Region database failed to save: "
+            sender.sendMessage(ChatColor.RED + "Region database failed to save: "
                     + e.getMessage());
         }
 
