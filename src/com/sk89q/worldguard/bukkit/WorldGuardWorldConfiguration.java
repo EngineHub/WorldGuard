@@ -280,7 +280,7 @@ public class WorldGuardWorldConfiguration {
 
         // Print an overview of settings
         if (config.getBoolean("summary-on-start", true)) {
-            logger.log(Level.INFO, "=============== WorldGuard configuration for world " + worldName + " ===============");
+            logger.log(Level.INFO, "=== WorldGuard configuration for world " + worldName + " ===");
             logger.log(Level.INFO, enforceOneSession ? "WorldGuard: Single session is enforced."
                     : "WorldGuard: Single session is NOT ENFORCED.");
             logger.log(Level.INFO, blockTNT ? "WorldGuard: TNT ignition is blocked."
