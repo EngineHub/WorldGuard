@@ -81,6 +81,9 @@ public class CommandRegionFlag extends WgRegionCommand {
             if (nfo == null) {
                 sender.sendMessage(ChatColor.RED + "Unknown flag specified.");
                 return true;
+            } else if (nfo.subName != null && args.length < 4) {
+                sender.sendMessage(ChatColor.RED + "Name a subflag to set this flag.");
+                return true;
             }
 
             boolean validValue = false;
@@ -103,6 +106,8 @@ public class CommandRegionFlag extends WgRegionCommand {
                     if (valueStr.equals("on")) {
                         valueStr = "true";
                     } else if (valueStr.equals("allow")) {
+                        valueStr = "true";
+                    } else if (valueStr.equals("1")) {
                         valueStr = "true";
                     }
                     validValue = true;
@@ -191,7 +196,12 @@ public class CommandRegionFlag extends WgRegionCommand {
                 return true;
             }
 
-            region.getFlags().setFlag(nfo.flagName, nfo.flagSubName, valueStr);
+            if (nfo.subName != null && nfo.subName.equals("*")) {
+                region.getFlags().setFlag(nfo.flagName, subnameStr, valueStr);
+            } else {
+                region.getFlags().setFlag(nfo.flagName, nfo.flagSubName, valueStr);
+            }
+
             mgr.save();
 
             sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + fullFlagname + " set to " + valueStr);

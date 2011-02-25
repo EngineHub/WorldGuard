@@ -216,6 +216,10 @@ public class AreaFlags {
     }
 
     public void setFlag(String name, String subname, String value) {
+        if(subname == null)
+        {
+            return;
+        }
         if (value == null) {
             getFlagData(name).remove(subname);
         } else {
@@ -224,35 +228,19 @@ public class AreaFlags {
     }
 
     public void setFlag(String name, String subname, Boolean value) {
-        if (value == null) {
-            getFlagData(name).remove(subname);
-        } else {
-            getFlagData(name).put(subname, value.toString());
-        }
+         setFlag(name, subname, value.toString());
     }
 
     public void setFlag(String name, String subname, Integer value) {
-        if (value == null) {
-            getFlagData(name).remove(subname);
-        } else {
-            getFlagData(name).put(subname, value.toString());
-        }
+         setFlag(name, subname, value.toString());
     }
 
     public void setFlag(String name, String subname, Float value) {
-        if (value == null) {
-            getFlagData(name).remove(subname);
-        } else {
-            getFlagData(name).put(subname, value.toString());
-        }
+         setFlag(name, subname, value.toString());
     }
 
     public void setFlag(String name, String subname, Double value) {
-        if (value == null) {
-            getFlagData(name).remove(subname);
-        } else {
-            getFlagData(name).put(subname, value.toString());
-        }
+         setFlag(name, subname, value.toString());
     }
 
     public String getFlag(String name, String subname) {
