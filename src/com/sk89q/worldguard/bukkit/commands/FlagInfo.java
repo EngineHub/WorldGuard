@@ -58,8 +58,14 @@ public class FlagInfo {
         flagList.add(new FlagInfo("waterflow", null, FlagValueType.STATE, "states", "waterflow"));
         flagList.add(new FlagInfo("iconomy", "buyable", FlagValueType.BOOLEAN, "iconomy", "buyable"));
         flagList.add(new FlagInfo("iconomy", "price", FlagValueType.INT, "iconomy", "price"));
-        flagList.add(new FlagInfo("spawn", "*", FlagValueType.LOCATION, "spawn", ""));
-        flagList.add(new FlagInfo("teleport", "*", FlagValueType.LOCATION, "teleport", ""));
+        flagList.add(new FlagInfo("spawn", "set", FlagValueType.LOCATION, "spawn", ""));
+        flagList.add(new FlagInfo("spawn", "delete", FlagValueType.LOCATION, "spawn", ""));
+        flagList.add(new FlagInfo("spawn", "allow", FlagValueType.STRING, "spawn", "settings"));
+        flagList.add(new FlagInfo("spawn", "deny", FlagValueType.STRING, "spawn", "settings"));
+        flagList.add(new FlagInfo("teleport", "set", FlagValueType.LOCATION, "teleport", ""));
+        flagList.add(new FlagInfo("teleport", "delete", FlagValueType.LOCATION, "teleport", ""));
+        flagList.add(new FlagInfo("teleport", "allow", FlagValueType.STRING, "teleport", "settings"));
+        flagList.add(new FlagInfo("teleport", "deny", FlagValueType.STRING, "teleport", "settings"));
     }
 
     public static FlagInfo getFlagInfo(String name, String subName) {
