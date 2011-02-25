@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.nijikokun.bukkit.iConomy.iConomy;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import org.bukkit.entity.Item;
@@ -41,7 +42,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * Plugin.
      */
     private WorldGuardPlugin plugin;
-    
+
+    private boolean checkediConomy = false;
+
     /**
      * Construct the object;
      * 
@@ -176,6 +179,15 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     pl.kickPlayer("Logged in from another location.");
                 }
             }
+        }
+
+        if (!checkediConomy) {
+            iConomy iconomy = (iConomy)plugin.getServer().getPluginManager().getPlugin("iConomy");
+            if (iconomy != null) {
+                plugin.getWgConfiguration().setiConomy(iconomy);
+            }
+
+            checkediConomy = true;
         }
     }
 
