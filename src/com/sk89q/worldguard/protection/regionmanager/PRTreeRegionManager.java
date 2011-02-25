@@ -146,7 +146,6 @@ public class PRTreeRegionManager extends RegionManager {
      */
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
 
-        /* This would only allow parents that overlap with their child
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
 
         int x = pt.getBlockX();
@@ -157,11 +156,10 @@ public class PRTreeRegionManager extends RegionManager {
                 appRegions.add(region);
             }
         }
-         *
-         */
+
 
         // this allows parents not to overlap with their childs
-        return new ApplicableRegionSet(pt, this.regions, global);
+        return new ApplicableRegionSet(pt, appRegions, global);
     }
 
     /**

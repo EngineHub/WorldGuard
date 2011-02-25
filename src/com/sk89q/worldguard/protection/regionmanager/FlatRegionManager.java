@@ -132,7 +132,7 @@ public class FlatRegionManager extends RegionManager {
      */
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
 
-        /* This would only allow parents that overlap with their child
+
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
 
         for (Map.Entry<String,ProtectedRegion> entry : regions.entrySet()) {
@@ -140,11 +140,8 @@ public class FlatRegionManager extends RegionManager {
                 appRegions.add(entry.getValue());
             }
         }
-         */
-
-        // this allows parents not to overlap with their childs
-
-        return new ApplicableRegionSet(pt, this.regions, global);
+         
+        return new ApplicableRegionSet(pt, appRegions, global);
     }
     
     /**

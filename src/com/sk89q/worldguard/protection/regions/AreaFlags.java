@@ -37,18 +37,20 @@ public class AreaFlags {
         ALLOW,
         DENY,
     };
-    public static final String FLAG_PASSTHROUGH = "z";
-    public static final String FLAG_BUILD = "b";
-    public static final String FLAG_PVP = "p";
-    public static final String FLAG_MOB_DAMAGE = "m";
-    public static final String FLAG_CREEPER_EXPLOSION = "c";
-    public static final String FLAG_TNT = "t";
-    public static final String FLAG_LIGHTER = "l";
-    public static final String FLAG_FIRE_SPREAD = "f";
-    public static final String FLAG_LAVA_FIRE = "F";
-    public static final String FLAG_CHEST_ACCESS = "C";
-    public static final String FLAG_WATER_FLOW = "w";
+  
+    public static final String FLAG_PASSTHROUGH = "passthrough";
+    public static final String FLAG_BUILD = "build";
+    public static final String FLAG_PVP = "pvp";
+    public static final String FLAG_MOB_DAMAGE = "mobdamage";
+    public static final String FLAG_CREEPER_EXPLOSION = "creeper";
+    public static final String FLAG_TNT = "tnt";
+    public static final String FLAG_LIGHTER = "llighter";
+    public static final String FLAG_FIRE_SPREAD = "firespread";
+    public static final String FLAG_LAVA_FIRE = "lavafirespread";
+    public static final String FLAG_CHEST_ACCESS = "chest";
+    public static final String FLAG_WATER_FLOW = "waterflow";
 
+    
     /**
      * Get the user-friendly name of a flag. If a name isn't known, then
      * the flag is returned unchanged.
@@ -56,6 +58,7 @@ public class AreaFlags {
      * @param flag
      * @return
      */
+    /*
     public static String getFlagName(String flag) {
         if (flag.equals(FLAG_PASSTHROUGH)) {
             return "passthrough";
@@ -83,13 +86,14 @@ public class AreaFlags {
             return flag;
         }
     }
-
+*/
     /**
      * Gets a flag from an alias. May return null.
      * 
      * @param name
      * @return
      */
+    /*
     public static String fromAlias(String name) {
         if (name.equalsIgnoreCase("passthrough")) {
             return FLAG_PASSTHROUGH;
@@ -116,7 +120,8 @@ public class AreaFlags {
         } else {
             return null;
         }
-    }
+    }*/
+    
     private Map<String, Map<String, String>> flags = new HashMap<String, Map<String, String>>();
 
     public Map<String, String> getFlagData(String name) {

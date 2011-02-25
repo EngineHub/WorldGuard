@@ -93,7 +93,7 @@ public class TimedFlagsTimer implements Runnable {
 
             
             //check greeting/farewell flag
-            ProtectedRegion newRegion = regions.getChildRegion();
+            ProtectedRegion newRegion = regions.getAffectedRegion();
             String newRegionName = null;
 
             if (newRegion != null) {
