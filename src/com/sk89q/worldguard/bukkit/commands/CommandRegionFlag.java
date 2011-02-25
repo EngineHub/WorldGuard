@@ -82,7 +82,7 @@ public class CommandRegionFlag extends WgRegionCommand {
                 sender.sendMessage(ChatColor.RED + "Unknown flag specified.");
                 return true;
             } else if (nfo.subName != null && args.length < 4) {
-                sender.sendMessage(ChatColor.RED + "Name a subflag to set this flag.");
+                sender.sendMessage(ChatColor.RED + "Name a subflag and a value to set this flag.");
                 return true;
             }
 
