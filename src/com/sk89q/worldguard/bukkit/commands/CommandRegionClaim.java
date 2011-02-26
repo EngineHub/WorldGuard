@@ -104,6 +104,12 @@ public class CommandRegionClaim extends WgRegionCommand {
                 return true;
             }
 
+            if (region.countBlocks() > wcfg.maxClaimVolume) {
+                player.sendMessage(ChatColor.RED + "This region is to large to claim.");
+                player.sendMessage(ChatColor.RED + "Max. volume: " + wcfg.maxClaimVolume + " Your volume: " + region.countBlocks());
+                return true;
+            }
+
             region.getOwners().addPlayer(player.getName());
 
             if (cfg.getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {

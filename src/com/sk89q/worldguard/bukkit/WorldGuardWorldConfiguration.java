@@ -92,6 +92,7 @@ public class WorldGuardWorldConfiguration {
     public boolean useiConomy;
     public boolean buyOnClaim;
     public int buyOnClaimPrice;
+    public int maxClaimVolume;
     /* Configuration data end */
 
 
@@ -200,6 +201,7 @@ public class WorldGuardWorldConfiguration {
 
         useRegions = config.getBoolean("regions.enable", true);
         regionWand = config.getInt("regions.wand", 287);
+        maxClaimVolume = config.getInt("regions.max-claim-volume", 1000);
 
         useiConomy = config.getBoolean("iconomy.enable", false);
         buyOnClaim = config.getBoolean("iconomy.buy-on-claim", false);
