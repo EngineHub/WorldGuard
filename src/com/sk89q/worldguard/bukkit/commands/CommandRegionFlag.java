@@ -51,7 +51,12 @@ public class CommandRegionFlag extends WgRegionCommand {
                 valueStr = args[2];
             } else {
                 subnameStr = args[2];
-                valueStr = args[3];
+                StringBuilder tmp = new StringBuilder();
+                for(int i=3; i < args.length; i++)
+                {
+                    tmp.append(args[i]);
+                }
+                valueStr = tmp.toString();
             }
 
             RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
