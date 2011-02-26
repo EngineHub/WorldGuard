@@ -139,14 +139,14 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * @return
      */
     public int countBlocks() {
-        if(points.size() < 3) {
+        int volume = 0;
+        int numPoints = points.size();
+        if(numPoints < 3) {
             return 0;
         }
 
         double area = 0;
-        int volume = 0;
         int xa, za, z1, z2;
-        int numPoints = points.size();
 
         for (int i = 0; i <= numPoints - 1; i++) {
             xa = points.get(i).getBlockX();
@@ -171,7 +171,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
         area = area + (xa * (points.get(1).getBlockZ() - points.get(numPoints - 1).getBlockZ()));
 
-        volume = (Math.abs(maxY - minY) + 1) * (int)Math.ceil((Math.abs(area) / 2));;
+        volume = (Math.abs(maxY - minY) + 1) * (int)Math.ceil((Math.abs(area) / 2));
 
         return volume;
     }
