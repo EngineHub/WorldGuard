@@ -51,6 +51,7 @@ worldguard.region.claim
 
 worldguard.tpregion
 worldguard.tpregion.spawn
+worldguard.tpregion.override
 
 worldguard.buyregion
 
