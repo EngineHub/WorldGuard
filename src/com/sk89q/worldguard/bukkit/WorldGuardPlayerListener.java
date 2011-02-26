@@ -129,6 +129,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
         if (wcfg.useRegions && !event.isBlock() && block != null) {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
+            if (block.getType() == Material.WALL_SIGN) {
+                pt = pt.subtract(0, 1, 0);
+            }
 
             if (!cfg.canBuild(player, pt)) {
                 player.sendMessage(ChatColor.DARK_RED
