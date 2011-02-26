@@ -44,15 +44,23 @@ public class CommandHandler {
         this.wg = wg;
         this.commandMap = new HashMap<String, WgCommand>();
 
+        WgCommand regionHandler = new RegionCommandHandler();
+
         // commands that DO support console as sender
         this.commandMap.put("allowfire", new CommandAllowFire());
         this.commandMap.put("god", new CommandGod());
         this.commandMap.put("heal", new CommandHeal());
-        this.commandMap.put("region", new RegionCommandHandler());
+        this.commandMap.put("region", regionHandler);
+        this.commandMap.put("rd", regionHandler);
+        this.commandMap.put("rc", regionHandler);
+        this.commandMap.put("rf", regionHandler);
+        this.commandMap.put("ri", regionHandler);
+        this.commandMap.put("rl", regionHandler);
+        this.commandMap.put("rp", regionHandler);
         this.commandMap.put("reloadwg", new CommandReloadWG());
         this.commandMap.put("slay", new CommandSlay());
         this.commandMap.put("stopfire", new CommandStopFire());
-        
+
         // commands that DO NOT support console as sender
         this.commandMap.put("stack", new CommandStack());
         this.commandMap.put("locate", new CommandLocate());

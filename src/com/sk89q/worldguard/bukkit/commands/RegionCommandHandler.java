@@ -35,9 +35,11 @@ import org.bukkit.entity.Player;
 public class RegionCommandHandler extends WgCommand {
 
     private Map<String, WgRegionCommand> commandMap;
+    private Map<String, String> aliasMap;
 
     public RegionCommandHandler() {
         this.commandMap = new HashMap<String, WgRegionCommand>();
+        this.aliasMap = new HashMap<String, String>();
 
         WgRegionCommand addmember = new CommandRegionAddMember();
         WgRegionCommand removemember = new CommandRegionRemoveMember();
@@ -60,21 +62,46 @@ public class RegionCommandHandler extends WgCommand {
         this.commandMap.put("define", new CommandRegionDefine());
         this.commandMap.put("claim", new CommandRegionClaim());
 
+
+        this.aliasMap.put("rd", "define");
+        this.aliasMap.put("rc", "claim");
+        this.aliasMap.put("rf", "flag");
+        this.aliasMap.put("ri", "info");
+        this.aliasMap.put("rl", "list");
+        this.aliasMap.put("rp", "priority");
     }
 
     public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
         String worldName;
         String subCommand;
+        int argsStartAt;
 
-        if (sender instanceof Player) {
-            CommandHandler.checkArgs(args, 1, -1);
-            worldName = ((Player) sender).getWorld().getName();
-            subCommand = args[0].toLowerCase();
+        if (!command.equals("region")) {
+            subCommand = this.aliasMap.get(command);
+            if (subCommand == null) {
+                return false;
+            }
+            if (sender instanceof Player) {
+                worldName = ((Player) sender).getWorld().getName();
+                argsStartAt = 0;
+            } else {
+                CommandHandler.checkArgs(args, 1, -1);
+                worldName = args[0];
+                argsStartAt = 1;
+            }
         } else {
-            CommandHandler.checkArgs(args, 2, -1);
-            worldName = args[0];
-            subCommand = args[1].toLowerCase();
+            if (sender instanceof Player) {
+                CommandHandler.checkArgs(args, 1, -1);
+                worldName = ((Player) sender).getWorld().getName();
+                subCommand = args[0].toLowerCase();
+                argsStartAt = 1;
+            } else {
+                CommandHandler.checkArgs(args, 2, -1);
+                worldName = args[0];
+                subCommand = args[1].toLowerCase();
+                argsStartAt = 2;
+            }
         }
 
         Server server = cfg.getWorldGuardPlugin().getServer();
@@ -96,16 +123,23 @@ public class RegionCommandHandler extends WgCommand {
         }
 
         String[] subArgs;
-        if (sender instanceof Player) {
-            subArgs = new String[args.length - 1];
-            System.arraycopy(args, 1, subArgs, 0, args.length - 1);
+        if (argsStartAt > 0) {
+            subArgs = new String[args.length - argsStartAt];
+            System.arraycopy(args, argsStartAt, subArgs, 0, args.length - argsStartAt);
         } else {
-            subArgs = new String[args.length - 2];
-            System.arraycopy(args, 2, subArgs, 0, args.length - 2);
+            subArgs = args;
         }
 
         wgcmd.handle(sender, senderName, subCommand, subArgs, cfg, wcfg);
 
         return true;
+    }
+
+    private String getCommandFromAlias(String alias) {
+        if (alias.equals("rf")) {
+            return "flag";
+        }
+
+        return "";
     }
 }

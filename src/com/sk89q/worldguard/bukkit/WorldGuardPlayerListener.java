@@ -255,13 +255,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 player.getWorld().getName()).getApplicableRegions(
                 BukkitUtil.toVector(location));
 
-        BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
-
-        String spawnconfig = regions.getAreaFlag("spawn", "settings", true, null);
         Location spawn = regions.getLocationAreaFlag("spawn", player.getServer(), true, null);
 
         if (spawn != null) {
+            String spawnconfig = regions.getAreaFlag("spawn", "settings", true, null);
             if (spawnconfig != null) {
+                BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
                 if (spawnconfig.equals("owner")) {
                     if (regions.isOwner(localPlayer)) {
                         player.teleportTo(spawn);
