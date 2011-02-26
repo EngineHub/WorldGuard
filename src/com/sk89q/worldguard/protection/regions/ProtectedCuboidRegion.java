@@ -114,6 +114,11 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * @return
      */
     public int countBlocks() {
-        return 1;
+        int xLength = max.getBlockX() - min.getBlockX() + 1;
+        int yLength = max.getBlockY() - min.getBlockY() + 1;
+        int zLength = max.getBlockZ() - min.getBlockZ() + 1;
+
+        int volume = xLength * yLength * zLength;
+        return volume;
     }
 }
