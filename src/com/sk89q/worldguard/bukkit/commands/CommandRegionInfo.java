@@ -93,9 +93,9 @@ public class CommandRegionInfo extends WgRegionCommand {
             if (nfo.type == FlagValueType.LOCATION && !displayLocations.contains(nfo.flagName)) {
                 value = flags.getFlag(nfo.flagName, "x");
                 if (value != null) {
-                    s.append(fullName + ": set");
+                    s.append(nfo.flagName + ": set");
                 } else {
-                    s.append(fullName + ": -");
+                    s.append(nfo.flagName + ": -");
                 }
                 displayLocations.add(nfo.flagName);
             } else if ((nfo.subName != null && nfo.subName.equals("*"))) {
