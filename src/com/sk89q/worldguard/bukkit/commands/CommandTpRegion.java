@@ -44,9 +44,9 @@ public class CommandTpRegion extends WgCommand {
 
             String flagright = "all";
             if (spawn) {
-                flagright = region.getFlags().getFlag("spawn", "settings");
+                flagright = region.getFlags().getFlag("spawn", "allow");
             } else {
-                flagright = region.getFlags().getFlag("teleport", "settings");
+                flagright = region.getFlags().getFlag("teleport", "allow");
             }
 
             LocalPlayer lPlayer = BukkitPlayer.wrapPlayer(cfg, player);

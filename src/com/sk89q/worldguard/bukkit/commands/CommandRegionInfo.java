@@ -27,6 +27,8 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -75,6 +77,8 @@ public class CommandRegionInfo extends WgRegionCommand {
         sender.sendMessage(ChatColor.BLUE + "Priority: " + region.getPriority());
 
         StringBuilder s = new StringBuilder();
+        List<String> displayLocations = new ArrayList<String>();
+
         for (FlagInfo nfo : FlagInfo.getFlagInfoList()) {
             if (s.length() > 0) {
                 s.append(", ");
@@ -86,13 +90,14 @@ public class CommandRegionInfo extends WgRegionCommand {
             }
 
             String value;
-            if (nfo.type == FlagValueType.LOCATION) {
+            if (nfo.type == FlagValueType.LOCATION && !displayLocations.contains(nfo.flagName)) {
                 value = flags.getFlag(nfo.flagName, "x");
                 if (value != null) {
                     s.append(fullName + ": set");
                 } else {
                     s.append(fullName + ": -");
                 }
+                displayLocations.add(nfo.flagName);
             } else if ((nfo.subName != null && nfo.subName.equals("*"))) {
                 StringBuilder ret = new StringBuilder();
                 for (Map.Entry<String, String> entry : flags.getFlagData(nfo.flagName).entrySet()) {

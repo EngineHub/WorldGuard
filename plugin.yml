@@ -24,7 +24,25 @@ commands:
     region:
         description: Adjust protected regions
         usage: /<command> <define|claim|setparent|flag|delete|info|addowner|removeowner|addmember|removemember|list|save|load|priority> ...
-        aliases: rg, regions, rd, rc, rsp, rf, rdel, ri, rao, rro, rl, rp
+        aliases: [rg, regions]
+    rd:
+        description: Alias for /region define
+        usage: same as /region define  
+    rc:
+        description: Alias for /region claim
+        usage: same as /region claim
+    rf:
+        description: Alias for /region flag
+        usage: same as /region flag
+    ri:
+        description: Alias for /region info
+        usage: same as /region info
+    rlist:
+        description: Alias for /region list
+        usage: same as /region list
+    rp:
+        description: Alias for /region priority
+        usage: same as /region priority
     locate:
         description: Set your compass towards a person
         usage: /<command> <target>

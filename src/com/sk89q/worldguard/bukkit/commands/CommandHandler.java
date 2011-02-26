@@ -55,7 +55,7 @@ public class CommandHandler {
         this.commandMap.put("rc", regionHandler);
         this.commandMap.put("rf", regionHandler);
         this.commandMap.put("ri", regionHandler);
-        this.commandMap.put("rl", regionHandler);
+        this.commandMap.put("rlist", regionHandler);
         this.commandMap.put("rp", regionHandler);
         this.commandMap.put("reloadwg", new CommandReloadWG());
         this.commandMap.put("slay", new CommandSlay());
@@ -72,7 +72,6 @@ public class CommandHandler {
     public boolean handleCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
         try {
-
             String cmdName = cmd.getName().toLowerCase();
             WgCommand wgcmd = commandMap.get(cmdName);
             if (wgcmd == null) {

@@ -258,7 +258,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Location spawn = regions.getLocationAreaFlag("spawn", player.getServer(), true, null);
 
         if (spawn != null) {
-            String spawnconfig = regions.getAreaFlag("spawn", "settings", true, null);
+            String spawnconfig = regions.getAreaFlag("spawn", "allow", true, null);
             if (spawnconfig != null) {
                 BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
                 if (spawnconfig.equals("owner")) {

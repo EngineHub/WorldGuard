@@ -67,7 +67,7 @@ public class RegionCommandHandler extends WgCommand {
         this.aliasMap.put("rc", "claim");
         this.aliasMap.put("rf", "flag");
         this.aliasMap.put("ri", "info");
-        this.aliasMap.put("rl", "list");
+        this.aliasMap.put("rlist", "list");
         this.aliasMap.put("rp", "priority");
     }
 
@@ -104,6 +104,8 @@ public class RegionCommandHandler extends WgCommand {
             }
         }
 
+        System.out.println(subCommand);
+
         Server server = cfg.getWorldGuardPlugin().getServer();
         if (server.getWorld(worldName) == null) {
             sender.sendMessage("Invalid world specified.");
@@ -135,11 +137,4 @@ public class RegionCommandHandler extends WgCommand {
         return true;
     }
 
-    private String getCommandFromAlias(String alias) {
-        if (alias.equals("rf")) {
-            return "flag";
-        }
-
-        return "";
-    }
 }
