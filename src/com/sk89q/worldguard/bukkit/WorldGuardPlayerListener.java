@@ -260,17 +260,22 @@ public class WorldGuardPlayerListener extends PlayerListener {
         String spawnconfig = regions.getAreaFlag("spawn", "settings", true, null);
         Location spawn = regions.getLocationAreaFlag("spawn", player.getServer(), true, null);
 
-        if (spawnconfig.equals("owner")) {
-            if (regions.isOwner(localPlayer)) {
+        if (spawn != null) {
+            if (spawnconfig != null) {
+                if (spawnconfig.equals("owner")) {
+                    if (regions.isOwner(localPlayer)) {
+                        player.teleportTo(spawn);
+                    }
+                } else if (spawnconfig.equals("member")) {
+                    if (regions.isMember(localPlayer)) {
+                        player.teleportTo(spawn);
+                    }
+                } else {
+                    player.teleportTo(spawn);
+                }
+            } else {
                 player.teleportTo(spawn);
             }
-        } else if (spawnconfig.equals("member")) {
-            if (regions.isMember(localPlayer)) {
-                player.teleportTo(spawn);
-            }
-        } else {
-            player.teleportTo(spawn);
         }
-
     }
 }
