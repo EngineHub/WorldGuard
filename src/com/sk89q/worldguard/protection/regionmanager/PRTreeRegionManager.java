@@ -157,8 +157,6 @@ public class PRTreeRegionManager extends RegionManager {
             }
         }
 
-
-        // this allows parents not to overlap with their childs
         return new ApplicableRegionSet(pt, appRegions, global);
     }
 
