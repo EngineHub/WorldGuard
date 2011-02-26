@@ -70,8 +70,6 @@ player-damage:
 
 regions:
     enable: on
-    claim-only-inside-existing-regions: off
-    max-region-count-per-player: 7
     wand: 287
     default:
         build: on

@@ -40,7 +40,6 @@ worldguard.region.setparent.all
 
 worldguard.region.priority
 
-
 worldguard.reloadwg
 
 worldguard.region.delete.own
@@ -55,4 +54,3 @@ worldguard.tpregion.spawn
 
 worldguard.buyregion
 
-worldedit.region.nolimit
