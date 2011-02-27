@@ -15,10 +15,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -38,11 +38,12 @@ import com.sk89q.worldguard.protection.regions.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class WorldGuardEntityListener extends EntityListener {
+
     /**
      * Plugin.
      */
     private WorldGuardPlugin plugin;
-    
+
     /**
      * Construct the object;
      * 
@@ -52,14 +53,13 @@ public class WorldGuardEntityListener extends EntityListener {
         this.plugin = plugin;
     }
 
-
     public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
 
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
-        
-        if (defender instanceof Player) {            
-            Player player = (Player)defender;
+
+        if (defender instanceof Player) {
+            Player player = (Player) defender;
 
             WorldGuardConfiguration cfg = plugin.getWgConfiguration();
             WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
@@ -81,13 +81,12 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
-
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
-        
+
         if (defender instanceof Player) {
-            Player player = (Player)defender;
+            Player player = (Player) defender;
 
             WorldGuardConfiguration cfg = plugin.getWgConfiguration();
             WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
@@ -102,50 +101,48 @@ public class WorldGuardEntityListener extends EntityListener {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-                    if (!mgr.getApplicableRegions(pt)
-                            .allowsFlag(AreaFlags.FLAG_PVP)) {
-                        ((Player)attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
+                    if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_PVP)) {
+                        ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
                         return;
                     }
                 }
             }
-            
+
             if (attacker != null && attacker instanceof Monster) {
                 if (attacker instanceof Creeper && wcfg.blockCreeperExplosions) {
                     event.setCancelled(true);
                     return;
                 }
-                
+
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+                    ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-                    if (!mgr.getApplicableRegions(pt)
-                            .allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
+                    if (!set.allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
                         event.setCancelled(true);
                         return;
                     }
-                    
+
                     if (attacker instanceof Creeper) {
-                        if (!mgr.getApplicableRegions(pt)
-                                .allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
+                        if (!set.allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
                             event.setCancelled(true);
                             return;
                         }
                     }
                 }
-                
+
             }
         }
     }
-    
+
     public void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
         Entity defender = event.getEntity();
         Entity attacker = event.getDamager();
-        
-        if (defender instanceof Player) {            
-            Player player = (Player)defender;
+
+        if (defender instanceof Player) {
+            Player player = (Player) defender;
 
             WorldGuardConfiguration cfg = plugin.getWgConfiguration();
             WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
@@ -160,25 +157,23 @@ public class WorldGuardEntityListener extends EntityListener {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-                    if (!mgr.getApplicableRegions(pt)
-                            .allowsFlag(AreaFlags.FLAG_PVP)) {
-                        ((Player)attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
+                    if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_PVP)) {
+                        ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
                         return;
                     }
                 }
             }
             if (attacker != null && attacker instanceof Skeleton) {
-            	if (wcfg.useRegions) {
-            		Vector pt = toVector(defender.getLocation());
-            		RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+                if (wcfg.useRegions) {
+                    Vector pt = toVector(defender.getLocation());
+                    RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-            		if (!mgr.getApplicableRegions(pt)
-            				.allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
-            			event.setCancelled(true);
-            			return;
-            		}
-            	}
+                    if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
         }
 
@@ -187,11 +182,10 @@ public class WorldGuardEntityListener extends EntityListener {
     @Override
     public void onEntityDamage(EntityDamageEvent event) {
 
-        if(event.isCancelled())
-        {
+        if (event.isCancelled()) {
             return;
         }
-        
+
         if (event instanceof EntityDamageByProjectileEvent) {
             this.onEntityDamageByProjectile((EntityDamageByProjectileEvent) event);
             return;
@@ -205,9 +199,9 @@ public class WorldGuardEntityListener extends EntityListener {
 
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
-        
-        if (defender instanceof Player) {            
-            Player player = (Player)defender;
+
+        if (defender instanceof Player) {
+            Player player = (Player) defender;
 
             WorldGuardConfiguration cfg = plugin.getWgConfiguration();
             WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
@@ -216,7 +210,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (wcfg.disableFallDamage && type == DamageCause.FALL) {
                 event.setCancelled(true);
                 return;
@@ -232,7 +226,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (wcfg.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
                 findFreePosition(player);
                 event.setCancelled(true);
@@ -255,8 +249,7 @@ public class WorldGuardEntityListener extends EntityListener {
     @Override
     public void onEntityExplode(EntityExplodeEvent event) {
 
-        if(event.isCancelled())
-        {
+        if (event.isCancelled()) {
             return;
         }
 
@@ -271,18 +264,17 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (wcfg.useRegions) {
                 Vector pt = toVector(l);
                 RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
-                
-                if (!mgr.getApplicableRegions(pt)
-                        .allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
+
+                if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -292,13 +284,12 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (wcfg.useRegions) {
                 Vector pt = toVector(l);
                 RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
 
-                if (!mgr.getApplicableRegions(pt)
-                        .allowsFlag(AreaFlags.FLAG_TNT)) {
+                if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_TNT)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -315,31 +306,90 @@ public class WorldGuardEntityListener extends EntityListener {
         WorldGuardConfiguration cfg = plugin.getWgConfiguration();
         WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getEntity().getWorld().getName());
 
-        CreatureType creaType = (CreatureType)CreatureType.valueOf(event.getMobType().toString());
+        CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
         String creaName = "";
         Boolean cancelEvent = false;
 
-        switch(creaType) {
-            case SPIDER:     if (wcfg.blockCreatureSpawn.contains("spider")) { cancelEvent = true; } creaName = "spider";       break;
-            case ZOMBIE:     if (wcfg.blockCreatureSpawn.contains("zombie")) { cancelEvent = true; } creaName = "zombie";       break;
-            case CREEPER:    if (wcfg.blockCreatureSpawn.contains("creeper")) { cancelEvent = true; } creaName = "creeper";     break;
-            case SKELETON:   if (wcfg.blockCreatureSpawn.contains("skeleton")) { cancelEvent = true; } creaName = "skeleton";   break;
-            case SQUID:      if (wcfg.blockCreatureSpawn.contains("squid")) { cancelEvent = true; } creaName = "squid";         break;
-            case PIG_ZOMBIE: if (wcfg.blockCreatureSpawn.contains("pigzombie")) { cancelEvent = true; } creaName = "pigzombie"; break;
-            case GHAST:      if (wcfg.blockCreatureSpawn.contains("ghast")) { cancelEvent = true; } creaName = "ghast";         break;
-            case SLIME:      if (wcfg.blockCreatureSpawn.contains("slime")) { cancelEvent = true; } creaName = "slime";         break;
-            case PIG:        if (wcfg.blockCreatureSpawn.contains("pig")) { cancelEvent = true; } creaName = "pig";             break;
-            case COW:        if (wcfg.blockCreatureSpawn.contains("cow")) { cancelEvent = true; } creaName = "cow";             break;
-            case SHEEP:      if (wcfg.blockCreatureSpawn.contains("sheep")) { cancelEvent = true; } creaName = "sheep";         break;
-            case CHICKEN:    if (wcfg.blockCreatureSpawn.contains("chicken")) { cancelEvent = true; } creaName = "chicken";     break;
+        switch (creaType) {
+            case SPIDER:
+                if (wcfg.blockCreatureSpawn.contains("spider")) {
+                    cancelEvent = true;
+                }
+                creaName = "spider";
+                break;
+            case ZOMBIE:
+                if (wcfg.blockCreatureSpawn.contains("zombie")) {
+                    cancelEvent = true;
+                }
+                creaName = "zombie";
+                break;
+            case CREEPER:
+                if (wcfg.blockCreatureSpawn.contains("creeper")) {
+                    cancelEvent = true;
+                }
+                creaName = "creeper";
+                break;
+            case SKELETON:
+                if (wcfg.blockCreatureSpawn.contains("skeleton")) {
+                    cancelEvent = true;
+                }
+                creaName = "skeleton";
+                break;
+            case SQUID:
+                if (wcfg.blockCreatureSpawn.contains("squid")) {
+                    cancelEvent = true;
+                }
+                creaName = "squid";
+                break;
+            case PIG_ZOMBIE:
+                if (wcfg.blockCreatureSpawn.contains("pigzombie")) {
+                    cancelEvent = true;
+                }
+                creaName = "pigzombie";
+                break;
+            case GHAST:
+                if (wcfg.blockCreatureSpawn.contains("ghast")) {
+                    cancelEvent = true;
+                }
+                creaName = "ghast";
+                break;
+            case SLIME:
+                if (wcfg.blockCreatureSpawn.contains("slime")) {
+                    cancelEvent = true;
+                }
+                creaName = "slime";
+                break;
+            case PIG:
+                if (wcfg.blockCreatureSpawn.contains("pig")) {
+                    cancelEvent = true;
+                }
+                creaName = "pig";
+                break;
+            case COW:
+                if (wcfg.blockCreatureSpawn.contains("cow")) {
+                    cancelEvent = true;
+                }
+                creaName = "cow";
+                break;
+            case SHEEP:
+                if (wcfg.blockCreatureSpawn.contains("sheep")) {
+                    cancelEvent = true;
+                }
+                creaName = "sheep";
+                break;
+            case CHICKEN:
+                if (wcfg.blockCreatureSpawn.contains("chicken")) {
+                    cancelEvent = true;
+                }
+                creaName = "chicken";
+                break;
         }
 
         if (wcfg.useRegions && creaName != "") {
             Vector pt = toVector(event.getEntity().getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
 
-            Boolean flagValue = mgr.getApplicableRegions(pt)
-                                    .getBooleanAreaFlag("creaturespawn", creaName, true, null);
+            Boolean flagValue = mgr.getApplicableRegions(pt).getBooleanAreaFlag("creaturespawn", creaName, true, null);
             if (flagValue != null) {
                 if (!flagValue) {
                     cancelEvent = true;
@@ -348,13 +398,13 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
         }
-        
+
         if (cancelEvent) {
             event.setCancelled(true);
             return;
         }
     }
-    
+
     /**
      * Find a position for the player to stand that is not inside a block.
      * Blocks above the player will be iteratively tested until there is

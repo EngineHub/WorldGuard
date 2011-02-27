@@ -15,8 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
@@ -44,7 +43,7 @@ public class WorldGuardBlockListener extends BlockListener {
      * Plugin.
      */
     private WorldGuardPlugin plugin;
-    
+
     /**
      * Construct the object;
      * 
@@ -105,7 +104,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 player.setItemInHand(held);
             }
         }
-        
+
         if (wcfg.useRegions) {
             Vector pt = BukkitUtil.toVector(event.getBlock());
 
@@ -115,20 +114,20 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
-        
+
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
                     new BlockBreakBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, player),
-                            toVector(event.getBlock()),
-                            event.getBlock().getTypeId()), false, false)) {
+                    toVector(event.getBlock()),
+                    event.getBlock().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
 
             if (wcfg.getBlacklist().check(
                     new DestroyWithBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, player),
-                            toVector(event.getBlock()),
-                            player.getItemInHand().getTypeId()), false, false)) {
+                    toVector(event.getBlock()),
+                    player.getItemInHand().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -143,15 +142,14 @@ public class WorldGuardBlockListener extends BlockListener {
     @Override
     public void onBlockFlow(BlockFromToEvent event) {
 
-        if(event.isCancelled())
-        {
+        if (event.isCancelled()) {
             return;
         }
 
         World world = event.getBlock().getWorld();
         Block blockFrom = event.getBlock();
         Block blockTo = event.getToBlock();
-        
+
         boolean isWater = blockFrom.getTypeId() == 8 || blockFrom.getTypeId() == 9;
         boolean isLava = blockFrom.getTypeId() == 10 || blockFrom.getTypeId() == 11;
 
@@ -178,18 +176,18 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         /*if (plugin.classicWater && isWater) {
-            int blockBelow = blockFrom.getRelative(0, -1, 0).getTypeId();
-            if (blockBelow != 0 && blockBelow != 8 && blockBelow != 9) {
-                blockFrom.setTypeId(9);
-                if (blockTo.getTypeId() == 0) {
-                    blockTo.setTypeId(9);
-                }
-                return;
-            }
+        int blockBelow = blockFrom.getRelative(0, -1, 0).getTypeId();
+        if (blockBelow != 0 && blockBelow != 8 && blockBelow != 9) {
+        blockFrom.setTypeId(9);
+        if (blockTo.getTypeId() == 0) {
+        blockTo.setTypeId(9);
+        }
+        return;
+        }
         }*/
 
         // Check the fluid block (from) whether it is air. If so and the target block is protected, cancel the event
-        if(wcfg.preventWaterDamage.size() > 0 && blockFrom.getTypeId() == 0) {
+        if (wcfg.preventWaterDamage.size() > 0 && blockFrom.getTypeId() == 0) {
             int targetId = world.getBlockTypeIdAt(
                     blockTo.getX(), blockTo.getY(), blockTo.getZ());
             if (wcfg.preventWaterDamage.contains(targetId)) {
@@ -197,7 +195,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
-        
+
         if (wcfg.preventWaterDamage.size() > 0 && isWater) {
             int targetId = world.getBlockTypeIdAt(
                     blockTo.getX(), blockTo.getY(), blockTo.getZ());
@@ -220,8 +218,7 @@ public class WorldGuardBlockListener extends BlockListener {
             Vector pt = toVector(blockFrom.getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(world.getName());
 
-            if (!mgr.getApplicableRegions(pt)
-                    .allowsFlag("waterflow")) {
+            if (!mgr.getApplicableRegions(pt).allowsFlag("waterflow")) {
                 event.setCancelled(true);
                 return;
             }
@@ -236,10 +233,10 @@ public class WorldGuardBlockListener extends BlockListener {
     @Override
     public void onBlockIgnite(BlockIgniteEvent event) {
 
-        if(event.isCancelled())
-        {
+        if (event.isCancelled()) {
             return;
         }
+
 
         IgniteCause cause = event.getCause();
         Block block = event.getBlock();
@@ -249,7 +246,41 @@ public class WorldGuardBlockListener extends BlockListener {
         WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(world.getName());
 
         boolean isFireSpread = cause == IgniteCause.SPREAD;
-        
+
+        if (wcfg.useRegions) {
+            Vector pt = toVector(block);
+            Player player = event.getPlayer();
+            RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(world.getName());
+
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+            if (player != null && !cfg.hasPermission(player, "region.bypass")) {
+                LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
+
+                if (cause == IgniteCause.FLINT_AND_STEEL
+                        && !set.canBuild(localPlayer)) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (cause == IgniteCause.FLINT_AND_STEEL
+                        && !set.allowsFlag(AreaFlags.FLAG_LIGHTER)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            if (isFireSpread && set.allowsFlag(AreaFlags.FLAG_FIRE_SPREAD)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (cause == IgniteCause.LAVA && !set.allowsFlag(AreaFlags.FLAG_LAVA_FIRE)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         if (wcfg.preventLavaFire && cause == IgniteCause.LAVA) {
             event.setCancelled(true);
             return;
@@ -259,7 +290,7 @@ public class WorldGuardBlockListener extends BlockListener {
             event.setCancelled(true);
             return;
         }
-        
+
         if (wcfg.blockLighter && cause == IgniteCause.FLINT_AND_STEEL) {
             event.setCancelled(true);
             return;
@@ -274,7 +305,7 @@ public class WorldGuardBlockListener extends BlockListener {
             int x = block.getX();
             int y = block.getY();
             int z = block.getZ();
-            
+
             if (wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x, y - 1, z))
                     || wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x + 1, y, z))
                     || wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x - 1, y, z))
@@ -284,39 +315,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
-        
-        /*if (plugin.useRegions) {
-            Vector pt = toVector(block);
-            
-            if (player != null && !plugin.hasPermission(player, "/regionbypass")) {
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-                
-                if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !plugin.globalRegionManager.getApplicableRegions(pt).canBuild(localPlayer)) {
-                    event.setCancelled(true);
-                    return;
-                }
-                
-                if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !plugin.globalRegionManager.getApplicableRegions(pt)
-                        .allowsFlag(AreaFlags.FLAG_LIGHTER)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-            
-            f (isFireSpread && !plugin.globalRegionManager.getApplicableRegions(pt)
-                    .allowsFlag(AreaFlags.FLAG_FIRE_SPREAD)) {
-                event.setCancelled(true);
-                return;
-            }
-            
-            if (cause == IgniteCause.LAVA && !plugin.globalRegionManager.getApplicableRegions(pt)
-                    .allowsFlag(AreaFlags.FLAG_LAVA_FIRE)) {
-                event.setCancelled(true);
-                return;
-            }
-        }*/
+
     }
 
     /**
@@ -327,8 +326,7 @@ public class WorldGuardBlockListener extends BlockListener {
     @Override
     public void onBlockBurn(BlockBurnEvent event) {
 
-        if(event.isCancelled())
-        {
+        if (event.isCancelled()) {
             return;
         }
 
@@ -363,8 +361,7 @@ public class WorldGuardBlockListener extends BlockListener {
     @Override
     public void onBlockPhysics(BlockPhysicsEvent event) {
 
-        if(event.isCancelled())
-        {
+        if (event.isCancelled()) {
             return;
         }
 
@@ -388,7 +385,7 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
     }
-    
+
     /**
      * Called when a block is interacted with
      * 
@@ -397,8 +394,7 @@ public class WorldGuardBlockListener extends BlockListener {
     @Override
     public void onBlockInteract(BlockInteractEvent event) {
 
-        if(event.isCancelled())
-        {
+        if (event.isCancelled()) {
             return;
         }
 
@@ -410,32 +406,33 @@ public class WorldGuardBlockListener extends BlockListener {
 
         if (entity instanceof Player
                 && (block.getType() == Material.CHEST
-                        || block.getType() == Material.DISPENSER
-                        || block.getType() == Material.FURNACE
-                        || block.getType() == Material.BURNING_FURNACE
-                        || block.getType() == Material.NOTE_BLOCK)) {
-            Player player = (Player)entity;
+                || block.getType() == Material.DISPENSER
+                || block.getType() == Material.FURNACE
+                || block.getType() == Material.BURNING_FURNACE
+                || block.getType() == Material.NOTE_BLOCK)) {
+            Player player = (Player) entity;
             if (wcfg.useRegions) {
                 Vector pt = toVector(block);
                 LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
                 RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-                if (!cfg.hasPermission(player, "/regionbypass")
-                        && !mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_CHEST_ACCESS)
-                        && !mgr.getApplicableRegions(pt).canBuild(localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-                    event.setCancelled(true);
-                    return;
+                if (!cfg.hasPermission(player, "region.bypass")) {
+                    ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+                    if (!set.allowsFlag(AreaFlags.FLAG_CHEST_ACCESS) && !set.canBuild(localPlayer)) {
+                        player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
             }
         }
-        
+
         if (wcfg.getBlacklist() != null && entity instanceof Player) {
-            Player player = (Player)entity;
-            
+            Player player = (Player) entity;
+
             if (!wcfg.getBlacklist().check(
                     new BlockInteractBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, player), toVector(block),
-                            block.getTypeId()), false, false)) {
+                    block.getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -450,8 +447,7 @@ public class WorldGuardBlockListener extends BlockListener {
     @Override
     public void onBlockPlace(BlockPlaceEvent event) {
 
-        if(event.isCancelled())
-        {
+        if (event.isCancelled()) {
             return;
         }
 
@@ -471,11 +467,11 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
-        
+
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
                     new BlockPlaceBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, player), toVector(blockPlaced),
-                            blockPlaced.getTypeId()), false, false)) {
+                    blockPlaced.getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -485,7 +481,7 @@ public class WorldGuardBlockListener extends BlockListener {
             if (wcfg.redstoneSponges && blockPlaced.isBlockIndirectlyPowered()) {
                 return;
             }
-            
+
             int ox = blockPlaced.getX();
             int oy = blockPlaced.getY();
             int oz = blockPlaced.getZ();
@@ -514,19 +510,19 @@ public class WorldGuardBlockListener extends BlockListener {
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
             ApplicableRegionSet app = mgr.getApplicableRegions(pt);
             List<String> regions = mgr.getApplicableRegionsIDs(pt);
-            
+
             if (regions.size() > 0) {
                 player.sendMessage(ChatColor.YELLOW + "Can you build? "
                         + (app.canBuild(BukkitPlayer.wrapPlayer(cfg, player)) ? "Yes" : "No"));
-                
+
                 StringBuilder str = new StringBuilder();
-                for (Iterator<String> it = regions.iterator(); it.hasNext(); ) {
+                for (Iterator<String> it = regions.iterator(); it.hasNext();) {
                     str.append(it.next());
                     if (it.hasNext()) {
                         str.append(", ");
                     }
                 }
-                
+
                 player.sendMessage(ChatColor.YELLOW + "Applicable regions: " + str.toString());
             } else {
                 player.sendMessage(ChatColor.YELLOW + "WorldGuard: No defined regions here!");
@@ -553,7 +549,6 @@ public class WorldGuardBlockListener extends BlockListener {
         }
     }
 
-
     /**
      * Called when redstone changes
      * From: the source of the redstone change
@@ -574,7 +569,7 @@ public class WorldGuardBlockListener extends BlockListener {
             int ox = blockTo.getX();
             int oy = blockTo.getY();
             int oz = blockTo.getZ();
-            
+
             for (int cx = -1; cx <= 1; cx++) {
                 for (int cy = -1; cy <= 1; cy++) {
                     for (int cz = -1; cz <= 1; cz++) {
@@ -583,17 +578,17 @@ public class WorldGuardBlockListener extends BlockListener {
                                 && sponge.isBlockIndirectlyPowered()) {
                             clearSpongeWater(world, ox + cx, oy + cy, oz + cz);
                         } else if (sponge.getTypeId() == 19
-                                && ! sponge.isBlockIndirectlyPowered()) {
+                                && !sponge.isBlockIndirectlyPowered()) {
                             addSpongeWater(world, ox + cx, oy + cy, oz + cz);
                         }
                     }
                 }
             }
-            
+
             return;
         }
     }
-    
+
     /**
      * Remove water around a sponge.
      * 
@@ -611,14 +606,13 @@ public class WorldGuardBlockListener extends BlockListener {
             for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
                 for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
                     if (isBlockWater(world, ox + cx, oy + cy, oz + cz)) {
-                        world.getBlockAt(ox + cx, oy + cy, oz + cz)
-                                .setTypeId(0);
+                        world.getBlockAt(ox + cx, oy + cy, oz + cz).setTypeId(0);
                     }
                 }
             }
         }
     }
-    
+
     /**
      * Add water around a sponge.
      * 
@@ -641,7 +635,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
             }
         }
-        
+
         // The positive x edge
         cx = ox + wcfg.spongeRadius + 1;
         for (int cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
@@ -661,7 +655,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
             }
         }
-        
+
         // The positive y edge
         cy = oy + wcfg.spongeRadius + 1;
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
@@ -671,7 +665,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
             }
         }
-        
+
         // The negative z edge
         int cz = oz - wcfg.spongeRadius - 1;
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
@@ -681,7 +675,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
             }
         }
-        
+
         // The positive z edge
         cz = oz + wcfg.spongeRadius + 1;
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
@@ -692,7 +686,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
     }
-    
+
     /**
      * Sets the given block to fluid water.
      * Used by addSpongeWater()
@@ -708,10 +702,10 @@ public class WorldGuardBlockListener extends BlockListener {
         Block block = world.getBlockAt(ox, oy, oz);
         int id = block.getTypeId();
         if (id == 0) {
-            block.setTypeId( 8 );
+            block.setTypeId(8);
         }
     }
-    
+
     /**
      * Checks if the given block is water
      * 

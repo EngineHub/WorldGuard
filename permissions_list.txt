@@ -41,6 +41,8 @@ worldguard.region.setparent.all
 worldguard.region.priority.own
 worldguard.region.priority.all
 
+worldguard.region.bypass
+
 worldguard.reloadwg
 
 worldguard.region.delete.own
@@ -55,4 +57,6 @@ worldguard.tpregion.spawn
 worldguard.tpregion.override
 
 worldguard.buyregion
+
+worldguard.notify
 

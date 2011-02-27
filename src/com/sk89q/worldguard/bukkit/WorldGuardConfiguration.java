@@ -196,7 +196,7 @@ public class WorldGuardConfiguration {
             Vector pt = new Vector(x, y, z);
             LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(this, player);
 
-            if (!hasPermission(player, "/regionbypass")) {
+            if (!hasPermission(player, "region.bypass")) {
                 RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
                 if (!mgr.getApplicableRegions(pt).canBuild(localPlayer)) {
@@ -215,7 +215,7 @@ public class WorldGuardConfiguration {
         if (getWorldConfig(player.getWorld().getName()).useRegions) {
             LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(this, player);
 
-            if (!hasPermission(player, "/regionbypass")) {
+            if (!hasPermission(player, "region.bypass")) {
                 RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
                 if (!mgr.getApplicableRegions(pt).canBuild(localPlayer)) {
@@ -256,17 +256,7 @@ public class WorldGuardConfiguration {
             return false;
         }
     }
-    /**
-     * Checks for the command or /region.
-     *
-     * @param player
-     * @param cmd
-     * @return
-     */
-    public boolean canUseRegionCommand(Player player, String cmd) {
-        return hasPermission(player, "region")
-                || hasPermission(player, cmd);
-    }
+
 
     /**
      * Checks to see if there are sufficient permissions, otherwise an exception
