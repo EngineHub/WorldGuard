@@ -266,17 +266,17 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
                 if (spawnconfig.equals("owner")) {
                     if (regions.isOwner(localPlayer)) {
-                        player.teleportTo(spawn);
+                        event.setRespawnLocation(spawn);
                     }
                 } else if (spawnconfig.equals("member")) {
                     if (regions.isMember(localPlayer)) {
-                        player.teleportTo(spawn);
+                        event.setRespawnLocation(spawn);
                     }
                 } else {
-                    player.teleportTo(spawn);
+                    event.setRespawnLocation(spawn);
                 }
             } else {
-                player.teleportTo(spawn);
+                event.setRespawnLocation(spawn);
             }
         }
     }
