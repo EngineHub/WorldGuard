@@ -106,10 +106,4 @@ blacklist:
             path: worldguard/logs/%w-%Y-%m-%d.log
             open-files: 10
 
-# See http://wiki.sk89q.com/wiki/WorldGuard/Permissions/Bukkit
-permissions:
-    users:
-        sk89q:
-            permissions:
-                - /region
-                - /reloadwg
+# For permissions, see http://wiki.sk89q.com/wiki/WorldGuard/Permissions/Bukkit
