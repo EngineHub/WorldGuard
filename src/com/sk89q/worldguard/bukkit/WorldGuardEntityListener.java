@@ -293,7 +293,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
             
-            if (wcfg.useRegions && event.getEntity() != null) {
+            if (wcfg.useRegions) {
                 Vector pt = toVector(l);
                 RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
 
