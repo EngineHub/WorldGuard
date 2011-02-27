@@ -15,8 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldedit.BlockVector;
@@ -36,6 +35,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.nijiko.coelho.iConomy.*;
 import com.nijiko.coelho.iConomy.system.*;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
 import java.io.IOException;
 import org.bukkit.ChatColor;
@@ -70,10 +71,17 @@ public class CommandRegionClaim extends WgRegionCommand {
             String id = args[0].toLowerCase();
             RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
+            LocalPlayer lPlayer = BukkitPlayer.wrapPlayer(cfg, player);
+
+            if (mgr.getRegionCountOfPlayer(lPlayer) >= wcfg.maxRegionCountPerPlayer) {
+                player.sendMessage(ChatColor.RED + "You own too much regions, delete one first to claim a new one.");
+                return true;
+            }
+
             ProtectedRegion existing = mgr.getRegion(id);
 
             if (existing != null) {
-                if (!existing.getOwners().contains(BukkitPlayer.wrapPlayer(cfg, player))) {
+                if (!existing.getOwners().contains(lPlayer)) {
                     player.sendMessage(ChatColor.RED + "You don't own this region.");
                     return true;
                 }
@@ -100,9 +108,20 @@ public class CommandRegionClaim extends WgRegionCommand {
                 region = new ProtectedCuboidRegion(id, min, max);
             }
 
-            if (mgr.overlapsUnownedRegion(region, BukkitPlayer.wrapPlayer(cfg, player))) {
-                player.sendMessage(ChatColor.RED + "This region overlaps with someone else's region.");
-                return true;
+            ApplicableRegionSet regions = mgr.getApplicableRegions(region);
+            if (regions.isAnyRegionAffected()) {
+                if (!regions.isOwner(lPlayer)) {
+                    player.sendMessage(ChatColor.RED + "This region overlaps with someone else's region.");
+                    return true;
+                }
+            }
+            else
+            {
+                if(wcfg.claimOnlyInsideExistingRegions)
+                {
+                    player.sendMessage(ChatColor.RED + "You may only claim regions inside existing regions that you or your group own.");
+                    return true;
+                }
             }
 
             if (region.countBlocks() > wcfg.maxClaimVolume) {
@@ -120,13 +139,13 @@ public class CommandRegionClaim extends WgRegionCommand {
                     double regionCosts = region.countBlocks() * wcfg.buyOnClaimPrice;
                     if (balance >= regionCosts) {
                         account.subtract(regionCosts);
-                        player.sendMessage(ChatColor.YELLOW + "You have bought that region for " +
-                                iConomy.getBank().format(regionCosts));
+                        player.sendMessage(ChatColor.YELLOW + "You have bought that region for "
+                                + iConomy.getBank().format(regionCosts));
                         account.save();
                     } else {
                         player.sendMessage(ChatColor.RED + "You have not enough money.");
-                        player.sendMessage(ChatColor.RED + "The region you want to claim costs " +
-                                iConomy.getBank().format(regionCosts));
+                        player.sendMessage(ChatColor.RED + "The region you want to claim costs "
+                                + iConomy.getBank().format(regionCosts));
                         player.sendMessage(ChatColor.RED + "You have " + iConomy.getBank().format(balance));
                         return true;
                     }

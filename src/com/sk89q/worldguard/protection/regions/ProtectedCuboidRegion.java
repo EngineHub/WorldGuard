@@ -15,11 +15,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.protection.regions;
 
 import com.sk89q.worldedit.*;
+import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 
 /**
  * Represents a cuboid region that can be protected.
@@ -27,6 +27,7 @@ import com.sk89q.worldedit.*;
  * @author sk89q
  */
 public class ProtectedCuboidRegion extends ProtectedRegion {
+
     /**
      * Store the first point.
      */
@@ -98,7 +99,37 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
                 && y >= min.getBlockY() && y <= max.getBlockY()
                 && z >= min.getBlockZ() && z <= max.getBlockZ();
     }
-    
+
+    /**
+     * Checks if two region intersects.
+     * 
+     * @param region
+     * @throws UnsupportedIntersectionException
+     * @return
+     */
+    public boolean intersectsWith(ProtectedRegion region) throws UnsupportedIntersectionException {
+        
+        if (region instanceof ProtectedCuboidRegion) {
+            ProtectedCuboidRegion r1 = (ProtectedCuboidRegion) this;
+            ProtectedCuboidRegion r2 = (ProtectedCuboidRegion) region;
+            BlockVector min1 = r1.getMinimumPoint();
+            BlockVector max1 = r1.getMaximumPoint();
+            BlockVector min2 = r2.getMinimumPoint();
+            BlockVector max2 = r2.getMaximumPoint();
+
+            return !(min1.getBlockX() > max2.getBlockX()
+                    || min1.getBlockY() > max2.getBlockY()
+                    || min1.getBlockZ() > max2.getBlockZ()
+                    || max1.getBlockX() < min2.getBlockX()
+                    || max1.getBlockY() < min2.getBlockY()
+                    || max1.getBlockZ() < min2.getBlockZ());
+        } else if (region instanceof ProtectedPolygonalRegion) {
+            throw new UnsupportedIntersectionException();
+        } else {
+            throw new UnsupportedIntersectionException();
+        }
+    }
+
     /**
      * Return the type of region as a user-friendly name.
      * 

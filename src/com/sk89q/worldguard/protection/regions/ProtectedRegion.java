@@ -225,7 +225,8 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         
         return false;
     }
-    
+
+
     /**
      * Checks whether a player is a member of the region or any of its parents.
      * 
@@ -300,32 +301,12 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Checks if two region intersects.
      * 
-     * @param region1
-     * @param region2
+     * @param region
      * @throws UnsupportedIntersectionException
      * @return
      */
-    public static boolean intersects(ProtectedRegion region1, ProtectedRegion region2)
-            throws UnsupportedIntersectionException {
-        if (region1 instanceof ProtectedCuboidRegion
-                && region2 instanceof ProtectedCuboidRegion) {
-            ProtectedCuboidRegion r1 = (ProtectedCuboidRegion)region1;
-            ProtectedCuboidRegion r2 = (ProtectedCuboidRegion)region2;
-            BlockVector min1 = r1.getMinimumPoint();
-            BlockVector max1 = r1.getMaximumPoint();
-            BlockVector min2 = r2.getMinimumPoint();
-            BlockVector max2 = r2.getMaximumPoint(); 
-            
-            return !(min1.getBlockX() > max2.getBlockX()
-                    || min1.getBlockY() > max2.getBlockY()
-                    || min1.getBlockZ() > max2.getBlockZ()
-                    || max1.getBlockX() < min2.getBlockX()
-                    || max1.getBlockY() < min2.getBlockY()
-                    || max1.getBlockZ() < min2.getBlockZ());
-        } else {
-            throw new UnsupportedIntersectionException();
-        }
-    }
+    public abstract boolean intersectsWith(ProtectedRegion region) throws UnsupportedIntersectionException;
+    
     
     /**
      * Thrown when setting a parent would create a circular inheritance

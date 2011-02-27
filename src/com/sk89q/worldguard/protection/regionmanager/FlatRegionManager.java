@@ -15,8 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.protection.regionmanager;
 
 import java.io.IOException;
@@ -31,8 +30,6 @@ import com.sk89q.worldguard.protection.GlobalFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.dbs.ProtectionDatabase;
-import java.util.HashMap;
-
 
 /**
  * A very simple implementation of the region manager that uses a flat list
@@ -42,40 +39,40 @@ import java.util.HashMap;
  * @author sk89q
  */
 public class FlatRegionManager extends RegionManager {
+
     /**
      * List of protected regions.
      */
-    private Map<String,ProtectedRegion> regions;
-
+    private Map<String, ProtectedRegion> regions;
 
     /**
      * Construct the manager.
      */
     public FlatRegionManager(GlobalFlags global, ProtectionDatabase regionloader) throws IOException {
 
-       super(global, regionloader);
-       regions = new TreeMap<String,ProtectedRegion>();
-       this.load();
+        super(global, regionloader);
+        regions = new TreeMap<String, ProtectedRegion>();
+        this.load();
     }
-    
+
     /**
      * Get a list of protected regions.
      *
      * @return
      */
-    public Map<String,ProtectedRegion> getRegions() {
+    public Map<String, ProtectedRegion> getRegions() {
         return regions;
     }
-    
+
     /**
      * Set a list of protected regions.
      *
      * @return
      */
-    public void setRegions(Map<String,ProtectedRegion> regions) {
-        this.regions = new TreeMap<String,ProtectedRegion>(regions);
+    public void setRegions(Map<String, ProtectedRegion> regions) {
+        this.regions = new TreeMap<String, ProtectedRegion>(regions);
     }
-    
+
     /**
      * Adds a region.
      * 
@@ -85,7 +82,7 @@ public class FlatRegionManager extends RegionManager {
     public void addRegion(ProtectedRegion region) {
         regions.put(region.getId(), region);
     }
-    
+
     /**
      * Removes a region and its children.
      * 
@@ -93,9 +90,9 @@ public class FlatRegionManager extends RegionManager {
      */
     public void removeRegion(String id) {
         ProtectedRegion region = regions.get(id);
-        
+
         regions.remove(id);
-        
+
         if (region != null) {
             for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
                 if (entry.getValue().getParent() == region) {
@@ -104,7 +101,7 @@ public class FlatRegionManager extends RegionManager {
             }
         }
     }
-    
+
     /**
      * Return whether a region exists by an ID.
      * 
@@ -114,7 +111,7 @@ public class FlatRegionManager extends RegionManager {
     public boolean hasRegion(String id) {
         return regions.containsKey(id);
     }
-    
+
     /**
      * Get a region by its ID.
      * 
@@ -123,7 +120,7 @@ public class FlatRegionManager extends RegionManager {
     public ProtectedRegion getRegion(String id) {
         return regions.get(id);
     }
-    
+
     /**
      * Get an object for a point for rules to be applied with.
      * 
@@ -132,18 +129,39 @@ public class FlatRegionManager extends RegionManager {
      */
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
 
+        List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
+
+        for (ProtectedRegion region : regions.values()) {
+            if (region.contains(pt)) {
+                appRegions.add(region);
+            }
+        }
+
+        return new ApplicableRegionSet(appRegions, global);
+    }
+
+    /**
+     * Get an object for a region for rules to be applied with.
+     *
+     * @param pt
+     * @return
+     */
+    public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
 
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
 
-        for (Map.Entry<String,ProtectedRegion> entry : regions.entrySet()) {
-            if (entry.getValue().contains(pt)) {
-                appRegions.add(entry.getValue());
+        for (ProtectedRegion region : regions.values()) {
+            try {
+                if (region.intersectsWith(checkRegion)) {
+                    appRegions.add(region);
+                }
+            } catch (UnsupportedIntersectionException ex) {
             }
         }
-         
-        return new ApplicableRegionSet(pt, appRegions, global);
+
+        return new ApplicableRegionSet(appRegions, global);
     }
-    
+
     /**
      * Get a list of region IDs that contain a point.
      * 
@@ -152,16 +170,16 @@ public class FlatRegionManager extends RegionManager {
      */
     public List<String> getApplicableRegionsIDs(Vector pt) {
         List<String> applicable = new ArrayList<String>();
-        
-        for (Map.Entry<String,ProtectedRegion> entry : regions.entrySet()) {
+
+        for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
             if (entry.getValue().contains(pt)) {
                 applicable.add(entry.getKey());
             }
         }
-        
+
         return applicable;
     }
-    
+
     /**
      * Returns true if the provided region overlaps with any other region that
      * is not owned by the player.
@@ -175,19 +193,19 @@ public class FlatRegionManager extends RegionManager {
             if (other.getOwners().contains(player)) {
                 continue;
             }
-            
+
             try {
-                if (ProtectedRegion.intersects(region, other)) {
+                if (region.intersectsWith(other)) {
                     return true;
                 }
             } catch (UnsupportedIntersectionException e) {
                 // TODO: Maybe do something here
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Get the number of regions.
      * 
@@ -197,20 +215,28 @@ public class FlatRegionManager extends RegionManager {
         return regions.size();
     }
 
-
     /**
      * Save the list of regions.
      *
      * @throws IOException
      */
-    public void save() throws IOException
-    {
-        if(this.regionloader == null)
-        {
+    public void save() throws IOException {
+        if (this.regionloader == null) {
             return;
         }
-        
+
         regionloader.save(this);
     }
 
+    public int getRegionCountOfPlayer(LocalPlayer player) {
+        int count = 0;
+
+        for (ProtectedRegion region : regions.values()) {
+            if (region.getOwners().contains(player)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }

@@ -20,7 +20,6 @@ package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.util.Iterator;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.AreaFlags.State;
@@ -36,7 +35,6 @@ import org.bukkit.Server;
 public class ApplicableRegionSet {
 
     private GlobalFlags global;
-    private Vector pt;
     private List<ProtectedRegion> applicable;
     private ProtectedRegion affectedRegion;
 
@@ -47,9 +45,7 @@ public class ApplicableRegionSet {
      * @param regions
      * @param global
      */
-    public ApplicableRegionSet(Vector pt, List<ProtectedRegion> applicable,
-            GlobalFlags global) {
-        this.pt = pt;
+    public ApplicableRegionSet(List<ProtectedRegion> applicable,  GlobalFlags global) {
         this.applicable = applicable;
         this.global = global;
         
@@ -256,6 +252,12 @@ public class ApplicableRegionSet {
     }
 
 
+    public boolean isAnyRegionAffected()
+    {
+        return this.applicable.size() > 0;
+    }
+
+  
     /**
      * Determines the region with the hightest priority that is not a parent.
      *

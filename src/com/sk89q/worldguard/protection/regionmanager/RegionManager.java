@@ -142,7 +142,17 @@ public abstract class RegionManager {
      * @return
      */
     public abstract ApplicableRegionSet getApplicableRegions(Vector pt);
-    
+
+
+    /**
+     * Get an object for a point for rules to be applied with.
+     *
+     * @param pt
+     * @return
+     */
+    public abstract ApplicableRegionSet getApplicableRegions(ProtectedRegion region);
+
+
     /**
      * Get a list of region IDs that contain a point.
      * 
@@ -177,4 +187,7 @@ public abstract class RegionManager {
     {
         global = globalflags;
     }
+
+
+    public abstract int getRegionCountOfPlayer(LocalPlayer player);
 }

@@ -71,7 +71,9 @@ player-damage:
 regions:
     enable: on
     wand: 287
-    max-claim-volume: 1000
+    max-claim-volume: 30000
+    claim-only-inside-existing-regions: off
+    max-region-count-per-player: 7
     default:
         build: on
         chest-access: off

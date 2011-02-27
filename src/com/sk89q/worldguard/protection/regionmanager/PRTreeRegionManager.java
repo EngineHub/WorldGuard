@@ -15,8 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.protection.regionmanager;
 
 import java.util.ArrayList;
@@ -34,22 +33,18 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.dbs.ProtectionDatabase;
 import java.io.IOException;
-import java.util.HashMap;
 
 public class PRTreeRegionManager extends RegionManager {
-    private static final int BRANCH_FACTOR = 30;
 
+    private static final int BRANCH_FACTOR = 30;
     /**
      * List of protected regions.
      */
-    private Map<String,ProtectedRegion> regions;
-    
+    private Map<String, ProtectedRegion> regions;
     /**
      * Converter to get coordinates of the tree.
      */
-    private MBRConverter<ProtectedRegion> converter
-            = new ProtectedRegionMBRConverter();
-    
+    private MBRConverter<ProtectedRegion> converter = new ProtectedRegionMBRConverter();
     /**
      * Priority R-tree.
      */
@@ -60,27 +55,27 @@ public class PRTreeRegionManager extends RegionManager {
      */
     public PRTreeRegionManager(GlobalFlags global, ProtectionDatabase regionloader) throws IOException {
         super(global, regionloader);
-        regions = new TreeMap<String,ProtectedRegion>();
+        regions = new TreeMap<String, ProtectedRegion>();
         tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
         this.load();
     }
-    
+
     /**
      * Get a list of protected regions.
      *
      * @return
      */
-    public Map<String,ProtectedRegion> getRegions() {
+    public Map<String, ProtectedRegion> getRegions() {
         return regions;
     }
-    
+
     /**
      * Set a list of protected regions.
      *
      * @return
      */
-    public void setRegions(Map<String,ProtectedRegion> regions) {
-        this.regions = new TreeMap<String,ProtectedRegion>(regions);
+    public void setRegions(Map<String, ProtectedRegion> regions) {
+        this.regions = new TreeMap<String, ProtectedRegion>(regions);
         tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
         tree.load(regions.values());
     }
@@ -115,7 +110,7 @@ public class PRTreeRegionManager extends RegionManager {
     public ProtectedRegion getRegion(String id) {
         return regions.get(id);
     }
-    
+
     /**
      * Removes a region and its children.
      * 
@@ -123,9 +118,9 @@ public class PRTreeRegionManager extends RegionManager {
      */
     public void removeRegion(String id) {
         ProtectedRegion region = regions.get(id);
-        
+
         regions.remove(id);
-        
+
         if (region != null) {
             for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
                 if (entry.getValue().getParent() == region) {
@@ -157,7 +152,22 @@ public class PRTreeRegionManager extends RegionManager {
             }
         }
 
-        return new ApplicableRegionSet(pt, appRegions, global);
+        return new ApplicableRegionSet(appRegions, global);
+    }
+
+    public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
+        List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
+
+        for (ProtectedRegion region : regions.values()) {
+            try {
+                if (region.intersectsWith(checkRegion)) {
+                    appRegions.add(region);
+                }
+            } catch (UnsupportedIntersectionException ex) {
+            }
+        }
+
+        return new ApplicableRegionSet(appRegions, global);
     }
 
     /**
@@ -171,16 +181,16 @@ public class PRTreeRegionManager extends RegionManager {
 
         int x = pt.getBlockX();
         int z = pt.getBlockZ();
-        
+
         for (ProtectedRegion region : tree.find(x, z, x, z)) {
             if (region.contains(pt)) {
                 applicable.add(region.getId());
             }
         }
-        
+
         return applicable;
     }
-    
+
     /**
      * Returns true if the provided region overlaps with any other region that
      * is not owned by the player.
@@ -194,19 +204,19 @@ public class PRTreeRegionManager extends RegionManager {
             if (other.getOwners().contains(player)) {
                 continue;
             }
-            
+
             try {
-                if (ProtectedRegion.intersects(region, other)) {
+                if (region.intersectsWith(other)) {
                     return true;
                 }
             } catch (UnsupportedIntersectionException e) {
                 // TODO: Maybe do something here
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Get the number of regions.
      * 
@@ -221,9 +231,19 @@ public class PRTreeRegionManager extends RegionManager {
      *
      * @throws IOException
      */
-    public void save() throws IOException
-    {
+    public void save() throws IOException {
         regionloader.save(this);
     }
 
+    public int getRegionCountOfPlayer(LocalPlayer player) {
+        int count = 0;
+
+        for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
+            if (entry.getValue().getOwners().contains(player)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }

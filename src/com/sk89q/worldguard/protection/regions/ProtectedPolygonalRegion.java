@@ -15,41 +15,49 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.protection.regions;
 
 import java.util.List;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-
+import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 
 public class ProtectedPolygonalRegion extends ProtectedRegion {
+
     protected List<BlockVector2D> points;
     protected int minY;
     protected int maxY;
     private BlockVector min;
     private BlockVector max;
-    
+
     public ProtectedPolygonalRegion(String id, List<BlockVector2D> points, int minY, int maxY) {
         super(id);
         this.points = points;
         this.minY = minY;
         this.maxY = maxY;
-        
+
         int minX = points.get(0).getBlockX();
         int minZ = points.get(0).getBlockZ();
         int maxX = points.get(0).getBlockX();
         int maxZ = points.get(0).getBlockZ();
-        
+
         for (BlockVector2D v : points) {
             int x = v.getBlockX();
             int z = v.getBlockZ();
-            if (x < minX) minX = x;
-            if (z < minZ) minZ = z;
-            if (x > maxX) maxX = x;
-            if (z > maxZ) maxZ = z;
+            if (x < minX) {
+                minX = x;
+            }
+            if (z < minZ) {
+                minZ = z;
+            }
+            if (x > maxX) {
+                maxX = x;
+            }
+            if (z > maxZ) {
+                maxZ = z;
+            }
         }
 
         min = new BlockVector(minX, minY, minZ);
@@ -74,13 +82,13 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         int targetX = pt.getBlockX(); //wide
         int targetY = pt.getBlockY(); //height
         int targetZ = pt.getBlockZ(); //depth
-        
+
         if (targetY < minY || targetY > maxY) {
             return false;
         }
         //Quick and dirty check.
-        if(targetX < min.getBlockX() || targetX > max.getBlockX() || targetZ < min.getBlockZ() || targetZ > max.getBlockZ()){
-        	return false;
+        if (targetX < min.getBlockX() || targetX > max.getBlockX() || targetZ < min.getBlockZ() || targetZ > max.getBlockZ()) {
+            return false;
         }
         boolean inside = false;
         int npoints = points.size();
@@ -92,13 +100,13 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
         xOld = points.get(npoints - 1).getBlockX();
         zOld = points.get(npoints - 1).getBlockZ();
-        
+
         for (i = 0; i < npoints; i++) {
             xNew = points.get(i).getBlockX();
             zNew = points.get(i).getBlockZ();
             //Check for corner
-            if(xNew == targetX && zNew == targetZ){
-        	return true;
+            if (xNew == targetX && zNew == targetZ) {
+                return true;
             }
             if (xNew > xOld) {
                 x1 = xOld;
@@ -113,14 +121,32 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
             }
             if ((xNew < targetX) == (targetX <= xOld)
                     && ((long) targetZ - (long) z1) * (long) (x2 - x1) <= ((long) z2 - (long) z1)
-                            * (long) (targetX - x1)) {
+                    * (long) (targetX - x1)) {
                 inside = !inside;
             }
             xOld = xNew;
             zOld = zNew;
         }
-        
+
         return inside;
+    }
+
+    /**
+     * Checks if two region intersects.
+     *
+     * @param region
+     * @throws UnsupportedIntersectionException
+     * @return
+     */
+    public boolean intersectsWith(ProtectedRegion region) throws UnsupportedIntersectionException {
+        
+        if (region instanceof ProtectedCuboidRegion) {
+            throw new UnsupportedIntersectionException();
+        } else if (region instanceof ProtectedPolygonalRegion) {
+            throw new UnsupportedIntersectionException();
+        } else {
+            throw new UnsupportedIntersectionException();
+        }
     }
 
     /**
@@ -141,7 +167,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     public int countBlocks() {
         int volume = 0;
         int numPoints = points.size();
-        if(numPoints < 3) {
+        if (numPoints < 3) {
             return 0;
         }
 
@@ -152,12 +178,12 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
             xa = points.get(i).getBlockX();
             za = points.get(i).getBlockZ();
 
-            if (points.get(i + 1) == null ) {
+            if (points.get(i + 1) == null) {
                 z1 = points.get(0).getBlockZ();
             } else {
                 z1 = points.get(i + 1).getBlockZ();
             }
-            if (points.get(i - 1) == null ) {
+            if (points.get(i - 1) == null) {
                 z2 = points.get(numPoints - 1).getBlockZ();
             } else {
                 z2 = points.get(i - 1).getBlockZ();
@@ -171,7 +197,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
         area = area + (xa * (points.get(1).getBlockZ() - points.get(numPoints - 1).getBlockZ()));
 
-        volume = (Math.abs(maxY - minY) + 1) * (int)Math.ceil((Math.abs(area) / 2));
+        volume = (Math.abs(maxY - minY) + 1) * (int) Math.ceil((Math.abs(area) / 2));
 
         return volume;
     }

@@ -93,6 +93,8 @@ public class WorldGuardWorldConfiguration {
     public boolean buyOnClaim;
     public double buyOnClaimPrice;
     public int maxClaimVolume;
+    public boolean claimOnlyInsideExistingRegions;
+    public int maxRegionCountPerPlayer;
     /* Configuration data end */
 
 
@@ -201,7 +203,9 @@ public class WorldGuardWorldConfiguration {
 
         useRegions = config.getBoolean("regions.enable", true);
         regionWand = config.getInt("regions.wand", 287);
-        maxClaimVolume = config.getInt("regions.max-claim-volume", 1000);
+        maxClaimVolume = config.getInt("regions.max-claim-volume", 30000);
+        claimOnlyInsideExistingRegions = config.getBoolean("regions.claim-only-inside-existing-regions", false);
+        maxRegionCountPerPlayer = config.getInt("regions.max-region-count-per-player", 7);
 
         useiConomy = config.getBoolean("iconomy.enable", false);
         buyOnClaim = config.getBoolean("iconomy.buy-on-claim", false);
