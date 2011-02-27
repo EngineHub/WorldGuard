@@ -131,23 +131,12 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         return inside;
     }
 
-    /**
-     * Checks if two region intersects.
-     *
-     * @param region
-     * @throws UnsupportedIntersectionException
-     * @return
-     */
-    public boolean intersectsWith(ProtectedRegion region) throws UnsupportedIntersectionException {
-        
-        if (region instanceof ProtectedCuboidRegion) {
-            throw new UnsupportedIntersectionException();
-        } else if (region instanceof ProtectedPolygonalRegion) {
-            throw new UnsupportedIntersectionException();
-        } else {
-            throw new UnsupportedIntersectionException();
-        }
+
+
+    public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
+
 
     /**
      * Return the type of region as a user-friendly name.

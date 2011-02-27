@@ -24,6 +24,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
+import java.util.List;
 
 /**
  * Represents a region of any shape and size that can be protected.
@@ -298,15 +299,9 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      */
     public abstract String getTypeName();
     
-    /**
-     * Checks if two region intersects.
-     * 
-     * @param region
-     * @throws UnsupportedIntersectionException
-     * @return
-     */
-    public abstract boolean intersectsWith(ProtectedRegion region) throws UnsupportedIntersectionException;
-    
+
+    public abstract List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException;
+
     
     /**
      * Thrown when setting a parent would create a circular inheritance

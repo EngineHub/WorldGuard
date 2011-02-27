@@ -149,17 +149,16 @@ public class FlatRegionManager extends RegionManager {
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
 
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
+        appRegions.addAll(regions.values());
 
-        for (ProtectedRegion region : regions.values()) {
-            try {
-                if (region.intersectsWith(checkRegion)) {
-                    appRegions.add(region);
-                }
-            } catch (UnsupportedIntersectionException ex) {
-            }
+        List<ProtectedRegion> intersectRegions;
+        try {
+            intersectRegions = checkRegion.getIntersectingRegions(appRegions);
+        } catch (Exception e) {
+            intersectRegions = new ArrayList<ProtectedRegion>();
         }
 
-        return new ApplicableRegionSet(appRegions, global);
+        return new ApplicableRegionSet(intersectRegions, global);
     }
 
     /**
@@ -188,22 +187,26 @@ public class FlatRegionManager extends RegionManager {
      * @param player
      * @return
      */
-    public boolean overlapsUnownedRegion(ProtectedRegion region, LocalPlayer player) {
+    public boolean overlapsUnownedRegion(ProtectedRegion checkRegion, LocalPlayer player) {
+
+        List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
+
         for (ProtectedRegion other : regions.values()) {
             if (other.getOwners().contains(player)) {
                 continue;
             }
 
-            try {
-                if (region.intersectsWith(other)) {
-                    return true;
-                }
-            } catch (UnsupportedIntersectionException e) {
-                // TODO: Maybe do something here
-            }
+            appRegions.add(other);
         }
 
-        return false;
+        List<ProtectedRegion> intersectRegions;
+        try {
+            intersectRegions = checkRegion.getIntersectingRegions(appRegions);
+        } catch (Exception e) {
+            intersectRegions = new ArrayList<ProtectedRegion>();
+        }
+
+        return intersectRegions.size() > 0;
     }
 
     /**

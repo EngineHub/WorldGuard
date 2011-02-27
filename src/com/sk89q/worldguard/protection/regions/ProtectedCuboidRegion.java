@@ -20,6 +20,7 @@ package com.sk89q.worldguard.protection.regions;
 
 import com.sk89q.worldedit.*;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
+import java.util.List;
 
 /**
  * Represents a cuboid region that can be protected.
@@ -100,13 +101,8 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
                 && z >= min.getBlockZ() && z <= max.getBlockZ();
     }
 
-    /**
-     * Checks if two region intersects.
-     * 
-     * @param region
-     * @throws UnsupportedIntersectionException
-     * @return
-     */
+
+    /*
     public boolean intersectsWith(ProtectedRegion region) throws UnsupportedIntersectionException {
         
         if (region instanceof ProtectedCuboidRegion) {
@@ -129,6 +125,12 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
             throw new UnsupportedIntersectionException();
         }
     }
+    */
+
+    public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 
     /**
      * Return the type of region as a user-friendly name.
@@ -152,4 +154,6 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         int volume = xLength * yLength * zLength;
         return volume;
     }
+
+
 }
