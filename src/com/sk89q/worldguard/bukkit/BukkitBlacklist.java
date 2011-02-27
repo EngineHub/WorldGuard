@@ -25,7 +25,8 @@ import com.sk89q.worldguard.blacklist.Blacklist;
 public class BukkitBlacklist extends Blacklist {
     private WorldGuardPlugin plugin;
     
-    public BukkitBlacklist(WorldGuardPlugin plugin) {
+    public BukkitBlacklist(Boolean useAsWhitelist, WorldGuardPlugin plugin) {
+        super(useAsWhitelist);
         this.plugin = plugin;
     }
     

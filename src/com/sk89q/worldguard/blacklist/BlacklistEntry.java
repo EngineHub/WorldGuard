@@ -271,7 +271,7 @@ public class BlacklistEntry {
      * @param silent
      * @return
      */
-    public boolean check(BlacklistEvent event, boolean forceRepeat, boolean silent) {
+    public boolean check(Boolean useAsWhitelist, BlacklistEvent event, boolean forceRepeat, boolean silent) {
         LocalPlayer player = event.getPlayer();
         
         if (shouldIgnore(player)) {
@@ -293,11 +293,13 @@ public class BlacklistEntry {
         }
 
         String actions[] = getActions(event);
-        boolean ret = true;
+
+        
+        boolean ret = useAsWhitelist ? false : true;
         
         // Nothing to do
         if (actions == null) {
-            return true;
+            return useAsWhitelist ? false : true;
         }
         
         for (String action : actions) {
@@ -308,6 +310,14 @@ public class BlacklistEntry {
                 }
                 
                 ret = false;
+
+            // Allow
+            } else if (action.equalsIgnoreCase("allow")) {
+                if (silent) {
+                    return true;
+                }
+
+                ret = true;
 
             // Kick
             } else if (action.equalsIgnoreCase("kick")) {

@@ -60,6 +60,14 @@ public abstract class Blacklist {
     Map<String,BlacklistTrackedEvent> lastAffected =
             new HashMap<String,BlacklistTrackedEvent>();
 
+
+    private boolean useAsWhitelist;
+
+    public Blacklist(Boolean useAsWhitelist)
+    {
+        this.useAsWhitelist = useAsWhitelist;
+    }
+
     /**
      * Returns whether the list is empty.
      * 
@@ -100,7 +108,7 @@ public abstract class Blacklist {
         }
         boolean ret = true;
         for (BlacklistEntry entry : entries) {
-            if (!entry.check(event, forceRepeat, silent)) {
+            if (!entry.check(useAsWhitelist, event, forceRepeat, silent)) {
                 ret = false;
             }
         }

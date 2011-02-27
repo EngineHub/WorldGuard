@@ -91,6 +91,7 @@ iconomy:
     buy-on-claim-price: 2
 
 blacklist:
+    use-as-whitelist: off
     logging:
         console:
             enable: on

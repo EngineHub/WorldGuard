@@ -37,7 +37,8 @@
 # - on-acquire (an item enters a player's inventory via some method)
 #
 # Actions (for events):
-# - deny (deny completely)
+# - deny (deny completely, used blacklist mode)
+# - allow (used in whitelist mode)
 # - notify (notify admins)
 # - log (log to console/file/database)
 # - tell (tell a player that that's not allowed)

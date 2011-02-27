@@ -227,6 +227,9 @@ public class WorldGuardWorldConfiguration {
         wp.getGlobalRegionManager().setGlobalFlags(worldName, globalFlags);
 
 
+
+        boolean useBlacklistAsWhitelist = config.getBoolean("blacklist.use-as-whitelist", false);
+
         // Console log configuration
         boolean logConsole = config.getBoolean("blacklist.logging.console.enable", true);
 
@@ -250,7 +253,7 @@ public class WorldGuardWorldConfiguration {
             }
 
             // First load the blacklist data from worldguard-blacklist.txt
-            Blacklist blist = new BukkitBlacklist(wp);
+            Blacklist blist = new BukkitBlacklist(useBlacklistAsWhitelist, wp);
             blist.load(blacklistFile);
 
             // If the blacklist is empty, then set the field to null
