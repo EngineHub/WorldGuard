@@ -114,6 +114,7 @@ public class CommandRegionClaim extends WgRegionCommand {
                     player.sendMessage(ChatColor.RED + "This region overlaps with someone else's region.");
                     return true;
                 }
+                region.setPriority(regions.getAffectedRegionPriority() + 1);
             }
             else
             {

@@ -410,6 +410,9 @@ public class ApplicableRegionSet {
         return affectedRegion != null ?  affectedRegion.getId() : "";
     }
 
+    public int getAffectedRegionPriority() {
+        return affectedRegion != null ?  affectedRegion.getPriority() : 0;
+    }
 
     /**
      * Clear a region's parents for isFlagAllowed().
