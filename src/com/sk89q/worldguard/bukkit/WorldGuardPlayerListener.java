@@ -18,7 +18,7 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import com.nijikokun.bukkit.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.iConomy;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;

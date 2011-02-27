@@ -57,7 +57,7 @@ public class FlagInfo {
         flagList.add(new FlagInfo("chest", null, FlagValueType.STATE, "states", "chest"));
         flagList.add(new FlagInfo("waterflow", null, FlagValueType.STATE, "states", "waterflow"));
         flagList.add(new FlagInfo("iconomy", "buyable", FlagValueType.BOOLEAN, "iconomy", "buyable"));
-        flagList.add(new FlagInfo("iconomy", "price", FlagValueType.INT, "iconomy", "price"));
+        flagList.add(new FlagInfo("iconomy", "price", FlagValueType.DOUBLE, "iconomy", "price"));
         flagList.add(new FlagInfo("spawn", "set", FlagValueType.LOCATION, "spawn", ""));
         flagList.add(new FlagInfo("spawn", "delete", FlagValueType.LOCATION, "spawn", ""));
         flagList.add(new FlagInfo("spawn", "allow", FlagValueType.STRING, "spawn", "allow"));

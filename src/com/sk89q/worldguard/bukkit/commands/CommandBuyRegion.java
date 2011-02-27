@@ -22,8 +22,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nijikokun.bukkit.iConomy.Account;
-import com.nijikokun.bukkit.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.system.*;
 import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
@@ -63,12 +63,11 @@ public class CommandBuyRegion extends WgCommand {
                 if (args.length == 2) {
                     if (args[1] == "info") {
                         player.sendMessage(ChatColor.YELLOW + "Region " + id + " costs " + 
-                                iConomy.Misc.formatCurrency(flags.getIntFlag("iconomy", "price"), iConomy.currency));
+                                iConomy.getBank().format(flags.getDoubleFlag("iconomy", "price")));
                         if (iConomy.getBank().hasAccount(player.getName())) {
                             player.sendMessage(ChatColor.YELLOW + "You have " +
-                                    iConomy.Misc.formatCurrency(
-                                            (int)Math.round(iConomy.getBank().getAccount(player.getName()).getBalance()),
-                                            iConomy.currency));
+                                    iConomy.getBank().format(
+                                            iConomy.getBank().getAccount(player.getName()).getBalance()));
                         } else {
                             player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
                         }
@@ -84,7 +83,7 @@ public class CommandBuyRegion extends WgCommand {
                         if (balance >= regionPrice) {
                             account.subtract(regionPrice);
                             player.sendMessage(ChatColor.YELLOW + "You have bought the region " + id + " for " +
-                                    iConomy.Misc.formatCurrency(regionPrice, iConomy.currency));
+                                    iConomy.getBank().format(regionPrice));
                             DefaultDomain owners = region.getOwners();
                             owners.addPlayer(player.getName());
                             region.setOwners(owners);

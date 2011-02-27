@@ -34,8 +34,9 @@ import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.nijikokun.bukkit.iConomy.Account;
-import com.nijikokun.bukkit.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.*;
+import com.nijiko.coelho.iConomy.system.*;
+
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -116,18 +117,17 @@ public class CommandRegionClaim extends WgRegionCommand {
                 if (iConomy.getBank().hasAccount(player.getName())) {
                     Account account = iConomy.getBank().getAccount(player.getName());
                     double balance = account.getBalance();
-                    int regionCosts = region.countBlocks() * wcfg.buyOnClaimPrice;
+                    double regionCosts = region.countBlocks() * wcfg.buyOnClaimPrice;
                     if (balance >= regionCosts) {
                         account.subtract(regionCosts);
                         player.sendMessage(ChatColor.YELLOW + "You have bought that region for " +
-                                iConomy.Misc.formatCurrency(regionCosts, iConomy.currency));
+                                iConomy.getBank().format(regionCosts));
                         account.save();
                     } else {
                         player.sendMessage(ChatColor.RED + "You have not enough money.");
                         player.sendMessage(ChatColor.RED + "The region you want to claim costs " +
-                                iConomy.Misc.formatCurrency(regionCosts, iConomy.currency));
-                        player.sendMessage(ChatColor.RED + "You have " + iConomy.Misc.formatCurrency(
-                                (int)Math.round(balance), iConomy.currency));
+                                iConomy.getBank().format(regionCosts));
+                        player.sendMessage(ChatColor.RED + "You have " + iConomy.getBank().format(balance));
                         return true;
                     }
                 } else {

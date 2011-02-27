@@ -91,7 +91,7 @@ public class WorldGuardWorldConfiguration {
     public String blockCreatureSpawn;
     public boolean useiConomy;
     public boolean buyOnClaim;
-    public int buyOnClaimPrice;
+    public double buyOnClaimPrice;
     public int maxClaimVolume;
     /* Configuration data end */
 
@@ -205,7 +205,7 @@ public class WorldGuardWorldConfiguration {
 
         useiConomy = config.getBoolean("iconomy.enable", false);
         buyOnClaim = config.getBoolean("iconomy.buy-on-claim", false);
-        buyOnClaimPrice = config.getInt("iconomy.buy-on-claim-price", 1);
+        buyOnClaimPrice = config.getDouble("iconomy.buy-on-claim-price", 1.0);
 
         blockCreatureSpawn = "";
         for (String creature : config.getStringList("mobs.block-creature-spawn", null)) {
