@@ -261,7 +261,7 @@ public class WorldGuardEntityListener extends EntityListener {
         }
 
         WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getEntity().getWorld().getName());
+        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getLocation().getWorld().getName());
 
         if (event.getEntity() instanceof LivingEntity) {
 
@@ -277,8 +277,8 @@ public class WorldGuardEntityListener extends EntityListener {
             }
             
             if (wcfg.useRegions) {
-                Vector pt = toVector(event.getEntity().getLocation());
-                RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
+                Vector pt = toVector(event.getLocation());
+                RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getLocation().getWorld().getName());
                 
                 if (!mgr.getApplicableRegions(pt)
                         .allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
@@ -292,9 +292,9 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
             
-            if (wcfg.useRegions && event.getEntity() != null) {
-                Vector pt = toVector(event.getEntity().getLocation());
-                RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
+            if (wcfg.useRegions) {
+                Vector pt = toVector(event.getLocation());
+                RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getLocation().getWorld().getName());
 
                 if (!mgr.getApplicableRegions(pt)
                         .allowsFlag(AreaFlags.FLAG_TNT)) {
