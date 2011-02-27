@@ -38,7 +38,8 @@ worldguard.region.save
 worldguard.region.setparent.own
 worldguard.region.setparent.all
 
-worldguard.region.priority
+worldguard.region.priority.own
+worldguard.region.priority.all
 
 worldguard.reloadwg
 

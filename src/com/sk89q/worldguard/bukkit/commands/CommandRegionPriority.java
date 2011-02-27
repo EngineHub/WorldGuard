@@ -18,6 +18,7 @@
  */
 package com.sk89q.worldguard.bukkit.commands;
 
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
@@ -26,6 +27,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -36,7 +38,6 @@ public class CommandRegionPriority extends WgRegionCommand {
     public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
         CommandHandler.checkArgs(args, 1, 2, "/region priority <id> (<value>)");
-        cfg.checkRegionPermission(sender, "region.priority");
 
         try {
             String id = args[0].toLowerCase();
@@ -49,6 +50,18 @@ public class CommandRegionPriority extends WgRegionCommand {
             }
 
             ProtectedRegion existing = mgr.getRegion(id);
+
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+
+                if (existing.isOwner(BukkitPlayer.wrapPlayer(cfg, player))) {
+                    cfg.checkRegionPermission(sender, "region.priority.own");
+                } else {
+                    cfg.checkRegionPermission(sender, "region.priority.all");
+                }
+            } else {
+                cfg.checkRegionPermission(sender, "region.priority.all");
+            }
 
             if (args.length > 1) {
                 try {
