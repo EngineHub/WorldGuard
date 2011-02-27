@@ -171,7 +171,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
             }
 
             // Check whether the other regions points are inside the current region
-            if (region.getTypeName() == "polygon") {
+            if (region instanceof ProtectedPolygonalRegion) {
                 for (i2 = 0; i < ((ProtectedPolygonalRegion)region).getPoints().size(); i++) {
                     BlockVector2D pt2Dr = ((ProtectedPolygonalRegion)region).getPoints().get(i2);
                     int minYr = ((ProtectedPolygonalRegion)region).minY;
@@ -184,7 +184,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
                         continue;
                     }
                 }
-            } else if (region.getTypeName() == "cuboid") {
+            } else if (region instanceof ProtectedCuboidRegion) {
                 BlockVector ptcMin = region.getMinimumPoint(); 
                 BlockVector ptcMax = region.getMaximumPoint();
 
