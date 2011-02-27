@@ -88,6 +88,9 @@ public class WorldGuardConfiguration {
     }
 
     public void onEnable() {
+
+        wg.getDataFolder().mkdirs();
+        
         checkOldConfigFiles();
         checkOldCSVDB();
 
@@ -402,6 +405,7 @@ public class WorldGuardConfiguration {
                 bl.forgetPlayer(player);
             }
         }
+      
     }
 
     public WorldGuardPlugin getWorldGuardPlugin()

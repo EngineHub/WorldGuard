@@ -107,3 +107,9 @@ blacklist:
             open-files: 10
 
 # For permissions, see http://wiki.sk89q.com/wiki/WorldGuard/Permissions/Bukkit
+permissions:
+    users:
+        sk89q:
+            permissions:
+                 - worldguard.region.*
+                 - worldgurad.god

@@ -104,8 +104,6 @@ public class RegionCommandHandler extends WgCommand {
             }
         }
 
-        System.out.println(subCommand);
-
         Server server = cfg.getWorldGuardPlugin().getServer();
         if (server.getWorld(worldName) == null) {
             sender.sendMessage("Invalid world specified.");

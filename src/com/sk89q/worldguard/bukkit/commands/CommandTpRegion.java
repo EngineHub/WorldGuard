@@ -54,7 +54,7 @@ public class CommandTpRegion extends WgCommand {
                 if (!region.isOwner(lPlayer)) {
                     cfg.checkPermission(player, "tpregion.override");
                 }
-            } else if (flagright.equals("meber")) {
+            } else if (flagright.equals("member")) {
                 if (!region.isMember(lPlayer)) {
                     cfg.checkPermission(player, "tpregion.override");
                 }
