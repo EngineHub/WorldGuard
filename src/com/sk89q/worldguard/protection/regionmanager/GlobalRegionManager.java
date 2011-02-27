@@ -24,6 +24,7 @@ import com.sk89q.worldguard.protection.dbs.JSONDatabase;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -37,17 +38,20 @@ public class GlobalRegionManager {
 
     private WorldGuardPlugin wg;
     private HashMap<String, RegionManager> managers;
+    private HashMap<String, Long> managerFileDates;
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     public GlobalRegionManager(WorldGuardPlugin wg) {
 
         this.wg = wg;
         this.managers = new HashMap<String, RegionManager>();
+        this.managerFileDates = new HashMap<String, Long>();
     }
 
     public void onEnable() {
 
         this.managers.clear();
+        this.managerFileDates.clear();
 
         for (World w : wg.getServer().getWorlds()) {
             loadWorld(w.getName());
@@ -56,8 +60,7 @@ public class GlobalRegionManager {
         wg.getWgConfiguration().onEnable();
     }
 
-    public void onDisable()
-    {
+    public void onDisable() {
         wg.getWgConfiguration().onDisable();
     }
 
@@ -65,11 +68,34 @@ public class GlobalRegionManager {
 
         String filename = name + ".regions.json";
         try {
-            managers.put(name, new FlatRegionManager(new GlobalFlags(), new JSONDatabase(new File(wg.getDataFolder(), filename))));
+            File file = new File(wg.getDataFolder(), filename);
+            managerFileDates.put(name, file.lastModified());
+            managers.put(name, new FlatRegionManager(new GlobalFlags(), new JSONDatabase(file)));
         } catch (FileNotFoundException e) {
         } catch (IOException e) {
             logger.warning("WorldGuard: Failed to load regions from file " + filename + " : "
                     + e.getMessage());
+        }
+    }
+
+    public void reloadDataWhereRequired() {
+
+        for (String name : managers.keySet()) {
+
+            String filename = name + ".regions.json";
+            File file = new File(wg.getDataFolder(), filename);
+
+            Long oldDate = managerFileDates.get(name);
+            if (oldDate == null) {
+                oldDate = new Long(0);
+            }
+
+            try {
+                if (file.lastModified() > oldDate) {
+                    loadWorld(name);
+                }
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -85,7 +111,6 @@ public class GlobalRegionManager {
 
         return ret;
     }
-
 
     public void setGlobalFlags(String worldName, GlobalFlags globalflags) {
 

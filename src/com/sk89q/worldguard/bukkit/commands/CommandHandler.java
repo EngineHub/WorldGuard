@@ -64,8 +64,8 @@ public class CommandHandler {
         // commands that DO NOT support console as sender
         this.commandMap.put("stack", new CommandStack());
         this.commandMap.put("locate", new CommandLocate());
-        this.commandMap.put("tpregrion", new CommandTpRegion());
         this.commandMap.put("buyregion", new CommandBuyRegion());
+        this.commandMap.put("tpregrion", new CommandTpRegion());
     }
     
     

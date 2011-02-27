@@ -132,6 +132,7 @@ public class RegionCommandHandler extends WgCommand {
             subArgs = args;
         }
 
+        cfg.getWorldGuardPlugin().getGlobalRegionManager().reloadDataWhereRequired();
         wgcmd.handle(sender, senderName, subCommand, subArgs, cfg, wcfg);
 
         return true;
