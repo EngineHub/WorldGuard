@@ -54,6 +54,7 @@ public final class StateRegionFlag extends RegionFlag {
             this.value = null;
         } else {
             try {
+                newValue = newValue.toUpperCase();
                 this.value = State.valueOf(newValue);
             } catch (Exception e) {
                 this.value = null;

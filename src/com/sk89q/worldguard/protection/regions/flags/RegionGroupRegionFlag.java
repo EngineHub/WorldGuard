@@ -53,6 +53,7 @@ public final class RegionGroupRegionFlag extends RegionFlag {
             this.value = null;
         } else {
             try {
+                newValue = newValue.toUpperCase();
                 this.value = RegionGroup.valueOf(newValue);
             } catch (Exception e) {
                 this.value = null;
