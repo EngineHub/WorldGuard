@@ -444,7 +444,7 @@ public class WorldGuardBlockListener extends BlockListener {
             ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(pt);
             LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, (Player)entity);
 
-            if (!applicableRegions.isFlagAllowed(AreaFlags.FLAG_LEVER_AND_BUTTON, true, localPlayer)) {
+            if (!applicableRegions.isFlagAllowed(AreaFlags.FLAG_LEVER_AND_BUTTON, true, null)) {
                 ((Player)entity).sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;

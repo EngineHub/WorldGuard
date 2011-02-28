@@ -33,6 +33,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.dbs.ProtectionDatabase;
 import java.io.IOException;
+import java.util.Iterator;
 
 public class PRTreeRegionManager extends RegionManager {
 
@@ -122,14 +123,22 @@ public class PRTreeRegionManager extends RegionManager {
         regions.remove(id);
 
         if (region != null) {
-            for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
-                if (entry.getValue().getParent() == region) {
-                    removeRegion(entry.getKey());
+            List<String> removeRegions = new ArrayList<String>();
+            Iterator<ProtectedRegion> iter = regions.values().iterator();
+            while (iter.hasNext()) {
+                ProtectedRegion curRegion = iter.next();
+                if (curRegion.getParent() == region) {
+                    removeRegions.add(curRegion.getId());
                 }
+            }
+
+            for(String remId : removeRegions)
+            {
+                removeRegion(remId);
             }
         }
 
-        tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+    tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
         tree.load(regions.values());
     }
 

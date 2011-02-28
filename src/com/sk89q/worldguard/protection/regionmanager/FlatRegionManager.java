@@ -30,6 +30,7 @@ import com.sk89q.worldguard.protection.GlobalFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.dbs.ProtectionDatabase;
+import java.util.Iterator;
 
 /**
  * A very simple implementation of the region manager that uses a flat list
@@ -94,10 +95,18 @@ public class FlatRegionManager extends RegionManager {
         regions.remove(id);
 
         if (region != null) {
-            for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
-                if (entry.getValue().getParent() == region) {
-                    removeRegion(entry.getKey());
+            List<String> removeRegions = new ArrayList<String>();
+            Iterator<ProtectedRegion> iter = regions.values().iterator();
+            while (iter.hasNext()) {
+                ProtectedRegion curRegion = iter.next();
+                if (curRegion.getParent() == region) {
+                    removeRegions.add(curRegion.getId());
                 }
+            }
+
+            for(String remId : removeRegions)
+            {
+                removeRegion(remId);
             }
         }
     }
