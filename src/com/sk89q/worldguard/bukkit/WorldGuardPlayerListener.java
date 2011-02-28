@@ -155,7 +155,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-            if (!mgr.getApplicableRegions(pt).allowsFlag(FlagType.LIGHTER)) {
+            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(FlagType.LIGHTER)) {
                 event.setCancelled(true);
                 return;
             }

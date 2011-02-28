@@ -115,17 +115,17 @@ public class ApplicableRegionSetTest {
         
         // Outside
         appl = manager.getApplicableRegions(outside);
-        //assertTrue(appl.allowsFlag(AreaFlags.FLAG_FIRE_SPREAD));
+        //assertTrue(appl.isStateFlagAllowed(AreaFlags.FLAG_FIRE_SPREAD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        //assertTrue(appl.allowsFlag(AreaFlags.FLAG_FIRE_SPREAD));
+        //assertTrue(appl.isStateFlagAllowed(AreaFlags.FLAG_FIRE_SPREAD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        //assertFalse(appl.allowsFlag(AreaFlags.FLAG_FIRE_SPREAD));
+        //assertFalse(appl.isStateFlagAllowed(AreaFlags.FLAG_FIRE_SPREAD));
 
         // Inside no fire zone
         appl = manager.getApplicableRegions(inNoFire);
-        //assertFalse(appl.allowsFlag(AreaFlags.FLAG_FIRE_SPREAD));
+        //assertFalse(appl.isStateFlagAllowed(AreaFlags.FLAG_FIRE_SPREAD));
     }
     
     @Test

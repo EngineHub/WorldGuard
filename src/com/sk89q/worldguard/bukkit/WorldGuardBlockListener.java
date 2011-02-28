@@ -227,7 +227,7 @@ public class WorldGuardBlockListener extends BlockListener {
             Vector pt = toVector(blockFrom.getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(world.getName());
 
-            if (!mgr.getApplicableRegions(pt).allowsFlag(FlagType.WATER_FLOW)) {
+            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(FlagType.WATER_FLOW)) {
                 event.setCancelled(true);
                 return;
             }
@@ -273,18 +273,18 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
 
                 if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !set.allowsFlag(FlagType.LIGHTER)) {
+                        && !set.isStateFlagAllowed(FlagType.LIGHTER)) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if (isFireSpread && set.allowsFlag(FlagType.FIRE_SPREAD)) {
+            if (isFireSpread && set.isStateFlagAllowed(FlagType.FIRE_SPREAD)) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (cause == IgniteCause.LAVA && !set.allowsFlag(FlagType.LAVA_FIRE)) {
+            if (cause == IgniteCause.LAVA && !set.isStateFlagAllowed(FlagType.LAVA_FIRE)) {
                 event.setCancelled(true);
                 return;
             }
@@ -428,7 +428,7 @@ public class WorldGuardBlockListener extends BlockListener {
 
                 if (!cfg.hasPermission(player, "region.bypass")) {
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                    if (!set.allowsFlag(FlagType.CHEST_ACCESS) && !set.canBuild(localPlayer)) {
+                    if (!set.isStateFlagAllowed(FlagType.CHEST_ACCESS) && !set.canBuild(localPlayer)) {
                         player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                         event.setCancelled(true);
                         return;
@@ -443,7 +443,7 @@ public class WorldGuardBlockListener extends BlockListener {
             ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(pt);
             LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, (Player)entity);
 
-            if (!applicableRegions.allowsFlag(FlagType.LEVER_AND_BUTTON, localPlayer)) {
+            if (!applicableRegions.isStateFlagAllowed(FlagType.LEVER_AND_BUTTON, localPlayer)) {
                 ((Player)entity).sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;

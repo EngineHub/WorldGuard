@@ -60,7 +60,7 @@ public class ApplicableRegionSet {
      * @return
      */
     public boolean canBuild(LocalPlayer player) {
-        return isFlagAllowed(FlagType.BUILD, global.canBuild) || this.isMember(player);
+        return isStateFlagAllowed(FlagType.BUILD, global.canBuild) || this.isMember(player);
     }
 
     /**
@@ -69,21 +69,21 @@ public class ApplicableRegionSet {
      * @param player
      * @return
      */
-    public boolean allowsFlag(FlagType type) {
-        return isFlagAllowed(type, global.getDefaultValue(type));
+    public boolean isStateFlagAllowed(FlagType type) {
+        return isStateFlagAllowed(type, global.getDefaultValue(type));
     }
 
-    public boolean allowsFlag(FlagType type, LocalPlayer player) {
-        return isFlagAllowed(type, global.getDefaultValue(type)) || this.isMember(player);
+    public boolean isStateFlagAllowed(FlagType type, LocalPlayer player) {
+        return isStateFlagAllowed(type, global.getDefaultValue(type)) || this.isMember(player);
     }
 
-    public boolean isFlagAllowed(FlagType type, boolean def) {
+    public boolean isStateFlagAllowed(FlagType type, boolean def) {
 
         State defState = def ? State.ALLOW : State.DENY;
         return getStateFlag(type, true).getValue(defState) == State.ALLOW;
     }
 
-    public boolean isFlagAllowed(FlagType type, boolean def, LocalPlayer player) {
+    public boolean isStateFlagAllowed(FlagType type, boolean def, LocalPlayer player) {
 
         State defState = def ? State.ALLOW : State.DENY;
         return getStateFlag(type, true).getValue(defState) == State.ALLOW  || this.isMember(player);
@@ -248,7 +248,7 @@ public class ApplicableRegionSet {
      * @return
      */
     /*
-    private boolean isFlagAllowed(String flag, boolean def, LocalPlayer player) {
+    private boolean isStateFlagAllowed(String flag, boolean def, LocalPlayer player) {
     boolean found = false;
     boolean allowed = false; // Used for ALLOW override
     if (player == null) {
@@ -327,7 +327,7 @@ public class ApplicableRegionSet {
    
 
     /**
-     * Clear a region's parents for isFlagAllowed().
+     * Clear a region's parents for isStateFlagAllowed().
      * 
      * @param needsClear
      * @param hasCleared
