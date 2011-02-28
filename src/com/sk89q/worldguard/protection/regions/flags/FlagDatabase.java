@@ -38,7 +38,7 @@ public class FlagDatabase {
 
         PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, CREEPER_EXPLOSION,
         TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW,
-        LEVER_AND_BUTTON, GREET_MESSAGE, FAREWELL_MESSAGE, DENY_SPAWN,
+        LEVER_AND_BUTTON, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, DENY_SPAWN,
         HEAL_DELAY, HEAL_AMOUNT, TELE_LOC, TELE_PERM, SPAWN_LOC, SPAWN_PERM,
         BUYABLE, PRICE
 
@@ -60,6 +60,7 @@ public class FlagDatabase {
         registerFlag("chest", FlagType.CHEST_ACCESS, FlagDataType.STATE);
         registerFlag("waterflow", FlagType.WATER_FLOW, FlagDataType.STATE);
         registerFlag("leverandbutton", FlagType.LEVER_AND_BUTTON, FlagDataType.STATE);
+        registerFlag("placevehicle", FlagType.PLACE_VEHICLE, FlagDataType.STATE);
 
         registerFlag("buyable", FlagType.BUYABLE, FlagDataType.BOOLEAN);
 

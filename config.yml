@@ -84,6 +84,7 @@ regions:
         mobdamage: on
         waterflow: on
         leverandbutton: on
+        placevehicle: on
 
 iconomy:
     enable: on

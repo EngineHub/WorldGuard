@@ -33,6 +33,7 @@ public class GlobalFlags {
     public boolean canLighter = true;
     public boolean canTnt = true;
     public boolean canLeverandbutton = true;
+    public boolean canPlaceVehicle = true;
     public boolean allowCreeper = true;
     public boolean allowMobDamage = true;
     public boolean allowWaterflow = true;
@@ -54,6 +55,8 @@ public class GlobalFlags {
                 return this.canTnt;
             case LEVER_AND_BUTTON:
                 return this.canLeverandbutton;
+            case PLACE_VEHICLE:
+                return this.canPlaceVehicle;
             case CREEPER_EXPLOSION:
                 return this.allowCreeper;
             case MOB_DAMAGE:
