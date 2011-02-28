@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.protection;
 
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
@@ -112,6 +113,9 @@ public class TimedFlagsTimer implements Runnable {
                     if (newGreetMsg != null) {
                         player.sendMessage(newGreetMsg);
                     }
+                    if (regions.getBooleanFlag(FlagType.NOTIFY_GREET, false).getValue(false)) {
+                        broadcastNotification(ChatColor.YELLOW + "Player " + player.getName() + " entered region " + newRegionName);
+                    }
                     nfo.lastFarewellMsg = farewellMsg;
                     nfo.lastRegion = newRegionName;
                 }
@@ -120,6 +124,9 @@ public class TimedFlagsTimer implements Runnable {
                     if (nfo.lastFarewellMsg != null) {
                         player.sendMessage(nfo.lastFarewellMsg);
                         nfo.lastFarewellMsg = null;
+                    }
+                    if (regions.getBooleanFlag(FlagType.NOTIFY_FAREWELL, false).getValue(false)) {
+                        broadcastNotification(ChatColor.YELLOW + "Player " + player.getName() + " left region " + nfo.lastRegion);
                     }
                     nfo.lastRegion = null;
                 }
@@ -133,6 +140,15 @@ public class TimedFlagsTimer implements Runnable {
                 newLoc.setX(newLoc.getBlockX() - 30);
                 newLoc.setY(newLoc.getWorld().getHighestBlockYAt(newLoc) + 1);
                 player.teleportTo(newLoc);
+            }
+            
+        }
+    }
+
+    public void broadcastNotification(String msg) {
+        for (Player player : wg.getServer().getOnlinePlayers()) {
+            if (wg.getWgConfiguration().hasPermission(player, "notify_onenter")) {
+                player.sendMessage(msg);
             }
         }
     }

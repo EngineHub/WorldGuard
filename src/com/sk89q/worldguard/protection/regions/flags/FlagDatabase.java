@@ -38,9 +38,9 @@ public class FlagDatabase {
 
         PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, CREEPER_EXPLOSION,
         TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW,
-        LEVER_AND_BUTTON, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, DENY_SPAWN,
-        HEAL_DELAY, HEAL_AMOUNT, TELE_LOC, TELE_PERM, SPAWN_LOC, SPAWN_PERM,
-        BUYABLE, PRICE
+        LEVER_AND_BUTTON, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE,
+        NOTIFY_GREET, NOTIFY_FAREWELL, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT,
+        TELE_LOC, TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE
 
     };
 
@@ -72,6 +72,8 @@ public class FlagDatabase {
         registerFlag("gmsg", FlagType.GREET_MESSAGE, FlagDataType.STRING);
         registerFlag("fmsg", FlagType.FAREWELL_MESSAGE, FlagDataType.STRING);
         registerFlag("denyspawn", FlagType.DENY_SPAWN, FlagDataType.STRING);
+        registerFlag("notifygreet", FlagType.NOTIFY_GREET, FlagDataType.BOOLEAN);
+        registerFlag("notifyfarewell", FlagType.NOTIFY_GREET, FlagDataType.BOOLEAN);
 
         registerFlag("teleloc", FlagType.TELE_LOC, FlagDataType.LOCATION);
         registerFlag("spawnloc", FlagType.SPAWN_LOC, FlagDataType.LOCATION);
