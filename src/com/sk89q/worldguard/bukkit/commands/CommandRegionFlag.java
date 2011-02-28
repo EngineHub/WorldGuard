@@ -24,8 +24,10 @@ import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.flags.FlagDatabase;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlag.FlagDataType;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlagInfo;
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -40,20 +42,18 @@ public class CommandRegionFlag extends WgRegionCommand {
 
     public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
-        CommandHandler.checkArgs(args, 3, 4, "/region flag <regionid> <name> (<subname>) <value>");
+        CommandHandler.checkArgs(args, 2, -1, "/region flag <regionid> <name> (<value>) [no value to unset flag]");
 
         try {
             String id = args[0].toLowerCase();
             String nameStr = args[1];
-            String subnameStr = null;
             String valueStr = null;
-            if (args.length < 4) {
+
+            if (args.length == 3) {
                 valueStr = args[2];
-            } else {
-                subnameStr = args[2];
+            } else if (args.length > 3) {
                 StringBuilder tmp = new StringBuilder();
-                for(int i=3; i < args.length; i++)
-                {
+                for (int i = 2; i < args.length; i++) {
                     tmp.append(args[i]);
                 }
                 valueStr = tmp.toString();
@@ -81,135 +81,52 @@ public class CommandRegionFlag extends WgRegionCommand {
                 cfg.checkRegionPermission(sender, "region.flag.foreignregions");
             }
 
-            FlagInfo nfo = FlagInfo.getFlagInfo(nameStr, subnameStr);
+            RegionFlagInfo nfo = FlagDatabase.getFlagInfoFromName(nameStr);
 
             if (nfo == null) {
                 sender.sendMessage(ChatColor.RED + "Unknown flag specified.");
                 return true;
-            } else if (nfo.subName != null && args.length < 4) {
-                sender.sendMessage(ChatColor.RED + "Name a subflag and a value to set this flag.");
-                return true;
             }
 
-            boolean validValue = false;
-            switch (nfo.type) {
-                case STRING: {
-                    validValue = true;                   
-                    break;
+            if (nfo.dataType == FlagDataType.LOCATION) {
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(ChatColor.RED + "Flag not supported in console mode.");
+                    return true;
                 }
-                case INT: {
-                    validValue = true;
-                    try {
-                        Integer val = Integer.valueOf(valueStr);
-                    } catch (Exception e) {
-                        validValue = false;
-                    }
-                    break;
-                }
-                case BOOLEAN: {
-                    valueStr = valueStr.toLowerCase();
-                    if (valueStr.equals("on")) {
-                        valueStr = "true";
-                    } else if (valueStr.equals("allow")) {
-                        valueStr = "true";
-                    } else if (valueStr.equals("1")) {
-                        valueStr = "true";
-                    }
-                    validValue = true;
-                    break;
-                }
-                case FLOAT: {
-                    validValue = true;
-                    try {
-                        Float val = Float.valueOf(valueStr);
-                    } catch (Exception e) {
-                        validValue = false;
-                    }
-                    break;
-                }
-                case DOUBLE: {
-                    validValue = true;
-                    try {
-                        Double val = Double.valueOf(valueStr);
-                    } catch (Exception e) {
-                        validValue = false;
-                    }
-                    break;
-                }
-                case STATE: {
-                    validValue = true;
+                Player player = (Player) sender;
 
-                    if (valueStr.equalsIgnoreCase("allow")) {
-                        valueStr = AreaFlags.State.ALLOW.toString();
-                    } else if (valueStr.equalsIgnoreCase("deny")) {
-                        valueStr = AreaFlags.State.DENY.toString();
-                    } else if (valueStr.equalsIgnoreCase("none")) {
-                        valueStr = AreaFlags.State.NONE.toString();
+                Location l = player.getLocation();
+
+                if (valueStr != null && valueStr.equals("set")) {
+
+                    if (region.contains(BukkitUtil.toVector(l))) {
+                        region.getFlags().getLocationFlag(nfo.type).setValue(l);
+                        sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " set to current location");
+                        return true;
+
                     } else {
-                        validValue = false;
-                    }
-                    break;
-                }
-                case LOCATION: {
-                    if (!(sender instanceof Player)) {
-                        sender.sendMessage(ChatColor.RED + "Flag not supported in console mode.");
-                        return true;
-                    }
-                    Player player = (Player) sender;
-
-                    Location l = player.getLocation();
-
-                    if (valueStr.equals("set")) {
-
-                        if (region.contains(BukkitUtil.toVector(l))) {
-                            region.getFlags().setLocationFlag(nfo.flagName, l);
-                            validValue = true;
-                            sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " set to current location");
-
-                        } else {
-                            player.sendMessage(ChatColor.RED + "You must set the " + nameStr + " location inside the region it belongs to.");
-                            return true;
-                        }
-
-                    } else if (valueStr.equals("delete")) {
-                        region.getFlags().setLocationFlag(nfo.flagName, null);
-                        validValue = true;
-                        sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " removed.");
-                    }
-
-
-                    if (validValue) {
-                        mgr.save();
+                        player.sendMessage(ChatColor.RED + "You must set the " + nameStr + " location inside the region it belongs to.");
                         return true;
                     }
 
-                    break;
-                }
-                default: {
-                    validValue = false;
-                    break;
+                } else if (valueStr == null || valueStr.equals("delete")) {
+                    region.getFlags().getLocationFlag(nfo.type).setValue((Location) null);
+                    sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " removed.");
+                    return true;
                 }
             }
 
-            String fullFlagname = nameStr;
-            if (subnameStr != null) {
-                fullFlagname += " " + subnameStr;
-            }
-
-            if (!validValue) {
-                sender.sendMessage(ChatColor.RED + "Invalid value '" + valueStr + "' for flag " + fullFlagname);
+            if (!region.getFlags().getLocationFlag(nfo.type).setValue(valueStr)) {
+                sender.sendMessage(ChatColor.RED + "Invalid value '" + valueStr + "' for flag " + nameStr);
+                return true;
+            } else {
+                mgr.save();
+                if (valueStr == null) {
+                    valueStr = "null";
+                }
+                sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " set to " + valueStr);
                 return true;
             }
-
-            if (nfo.subName != null && nfo.subName.equals("*")) {
-                region.getFlags().setFlag(nfo.flagName, subnameStr, valueStr);
-            } else {
-                region.getFlags().setFlag(nfo.flagName, nfo.flagSubName, valueStr);
-            }
-
-            mgr.save();
-
-            sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + fullFlagname + " set to " + valueStr);
         } catch (IOException e) {
             sender.sendMessage(ChatColor.RED + "Region database failed to save: "
                     + e.getMessage());

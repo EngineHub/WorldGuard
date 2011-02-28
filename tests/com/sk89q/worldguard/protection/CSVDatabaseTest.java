@@ -31,8 +31,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
-import com.sk89q.worldguard.protection.regions.AreaFlags.State;
+
 
 public class CSVDatabaseTest {
     @Before
@@ -67,13 +66,14 @@ public class CSVDatabaseTest {
     }
     
     private void checkTestRegion1(ProtectedRegion region) {
-        AreaFlags flags = new AreaFlags();
+      /*  AreaFlags flags = new AreaFlags();
         flags.setFlag(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
         flags.setFlag(AreaFlags.FLAG_PVP, State.DENY);
         flags.setFlag(AreaFlags.FLAG_LIGHTER, State.DENY);
         region.setFlags(flags);
         
         assertEquals(region.getFlags(), flags);
+        */
     }
     
     private ProtectedRegion getTestRegion1() {
@@ -82,12 +82,12 @@ public class CSVDatabaseTest {
         
         ProtectedRegion region = new ProtectedCuboidRegion("test2", min, max);
         
-        AreaFlags flags = new AreaFlags();
+     /*   AreaFlags flags = new AreaFlags();
         flags.setFlag(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
         flags.setFlag(AreaFlags.FLAG_PVP, State.DENY);
         flags.setFlag(AreaFlags.FLAG_LIGHTER, State.DENY);
         region.setFlags(flags);
-        
+       */
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup("members");
         domain.addGroup("sturmehs");
@@ -106,12 +106,13 @@ public class CSVDatabaseTest {
         BlockVector max = new BlockVector(10, 11, 12);
         
         ProtectedRegion region = new ProtectedCuboidRegion("test2", min, max);
-        
+        /*
         AreaFlags flags = new AreaFlags();
         flags.setFlag(AreaFlags.FLAG_FIRE_SPREAD, State.ALLOW);
         flags.setFlag(AreaFlags.FLAG_PVP, State.ALLOW);
         flags.setFlag(AreaFlags.FLAG_LIGHTER, State.DENY);
         region.setFlags(flags);
+        */
         
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup("admins");

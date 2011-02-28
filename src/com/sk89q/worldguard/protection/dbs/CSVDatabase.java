@@ -33,8 +33,6 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
-import com.sk89q.worldguard.protection.regions.AreaFlags.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.util.ArrayReader;
@@ -100,9 +98,7 @@ public class CSVDatabase implements ProtectionDatabase {
                         cuboid.getParent() != null ? cuboid.getParent().getId() : "",
                         writeDomains(cuboid.getOwners()),
                         writeDomains(cuboid.getMembers()),
-                        writeFlags(cuboid.getFlags()),
-                        cuboid.getFlags().getFlag("msg", "g") != null ? cuboid.getFlags().getFlag("msg", "g") : "",
-                        cuboid.getFlags().getFlag("msg", "l") != null ? cuboid.getFlags().getFlag("msg", "l") : "",
+                        //writeFlags(cuboid.getFlags()),
                         });
             }
         } finally {
@@ -163,9 +159,8 @@ public class CSVDatabase implements ProtectionDatabase {
                     
                     ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
                     region.setPriority(priority);
-                    region.setFlags(parseFlags(flagsData));
+                    //region.setFlags(parseFlags(flagsData));
                     region.setOwners(this.parseDomains(ownersData));
-                    region.getFlags().setFlag("msg", "g", enterMessage);
                     regions.put(id, region);
                 } else if (type.equalsIgnoreCase("cuboid.2")) {
                     Vector pt1 = new Vector(
@@ -190,11 +185,9 @@ public class CSVDatabase implements ProtectionDatabase {
                     
                     ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
                     region.setPriority(priority);
-                    region.setFlags(parseFlags(flagsData));
+                    //region.setFlags(parseFlags(flagsData));
                     region.setOwners(this.parseDomains(ownersData));
                     region.setMembers(this.parseDomains(membersData));
-                    region.getFlags().setFlag("msg", "g", enterMessage);
-                    region.getFlags().setFlag("msg", "l", leaveMessage);
                     regions.put(id, region);
                     
                     // Link children to parents later
@@ -296,6 +289,7 @@ public class CSVDatabase implements ProtectionDatabase {
      * @param data
      * @return
      */
+/*
     private AreaFlags parseFlags(String data) {
         if (data == null) {
             return new AreaFlags();
@@ -328,7 +322,8 @@ public class CSVDatabase implements ProtectionDatabase {
         
         return flags;
     }
-    
+*/
+
     /**
      * Used to write the list of domains.
      * 
@@ -358,6 +353,7 @@ public class CSVDatabase implements ProtectionDatabase {
      * @param flag
      * @return
      */
+/*
     private String writeFlag(State state, String flag) {
         if (state == State.ALLOW) {
             return "+" + flag;
@@ -367,7 +363,8 @@ public class CSVDatabase implements ProtectionDatabase {
         
         return "";
     }
-    
+*/
+
     /**
      * Returns a null if a string is null or empty.
      * 
@@ -390,6 +387,7 @@ public class CSVDatabase implements ProtectionDatabase {
      * @param flags
      * @return
      */
+/*
     private String writeFlags(AreaFlags flags) {
         StringBuilder str = new StringBuilder();
         for (Map.Entry<String, State> entry : flags.entrySet()) {
@@ -397,7 +395,7 @@ public class CSVDatabase implements ProtectionDatabase {
         }
         return str.toString();
     }
-
+*/
     /**
      * Get a list of protected regions.
      *

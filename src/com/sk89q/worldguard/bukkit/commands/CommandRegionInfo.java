@@ -22,14 +22,12 @@ import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
-import com.sk89q.worldguard.bukkit.commands.FlagInfo.FlagValueType;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.sk89q.worldguard.protection.regions.flags.FlagDatabase;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlagInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -68,7 +66,7 @@ public class CommandRegionInfo extends WgRegionCommand {
             cfg.checkRegionPermission(sender, "region.info.foreignregions");
         }
 
-        AreaFlags flags = region.getFlags();
+        RegionFlagContainer flags = region.getFlags();
         DefaultDomain owners = region.getOwners();
         DefaultDomain members = region.getMembers();
 
@@ -77,44 +75,13 @@ public class CommandRegionInfo extends WgRegionCommand {
         sender.sendMessage(ChatColor.BLUE + "Priority: " + region.getPriority());
 
         StringBuilder s = new StringBuilder();
-        List<String> displayLocations = new ArrayList<String>();
 
-        for (FlagInfo nfo : FlagInfo.getFlagInfoList()) {
+        for (RegionFlagInfo nfo : FlagDatabase.getFlagInfoList()) {
             if (s.length() > 0) {
                 s.append(", ");
             }
 
-            String fullName = nfo.name;
-            if (nfo.subName != null && nfo.subName != "*") {
-                fullName += " " + nfo.subName;
-            }
-
-            String value;
-            if (nfo.type == FlagValueType.LOCATION && !displayLocations.contains(nfo.flagName)) {
-                value = flags.getFlag(nfo.flagName, "x");
-                if (value != null) {
-                    s.append(nfo.flagName + ": set");
-                } else {
-                    s.append(nfo.flagName + ": -");
-                }
-                displayLocations.add(nfo.flagName);
-            } else if ((nfo.subName != null && nfo.subName.equals("*"))) {
-                StringBuilder ret = new StringBuilder();
-                for (Map.Entry<String, String> entry : flags.getFlagData(nfo.flagName).entrySet()) {
-                    if (Boolean.valueOf(entry.getValue())) {
-                        ret.append(entry.getKey() + " ");
-                    }
-                }
-                s.append(fullName + ": " + ret);
-            } else {
-                value = flags.getFlag(nfo.flagName, nfo.flagSubName);
-                if (value != null) {
-                    s.append(fullName + ": " + value);
-                } else {
-                    s.append(fullName + ": -");
-                }
-            }
-
+            s.append(flags.getFlag(nfo.type).toString());
         }
 
         sender.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());

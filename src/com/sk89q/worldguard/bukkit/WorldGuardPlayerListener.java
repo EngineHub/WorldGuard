@@ -18,6 +18,8 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.protection.regions.flags.RegionFlag.RegionGroup;
+import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
 import com.nijiko.coelho.iConomy.iConomy;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
@@ -31,8 +33,6 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
@@ -155,7 +155,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-            if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_LIGHTER)) {
+            if (!mgr.getApplicableRegions(pt).allowsFlag(FlagType.LIGHTER)) {
                 event.setCancelled(true);
                 return;
             }
@@ -258,17 +258,17 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 player.getWorld().getName()).getApplicableRegions(
                 BukkitUtil.toVector(location));
 
-        Location spawn = regions.getLocationAreaFlag("spawn", player.getServer(), true, null);
+        Location spawn = regions.getLocationFlag(FlagType.SPAWN_LOC, true).getValue(player.getServer());
 
         if (spawn != null) {
-            String spawnconfig = regions.getAreaFlag("spawn", "allow", true, null);
+            RegionGroup spawnconfig = regions.getRegionGroupFlag(FlagType.SPAWN_PERM, true).getValue();
             if (spawnconfig != null) {
                 BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
-                if (spawnconfig.equals("owner")) {
+                if (spawnconfig == RegionGroup.OWNER) {
                     if (regions.isOwner(localPlayer)) {
                         event.setRespawnLocation(spawn);
                     }
-                } else if (spawnconfig.equals("member")) {
+                } else if (spawnconfig == RegionGroup.MEMBER) {
                     if (regions.isMember(localPlayer)) {
                         event.setRespawnLocation(spawn);
                     }

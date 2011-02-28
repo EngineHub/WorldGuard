@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
+
 /**
  * Used for default flags.
  * 
@@ -34,4 +36,32 @@ public class GlobalFlags {
     public boolean allowCreeper = true;
     public boolean allowMobDamage = true;
     public boolean allowWaterflow = true;
+
+
+    public boolean getDefaultValue(FlagType type)
+    {
+        switch(type)
+        {
+            case BUILD:
+                return this.canBuild;
+            case CHEST_ACCESS:
+                return this.canAccessChests;
+            case PVP:
+                return this.canPvP;
+            case LIGHTER:
+                return this.canLighter;
+            case TNT:
+                return this.canTnt;
+            case LEVER_AND_BUTTON:
+                return this.canLeverandbutton;
+            case CREEPER_EXPLOSION:
+                return this.allowCreeper;
+            case MOB_DAMAGE:
+                return this.allowMobDamage;
+            case WATER_FLOW:
+                return this.allowWaterflow;
+            default:
+                return false;
+        }
+    }
 }

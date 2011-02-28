@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.protection.dbs;
 
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -97,10 +96,7 @@ public class JSONContainer {
             {
                 region.setMembers(new DefaultDomain());
             }
-            else if(region.getFlags() == null)
-            {
-                region.setFlags(new AreaFlags());
-            }
+
 
         }
 

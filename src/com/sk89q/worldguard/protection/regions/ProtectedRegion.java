@@ -24,6 +24,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
 import java.util.List;
 
 /**
@@ -41,11 +42,11 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      */
     private int priority = 0;
     /**
-     * Holds the parent.
+     * Holds the curParent.
      */
     private transient ProtectedRegion parent;
     /**
-     * Holds the parent's Id. Used for serialization, don't touch it.
+     * Holds the curParent's Id. Used for serialization, don't touch it.
      */
     private String parentId;
     /**
@@ -59,7 +60,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Area flags.
      */
-    private AreaFlags flags = new AreaFlags();
+    private RegionFlagContainer flags = new RegionFlagContainer();
 
 
     /**
@@ -132,17 +133,17 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
     
     /**
-     * @return the parent
+     * @return the curParent
      */
     public ProtectedRegion getParent() {
         return parent;
     }
 
     /**
-     * Set the parent. This checks to make sure that it will not result
+     * Set the curParent. This checks to make sure that it will not result
      * in circular inheritance.
      * 
-     * @param parent the parent to setFlag
+     * @param curParent the curParent to setFlag
      * @throws CircularInheritanceException 
      */
     public void setParent(ProtectedRegion parent) throws CircularInheritanceException {
@@ -166,14 +167,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         this.parent = parent;
     }
 
-    /**
-     * Se flags.
-     * @param flags
-     */
-    public void setFlags(AreaFlags flags) {
-        this.flags = flags;
-    }
-    
+
     /**
      * @return the owners
      */
@@ -215,13 +209,13 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
             return true;
         }
         
-        ProtectedRegion parent = getParent();
-        while (parent != null) {
-            if (parent.getOwners().contains(player)) {
+        ProtectedRegion curParent = getParent();
+        while (curParent != null) {
+            if (curParent.getOwners().contains(player)) {
                 return true;
             }
             
-            parent = parent.getParent();
+            curParent = curParent.getParent();
         }
         
         return false;
@@ -239,14 +233,14 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
             return true;
         }
         
-        ProtectedRegion parent = getParent();
-        while (parent != null) {
-            if (parent.getOwners().contains(player)
-                    || parent.getMembers().contains(player)) {
+        ProtectedRegion curParent = getParent();
+        while (curParent != null) {
+            if (curParent.getOwners().contains(player)
+                    || curParent.getMembers().contains(player)) {
                 return true;
             }
             
-            parent = parent.getParent();
+            curParent = curParent.getParent();
         }
         
         return false;
@@ -257,7 +251,11 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * 
      * @return
      */
-    public AreaFlags getFlags() {
+    public RegionFlagContainer getFlags() {
+        if(this.flags == null)
+        {
+            this.flags = new RegionFlagContainer();
+        }
         return flags;
     }
 
@@ -304,7 +302,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
     
     /**
-     * Thrown when setting a parent would create a circular inheritance
+     * Thrown when setting a curParent would create a circular inheritance
      * situation.
      * 
      */

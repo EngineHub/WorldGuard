@@ -21,11 +21,12 @@ package com.sk89q.worldguard.protection;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.util.Iterator;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
-import com.sk89q.worldguard.protection.regions.AreaFlags.State;
+import com.sk89q.worldguard.protection.regions.flags.*;
+import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlag;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlag.State;
 import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.Server;
+
 
 /**
  * Represents a setFlag of regions and their rules as applied to one point.
@@ -59,30 +60,7 @@ public class ApplicableRegionSet {
      * @return
      */
     public boolean canBuild(LocalPlayer player) {
-
-        if (this.applicable.size() < 1) {
-            return global.canBuild;
-        }
-
-        if (affectedRegion == null) {
-            return global.canBuild;
-        }
-
-        String data = getAreaFlag("states", AreaFlags.FLAG_BUILD, true, null, affectedRegion);
-
-        State state;
-        try {
-            state = data != null ? State.valueOf(data) : State.DENY;
-        } catch (Exception e) {
-            state = State.DENY;
-        }
-
-        if (state != State.ALLOW && !affectedRegion.isMember(player)) {
-            return false;
-        }
-
-        return true;
-
+        return isFlagAllowed(FlagType.BUILD, global.canBuild) || this.isMember(player);
     }
 
     /**
@@ -91,39 +69,180 @@ public class ApplicableRegionSet {
      * @param player
      * @return
      */
-    public boolean allowsFlag(String flag) {
-        boolean def = true;
-
-        if (flag.equals(AreaFlags.FLAG_CHEST_ACCESS)) {
-            def = global.canAccessChests;
-        } else if (flag.equals(AreaFlags.FLAG_PVP)) {
-            def = global.canPvP;
-        } else if (flag.equals(AreaFlags.FLAG_LIGHTER)) {
-            def = global.canLighter;
-        } else if (flag.equals(AreaFlags.FLAG_TNT)) {
-            def = global.canTnt;
-        } else if (flag.equals(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
-            def = global.allowCreeper;
-        } else if (flag.equals(AreaFlags.FLAG_MOB_DAMAGE)) {
-            def = global.allowMobDamage;
-        } else if (flag.equals(AreaFlags.FLAG_WATER_FLOW)) {
-            def = global.allowWaterflow;
-        } else if (flag.equals(AreaFlags.FLAG_LEVER_AND_BUTTON)) {
-            def = global.canLeverandbutton;
-        }
-
-        return isFlagAllowed(flag, def, null);
+    public boolean allowsFlag(FlagType type) {
+        return isFlagAllowed(type, global.getDefaultValue(type));
     }
 
-    public boolean isFlagAllowed(String flag, boolean def, LocalPlayer player) {
+    public boolean allowsFlag(FlagType type, LocalPlayer player) {
+        return isFlagAllowed(type, global.getDefaultValue(type)) || this.isMember(player);
+    }
+
+    public boolean isFlagAllowed(FlagType type, boolean def) {
 
         State defState = def ? State.ALLOW : State.DENY;
-        return getStateAreaFlag("states", flag, defState, true, player) == State.ALLOW;
+        return getStateFlag(type, true).getValue(defState) == State.ALLOW;
+    }
+
+    public boolean isFlagAllowed(FlagType type, boolean def, LocalPlayer player) {
+
+        State defState = def ? State.ALLOW : State.DENY;
+        return getStateFlag(type, true).getValue(defState) == State.ALLOW  || this.isMember(player);
+    }
+
+
+    private RegionFlag getFlag(FlagType type, Boolean inherit) {
+
+        ProtectedRegion region = affectedRegion;
+
+        if (region == null) {
+            return null;
+        }
+
+        if (!inherit) {
+            return region.getFlags().getFlag(type);
+        } else {
+            RegionFlag value;
+            do {
+                value = region.getFlags().getFlag(type);
+                region = region.getParent();
+
+            } while (!value.hasValue() && region != null);
+
+            return value;
+        }
+
+    }
+
+  public BooleanRegionFlag getBooleanFlag(FlagType type, boolean inherit) {
+
+        RegionFlag flag = this.getFlag(type, inherit);
+
+        if (flag instanceof BooleanRegionFlag) {
+            return (BooleanRegionFlag) flag;
+        } else {
+            return null;
+        }
+    }
+
+    public StateRegionFlag getStateFlag(FlagType type, boolean inherit) {
+
+        RegionFlag flag = this.getFlag(type, inherit);
+
+        if (flag instanceof StateRegionFlag) {
+            return (StateRegionFlag) flag;
+        } else {
+            return null;
+        }
+    }
+
+     public IntegerRegionFlag getIntegerFlag(FlagType type, boolean inherit) {
+
+        RegionFlag flag = this.getFlag(type, inherit);
+
+        if (flag instanceof IntegerRegionFlag) {
+            return (IntegerRegionFlag) flag;
+        } else {
+            return null;
+        }
+    }
+
+    public DoubleRegionFlag getDoubleFlag(FlagType type, boolean inherit) {
+
+        RegionFlag flag = this.getFlag(type, inherit);
+
+        if (flag instanceof DoubleRegionFlag) {
+            return (DoubleRegionFlag) flag;
+        } else {
+            return null;
+        }
+    }
+
+    public StringRegionFlag getStringFlag(FlagType type, boolean inherit) {
+
+        RegionFlag flag = this.getFlag(type, inherit);
+
+        if (flag instanceof StringRegionFlag) {
+            return (StringRegionFlag) flag;
+        } else {
+            return null;
+        }
+    }
+
+    public RegionGroupRegionFlag getRegionGroupFlag(FlagType type, boolean inherit) {
+
+        RegionFlag flag = this.getFlag(type, inherit);
+
+        if (flag instanceof RegionGroupRegionFlag) {
+            return (RegionGroupRegionFlag) flag;
+        } else {
+            return null;
+        }
+    }
+
+    public LocationRegionFlag getLocationFlag(FlagType type, boolean inherit) {
+
+        RegionFlag flag = this.getFlag(type, inherit);
+
+        if (flag instanceof LocationRegionFlag) {
+            return (LocationRegionFlag) flag;
+        } else {
+            return null;
+        }
+    }
+
+    public boolean isAnyRegionAffected()
+    {
+        return this.applicable.size() > 0;
+    }
+
+  
+    /**
+     * Determines the region with the hightest priority that is not a parent.
+     *
+     */
+    private void determineAffectedRegion() {
+
+        affectedRegion = null;
+        Iterator<ProtectedRegion> iter = applicable.iterator();
+
+        while (iter.hasNext()) {
+            ProtectedRegion region = iter.next();
+
+            if (affectedRegion == null || affectedRegion.getPriority() < region.getPriority()) {
+                affectedRegion = region;
+            }
+        }
+    }
+
+
+
+     public boolean isOwner(LocalPlayer player) {
+        return affectedRegion != null ? affectedRegion.isOwner(player) : false;
     }
 
     /**
+     * Checks whether a player is a member of the region or any of its parents.
+     *
+     * @param player
+     * @return
+     */
+    public boolean isMember(LocalPlayer player) {
+        return affectedRegion != null ? affectedRegion.isMember(player) : false;
+    }
+
+    public String getAffectedRegionId() {
+        return affectedRegion != null ?  affectedRegion.getId() : "";
+    }
+
+    public int getAffectedRegionPriority() {
+        return affectedRegion != null ?  affectedRegion.getPriority() : 0;
+    }
+
+
+
+    /**
      * Checks to see if a flag is permitted.
-     * 
+     *
      * @param def default state if there are no regions defined
      * @param player null to not check owners and members
      * @return
@@ -205,216 +324,7 @@ public class ApplicableRegionSet {
     || (player != null && needsClear.size() == 0);
     }
      */
-    /**
-     * Get an area flag
-     *
-     * @param name flag name
-     * @param subname flag subname
-     * @param inherit true to inherit flag values from parents
-     * @param player null to not check owners and members
-     * @return
-     */
-    public String getAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
-
-        return getAreaFlag(name, subname, inherit, player, getAffectedRegion());
-    }
-
-    private String getAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player, ProtectedRegion affectedRegion) {
-
-        if (affectedRegion == null) {
-            return null;
-        }
-
-        if (player != null && !affectedRegion.isMember(player)) {
-            return null;
-        }
-
-        if (!inherit) {
-            return affectedRegion.getFlags().getFlag(name, subname);
-        } else {
-            String value;
-            do {
-                value = affectedRegion.getFlags().getFlag(name, subname);
-                affectedRegion = affectedRegion.getParent();
-
-            } while (value == null && affectedRegion != null);
-
-            return value;
-        }
-
-    }
-
-    /**
-     * Gets the region with the hightest priority.
-     *
-     */
-    private ProtectedRegion getAffectedRegion() {
-
-        return affectedRegion;
-    }
-
-
-    public boolean isAnyRegionAffected()
-    {
-        return this.applicable.size() > 0;
-    }
-
-  
-    /**
-     * Determines the region with the hightest priority that is not a parent.
-     *
-     */
-    private void determineAffectedRegion() {
-
-        affectedRegion = null;
-        Iterator<ProtectedRegion> iter = applicable.iterator();
-
-        while (iter.hasNext()) {
-            ProtectedRegion region = iter.next();
-
-            if (affectedRegion == null || affectedRegion.getPriority() < region.getPriority()) {
-                affectedRegion = region;
-            }
-        }
-    }
-
-
-    public String getAreaFlag(String name, String subname, String defaultValue, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-        return data != null ? data : defaultValue;
-    }
-
-    public Boolean getBooleanAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-        return data != null ? Boolean.valueOf(data) : null;
-    }
-
-    public Boolean getBooleanAreaFlag(String name, String subname, boolean defaultValue, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-        return data != null ? Boolean.valueOf(data) : defaultValue;
-    }
-
-    public Integer getIntAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-        try {
-            return data != null ? Integer.valueOf(data) : null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public Integer getIntAreaFlag(String name, String subname, int defaultValue, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-        try {
-            return data != null ? Integer.valueOf(data) : defaultValue;
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    public Float getFloatAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-        try {
-            return data != null ? Float.valueOf(data) : null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public Float getFloatAreaFlag(String name, String subname, float defaultValue, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-        try {
-            return data != null ? Float.valueOf(data) : defaultValue;
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    public Double getDoubleAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-        try {
-            return data != null ? Double.valueOf(data) : null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public Double getDoubleAreaFlag(String name, String subname, double defaultValue, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-        try {
-            return data != null ? Double.valueOf(data) : defaultValue;
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    public State getStateAreaFlag(String name, String subname, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-
-        try {
-            return data != null ? State.valueOf(data) : null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public State getStateAreaFlag(String name, String subname, State defaultValue, Boolean inherit, LocalPlayer player) {
-        String data = getAreaFlag(name, subname, inherit, player);
-
-        try {
-            return data != null ? State.valueOf(data) : defaultValue;
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    public Location getLocationAreaFlag(String name, Server server, Boolean inherit, LocalPlayer player) {
-
-        ProtectedRegion childRegion = getAffectedRegion();
-        if (childRegion == null) {
-            return null;
-        }
-
-        if (player != null && !childRegion.isMember(player)) {
-            return null;
-        }
-
-        if (!inherit) {
-            return childRegion.getFlags().getLocationFlag(server, name);
-        } else {
-            Location value;
-            do {
-                value = childRegion.getFlags().getLocationFlag(server, name);
-                childRegion = childRegion.getParent();
-
-            } while (value == null && childRegion != null);
-
-            return value;
-        }
-
-    }
-
-     public boolean isOwner(LocalPlayer player) {
-        return affectedRegion != null ? affectedRegion.isOwner(player) : false;
-    }
-
-    /**
-     * Checks whether a player is a member of the region or any of its parents.
-     *
-     * @param player
-     * @return
-     */
-    public boolean isMember(LocalPlayer player) {
-        return affectedRegion != null ? affectedRegion.isMember(player) : false;
-    }
-
-    public String getAffectedRegionId() {
-        return affectedRegion != null ?  affectedRegion.getId() : "";
-    }
-
-    public int getAffectedRegionPriority() {
-        return affectedRegion != null ?  affectedRegion.getPriority() : 0;
-    }
+   
 
     /**
      * Clear a region's parents for isFlagAllowed().

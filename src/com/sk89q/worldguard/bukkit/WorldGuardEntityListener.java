@@ -18,6 +18,7 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import org.bukkit.ChatColor;
@@ -34,7 +35,6 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class WorldGuardEntityListener extends EntityListener {
@@ -102,7 +102,7 @@ public class WorldGuardEntityListener extends EntityListener {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-                    if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_PVP)) {
+                    if (!mgr.getApplicableRegions(pt).allowsFlag(FlagType.PVP)) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
                         return;
@@ -121,13 +121,13 @@ public class WorldGuardEntityListener extends EntityListener {
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-                    if (!set.allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
+                    if (!set.allowsFlag(FlagType.MOB_DAMAGE)) {
                         event.setCancelled(true);
                         return;
                     }
 
                     if (attacker instanceof Creeper) {
-                        if (!set.allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
+                        if (!set.allowsFlag(FlagType.CREEPER_EXPLOSION)) {
                             event.setCancelled(true);
                             return;
                         }
@@ -158,7 +158,7 @@ public class WorldGuardEntityListener extends EntityListener {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-                    if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_PVP)) {
+                    if (!mgr.getApplicableRegions(pt).allowsFlag(FlagType.PVP)) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
                         return;
@@ -170,7 +170,7 @@ public class WorldGuardEntityListener extends EntityListener {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-                    if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_MOB_DAMAGE)) {
+                    if (!mgr.getApplicableRegions(pt).allowsFlag(FlagType.MOB_DAMAGE)) {
                         event.setCancelled(true);
                         return;
                     }
@@ -275,7 +275,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 Vector pt = toVector(l);
                 RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
 
-                if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_CREEPER_EXPLOSION)) {
+                if (!mgr.getApplicableRegions(pt).allowsFlag(FlagType.CREEPER_EXPLOSION)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -290,7 +290,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 Vector pt = toVector(l);
                 RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
 
-                if (!mgr.getApplicableRegions(pt).allowsFlag(AreaFlags.FLAG_TNT)) {
+                if (!mgr.getApplicableRegions(pt).allowsFlag(FlagType.TNT)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -386,11 +386,11 @@ public class WorldGuardEntityListener extends EntityListener {
                 break;
         }
 
-        if (wcfg.useRegions && creaName != "") {
+        if (wcfg.useRegions && !creaName.equals("")) {
             Vector pt = toVector(event.getEntity().getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
 
-            Boolean flagValue = mgr.getApplicableRegions(pt).getBooleanAreaFlag("creaturespawn", creaName, true, null);
+            Boolean flagValue = mgr.getApplicableRegions(pt).getStringFlag(FlagType.DENY_SPAWN, true).getValue("").contains(creaName);
             if (flagValue != null) {
                 if (!flagValue) {
                     cancelEvent = true;

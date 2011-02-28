@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.bukkit.BukkitPlayer;
+
+import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.util.HashMap;
@@ -78,11 +78,11 @@ public class TimedFlagsTimer implements Runnable {
             RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
             ApplicableRegionSet regions = mgr.getApplicableRegions(toVector(player.getLocation()));
 
-            int healDelay = regions.getIntAreaFlag("heal", "delay", -1, true, null);
+            int healDelay = regions.getIntegerFlag(FlagType.HEAL_DELAY, true).getValue(-1);
 
             if (healDelay > 0) {
                 healDelay *= 1000;
-                int healAmount = regions.getIntAreaFlag("heal", "amount", 1, true, null);
+                int healAmount = regions.getIntegerFlag(FlagType.HEAL_AMOUNT, true).getValue(1);
                 if (now - nfo.lastHealTick > healDelay) {
                     player.setHealth(player.getHealth() + healAmount);
                 } else {
@@ -99,8 +99,8 @@ public class TimedFlagsTimer implements Runnable {
    
 
                 if (nfo.lastRegion == null || !newRegionName.equals(nfo.lastRegion)) {
-                    String newGreetMsg = regions.getAreaFlag("msg", "g", null, true, null);
-                    String farewellMsg = regions.getAreaFlag("msg", "f", null, true, null);
+                    String newGreetMsg = regions.getStringFlag(FlagType.GREET_MESSAGE, true).getValue();
+                    String farewellMsg = regions.getStringFlag(FlagType.FAREWELL_MESSAGE, true).getValue();
 
                     if (nfo.lastFarewellMsg != null) {
                         player.sendMessage(nfo.lastFarewellMsg);

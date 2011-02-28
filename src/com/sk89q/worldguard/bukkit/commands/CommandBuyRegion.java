@@ -28,8 +28,9 @@ import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
-import com.sk89q.worldguard.protection.regions.AreaFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
 
 /**
  *
@@ -57,13 +58,13 @@ public class CommandBuyRegion extends WgCommand {
         RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
         ProtectedRegion region = mgr.getRegion(id);
         if (region != null) {
-            AreaFlags flags = region.getFlags();
+            RegionFlagContainer flags = region.getFlags();
 
-            if (flags.getBooleanFlag("iconomy", "buyable", false)) {
+            if (flags.getBooleanFlag(FlagType.BUYABLE).getValue(false)) {
                 if (args.length == 2) {
                     if (args[1] == "info") {
                         player.sendMessage(ChatColor.YELLOW + "Region " + id + " costs " + 
-                                iConomy.getBank().format(flags.getDoubleFlag("iconomy", "price")));
+                                iConomy.getBank().format(flags.getDoubleFlag(FlagType.PRICE).getValue()));
                         if (iConomy.getBank().hasAccount(player.getName())) {
                             player.sendMessage(ChatColor.YELLOW + "You have " +
                                     iConomy.getBank().format(
@@ -78,7 +79,7 @@ public class CommandBuyRegion extends WgCommand {
                     if (iConomy.getBank().hasAccount(player.getName())) {
                         Account account = iConomy.getBank().getAccount(player.getName());
                         double balance = account.getBalance();
-                        int regionPrice = flags.getIntFlag("iconomy", "price");
+                        double regionPrice = flags.getDoubleFlag(FlagType.PRICE).getValue();
 
                         if (balance >= regionPrice) {
                             account.subtract(regionPrice);
@@ -87,7 +88,7 @@ public class CommandBuyRegion extends WgCommand {
                             DefaultDomain owners = region.getOwners();
                             owners.addPlayer(player.getName());
                             region.setOwners(owners);
-                            flags.setFlag("iconomy", "buyable", false);
+                            flags.getBooleanFlag(FlagType.BUYABLE).setValue(false);
                             account.save();
                         }
                     } else {

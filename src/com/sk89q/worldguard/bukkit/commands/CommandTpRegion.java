@@ -14,6 +14,9 @@ import org.bukkit.entity.Player;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlag.RegionGroup;
+import com.sk89q.worldguard.protection.regions.flags.RegionGroupRegionFlag;
 
 /**
  * @author wallnuss
@@ -42,19 +45,19 @@ public class CommandTpRegion extends WgCommand {
         ProtectedRegion region = mgr.getRegion(id);
         if (region != null) {
 
-            String flagright = "all";
+            RegionGroup flagright;
             if (spawn) {
-                flagright = region.getFlags().getFlag("spawn", "allow");
+                flagright = region.getFlags().getRegionGroupFlag(FlagType.SPAWN_PERM).getValue(RegionGroup.ALL);
             } else {
-                flagright = region.getFlags().getFlag("teleport", "allow");
+                flagright = region.getFlags().getRegionGroupFlag(FlagType.TELE_PERM).getValue(RegionGroup.ALL);
             }
 
             LocalPlayer lPlayer = BukkitPlayer.wrapPlayer(cfg, player);
-            if (flagright.equals("owner")) {
+            if (flagright == RegionGroup.OWNER) {
                 if (!region.isOwner(lPlayer)) {
                     cfg.checkPermission(player, "tpregion.override");
                 }
-            } else if (flagright.equals("member")) {
+            } else if (flagright == RegionGroup.MEMBER) {
                 if (!region.isMember(lPlayer)) {
                     cfg.checkPermission(player, "tpregion.override");
                 }
@@ -63,9 +66,9 @@ public class CommandTpRegion extends WgCommand {
             Location location = null;
 
             if (spawn) {
-                location = region.getFlags().getLocationFlag(cfg.getWorldGuardPlugin().getServer(), "spawn");
+                location = region.getFlags().getLocationFlag(FlagType.SPAWN_LOC).getValue(cfg.getWorldGuardPlugin().getServer());
             } else {
-                location = region.getFlags().getLocationFlag(cfg.getWorldGuardPlugin().getServer(), "teleport");
+                location = region.getFlags().getLocationFlag(FlagType.TELE_LOC).getValue(cfg.getWorldGuardPlugin().getServer());
             }
             if (location != null) {
                 player.teleportTo(location);
