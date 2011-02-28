@@ -224,8 +224,10 @@ public class WorldGuardWorldConfiguration {
         globalFlags.canTnt = config.getBoolean("regions.default.tnt", true);
         globalFlags.allowCreeper = config.getBoolean("regions.default.creeper", true);
         globalFlags.allowMobDamage = config.getBoolean("regions.default.mobdamage", true);
+        globalFlags.canLeverandbutton = config.getBoolean("regions.default.leverandbutton", true);
+        globalFlags.canPlaceVehicle = config.getBoolean("regions.default.placevehicle", true);
+        globalFlags.allowWaterflow = config.getBoolean("regions.default.waterflow", true);        
         wp.getGlobalRegionManager().setGlobalFlags(worldName, globalFlags);
-
 
 
         boolean useBlacklistAsWhitelist = config.getBoolean("blacklist.use-as-whitelist", false);
