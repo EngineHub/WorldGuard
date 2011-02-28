@@ -27,13 +27,13 @@ import java.util.Map.Entry;
 
 
 /**
- * Holds the flags for a region.
+ * Holds the sFlags for a region.
  *
  * @author sk89q
  */
 public class RegionFlagContainer {
 
-    private Map<String, String> flags = new HashMap<String, String>();
+    private Map<String, String> sFlags = new HashMap<String, String>();
     private transient Map<FlagType, RegionFlag> flagData = new EnumMap<FlagType, RegionFlag>(FlagType.class);
     private transient boolean hasInit = false;
 
@@ -59,7 +59,7 @@ public class RegionFlagContainer {
 
     private void initFlagData() {
 
-        Iterator<Entry<String, String>> iter = this.flags.entrySet().iterator();
+        Iterator<Entry<String, String>> iter = this.sFlags.entrySet().iterator();
 
         while (iter.hasNext()) {
             Entry<String, String> entry = iter.next();
@@ -79,9 +79,9 @@ public class RegionFlagContainer {
         }
 
         if (value == null) {
-            this.flags.remove(name);
+            this.sFlags.remove(name);
         } else {
-            this.flags.put(name, value);
+            this.sFlags.put(name, value);
         }
     }
 
@@ -92,13 +92,13 @@ public class RegionFlagContainer {
         }
 
         RegionFlagContainer other = (RegionFlagContainer) obj;
-        return other.flags.equals(this.flags);
+        return other.sFlags.equals(this.sFlags);
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 97 * hash + (this.flags != null ? this.flags.hashCode() : 0);
+        hash = 97 * hash + (this.sFlags != null ? this.sFlags.hashCode() : 0);
         return hash;
     }
 
