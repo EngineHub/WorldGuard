@@ -25,14 +25,16 @@ import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 
 /**
  *
  * @author Michael
  */
-public class CommandHandler {
+public class CommandHandler implements CommandExecutor {
 
     private WorldGuardPlugin wg;
     private Map<String, WgCommand> commandMap;
@@ -68,8 +70,20 @@ public class CommandHandler {
         this.commandMap.put("tpregrion", new CommandTpRegion());
     }
     
-    
-    public boolean handleCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+
+    public void registerCommands()
+    {
+       for(String cmd : this.commandMap.keySet())
+       {
+           PluginCommand command = wg.getCommand(cmd);
+           if(command != null)
+           {
+               command.setExecutor(this);
+           }
+       }
+    }
+
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
         try {
             String cmdName = cmd.getName().toLowerCase();
@@ -133,6 +147,7 @@ public class CommandHandler {
             throw new InsufficientArgumentsException(help);
         }
     }
+
 
      /**
      * Thrown when command handling has raised an exception.

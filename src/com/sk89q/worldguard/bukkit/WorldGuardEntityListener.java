@@ -78,6 +78,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
+            
         }
     }
 

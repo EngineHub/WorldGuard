@@ -88,6 +88,8 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
+
+
     }
 
     /**

@@ -19,8 +19,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import java.util.logging.*;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -58,6 +56,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         getDataFolder().mkdirs();
         globalRegionManager.onEnable();
         registerEvents();
+        commandHandler.registerCommands();
 
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }
@@ -106,13 +105,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);
     }
 
-    /**
-     * Handles a command.
-     */
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        return commandHandler.handleCommand(sender, cmd, commandLabel, args);
-    }
 
     /**
      * Get the GlobalRegionManager.
