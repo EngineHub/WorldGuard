@@ -28,7 +28,7 @@ import com.sk89q.worldguard.protection.regions.flags.RegionFlag.State;
 import java.util.List;
 
 /**
- * Represents a setFlag of regions and their rules as applied to one point.
+ * Represents a setFlag of regions and their rules as applied to one point or region.
  * 
  * @author sk89q
  */
@@ -67,12 +67,7 @@ public class ApplicableRegionSet {
         return getStateFlag(FlagType.BUILD, true).getValue(State.DENY) == State.ALLOW || isMember(player);
     }
 
-    /**
-     * Checks a flag.
-     * 
-     * @param player
-     * @return
-     */
+
     public boolean isStateFlagAllowed(FlagType type) {
 
         return isStateFlagAllowed(type, global.getDefaultValue(type));
@@ -214,7 +209,7 @@ public class ApplicableRegionSet {
     }
 
     /**
-     * Determines the region with the hightest priority that is not a parent.
+     * Determines the region with the hightest priority.
      *
      */
     private void determineAffectedRegion() {
@@ -252,109 +247,5 @@ public class ApplicableRegionSet {
     public int getAffectedRegionPriority() {
         return affectedRegion != null ? affectedRegion.getPriority() : 0;
     }
-    /**
-     * Checks to see if a flag is permitted.
-     *
-     * @param def default state if there are no regions defined
-     * @param player null to not check owners and members
-     * @return
-     */
-    /*
-    private boolean isStateFlagAllowed(String flag, boolean def, LocalPlayer player) {
-    boolean found = false;
-    boolean allowed = false; // Used for ALLOW override
-    if (player == null) {
-    allowed = def;
-    }
-    int lastPriority = 0;
-
-    // The algorithm is as follows:
-    // While iterating through the list of regions, if an entry disallows
-    // the flag, then put it into the needsClear setFlag. If an entry allows
-    // the flag and it has a parent, then its parent is put into hasCleared.
-    // In the situation that the child is reached before the parent, upon
-    // the parent being reached, even if the parent disallows, because the
-    // parent will be in hasCleared, permission will be allowed. In the
-    // other case, where the parent is reached first, if it does not allow
-    // permissions, it will be placed into needsClear. If a child of
-    // the parent is reached later, the parent will be removed from
-    // needsClear. At the end, if needsClear is not empty, that means that
-    // permission should not be given. If a parent has multiple children
-    // and one child does not allow permissions, then it will be placed into
-    // needsClear just like as if was a parent.
-
-    Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
-    Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
-
-    Iterator<Entry<String, ProtectedRegion>> iter = applicable.entrySet().iterator();
-
-    while (iter.hasNext()) {
-    ProtectedRegion region = iter.next().getValue();
-
-    // Ignore non-build regions
-    if (player != null && region.getFlags().getStateFlag(AreaFlags.FLAG_PASSTHROUGH) == State.ALLOW) {
-    continue;
-    }
-
-
-    // Allow DENY to override everything
-    if (region.getFlags().getStateFlag(flag) == State.DENY) {
-    return false;
-    }
-
-    // Forget about regions that allow it, although make sure the
-    // default state is now to allow
-    if (region.getFlags().getStateFlag(flag) == State.ALLOW) {
-    allowed = true;
-    found = true;
-    continue;
-    }
-
-    // Ignore lower priority regions
-    if (found && region.getPriority() < lastPriority) {
-    break;
-    }
-
-    if (player != null) {
-    if (hasCleared.contains(region)) {
-    // Already cleared, so do nothing
-    } else {
-    if (!region.isMember(player)) {
-    needsClear.add(region);
-    } else {
-    // Need to clear all parents
-    clearParents(needsClear, hasCleared, region);
-    }
-    }
-    }
-
-    found = true;
-    lastPriority = region.getPriority();
-    }
-
-    return (found == false ? def : allowed)
-    || (player != null && needsClear.size() == 0);
-    }
-     */
-    /**
-     * Clear a region's parents for isStateFlagAllowed().
-     * 
-     * @param needsClear
-     * @param hasCleared
-     * @param region
-     */
-    /*
-    private void clearParents(Set<ProtectedRegion> needsClear,
-    Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
-    ProtectedRegion parent = region.getParent();
-
-    while (parent != null) {
-    if (!needsClear.remove(parent)) {
-    hasCleared.add(parent);
-    }
-
-    parent = parent.getParent();
-    }
-    }
-     */
+ 
 }
