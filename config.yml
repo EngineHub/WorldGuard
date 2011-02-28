@@ -83,6 +83,7 @@ regions:
         creeper: on
         mobdamage: on
         waterflow: on
+        leverandbutton: on
 
 iconomy:
     enable: on

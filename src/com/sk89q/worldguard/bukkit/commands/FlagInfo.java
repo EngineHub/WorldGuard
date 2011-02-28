@@ -64,6 +64,7 @@ public class FlagInfo {
         flagList.add(new FlagInfo("teleport", "set", FlagValueType.LOCATION, "teleport", ""));
         flagList.add(new FlagInfo("teleport", "delete", FlagValueType.LOCATION, "teleport", ""));
         flagList.add(new FlagInfo("teleport", "allow", FlagValueType.STRING, "teleport", "allow"));
+        flagList.add(new FlagInfo("leverandbutton", null, FlagValueType.STATE, "states", "leverandbutton"));
     }
 
     public static FlagInfo getFlagInfo(String name, String subName) {

@@ -30,6 +30,7 @@ public class GlobalFlags {
     public boolean canPvP = true;
     public boolean canLighter = true;
     public boolean canTnt = true;
+    public boolean canLeverandbutton = true;
     public boolean allowCreeper = true;
     public boolean allowMobDamage = true;
     public boolean allowWaterflow = true;

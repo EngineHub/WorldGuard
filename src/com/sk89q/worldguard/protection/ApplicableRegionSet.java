@@ -108,12 +108,14 @@ public class ApplicableRegionSet {
             def = global.allowMobDamage;
         } else if (flag.equals(AreaFlags.FLAG_WATER_FLOW)) {
             def = global.allowWaterflow;
+        } else if (flag.equals(AreaFlags.FLAG_LEVER_AND_BUTTON)) {
+            def = global.canLeverandbutton;
         }
 
         return isFlagAllowed(flag, def, null);
     }
 
-    private boolean isFlagAllowed(String flag, boolean def, LocalPlayer player) {
+    public boolean isFlagAllowed(String flag, boolean def, LocalPlayer player) {
 
         State defState = def ? State.ALLOW : State.DENY;
         return getStateAreaFlag("states", flag, defState, true, player) == State.ALLOW;

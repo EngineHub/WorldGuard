@@ -18,23 +18,31 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import com.nijiko.coelho.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.system.Account;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.util.Iterator;
 import java.util.List;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.World;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.*;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
+import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.AreaFlags;
+import com.sk89q.worldguard.protection.regions.AreaFlags.State;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class WorldGuardBlockListener extends BlockListener {
@@ -399,6 +407,7 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         Block block = event.getBlock();
+        Material type = block.getType();
         LivingEntity entity = event.getEntity();
 
         WorldGuardConfiguration cfg = plugin.getWgConfiguration();
@@ -424,6 +433,19 @@ public class WorldGuardBlockListener extends BlockListener {
                         return;
                     }
                 }
+            }
+        }
+
+        if (wcfg.useRegions && (type == Material.LEVER || type == Material.STONE_BUTTON) && entity instanceof Player) {
+            Vector pt = toVector(block);
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(((Player)entity).getWorld().getName());
+            ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(pt);
+            LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, (Player)entity);
+
+            if (!applicableRegions.isFlagAllowed(AreaFlags.FLAG_LEVER_AND_BUTTON, true, localPlayer)) {
+                ((Player)entity).sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                event.setCancelled(true);
+                return;
             }
         }
 
@@ -545,6 +567,49 @@ public class WorldGuardBlockListener extends BlockListener {
                 player.setHealth(player.getHealth() - 3);
 
                 return;
+            }
+        }
+
+        if (wcfg.useRegions && wcfg.useiConomy && cfg.getiConomy() != null && (type == Material.SIGN || type == Material.WALL_SIGN)) {
+            if (((Sign)blockClicked).getLine(0) == "[WorldGuard]" && ((Sign)blockClicked).getLine(1) == "For sale") {
+                String regionId = ((Sign)blockClicked).getLine(2);
+                String regionComment = ((Sign)blockClicked).getLine(3);
+
+                if (regionId != null && regionId != "") {
+                    RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+                    ProtectedRegion region = mgr.getRegion(regionId);
+
+                    if (region != null) {
+                        AreaFlags flags = region.getFlags();
+
+                        if (flags.getBooleanFlag("iconomy", "buyable", false)) {
+                            if (iConomy.getBank().hasAccount(player.getName())) {
+                                Account account = iConomy.getBank().getAccount(player.getName());
+                                double balance = account.getBalance();
+                                int regionPrice = flags.getIntFlag("iconomy", "price");
+
+                                if (balance >= regionPrice) {
+                                    account.subtract(regionPrice);
+                                    player.sendMessage(ChatColor.YELLOW + "You have bought the region " + regionId + " for " +
+                                            iConomy.getBank().format(regionPrice));
+                                    DefaultDomain owners = region.getOwners();
+                                    owners.addPlayer(player.getName());
+                                    region.setOwners(owners);
+                                    flags.setFlag("iconomy", "buyable", false);
+                                    account.save();
+                                }
+                            } else {
+                                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Region: " + regionId + " is not buyable");
+                        } 
+                    } else {
+                        player.sendMessage(ChatColor.DARK_RED + "The region " + regionId + " does not exist.");
+                    }
+                } else {
+                    player.sendMessage(ChatColor.DARK_RED + "No region specified.");
+                }
             }
         }
     }

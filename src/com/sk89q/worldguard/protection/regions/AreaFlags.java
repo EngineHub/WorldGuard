@@ -49,6 +49,7 @@ public class AreaFlags {
     public static final String FLAG_LAVA_FIRE = "lavafirespread";
     public static final String FLAG_CHEST_ACCESS = "chest";
     public static final String FLAG_WATER_FLOW = "waterflow";
+    public static final String FLAG_LEVER_AND_BUTTON = "leverandbutton";
 
     
     /**
