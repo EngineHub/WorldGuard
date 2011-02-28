@@ -18,6 +18,9 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event;
+import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlag.RegionGroup;
 import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
 import com.nijiko.coelho.iConomy.iConomy;
@@ -55,6 +58,21 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public WorldGuardPlayerListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
+
+
+    public void registerEvents() {
+
+        PluginManager pm = plugin.getServer().getPluginManager();
+
+        pm.registerEvent(Event.Type.PLAYER_ITEM, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_JOIN, this, Priority.Normal, plugin);
+        pm.registerEvent(Event.Type.PLAYER_LOGIN, this, Priority.Normal, plugin);
+        pm.registerEvent(Event.Type.PLAYER_QUIT, this, Priority.Normal, plugin);
+        pm.registerEvent(Event.Type.PLAYER_RESPAWN, this, Priority.High, plugin);
+    }
+
 
     /**
      * Called when a player joins a server

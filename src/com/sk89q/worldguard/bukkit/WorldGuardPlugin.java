@@ -19,13 +19,10 @@
 package com.sk89q.worldguard.bukkit;
 
 import java.util.logging.*;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler;
 import com.sk89q.worldguard.protection.*;
 import com.sk89q.worldguard.protection.regionmanager.GlobalRegionManager;
-import org.bukkit.plugin.PluginManager;
 
 /**
  * Plugin for Bukkit.
@@ -55,7 +52,14 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         getDataFolder().mkdirs();
         globalRegionManager.onEnable();
-        registerEvents();
+
+        playerListener.registerEvents();
+        blockListener.registerEvents();
+        entityListener.registerEvents();
+
+        // 25 equals about 1s real time
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);
+
         commandHandler.registerCommands();
 
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
@@ -69,40 +73,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         globalRegionManager.onDisable();
 
         logger.info("WorldGuard " + this.getDescription().getVersion() + " disabled.");
-    }
-
-    /**
-     * Register used events.
-     */
-    private void registerEvents() {
-
-        PluginManager pm = getServer().getPluginManager();
-
-        pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.High, this);
-        pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.High, this);
-        pm.registerEvent(Event.Type.BLOCK_FLOW, blockListener, Priority.Normal, this);
-        pm.registerEvent(Event.Type.BLOCK_IGNITE, blockListener, Priority.High, this);
-        pm.registerEvent(Event.Type.BLOCK_PHYSICS, blockListener, Priority.Normal, this);
-        pm.registerEvent(Event.Type.BLOCK_INTERACT, blockListener, Priority.High, this);
-        pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.High, this);
-        pm.registerEvent(Event.Type.BLOCK_RIGHTCLICKED, blockListener, Priority.High, this);
-        pm.registerEvent(Event.Type.BLOCK_BURN, blockListener, Priority.High, this);
-        pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Priority.High, this);
-
-        pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High, this);
-        pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.High, this);
-        pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.High, this);
-
-        pm.registerEvent(Event.Type.PLAYER_ITEM, playerListener, Priority.High, this);
-        pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.High, this);
-        pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Priority.High, this);
-        pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
-        pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
-        pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
-        pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Priority.High, this);
-
-        // 25 equals about 1s real time
-        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);
     }
 
 

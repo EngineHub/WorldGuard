@@ -18,6 +18,9 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event;
+import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
@@ -52,6 +55,16 @@ public class WorldGuardEntityListener extends EntityListener {
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
+
+    public void registerEvents() {
+
+        PluginManager pm = plugin.getServer().getPluginManager();
+
+        pm.registerEvent(Event.Type.ENTITY_DAMAGED, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.ENTITY_EXPLODE, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.CREATURE_SPAWN, this, Priority.High, plugin);
+    }
+
 
     public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
 

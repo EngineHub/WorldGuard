@@ -18,6 +18,9 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event;
+import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
 import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
 import com.nijiko.coelho.iConomy.iConomy;
@@ -58,6 +61,22 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     public WorldGuardBlockListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    public void registerEvents() {
+
+        PluginManager pm = plugin.getServer().getPluginManager();
+
+        pm.registerEvent(Event.Type.BLOCK_DAMAGED, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_BREAK, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_FLOW, this, Priority.Normal, plugin);
+        pm.registerEvent(Event.Type.BLOCK_IGNITE, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_PHYSICS, this, Priority.Normal, plugin);
+        pm.registerEvent(Event.Type.BLOCK_INTERACT, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_PLACED, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_RIGHTCLICKED, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_BURN, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
     }
 
     /**
