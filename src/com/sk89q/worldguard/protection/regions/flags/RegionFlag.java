@@ -60,4 +60,6 @@ public abstract class RegionFlag {
 
     @Override
     public abstract String toString();
+
+    public abstract boolean setValue(String newVal);
 }

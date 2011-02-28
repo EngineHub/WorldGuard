@@ -28,6 +28,7 @@ public final class StateRegionFlag extends RegionFlag {
 
     public StateRegionFlag(RegionFlagContainer container, RegionFlagInfo info, String value) {
         super(container, info);
+                            System.out.println("new state value : " + value);
         this.setValue(value);
     }
 

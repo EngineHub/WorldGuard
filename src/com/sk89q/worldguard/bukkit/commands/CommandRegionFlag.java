@@ -116,7 +116,7 @@ public class CommandRegionFlag extends WgRegionCommand {
                 }
             }
 
-            if (!region.getFlags().getLocationFlag(nfo.type).setValue(valueStr)) {
+            if (!region.getFlags().getFlag(nfo.type).setValue(valueStr)) {
                 sender.sendMessage(ChatColor.RED + "Invalid value '" + valueStr + "' for flag " + nameStr);
                 return true;
             } else {

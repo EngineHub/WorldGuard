@@ -31,6 +31,9 @@ import java.util.Map;
  */
 public class FlagDatabase {
 
+    private static Map<FlagType, RegionFlagInfo> flagByFlagType;
+    private static Map<String, RegionFlagInfo> flagByName;
+
     public enum FlagType {
 
         PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, CREEPER_EXPLOSION,
@@ -42,6 +45,9 @@ public class FlagDatabase {
     };
 
     static {
+        flagByFlagType = new EnumMap<FlagType, RegionFlagInfo>(FlagType.class);
+        flagByName = new HashMap<String, RegionFlagInfo>();
+
         registerFlag("passthrough", FlagType.PASSTHROUGH, FlagDataType.STATE);
         registerFlag("build", FlagType.BUILD, FlagDataType.STATE);
         registerFlag("pvp", FlagType.PVP, FlagDataType.STATE);
@@ -152,6 +158,4 @@ public class FlagDatabase {
 
     }
     
-    private static Map<FlagType, RegionFlagInfo> flagByFlagType = new EnumMap<FlagType, RegionFlagInfo>(FlagType.class);
-    private static Map<String, RegionFlagInfo> flagByName = new HashMap<String, RegionFlagInfo>();
 }

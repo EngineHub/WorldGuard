@@ -35,11 +35,13 @@ public class RegionFlagContainer {
 
     private Map<String, String> flags = new HashMap<String, String>();
     private transient Map<FlagType, RegionFlag> flagData = new EnumMap<FlagType, RegionFlag>(FlagType.class);
+    private transient boolean hasInit = false;
 
     public RegionFlag getFlag(FlagType type) {
 
-        if (this.flagData == null) {
+        if (!this.hasInit) {
             this.initFlagData();
+            this.hasInit = true;
         }
 
         RegionFlag ret = this.flagData.get(type);
