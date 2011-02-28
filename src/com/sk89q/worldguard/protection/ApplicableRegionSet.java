@@ -27,7 +27,6 @@ import com.sk89q.worldguard.protection.regions.flags.RegionFlag;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlag.State;
 import java.util.List;
 
-
 /**
  * Represents a setFlag of regions and their rules as applied to one point.
  * 
@@ -46,10 +45,10 @@ public class ApplicableRegionSet {
      * @param regions
      * @param global
      */
-    public ApplicableRegionSet(List<ProtectedRegion> applicable,  GlobalFlags global) {
+    public ApplicableRegionSet(List<ProtectedRegion> applicable, GlobalFlags global) {
         this.applicable = applicable;
         this.global = global;
-        
+
         determineAffectedRegion();
     }
 
@@ -60,7 +59,12 @@ public class ApplicableRegionSet {
      * @return
      */
     public boolean canBuild(LocalPlayer player) {
-        return isStateFlagAllowed(FlagType.BUILD, global.canBuild, player);
+
+        if (!this.isAnyRegionAffected()) {
+            return global.canBuild;
+        }
+
+        return getStateFlag(FlagType.BUILD, true).getValue(State.DENY) == State.ALLOW || isMember(player);
     }
 
     /**
@@ -70,34 +74,40 @@ public class ApplicableRegionSet {
      * @return
      */
     public boolean isStateFlagAllowed(FlagType type) {
+
         return isStateFlagAllowed(type, global.getDefaultValue(type));
     }
 
     public boolean isStateFlagAllowed(FlagType type, boolean def) {
 
-        if(!this.isAnyRegionAffected())
-        {
+        if (!this.isAnyRegionAffected()) {
             return def;
         }
-
-        return getStateFlag(type, true).getValue(State.DENY) == State.ALLOW;
+        State defState = def ? State.ALLOW : State.DENY;
+        return getStateFlag(type, true).getValue(defState) == State.ALLOW;
     }
 
     public boolean isStateFlagAllowed(FlagType type, LocalPlayer player) {
 
+        if (type == FlagType.BUILD) {
+            return canBuild(player);
+        }
         return isStateFlagAllowed(type, global.getDefaultValue(type), player);
     }
 
     public boolean isStateFlagAllowed(FlagType type, boolean def, LocalPlayer player) {
 
-        if(!this.isAnyRegionAffected())
-        {
+        if (type == FlagType.BUILD) {
+            return canBuild(player);
+        }
+
+        if (!this.isAnyRegionAffected()) {
             return def;
         }
 
-        return getStateFlag(type, true).getValue(State.DENY) == State.ALLOW  || this.isMember(player);
+        State defState = def ? State.ALLOW : State.DENY;
+        return getStateFlag(type, true).getValue(defState) == State.ALLOW || this.isMember(player);
     }
-
 
     private RegionFlag getFlag(FlagType type, Boolean inherit) {
 
@@ -122,7 +132,7 @@ public class ApplicableRegionSet {
 
     }
 
-  public BooleanRegionFlag getBooleanFlag(FlagType type, boolean inherit) {
+    public BooleanRegionFlag getBooleanFlag(FlagType type, boolean inherit) {
 
         RegionFlag flag = this.getFlag(type, inherit);
 
@@ -144,7 +154,7 @@ public class ApplicableRegionSet {
         }
     }
 
-     public IntegerRegionFlag getIntegerFlag(FlagType type, boolean inherit) {
+    public IntegerRegionFlag getIntegerFlag(FlagType type, boolean inherit) {
 
         RegionFlag flag = this.getFlag(type, inherit);
 
@@ -199,12 +209,10 @@ public class ApplicableRegionSet {
         }
     }
 
-    public boolean isAnyRegionAffected()
-    {
+    public boolean isAnyRegionAffected() {
         return this.applicable.size() > 0;
     }
 
-  
     /**
      * Determines the region with the hightest priority that is not a parent.
      *
@@ -223,9 +231,7 @@ public class ApplicableRegionSet {
         }
     }
 
-
-
-     public boolean isOwner(LocalPlayer player) {
+    public boolean isOwner(LocalPlayer player) {
         return affectedRegion != null ? affectedRegion.isOwner(player) : false;
     }
 
@@ -240,15 +246,12 @@ public class ApplicableRegionSet {
     }
 
     public String getAffectedRegionId() {
-        return affectedRegion != null ?  affectedRegion.getId() : "";
+        return affectedRegion != null ? affectedRegion.getId() : "";
     }
 
     public int getAffectedRegionPriority() {
-        return affectedRegion != null ?  affectedRegion.getPriority() : 0;
+        return affectedRegion != null ? affectedRegion.getPriority() : 0;
     }
-
-
-
     /**
      * Checks to see if a flag is permitted.
      *
@@ -333,8 +336,6 @@ public class ApplicableRegionSet {
     || (player != null && needsClear.size() == 0);
     }
      */
-   
-
     /**
      * Clear a region's parents for isStateFlagAllowed().
      * 
