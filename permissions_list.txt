@@ -27,6 +27,12 @@ worldguard.region.list
 
 worldguard.region.load
 
+worldguard.region.addowner.own
+worldguard.region.addowner.all
+
+worldguard.region.addmember.own
+worldguard.region.addmember.all
+
 worldguard.region.removeowner.own
 worldguard.region.removeowner.all
 
@@ -59,4 +65,4 @@ worldguard.tpregion.override
 worldguard.buyregion
 
 worldguard.notify
-
+worldguard.notify_onenter
