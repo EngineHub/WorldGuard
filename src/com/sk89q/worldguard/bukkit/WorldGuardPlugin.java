@@ -18,11 +18,11 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import java.util.logging.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler;
-import com.sk89q.worldguard.protection.*;
+import com.sk89q.worldguard.protection.TimedFlagsTimer;
 import com.sk89q.worldguard.protection.regionmanager.GlobalRegionManager;
+import java.util.logging.Logger;
 
 /**
  * Plugin for Bukkit.

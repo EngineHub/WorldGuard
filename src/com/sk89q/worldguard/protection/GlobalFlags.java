@@ -64,7 +64,7 @@ public class GlobalFlags {
             case WATER_FLOW:
                 return this.allowWaterflow;
             default:
-                return false;
+                return true;
         }
     }
 }

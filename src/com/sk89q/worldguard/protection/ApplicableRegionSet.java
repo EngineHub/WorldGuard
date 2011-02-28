@@ -60,7 +60,7 @@ public class ApplicableRegionSet {
      * @return
      */
     public boolean canBuild(LocalPlayer player) {
-        return isStateFlagAllowed(FlagType.BUILD, global.canBuild) || this.isMember(player);
+        return isStateFlagAllowed(FlagType.BUILD, global.canBuild, player);
     }
 
     /**

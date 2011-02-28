@@ -20,6 +20,9 @@
 package com.sk89q.worldguard.protection;
 
 
+import org.bukkit.Location;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
@@ -122,6 +125,15 @@ public class TimedFlagsTimer implements Runnable {
                 }
             }
 
+            //check passthrough flag
+            LocalPlayer lplayer = BukkitPlayer.wrapPlayer(wg.getWgConfiguration(), player);
+            if(!regions.isStateFlagAllowed(FlagType.PASSTHROUGH, lplayer))
+            {
+                Location newLoc = player.getLocation().clone();
+                newLoc.setX(newLoc.getBlockX() - 30);
+                newLoc.setY(newLoc.getWorld().getHighestBlockYAt(newLoc) + 1);
+                player.teleportTo(newLoc);
+            }
         }
     }
 
