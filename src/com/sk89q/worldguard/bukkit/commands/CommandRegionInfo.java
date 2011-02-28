@@ -81,7 +81,7 @@ public class CommandRegionInfo extends WgRegionCommand {
                 s.append(", ");
             }
 
-            s.append(flags.getFlag(nfo.type).toString());
+            s.append(nfo.name + ": " + flags.getFlag(nfo.type).toString());
         }
 
         sender.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());

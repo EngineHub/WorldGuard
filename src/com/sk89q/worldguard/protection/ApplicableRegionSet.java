@@ -73,20 +73,29 @@ public class ApplicableRegionSet {
         return isStateFlagAllowed(type, global.getDefaultValue(type));
     }
 
-    public boolean isStateFlagAllowed(FlagType type, LocalPlayer player) {
-        return isStateFlagAllowed(type, global.getDefaultValue(type)) || this.isMember(player);
-    }
-
     public boolean isStateFlagAllowed(FlagType type, boolean def) {
 
-        State defState = def ? State.ALLOW : State.DENY;
-        return getStateFlag(type, true).getValue(defState) == State.ALLOW;
+        if(!this.isAnyRegionAffected())
+        {
+            return def;
+        }
+
+        return getStateFlag(type, true).getValue(State.DENY) == State.ALLOW;
+    }
+
+    public boolean isStateFlagAllowed(FlagType type, LocalPlayer player) {
+
+        return isStateFlagAllowed(type, global.getDefaultValue(type), player);
     }
 
     public boolean isStateFlagAllowed(FlagType type, boolean def, LocalPlayer player) {
 
-        State defState = def ? State.ALLOW : State.DENY;
-        return getStateFlag(type, true).getValue(defState) == State.ALLOW  || this.isMember(player);
+        if(!this.isAnyRegionAffected())
+        {
+            return def;
+        }
+
+        return getStateFlag(type, true).getValue(State.DENY) == State.ALLOW  || this.isMember(player);
     }
 
 
