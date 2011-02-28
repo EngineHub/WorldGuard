@@ -31,9 +31,13 @@ public final class RegionGroupRegionFlag extends RegionFlag {
         this.setValue(value);
     }
 
+    public RegionGroupRegionFlag() {
+        super(null, null);
+    }
+
     public void setValue(RegionGroup newValue) {
         this.value = newValue;
-        this.container.internalSetValue(info.name, newValue != null ? newValue.toString() : null);
+        this.updataContainer();
     }
 
     public RegionGroup getValue() {
@@ -52,13 +56,21 @@ public final class RegionGroupRegionFlag extends RegionFlag {
                 this.value = RegionGroup.valueOf(newValue);
             } catch (Exception e) {
                 this.value = null;
+                this.updataContainer();
                 return false;
             }
         }
 
+        this.updataContainer();
         return true;
     }
-    
+
+    private void updataContainer() {
+        if (this.container != null) {
+            this.container.internalSetValue(info.name, this.value != null ? this.value.toString() : null);
+        }
+    }
+
     @Override
     public boolean hasValue() {
         return this.value != null;

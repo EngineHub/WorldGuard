@@ -120,7 +120,7 @@ public class ApplicableRegionSet {
         if (flag instanceof BooleanRegionFlag) {
             return (BooleanRegionFlag) flag;
         } else {
-            return null;
+            return new BooleanRegionFlag();
         }
     }
 
@@ -131,7 +131,7 @@ public class ApplicableRegionSet {
         if (flag instanceof StateRegionFlag) {
             return (StateRegionFlag) flag;
         } else {
-            return null;
+            return new StateRegionFlag();
         }
     }
 
@@ -142,7 +142,7 @@ public class ApplicableRegionSet {
         if (flag instanceof IntegerRegionFlag) {
             return (IntegerRegionFlag) flag;
         } else {
-            return null;
+            return new IntegerRegionFlag();
         }
     }
 
@@ -153,7 +153,7 @@ public class ApplicableRegionSet {
         if (flag instanceof DoubleRegionFlag) {
             return (DoubleRegionFlag) flag;
         } else {
-            return null;
+            return new DoubleRegionFlag();
         }
     }
 
@@ -164,7 +164,7 @@ public class ApplicableRegionSet {
         if (flag instanceof StringRegionFlag) {
             return (StringRegionFlag) flag;
         } else {
-            return null;
+            return new StringRegionFlag();
         }
     }
 
@@ -175,7 +175,7 @@ public class ApplicableRegionSet {
         if (flag instanceof RegionGroupRegionFlag) {
             return (RegionGroupRegionFlag) flag;
         } else {
-            return null;
+            return new RegionGroupRegionFlag();
         }
     }
 
@@ -186,7 +186,7 @@ public class ApplicableRegionSet {
         if (flag instanceof LocationRegionFlag) {
             return (LocationRegionFlag) flag;
         } else {
-            return null;
+            return new LocationRegionFlag();
         }
     }
 

@@ -36,6 +36,10 @@ public final class LocationRegionFlag extends RegionFlag {
         this.setValue(value);
     }
 
+    public LocationRegionFlag() {
+        super(null, null);
+    }
+
     public void setValue(Location newValue) {
         if (newValue == null) {
             this.worldName = null;
@@ -48,19 +52,11 @@ public final class LocationRegionFlag extends RegionFlag {
             this.pitch = newValue.getPitch();
         }
 
-        String stringVal;
-        if (newValue == null) {
-            stringVal = null;
-        } else {
-            stringVal = newValue.getWorld().getName() + ";" + newValue.getBlockX() + ";"
-                    + newValue.getBlockY() + ";" + newValue.getBlockZ() + ";" + newValue.getYaw()
-                    + ";" + newValue.getPitch();
-        }
-        this.container.internalSetValue(info.name, stringVal);
+        this.updataContainer();
     }
 
     public Location getValue(Server server) {
-        
+
         if (this.worldName == null) {
             return null;
         } else {
@@ -97,25 +93,38 @@ public final class LocationRegionFlag extends RegionFlag {
 
             } catch (Exception e) {
                 this.worldName = null;
+                this.updataContainer();
                 return false;
             }
         }
 
+        this.updataContainer();
         return true;
+    }
+
+    private void updataContainer() {
+        if (this.container != null) {
+            String stringVal;
+            if (this.worldName == null) {
+                stringVal = null;
+            } else {
+                stringVal = this.worldName + ";" + this.x + ";" + this.y + ";" + this.z
+                        + ";" + this.yaw + ";" + this.pitch;
+            }
+            this.container.internalSetValue(info.name, stringVal);
+        }
     }
 
     @Override
     public boolean hasValue() {
         return this.worldName != null;
     }
+
     @Override
     public String toString() {
-        if(this.worldName != null)
-        {
+        if (this.worldName != null) {
             return this.worldName + "(" + Math.round(this.x) + "," + Math.round(this.y) + "," + Math.round(this.z) + ")";
-        }
-        else
-        {
+        } else {
             return "-";
         }
     }

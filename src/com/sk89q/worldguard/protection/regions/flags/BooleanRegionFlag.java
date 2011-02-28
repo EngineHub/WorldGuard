@@ -32,9 +32,13 @@ public final class BooleanRegionFlag extends RegionFlag {
         this.setValue(value);
     }
 
+    public BooleanRegionFlag() {
+        super(null, null);
+    }
+
     public void setValue(Boolean newValue) {
         this.value = newValue;
-        this.container.internalSetValue(info.name, newValue != null ? newValue.toString() : null);
+        this.updataContainer();
     }
 
     public Boolean getValue() {
@@ -50,14 +54,20 @@ public final class BooleanRegionFlag extends RegionFlag {
             this.value = null;
         } else {
             newValue = newValue.toLowerCase();
-            if(newValue.equals("on") || newValue.equals("allow") || newValue.equals("1"))
-            {
+            if (newValue.equals("on") || newValue.equals("allow") || newValue.equals("1")) {
                 newValue = "true";
             }
             this.value = Boolean.valueOf(newValue);
         }
 
+        this.updataContainer();
         return true;
+    }
+
+    private void updataContainer() {
+        if (this.container != null) {
+            this.container.internalSetValue(info.name, this.value != null ? this.value.toString() : null);
+        }
     }
 
     @Override
@@ -67,12 +77,9 @@ public final class BooleanRegionFlag extends RegionFlag {
 
     @Override
     public String toString() {
-        if(this.value != null)
-        {
+        if (this.value != null) {
             return this.value.toString();
-        }
-        else
-        {
+        } else {
             return "-";
         }
     }

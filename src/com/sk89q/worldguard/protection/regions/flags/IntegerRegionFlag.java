@@ -31,9 +31,13 @@ public final class IntegerRegionFlag extends RegionFlag {
         this.setValue(value);
     }
 
+    public IntegerRegionFlag() {
+        super(null, null);
+    }
+
     public void setValue(Integer newValue) {
         this.value = newValue;
-        this.container.internalSetValue(info.name, newValue != null ? newValue.toString() : null);
+        this.updataContainer();
     }
 
     public Integer getValue() {
@@ -52,11 +56,19 @@ public final class IntegerRegionFlag extends RegionFlag {
                 this.value = Integer.valueOf(newValue);
             } catch (Exception e) {
                 this.value = null;
+                this.updataContainer();
                 return false;
             }
         }
 
+        this.updataContainer();
         return true;
+    }
+
+    private void updataContainer() {
+        if (this.container != null) {
+            this.container.internalSetValue(info.name, this.value != null ? this.value.toString() : null);
+        }
     }
 
     @Override
@@ -66,12 +78,9 @@ public final class IntegerRegionFlag extends RegionFlag {
 
     @Override
     public String toString() {
-        if(this.value != null)
-        {
+        if (this.value != null) {
             return this.value.toString();
-        }
-        else
-        {
+        } else {
             return "-";
         }
     }

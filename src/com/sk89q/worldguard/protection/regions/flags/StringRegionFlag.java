@@ -32,9 +32,13 @@ public class StringRegionFlag extends RegionFlag {
         this.value = value;
     }
 
+    public StringRegionFlag() {
+        super(null, null);
+    }
+
     public boolean setValue(String newValue) {
         this.value = newValue;
-        this.container.internalSetValue(info.name, newValue);
+        this.updataContainer();
         return true;
     }
 
@@ -46,6 +50,11 @@ public class StringRegionFlag extends RegionFlag {
         return this.value != null ? this.value : def;
     }
 
+    private void updataContainer() {
+        if (this.container != null) {
+            this.container.internalSetValue(info.name, this.value);
+        }
+    }
 
     @Override
     public boolean hasValue() {

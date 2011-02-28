@@ -31,9 +31,13 @@ public final class DoubleRegionFlag extends RegionFlag {
         this.setValue(value);
     }
 
+    public DoubleRegionFlag() {
+        super(null, null);
+    }
+
     public void setValue(Double newValue) {
         this.value = newValue;
-        this.container.internalSetValue(info.name, newValue != null ? newValue.toString() : null);
+        this.updataContainer();
     }
 
     public Double getValue() {
@@ -52,11 +56,18 @@ public final class DoubleRegionFlag extends RegionFlag {
                 this.value = Double.valueOf(newValue);
             } catch (Exception e) {
                 this.value = null;
+                this.updataContainer();
                 return false;
             }
         }
-
+        this.updataContainer();
         return true;
+    }
+
+    private void updataContainer() {
+        if (this.container != null) {
+            this.container.internalSetValue(info.name, this.value != null ? this.value.toString() : null);
+        }
     }
 
     @Override
@@ -66,12 +77,9 @@ public final class DoubleRegionFlag extends RegionFlag {
 
     @Override
     public String toString() {
-        if(this.value != null)
-        {
+        if (this.value != null) {
             return this.value.toString();
-        }
-        else
-        {
+        } else {
             return "-";
         }
     }
