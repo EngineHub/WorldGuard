@@ -20,32 +20,20 @@ package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
-import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 
 import org.bukkit.entity.Boat;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Vehicle;
 
-import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleListener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.util.BlockVector;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
-
-import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 /**
  *
