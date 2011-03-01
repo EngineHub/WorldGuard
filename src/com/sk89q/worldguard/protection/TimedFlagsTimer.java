@@ -88,7 +88,13 @@ public class TimedFlagsTimer implements Runnable {
                 healDelay *= 1000;
                 int healAmount = regions.getIntegerFlag(FlagType.HEAL_AMOUNT, true).getValue(1);
                 if (now - nfo.lastHealTick > healDelay) {
-                    player.setHealth(player.getHealth() + healAmount);
+                    if (player.getHealth() < 20) {
+                        if (player.getHealth() + healAmount > 20) {
+                            player.setHealth(20);
+                        } else {
+                            player.setHealth(player.getHealth() + healAmount);
+                        }
+                    }
                 } else {
                     nfo.sheduledHealTick = now + healDelay;
                     nfo.sheduledHealAmount = healAmount;
