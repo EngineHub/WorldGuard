@@ -140,10 +140,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         WorldGuardConfiguration cfg = plugin.getWgConfiguration();
         WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
 
-
-        Material type = block.getType();
-
-        if (wcfg.useRegions && type != Material.LEVER && type != Material.STONE_BUTTON && type != Material.DIODE
+        if (wcfg.useRegions
                 && (itemId == 322 || itemId == 320 || itemId == 319 || itemId == 297 || itemId == 260
                         || itemId == 350 || itemId == 349 || itemId == 354) ) {
             return;
