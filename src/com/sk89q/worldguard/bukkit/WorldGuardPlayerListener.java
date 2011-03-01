@@ -18,6 +18,8 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import java.util.logging.Logger;
+
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
@@ -133,9 +135,19 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Block block = event.getBlockClicked();
         ItemStack item = event.getItem();
+        int itemId = item.getTypeId();
 
         WorldGuardConfiguration cfg = plugin.getWgConfiguration();
         WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+
+
+        Material type = block.getType();
+
+        if (wcfg.useRegions && type != Material.LEVER && type != Material.STONE_BUTTON && type != Material.DIODE
+                && (itemId == 322 || itemId == 320 || itemId == 319 || itemId == 297 || itemId == 260
+                        || itemId == 350 || itemId == 349 || itemId == 354) ) {
+            return;
+        }
 
         if (!wcfg.itemDurability) {
             // Hoes

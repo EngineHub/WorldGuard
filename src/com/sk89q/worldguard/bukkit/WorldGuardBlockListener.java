@@ -28,6 +28,8 @@ import com.nijiko.coelho.iConomy.system.Account;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
+
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.ChatColor;
