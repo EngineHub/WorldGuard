@@ -405,7 +405,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
             Boolean flagValue = mgr.getApplicableRegions(pt).getStringFlag(FlagType.DENY_SPAWN, true).getValue("").contains(creaName);
             if (flagValue != null) {
-                if (!flagValue) {
+                if (flagValue) {
                     cancelEvent = true;
                 } else {
                     cancelEvent = false;
