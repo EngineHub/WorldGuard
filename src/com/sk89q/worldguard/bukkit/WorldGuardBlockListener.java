@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -592,10 +593,14 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (wcfg.useRegions && wcfg.useiConomy && cfg.getiConomy() != null && (type == Material.SIGN || type == Material.WALL_SIGN)) {
-            if (((Sign)blockClicked).getLine(0) == "[WorldGuard]" && ((Sign)blockClicked).getLine(1) == "For sale") {
-                String regionId = ((Sign)blockClicked).getLine(2);
-                String regionComment = ((Sign)blockClicked).getLine(3);
+        if (wcfg.useRegions && wcfg.useiConomy && cfg.getiConomy() != null
+                    && (type == Material.SIGN_POST || type == Material.SIGN || type == Material.WALL_SIGN)) {
+            BlockState block = blockClicked.getState();
+
+            if (((Sign)block).getLine(0).equalsIgnoreCase("[WorldGuard]")
+                    && ((Sign)block).getLine(1).equalsIgnoreCase("For sale")) {
+                String regionId = ((Sign)block).getLine(2);
+                String regionComment = ((Sign)block).getLine(3);
 
                 if (regionId != null && regionId != "") {
                     RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
@@ -608,7 +613,7 @@ public class WorldGuardBlockListener extends BlockListener {
                             if (iConomy.getBank().hasAccount(player.getName())) {
                                 Account account = iConomy.getBank().getAccount(player.getName());
                                 double balance = account.getBalance();
-                                double regionPrice = flags.getIntegerFlag(FlagType.PRICE).getValue();
+                                double regionPrice = flags.getDoubleFlag(FlagType.PRICE).getValue();
 
                                 if (balance >= regionPrice) {
                                     account.subtract(regionPrice);
@@ -619,6 +624,8 @@ public class WorldGuardBlockListener extends BlockListener {
                                     region.setOwners(owners);
                                     flags.getBooleanFlag(FlagType.BUYABLE).setValue(false);
                                     account.save();
+                                } else {
+                                    player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
                                 }
                             } else {
                                 player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
