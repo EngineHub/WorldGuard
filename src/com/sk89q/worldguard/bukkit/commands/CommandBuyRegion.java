@@ -90,6 +90,8 @@ public class CommandBuyRegion extends WgCommand {
                             region.setOwners(owners);
                             flags.getBooleanFlag(FlagType.BUYABLE).setValue(false);
                             account.save();
+                        } else {
+                            player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
                         }
                     } else {
                         player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
