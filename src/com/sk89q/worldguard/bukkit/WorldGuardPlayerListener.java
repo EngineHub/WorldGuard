@@ -18,13 +18,11 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import java.util.logging.Logger;
-
+import com.sk89q.worldguard.protection.regions.flags.Flags;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlag.RegionGroup;
-import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
 import com.nijiko.coelho.iConomy.iConomy;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
@@ -182,7 +180,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(FlagType.LIGHTER)) {
+            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(Flags.LIGHTER)) {
                 event.setCancelled(true);
                 return;
             }
@@ -285,10 +283,10 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 player.getWorld().getName()).getApplicableRegions(
                 BukkitUtil.toVector(location));
 
-        Location spawn = regions.getLocationFlag(FlagType.SPAWN_LOC, true).getValue(player.getServer());
+        Location spawn = regions.getLocationFlag(Flags.SPAWN_LOC, true).getValue(player.getServer());
 
         if (spawn != null) {
-            RegionGroup spawnconfig = regions.getRegionGroupFlag(FlagType.SPAWN_PERM, true).getValue();
+            RegionGroup spawnconfig = regions.getRegionGroupFlag(Flags.SPAWN_PERM, true).getValue();
             if (spawnconfig != null) {
                 BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
                 if (spawnconfig == RegionGroup.OWNER) {

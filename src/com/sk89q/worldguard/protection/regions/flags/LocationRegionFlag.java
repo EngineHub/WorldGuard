@@ -18,6 +18,7 @@
  */
 package com.sk89q.worldguard.protection.regions.flags;
 
+import com.sk89q.worldguard.protection.regions.flags.info.RegionFlagInfo;
 import org.bukkit.Location;
 import org.bukkit.Server;
 

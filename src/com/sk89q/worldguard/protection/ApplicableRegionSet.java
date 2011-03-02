@@ -22,9 +22,10 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.util.Iterator;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.regions.flags.*;
-import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
+import com.sk89q.worldguard.protection.regions.flags.Flags.FlagType;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlag;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlag.State;
+import com.sk89q.worldguard.protection.regions.flags.info.*;
 import java.util.List;
 
 /**
@@ -64,35 +65,35 @@ public class ApplicableRegionSet {
             return global.canBuild;
         }
 
-        return getStateFlag(FlagType.BUILD, true).getValue(State.DENY) == State.ALLOW || isMember(player);
+        return getStateFlag(Flags.BUILD, true).getValue(State.DENY) == State.ALLOW || isMember(player);
     }
 
 
-    public boolean isStateFlagAllowed(FlagType type) {
+    public boolean isStateFlagAllowed(StateRegionFlagInfo info) {
 
-        return isStateFlagAllowed(type, global.getDefaultValue(type));
+        return isStateFlagAllowed(info, global.getDefaultValue(info.type));
     }
 
-    public boolean isStateFlagAllowed(FlagType type, boolean def) {
+    public boolean isStateFlagAllowed(StateRegionFlagInfo info, boolean def) {
 
         if (!this.isAnyRegionAffected()) {
             return def;
         }
         State defState = def ? State.ALLOW : State.DENY;
-        return getStateFlag(type, true).getValue(defState) == State.ALLOW;
+        return getStateFlag(info, true).getValue(defState) == State.ALLOW;
     }
 
-    public boolean isStateFlagAllowed(FlagType type, LocalPlayer player) {
+    public boolean isStateFlagAllowed(StateRegionFlagInfo info, LocalPlayer player) {
 
-        if (type == FlagType.BUILD) {
+        if (info.type == FlagType.BUILD) {
             return canBuild(player);
         }
-        return isStateFlagAllowed(type, global.getDefaultValue(type), player);
+        return isStateFlagAllowed(info, global.getDefaultValue(info.type), player);
     }
 
-    public boolean isStateFlagAllowed(FlagType type, boolean def, LocalPlayer player) {
+    public boolean isStateFlagAllowed(StateRegionFlagInfo info, boolean def, LocalPlayer player) {
 
-        if (type == FlagType.BUILD) {
+        if (info.type == FlagType.BUILD) {
             return canBuild(player);
         }
 
@@ -101,10 +102,10 @@ public class ApplicableRegionSet {
         }
 
         State defState = def ? State.ALLOW : State.DENY;
-        return getStateFlag(type, true).getValue(defState) == State.ALLOW || this.isMember(player);
+        return getStateFlag(info, true).getValue(defState) == State.ALLOW || this.isMember(player);
     }
 
-    private RegionFlag getFlag(FlagType type, Boolean inherit) {
+    private RegionFlag getFlag(RegionFlagInfo info, Boolean inherit) {
 
         ProtectedRegion region = affectedRegion;
 
@@ -113,11 +114,11 @@ public class ApplicableRegionSet {
         }
 
         if (!inherit) {
-            return region.getFlags().getFlag(type);
+            return region.getFlags().getFlag(info);
         } else {
             RegionFlag value;
             do {
-                value = region.getFlags().getFlag(type);
+                value = region.getFlags().getFlag(info);
                 region = region.getParent();
 
             } while (!value.hasValue() && region != null);
@@ -127,9 +128,9 @@ public class ApplicableRegionSet {
 
     }
 
-    public BooleanRegionFlag getBooleanFlag(FlagType type, boolean inherit) {
+    public BooleanRegionFlag getBooleanFlag(BooleanRegionFlagInfo info, boolean inherit) {
 
-        RegionFlag flag = this.getFlag(type, inherit);
+        RegionFlag flag = this.getFlag(info, inherit);
 
         if (flag instanceof BooleanRegionFlag) {
             return (BooleanRegionFlag) flag;
@@ -138,9 +139,9 @@ public class ApplicableRegionSet {
         }
     }
 
-    public StateRegionFlag getStateFlag(FlagType type, boolean inherit) {
+    public StateRegionFlag getStateFlag(StateRegionFlagInfo info, boolean inherit) {
 
-        RegionFlag flag = this.getFlag(type, inherit);
+        RegionFlag flag = this.getFlag(info, inherit);
 
         if (flag instanceof StateRegionFlag) {
             return (StateRegionFlag) flag;
@@ -149,9 +150,9 @@ public class ApplicableRegionSet {
         }
     }
 
-    public IntegerRegionFlag getIntegerFlag(FlagType type, boolean inherit) {
+    public IntegerRegionFlag getIntegerFlag(IntegerRegionFlagInfo info, boolean inherit) {
 
-        RegionFlag flag = this.getFlag(type, inherit);
+        RegionFlag flag = this.getFlag(info, inherit);
 
         if (flag instanceof IntegerRegionFlag) {
             return (IntegerRegionFlag) flag;
@@ -160,9 +161,9 @@ public class ApplicableRegionSet {
         }
     }
 
-    public DoubleRegionFlag getDoubleFlag(FlagType type, boolean inherit) {
+    public DoubleRegionFlag getDoubleFlag(DoubleRegionFlagInfo info, boolean inherit) {
 
-        RegionFlag flag = this.getFlag(type, inherit);
+        RegionFlag flag = this.getFlag(info, inherit);
 
         if (flag instanceof DoubleRegionFlag) {
             return (DoubleRegionFlag) flag;
@@ -171,9 +172,9 @@ public class ApplicableRegionSet {
         }
     }
 
-    public StringRegionFlag getStringFlag(FlagType type, boolean inherit) {
+    public StringRegionFlag getStringFlag(StringRegionFlagInfo info, boolean inherit) {
 
-        RegionFlag flag = this.getFlag(type, inherit);
+        RegionFlag flag = this.getFlag(info, inherit);
 
         if (flag instanceof StringRegionFlag) {
             return (StringRegionFlag) flag;
@@ -182,9 +183,9 @@ public class ApplicableRegionSet {
         }
     }
 
-    public RegionGroupRegionFlag getRegionGroupFlag(FlagType type, boolean inherit) {
+    public RegionGroupRegionFlag getRegionGroupFlag(RegionGroupRegionFlagInfo info, boolean inherit) {
 
-        RegionFlag flag = this.getFlag(type, inherit);
+        RegionFlag flag = this.getFlag(info, inherit);
 
         if (flag instanceof RegionGroupRegionFlag) {
             return (RegionGroupRegionFlag) flag;
@@ -193,9 +194,9 @@ public class ApplicableRegionSet {
         }
     }
 
-    public LocationRegionFlag getLocationFlag(FlagType type, boolean inherit) {
+    public LocationRegionFlag getLocationFlag(LocationRegionFlagInfo info, boolean inherit) {
 
-        RegionFlag flag = this.getFlag(type, inherit);
+        RegionFlag flag = this.getFlag(info, inherit);
 
         if (flag instanceof LocationRegionFlag) {
             return (LocationRegionFlag) flag;

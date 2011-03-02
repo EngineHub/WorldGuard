@@ -18,6 +18,8 @@
  */
 package com.sk89q.worldguard.protection.regions.flags;
 
+import com.sk89q.worldguard.protection.regions.flags.info.RegionFlagInfo;
+
 /**
  *
  * @author Michael

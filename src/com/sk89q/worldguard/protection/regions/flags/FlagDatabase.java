@@ -18,7 +18,8 @@
  */
 package com.sk89q.worldguard.protection.regions.flags;
 
-import com.sk89q.worldguard.protection.regions.flags.RegionFlag.FlagDataType;
+import com.sk89q.worldguard.protection.regions.flags.Flags.FlagType;
+import com.sk89q.worldguard.protection.regions.flags.info.*;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -31,79 +32,24 @@ import java.util.Map;
  */
 public class FlagDatabase {
 
-    private static Map<FlagType, RegionFlagInfo> flagByFlagType;
-    private static Map<String, RegionFlagInfo> flagByName;
+    private static Map<FlagType, RegionFlagInfo> flagByFlagType = new EnumMap<FlagType, RegionFlagInfo>(FlagType.class);
+    private static Map<String, RegionFlagInfo> flagByName = new HashMap<String, RegionFlagInfo>();
 
-    public enum FlagType {
+    public static void registerFlag(RegionFlagInfo info) {
 
-        PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, CREEPER_EXPLOSION,
-        TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW,
-        LEVER_AND_BUTTON, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE,
-        NOTIFY_GREET, NOTIFY_FAREWELL, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT,
-        TELE_LOC, TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE
-
-    };
-
-    static {
-        flagByFlagType = new EnumMap<FlagType, RegionFlagInfo>(FlagType.class);
-        flagByName = new HashMap<String, RegionFlagInfo>();
-
-        registerFlag("passthrough", FlagType.PASSTHROUGH, FlagDataType.STATE);
-        registerFlag("build", FlagType.BUILD, FlagDataType.STATE);
-        registerFlag("pvp", FlagType.PVP, FlagDataType.STATE);
-        registerFlag("mobdamage", FlagType.MOB_DAMAGE, FlagDataType.STATE);
-        registerFlag("creeperexp", FlagType.CREEPER_EXPLOSION, FlagDataType.STATE);
-        registerFlag("tnt", FlagType.TNT, FlagDataType.STATE);
-        registerFlag("lighter", FlagType.LIGHTER, FlagDataType.STATE);
-        registerFlag("firespread", FlagType.FIRE_SPREAD, FlagDataType.STATE);
-        registerFlag("lavafire", FlagType.LAVA_FIRE, FlagDataType.STATE);
-        registerFlag("chest", FlagType.CHEST_ACCESS, FlagDataType.STATE);
-        registerFlag("waterflow", FlagType.WATER_FLOW, FlagDataType.STATE);
-        registerFlag("leverandbutton", FlagType.LEVER_AND_BUTTON, FlagDataType.STATE);
-        registerFlag("placevehicle", FlagType.PLACE_VEHICLE, FlagDataType.STATE);
-
-        registerFlag("buyable", FlagType.BUYABLE, FlagDataType.BOOLEAN);
-
-        registerFlag("healdelay", FlagType.HEAL_DELAY, FlagDataType.INTEGER);
-        registerFlag("healamount", FlagType.HEAL_AMOUNT, FlagDataType.INTEGER);
-        
-        registerFlag("price", FlagType.PRICE, FlagDataType.DOUBLE);
-
-        registerFlag("gmsg", FlagType.GREET_MESSAGE, FlagDataType.STRING);
-        registerFlag("fmsg", FlagType.FAREWELL_MESSAGE, FlagDataType.STRING);
-        registerFlag("denyspawn", FlagType.DENY_SPAWN, FlagDataType.STRING);
-        registerFlag("notifygreet", FlagType.NOTIFY_GREET, FlagDataType.BOOLEAN);
-        registerFlag("notifyfarewell", FlagType.NOTIFY_GREET, FlagDataType.BOOLEAN);
-
-        registerFlag("teleloc", FlagType.TELE_LOC, FlagDataType.LOCATION);
-        registerFlag("spawnloc", FlagType.SPAWN_LOC, FlagDataType.LOCATION);
-
-        registerFlag("teleperm", FlagType.TELE_PERM, FlagDataType.REGIONGROUP);
-        registerFlag("spawnperm", FlagType.SPAWN_PERM, FlagDataType.REGIONGROUP);
-    }
-
-
-    
-    private static void registerFlag(String name, FlagType type, FlagDataType dataType) {
-
-        RegionFlagInfo info = new RegionFlagInfo(name, type, dataType);
         flagByFlagType.put(info.type, info);
         flagByName.put(info.name, info);
     }
 
-
-    public static RegionFlagInfo getFlagInfoFromName(String name)
-    {
+    public static RegionFlagInfo getFlagInfoFromName(String name) {
         return flagByName.get(name);
     }
 
-    public static List<RegionFlagInfo> getFlagInfoList()
-    {
+    public static List<RegionFlagInfo> getFlagInfoList() {
         List<RegionFlagInfo> list = new ArrayList<RegionFlagInfo>();
         list.addAll(flagByFlagType.values());
         return list;
     }
-
 
     public static RegionFlag getNewInstanceOf(FlagType type, String value, RegionFlagContainer container) {
         RegionFlagInfo info = flagByFlagType.get(type);
@@ -160,5 +106,4 @@ public class FlagDatabase {
         }
 
     }
-    
 }

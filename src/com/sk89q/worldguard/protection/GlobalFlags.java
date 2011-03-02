@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
+import com.sk89q.worldguard.protection.regions.flags.Flags.FlagType;
 
 /**
  * Used for default flags.

@@ -18,18 +18,16 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.protection.regions.flags.Flags;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
-import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
 import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.coelho.iConomy.system.Account;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
-
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -249,7 +247,7 @@ public class WorldGuardBlockListener extends BlockListener {
             Vector pt = toVector(blockFrom.getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(world.getName());
 
-            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(FlagType.WATER_FLOW)) {
+            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(Flags.WATER_FLOW)) {
                 event.setCancelled(true);
                 return;
             }
@@ -295,18 +293,18 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
 
                 if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !set.isStateFlagAllowed(FlagType.LIGHTER)) {
+                        && !set.isStateFlagAllowed(Flags.LIGHTER)) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if (isFireSpread && set.isStateFlagAllowed(FlagType.FIRE_SPREAD)) {
+            if (isFireSpread && set.isStateFlagAllowed(Flags.FIRE_SPREAD)) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (cause == IgniteCause.LAVA && !set.isStateFlagAllowed(FlagType.LAVA_FIRE)) {
+            if (cause == IgniteCause.LAVA && !set.isStateFlagAllowed(Flags.LAVA_FIRE)) {
                 event.setCancelled(true);
                 return;
             }
@@ -450,7 +448,7 @@ public class WorldGuardBlockListener extends BlockListener {
 
                 if (!cfg.hasPermission(player, "region.bypass")) {
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                    if (!set.isStateFlagAllowed(FlagType.CHEST_ACCESS) && !set.canBuild(localPlayer)) {
+                    if (!set.isStateFlagAllowed(Flags.CHEST_ACCESS) && !set.canBuild(localPlayer)) {
                         player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                         event.setCancelled(true);
                         return;
@@ -465,7 +463,7 @@ public class WorldGuardBlockListener extends BlockListener {
             ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(pt);
             LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, (Player)entity);
 
-            if (!applicableRegions.isStateFlagAllowed(FlagType.LEVER_AND_BUTTON, localPlayer)) {
+            if (!applicableRegions.isStateFlagAllowed(Flags.LEVER_AND_BUTTON, localPlayer)) {
                 ((Player)entity).sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
@@ -609,11 +607,11 @@ public class WorldGuardBlockListener extends BlockListener {
                     if (region != null) {
                         RegionFlagContainer flags = region.getFlags();
 
-                        if (flags.getBooleanFlag(FlagType.BUYABLE).getValue(false)) {
+                        if (flags.getBooleanFlag(Flags.BUYABLE).getValue(false)) {
                             if (iConomy.getBank().hasAccount(player.getName())) {
                                 Account account = iConomy.getBank().getAccount(player.getName());
                                 double balance = account.getBalance();
-                                double regionPrice = flags.getDoubleFlag(FlagType.PRICE).getValue();
+                                double regionPrice = flags.getDoubleFlag(Flags.PRICE).getValue();
 
                                 if (balance >= regionPrice) {
                                     account.subtract(regionPrice);
@@ -622,7 +620,7 @@ public class WorldGuardBlockListener extends BlockListener {
                                     DefaultDomain owners = region.getOwners();
                                     owners.addPlayer(player.getName());
                                     region.setOwners(owners);
-                                    flags.getBooleanFlag(FlagType.BUYABLE).setValue(false);
+                                    flags.getBooleanFlag(Flags.BUYABLE).setValue(false);
                                     account.save();
                                 } else {
                                     player.sendMessage(ChatColor.YELLOW + "You have not enough money.");

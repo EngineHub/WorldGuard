@@ -18,13 +18,13 @@
  */
 package com.sk89q.worldguard.protection.regions.flags;
 
-import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
+import com.sk89q.worldguard.protection.regions.flags.Flags.FlagType;
+import com.sk89q.worldguard.protection.regions.flags.info.*;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
 
 /**
  * Holds the sFlags for a region.
@@ -37,7 +37,7 @@ public class RegionFlagContainer {
     private transient Map<FlagType, RegionFlag> flagData = new EnumMap<FlagType, RegionFlag>(FlagType.class);
     private transient boolean hasInit = false;
 
-    public RegionFlag getFlag(FlagType type) {
+    private RegionFlag getFlag(FlagType type) {
 
         if (!this.hasInit) {
             this.initFlagData();
@@ -102,10 +102,14 @@ public class RegionFlagContainer {
         return hash;
     }
 
-    public BooleanRegionFlag getBooleanFlag(FlagType type) {
+    public RegionFlag getFlag(RegionFlagInfo info) {
+        return this.getFlag(info.type);
+    }
 
-        RegionFlag flag = this.getFlag(type);
-                
+    public BooleanRegionFlag getBooleanFlag(BooleanRegionFlagInfo info) {
+
+        RegionFlag flag = this.getFlag(info.type);
+
         if (flag instanceof BooleanRegionFlag) {
             return (BooleanRegionFlag) flag;
         } else {
@@ -113,9 +117,9 @@ public class RegionFlagContainer {
         }
     }
 
-    public StateRegionFlag getStateFlag(FlagType type) {
+    public StateRegionFlag getStateFlag(StateRegionFlagInfo info) {
 
-        RegionFlag flag = this.getFlag(type);
+        RegionFlag flag = this.getFlag(info.type);
 
         if (flag instanceof StateRegionFlag) {
             return (StateRegionFlag) flag;
@@ -124,60 +128,58 @@ public class RegionFlagContainer {
         }
     }
 
-     public IntegerRegionFlag getIntegerFlag(FlagType type) {
+    public IntegerRegionFlag getIntegerFlag(IntegerRegionFlagInfo info) {
 
-        RegionFlag flag = this.getFlag(type);
-                
+        RegionFlag flag = this.getFlag(info.type);
+
         if (flag instanceof IntegerRegionFlag) {
             return (IntegerRegionFlag) flag;
         } else {
             return null;
         }
     }
-     
-    public DoubleRegionFlag getDoubleFlag(FlagType type) {
 
-        RegionFlag flag = this.getFlag(type);
-                
+    public DoubleRegionFlag getDoubleFlag(DoubleRegionFlagInfo info) {
+
+        RegionFlag flag = this.getFlag(info.type);
+
         if (flag instanceof DoubleRegionFlag) {
             return (DoubleRegionFlag) flag;
         } else {
             return null;
         }
     }
-    
-    public StringRegionFlag getStringFlag(FlagType type) {
 
-        RegionFlag flag = this.getFlag(type);
-                
+    public StringRegionFlag getStringFlag(StringRegionFlagInfo info) {
+
+        RegionFlag flag = this.getFlag(info.type);
+
         if (flag instanceof StringRegionFlag) {
             return (StringRegionFlag) flag;
         } else {
             return null;
         }
     }
-    
-    public RegionGroupRegionFlag getRegionGroupFlag(FlagType type) {
 
-        RegionFlag flag = this.getFlag(type);
-                
+    public RegionGroupRegionFlag getRegionGroupFlag(RegionGroupRegionFlagInfo info) {
+
+        RegionFlag flag = this.getFlag(info.type);
+
         if (flag instanceof RegionGroupRegionFlag) {
             return (RegionGroupRegionFlag) flag;
         } else {
             return null;
         }
     }
-    
-    public LocationRegionFlag getLocationFlag(FlagType type) {
 
-        RegionFlag flag = this.getFlag(type);
-                
+    public LocationRegionFlag getLocationFlag(LocationRegionFlagInfo info) {
+
+        RegionFlag flag = this.getFlag(info.type);
+
         if (flag instanceof LocationRegionFlag) {
             return (LocationRegionFlag) flag;
         } else {
             return null;
         }
     }
-
-
 }

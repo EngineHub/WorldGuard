@@ -27,7 +27,7 @@ import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.flags.FlagDatabase;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
-import com.sk89q.worldguard.protection.regions.flags.RegionFlagInfo;
+import com.sk89q.worldguard.protection.regions.flags.info.RegionFlagInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -81,7 +81,7 @@ public class CommandRegionInfo extends WgRegionCommand {
                 s.append(", ");
             }
 
-            s.append(nfo.name + ": " + flags.getFlag(nfo.type).toString());
+            s.append(nfo.name + ": " + flags.getFlag(nfo).toString());
         }
 
         sender.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());

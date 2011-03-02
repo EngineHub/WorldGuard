@@ -14,9 +14,8 @@ import org.bukkit.entity.Player;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.flags.FlagDatabase.FlagType;
+import com.sk89q.worldguard.protection.regions.flags.Flags;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlag.RegionGroup;
-import com.sk89q.worldguard.protection.regions.flags.RegionGroupRegionFlag;
 
 /**
  * @author wallnuss
@@ -47,9 +46,9 @@ public class CommandTpRegion extends WgCommand {
 
             RegionGroup flagright;
             if (spawn) {
-                flagright = region.getFlags().getRegionGroupFlag(FlagType.SPAWN_PERM).getValue(RegionGroup.ALL);
+                flagright = region.getFlags().getRegionGroupFlag(Flags.SPAWN_PERM).getValue(RegionGroup.ALL);
             } else {
-                flagright = region.getFlags().getRegionGroupFlag(FlagType.TELE_PERM).getValue(RegionGroup.ALL);
+                flagright = region.getFlags().getRegionGroupFlag(Flags.TELE_PERM).getValue(RegionGroup.ALL);
             }
 
             LocalPlayer lPlayer = BukkitPlayer.wrapPlayer(cfg, player);
@@ -66,9 +65,9 @@ public class CommandTpRegion extends WgCommand {
             Location location = null;
 
             if (spawn) {
-                location = region.getFlags().getLocationFlag(FlagType.SPAWN_LOC).getValue(cfg.getWorldGuardPlugin().getServer());
+                location = region.getFlags().getLocationFlag(Flags.SPAWN_LOC).getValue(cfg.getWorldGuardPlugin().getServer());
             } else {
-                location = region.getFlags().getLocationFlag(FlagType.TELE_LOC).getValue(cfg.getWorldGuardPlugin().getServer());
+                location = region.getFlags().getLocationFlag(Flags.TELE_LOC).getValue(cfg.getWorldGuardPlugin().getServer());
             }
             if (location != null) {
                 player.teleportTo(location);

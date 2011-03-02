@@ -27,7 +27,8 @@ import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.flags.FlagDatabase;
 import com.sk89q.worldguard.protection.regions.flags.RegionFlag.FlagDataType;
-import com.sk89q.worldguard.protection.regions.flags.RegionFlagInfo;
+import com.sk89q.worldguard.protection.regions.flags.info.LocationRegionFlagInfo;
+import com.sk89q.worldguard.protection.regions.flags.info.RegionFlagInfo;
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -88,19 +89,20 @@ public class CommandRegionFlag extends WgRegionCommand {
                 return true;
             }
 
-            if (nfo.dataType == FlagDataType.LOCATION) {
+            if (nfo instanceof LocationRegionFlagInfo) {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(ChatColor.RED + "Flag not supported in console mode.");
                     return true;
                 }
                 Player player = (Player) sender;
+                LocationRegionFlagInfo lInfo = (LocationRegionFlagInfo)nfo;
 
                 Location l = player.getLocation();
 
                 if (valueStr != null && valueStr.equals("set")) {
 
                     if (region.contains(BukkitUtil.toVector(l))) {
-                        region.getFlags().getLocationFlag(nfo.type).setValue(l);
+                        region.getFlags().getLocationFlag(lInfo).setValue(l);
                         sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " set to current location");
                         return true;
 
@@ -110,13 +112,13 @@ public class CommandRegionFlag extends WgRegionCommand {
                     }
 
                 } else if (valueStr == null || valueStr.equals("delete")) {
-                    region.getFlags().getLocationFlag(nfo.type).setValue((Location) null);
+                    region.getFlags().getLocationFlag(lInfo).setValue((Location) null);
                     sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated. Flag " + nameStr + " removed.");
                     return true;
                 }
             }
 
-            if (!region.getFlags().getFlag(nfo.type).setValue(valueStr)) {
+            if (!region.getFlags().getFlag(nfo).setValue(valueStr)) {
                 sender.sendMessage(ChatColor.RED + "Invalid value '" + valueStr + "' for flag " + nameStr);
                 return true;
             } else {
