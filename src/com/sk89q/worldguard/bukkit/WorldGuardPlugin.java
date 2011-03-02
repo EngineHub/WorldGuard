@@ -22,6 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler;
 import com.sk89q.worldguard.protection.TimedFlagsTimer;
 import com.sk89q.worldguard.protection.regionmanager.GlobalRegionManager;
+import com.sk89q.worldguard.protection.regions.flags.Flags;
 import java.util.logging.Logger;
 
 /**
@@ -51,6 +52,8 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Called on plugin enable.
      */
     public void onEnable() {
+
+        Flags.Init();
 
         getDataFolder().mkdirs();
         globalRegionManager.onEnable();
