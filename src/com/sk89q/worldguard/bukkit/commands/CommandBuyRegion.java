@@ -62,7 +62,7 @@ public class CommandBuyRegion extends WgCommand {
 
             if (flags.getBooleanFlag(FlagType.BUYABLE).getValue(false)) {
                 if (args.length == 2) {
-                    if (args[1] == "info") {
+                    if (args[1].equalsIgnoreCase("info")) {
                         player.sendMessage(ChatColor.YELLOW + "Region " + id + " costs " + 
                                 iConomy.getBank().format(flags.getDoubleFlag(FlagType.PRICE).getValue()));
                         if (iConomy.getBank().hasAccount(player.getName())) {
