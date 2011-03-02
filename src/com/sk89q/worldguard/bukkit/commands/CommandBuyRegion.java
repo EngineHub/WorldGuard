@@ -51,6 +51,8 @@ public class CommandBuyRegion extends WgCommand {
             return true;
         }
 
+        CommandHandler.checkArgs(args, 1, 2);
+
         cfg.checkRegionPermission(player, "buyregion");
 
         String id = args[0];
