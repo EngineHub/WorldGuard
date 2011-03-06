@@ -117,7 +117,7 @@ public class GlobalRegionManager {
         if (globalflags != null) {
             RegionManager ret = this.managers.get(worldName);
 
-            if (ret == null) {
+            if (ret != null) {
                 ret.setGlobalFlags(globalflags);
             }
         }
