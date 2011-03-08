@@ -320,13 +320,9 @@ public class WorldGuardEntityListener extends EntityListener {
         GlobalConfiguration cfg = plugin.getGlobalConfiguration();
         WorldConfiguration wcfg = cfg.getWorldConfig(event.getEntity().getWorld().getName());
 
-<<<<<<< HEAD
         //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
         CreatureType creaType = event.getCreatureType();
         String creaName = "";
-=======
-        CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
->>>>>>> ebdb727... Some initial code reorganization. Todo: Have CSVDatabase handle flags so they can be ported over, and do the commands system a cleaner way.
         Boolean cancelEvent = false;
 
         if (wcfg.blockCreatureSpawn.contains(creaType)) {
