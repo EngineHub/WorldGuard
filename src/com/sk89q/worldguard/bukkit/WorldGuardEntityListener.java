@@ -320,7 +320,8 @@ public class WorldGuardEntityListener extends EntityListener {
         WorldGuardConfiguration cfg = plugin.getWgConfiguration();
         WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getEntity().getWorld().getName());
 
-        CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
+        //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
+        CreatureType creaType = event.getCreatureType();
         String creaName = "";
         Boolean cancelEvent = false;
 
