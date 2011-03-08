@@ -15,8 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 
 package com.sk89q.worldguard.bukkit;
 
@@ -28,31 +27,30 @@ import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
 import com.sk89q.worldguard.protection.GlobalFlags;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.util.config.Configuration;
 
 /**
- *
+ * 
  * @author Michael
  */
-public class WorldGuardWorldConfiguration {
+public class WorldConfiguration {
 
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+    private static final Logger logger = Logger
+            .getLogger("Minecraft.WorldGuard");
 
-    private WorldGuardPlugin wp;
-    
+    private WorldGuardPlugin plugin;
+
     private String worldName;
     private File configFile;
     private File blacklistFile;
 
     private Blacklist blacklist;
-
 
     /* Configuration data start */
     public boolean fireSpreadDisableToggle;
@@ -88,75 +86,30 @@ public class WorldGuardWorldConfiguration {
     public boolean teleportOnSuffocation;
     public boolean useRegions;
     public int regionWand = 287;
-    public String blockCreatureSpawn;
+    public Set<CreatureType> blockCreatureSpawn;
     public boolean useiConomy;
     public boolean buyOnClaim;
     public double buyOnClaimPrice;
     public int maxClaimVolume;
     public boolean claimOnlyInsideExistingRegions;
     public int maxRegionCountPerPlayer;
+
     /* Configuration data end */
 
-
-    public WorldGuardWorldConfiguration(WorldGuardPlugin wp, String worldName, File configFile, File blacklistFile)
-    {
-        this.wp = wp;
+    public WorldConfiguration(WorldGuardPlugin wp, String worldName,
+            File configFile, File blacklistFile) {
+        this.plugin = wp;
         this.worldName = worldName;
         this.configFile = configFile;
         this.blacklistFile = blacklistFile;
 
-        createDefaultConfiguration(configFile, "config.yml");
-        createDefaultConfiguration(blacklistFile, "blacklist.txt");
-        
+        WorldGuardPlugin.createDefaultConfiguration(configFile, "config.yml");
+        WorldGuardPlugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
+
         loadConfiguration();
     }
 
-
     /**
-     * Create a default configuration file from the .jar.
-     *
-     * @param name
-     */
-    public static void createDefaultConfiguration(File actual, String defaultName) {
-
-        if (!actual.exists()) {
-
-            InputStream input =
-                    WorldGuardPlugin.class.getResourceAsStream("/defaults/" + defaultName);
-            if (input != null) {
-                FileOutputStream output = null;
-
-                try {
-                    output = new FileOutputStream(actual);
-                    byte[] buf = new byte[8192];
-                    int length = 0;
-                    while ((length = input.read(buf)) > 0) {
-                        output.write(buf, 0, length);
-                    }
-
-                    logger.info("WorldGuard: Default configuration file written: " + defaultName);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (input != null) {
-                            input.close();
-                        }
-                    } catch (IOException e) {
-                    }
-
-                    try {
-                        if (output != null) {
-                            output.close();
-                        }
-                    } catch (IOException e) {
-                    }
-                }
-            }
-        }
-    }
-
-   /**
      * Load the configuration.
      */
     private void loadConfiguration() {
@@ -211,9 +164,15 @@ public class WorldGuardWorldConfiguration {
         buyOnClaim = config.getBoolean("iconomy.buy-on-claim", false);
         buyOnClaimPrice = config.getDouble("iconomy.buy-on-claim-price", 1.0);
 
-        blockCreatureSpawn = "";
-        for (String creature : config.getStringList("mobs.block-creature-spawn", null)) {
-            blockCreatureSpawn += creature.toLowerCase() + " ";
+        blockCreatureSpawn = new HashSet<CreatureType>();
+        for (String creatureName : config.getStringList("mobs.block-creature-spawn", null)) {
+            CreatureType creature = CreatureType.fromName(creatureName);
+            
+            if (creature == null) {
+                logger.warning("WorldGuard: Unknown mob type '" + creatureName + "'");
+            } else {
+                blockCreatureSpawn.add(creature);
+            }
         }
 
         GlobalFlags globalFlags = new GlobalFlags();
@@ -227,8 +186,7 @@ public class WorldGuardWorldConfiguration {
         globalFlags.canLeverandbutton = config.getBoolean("regions.default.leverandbutton", true);
         globalFlags.canPlaceVehicle = config.getBoolean("regions.default.placevehicle", true);
         globalFlags.allowWaterflow = config.getBoolean("regions.default.waterflow", true);        
-        wp.getGlobalRegionManager().setGlobalFlags(worldName, globalFlags);
-
+        plugin.getGlobalRegionManager().setGlobalFlags(worldName, globalFlags);
 
         boolean useBlacklistAsWhitelist = config.getBoolean("blacklist.use-as-whitelist", false);
 
@@ -255,7 +213,7 @@ public class WorldGuardWorldConfiguration {
             }
 
             // First load the blacklist data from worldguard-blacklist.txt
-            Blacklist blist = new BukkitBlacklist(useBlacklistAsWhitelist, wp);
+            Blacklist blist = new BukkitBlacklist(useBlacklistAsWhitelist, plugin);
             blist.load(blacklistFile);
 
             // If the blacklist is empty, then set the field to null
@@ -291,35 +249,39 @@ public class WorldGuardWorldConfiguration {
 
         // Print an overview of settings
         if (config.getBoolean("summary-on-start", true)) {
-            logger.log(Level.INFO, "=== WorldGuard configuration for world " + worldName + " ===");
-            logger.log(Level.INFO, enforceOneSession ? "WorldGuard: Single session is enforced."
-                    : "WorldGuard: Single session is NOT ENFORCED.");
-            logger.log(Level.INFO, blockTNT ? "WorldGuard: TNT ignition is blocked."
-                    : "WorldGuard: TNT ignition is PERMITTED.");
-            logger.log(Level.INFO, blockLighter ? "WorldGuard: Lighters are blocked."
-                    : "WorldGuard: Lighters are PERMITTED.");
-            logger.log(Level.INFO, preventLavaFire ? "WorldGuard: Lava fire is blocked."
-                    : "WorldGuard: Lava fire is PERMITTED.");
+            logger.log(Level.INFO, enforceOneSession
+                    ? "WorldGuard: (" + worldName + ") Single session is enforced."
+                    : "WorldGuard: (" + worldName + ") Single session is NOT ENFORCED.");
+            logger.log(Level.INFO, blockTNT
+                    ? "WorldGuard: (" + worldName + ") TNT ignition is blocked."
+                    : "WorldGuard: (" + worldName + ") TNT ignition is PERMITTED.");
+            logger.log(Level.INFO, blockLighter
+                    ? "WorldGuard: (" + worldName + ") Lighters are blocked."
+                    : "WorldGuard: (" + worldName + ") Lighters are PERMITTED.");
+            logger.log(Level.INFO, preventLavaFire
+                    ? "WorldGuard: (" + worldName + ") Lava fire is blocked."
+                    : "WorldGuard: (" + worldName + ") Lava fire is PERMITTED.");
+            
             if (disableFireSpread) {
-                logger.log(Level.INFO, "WorldGuard: All fire spread is disabled.");
+                logger.log(Level.INFO, "WorldGuard: (" + worldName + ") All fire spread is disabled.");
             } else {
                 if (disableFireSpreadBlocks.size() > 0) {
-                    logger.log(Level.INFO, "WorldGuard: Fire spread is limited to "
+                    logger.log(Level.INFO, "WorldGuard: (" + worldName
+                            + ") Fire spread is limited to "
                             + disableFireSpreadBlocks.size() + " block types.");
                 } else {
-                    logger.log(Level.INFO, "WorldGuard: Fire spread is UNRESTRICTED.");
+                    logger.log(Level.INFO, "WorldGuard: (" + worldName
+                            + ") Fire spread is UNRESTRICTED.");
                 }
             }
         }
     }
-    
-    public Blacklist getBlacklist()
-    {
+
+    public Blacklist getBlacklist() {
         return this.blacklist;
     }
 
-    public String getWorldName()
-    {
+    public String getWorldName() {
         return this.worldName;
     }
 

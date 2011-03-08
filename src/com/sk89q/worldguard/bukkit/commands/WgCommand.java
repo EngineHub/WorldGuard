@@ -20,7 +20,8 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.command.CommandSender;
 
@@ -30,6 +31,8 @@ import org.bukkit.command.CommandSender;
  */
 public abstract class WgCommand {
 
-    public abstract boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException;
+    public abstract boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException;
 
 }

@@ -20,11 +20,13 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.RegionUtil;
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -36,20 +38,25 @@ import org.bukkit.entity.Player;
  */
 public class CommandRegionRemoveMember extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
 
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg,
+            WorldConfiguration wcfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
         boolean cmdIsOwner = command.equalsIgnoreCase("removeowner");
         String permOwn;
         String permAll;
 
         if (cmdIsOwner) {
             CommandHandler.checkArgs(args, 2, -1, "/region removeowner <id> [player1 [group1 [players/groups...]]]");
-            permOwn = "region.removeowner.own";
-            permAll = "region.removeowner.all";
+            permOwn = "worldguard.region.removeowner.own";
+            permAll = "worldguard.region.removeowner";
         } else {
             CommandHandler.checkArgs(args, 2, -1, "/region removemember <id> [player1 [group1 [players/groups...]]]");
-            permOwn = "region.removemember.own";
-            permAll = "region.removemember.all";
+            permOwn = "worldguard.region.removemember.own";
+            permAll = "worldguard.region.removemember";
         }
 
         RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
@@ -66,23 +73,23 @@ public class CommandRegionRemoveMember extends WgRegionCommand {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            if (existing.isOwner(BukkitPlayer.wrapPlayer(cfg, player))) {
-                cfg.checkRegionPermission(sender, permOwn);
+            if (existing.isOwner(BukkitPlayer.wrapPlayer(plugin, player))) {
+                plugin.checkPermission(sender, permOwn);
             }
             else {
-                cfg.checkRegionPermission(sender, permAll);
+                plugin.checkPermission(sender, permAll);
             }
         }
         else
         {
-           cfg.checkRegionPermission(sender, permAll);
+            plugin.checkPermission(sender, permAll);
         }
 
 
         if (cmdIsOwner) {
-            WorldGuardConfiguration.removeFromDomain(existing.getOwners(), args, 1);
+            RegionUtil.removeFromDomain(existing.getOwners(), args, 1);
         } else {
-            WorldGuardConfiguration.removeFromDomain(existing.getMembers(), args, 1);
+            RegionUtil.removeFromDomain(existing.getMembers(), args, 1);
         }
 
         try {

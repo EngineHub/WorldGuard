@@ -20,8 +20,9 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
@@ -34,9 +35,11 @@ import org.bukkit.entity.Player;
  */
 public class CommandAllowFire extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
-
-        cfg.checkPermission(sender, "allowfire");
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        plugin.checkPermission(sender, "worldguard.fire-toggle.allow");
 
         String worldName;
 
@@ -55,7 +58,7 @@ public class CommandAllowFire extends WgCommand {
             return true;
         }
 
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(worldName);
+        WorldConfiguration wcfg = cfg.getWorldConfig(worldName);
 
         if (wcfg.fireSpreadDisableToggle) {
             server.broadcastMessage(ChatColor.YELLOW

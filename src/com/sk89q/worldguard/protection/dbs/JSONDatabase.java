@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  * @author Redecouverte
  */
 public class JSONDatabase implements ProtectionDatabase {
-    private static Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+    protected static Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     /**
      * References the json db folder.
@@ -110,7 +110,9 @@ public class JSONDatabase implements ProtectionDatabase {
 
     /**
      * Writes a String to a file.
-     *
+     * 
+     * @param string 
+     * @param file 
      * @throws IOException
      */
     public static void writeStringToFile(String string, File file) throws IOException {
@@ -160,8 +162,6 @@ public class JSONDatabase implements ProtectionDatabase {
 
     /**
      * Get a list of protected regions.
-     *
-     * @return
      */
     public void setRegions(Map<String,ProtectedRegion> regions) {
         this.regions = regions;

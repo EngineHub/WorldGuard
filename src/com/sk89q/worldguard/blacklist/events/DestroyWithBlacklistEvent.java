@@ -32,6 +32,7 @@ public class DestroyWithBlacklistEvent extends BlacklistEvent {
      * 
      * @return
      */
+    @Override
     public String getDescription() {
         return "destroy with";
     }

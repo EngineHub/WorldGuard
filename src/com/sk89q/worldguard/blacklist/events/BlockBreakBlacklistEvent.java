@@ -32,6 +32,7 @@ public class BlockBreakBlacklistEvent extends BlockBlacklistEvent {
      * 
      * @return
      */
+    @Override
     public String getDescription() {
         return "break";
     }

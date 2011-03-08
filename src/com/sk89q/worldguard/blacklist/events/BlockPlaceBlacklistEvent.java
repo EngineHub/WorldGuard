@@ -32,6 +32,7 @@ public class BlockPlaceBlacklistEvent extends BlockBlacklistEvent {
      * 
      * @return
      */
+    @Override
     public String getDescription() {
         return "place";
     }

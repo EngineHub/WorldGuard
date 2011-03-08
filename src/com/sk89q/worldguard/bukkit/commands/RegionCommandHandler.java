@@ -18,8 +18,9 @@
  */
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,9 +71,11 @@ public class RegionCommandHandler extends WgCommand {
         this.aliasMap.put("rlist", "list");
         this.aliasMap.put("rp", "priority");
     }
-
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
-
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
         String worldName;
         String subCommand;
         int argsStartAt;
@@ -110,7 +113,7 @@ public class RegionCommandHandler extends WgCommand {
             return true;
         }
 
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(worldName);
+        WorldConfiguration wcfg = cfg.getWorldConfig(worldName);
 
         if (!wcfg.useRegions) {
             sender.sendMessage(ChatColor.RED + "Regions are disabled in this world.");
@@ -131,7 +134,7 @@ public class RegionCommandHandler extends WgCommand {
         }
 
         cfg.getWorldGuardPlugin().getGlobalRegionManager().reloadDataWhereRequired();
-        wgcmd.handle(sender, senderName, subCommand, subArgs, cfg, wcfg);
+        wgcmd.handle(sender, senderName, subCommand, subArgs, cfg, wcfg, plugin);
 
         return true;
     }

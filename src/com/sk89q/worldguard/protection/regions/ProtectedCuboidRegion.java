@@ -44,9 +44,8 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * Construct a new instance of this cuboid region.
      *
      * @param id
-     * @param pos1
-     * @param pos2
-     * @param priority
+     * @param min 
+     * @param max 
      */
     public ProtectedCuboidRegion(String id, BlockVector min, BlockVector max) {
         super(id);
@@ -59,6 +58,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      *
      * @return min point
      */
+    @Override
     public BlockVector getMinimumPoint() {
         return min;
     }
@@ -77,6 +77,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      *
      * @return max point
      */
+    @Override
     public BlockVector getMaximumPoint() {
         return max;
     }
@@ -129,6 +130,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     }
     */
 
+    @Override
     public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
         int numRegions = regions.size();
         List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
@@ -257,6 +259,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * 
      * @return type of region
      */
+    @Override
     public String getTypeName() {
         return "cuboid";
     }
@@ -266,6 +269,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * 
      * @return
      */
+    @Override
     public int countBlocks() {
         int xLength = max.getBlockX() - min.getBlockX() + 1;
         int yLength = max.getBlockY() - min.getBlockY() + 1;

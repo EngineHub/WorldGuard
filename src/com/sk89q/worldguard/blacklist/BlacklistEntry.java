@@ -107,7 +107,7 @@ public class BlacklistEntry {
     }
 
     /**
-     * @param action
+     * @param actions
      */
     public void setDestroyWithActions(String[] actions) {
         this.destroyWithActions = actions;
@@ -266,6 +266,7 @@ public class BlacklistEntry {
     /**
      * Method to handle the event.
      * 
+     * @param useAsWhitelist 
      * @param event
      * @param forceRepeat
      * @param silent

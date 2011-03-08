@@ -76,6 +76,8 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param dsn
      * @param user
      * @param pass
+     * @param table 
+     * @param worldName 
      */
     public DatabaseLoggerHandler(String dsn, String user, String pass, String table, String worldName) {
         this.dsn = dsn;
@@ -136,7 +138,6 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Log an event.
      *
-     * @param player
      * @param event
      */
     public void logEvent(BlacklistEvent event, String comment) {

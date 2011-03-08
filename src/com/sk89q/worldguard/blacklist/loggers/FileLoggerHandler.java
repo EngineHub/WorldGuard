@@ -71,6 +71,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * Construct the object.
      *
      * @param pathPattern
+     * @param worldName 
      */
     public FileLoggerHandler(String pathPattern, String worldName) {
         this.pathPattern = pathPattern;
@@ -82,6 +83,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      *
      * @param pathPattern
      * @param cacheSize
+     * @param worldName 
      */
     public FileLoggerHandler(String pathPattern, int cacheSize, String worldName) {
         if (cacheSize < 1) {
@@ -236,7 +238,6 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Log an event.
      *
-     * @param player
      * @param event
      */
     public void logEvent(BlacklistEvent event, String comment) {

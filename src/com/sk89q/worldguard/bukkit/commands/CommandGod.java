@@ -19,7 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,13 +33,16 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
  */
 public class CommandGod extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
 
         CommandHandler.checkArgs(args, 0, 1);
 
         // Allow setting other people invincible
         if (args.length > 0) {
-            cfg.checkPermission(sender, "god.other");
+            plugin.checkPermission(sender, "worldguard.god.other");
 
             Player other = matchSinglePlayer(cfg.getWorldGuardPlugin().getServer(), args[0]);
             if (other == null) {
@@ -56,7 +60,7 @@ public class CommandGod extends WgCommand {
             }
             // Invincibility for one's self
         } else if(sender instanceof Player) {
-            cfg.checkPermission(sender, "god.self");
+            plugin.checkPermission(sender, "worldguard.god");
             Player player = (Player)sender;
             if (!cfg.isInvinciblePlayer(player.getName())) {
                 cfg.addInvinciblePlayer(player.getName());

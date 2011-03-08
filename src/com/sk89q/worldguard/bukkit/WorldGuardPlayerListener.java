@@ -18,26 +18,27 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldguard.protection.regions.flags.Flags;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event;
-import org.bukkit.plugin.PluginManager;
-import com.sk89q.worldguard.protection.regions.flags.RegionFlag.RegionGroup;
-import com.nijiko.coelho.iConomy.iConomy;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
-import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
-import org.bukkit.entity.Item;
-import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
-import org.bukkit.*;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginManager;
+import com.nijiko.coelho.iConomy.iConomy;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
-
-import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.regions.flags.Flags;
+import com.sk89q.worldguard.protection.regions.flags.RegionFlag.RegionGroup;
 
 /**
  * Handles all events thrown in relation to a Player
@@ -61,7 +62,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
 
     public void registerEvents() {
-
         PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.PLAYER_ITEM, this, Priority.High, plugin);
@@ -83,19 +83,19 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerJoin(PlayerEvent event) {
         Player player = event.getPlayer();
 
-        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
 
         if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW
                     + "Fire spread is currently globally disabled.");
         }
 
-        if (cfg.inGroup(player, "wg-invincible")) {
+        if (plugin.inGroup(player, "wg-invincible")) {
             cfg.addInvinciblePlayer(player.getName());
         }
 
-        if (cfg.inGroup(player, "wg-amphibious")) {
+        if (plugin.inGroup(player, "wg-amphibious")) {
             cfg.addAmphibiousPlayer(player.getName());
         }
     }
@@ -109,13 +109,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerQuit(PlayerEvent event) {
         Player player = event.getPlayer();
 
-        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
 
         cfg.removeInvinciblePlayer(player.getName());
         cfg.removeAmphibiousPlayer(player.getName());
 
-        cfg.forgetPlayerAllBlacklists(BukkitPlayer.wrapPlayer(cfg, player));
+        cfg.forgetPlayer(BukkitPlayer.wrapPlayer(plugin, player));
     }
 
     /**
@@ -135,8 +134,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         ItemStack item = event.getItem();
         int itemId = item.getTypeId();
 
-        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
 
         if (wcfg.useRegions
                 && (itemId == 322 || itemId == 320 || itemId == 319 || itemId == 297 || itemId == 260
@@ -168,7 +167,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
         if (wcfg.getBlacklist() != null && item != null && block != null) {
             if (!wcfg.getBlacklist().check(
-                    new ItemUseBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, player),
+                    new ItemUseBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, player),
                     toVector(block.getRelative(event.getBlockFace())),
                     item.getTypeId()), false, false)) {
                 event.setCancelled(true);
@@ -196,8 +195,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
-        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
 
         if (wcfg.enforceOneSession) {
             String name = player.getName();
@@ -212,7 +211,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         if (!checkediConomy) {
             iConomy iconomy = (iConomy) plugin.getServer().getPluginManager().getPlugin("iConomy");
             if (iconomy != null) {
-                plugin.getWgConfiguration().setiConomy(iconomy);
+                plugin.getGlobalConfiguration().setiConomy(iconomy);
             }
 
             checkediConomy = true;
@@ -231,14 +230,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
             return;
         }
 
-        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getPlayer().getWorld().getName());
+        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.getWorldConfig(event.getPlayer().getWorld().getName());
 
         if (wcfg.getBlacklist() != null) {
             Item ci = event.getItemDrop();
 
             if (!wcfg.getBlacklist().check(
-                    new ItemDropBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
+                    new ItemDropBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -258,14 +257,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
             return;
         }
 
-        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getPlayer().getWorld().getName());
+        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.getWorldConfig(event.getPlayer().getWorld().getName());
 
         if (wcfg.getBlacklist() != null) {
             Item ci = event.getItem();
 
             if (!wcfg.getBlacklist().check(
-                    new ItemAcquireBlacklistEvent(BukkitPlayer.wrapPlayer(cfg, event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
+                    new ItemAcquireBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -277,8 +276,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Location location = player.getLocation();
 
-        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-
         ApplicableRegionSet regions = plugin.getGlobalRegionManager().getRegionManager(
                 player.getWorld().getName()).getApplicableRegions(
                 BukkitUtil.toVector(location));
@@ -288,7 +285,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         if (spawn != null) {
             RegionGroup spawnconfig = regions.getRegionGroupFlag(Flags.SPAWN_PERM, true).getValue();
             if (spawnconfig != null) {
-                BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(cfg, player);
+                BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(plugin, player);
                 if (spawnconfig == RegionGroup.OWNER) {
                     if (regions.isOwner(localPlayer)) {
                         event.setRespawnLocation(spawn);

@@ -100,15 +100,14 @@ public abstract class RegionManager {
     
     /**
      * Set a list of protected regions.
-     *
-     * @return
+     * 
+     * @param regions 
      */
     public abstract void setRegions(Map<String,ProtectedRegion> regions);
     
     /**
      * Adds a region.
      * 
-     * @param id
      * @param region
      */
     public abstract void addRegion(ProtectedRegion region);
@@ -125,6 +124,7 @@ public abstract class RegionManager {
      * Get a region by its ID.
      * 
      * @param id
+     * @return 
      */
     public abstract ProtectedRegion getRegion(String id);
     
@@ -146,8 +146,8 @@ public abstract class RegionManager {
 
     /**
      * Get an object for a point for rules to be applied with.
-     *
-     * @param pt
+     * 
+     * @param region 
      * @return
      */
     public abstract ApplicableRegionSet getApplicableRegions(ProtectedRegion region);
@@ -180,11 +180,10 @@ public abstract class RegionManager {
 
     /**
      * Sets the global flags.
-     *
-     * @return
+     * 
+     * @param globalflags 
      */
-    public void setGlobalFlags(GlobalFlags globalflags)
-    {
+    public void setGlobalFlags(GlobalFlags globalflags) {
         global = globalflags;
     }
 

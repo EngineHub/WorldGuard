@@ -47,18 +47,21 @@ public class LoggerToChatHandler extends Handler {
     /**
      * Close the handler.
      */
+    @Override
     public void close() {
     }
 
     /**
      * Flush the output.
      */
+    @Override
     public void flush() {
     }
 
     /**
      * Publish a log record.
      */
+    @Override
     public void publish(LogRecord record) {
         player.sendMessage(ChatColor.GRAY + record.getLevel().getName() + ": "
                 + ChatColor.WHITE + record.getMessage());

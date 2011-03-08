@@ -42,8 +42,7 @@ public class ApplicableRegionSet {
     /**
      * Construct the object.
      * 
-     * @param pt
-     * @param regions
+     * @param applicable
      * @param global
      */
     public ApplicableRegionSet(List<ProtectedRegion> applicable, GlobalFlags global) {
@@ -105,7 +104,7 @@ public class ApplicableRegionSet {
         return getStateFlag(info, true).getValue(defState) == State.ALLOW || this.isMember(player);
     }
 
-    private RegionFlag getFlag(RegionFlagInfo info, Boolean inherit) {
+    private RegionFlag getFlag(RegionFlagInfo<?> info, Boolean inherit) {
 
         ProtectedRegion region = affectedRegion;
 

@@ -72,7 +72,6 @@ public class JSONContainer {
         ret.putAll(this.pRegions);
 
         for (Map.Entry<String, ProtectedRegion> entry : ret.entrySet()) {
-            String id = entry.getKey();
             ProtectedRegion region = entry.getValue();
 
             String parentId = region.getParentId();

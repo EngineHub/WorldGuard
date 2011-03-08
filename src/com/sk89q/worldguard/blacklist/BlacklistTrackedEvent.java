@@ -32,7 +32,7 @@ public class BlacklistTrackedEvent {
     /**
      * Construct the object.
      * 
-     * @param id
+     * @param event 
      * @param time
      */
     public BlacklistTrackedEvent(BlacklistEvent event, long time) {

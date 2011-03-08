@@ -94,7 +94,7 @@ public class CommandHandler implements CommandExecutor {
 
             String senderName = sender instanceof Player ? ((Player)sender).getName() : "Console";
             
-            wgcmd.handle(sender, senderName, cmdName, args, wg.getWgConfiguration());
+            wgcmd.handle(sender, senderName, cmdName, args, wg.getGlobalConfiguration(), wg);
             return true;
 
         } catch (InsufficientArgumentsException e) {

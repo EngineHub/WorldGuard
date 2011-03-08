@@ -46,12 +46,14 @@ public interface ProtectionDatabase {
     /**
      * Load the list of regions into a region manager.
      * 
+     * @param manager 
      * @throws IOException
      */
     public void load(RegionManager manager) throws IOException;
     /**
      * Save the list of regions from a region manager.
      * 
+     * @param manager 
      * @throws IOException
      */
     public void save(RegionManager manager) throws IOException;

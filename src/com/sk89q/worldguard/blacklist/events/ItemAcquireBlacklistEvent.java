@@ -32,6 +32,7 @@ public class ItemAcquireBlacklistEvent extends ItemBlacklistEvent {
      * 
      * @return
      */
+    @Override
     public String getDescription() {
         return "acquire";
     }

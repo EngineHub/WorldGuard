@@ -18,56 +18,59 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import com.sk89q.bukkit.migration.PermissionsResolverManager;
+import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler;
+import com.sk89q.worldguard.bukkit.commands.CommandHandler.InsufficientPermissionsException;
 import com.sk89q.worldguard.protection.TimedFlagsTimer;
 import com.sk89q.worldguard.protection.regionmanager.GlobalRegionManager;
-import com.sk89q.worldguard.protection.regions.flags.Flags;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Logger;
 
 /**
  * Plugin for Bukkit.
  * 
- * @author sk89qs
+ * @author sk89q
  */
 public class WorldGuardPlugin extends JavaPlugin {
 
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-    
-    private final WorldGuardPlayerListener playerListener =
-            new WorldGuardPlayerListener(this);
-    private final WorldGuardBlockListener blockListener =
-            new WorldGuardBlockListener(this);
-    private final WorldGuardEntityListener entityListener =
-            new WorldGuardEntityListener(this);
-    private final WorldGuardVehicleListener vehicleListener =
-            new WorldGuardVehicleListener(this);
-    
-    private final CommandHandler commandHandler = new CommandHandler(this);
-    private final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this);
-    private final WorldGuardConfiguration configuration = new WorldGuardConfiguration(this);
+    protected static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
+    protected final CommandHandler commandHandler = new CommandHandler(this);
+    protected final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this);
+    protected final GlobalConfiguration configuration = new GlobalConfiguration(this);
+    protected PermissionsResolverManager perms;
 
     /**
      * Called on plugin enable.
      */
     public void onEnable() {
-
-        Flags.Init();
-
         getDataFolder().mkdirs();
         globalRegionManager.onEnable();
 
-        playerListener.registerEvents();
-        blockListener.registerEvents();
-        entityListener.registerEvents();
-        vehicleListener.registerEvents();
+        // Register events
+        (new WorldGuardPlayerListener(this)).registerEvents();
+        (new WorldGuardBlockListener(this)).registerEvents();
+        (new WorldGuardEntityListener(this)).registerEvents();
+        (new WorldGuardVehicleListener(this)).registerEvents();
 
         // 25 equals about 1s real time
-        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(
+                this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);
 
         commandHandler.registerCommands();
 
+        // Set up permissions
+        perms = new PermissionsResolverManager(
+                getConfiguration(), getServer(), "WorldGuard", logger);
+        (new PermissionsResolverServerListener(perms)).register(this);
+        
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }
 
@@ -75,10 +78,9 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Called on plugin disable.
      */
     public void onDisable() {
-
         globalRegionManager.onDisable();
 
-        logger.info("WorldGuard " + this.getDescription().getVersion() + " disabled.");
+        logger.info("WorldGuard " + getDescription().getVersion() + " disabled.");
     }
 
 
@@ -96,7 +98,123 @@ public class WorldGuardPlugin extends JavaPlugin {
      *
      * @return
      */
-    public WorldGuardConfiguration getWgConfiguration() {
+    public GlobalConfiguration getGlobalConfiguration() {
         return configuration;
+    }
+
+    /**
+     * Check whether a player is in a group.
+     * 
+     * @param player
+     * @param group
+     * @return
+     */
+    public boolean inGroup(Player player, String group) {
+        try {
+            return perms.inGroup(player.getName(), group);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Get the groups of a player.
+     * 
+     * @param player
+     * @return
+     */
+    public String[] getGroups(Player player) {
+        try {
+            return perms.getGroups(player.getName());
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return new String[0];
+        }
+    }
+
+    /**
+     * Checks whether a player has a permission.
+     * 
+     * @param player
+     * @param perm
+     * @return
+     */
+    public boolean hasPermission(Player player, String perm) {
+        try {
+            return player.isOp()
+                    || perms.hasPermission(player.getName(),
+                            "worldguard." + perm);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+    * Checks to see if there are sufficient permissions, otherwise an exception
+    * is raised in that case.
+    *
+    * @param sender
+    * @param permission
+    * @throws InsufficientPermissionsException
+    */
+    public void checkPermission(CommandSender sender, String permission)
+            throws InsufficientPermissionsException {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+        if (!hasPermission((Player)sender, permission)) {
+            throw new InsufficientPermissionsException();
+        }
+    }
+
+    /**
+     * Create a default configuration file from the .jar.
+     * 
+     * @param actual 
+     * @param defaultName 
+     */
+    public static void createDefaultConfiguration(File actual,
+            String defaultName) {
+
+        if (actual.exists()) {
+            return;
+        }
+
+        InputStream input = WorldGuardPlugin.class
+                .getResourceAsStream("/defaults/" + defaultName);
+        
+        if (input != null) {
+            FileOutputStream output = null;
+
+            try {
+                output = new FileOutputStream(actual);
+                byte[] buf = new byte[8192];
+                int length = 0;
+                while ((length = input.read(buf)) > 0) {
+                    output.write(buf, 0, length);
+                }
+
+                logger.info("WorldGuard: Default configuration file written: "
+                        + defaultName);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (input != null) {
+                        input.close();
+                    }
+                } catch (IOException e) {
+                }
+
+                try {
+                    if (output != null) {
+                        output.close();
+                    }
+                } catch (IOException e) {
+                }
+            }
+        }
     }
 }

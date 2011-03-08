@@ -139,7 +139,7 @@ public class TimedFlagsTimer implements Runnable {
             }
 
             //check passthrough flag
-            LocalPlayer lplayer = BukkitPlayer.wrapPlayer(wg.getWgConfiguration(), player);
+            LocalPlayer lplayer = BukkitPlayer.wrapPlayer(wg, player);
             if(!regions.isStateFlagAllowed(Flags.PASSTHROUGH, lplayer))
             {
                 Location newLoc = player.getLocation().clone();
@@ -153,7 +153,7 @@ public class TimedFlagsTimer implements Runnable {
 
     public void broadcastNotification(String msg) {
         for (Player player : wg.getServer().getOnlinePlayers()) {
-            if (wg.getWgConfiguration().hasPermission(player, "notify_onenter")) {
+            if (wg.hasPermission(player, "notify_onenter")) {
                 player.sendMessage(msg);
             }
         }

@@ -79,6 +79,9 @@ public abstract class Blacklist {
 
     /**
      * Get the entries for an item or list.
+     * 
+     * @param id 
+     * @return 
      */
     public List<BlacklistEntry> getEntries(int id) {
         return blacklist.get(id);
@@ -119,7 +122,6 @@ public abstract class Blacklist {
      * Load the blacklist.
      *
      * @param file
-     * @return
      * @throws IOException
      */
     public void load(File file) throws IOException {
@@ -242,6 +244,7 @@ public abstract class Blacklist {
      * Notify administrators.
      * 
      * @param event
+     * @param comment 
      */
     public void notify(BlacklistEvent event, String comment) {
         lastEvent = event;
@@ -272,8 +275,6 @@ public abstract class Blacklist {
 
     /**
      * Forget all players.
-     *
-     * @param player
      */
     public void forgetAllPlayers() {
         lastAffected.clear();

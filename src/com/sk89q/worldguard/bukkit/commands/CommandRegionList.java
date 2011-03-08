@@ -19,8 +19,9 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -35,9 +36,13 @@ import org.bukkit.command.CommandSender;
  */
 public class CommandRegionList extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
-
-        cfg.checkRegionPermission(sender, "region.list");
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg,
+            WorldConfiguration wcfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
+        plugin.checkPermission(sender, "worldguard.region.list");
         CommandHandler.checkArgs(args, 0, 1, "/region list [page]");
 
         int page = 0;

@@ -74,8 +74,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-            WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+            GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+            WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
 
             if (cfg.isInvinciblePlayer(player.getName())) {
                 event.setCancelled(true);
@@ -102,8 +102,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-            WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+            GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+            WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
 
             if (cfg.isInvinciblePlayer(player.getName())) {
                 event.setCancelled(true);
@@ -158,8 +158,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-            WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+            GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+            WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
 
             if (cfg.isInvinciblePlayer(player.getName())) {
                 event.setCancelled(true);
@@ -217,8 +217,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-            WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+            GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+            WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
 
             if (cfg.isInvinciblePlayer(player.getName())) {
                 event.setCancelled(true);
@@ -267,9 +267,9 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
+        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
         Location l = event.getLocation();
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(l.getWorld().getName());
+        WorldConfiguration wcfg = cfg.getWorldConfig(l.getWorld().getName());
 
         if (event.getEntity() instanceof LivingEntity) {
 
@@ -317,94 +317,27 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        WorldGuardConfiguration cfg = plugin.getWgConfiguration();
-        WorldGuardWorldConfiguration wcfg = cfg.getWorldConfig(event.getEntity().getWorld().getName());
+        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.getWorldConfig(event.getEntity().getWorld().getName());
 
+<<<<<<< HEAD
         //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
         CreatureType creaType = event.getCreatureType();
         String creaName = "";
+=======
+        CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
+>>>>>>> ebdb727... Some initial code reorganization. Todo: Have CSVDatabase handle flags so they can be ported over, and do the commands system a cleaner way.
         Boolean cancelEvent = false;
 
-        switch (creaType) {
-            case SPIDER:
-                if (wcfg.blockCreatureSpawn.contains("spider")) {
-                    cancelEvent = true;
-                }
-                creaName = "spider";
-                break;
-            case ZOMBIE:
-                if (wcfg.blockCreatureSpawn.contains("zombie")) {
-                    cancelEvent = true;
-                }
-                creaName = "zombie";
-                break;
-            case CREEPER:
-                if (wcfg.blockCreatureSpawn.contains("creeper")) {
-                    cancelEvent = true;
-                }
-                creaName = "creeper";
-                break;
-            case SKELETON:
-                if (wcfg.blockCreatureSpawn.contains("skeleton")) {
-                    cancelEvent = true;
-                }
-                creaName = "skeleton";
-                break;
-            case SQUID:
-                if (wcfg.blockCreatureSpawn.contains("squid")) {
-                    cancelEvent = true;
-                }
-                creaName = "squid";
-                break;
-            case PIG_ZOMBIE:
-                if (wcfg.blockCreatureSpawn.contains("pigzombie")) {
-                    cancelEvent = true;
-                }
-                creaName = "pigzombie";
-                break;
-            case GHAST:
-                if (wcfg.blockCreatureSpawn.contains("ghast")) {
-                    cancelEvent = true;
-                }
-                creaName = "ghast";
-                break;
-            case SLIME:
-                if (wcfg.blockCreatureSpawn.contains("slime")) {
-                    cancelEvent = true;
-                }
-                creaName = "slime";
-                break;
-            case PIG:
-                if (wcfg.blockCreatureSpawn.contains("pig")) {
-                    cancelEvent = true;
-                }
-                creaName = "pig";
-                break;
-            case COW:
-                if (wcfg.blockCreatureSpawn.contains("cow")) {
-                    cancelEvent = true;
-                }
-                creaName = "cow";
-                break;
-            case SHEEP:
-                if (wcfg.blockCreatureSpawn.contains("sheep")) {
-                    cancelEvent = true;
-                }
-                creaName = "sheep";
-                break;
-            case CHICKEN:
-                if (wcfg.blockCreatureSpawn.contains("chicken")) {
-                    cancelEvent = true;
-                }
-                creaName = "chicken";
-                break;
+        if (wcfg.blockCreatureSpawn.contains(creaType)) {
+            cancelEvent = true;
         }
 
-        if (wcfg.useRegions && !creaName.equals("")) {
+        if (wcfg.useRegions) {
             Vector pt = toVector(event.getEntity().getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(event.getEntity().getWorld().getName());
 
-            Boolean flagValue = mgr.getApplicableRegions(pt).getStringFlag(Flags.DENY_SPAWN, true).getValue("").contains(creaName);
+            Boolean flagValue = mgr.getApplicableRegions(pt).getStringFlag(Flags.DENY_SPAWN, true).getValue("").contains(creaType.getName());
             if (flagValue != null) {
                 if (flagValue) {
                     cancelEvent = true;

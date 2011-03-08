@@ -30,7 +30,6 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalFlags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
-import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.dbs.ProtectionDatabase;
 import java.io.IOException;
 import java.util.Iterator;
@@ -53,6 +52,10 @@ public class PRTreeRegionManager extends RegionManager {
 
     /**
      * Construct the manager.
+     * 
+     * @param global 
+     * @param regionloader 
+     * @throws IOException 
      */
     public PRTreeRegionManager(GlobalFlags global, ProtectionDatabase regionloader) throws IOException {
         super(global, regionloader);
@@ -66,15 +69,15 @@ public class PRTreeRegionManager extends RegionManager {
      *
      * @return
      */
+    @Override
     public Map<String, ProtectedRegion> getRegions() {
         return regions;
     }
 
     /**
      * Set a list of protected regions.
-     *
-     * @return
      */
+    @Override
     public void setRegions(Map<String, ProtectedRegion> regions) {
         this.regions = new TreeMap<String, ProtectedRegion>(regions);
         tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
@@ -84,9 +87,9 @@ public class PRTreeRegionManager extends RegionManager {
     /**
      * Adds a region.
      * 
-     * @param id
      * @param region
      */
+    @Override
     public void addRegion(ProtectedRegion region) {
         regions.put(region.getId(), region);
         tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
@@ -99,6 +102,7 @@ public class PRTreeRegionManager extends RegionManager {
      * @param id
      * @return
      */
+    @Override
     public boolean hasRegion(String id) {
         return regions.containsKey(id);
     }
@@ -108,6 +112,7 @@ public class PRTreeRegionManager extends RegionManager {
      * 
      * @param id
      */
+    @Override
     public ProtectedRegion getRegion(String id) {
         return regions.get(id);
     }
@@ -117,6 +122,7 @@ public class PRTreeRegionManager extends RegionManager {
      * 
      * @param id
      */
+    @Override
     public void removeRegion(String id) {
         ProtectedRegion region = regions.get(id);
 
@@ -148,6 +154,7 @@ public class PRTreeRegionManager extends RegionManager {
      * @param pt
      * @return
      */
+    @Override
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
 
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
@@ -164,6 +171,7 @@ public class PRTreeRegionManager extends RegionManager {
         return new ApplicableRegionSet(appRegions, global);
     }
 
+    @Override
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
         appRegions.addAll(regions.values());
@@ -184,6 +192,7 @@ public class PRTreeRegionManager extends RegionManager {
      * @param pt
      * @return
      */
+    @Override
     public List<String> getApplicableRegionsIDs(Vector pt) {
         List<String> applicable = new ArrayList<String>();
 
@@ -203,10 +212,10 @@ public class PRTreeRegionManager extends RegionManager {
      * Returns true if the provided region overlaps with any other region that
      * is not owned by the player.
      * 
-     * @param region
      * @param player
      * @return
      */
+    @Override
     public boolean overlapsUnownedRegion(ProtectedRegion checkRegion, LocalPlayer player) {
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
 
@@ -233,6 +242,7 @@ public class PRTreeRegionManager extends RegionManager {
      * 
      * @return
      */
+    @Override
     public int size() {
         return regions.size();
     }
@@ -242,10 +252,12 @@ public class PRTreeRegionManager extends RegionManager {
      *
      * @throws IOException
      */
+    @Override
     public void save() throws IOException {
         regionloader.save(this);
     }
 
+    @Override
     public int getRegionCountOfPlayer(LocalPlayer player) {
         int count = 0;
 

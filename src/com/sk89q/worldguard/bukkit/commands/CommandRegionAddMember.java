@@ -19,11 +19,13 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.RegionUtil;
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -35,8 +37,12 @@ import org.bukkit.entity.Player;
  */
 public class CommandRegionAddMember extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
-
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg,
+            WorldConfiguration wcfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
 
         boolean cmdIsOwner = command.equalsIgnoreCase("addowner");
 
@@ -45,12 +51,12 @@ public class CommandRegionAddMember extends WgRegionCommand {
 
         if (cmdIsOwner) {
             CommandHandler.checkArgs(args, 2, -1, "/region addowner <id> [player1 [group1 [players/groups...]]]");
-            permOwn = "region.addowner.own";
-            permAll = "region.addowner.all";
+            permOwn = "worldguard.region.addowner.own";
+            permAll = "worldguard.region.addowner";
         } else {
             CommandHandler.checkArgs(args, 2, -1, "/region addmember <id> [player1 [group1 [players/groups...]]]");
-            permOwn = "region.addmember.own";
-            permAll = "region.addmember.all";
+            permOwn = "worldguard.region.addmember.own";
+            permAll = "worldguard.region.addmember";
         }
 
         RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
@@ -67,22 +73,22 @@ public class CommandRegionAddMember extends WgRegionCommand {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            if (existing.isOwner(BukkitPlayer.wrapPlayer(cfg, player))) {
-                cfg.checkRegionPermission(sender, permOwn);
+            if (existing.isOwner(BukkitPlayer.wrapPlayer(plugin, player))) {
+                plugin.checkPermission(sender, permOwn);
             }
             else {
-                cfg.checkRegionPermission(sender, permAll);
+                plugin.checkPermission(sender, permAll);
             }
         }
         else
         {
-           cfg.checkRegionPermission(sender, permAll);
+            plugin.checkPermission(sender, permAll);
         }
 
         if (cmdIsOwner) {
-            WorldGuardConfiguration.addToDomain(existing.getOwners(), args, 1);
+            RegionUtil.addToDomain(existing.getOwners(), args, 1);
         } else {
-            WorldGuardConfiguration.addToDomain(existing.getMembers(), args, 1);
+            RegionUtil.addToDomain(existing.getMembers(), args, 1);
         }
 
         try {

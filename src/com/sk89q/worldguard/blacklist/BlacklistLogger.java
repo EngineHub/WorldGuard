@@ -55,8 +55,6 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
 
     /**
      * Add a handler.
-     *
-     * @param handler
      */
     public void clearHandlers() {
         handlers.clear();
@@ -65,7 +63,6 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
     /**
      * Log an event.
      *
-     * @param player
      * @param event
      */
     public void logEvent(BlacklistEvent event, String comment) {

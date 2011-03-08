@@ -30,9 +30,10 @@ public class BukkitBlacklist extends Blacklist {
         this.plugin = plugin;
     }
     
+    @Override
     public void broadcastNotification(String msg) {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            if (plugin.getWgConfiguration().hasPermission(player, "notify")) {
+            if (plugin.hasPermission(player, "notify")) {
                 player.sendMessage(msg);
             }
         }

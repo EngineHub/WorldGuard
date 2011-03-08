@@ -45,7 +45,6 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Log an event.
      *
-     * @param player
      * @param event
      */
     public void logEvent(BlacklistEvent event, String comment) {

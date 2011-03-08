@@ -19,8 +19,9 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -34,9 +35,12 @@ import org.bukkit.entity.Player;
  * @author Michael
  */
 public class CommandRegionDelete extends WgRegionCommand {
-
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
-
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg,
+            WorldConfiguration wcfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
         CommandHandler.checkArgs(args, 0, 1, "/region delete <id>");
 
         try {
@@ -54,13 +58,13 @@ public class CommandRegionDelete extends WgRegionCommand {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
 
-                if (existing.isOwner(BukkitPlayer.wrapPlayer(cfg, player))) {
-                    cfg.checkRegionPermission(sender, "region.delete.own");
+                if (existing.isOwner(BukkitPlayer.wrapPlayer(plugin, player))) {
+                    plugin.checkPermission(sender, "worldguard.region.delete.own");
                 } else {
-                    cfg.checkRegionPermission(sender, "region.delete.all");
+                    plugin.checkPermission(sender, "worldguard.region.delete");
                 }
             } else {
-                cfg.checkRegionPermission(sender, "region.delete.all");
+                plugin.checkPermission(sender, "worldguard.region.delete");
             }
 
             mgr.removeRegion(id);

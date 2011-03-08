@@ -136,8 +136,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         return inside;
     }
 
-
-
+    @Override
     public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
         int numRegions = regions.size();
         int numPoints = points.size();
@@ -269,6 +268,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * 
      * @return
      */
+    @Override
     public int countBlocks() {
         int volume = 0;
         int numPoints = points.size();

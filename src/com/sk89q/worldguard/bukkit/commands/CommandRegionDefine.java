@@ -26,13 +26,15 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.RegionUtil;
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -46,8 +48,12 @@ import org.bukkit.plugin.Plugin;
  */
 public class CommandRegionDefine extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
-
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg,
+            WorldConfiguration wcfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may use this command");
             return true;
@@ -59,7 +65,7 @@ public class CommandRegionDefine extends WgRegionCommand {
             sender.sendMessage(ChatColor.RED + "WorldEdit must be installed and enabled!");
             return true;
         }
-        cfg.checkRegionPermission(sender, "region.define");
+        plugin.checkPermission(sender, "worldguard.region.define");
         CommandHandler.checkArgs(args, 1, -1, "/region define <id> [owner1 [owner2 [owners...]]]");
 
         try {
@@ -85,7 +91,7 @@ public class CommandRegionDefine extends WgRegionCommand {
             }
 
             if (args.length >= 2) {
-                region.setOwners(WorldGuardConfiguration.parseDomainString(args, 1));
+                region.setOwners(RegionUtil.parseDomainString(args, 1));
             }
             RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(w.getName());
             mgr.addRegion(region);

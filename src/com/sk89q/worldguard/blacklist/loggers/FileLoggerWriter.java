@@ -42,6 +42,7 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
     /**
      * Construct the object.
      * 
+     * @param path 
      * @param writer
      */
     public FileLoggerWriter(String path, BufferedWriter writer) {
@@ -75,8 +76,6 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
     
     /**
      * Update last use time.
-     * 
-     * @return
      */
     public void updateLastUse() {
         lastUse = System.currentTimeMillis();

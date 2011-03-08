@@ -19,7 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,13 +33,16 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
  */
 public class CommandHeal extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
-
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
         CommandHandler.checkArgs(args, 0, 1);
 
         // Allow healing other people
         if (args.length > 0) {
-            cfg.checkPermission(sender, "heal.other");
+            plugin.checkPermission(sender, "worldguard.heal.other");
 
             Player other = matchSinglePlayer(cfg.getWorldGuardPlugin().getServer(), args[0]);
             if (other == null) {
@@ -49,7 +53,7 @@ public class CommandHeal extends WgCommand {
                 other.sendMessage(ChatColor.YELLOW + senderName + " has healed you!");
             }
         } else if (sender instanceof Player){
-            cfg.checkPermission(sender, "heal.self");
+            plugin.checkPermission(sender, "worldguard.heal");
             Player player = (Player)sender;
             player.setHealth(20);
             player.sendMessage(ChatColor.YELLOW + "You have been healed!");

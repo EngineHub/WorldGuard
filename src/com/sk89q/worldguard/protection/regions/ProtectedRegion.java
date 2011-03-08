@@ -143,7 +143,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * Set the curParent. This checks to make sure that it will not result
      * in circular inheritance.
      * 
-     * @param curParent the curParent to setFlag
+     * @param parent the curParent to setFlag
      * @throws CircularInheritanceException 
      */
     public void setParent(ProtectedRegion parent) throws CircularInheritanceException {
@@ -192,7 +192,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
-     * @param owners the owners to setFlag
+     * @param members the members to setFlag
      */
     public void setMembers(DefaultDomain members) {
         this.members = members;

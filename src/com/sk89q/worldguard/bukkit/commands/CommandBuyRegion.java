@@ -24,7 +24,8 @@ import org.bukkit.entity.Player;
 
 import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.coelho.iConomy.system.*;
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
@@ -38,8 +39,12 @@ import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
  */
 public class CommandBuyRegion extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
 
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may use this command");
             return true;
@@ -53,7 +58,7 @@ public class CommandBuyRegion extends WgCommand {
 
         CommandHandler.checkArgs(args, 1, 2);
 
-        cfg.checkRegionPermission(player, "buyregion");
+        plugin.checkPermission(player, "worldguard.regions.buy");
 
         String id = args[0];
 

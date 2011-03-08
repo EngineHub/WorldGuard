@@ -19,7 +19,8 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.bukkit.LoggerToChatHandler;
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,9 +33,12 @@ import org.bukkit.entity.Player;
  */
 public class CommandReloadWG extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
-
-        cfg.checkPermission(sender, "reloadwg");
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
+        plugin.checkPermission(sender, "worldguard.reload");
         CommandHandler.checkArgs(args, 0, 0);
 
         LoggerToChatHandler handler = null;
@@ -48,8 +52,8 @@ public class CommandReloadWG extends WgCommand {
         }
 
         try {
-            cfg.onDisable();
-            cfg.onEnable();
+            cfg.unload();
+            cfg.load();
 
             sender.sendMessage("WorldGuard configuration reloaded.");
         } catch (Throwable t) {

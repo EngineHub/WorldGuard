@@ -19,8 +19,9 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
@@ -38,8 +39,12 @@ import org.bukkit.entity.Player;
  */
 public class CommandRegionInfo extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
-
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg,
+            WorldConfiguration wcfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
         CommandHandler.checkArgs(args, 1, 1, "/region info <id>");
 
         RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
@@ -55,15 +60,15 @@ public class CommandRegionInfo extends WgRegionCommand {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            if (region.isOwner(BukkitPlayer.wrapPlayer(cfg, player))) {
-                cfg.checkRegionPermission(sender, "region.info.ownregions");
-            } else if (region.isMember(BukkitPlayer.wrapPlayer(cfg, player))) {
-                cfg.checkRegionPermission(sender, "region.info.memberregions");
+            if (region.isOwner(BukkitPlayer.wrapPlayer(plugin, player))) {
+                plugin.checkPermission(sender, "worldguard.region.info.own");
+            } else if (region.isMember(BukkitPlayer.wrapPlayer(plugin, player))) {
+                plugin.checkPermission(sender, "worldguard.region.info.member");
             } else {
-                cfg.checkRegionPermission(sender, "region.info.foreignregions");
+                plugin.checkPermission(sender, "worldguard.region.info");
             }
         } else {
-            cfg.checkRegionPermission(sender, "region.info.foreignregions");
+            plugin.checkPermission(sender, "worldguard.region.info");
         }
 
         RegionFlagContainer flags = region.getFlags();

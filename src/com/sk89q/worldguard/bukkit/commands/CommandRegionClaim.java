@@ -26,8 +26,9 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardWorldConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -50,8 +51,12 @@ import org.bukkit.plugin.Plugin;
  */
 public class CommandRegionClaim extends WgRegionCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg, WorldGuardWorldConfiguration wcfg) throws CommandHandlingException {
-
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg,
+            WorldConfiguration wcfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may use this command");
             return true;
@@ -64,14 +69,14 @@ public class CommandRegionClaim extends WgRegionCommand {
             return true;
         }
 
-        cfg.checkRegionPermission(player, "region.claim");
+        plugin.checkPermission(player, "worldguard.region.claim");
         CommandHandler.checkArgs(args, 1, 1, "/region claim <id>");
 
         try {
             String id = args[0].toLowerCase();
             RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
 
-            LocalPlayer lPlayer = BukkitPlayer.wrapPlayer(cfg, player);
+            LocalPlayer lPlayer = BukkitPlayer.wrapPlayer(plugin, player);
 
             if (mgr.getRegionCountOfPlayer(lPlayer) >= wcfg.maxRegionCountPerPlayer) {
                 player.sendMessage(ChatColor.RED + "You own too much regions, delete one first to claim a new one.");

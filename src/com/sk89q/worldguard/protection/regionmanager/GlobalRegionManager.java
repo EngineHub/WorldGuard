@@ -24,9 +24,7 @@ import com.sk89q.worldguard.protection.dbs.JSONDatabase;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 import org.bukkit.World;
 
@@ -57,11 +55,11 @@ public class GlobalRegionManager {
             loadWorld(w.getName());
         }
 
-        wg.getWgConfiguration().onEnable();
+        wg.getGlobalConfiguration().load();
     }
 
     public void onDisable() {
-        wg.getWgConfiguration().onDisable();
+        wg.getGlobalConfiguration().unload();
     }
 
     private void loadWorld(String name) {

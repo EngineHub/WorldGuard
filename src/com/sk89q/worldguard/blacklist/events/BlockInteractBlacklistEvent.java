@@ -32,6 +32,7 @@ public class BlockInteractBlacklistEvent extends BlockBlacklistEvent {
      * 
      * @return
      */
+    @Override
     public String getDescription() {
         return "interact with";
     }

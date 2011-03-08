@@ -5,7 +5,8 @@ package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
-import com.sk89q.worldguard.bukkit.WorldGuardConfiguration;
+import com.sk89q.worldguard.bukkit.GlobalConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -23,21 +24,25 @@ import com.sk89q.worldguard.protection.regions.flags.RegionFlag.RegionGroup;
  */
 public class CommandTpRegion extends WgCommand {
 
-    public boolean handle(CommandSender sender, String senderName, String command, String[] args, WorldGuardConfiguration cfg) throws CommandHandlingException {
+    @Override
+    public boolean handle(CommandSender sender, String senderName,
+            String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
+            throws CommandHandlingException {
+        
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players may use this command");
             return true;
         }
 
         Player player = (Player) sender;
-        cfg.checkPermission(sender, "tpregion");
+        plugin.checkPermission(sender, "worldguard.region.teleport");
 
         CommandHandler.checkArgs(args, 1, 2, "/tpregion <region name> {spawn}");
 
         String id = args[0];
         Boolean spawn = false;
         if (args.length == 2 && args[1].equals("spawn")) {
-            cfg.checkPermission(player, "tpregion.spawn");
+            plugin.checkPermission(sender, "worldguard.region.teleport.spawn");
             spawn = true;
         }
         RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
@@ -51,14 +56,14 @@ public class CommandTpRegion extends WgCommand {
                 flagright = region.getFlags().getRegionGroupFlag(Flags.TELE_PERM).getValue(RegionGroup.ALL);
             }
 
-            LocalPlayer lPlayer = BukkitPlayer.wrapPlayer(cfg, player);
+            LocalPlayer lPlayer = BukkitPlayer.wrapPlayer(plugin, player);
             if (flagright == RegionGroup.OWNER) {
                 if (!region.isOwner(lPlayer)) {
-                    cfg.checkPermission(player, "tpregion.override");
+                    plugin.checkPermission(sender, "worldguard.region.teleport.override");
                 }
             } else if (flagright == RegionGroup.MEMBER) {
                 if (!region.isMember(lPlayer)) {
-                    cfg.checkPermission(player, "tpregion.override");
+                    plugin.checkPermission(sender, "worldguard.region.teleport.override");
                 }
             }
 
