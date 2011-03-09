@@ -27,6 +27,7 @@ import com.sk89q.worldguard.bukkit.commands.CommandHandler;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.InsufficientPermissionsException;
 import com.sk89q.worldguard.protection.TimedFlagsTimer;
 import com.sk89q.worldguard.protection.regionmanager.GlobalRegionManager;
+import com.sk89q.worldguard.protection.regions.flags.Flags;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,6 +53,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public void onEnable() {
         getDataFolder().mkdirs();
+        Flags.Init();
         globalRegionManager.onEnable();
 
         // Register events

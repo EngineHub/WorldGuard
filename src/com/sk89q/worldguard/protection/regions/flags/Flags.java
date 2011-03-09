@@ -75,4 +75,10 @@ public class Flags {
     public static RegionGroupRegionFlagInfo TELE_PERM = new RegionGroupRegionFlagInfo("teleperm", FlagType.TELE_PERM);
     public static RegionGroupRegionFlagInfo SPAWN_PERM = new RegionGroupRegionFlagInfo("spawnperm", FlagType.SPAWN_PERM);
 
+    
+    private static int initCount = 0;
+
+    static public void Init() {
+        initCount++;
+    }
 }
