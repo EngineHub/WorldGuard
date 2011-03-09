@@ -44,7 +44,7 @@ public class CommandStack extends WgCommand {
             return true;
         }
         Player player = (Player) sender;
-        plugin.checkPermission(sender, "worldguard.stack");
+        plugin.checkPermission(sender, "stack");
         CommandHandler.checkArgs(args, 0, 0);
 
         ItemStack[] items = player.getInventory().getContents();

@@ -61,12 +61,12 @@ public class CommandRegionPriority extends WgRegionCommand {
                 Player player = (Player) sender;
 
                 if (existing.isOwner(BukkitPlayer.wrapPlayer(plugin, player))) {
-                    plugin.checkPermission(sender, "worldguard.region.priority.own");
+                    plugin.checkPermission(sender, "region.priority.own");
                 } else {
-                    plugin.checkPermission(sender, "worldguard.region.priority");
+                    plugin.checkPermission(sender, "region.priority");
                 }
             } else {
-                plugin.checkPermission(sender, "worldguard.region.priority");
+                plugin.checkPermission(sender, "region.priority");
             }
 
             if (args.length > 1) {

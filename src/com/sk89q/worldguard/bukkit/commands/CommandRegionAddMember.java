@@ -51,12 +51,12 @@ public class CommandRegionAddMember extends WgRegionCommand {
 
         if (cmdIsOwner) {
             CommandHandler.checkArgs(args, 2, -1, "/region addowner <id> [player1 [group1 [players/groups...]]]");
-            permOwn = "worldguard.region.addowner.own";
-            permAll = "worldguard.region.addowner";
+            permOwn = "region.addowner.own";
+            permAll = "region.addowner";
         } else {
             CommandHandler.checkArgs(args, 2, -1, "/region addmember <id> [player1 [group1 [players/groups...]]]");
-            permOwn = "worldguard.region.addmember.own";
-            permAll = "worldguard.region.addmember";
+            permOwn = "region.addmember.own";
+            permAll = "region.addmember";
         }
 
         RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());

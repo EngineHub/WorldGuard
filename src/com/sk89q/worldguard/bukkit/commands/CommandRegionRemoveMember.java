@@ -51,12 +51,12 @@ public class CommandRegionRemoveMember extends WgRegionCommand {
 
         if (cmdIsOwner) {
             CommandHandler.checkArgs(args, 2, -1, "/region removeowner <id> [player1 [group1 [players/groups...]]]");
-            permOwn = "worldguard.region.removeowner.own";
-            permAll = "worldguard.region.removeowner";
+            permOwn = "region.removeowner.own";
+            permAll = "region.removeowner";
         } else {
             CommandHandler.checkArgs(args, 2, -1, "/region removemember <id> [player1 [group1 [players/groups...]]]");
-            permOwn = "worldguard.region.removemember.own";
-            permAll = "worldguard.region.removemember";
+            permOwn = "region.removemember.own";
+            permAll = "region.removemember";
         }
 
         RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());

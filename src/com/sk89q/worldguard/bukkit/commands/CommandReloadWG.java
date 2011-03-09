@@ -38,7 +38,7 @@ public class CommandReloadWG extends WgCommand {
             String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
             throws CommandHandlingException {
         
-        plugin.checkPermission(sender, "worldguard.reload");
+        plugin.checkPermission(sender, "reload");
         CommandHandler.checkArgs(args, 0, 0);
 
         LoggerToChatHandler handler = null;

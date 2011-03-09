@@ -42,7 +42,7 @@ public class CommandSlay extends WgCommand {
 
         // Allow killing other people
         if (args.length > 0) {
-            plugin.checkPermission(sender, "worldguard.slay.other");
+            plugin.checkPermission(sender, "slay.other");
 
             Player other = BukkitUtil.matchSinglePlayer(cfg.getWorldGuardPlugin().getServer(), args[0]);
             if (other == null) {
@@ -53,7 +53,7 @@ public class CommandSlay extends WgCommand {
                 other.sendMessage(ChatColor.YELLOW + senderName + " has killed you!");
             }
         } else if (sender instanceof Player) {
-            plugin.checkPermission(sender, "worldguard.slay");
+            plugin.checkPermission(sender, "slay");
             
             Player player = (Player)sender;
             player.setHealth(0);

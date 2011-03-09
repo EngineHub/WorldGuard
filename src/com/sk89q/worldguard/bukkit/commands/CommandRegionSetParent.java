@@ -61,12 +61,12 @@ public class CommandRegionSetParent extends WgRegionCommand {
             Player player = (Player) sender;
 
             if (region.isOwner(BukkitPlayer.wrapPlayer(plugin, player))) {
-                plugin.checkPermission(sender, "worldguard.region.setparent.own");
+                plugin.checkPermission(sender, "region.setparent.own");
             } else {
-                plugin.checkPermission(sender, "worldguard.region.setparent");
+                plugin.checkPermission(sender, "region.setparent");
             }
         } else {
-            plugin.checkPermission(sender, "worldguard.region.setparent");
+            plugin.checkPermission(sender, "region.setparent");
         }
 
         ProtectedRegion parent = null;
@@ -84,12 +84,12 @@ public class CommandRegionSetParent extends WgRegionCommand {
                 Player player = (Player) sender;
 
                 if (parent.isOwner(BukkitPlayer.wrapPlayer(plugin, player))) {
-                    plugin.checkPermission(sender, "worldguard.region.setparent.own");
+                    plugin.checkPermission(sender, "region.setparent.own");
                 } else {
-                    plugin.checkPermission(sender, "worldguard.region.setparent");
+                    plugin.checkPermission(sender, "region.setparent");
                 }
             } else {
-                plugin.checkPermission(sender, "worldguard.region.setparent");
+                plugin.checkPermission(sender, "region.setparent");
             }
         }
 

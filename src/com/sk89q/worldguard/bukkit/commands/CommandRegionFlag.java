@@ -76,14 +76,14 @@ public class CommandRegionFlag extends WgRegionCommand {
                 Player player = (Player) sender;
 
                 if (region.isOwner(BukkitPlayer.wrapPlayer(plugin, player))) {
-                    plugin.checkPermission(sender, "worldguard.region.flag.own");
+                    plugin.checkPermission(sender, "region.flag.own");
                 } else if (region.isMember(BukkitPlayer.wrapPlayer(plugin, player))) {
-                    plugin.checkPermission(sender, "worldguard.region.flag.member");
+                    plugin.checkPermission(sender, "region.flag.member");
                 } else {
-                    plugin.checkPermission(sender, "worldguard.region.flag");
+                    plugin.checkPermission(sender, "region.flag");
                 }
             } else {
-                plugin.checkPermission(sender, "worldguard.region.flag");
+                plugin.checkPermission(sender, "region.flag");
             }
 
             RegionFlagInfo nfo = FlagDatabase.getFlagInfoFromName(nameStr);

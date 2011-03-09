@@ -65,7 +65,7 @@ public class CommandRegionDefine extends WgRegionCommand {
             sender.sendMessage(ChatColor.RED + "WorldEdit must be installed and enabled!");
             return true;
         }
-        plugin.checkPermission(sender, "worldguard.region.define");
+        plugin.checkPermission(sender, "region.define");
         CommandHandler.checkArgs(args, 1, -1, "/region define <id> [owner1 [owner2 [owners...]]]");
 
         try {

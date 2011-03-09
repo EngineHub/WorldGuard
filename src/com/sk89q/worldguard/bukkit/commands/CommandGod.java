@@ -42,7 +42,7 @@ public class CommandGod extends WgCommand {
 
         // Allow setting other people invincible
         if (args.length > 0) {
-            plugin.checkPermission(sender, "worldguard.god.other");
+            plugin.checkPermission(sender, "god.other");
 
             Player other = matchSinglePlayer(cfg.getWorldGuardPlugin().getServer(), args[0]);
             if (other == null) {
@@ -60,7 +60,7 @@ public class CommandGod extends WgCommand {
             }
             // Invincibility for one's self
         } else if(sender instanceof Player) {
-            plugin.checkPermission(sender, "worldguard.god");
+            plugin.checkPermission(sender, "god");
             Player player = (Player)sender;
             if (!cfg.isInvinciblePlayer(player.getName())) {
                 cfg.addInvinciblePlayer(player.getName());

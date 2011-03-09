@@ -40,7 +40,7 @@ public class CommandRegionLoad extends WgRegionCommand {
             WorldConfiguration wcfg, WorldGuardPlugin plugin)
             throws CommandHandlingException {
         
-        plugin.checkPermission(sender, "worldguard.region.load");
+        plugin.checkPermission(sender, "region.load");
         CommandHandler.checkArgs(args, 0, 0, "/region load");
 
         try {

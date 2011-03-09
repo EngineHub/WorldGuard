@@ -42,7 +42,7 @@ public class CommandRegionList extends WgRegionCommand {
             WorldConfiguration wcfg, WorldGuardPlugin plugin)
             throws CommandHandlingException {
         
-        plugin.checkPermission(sender, "worldguard.region.list");
+        plugin.checkPermission(sender, "region.list");
         CommandHandler.checkArgs(args, 0, 1, "/region list [page]");
 
         int page = 0;

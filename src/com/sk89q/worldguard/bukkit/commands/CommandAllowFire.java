@@ -39,7 +39,7 @@ public class CommandAllowFire extends WgCommand {
     public boolean handle(CommandSender sender, String senderName,
             String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
             throws CommandHandlingException {
-        plugin.checkPermission(sender, "worldguard.fire-toggle.allow");
+        plugin.checkPermission(sender, "fire-toggle.allow");
 
         String worldName;
 

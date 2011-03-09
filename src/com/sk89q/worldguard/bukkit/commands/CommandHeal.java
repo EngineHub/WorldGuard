@@ -42,7 +42,7 @@ public class CommandHeal extends WgCommand {
 
         // Allow healing other people
         if (args.length > 0) {
-            plugin.checkPermission(sender, "worldguard.heal.other");
+            plugin.checkPermission(sender, "heal.other");
 
             Player other = matchSinglePlayer(cfg.getWorldGuardPlugin().getServer(), args[0]);
             if (other == null) {
@@ -53,7 +53,7 @@ public class CommandHeal extends WgCommand {
                 other.sendMessage(ChatColor.YELLOW + senderName + " has healed you!");
             }
         } else if (sender instanceof Player){
-            plugin.checkPermission(sender, "worldguard.heal");
+            plugin.checkPermission(sender, "heal");
             Player player = (Player)sender;
             player.setHealth(20);
             player.sendMessage(ChatColor.YELLOW + "You have been healed!");

@@ -39,7 +39,7 @@ public class CommandStopFire extends WgCommand {
             String command, String[] args, GlobalConfiguration cfg, WorldGuardPlugin plugin)
             throws CommandHandlingException {
         
-        plugin.checkPermission(sender, "worldguard.fire-toggle.stop");
+        plugin.checkPermission(sender, "fire-toggle.stop");
         CommandHandler.checkArgs(args, 0, 0);
 
         String worldName;

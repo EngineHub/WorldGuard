@@ -45,7 +45,7 @@ public class CommandLocate extends WgCommand {
         }
 
         Player player = (Player) sender;
-        plugin.checkPermission(sender, "worldguard.locate");
+        plugin.checkPermission(sender, "locate");
         CommandHandler.checkArgs(args, 0, 3);
 
         if (args.length == 1) {

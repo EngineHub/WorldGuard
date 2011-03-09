@@ -58,7 +58,7 @@ public class CommandBuyRegion extends WgCommand {
 
         CommandHandler.checkArgs(args, 1, 2);
 
-        plugin.checkPermission(player, "worldguard.regions.buy");
+        plugin.checkPermission(player, "regions.buy");
 
         String id = args[0];
 

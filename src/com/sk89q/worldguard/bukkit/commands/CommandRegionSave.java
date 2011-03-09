@@ -41,7 +41,7 @@ public class CommandRegionSave extends WgRegionCommand {
             WorldConfiguration wcfg, WorldGuardPlugin plugin)
             throws CommandHandlingException {
         
-        plugin.checkPermission(sender, "worldguard.region.save");
+        plugin.checkPermission(sender, "region.save");
         CommandHandler.checkArgs(args, 0, 0, "/region save");
 
         try {

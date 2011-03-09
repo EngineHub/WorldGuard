@@ -35,14 +35,14 @@ public class CommandTpRegion extends WgCommand {
         }
 
         Player player = (Player) sender;
-        plugin.checkPermission(sender, "worldguard.region.teleport");
+        plugin.checkPermission(sender, "region.teleport");
 
         CommandHandler.checkArgs(args, 1, 2, "/tpregion <region name> {spawn}");
 
         String id = args[0];
         Boolean spawn = false;
         if (args.length == 2 && args[1].equals("spawn")) {
-            plugin.checkPermission(sender, "worldguard.region.teleport.spawn");
+            plugin.checkPermission(sender, "region.teleport.spawn");
             spawn = true;
         }
         RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
@@ -59,11 +59,11 @@ public class CommandTpRegion extends WgCommand {
             LocalPlayer lPlayer = BukkitPlayer.wrapPlayer(plugin, player);
             if (flagright == RegionGroup.OWNER) {
                 if (!region.isOwner(lPlayer)) {
-                    plugin.checkPermission(sender, "worldguard.region.teleport.override");
+                    plugin.checkPermission(sender, "region.teleport.override");
                 }
             } else if (flagright == RegionGroup.MEMBER) {
                 if (!region.isMember(lPlayer)) {
-                    plugin.checkPermission(sender, "worldguard.region.teleport.override");
+                    plugin.checkPermission(sender, "region.teleport.override");
                 }
             }
 

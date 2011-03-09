@@ -69,7 +69,7 @@ public class CommandRegionClaim extends WgRegionCommand {
             return true;
         }
 
-        plugin.checkPermission(player, "worldguard.region.claim");
+        plugin.checkPermission(player, "region.claim");
         CommandHandler.checkArgs(args, 1, 1, "/region claim <id>");
 
         try {

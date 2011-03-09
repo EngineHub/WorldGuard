@@ -59,12 +59,12 @@ public class CommandRegionDelete extends WgRegionCommand {
                 Player player = (Player) sender;
 
                 if (existing.isOwner(BukkitPlayer.wrapPlayer(plugin, player))) {
-                    plugin.checkPermission(sender, "worldguard.region.delete.own");
+                    plugin.checkPermission(sender, "region.delete.own");
                 } else {
-                    plugin.checkPermission(sender, "worldguard.region.delete");
+                    plugin.checkPermission(sender, "region.delete");
                 }
             } else {
-                plugin.checkPermission(sender, "worldguard.region.delete");
+                plugin.checkPermission(sender, "region.delete");
             }
 
             mgr.removeRegion(id);
