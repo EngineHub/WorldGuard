@@ -73,4 +73,9 @@ public class BukkitPlayer extends LocalPlayer {
         player.sendMessage(msg);
     }
 
+	@Override
+	public boolean hasPermission(String permission) {
+		return plugin.hasPermission(player, permission);
+	}
+
 }

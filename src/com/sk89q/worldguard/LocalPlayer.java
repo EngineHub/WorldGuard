@@ -72,6 +72,8 @@ public abstract class LocalPlayer {
      */
     public abstract String[] getGroups();
     
+    public abstract boolean hasPermission(String permission);
+    
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof LocalPlayer)) {

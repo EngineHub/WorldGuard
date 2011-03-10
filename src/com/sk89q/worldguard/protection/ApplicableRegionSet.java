@@ -18,6 +18,8 @@
  */
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.util.Iterator;
 import com.sk89q.worldguard.LocalPlayer;
@@ -35,217 +37,219 @@ import java.util.List;
  */
 public class ApplicableRegionSet {
 
-    private GlobalFlags global;
-    private List<ProtectedRegion> applicable;
-    private ProtectedRegion affectedRegion;
+	private GlobalFlags global;
+	private List<ProtectedRegion> applicable;
+	private ProtectedRegion affectedRegion;
 
-    /**
-     * Construct the object.
-     * 
-     * @param applicable
-     * @param global
-     */
-    public ApplicableRegionSet(List<ProtectedRegion> applicable, GlobalFlags global) {
-        this.applicable = applicable;
-        this.global = global;
+	/**
+	 * Construct the object.
+	 * 
+	 * @param applicable
+	 * @param global
+	 */
+	public ApplicableRegionSet(List<ProtectedRegion> applicable, GlobalFlags global) {
+		this.applicable = applicable;
+		this.global = global;
 
-        determineAffectedRegion();
-    }
+		determineAffectedRegion();
+	}
 
-    /**
-     * Checks if a player can build in an area.
-     * 
-     * @param player
-     * @return
-     */
-    public boolean canBuild(LocalPlayer player) {
+	/**
+	 * Checks if a player can build in an area.
+	 * 
+	 * @param player
+	 * @return
+	 */
+	public boolean canBuild(LocalPlayer player) {
 
-        if (!this.isAnyRegionAffected()) {
-            return global.canBuild;
-        }
+		if (!this.isAnyRegionAffected()) {
+			if (!global.canBuild) {
+				return player.hasPermission("region.build_on_nomansland");
+			}
+			return false;
+		}
 
-        return getStateFlag(Flags.BUILD, true).getValue(State.DENY) == State.ALLOW || isMember(player);
-    }
+		return getStateFlag(Flags.BUILD, true).getValue(State.DENY) == State.ALLOW || isMember(player);
+	}
 
+	public boolean isStateFlagAllowed(StateRegionFlagInfo info) {
 
-    public boolean isStateFlagAllowed(StateRegionFlagInfo info) {
+		return isStateFlagAllowed(info, global.getDefaultValue(info.type));
+	}
 
-        return isStateFlagAllowed(info, global.getDefaultValue(info.type));
-    }
+	public boolean isStateFlagAllowed(StateRegionFlagInfo info, boolean def) {
 
-    public boolean isStateFlagAllowed(StateRegionFlagInfo info, boolean def) {
+		if (!this.isAnyRegionAffected()) {
+			return def;
+		}
+		State defState = def ? State.ALLOW : State.DENY;
+		return getStateFlag(info, true).getValue(defState) == State.ALLOW;
+	}
 
-        if (!this.isAnyRegionAffected()) {
-            return def;
-        }
-        State defState = def ? State.ALLOW : State.DENY;
-        return getStateFlag(info, true).getValue(defState) == State.ALLOW;
-    }
+	public boolean isStateFlagAllowed(StateRegionFlagInfo info, LocalPlayer player) {
 
-    public boolean isStateFlagAllowed(StateRegionFlagInfo info, LocalPlayer player) {
+		if (info.type == FlagType.BUILD) {
+			return canBuild(player);
+		}
+		return isStateFlagAllowed(info, global.getDefaultValue(info.type), player);
+	}
 
-        if (info.type == FlagType.BUILD) {
-            return canBuild(player);
-        }
-        return isStateFlagAllowed(info, global.getDefaultValue(info.type), player);
-    }
+	public boolean isStateFlagAllowed(StateRegionFlagInfo info, boolean def, LocalPlayer player) {
 
-    public boolean isStateFlagAllowed(StateRegionFlagInfo info, boolean def, LocalPlayer player) {
+		if (info.type == FlagType.BUILD) {
+			return canBuild(player);
+		}
 
-        if (info.type == FlagType.BUILD) {
-            return canBuild(player);
-        }
+		if (!this.isAnyRegionAffected()) {
+			return def;
+		}
 
-        if (!this.isAnyRegionAffected()) {
-            return def;
-        }
+		State defState = def ? State.ALLOW : State.DENY;
+		return getStateFlag(info, true).getValue(defState) == State.ALLOW || this.isMember(player);
+	}
 
-        State defState = def ? State.ALLOW : State.DENY;
-        return getStateFlag(info, true).getValue(defState) == State.ALLOW || this.isMember(player);
-    }
+	private RegionFlag getFlag(RegionFlagInfo<?> info, Boolean inherit) {
 
-    private RegionFlag getFlag(RegionFlagInfo<?> info, Boolean inherit) {
+		ProtectedRegion region = affectedRegion;
 
-        ProtectedRegion region = affectedRegion;
+		if (region == null) {
+			return null;
+		}
 
-        if (region == null) {
-            return null;
-        }
+		if (!inherit) {
+			return region.getFlags().getFlag(info);
+		} else {
+			RegionFlag value;
+			do {
+				value = region.getFlags().getFlag(info);
+				region = region.getParent();
 
-        if (!inherit) {
-            return region.getFlags().getFlag(info);
-        } else {
-            RegionFlag value;
-            do {
-                value = region.getFlags().getFlag(info);
-                region = region.getParent();
+			} while (!value.hasValue() && region != null);
 
-            } while (!value.hasValue() && region != null);
+			return value;
+		}
 
-            return value;
-        }
+	}
 
-    }
+	public BooleanRegionFlag getBooleanFlag(BooleanRegionFlagInfo info, boolean inherit) {
 
-    public BooleanRegionFlag getBooleanFlag(BooleanRegionFlagInfo info, boolean inherit) {
+		RegionFlag flag = this.getFlag(info, inherit);
 
-        RegionFlag flag = this.getFlag(info, inherit);
+		if (flag instanceof BooleanRegionFlag) {
+			return (BooleanRegionFlag) flag;
+		} else {
+			return new BooleanRegionFlag();
+		}
+	}
 
-        if (flag instanceof BooleanRegionFlag) {
-            return (BooleanRegionFlag) flag;
-        } else {
-            return new BooleanRegionFlag();
-        }
-    }
+	public StateRegionFlag getStateFlag(StateRegionFlagInfo info, boolean inherit) {
 
-    public StateRegionFlag getStateFlag(StateRegionFlagInfo info, boolean inherit) {
+		RegionFlag flag = this.getFlag(info, inherit);
 
-        RegionFlag flag = this.getFlag(info, inherit);
+		if (flag instanceof StateRegionFlag) {
+			return (StateRegionFlag) flag;
+		} else {
+			return new StateRegionFlag();
+		}
+	}
 
-        if (flag instanceof StateRegionFlag) {
-            return (StateRegionFlag) flag;
-        } else {
-            return new StateRegionFlag();
-        }
-    }
+	public IntegerRegionFlag getIntegerFlag(IntegerRegionFlagInfo info, boolean inherit) {
 
-    public IntegerRegionFlag getIntegerFlag(IntegerRegionFlagInfo info, boolean inherit) {
+		RegionFlag flag = this.getFlag(info, inherit);
 
-        RegionFlag flag = this.getFlag(info, inherit);
+		if (flag instanceof IntegerRegionFlag) {
+			return (IntegerRegionFlag) flag;
+		} else {
+			return new IntegerRegionFlag();
+		}
+	}
 
-        if (flag instanceof IntegerRegionFlag) {
-            return (IntegerRegionFlag) flag;
-        } else {
-            return new IntegerRegionFlag();
-        }
-    }
+	public DoubleRegionFlag getDoubleFlag(DoubleRegionFlagInfo info, boolean inherit) {
 
-    public DoubleRegionFlag getDoubleFlag(DoubleRegionFlagInfo info, boolean inherit) {
+		RegionFlag flag = this.getFlag(info, inherit);
 
-        RegionFlag flag = this.getFlag(info, inherit);
+		if (flag instanceof DoubleRegionFlag) {
+			return (DoubleRegionFlag) flag;
+		} else {
+			return new DoubleRegionFlag();
+		}
+	}
 
-        if (flag instanceof DoubleRegionFlag) {
-            return (DoubleRegionFlag) flag;
-        } else {
-            return new DoubleRegionFlag();
-        }
-    }
+	public StringRegionFlag getStringFlag(StringRegionFlagInfo info, boolean inherit) {
 
-    public StringRegionFlag getStringFlag(StringRegionFlagInfo info, boolean inherit) {
+		RegionFlag flag = this.getFlag(info, inherit);
 
-        RegionFlag flag = this.getFlag(info, inherit);
+		if (flag instanceof StringRegionFlag) {
+			return (StringRegionFlag) flag;
+		} else {
+			return new StringRegionFlag();
+		}
+	}
 
-        if (flag instanceof StringRegionFlag) {
-            return (StringRegionFlag) flag;
-        } else {
-            return new StringRegionFlag();
-        }
-    }
+	public RegionGroupRegionFlag getRegionGroupFlag(RegionGroupRegionFlagInfo info, boolean inherit) {
 
-    public RegionGroupRegionFlag getRegionGroupFlag(RegionGroupRegionFlagInfo info, boolean inherit) {
+		RegionFlag flag = this.getFlag(info, inherit);
 
-        RegionFlag flag = this.getFlag(info, inherit);
+		if (flag instanceof RegionGroupRegionFlag) {
+			return (RegionGroupRegionFlag) flag;
+		} else {
+			return new RegionGroupRegionFlag();
+		}
+	}
 
-        if (flag instanceof RegionGroupRegionFlag) {
-            return (RegionGroupRegionFlag) flag;
-        } else {
-            return new RegionGroupRegionFlag();
-        }
-    }
+	public LocationRegionFlag getLocationFlag(LocationRegionFlagInfo info, boolean inherit) {
 
-    public LocationRegionFlag getLocationFlag(LocationRegionFlagInfo info, boolean inherit) {
+		RegionFlag flag = this.getFlag(info, inherit);
 
-        RegionFlag flag = this.getFlag(info, inherit);
+		if (flag instanceof LocationRegionFlag) {
+			return (LocationRegionFlag) flag;
+		} else {
+			return new LocationRegionFlag();
+		}
+	}
 
-        if (flag instanceof LocationRegionFlag) {
-            return (LocationRegionFlag) flag;
-        } else {
-            return new LocationRegionFlag();
-        }
-    }
+	public boolean isAnyRegionAffected() {
+		return this.applicable.size() > 0;
+	}
 
-    public boolean isAnyRegionAffected() {
-        return this.applicable.size() > 0;
-    }
+	/**
+	 * Determines the region with the hightest priority.
+	 * 
+	 */
+	private void determineAffectedRegion() {
 
-    /**
-     * Determines the region with the hightest priority.
-     *
-     */
-    private void determineAffectedRegion() {
+		affectedRegion = null;
+		Iterator<ProtectedRegion> iter = applicable.iterator();
 
-        affectedRegion = null;
-        Iterator<ProtectedRegion> iter = applicable.iterator();
+		while (iter.hasNext()) {
+			ProtectedRegion region = iter.next();
 
-        while (iter.hasNext()) {
-            ProtectedRegion region = iter.next();
+			if (affectedRegion == null || affectedRegion.getPriority() < region.getPriority()) {
+				affectedRegion = region;
+			}
+		}
+	}
 
-            if (affectedRegion == null || affectedRegion.getPriority() < region.getPriority()) {
-                affectedRegion = region;
-            }
-        }
-    }
+	public boolean isOwner(LocalPlayer player) {
+		return affectedRegion != null ? affectedRegion.isOwner(player) : false;
+	}
 
-    public boolean isOwner(LocalPlayer player) {
-        return affectedRegion != null ? affectedRegion.isOwner(player) : false;
-    }
+	/**
+	 * Checks whether a player is a member of the region or any of its parents.
+	 * 
+	 * @param player
+	 * @return
+	 */
+	public boolean isMember(LocalPlayer player) {
+		return affectedRegion != null ? affectedRegion.isMember(player) : false;
+	}
 
-    /**
-     * Checks whether a player is a member of the region or any of its parents.
-     *
-     * @param player
-     * @return
-     */
-    public boolean isMember(LocalPlayer player) {
-        return affectedRegion != null ? affectedRegion.isMember(player) : false;
-    }
+	public String getAffectedRegionId() {
+		return affectedRegion != null ? affectedRegion.getId() : "";
+	}
 
-    public String getAffectedRegionId() {
-        return affectedRegion != null ? affectedRegion.getId() : "";
-    }
+	public int getAffectedRegionPriority() {
+		return affectedRegion != null ? affectedRegion.getPriority() : 0;
+	}
 
-    public int getAffectedRegionPriority() {
-        return affectedRegion != null ? affectedRegion.getPriority() : 0;
-    }
- 
 }
