@@ -28,6 +28,6 @@ import com.sk89q.worldguard.protection.regions.flags.RegionFlag.FlagDataType;
 public class DoubleRegionFlagInfo extends RegionFlagInfo<Boolean> {
 
     public DoubleRegionFlagInfo(String name, FlagType type) {
-        super(name, type, FlagDataType.BOOLEAN);
+        super(name, type, FlagDataType.DOUBLE);
     }
 }
