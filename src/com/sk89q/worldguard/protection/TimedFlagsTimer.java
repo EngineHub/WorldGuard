@@ -79,6 +79,9 @@ public class TimedFlagsTimer implements Runnable {
                 nfo.lastHealTick = now;
             }
 
+            if(player.getWorld().getName() == null) {
+                continue;
+            }
             RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
             ApplicableRegionSet regions = mgr.getApplicableRegions(toVector(player.getLocation()));
 
