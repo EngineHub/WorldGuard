@@ -322,7 +322,6 @@ public class WorldGuardEntityListener extends EntityListener {
 
         //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
         CreatureType creaType = event.getCreatureType();
-        String creaName = "";
         Boolean cancelEvent = false;
 
         if (wcfg.blockCreatureSpawn.contains(creaType)) {

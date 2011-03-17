@@ -25,6 +25,7 @@ import com.sk89q.worldguard.protection.regions.flags.RegionFlag.FlagDataType;
 /**
  *
  * @author Michael
+ * @param <T> 
  */
 public abstract class RegionFlagInfo<T> {
 
