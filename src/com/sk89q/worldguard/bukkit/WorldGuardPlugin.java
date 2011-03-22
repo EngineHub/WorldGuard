@@ -72,6 +72,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         perms = new PermissionsResolverManager(
                 getConfiguration(), getServer(), "WorldGuard", logger);
         (new PermissionsResolverServerListener(perms)).register(this);
+        perms.load();
         
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }
