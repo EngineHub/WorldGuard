@@ -18,14 +18,14 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldguard.protection.regions.flags.Flags;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.RegionFlags;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
-import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
 import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.coelho.iConomy.system.Account;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.util.Iterator;
 import java.util.List;
 import org.bukkit.block.Block;
@@ -146,7 +146,7 @@ public class WorldGuardBlockListener extends BlockListener {
 
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
-                    new BlockBreakBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, player),
+                    new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
                     toVector(event.getBlock()),
                     event.getBlock().getTypeId()), false, false)) {
                 event.setCancelled(true);
@@ -154,7 +154,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
 
             if (wcfg.getBlacklist().check(
-                    new DestroyWithBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, player),
+                    new DestroyWithBlacklistEvent(plugin.wrapPlayer(player),
                     toVector(event.getBlock()),
                     player.getItemInHand().getTypeId()), false, false)) {
                 event.setCancelled(true);
@@ -245,9 +245,9 @@ public class WorldGuardBlockListener extends BlockListener {
 
         if (wcfg.useRegions) {
             Vector pt = toVector(blockFrom.getLocation());
-            RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(world.getName());
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world.getName());
 
-            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(Flags.WATER_FLOW)) {
+            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(DefaultFlag.WATER_FLOW)) {
                 event.setCancelled(true);
                 return;
             }
@@ -279,12 +279,12 @@ public class WorldGuardBlockListener extends BlockListener {
         if (wcfg.useRegions) {
             Vector pt = toVector(block);
             Player player = event.getPlayer();
-            RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(world.getName());
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world.getName());
 
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             if (player != null && !plugin.hasPermission(player, "region.bypass")) {
-                LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(plugin, player);
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
                 if (cause == IgniteCause.FLINT_AND_STEEL
                         && !set.canBuild(localPlayer)) {
@@ -293,18 +293,18 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
 
                 if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !set.isStateFlagAllowed(Flags.LIGHTER)) {
+                        && !set.isStateFlagAllowed(DefaultFlag.LIGHTER)) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if (isFireSpread && set.isStateFlagAllowed(Flags.FIRE_SPREAD)) {
+            if (isFireSpread && set.isStateFlagAllowed(DefaultFlag.FIRE_SPREAD)) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (cause == IgniteCause.LAVA && !set.isStateFlagAllowed(Flags.LAVA_FIRE)) {
+            if (cause == IgniteCause.LAVA && !set.isStateFlagAllowed(DefaultFlag.LAVA_FIRE)) {
                 event.setCancelled(true);
                 return;
             }
@@ -443,12 +443,12 @@ public class WorldGuardBlockListener extends BlockListener {
             Player player = (Player) entity;
             if (wcfg.useRegions) {
                 Vector pt = toVector(block);
-                LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(plugin, player);
-                RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld().getName());
 
                 if (!plugin.hasPermission(player, "region.bypass")) {
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                    if (!set.isStateFlagAllowed(Flags.CHEST_ACCESS) && !set.canBuild(localPlayer)) {
+                    if (!set.isStateFlagAllowed(DefaultFlag.CHEST_ACCESS) && !set.canBuild(localPlayer)) {
                         player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                         event.setCancelled(true);
                         return;
@@ -459,11 +459,11 @@ public class WorldGuardBlockListener extends BlockListener {
 
         if (wcfg.useRegions && (type == Material.LEVER || type == Material.STONE_BUTTON) && entity instanceof Player) {
             Vector pt = toVector(block);
-            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(((Player)entity).getWorld().getName());
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(((Player)entity).getWorld().getName());
             ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(pt);
-            LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(plugin, (Player)entity);
+            LocalPlayer localPlayer = plugin.wrapPlayer((Player)entity);
 
-            if (!applicableRegions.isStateFlagAllowed(Flags.LEVER_AND_BUTTON, localPlayer)) {
+            if (!applicableRegions.isStateFlagAllowed(DefaultFlag.LEVER_AND_BUTTON, localPlayer)) {
                 ((Player)entity).sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
@@ -474,7 +474,7 @@ public class WorldGuardBlockListener extends BlockListener {
             Player player = (Player) entity;
 
             if (!wcfg.getBlacklist().check(
-                    new BlockInteractBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, player), toVector(block),
+                    new BlockInteractBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
                     block.getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
@@ -513,7 +513,7 @@ public class WorldGuardBlockListener extends BlockListener {
 
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
-                    new BlockPlaceBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, player), toVector(blockPlaced),
+                    new BlockPlaceBlacklistEvent(plugin.wrapPlayer(player), toVector(blockPlaced),
                     blockPlaced.getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
@@ -550,13 +550,13 @@ public class WorldGuardBlockListener extends BlockListener {
         if (wcfg.useRegions && event.getItemInHand().getTypeId() == wcfg.regionWand) {
             Vector pt = toVector(blockClicked);
 
-            RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+            RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld().getName());
             ApplicableRegionSet app = mgr.getApplicableRegions(pt);
             List<String> regions = mgr.getApplicableRegionsIDs(pt);
 
             if (regions.size() > 0) {
                 player.sendMessage(ChatColor.YELLOW + "Can you build? "
-                        + (app.canBuild(BukkitPlayer.wrapPlayer(plugin, player)) ? "Yes" : "No"));
+                        + (app.canBuild(plugin.wrapPlayer(player)) ? "Yes" : "No"));
 
                 StringBuilder str = new StringBuilder();
                 for (Iterator<String> it = regions.iterator(); it.hasNext();) {
@@ -601,17 +601,17 @@ public class WorldGuardBlockListener extends BlockListener {
                 //String regionComment = ((Sign)block).getLine(3);
 
                 if (regionId != null && regionId != "") {
-                    RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+                    RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(player.getWorld().getName());
                     ProtectedRegion region = mgr.getRegion(regionId);
 
                     if (region != null) {
-                        RegionFlagContainer flags = region.getFlags();
+                        RegionFlags flags = region.getFlags();
 
-                        if (flags.getBooleanFlag(Flags.BUYABLE).getValue(false)) {
+                        if (flags.getBooleanFlag(DefaultFlag.BUYABLE).getValue(false)) {
                             if (iConomy.getBank().hasAccount(player.getName())) {
                                 Account account = iConomy.getBank().getAccount(player.getName());
                                 double balance = account.getBalance();
-                                double regionPrice = flags.getDoubleFlag(Flags.PRICE).getValue();
+                                double regionPrice = flags.getDoubleFlag(DefaultFlag.PRICE).getValue();
 
                                 if (balance >= regionPrice) {
                                     account.subtract(regionPrice);
@@ -620,7 +620,7 @@ public class WorldGuardBlockListener extends BlockListener {
                                     DefaultDomain owners = region.getOwners();
                                     owners.addPlayer(player.getName());
                                     region.setOwners(owners);
-                                    flags.getBooleanFlag(Flags.BUYABLE).setValue(false);
+                                    flags.getBooleanFlag(DefaultFlag.BUYABLE).setValue(false);
                                     account.save();
                                 } else {
                                     player.sendMessage(ChatColor.YELLOW + "You have not enough money.");

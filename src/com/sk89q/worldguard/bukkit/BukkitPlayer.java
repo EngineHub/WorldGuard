@@ -32,10 +32,6 @@ public class BukkitPlayer extends LocalPlayer {
         this.plugin = plugin;
         this.player = player;
     }
-    
-    public static BukkitPlayer wrapPlayer(WorldGuardPlugin plugin, Player player) {
-        return new BukkitPlayer(plugin, player);
-    }
 
     @Override
     public String getName() {

@@ -23,8 +23,8 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
 import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldguard.protection.dbs.CSVDatabase;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.databases.CSVDatabase;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -184,7 +184,7 @@ public class GlobalConfiguration {
             World w = plugin.getServer().getWorlds().get(0);
             
             RegionManager mgr = plugin.getGlobalRegionManager()
-                    .getRegionManager(w.getName());
+                    .get(w.getName());
 
             // First load up the old database using the CSV loader
             CSVDatabase db = new CSVDatabase(oldDatabase);
@@ -213,11 +213,11 @@ public class GlobalConfiguration {
      */
     public boolean canBuild(Player player, Vector pt) {
         if (getWorldConfig(player.getWorld().getName()).useRegions) {
-            LocalPlayer localPlayer = BukkitPlayer.wrapPlayer(plugin, player);
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
             if (!plugin.hasPermission(player, "region.bypass")) {
                 RegionManager mgr = plugin.getGlobalRegionManager()
-                        .getRegionManager(player.getWorld().getName());
+                        .get(player.getWorld().getName());
 
                 if (!mgr.getApplicableRegions(pt).canBuild(localPlayer)) {
                     return false;

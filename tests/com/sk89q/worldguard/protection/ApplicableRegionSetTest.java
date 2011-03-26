@@ -19,11 +19,11 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldguard.protection.managers.FlatRegionManager;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
-import com.sk89q.worldguard.protection.regionmanager.FlatRegionManager;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

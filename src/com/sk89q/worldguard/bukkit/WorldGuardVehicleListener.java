@@ -19,7 +19,8 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Vehicle;
@@ -29,7 +30,6 @@ import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.regions.flags.Flags;
 import org.bukkit.Location;
 
 /**
@@ -70,10 +70,10 @@ public class WorldGuardVehicleListener extends VehicleListener {
 
         if (vhcl instanceof Minecart || vhcl instanceof Boat) {
             GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(vhcl.getWorld().getName());
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(vhcl.getWorld().getName());
             ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(pt);
 
-            if (!applicableRegions.isStateFlagAllowed(Flags.PLACE_VEHICLE)) {
+            if (!applicableRegions.isStateFlagAllowed(DefaultFlag.PLACE_VEHICLE)) {
                 vhcl.remove();
                 return;
             }

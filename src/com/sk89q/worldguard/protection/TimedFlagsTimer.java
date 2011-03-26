@@ -20,13 +20,13 @@
 package com.sk89q.worldguard.protection;
 
 
-import com.sk89q.worldguard.protection.regions.flags.Flags;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.entity.Player;
@@ -82,14 +82,14 @@ public class TimedFlagsTimer implements Runnable {
             if(player.getWorld().getName() == null) {
                 continue;
             }
-            RegionManager mgr = wg.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+            RegionManager mgr = wg.getGlobalRegionManager().get(player.getWorld().getName());
             ApplicableRegionSet regions = mgr.getApplicableRegions(toVector(player.getLocation()));
 
-            int healDelay = regions.getIntegerFlag(Flags.HEAL_DELAY, true).getValue(-1);
+            int healDelay = regions.getIntegerFlag(DefaultFlag.HEAL_DELAY, true).getValue(-1);
 
             if (healDelay > 0) {
                 healDelay *= 1000;
-                int healAmount = regions.getIntegerFlag(Flags.HEAL_AMOUNT, true).getValue(1);
+                int healAmount = regions.getIntegerFlag(DefaultFlag.HEAL_AMOUNT, true).getValue(1);
                 if (now - nfo.lastHealTick > healDelay) {
                     if (player.getHealth() < 20) {
                         if (player.getHealth() + healAmount > 20) {
@@ -112,8 +112,8 @@ public class TimedFlagsTimer implements Runnable {
    
 
                 if (nfo.lastRegion == null || !newRegionName.equals(nfo.lastRegion)) {
-                    String newGreetMsg = regions.getStringFlag(Flags.GREET_MESSAGE, true).getValue();
-                    String farewellMsg = regions.getStringFlag(Flags.FAREWELL_MESSAGE, true).getValue();
+                    String newGreetMsg = regions.getStringFlag(DefaultFlag.GREET_MESSAGE, true).getValue();
+                    String farewellMsg = regions.getStringFlag(DefaultFlag.FAREWELL_MESSAGE, true).getValue();
 
                     if (nfo.lastFarewellMsg != null) {
                         player.sendMessage(nfo.lastFarewellMsg);
@@ -122,7 +122,7 @@ public class TimedFlagsTimer implements Runnable {
                     if (newGreetMsg != null) {
                         player.sendMessage(newGreetMsg);
                     }
-                    if (regions.getBooleanFlag(Flags.NOTIFY_GREET, false).getValue(false)) {
+                    if (regions.getBooleanFlag(DefaultFlag.NOTIFY_GREET, false).getValue(false)) {
                         broadcastNotification(ChatColor.YELLOW + "Player " + player.getName() + " entered region " + newRegionName);
                     }
                     nfo.lastFarewellMsg = farewellMsg;
@@ -134,7 +134,7 @@ public class TimedFlagsTimer implements Runnable {
                         player.sendMessage(nfo.lastFarewellMsg);
                         nfo.lastFarewellMsg = null;
                     }
-                    if (regions.getBooleanFlag(Flags.NOTIFY_FAREWELL, false).getValue(false)) {
+                    if (regions.getBooleanFlag(DefaultFlag.NOTIFY_FAREWELL, false).getValue(false)) {
                         broadcastNotification(ChatColor.YELLOW + "Player " + player.getName() + " left region " + nfo.lastRegion);
                     }
                     nfo.lastRegion = null;
@@ -143,7 +143,7 @@ public class TimedFlagsTimer implements Runnable {
 
             //check passthrough flag
             LocalPlayer lplayer = BukkitPlayer.wrapPlayer(wg, player);
-            if(!regions.isStateFlagAllowed(Flags.PASSTHROUGH, lplayer))
+            if(!regions.isStateFlagAllowed(DefaultFlag.PASSTHROUGH, lplayer))
             {
                 Location newLoc = player.getLocation().clone();
                 newLoc.setX(newLoc.getBlockX() - 30);

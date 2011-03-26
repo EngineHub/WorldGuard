@@ -28,10 +28,10 @@ import com.sk89q.worldguard.bukkit.GlobalConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.RegionFlags;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.flags.Flags;
-import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
 
 /**
  *
@@ -62,16 +62,16 @@ public class CommandBuyRegion extends WgCommand {
 
         String id = args[0];
 
-        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(player.getWorld().getName());
         ProtectedRegion region = mgr.getRegion(id);
         if (region != null) {
-            RegionFlagContainer flags = region.getFlags();
+            RegionFlags flags = region.getFlags();
 
-            if (flags.getBooleanFlag(Flags.BUYABLE).getValue(false)) {
+            if (flags.getBooleanFlag(DefaultFlag.BUYABLE).getValue(false)) {
                 if (args.length == 2) {
                     if (args[1].equalsIgnoreCase("info")) {
                         player.sendMessage(ChatColor.YELLOW + "Region " + id + " costs " + 
-                                iConomy.getBank().format(flags.getDoubleFlag(Flags.PRICE).getValue()));
+                                iConomy.getBank().format(flags.getDoubleFlag(DefaultFlag.PRICE).getValue()));
                         if (iConomy.getBank().hasAccount(player.getName())) {
                             player.sendMessage(ChatColor.YELLOW + "You have " +
                                     iConomy.getBank().format(
@@ -86,7 +86,7 @@ public class CommandBuyRegion extends WgCommand {
                     if (iConomy.getBank().hasAccount(player.getName())) {
                         Account account = iConomy.getBank().getAccount(player.getName());
                         double balance = account.getBalance();
-                        double regionPrice = flags.getDoubleFlag(Flags.PRICE).getValue();
+                        double regionPrice = flags.getDoubleFlag(DefaultFlag.PRICE).getValue();
 
                         if (balance >= regionPrice) {
                             account.subtract(regionPrice);
@@ -95,7 +95,7 @@ public class CommandBuyRegion extends WgCommand {
                             DefaultDomain owners = region.getOwners();
                             owners.addPlayer(player.getName());
                             region.setOwners(owners);
-                            flags.getBooleanFlag(Flags.BUYABLE).setValue(false);
+                            flags.getBooleanFlag(DefaultFlag.BUYABLE).setValue(false);
                             account.save();
                         } else {
                             player.sendMessage(ChatColor.YELLOW + "You have not enough money.");

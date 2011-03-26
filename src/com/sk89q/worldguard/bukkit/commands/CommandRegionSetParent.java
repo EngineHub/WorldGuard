@@ -23,7 +23,7 @@ import com.sk89q.worldguard.bukkit.GlobalConfiguration;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class CommandRegionSetParent extends WgRegionCommand {
 
         String id = args[0].toLowerCase();
         String parentId = args.length > 1 ? args[1].toLowerCase() : null;
-        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
+        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(wcfg.getWorldName());
 
         ProtectedRegion region = mgr.getRegion(id);
 

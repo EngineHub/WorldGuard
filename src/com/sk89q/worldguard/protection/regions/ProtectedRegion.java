@@ -24,8 +24,10 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
-import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
+import com.sk89q.worldguard.protection.flags.Flag;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a region of any shape and size that can be protected.
@@ -58,10 +60,9 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      */
     private DefaultDomain members = new DefaultDomain();
     /**
-     * Area flags.
+     * List of flags.
      */
-    private RegionFlagContainer flags = new RegionFlagContainer();
-
+    private Map<Flag<?>, Object> flags = new HashMap<Flag<?>, Object>();
 
     /**
      * Construct a new instance of this region.
@@ -245,18 +246,37 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         
         return false;
     }
-
+    
     /**
-     * Get flags.
+     * Get a flag's value.
      * 
+     * @param <T>
+     * @param <V>
+     * @param flag
      * @return
      */
-    public RegionFlagContainer getFlags() {
-        if(this.flags == null)
-        {
-            this.flags = new RegionFlagContainer();
+    @SuppressWarnings("unchecked")
+    public <T extends Flag<V>, V> V getFlag(T flag) {
+        Object obj = flags.get(flag);
+        V val;
+        if (obj != null) {
+            val = (V) obj;
+        } else {
+            return flag.getDefault();
         }
-        return flags;
+        return val;
+    }
+    
+    /**
+     * Set a flag's value.
+     * 
+     * @param <T>
+     * @param <V>
+     * @param flag
+     * @param val
+     */
+    public <T extends Flag<V>, V> void setFlag(T flag, V val) {
+        flags.put(flag, val);
     }
 
     /**

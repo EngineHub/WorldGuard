@@ -23,7 +23,7 @@ import com.sk89q.worldguard.bukkit.GlobalConfiguration;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.io.IOException;
 import org.bukkit.ChatColor;
@@ -45,7 +45,7 @@ public class CommandRegionDelete extends WgRegionCommand {
 
         try {
             String id = args[0].toLowerCase();
-            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(wcfg.getWorldName());
 
             if (!mgr.hasRegion(id)) {
                 sender.sendMessage(ChatColor.RED + "A region with ID '"

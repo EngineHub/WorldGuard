@@ -32,13 +32,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import com.nijiko.coelho.iConomy.iConomy;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
-import com.sk89q.worldguard.protection.regions.flags.Flags;
-import com.sk89q.worldguard.protection.regions.flags.RegionFlag.RegionGroup;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.RegionFlag.RegionGroup;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
  * Handles all events thrown in relation to a Player
@@ -114,7 +115,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         cfg.removeInvinciblePlayer(player.getName());
         cfg.removeAmphibiousPlayer(player.getName());
 
-        cfg.forgetPlayer(BukkitPlayer.wrapPlayer(plugin, player));
+        cfg.forgetPlayer(plugin.wrapPlayer(player));
     }
 
     /**
@@ -167,7 +168,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
         if (wcfg.getBlacklist() != null && item != null && block != null) {
             if (!wcfg.getBlacklist().check(
-                    new ItemUseBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, player),
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
                     toVector(block.getRelative(event.getBlockFace())),
                     item.getTypeId()), false, false)) {
                 event.setCancelled(true);
@@ -177,9 +178,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
         if (wcfg.useRegions && item != null && block != null && item.getTypeId() == 259) {
             Vector pt = toVector(block.getRelative(event.getBlockFace()));
-            RegionManager mgr = plugin.getGlobalRegionManager().getRegionManager(player.getWorld().getName());
+            RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld().getName());
 
-            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(Flags.LIGHTER)) {
+            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(DefaultFlag.LIGHTER)) {
                 event.setCancelled(true);
                 return;
             }
@@ -237,7 +238,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             Item ci = event.getItemDrop();
 
             if (!wcfg.getBlacklist().check(
-                    new ItemDropBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
+                    new ItemDropBlacklistEvent(plugin.wrapPlayer(event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -264,7 +265,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             Item ci = event.getItem();
 
             if (!wcfg.getBlacklist().check(
-                    new ItemAcquireBlacklistEvent(BukkitPlayer.wrapPlayer(plugin, event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
+                    new ItemAcquireBlacklistEvent(plugin.wrapPlayer(event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -276,16 +277,17 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Location location = player.getLocation();
 
-        ApplicableRegionSet regions = plugin.getGlobalRegionManager().getRegionManager(
+        ApplicableRegionSet regions = plugin.getGlobalRegionManager().get(
                 player.getWorld().getName()).getApplicableRegions(
                 BukkitUtil.toVector(location));
 
-        Location spawn = regions.getLocationFlag(Flags.SPAWN_LOC, true).getValue(player.getServer());
+        Location spawn = regions.getLocationFlag(DefaultFlag.SPAWN_LOC, true).getValue(player.getServer());
 
         if (spawn != null) {
-            RegionGroup spawnconfig = regions.getRegionGroupFlag(Flags.SPAWN_PERM, true).getValue();
+            RegionGroup spawnconfig = regions.getRegionGroupFlag(DefaultFlag.SPAWN_PERM, true).getValue();
             if (spawnconfig != null) {
-                BukkitPlayer localPlayer = BukkitPlayer.wrapPlayer(plugin, player);
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                
                 if (spawnconfig == RegionGroup.OWNER) {
                     if (regions.isOwner(localPlayer)) {
                         event.setRespawnLocation(spawn);

@@ -24,7 +24,7 @@ import com.sk89q.worldguard.bukkit.GlobalConfiguration;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.RegionUtil;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class CommandRegionRemoveMember extends WgRegionCommand {
             permAll = "region.removemember";
         }
 
-        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
+        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(wcfg.getWorldName());
 
         String id = args[0].toLowerCase();
         if (!mgr.hasRegion(id)) {

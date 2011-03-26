@@ -24,12 +24,12 @@ import com.sk89q.worldguard.bukkit.GlobalConfiguration;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.flags.FlagDatabase;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.LocationFlag;
+import com.sk89q.worldguard.protection.flags.RegionFlag.FlagDataType;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.flags.FlagDatabase;
-import com.sk89q.worldguard.protection.regions.flags.RegionFlag.FlagDataType;
-import com.sk89q.worldguard.protection.regions.flags.info.LocationRegionFlagInfo;
-import com.sk89q.worldguard.protection.regions.flags.info.RegionFlagInfo;
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -64,7 +64,7 @@ public class CommandRegionFlag extends WgRegionCommand {
                 valueStr = tmp.toString();
             }
 
-            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(wcfg.getWorldName());
             ProtectedRegion region = mgr.getRegion(id);
 
             if (region == null) {
@@ -86,20 +86,20 @@ public class CommandRegionFlag extends WgRegionCommand {
                 plugin.checkPermission(sender, "region.flag");
             }
 
-            RegionFlagInfo nfo = FlagDatabase.getFlagInfoFromName(nameStr);
+            Flag nfo = FlagDatabase.getFlagInfoFromName(nameStr);
 
             if (nfo == null) {
                 sender.sendMessage(ChatColor.RED + "Unknown flag specified.");
                 return true;
             }
 
-            if (nfo instanceof LocationRegionFlagInfo) {
+            if (nfo instanceof LocationFlag) {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(ChatColor.RED + "Flag not supported in console mode.");
                     return true;
                 }
                 Player player = (Player) sender;
-                LocationRegionFlagInfo lInfo = (LocationRegionFlagInfo)nfo;
+                LocationFlag lInfo = (LocationFlag)nfo;
 
                 Location l = player.getLocation();
 

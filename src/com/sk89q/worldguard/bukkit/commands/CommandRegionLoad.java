@@ -23,7 +23,7 @@ import com.sk89q.worldguard.bukkit.GlobalConfiguration;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import java.io.IOException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -44,7 +44,7 @@ public class CommandRegionLoad extends WgRegionCommand {
         CommandHandler.checkArgs(args, 0, 0, "/region load");
 
         try {
-            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
+            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(wcfg.getWorldName());
             mgr.load();
             sender.sendMessage(ChatColor.YELLOW + "Region database loaded from file!");
         } catch (IOException e) {

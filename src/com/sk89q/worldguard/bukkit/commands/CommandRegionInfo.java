@@ -24,11 +24,11 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.CommandHandler.CommandHandlingException;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.regionmanager.RegionManager;
+import com.sk89q.worldguard.protection.flags.FlagDatabase;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.RegionFlags;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.flags.FlagDatabase;
-import com.sk89q.worldguard.protection.regions.flags.RegionFlagContainer;
-import com.sk89q.worldguard.protection.regions.flags.info.RegionFlagInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -47,7 +47,7 @@ public class CommandRegionInfo extends WgRegionCommand {
         
         CommandHandler.checkArgs(args, 1, 1, "/region info <id>");
 
-        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().getRegionManager(wcfg.getWorldName());
+        RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(wcfg.getWorldName());
         String id = args[0].toLowerCase();
         if (!mgr.hasRegion(id)) {
             sender.sendMessage(ChatColor.RED + "A region with ID '"
@@ -71,7 +71,7 @@ public class CommandRegionInfo extends WgRegionCommand {
             plugin.checkPermission(sender, "region.info");
         }
 
-        RegionFlagContainer flags = region.getFlags();
+        RegionFlags flags = region.getFlags();
         DefaultDomain owners = region.getOwners();
         DefaultDomain members = region.getMembers();
 
@@ -81,7 +81,7 @@ public class CommandRegionInfo extends WgRegionCommand {
 
         StringBuilder s = new StringBuilder();
 
-        for (RegionFlagInfo nfo : FlagDatabase.getFlagInfoList()) {
+        for (Flag nfo : FlagDatabase.getFlagInfoList()) {
             if (s.length() > 0) {
                 s.append(", ");
             }
