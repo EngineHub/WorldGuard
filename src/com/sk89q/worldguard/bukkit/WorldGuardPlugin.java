@@ -547,6 +547,12 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public static void createDefaultConfiguration(File actual,
             String defaultName) {
+        
+        // Make parent directories
+        File parent = actual.getParentFile();
+        if (!parent.exists()) {
+            parent.mkdirs();
+        }
 
         if (actual.exists()) {
             return;

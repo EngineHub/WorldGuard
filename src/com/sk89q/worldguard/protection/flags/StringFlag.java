@@ -20,7 +20,7 @@ package com.sk89q.worldguard.protection.flags;
 
 /**
  *
- * @author Michael
+ * @author sk89q
  */
 public class StringFlag extends Flag<String> {
     
