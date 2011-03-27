@@ -20,9 +20,9 @@ package com.sk89q.worldguard.protection.flags;
 
 /**
  *
- * @author Michael
+ * @author sk89q
  */
-public class DoubleFlag extends Flag {
+public class DoubleFlag extends Flag<Double> {
     
     public DoubleFlag(String name, char legacyCode) {
         super(name, legacyCode);

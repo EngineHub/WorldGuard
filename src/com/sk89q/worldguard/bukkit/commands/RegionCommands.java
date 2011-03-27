@@ -31,14 +31,11 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.*;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.FlagDatabase;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.RegionFlags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
 import com.sk89q.worldguard.util.RegionUtil;
@@ -160,7 +157,7 @@ public class RegionCommands {
                 throw new CommandException("This region already exists and you don't own it.");
             }
         }
-
+/*
         ApplicableRegionSet regions = mgr.getApplicableRegions(region);
         
         // Check if this region overlaps any other region
@@ -175,7 +172,7 @@ public class RegionCommands {
                 throw new CommandException("You may only claim regions inside " +
                 		"existing regions that you or your group own.");
             }
-        }
+        }*/
 
         if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
             if (iConomy.getBank().hasAccount(player.getName())) {
@@ -236,10 +233,10 @@ public class RegionCommands {
             player = plugin.checkPlayer(sender);
             localPlayer = plugin.wrapPlayer(player);
             world = player.getWorld();
-            args.getString(0).toLowerCase();
+            id = args.getString(0).toLowerCase();
         } else {
             world = plugin.matchWorld(sender, args.getString(0));
-            args.getString(1).toLowerCase();
+            id = args.getString(1).toLowerCase();
         }
         
         RegionManager mgr = plugin.getGlobalRegionManager().get(world.getName());
@@ -262,7 +259,6 @@ public class RegionCommands {
             plugin.checkPermission(sender, "region.info");
         }
 
-        RegionFlags flags = region.getFlags();
         DefaultDomain owners = region.getOwners();
         DefaultDomain members = region.getMembers();
 
@@ -272,12 +268,12 @@ public class RegionCommands {
 
         StringBuilder s = new StringBuilder();
 
-        for (Flag nfo : FlagDatabase.getFlagInfoList()) {
+        for (Flag<?> flag : DefaultFlag.getFlags()) {
             if (s.length() > 0) {
                 s.append(", ");
             }
 
-            s.append(nfo.name + ": " + flags.getFlag(nfo).toString());
+            s.append(flag.getName() + ": " + String.valueOf(region.getFlag(flag)));
         }
 
         sender.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());
@@ -287,6 +283,5 @@ public class RegionCommands {
                 + owners.toUserFriendlyString());
         sender.sendMessage(ChatColor.LIGHT_PURPLE + "Members: "
                 + members.toUserFriendlyString());
-        return true;
     }
 }

@@ -19,10 +19,15 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.protection.flags.*;
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import com.sk89q.worldguard.LocalPlayer;
-import java.util.List;
 
 /**
  * Represents a setFlag of regions and their rules as applied to one point or
@@ -32,9 +37,8 @@ import java.util.List;
  */
 public class ApplicableRegionSet {
 
-    private Iterator<ProtectedRegion> applicable;
+    private Collection<ProtectedRegion> applicable;
     private ProtectedRegion globalRegion;
-    private ProtectedRegion affectedRegion;
 
     /**
      * Construct the object.
@@ -42,7 +46,7 @@ public class ApplicableRegionSet {
      * @param applicable
      * @param globalRegion 
      */
-    public ApplicableRegionSet(Iterator<ProtectedRegion> applicable,
+    public ApplicableRegionSet(Collection<ProtectedRegion> applicable,
             ProtectedRegion globalRegion) {
         this.applicable = applicable;
         this.globalRegion = globalRegion;
@@ -55,25 +59,27 @@ public class ApplicableRegionSet {
      * @return
      */
     public boolean canBuild(LocalPlayer player) {
-        return isFlagAllowed(DefaultFlag.BUILD, player);
+        return internalGetState(DefaultFlag.BUILD, player);
     }
-
+    
     /**
-     * Checks a flag.
+     * Checks if a player can build in an area.
      * 
      * @param player
      * @return
      */
-    public boolean allowsFlag(String flag) {
-        boolean def = true;
-
-        if (flag.equals(AreaFlags.FLAG_CHEST_ACCESS)) {
-            def = global.canAccessChests;
-        } else if (flag.equals(AreaFlags.FLAG_PVP)) {
-            def = global.canPvP;
-        }
-
-        return isFlagAllowed(flag, def, null);
+    public boolean canUse(LocalPlayer player) {
+        return internalGetState(DefaultFlag.USE, player);
+    }
+    
+    /**
+     * Gets the state of a state flag. This cannot be used for the build flag.
+     * 
+     * @param flag
+     * @return
+     */
+    public boolean allows(StateFlag flag) {
+        return internalGetState(flag, null);
     }
 
     /**
@@ -85,12 +91,33 @@ public class ApplicableRegionSet {
      *            null to not check owners and members
      * @return
      */
-    private boolean getState(StateFlag flag, LocalPlayer player) {
+    private boolean internalGetState(StateFlag flag, LocalPlayer player) {
         boolean found = false;
         boolean allowed = false; // Used for ALLOW override
-        if (player == null) {
-            allowed = def;
+        boolean def = false;
+        
+        // Handle defaults
+        if (globalRegion != null) {
+            State globalState = globalRegion.getFlag(flag);
+            
+            // The global region has this flag set
+            if (globalState != null) {
+                def = (globalState == State.ALLOW);
+            }
+        } else {
+            // There is no global region, so let's use the hard-coded default
+            def = flag.getDefault();
         }
+        
+        // The player argument is used if and only if the flag is the build
+        // flag -- in which case, if there are any regions in this area, we
+        // default to FALSE, otherwise true if there are no defined regions.
+        // However, other flags are different -- if there are regions defined,
+        // we default to the global region value. 
+        if (player == null) {
+            allowed = def; 
+        }
+        
         int lastPriority = 0;
 
         // The algorithm is as follows:
@@ -111,33 +138,40 @@ public class ApplicableRegionSet {
         Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
         Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
 
-        while (applicable.hasNext()) {
-            ProtectedRegion region = applicable.next();
-
-            // Ignore non-build regions
-            if (player != null
-                    && region.getFlags().get(AreaFlags.FLAG_PASSTHROUGH) == State.ALLOW) {
-                continue;
-            }
-
-            // Allow DENY to override everything
-            if (region.getFlags().get(flag) == State.DENY) {
-                return false;
-            }
-
-            // Forget about regions that allow it, although make sure the
-            // default state is now to allow
-            if (region.getFlags().get(flag) == State.ALLOW) {
-                allowed = true;
-                found = true;
-                continue;
-            }
+        Iterator<ProtectedRegion> it = applicable.iterator();
+        
+        while (it.hasNext()) {
+            ProtectedRegion region = it.next();
 
             // Ignore lower priority regions
             if (found && region.getPriority() < lastPriority) {
                 break;
             }
 
+            // Ignore non-build regions
+            if (player != null
+                    && region.getFlag(DefaultFlag.PASSTHROUGH) == State.ALLOW) {
+                continue;
+            }
+            
+            State v = region.getFlag(flag);
+
+            // Allow DENY to override everything
+            if (v == State.DENY) {
+                return false;
+            }
+
+            // Forget about regions that allow it, although make sure the
+            // default state is now to allow
+            if (v == State.ALLOW) {
+                allowed = true;
+                found = true;
+                continue;
+            }
+
+            // For the build flag, the flags are conditional and are based
+            // on membership, so we have to check for parent-child
+            // relationships
             if (player != null) {
                 if (hasCleared.contains(region)) {
                     // Already cleared, so do nothing
@@ -180,59 +214,62 @@ public class ApplicableRegionSet {
     }
 
     /**
-     * Returns whether this set has any regions affected (discounting
-     * a global region).
+     * Gets the value of a flag. Do not use this for state flags.
      * 
+     * @param flag 
+     * @param <T> 
+     * @param <V> 
      * @return
      */
-    public boolean isAnyRegionAffected() {
-        return applicable.size() > 0;
-    }
+    public <T extends Flag<V>, V> V getFlag(T flag) {
+        int lastPriority = 0;
+        boolean found = false;
 
-    /**
-     * Get the affected region.
-     * 
-     * @return 
-     */
-    public ProtectedRegion _getAffectedRegion() {
-        if (affectedRegion != null) {
-            return affectedRegion;
-        }
+        Map<ProtectedRegion, V> needsClear = new HashMap<ProtectedRegion, V>();
+        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
 
-        affectedRegion = null;
-        Iterator<ProtectedRegion> iter = applicable.iterator();
+        Iterator<ProtectedRegion> it = applicable.iterator();
 
-        while (iter.hasNext()) {
-            ProtectedRegion region = iter.next();
+        while (it.hasNext()) {
+            ProtectedRegion region = it.next();
 
-            if (affectedRegion == null
-                    || affectedRegion.getPriority() < region.getPriority()) {
-                affectedRegion = region;
+            // Ignore lower priority regions
+            if (found && region.getPriority() < lastPriority) {
+                break;
             }
+
+            if (hasCleared.contains(region)) {
+                // Already cleared, so do nothing
+            } else if (region.getFlag(flag) != null){
+                clearParents(needsClear, hasCleared, region);
+                
+                needsClear.put(region, region.getFlag(flag));
+            }
+            
+            found = true;
+            lastPriority = region.getPriority();
         }
         
-        return affectedRegion;
+        return needsClear.values().iterator().next();
     }
 
     /**
-     * Checks whether a player is an owner of any region in this set.
+     * Clear a region's parents for getFlag().
      * 
-     * @param player
-     * @return
+     * @param needsClear
+     * @param hasCleared
+     * @param region
      */
-    public boolean _isOwner(LocalPlayer player) {
-        
-        return affectedRegion != null ? affectedRegion.isOwner(player) : false;
-    }
+    private void clearParents(Map<ProtectedRegion, ?> needsClear,
+            Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
+        ProtectedRegion parent = region.getParent();
 
-    /**
-     * Checks whether a player is a member of the region or any of its parents.
-     * 
-     * @param player
-     * @return
-     */
-    public boolean _isMember(LocalPlayer player) {
-        return affectedRegion != null ? affectedRegion.isMember(player) : false;
-    }
+        while (parent != null) {
+            if (needsClear.remove(parent) == null) {
+                hasCleared.add(parent);
+            }
 
+            parent = parent.getParent();
+        }
+    }
 }

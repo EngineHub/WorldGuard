@@ -34,7 +34,6 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.TimedFlagsTimer;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -82,8 +81,6 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public void onEnable() {
         getDataFolder().mkdirs();
-        
-        DefaultFlag.init();
         
         configuration = new GlobalConfiguration(this);
         configuration.load();

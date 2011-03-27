@@ -15,10 +15,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldguard.protection;
-
 
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -33,27 +32,29 @@ import org.bukkit.entity.Player;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 /**
- *
+ * Timer for handling flags that require a constant timer..
+ * 
  * @author Michael
  */
 public class TimedFlagsTimer implements Runnable {
 
-    WorldGuardPlugin wg;
+    private WorldGuardPlugin plugin;
 
-    Map<String, TimedFlagPlayerInfo> playerData;
+    private Map<String, TimedFlagPlayerInfo> playerData;
 
-
-    public TimedFlagsTimer(WorldGuardPlugin wg)
-    {
-        this.wg = wg;
-        this.playerData = new HashMap<String, TimedFlagPlayerInfo> ();
+    /**
+     * Construct the object.
+     * 
+     * @param plugin
+     */
+    public TimedFlagsTimer(WorldGuardPlugin plugin) {
+        this.plugin = plugin;
+        this.playerData = new HashMap<String, TimedFlagPlayerInfo>();
     }
 
-    private TimedFlagPlayerInfo getPlayerInfo(String name)
-    {
+    private TimedFlagPlayerInfo getPlayerInfo(String name) {
         TimedFlagPlayerInfo ret = playerData.get(name);
-        if(ret == null)
-        {
+        if (ret == null) {
             ret = new TimedFlagPlayerInfo();
             playerData.put(name, ret);
         }
@@ -62,34 +63,36 @@ public class TimedFlagsTimer implements Runnable {
     }
 
     public void run() {
-
-        //get players
-        Player[] players = wg.getServer().getOnlinePlayers();
+/*
+        // get players
+        Player[] players = plugin.getServer().getOnlinePlayers();
 
         for (Player player : players) {
 
             TimedFlagPlayerInfo nfo = getPlayerInfo(player.getName());
             long now = System.currentTimeMillis();
 
-            //check healing flag
-            if(nfo.sheduledHealTick != null && now >= nfo.sheduledHealTick)
-            {
+            // check healing flag
+            if (nfo.sheduledHealTick != null && now >= nfo.sheduledHealTick) {
                 player.setHealth(player.getHealth() + nfo.sheduledHealAmount);
                 nfo.sheduledHealTick = null;
                 nfo.lastHealTick = now;
             }
 
-            if(player.getWorld().getName() == null) {
+            if (player.getWorld().getName() == null) {
                 continue;
             }
-            RegionManager mgr = wg.getGlobalRegionManager().get(player.getWorld().getName());
-            ApplicableRegionSet regions = mgr.getApplicableRegions(toVector(player.getLocation()));
+            RegionManager mgr = plugin.getGlobalRegionManager().get(
+                    player.getWorld().getName());
+            ApplicableRegionSet regions = mgr
+                    .getApplicableRegions(toVector(player.getLocation()));
 
-            int healDelay = regions.getIntegerFlag(DefaultFlag.HEAL_DELAY, true).getValue(-1);
+            Integer healDelay = regions.getFlag(DefaultFlag.HEAL_DELAY);
 
             if (healDelay > 0) {
                 healDelay *= 1000;
-                int healAmount = regions.getIntegerFlag(DefaultFlag.HEAL_AMOUNT, true).getValue(1);
+                int healAmount = regions.getIntegerFlag(
+                        DefaultFlag.HEAL_AMOUNT, true).getValue(1);
                 if (now - nfo.lastHealTick > healDelay) {
                     if (player.getHealth() < 20) {
                         if (player.getHealth() + healAmount > 20) {
@@ -104,16 +107,17 @@ public class TimedFlagsTimer implements Runnable {
                 }
             }
 
-            
-            //check greeting/farewell flag
+            // check greeting/farewell flag
             String newRegionName = regions.getAffectedRegionId();
 
             if (newRegionName != null) {
-   
 
-                if (nfo.lastRegion == null || !newRegionName.equals(nfo.lastRegion)) {
-                    String newGreetMsg = regions.getStringFlag(DefaultFlag.GREET_MESSAGE, true).getValue();
-                    String farewellMsg = regions.getStringFlag(DefaultFlag.FAREWELL_MESSAGE, true).getValue();
+                if (nfo.lastRegion == null
+                        || !newRegionName.equals(nfo.lastRegion)) {
+                    String newGreetMsg = regions.getStringFlag(
+                            DefaultFlag.GREET_MESSAGE, true).getValue();
+                    String farewellMsg = regions.getStringFlag(
+                            DefaultFlag.FAREWELL_MESSAGE, true).getValue();
 
                     if (nfo.lastFarewellMsg != null) {
                         player.sendMessage(nfo.lastFarewellMsg);
@@ -122,8 +126,11 @@ public class TimedFlagsTimer implements Runnable {
                     if (newGreetMsg != null) {
                         player.sendMessage(newGreetMsg);
                     }
-                    if (regions.getBooleanFlag(DefaultFlag.NOTIFY_GREET, false).getValue(false)) {
-                        broadcastNotification(ChatColor.YELLOW + "Player " + player.getName() + " entered region " + newRegionName);
+                    if (regions.getBooleanFlag(DefaultFlag.NOTIFY_GREET, false)
+                            .getValue(false)) {
+                        broadcastNotification(ChatColor.YELLOW + "Player "
+                                + player.getName() + " entered region "
+                                + newRegionName);
                     }
                     nfo.lastFarewellMsg = farewellMsg;
                     nfo.lastRegion = newRegionName;
@@ -134,29 +141,31 @@ public class TimedFlagsTimer implements Runnable {
                         player.sendMessage(nfo.lastFarewellMsg);
                         nfo.lastFarewellMsg = null;
                     }
-                    if (regions.getBooleanFlag(DefaultFlag.NOTIFY_FAREWELL, false).getValue(false)) {
-                        broadcastNotification(ChatColor.YELLOW + "Player " + player.getName() + " left region " + nfo.lastRegion);
+                    if (regions.getBooleanFlag(DefaultFlag.NOTIFY_FAREWELL,
+                            false).getValue(false)) {
+                        broadcastNotification(ChatColor.YELLOW + "Player "
+                                + player.getName() + " left region "
+                                + nfo.lastRegion);
                     }
                     nfo.lastRegion = null;
                 }
             }
 
-            //check passthrough flag
-            LocalPlayer lplayer = BukkitPlayer.wrapPlayer(wg, player);
-            if(!regions.isStateFlagAllowed(DefaultFlag.PASSTHROUGH, lplayer))
-            {
+            // check passthrough flag
+            LocalPlayer lplayer = BukkitPlayer.wrapPlayer(plugin, player);
+            if (!regions.isStateFlagAllowed(DefaultFlag.PASSTHROUGH, lplayer)) {
                 Location newLoc = player.getLocation().clone();
                 newLoc.setX(newLoc.getBlockX() - 30);
                 newLoc.setY(newLoc.getWorld().getHighestBlockYAt(newLoc) + 1);
                 player.teleportTo(newLoc);
             }
-            
-        }
+
+        }*/
     }
 
     public void broadcastNotification(String msg) {
-        for (Player player : wg.getServer().getOnlinePlayers()) {
-            if (wg.hasPermission(player, "notify_onenter")) {
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
+            if (plugin.hasPermission(player, "notify_onenter")) {
                 player.sendMessage(msg);
             }
         }

@@ -24,7 +24,6 @@ import com.sk89q.worldguard.blacklist.BlacklistLogger;
 import com.sk89q.worldguard.blacklist.loggers.ConsoleLoggerHandler;
 import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
 import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
-import com.sk89q.worldguard.protection.GlobalFlags;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -174,19 +173,6 @@ public class WorldConfiguration {
                 blockCreatureSpawn.add(creature);
             }
         }
-
-        GlobalFlags globalFlags = new GlobalFlags();
-        globalFlags.canBuild = config.getBoolean("regions.default.build", true);
-        globalFlags.canAccessChests = config.getBoolean("regions.default.chest-access", false);
-        globalFlags.canPvP = config.getBoolean("regions.default.pvp", true);
-        globalFlags.canLighter = config.getBoolean("regions.default.lighter", true);
-        globalFlags.canTnt = config.getBoolean("regions.default.tnt", true);
-        globalFlags.allowCreeper = config.getBoolean("regions.default.creeper", true);
-        globalFlags.allowMobDamage = config.getBoolean("regions.default.mobdamage", true);
-        globalFlags.canLeverandbutton = config.getBoolean("regions.default.leverandbutton", true);
-        globalFlags.canPlaceVehicle = config.getBoolean("regions.default.placevehicle", true);
-        globalFlags.allowWaterflow = config.getBoolean("regions.default.waterflow", true);        
-        plugin.getGlobalRegionManager().setGlobalFlags(worldName, globalFlags);
 
         boolean useBlacklistAsWhitelist = config.getBoolean("blacklist.use-as-whitelist", false);
 

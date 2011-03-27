@@ -253,7 +253,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @param <T>
      * @param <V>
      * @param flag
-     * @return
+     * @return value or null if isn't defined
      */
     @SuppressWarnings("unchecked")
     public <T extends Flag<V>, V> V getFlag(T flag) {
@@ -262,7 +262,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         if (obj != null) {
             val = (V) obj;
         } else {
-            return flag.getDefault();
+            return null;
         }
         return val;
     }
@@ -309,17 +309,17 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
             return 1;
         }
     }
-    
+
     /**
      * Return the type of region as a user-friendly, lowercase name.
      * 
      * @return type of region
      */
     public abstract String getTypeName();
-    
 
-    public abstract List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException;
-
+    public abstract List<ProtectedRegion> getIntersectingRegions(
+            List<ProtectedRegion> regions)
+            throws UnsupportedIntersectionException;
     
     /**
      * Thrown when setting a curParent would create a circular inheritance

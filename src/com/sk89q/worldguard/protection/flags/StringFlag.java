@@ -22,7 +22,7 @@ package com.sk89q.worldguard.protection.flags;
  *
  * @author Michael
  */
-public class StringFlag extends Flag {
+public class StringFlag extends Flag<String> {
     
     public StringFlag(String name, char legacyCode) {
         super(name, legacyCode);

@@ -20,27 +20,29 @@ package com.sk89q.worldguard.protection.flags;
 
 /**
  *
- * @author Michael
+ * @author sk89q
  */
 public class StateFlag extends Flag<StateFlag.State> {
     
     public enum State {
-        NONE,
         ALLOW,
         DENY
     }
     
-    public StateFlag(String name, char legacyCode) {
+    private boolean def;
+    
+    public StateFlag(String name, char legacyCode, boolean def) {
         super(name, legacyCode);
+        this.def = def;
     }
 
-    public StateFlag(String name) {
+    public StateFlag(String name, boolean def) {
         super(name);
+        this.def = def;
     }
 
-    @Override
-    public State getDefault() {
-        return State.NONE;
+    public boolean getDefault() {
+        return def;
     }
     
 }

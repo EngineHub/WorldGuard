@@ -19,7 +19,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.RegionFlags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
@@ -68,14 +67,14 @@ public class WorldGuardBlockListener extends BlockListener {
 
         PluginManager pm = plugin.getServer().getPluginManager();
 
-        pm.registerEvent(Event.Type.BLOCK_DAMAGED, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_DAMAGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_BREAK, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.BLOCK_FLOW, this, Priority.Normal, plugin);
+        pm.registerEvent(Event.Type.BLOCK_FROMTO, this, Priority.Normal, plugin);
         pm.registerEvent(Event.Type.BLOCK_IGNITE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_PHYSICS, this, Priority.Normal, plugin);
-        pm.registerEvent(Event.Type.BLOCK_INTERACT, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.BLOCK_PLACED, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.BLOCK_RIGHTCLICKED, this, Priority.High, plugin);
+        //pm.registerEvent(Event.Type.BLOCK_INTERACT, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_PLACE, this, Priority.High, plugin);
+        //pm.registerEvent(Event.Type.BLOCK_RIGHTCLICK, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_BURN, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
     }
@@ -247,7 +246,7 @@ public class WorldGuardBlockListener extends BlockListener {
             Vector pt = toVector(blockFrom.getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().get(world.getName());
 
-            if (!mgr.getApplicableRegions(pt).isStateFlagAllowed(DefaultFlag.WATER_FLOW)) {
+            if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.WATER_FLOW)) {
                 event.setCancelled(true);
                 return;
             }
@@ -293,18 +292,18 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
 
                 if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !set.isStateFlagAllowed(DefaultFlag.LIGHTER)) {
+                        && !set.allows(DefaultFlag.LIGHTER)) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if (isFireSpread && set.isStateFlagAllowed(DefaultFlag.FIRE_SPREAD)) {
+            if (isFireSpread && set.allows(DefaultFlag.FIRE_SPREAD)) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (cause == IgniteCause.LAVA && !set.isStateFlagAllowed(DefaultFlag.LAVA_FIRE)) {
+            if (cause == IgniteCause.LAVA && !set.allows(DefaultFlag.LAVA_FIRE)) {
                 event.setCancelled(true);
                 return;
             }
@@ -419,7 +418,7 @@ public class WorldGuardBlockListener extends BlockListener {
      * Called when a block is interacted with
      * 
      * @param event Relevant event details
-     */
+     *//*
     @Override
     public void onBlockInteract(BlockInteractEvent event) {
 
@@ -448,7 +447,7 @@ public class WorldGuardBlockListener extends BlockListener {
 
                 if (!plugin.hasPermission(player, "region.bypass")) {
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                    if (!set.isStateFlagAllowed(DefaultFlag.CHEST_ACCESS) && !set.canBuild(localPlayer)) {
+                    if (!set.allows(DefaultFlag.CHEST_ACCESS) && !set.canBuild(localPlayer)) {
                         player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                         event.setCancelled(true);
                         return;
@@ -463,7 +462,7 @@ public class WorldGuardBlockListener extends BlockListener {
             ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(pt);
             LocalPlayer localPlayer = plugin.wrapPlayer((Player)entity);
 
-            if (!applicableRegions.isStateFlagAllowed(DefaultFlag.LEVER_AND_BUTTON, localPlayer)) {
+            if (!applicableRegions.canUse(localPlayer)) {
                 ((Player)entity).sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
@@ -480,7 +479,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
-    }
+    }*/
 
     /**
      * Called when a player places a block
@@ -538,9 +537,9 @@ public class WorldGuardBlockListener extends BlockListener {
      *
      * @param event Relevant event details
      */
+    /*
     @Override
     public void onBlockRightClick(BlockRightClickEvent event) {
-
         Player player = event.getPlayer();
         Block blockClicked = event.getBlock();
 
@@ -639,7 +638,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
             }
         }
-    }
+    }*/
 
     /**
      * Called when redstone changes

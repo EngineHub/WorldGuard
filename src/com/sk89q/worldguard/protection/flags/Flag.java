@@ -46,6 +46,4 @@ public abstract class Flag<T> {
         return legacyCode;
     }
     
-    public abstract T getDefault();
-    
 }

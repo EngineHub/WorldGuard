@@ -20,9 +20,9 @@ package com.sk89q.worldguard.protection.flags;
 
 /**
  *
- * @author Michael
+ * @author sk89q
  */
-public class RegionGroupFlag extends Flag {
+public class RegionGroupFlag extends Flag<String> {
     
     public RegionGroupFlag(String name, char legacyCode) {
         super(name, legacyCode);

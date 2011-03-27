@@ -125,8 +125,8 @@ public abstract class RegionManager {
      * @param region
      * @return
      */
-    public abstract ApplicableRegionSet getApplicableRegions(
-            ProtectedRegion region);
+    /*public abstract ApplicableRegionSet getApplicableRegions(
+            ProtectedRegion region);*/
 
     /**
      * Get a list of region IDs that contain a point.

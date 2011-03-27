@@ -28,7 +28,6 @@ import java.util.HashMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.domains.DefaultDomain;
 

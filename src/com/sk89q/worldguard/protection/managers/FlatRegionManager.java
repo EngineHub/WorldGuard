@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.managers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
@@ -138,8 +139,8 @@ public class FlatRegionManager extends RegionManager {
      */
     @Override
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
-
-        List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
+        PriorityQueue<ProtectedRegion> appRegions =
+                new PriorityQueue<ProtectedRegion>();
 
         for (ProtectedRegion region : regions.values()) {
             if (region.contains(pt)) {
@@ -147,7 +148,7 @@ public class FlatRegionManager extends RegionManager {
             }
         }
 
-        return new ApplicableRegionSet(appRegions);
+        return new ApplicableRegionSet(appRegions, regions.get("__global__"));
     }
 
     /**
@@ -155,7 +156,7 @@ public class FlatRegionManager extends RegionManager {
      *
      * @return
      */
-    @Override
+    /*@Override
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
 
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
@@ -168,8 +169,8 @@ public class FlatRegionManager extends RegionManager {
             intersectRegions = new ArrayList<ProtectedRegion>();
         }
 
-        return new ApplicableRegionSet(intersectRegions);
-    }
+        return new ApplicableRegionSet(intersectRegions, regions.get("__global__"));
+    }*/
 
     /**
      * Get a list of region IDs that contain a point.

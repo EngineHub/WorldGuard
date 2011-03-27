@@ -18,12 +18,13 @@
  */
 package com.sk89q.worldguard.protection.flags;
 
+import org.bukkit.Location;
 
 /**
  *
- * @author Michael
+ * @author sk89q
  */
-public class LocationFlag extends Flag {
+public class LocationFlag extends Flag<Location> {
     
     public LocationFlag(String name, char legacyCode) {
         super(name, legacyCode);

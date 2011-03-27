@@ -20,9 +20,9 @@ package com.sk89q.worldguard.protection.flags;
 
 /**
  *
- * @author Michael
+ * @author sk89q
  */
-public class IntegerFlag extends Flag {
+public class IntegerFlag extends Flag<Integer> {
     
     public IntegerFlag(String name, char legacyCode) {
         super(name, legacyCode);

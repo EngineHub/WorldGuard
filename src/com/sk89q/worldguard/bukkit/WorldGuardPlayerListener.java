@@ -38,7 +38,6 @@ import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.RegionFlag.RegionGroup;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
@@ -65,7 +64,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void registerEvents() {
         PluginManager pm = plugin.getServer().getPluginManager();
 
-        pm.registerEvent(Event.Type.PLAYER_ITEM, this, Priority.High, plugin);
+        //pm.registerEvent(Event.Type.PLAYER_ITEM, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_JOIN, this, Priority.Normal, plugin);
@@ -122,7 +121,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * Called when a player uses an item
      * 
      * @param event Relevant event details
-     */
+     *//*
     @Override
     public void onPlayerItem(PlayerItemEvent event) {
 
@@ -185,7 +184,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 return;
             }
         }
-    }
+    }*/
 
     /**
      * Called when a player attempts to log in to the server
@@ -271,7 +270,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
     }
-
+/*
     @Override
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
@@ -303,5 +302,5 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 event.setRespawnLocation(spawn);
             }
         }
-    }
+    }*/
 }

@@ -73,7 +73,7 @@ public class WorldGuardVehicleListener extends VehicleListener {
             RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(vhcl.getWorld().getName());
             ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(pt);
 
-            if (!applicableRegions.isStateFlagAllowed(DefaultFlag.PLACE_VEHICLE)) {
+            if (!applicableRegions.allows(DefaultFlag.PLACE_VEHICLE)) {
                 vhcl.remove();
                 return;
             }

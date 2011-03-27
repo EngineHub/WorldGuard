@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.managers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 import org.khelekore.prtree.MBRConverter;
 import org.khelekore.prtree.PRTree;
@@ -154,8 +155,8 @@ public class PRTreeRegionManager extends RegionManager {
      */
     @Override
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
-
-        List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
+        PriorityQueue<ProtectedRegion> appRegions =
+                new PriorityQueue<ProtectedRegion>();
 
         int x = pt.getBlockX();
         int z = pt.getBlockZ();
@@ -166,10 +167,10 @@ public class PRTreeRegionManager extends RegionManager {
             }
         }
 
-        return new ApplicableRegionSet(appRegions);
+        return new ApplicableRegionSet(appRegions, regions.get("__global__"));
     }
 
-    @Override
+    /*@Override
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
         appRegions.addAll(regions.values());
@@ -181,8 +182,8 @@ public class PRTreeRegionManager extends RegionManager {
             intersectRegions = new ArrayList<ProtectedRegion>();
         }
 
-        return new ApplicableRegionSet(intersectRegions);
-    }
+        return new ApplicableRegionSet(intersectRegions, regions.get("__global__"));
+    }*/
 
     /**
      * Get a list of region IDs that contain a point.
