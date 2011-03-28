@@ -74,13 +74,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
-
-            if (cfg.isInvinciblePlayer(player.getName())) {
-                event.setCancelled(true);
-                return;
-            }
+            ConfigurationManager cfg = plugin.getGlobalConfiguration();
+            WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
 
             if (wcfg.disableLavaDamage && type == DamageCause.LAVA) {
                 event.setCancelled(true);
@@ -102,13 +97,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
-
-            if (cfg.isInvinciblePlayer(player.getName())) {
-                event.setCancelled(true);
-                return;
-            }
+            ConfigurationManager cfg = plugin.getGlobalConfiguration();
+            WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
 
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
@@ -158,13 +148,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
-
-            if (cfg.isInvinciblePlayer(player.getName())) {
-                event.setCancelled(true);
-                return;
-            }
+            ConfigurationManager cfg = plugin.getGlobalConfiguration();
+            WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
 
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
@@ -217,13 +202,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
-
-            if (cfg.isInvinciblePlayer(player.getName())) {
-                event.setCancelled(true);
-                return;
-            }
+            ConfigurationManager cfg = plugin.getGlobalConfiguration();
+            WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
 
             if (wcfg.disableFallDamage && type == DamageCause.FALL) {
                 event.setCancelled(true);
@@ -251,12 +231,6 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
-
-            if (type == DamageCause.DROWNING
-                    && cfg.isAmphibiousPlayer(player.getName())) {
-                event.setCancelled(true);
-                return;
-            }
         }
     }
 
@@ -267,9 +241,9 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
         Location l = event.getLocation();
-        WorldConfiguration wcfg = cfg.getWorldConfig(l.getWorld().getName());
+        WorldConfiguration wcfg = cfg.forWorld(l.getWorld().getName());
 
         if (event.getEntity() instanceof LivingEntity) {
 
@@ -317,8 +291,8 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(event.getEntity().getWorld().getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(event.getEntity().getWorld().getName());
 
         //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
         CreatureType creaType = event.getCreatureType();
@@ -380,7 +354,7 @@ public class WorldGuardEntityListener extends EntityListener {
                     loc.setX(x + 0.5);
                     loc.setY(y);
                     loc.setZ(z + 0.5);
-                    player.teleportTo(loc);
+                    player.teleport(loc);
                 }
 
                 return;

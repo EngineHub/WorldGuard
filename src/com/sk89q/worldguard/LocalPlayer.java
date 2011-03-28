@@ -72,6 +72,14 @@ public abstract class LocalPlayer {
      */
     public abstract String[] getGroups();
     
+    /**
+     * Returns whether a player has permission.
+     * 
+     * @param perm 
+     * @return 
+     */
+    public abstract boolean hasPermission(String perm);
+    
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof LocalPlayer)) {

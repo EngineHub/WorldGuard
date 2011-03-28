@@ -69,8 +69,7 @@ public class WorldGuardVehicleListener extends VehicleListener {
         Vector pt = new Vector(vhclLoc.getBlockX(), vhclLoc.getBlockY(), vhclLoc.getBlockZ());
 
         if (vhcl instanceof Minecart || vhcl instanceof Boat) {
-            GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-            RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(vhcl.getWorld().getName());
+            RegionManager mgr = plugin.getGlobalRegionManager().get(vhcl.getWorld().getName());
             ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(pt);
 
             if (!applicableRegions.allows(DefaultFlag.PLACE_VEHICLE)) {

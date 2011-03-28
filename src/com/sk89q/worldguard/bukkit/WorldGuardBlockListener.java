@@ -23,16 +23,9 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
-import com.nijiko.coelho.iConomy.iConomy;
-import com.nijiko.coelho.iConomy.system.Account;
-import java.util.Iterator;
-import java.util.List;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.World;
 import org.bukkit.event.block.*;
@@ -41,10 +34,7 @@ import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 public class WorldGuardBlockListener extends BlockListener {
@@ -93,13 +83,11 @@ public class WorldGuardBlockListener extends BlockListener {
         Player player = event.getPlayer();
         Block blockDamaged = event.getBlock();
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
 
         if (wcfg.useRegions && blockDamaged.getType() == Material.CAKE_BLOCK) {
-            Vector pt = toVector(blockDamaged);
-
-            if (!cfg.canBuild(player, pt)) {
+            if (!plugin.canBuild(player, blockDamaged.getLocation())) {
                 player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
 
                 event.setCancelled(true);
@@ -122,8 +110,8 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         Player player = event.getPlayer();
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(player.getWorld().getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getItemInHand();
@@ -134,9 +122,7 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         if (wcfg.useRegions) {
-            Vector pt = BukkitUtil.toVector(event.getBlock());
-
-            if (!cfg.canBuild(player, pt)) {
+            if (!plugin.canBuild(player, event.getBlock().getLocation())) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
@@ -181,8 +167,8 @@ public class WorldGuardBlockListener extends BlockListener {
         boolean isWater = blockFrom.getTypeId() == 8 || blockFrom.getTypeId() == 9;
         boolean isLava = blockFrom.getTypeId() == 10 || blockFrom.getTypeId() == 11;
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(event.getBlock().getWorld().getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(event.getBlock().getWorld().getName());
 
         if (wcfg.simulateSponge && isWater) {
             int ox = blockTo.getX();
@@ -270,8 +256,8 @@ public class WorldGuardBlockListener extends BlockListener {
         Block block = event.getBlock();
         World world = block.getWorld();
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(world.getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(world.getName());
 
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
@@ -358,8 +344,8 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(event.getBlock().getWorld().getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(event.getBlock().getWorld().getName());
 
         if (wcfg.disableFireSpread) {
             event.setCancelled(true);
@@ -393,8 +379,8 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(event.getBlock().getWorld().getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(event.getBlock().getWorld().getName());
 
         int id = event.getChangedTypeId();
 
@@ -497,13 +483,11 @@ public class WorldGuardBlockListener extends BlockListener {
         Player player = event.getPlayer();
         World world = blockPlaced.getWorld();
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(world.getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(world.getName());
 
         if (wcfg.useRegions) {
-            Vector pt = toVector(blockPlaced);
-
-            if (!cfg.canBuild(player, pt)) {
+            if (!plugin.canBuild(player, blockPlaced.getLocation())) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
@@ -653,8 +637,8 @@ public class WorldGuardBlockListener extends BlockListener {
         Block blockTo = event.getBlock();
         World world = blockTo.getWorld();
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(world.getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(world.getName());
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
             int ox = blockTo.getX();
@@ -690,8 +674,8 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     private void clearSpongeWater(World world, int ox, int oy, int oz) {
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(world.getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(world.getName());
 
         for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
             for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
@@ -714,8 +698,8 @@ public class WorldGuardBlockListener extends BlockListener {
      */
     private void addSpongeWater(World world, int ox, int oy, int oz) {
 
-        GlobalConfiguration cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.getWorldConfig(world.getName());
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.forWorld(world.getName());
 
         // The negative x edge
         int cx = ox - wcfg.spongeRadius - 1;

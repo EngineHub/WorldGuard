@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldguard.protection.databases;
 
@@ -23,16 +23,18 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.google.gson.Gson;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Map;
 import java.util.logging.Logger;
 
 /**
  * Represents a protected area database that uses JSON files.
- *
+ * 
  * @author Redecouverte
  */
 public class JSONDatabase implements ProtectionDatabase {
@@ -46,12 +48,12 @@ public class JSONDatabase implements ProtectionDatabase {
     /**
      * Holds the list of regions.
      */
-    private Map<String,ProtectedRegion> regions;
+    private Map<String, ProtectedRegion> regions;
 
     /**
-     * Construct the database with a path to a file. No file is read or
-     * written at this time.
-     *
+     * Construct the database with a path to a file. No file is read or written
+     * at this time.
+     * 
      * @param file
      */
     public JSONDatabase(File file) {
@@ -61,11 +63,13 @@ public class JSONDatabase implements ProtectionDatabase {
     /**
      * Helper function to read a file into a String
      */
-    private static String readFileAsString(File file) throws java.io.IOException {
+    private static String readFileAsString(File file)
+            throws java.io.IOException {
         byte[] buffer = new byte[(int) file.length()];
         BufferedInputStream f = null;
         try {
-            f = new BufferedInputStream(new FileInputStream(file.getAbsolutePath()));
+            f = new BufferedInputStream(new FileInputStream(
+                    file.getAbsolutePath()));
             f.read(buffer);
         } finally {
             if (f != null) {
@@ -76,10 +80,8 @@ public class JSONDatabase implements ProtectionDatabase {
             }
         }
 
-        for(int i = 0; i < buffer.length; i++)
-        {
-            if(buffer[i] < 0x20 || buffer[i] > 0x126)
-            {
+        for (int i = 0; i < buffer.length; i++) {
+            if (buffer[i] < 0x20 || buffer[i] > 0x126) {
                 buffer[i] = 0x20;
             }
         }
@@ -92,9 +94,10 @@ public class JSONDatabase implements ProtectionDatabase {
      */
     public void load() throws IOException {
 
-         Gson gson = new Gson();
-	 JSONContainer jContainer = gson.fromJson(readFileAsString(file), JSONContainer.class);
-         this.regions = jContainer.getRegions();
+        Gson gson = new Gson();
+        JSONContainer jContainer = gson.fromJson(readFileAsString(file),
+                JSONContainer.class);
+        this.regions = jContainer.getRegions();
     }
 
     /**
@@ -103,37 +106,41 @@ public class JSONDatabase implements ProtectionDatabase {
     public void save() throws IOException {
 
         Gson gson = new Gson();
-        String jsonData = gson.toJson(new JSONContainer(this.regions), JSONContainer.class);
+        String jsonData = gson.toJson(new JSONContainer(this.regions),
+                JSONContainer.class);
         writeStringToFile(jsonData, this.file);
     }
-
 
     /**
      * Writes a String to a file.
      * 
-     * @param string 
-     * @param file 
+     * @param string
+     * @param file
      * @throws IOException
      */
-    public static void writeStringToFile(String string, File file) throws IOException {
-        FileWriter writer = null;
-
+    public static void writeStringToFile(String string, File file)
+            throws IOException {
+        FileOutputStream output = null;
+        
         try {
-            writer = new FileWriter(file);
+            output = new FileOutputStream(file);
+            OutputStreamWriter streamWriter = new OutputStreamWriter(output, "utf-8");
+            BufferedWriter writer = new BufferedWriter(streamWriter);
             writer.write(string);
+            writer.close();
         } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
+            if (output != null) {
+                try {
+                    output.close();
+                } catch (IOException e) {
                 }
-            } catch (IOException e) {
             }
         }
     }
 
     /**
      * Load the list of regions into a region manager.
-     *
+     * 
      * @throws IOException
      */
     public void load(RegionManager manager) throws IOException {
@@ -143,7 +150,7 @@ public class JSONDatabase implements ProtectionDatabase {
 
     /**
      * Save the list of regions from a region manager.
-     *
+     * 
      * @throws IOException
      */
     public void save(RegionManager manager) throws IOException {
@@ -153,17 +160,17 @@ public class JSONDatabase implements ProtectionDatabase {
 
     /**
      * Get a list of protected regions.
-     *
+     * 
      * @return
      */
-    public Map<String,ProtectedRegion> getRegions() {
+    public Map<String, ProtectedRegion> getRegions() {
         return regions;
     }
 
     /**
      * Get a list of protected regions.
      */
-    public void setRegions(Map<String,ProtectedRegion> regions) {
+    public void setRegions(Map<String, ProtectedRegion> regions) {
         this.regions = regions;
     }
 }

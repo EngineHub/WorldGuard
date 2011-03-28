@@ -46,6 +46,7 @@
     <mkdir dir="${build.dir}/defaults"/>
     <copy tofile="${build.dir}/defaults/global.yml" file="global.yml"/>
     <copy tofile="${build.dir}/defaults/config.yml" file="config.yml"/>
+    <copy tofile="${build.dir}/defaults/config_world.yml" file="config_world.yml"/>
     <copy tofile="${build.dir}/defaults/blacklist.txt" file="blacklist.txt"/>
     <jar jarfile="${dist.dir}/WorldGuard.jar" basedir="${build.dir}" manifest="manifest.mf">
         <zipgroupfileset dir="lib" includes="prtree.jar" />

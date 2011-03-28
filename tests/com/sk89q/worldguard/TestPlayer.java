@@ -75,4 +75,9 @@ public class TestPlayer extends LocalPlayer {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public boolean hasPermission(String perm) {
+        return true;
+    }
 }

@@ -18,6 +18,7 @@
  */
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.databases.JSONDatabase;
 import com.sk89q.worldguard.protection.managers.FlatRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -26,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
+import org.bukkit.World;
 
 /**
  * This class keeps track of region information for every world. It loads
@@ -37,11 +39,11 @@ import java.util.logging.Logger;
 public class GlobalRegionManager {
 
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-
+    
     /**
-     * Path to the folder that region data is stored within.
+     * Reference to the plugin.
      */
-    protected File dataFolder;
+    private WorldGuardPlugin plugin;
     
     /**
      * Map of managers per-world.
@@ -56,8 +58,11 @@ public class GlobalRegionManager {
 
     /**
      * Construct the object.
+     * 
+     * @param plugin 
      */
-    public GlobalRegionManager() {
+    public GlobalRegionManager(WorldGuardPlugin plugin) {
+        this.plugin = plugin;
         managers = new HashMap<String, RegionManager>();
         lastModified = new HashMap<String, Long>();
     }
@@ -77,8 +82,8 @@ public class GlobalRegionManager {
      * @return
      */
     protected File getPath(String name) {
-        return new File(dataFolder,
-                "name" + File.separator + "regions.json");
+        return new File(plugin.getDataFolder(),
+                "worlds" + File.separator + name + File.separator + "regions.json");
     }
 
     /**
@@ -123,6 +128,16 @@ public class GlobalRegionManager {
         } catch (IOException e) {
             logger.warning("WorldGuard: Failed to load regions from file "
                     + file.getAbsolutePath() + " : " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Preloads region managers for all worlds.
+     */
+    public void preload() {
+        // Load regions
+        for (World world : plugin.getServer().getWorlds()) {
+            load(world.getName());
         }
     }
 

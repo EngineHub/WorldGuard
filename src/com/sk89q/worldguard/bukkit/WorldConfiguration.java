@@ -35,7 +35,9 @@ import org.bukkit.entity.CreatureType;
 import org.bukkit.util.config.Configuration;
 
 /**
+ * Holds the configuration for individual worlds.
  * 
+ * @author sk89q
  * @author Michael
  */
 public class WorldConfiguration {
@@ -95,17 +97,26 @@ public class WorldConfiguration {
 
     /* Configuration data end */
 
-    public WorldConfiguration(WorldGuardPlugin wp, String worldName,
-            File configFile, File blacklistFile) {
-        this.plugin = wp;
+    /**
+     * Construct the object.
+     * 
+     * @param plugin 
+     * @param worldName 
+     */
+    public WorldConfiguration(WorldGuardPlugin plugin, String worldName) {
+        File baseFolder = new File(plugin.getDataFolder(), "worlds/" + worldName);
+        configFile = new File(baseFolder, "config.yml");
+        blacklistFile = new File(baseFolder, "blacklist.txt");
+        
+        this.plugin = plugin;
         this.worldName = worldName;
-        this.configFile = configFile;
-        this.blacklistFile = blacklistFile;
-
-        WorldGuardPlugin.createDefaultConfiguration(configFile, "config.yml");
+        
+        WorldGuardPlugin.createDefaultConfiguration(configFile, "config_world.yml");
         WorldGuardPlugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
 
         loadConfiguration();
+
+        logger.info("WorldGuard: Loaded configuration for world '" + worldName + '"');
     }
 
     /**

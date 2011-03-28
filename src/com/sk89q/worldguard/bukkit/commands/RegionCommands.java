@@ -24,8 +24,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.nijiko.coelho.iConomy.iConomy;
-import com.nijiko.coelho.iConomy.system.Account;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -139,7 +137,7 @@ public class RegionCommands {
         }
 
         WorldConfiguration wcfg = plugin.getGlobalConfiguration()
-                .getWorldConfig(player.getWorld().getName());
+                .forWorld(player.getWorld().getName());
         RegionManager mgr = plugin.getGlobalRegionManager().get(
                 sel.getWorld().getName());
         
@@ -174,7 +172,7 @@ public class RegionCommands {
             }
         }*/
 
-        if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
+        /*if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
             if (iConomy.getBank().hasAccount(player.getName())) {
                 Account account = iConomy.getBank().getAccount(player.getName());
                 double balance = account.getBalance();
@@ -195,7 +193,7 @@ public class RegionCommands {
                 player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
                 return;
             }
-        }
+        }*/
 
         if (region.countBlocks() > wcfg.maxClaimVolume) {
             player.sendMessage(ChatColor.RED + "This region is to large to claim.");

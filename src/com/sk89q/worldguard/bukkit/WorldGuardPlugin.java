@@ -16,80 +16,115 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.sk89q.worldguard.bukkit;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.sk89q.bukkit.migration.PermissionsResolverManager;
-import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.minecraft.util.commands.CommandsManager;
+import com.sk89q.bukkit.migration.*;
+import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.TimedFlagsTimer;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
+import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
+import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
+import com.sk89q.worldguard.protection.*;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import java.io.*;
+import java.util.*;
+import java.util.logging.Filter;
 import java.util.logging.Logger;
 
 /**
- * Plugin for Bukkit.
+ * The main class for WorldGuard as a Bukkit plugin.
  * 
  * @author sk89q
  */
 public class WorldGuardPlugin extends JavaPlugin {
-
     /**
      * Logger for messages.
      */
     protected static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
     /**
-     * List of commands.
+     * Manager for commands. This automatically handles nested commands,
+     * permissions checking, and a number of other fancy command things.
+     * We just set it up and register commands against it.
      */
-    protected CommandsManager<CommandSender> commands;
+    protected final CommandsManager<CommandSender> commands;
 
     /**
      * Handles the region databases for all worlds.
      */
-    protected GlobalRegionManager globalRegionManager;
+    protected final GlobalRegionManager globalRegionManager;
     
     /**
      * Handles all configuration.
      */
-    protected GlobalConfiguration configuration;
+    protected final ConfigurationManager configuration;
     
     /**
-     * Processes queries for permissions information.
+     * Processes queries for permissions information. The permissions manager
+     * is from WorldEdit and it automatically handles looking up permissions
+     * systems and picking the right one. WorldGuard just needs to call
+     * the permission methods.
      */
     protected PermissionsResolverManager perms;
 
     /**
+     * Construct objects. Actual loading occurs when the plugin is enabled, so
+     * this merely instantiates the objects.
+     */
+    public WorldGuardPlugin() {
+        configuration = new ConfigurationManager(this);
+        globalRegionManager = new GlobalRegionManager(this);
+        
+        final WorldGuardPlugin plugin = this;
+        commands = new CommandsManager<CommandSender>() {
+            @Override
+            public boolean hasPermission(CommandSender player, String perm) {
+                return plugin.hasPermission(player, perm);
+            }
+        };
+        
+        // Register command classes
+        commands.register(ToggleCommands.class);
+        commands.register(ProtectionCommands.class);
+        
+        // Set up permissions
+        perms = new PermissionsResolverManager(
+                getConfiguration(), getServer(), "WorldGuard", logger);
+    }
+    
+    /**
      * Called on plugin enable.
      */
     public void onEnable() {
+        // Need to create the plugins/WorldGuard folder
         getDataFolder().mkdirs();
-        
-        configuration = new GlobalConfiguration(this);
-        configuration.load();
 
-        globalRegionManager = new GlobalRegionManager();
+        // This must be done before configuration is laoded
+        LegacyWorldGuardMigration.migrateBlacklist(this);
         
-        for (World world : getServer().getWorlds()) {
-            globalRegionManager.load(world.getName());
-        }
+        // Load the configuration
+        configuration.load();
+        globalRegionManager.preload();
+        
+        // Migrate regions after the regions were loaded because
+        // the migration code reuses the loaded region managers
+        LegacyWorldGuardMigration.migrateRegions(this);
+
+        // Load permissions
+        (new PermissionsResolverServerListener(perms)).register(this);
+        perms.load();
 
         // Register events
         (new WorldGuardPlayerListener(this)).registerEvents();
@@ -98,23 +133,18 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardVehicleListener(this)).registerEvents();
 
         // 25 equals about 1s real time
-        this.getServer().getScheduler().scheduleSyncRepeatingTask(
+        getServer().getScheduler().scheduleSyncRepeatingTask(
                 this, new TimedFlagsTimer(this), 25 * 5, 25 * 5);
 
-        // Register the commands that we want to use
-        final WorldGuardPlugin plugin = this;
-        commands = new CommandsManager<CommandSender>() {
-            @Override
-            public boolean hasPermission(CommandSender player, String perm) {
-                return plugin.hasPermission(player, perm);
+        if (configuration.suppressTickSyncWarnings) {
+            Logger.getLogger("Minecraft").setFilter(
+                    new TickSyncDelayLoggerFilter());
+        } else {
+            Filter filter = Logger.getLogger("Minecraft").getFilter();
+            if (filter != null && filter instanceof TickSyncDelayLoggerFilter) {
+                Logger.getLogger("Minecraft").setFilter(null);
             }
-        };
-
-        // Set up permissions
-        perms = new PermissionsResolverManager(
-                getConfiguration(), getServer(), "WorldGuard", logger);
-        (new PermissionsResolverServerListener(perms)).register(this);
-        perms.load();
+        }
         
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }
@@ -128,7 +158,35 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         logger.info("WorldGuard " + getDescription().getVersion() + " disabled.");
     }
-
+    
+    /**
+     * Handle a command.
+     */
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label,
+            String[] args) {
+        try {
+            commands.execute(cmd.getName(), args, sender, this, sender);
+        } catch (CommandPermissionsException e) {
+            sender.sendMessage(ChatColor.RED + "You don't have permission.");
+        } catch (MissingNestedCommandException e) {
+            sender.sendMessage(ChatColor.RED + e.getUsage());
+        } catch (CommandUsageException e) {
+            sender.sendMessage(ChatColor.RED + e.getMessage());
+            sender.sendMessage(ChatColor.RED + e.getUsage());
+        } catch (WrappedCommandException e) {
+            if (e.getCause() instanceof NumberFormatException) {
+                sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
+            } else {
+                sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
+                e.printStackTrace();
+            }
+        } catch (CommandException e) {
+            sender.sendMessage(ChatColor.RED + e.getMessage());
+        }
+        
+        return true;
+    }
 
     /**
      * Get the GlobalRegionManager.
@@ -144,7 +202,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      *
      * @return
      */
-    public GlobalConfiguration getGlobalConfiguration() {
+    public ConfigurationManager getGlobalConfiguration() {
         return configuration;
     }
 
@@ -528,6 +586,48 @@ public class WorldGuardPlugin extends JavaPlugin {
             throw new CommandException("WorldEdit detection failed (report error).");
         }
     }
+    /**
+     * Check if a player has permission to build at a location.
+     * 
+     * @param player
+     * @param loc 
+     * @return
+     */
+    public boolean canBuild(Player player, Location loc) {
+        WorldConfiguration worldConfig =
+                configuration.forWorld(loc.getWorld().getName());
+        
+        if (worldConfig.useRegions) {
+            LocalPlayer localPlayer = wrapPlayer(player);
+
+            if (!hasPermission(player, "region.bypass")) {
+                RegionManager mgr = getGlobalRegionManager()
+                        .get(player.getWorld().getName());
+
+                if (!mgr.getApplicableRegions(BukkitUtil.toVector(loc))
+                        .canBuild(localPlayer)) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Check if a player has permission to build at a location.
+     * 
+     * @param player
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public boolean canBuild(Player player, int x, int y, int z) {
+        return canBuild(player, new Location(player.getWorld(), x, y, z));
+    }
     
     /**
      * Wrap a player as a LocalPlayer.
@@ -573,7 +673,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
 
                 logger.info("WorldGuard: Default configuration file written: "
-                        + defaultName);
+                        + actual.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
