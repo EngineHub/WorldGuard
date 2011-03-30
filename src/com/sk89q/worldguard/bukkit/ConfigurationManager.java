@@ -73,7 +73,7 @@ public class ConfigurationManager {
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
-            forWorld(world.getName());
+            get(world);
         }
     }
 
@@ -87,10 +87,11 @@ public class ConfigurationManager {
     /**
      * Get the configuration for a world.
      * 
-     * @param worldName
+     * @param world
      * @return
      */
-    public WorldConfiguration forWorld(String worldName) {
+    public WorldConfiguration get(World world) {
+        String worldName = world.getName();
         WorldConfiguration config = worlds.get(worldName);
         
         if (config == null) {

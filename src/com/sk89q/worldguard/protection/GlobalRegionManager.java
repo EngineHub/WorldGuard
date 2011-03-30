@@ -18,8 +18,14 @@
  */
 package com.sk89q.worldguard.protection;
 
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.BukkitUtil;
+import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.databases.JSONDatabase;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.FlatRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import java.io.File;
@@ -27,7 +33,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 /**
  * This class keeps track of region information for every world. It loads
@@ -44,6 +53,11 @@ public class GlobalRegionManager {
      * Reference to the plugin.
      */
     private WorldGuardPlugin plugin;
+    
+    /**
+     * Reference to the global configuration.
+     */
+    private ConfigurationManager config;
     
     /**
      * Map of managers per-world.
@@ -63,6 +77,7 @@ public class GlobalRegionManager {
      */
     public GlobalRegionManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
+        config = plugin.getGlobalConfiguration();
         managers = new HashMap<String, RegionManager>();
         lastModified = new HashMap<String, Long>();
     }
@@ -111,9 +126,10 @@ public class GlobalRegionManager {
     /**
      * Load region information for a world.
      * 
-     * @param name
+     * @param world
      */
-    public void load(String name) {
+    public void load(World world) {
+        String name = world.getName();
         File file = getPath(name);
         
         try {
@@ -137,7 +153,7 @@ public class GlobalRegionManager {
     public void preload() {
         // Load regions
         for (World world : plugin.getServer().getWorlds()) {
-            load(world.getName());
+            load(world);
         }
     }
 
@@ -147,7 +163,6 @@ public class GlobalRegionManager {
      */
     public void reloadChanged() {
         for (String name : managers.keySet()) {
-
             File file = getPath(name);
 
             Long oldDate = lastModified.get(name);
@@ -158,7 +173,11 @@ public class GlobalRegionManager {
 
             try {
                 if (file.lastModified() > oldDate) {
-                    load(name);
+                    World world = plugin.getServer().getWorld(name);
+                    
+                    if (world != null) {
+                        load(world);
+                    }
                 }
             } catch (Exception e) {
             }
@@ -168,16 +187,87 @@ public class GlobalRegionManager {
     /**
      * Get the region manager for a particular world.
      * 
-     * @param name
+     * @param world
      * @return
      */
-    public RegionManager get(String name) {
-        RegionManager manager = managers.get(name);
+    public RegionManager get(World world) {
+        RegionManager manager = managers.get(world.getName());
 
         if (manager == null) {
-            load(name);
+            load(world);
         }
 
         return manager;
+    }
+    
+    /**
+     * Returns whether the player can bypass.
+     * 
+     * @param player
+     * @param world
+     * @return
+     */
+    public boolean hasBypass(Player player, World world) {
+        return plugin.hasPermission(player, "worldguard.region.bypass."
+                        + world.getName());
+    }
+    
+    /**
+     * Check if a player has permission to build at a block.
+     * 
+     * @param player
+     * @param block 
+     * @return
+     */
+    public boolean canBuild(Player player, Block block) {
+        return canBuild(player, block.getLocation());
+    }
+    
+    /**
+     * Check if a player has permission to build at a location.
+     * 
+     * @param player
+     * @param loc 
+     * @return
+     */
+    public boolean canBuild(Player player, Location loc) {
+        World world = loc.getWorld();
+        WorldConfiguration worldConfig = config.get(world);
+        
+        if (!worldConfig.useRegions) {
+            return true;
+        }
+    
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+        if (!hasBypass(player, world)) {
+            RegionManager mgr = get(world);
+
+            if (!mgr.getApplicableRegions(BukkitUtil.toVector(loc))
+                    .canBuild(localPlayer)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    /**
+     * Checks to see whether a flag is allowed.
+     * 
+     * @param flag
+     * @param loc
+     * @return
+     */
+    public boolean allows(StateFlag flag, Location loc) {
+        World world = loc.getWorld();
+        WorldConfiguration worldConfig = config.get(world);
+        
+        if (!worldConfig.useRegions) {
+            return true;
+        }
+        
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        return mgr.getApplicableRegions(toVector(loc)).allows(flag);
     }
 }

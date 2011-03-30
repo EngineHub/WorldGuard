@@ -42,7 +42,7 @@ public class GlobalProtectedRegion extends ProtectedRegion {
     }
 
     @Override
-    public int countBlocks() {
+    public int volume() {
         return 0;
     }
 

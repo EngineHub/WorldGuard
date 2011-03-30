@@ -84,9 +84,7 @@ public class LegacyWorldGuardMigration {
                     + "and set as your primarily world's database.");
 
             World w = plugin.getServer().getWorlds().get(0);
-            
-            RegionManager mgr = plugin.getGlobalRegionManager()
-                    .get(w.getName());
+            RegionManager mgr = plugin.getGlobalRegionManager().get(w);
 
             // First load up the old database using the CSV loader
             CSVDatabase db = new CSVDatabase(oldDatabase);

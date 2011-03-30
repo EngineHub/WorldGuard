@@ -81,6 +81,39 @@ public class ApplicableRegionSet {
     public boolean allows(StateFlag flag) {
         return internalGetState(flag, null);
     }
+    
+    /**
+     * Indicates whether a player is an owner of all regions in this set.
+     * 
+     * @param player
+     * @return
+     */
+    public boolean isOwnerOfAll(LocalPlayer player) {
+        for (ProtectedRegion region : applicable) {
+            if (!region.isOwner(player)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Indicates whether a player is an owner or member of all regions in
+     * this set.
+     * 
+     * @param player
+     * @return
+     */
+    public boolean isMemberOfAll(LocalPlayer player) {
+        for (ProtectedRegion region : applicable) {
+            if (!region.isMember(player)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 
     /**
      * Checks to see if a flag is permitted.
@@ -271,5 +304,14 @@ public class ApplicableRegionSet {
 
             parent = parent.getParent();
         }
+    }
+    
+    /**
+     * Get the number of regions that are included.
+     * 
+     * @return
+     */
+    public int size() {
+        return applicable.size();
     }
 }

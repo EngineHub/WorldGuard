@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
@@ -37,7 +36,6 @@ import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.protection.*;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Filter;
@@ -98,10 +96,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Register command classes
         commands.register(ToggleCommands.class);
         commands.register(ProtectionCommands.class);
-        
-        // Set up permissions
-        perms = new PermissionsResolverManager(
-                getConfiguration(), getServer(), "WorldGuard", logger);
     }
     
     /**
@@ -110,6 +104,10 @@ public class WorldGuardPlugin extends JavaPlugin {
     public void onEnable() {
         // Need to create the plugins/WorldGuard folder
         getDataFolder().mkdirs();
+
+        // Set up permissions
+        perms = new PermissionsResolverManager(
+                getConfiguration(), getServer(), "WorldGuard", logger);
 
         // This must be done before configuration is laoded
         LegacyWorldGuardMigration.migrateBlacklist(this);
@@ -585,48 +583,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         } else {
             throw new CommandException("WorldEdit detection failed (report error).");
         }
-    }
-    /**
-     * Check if a player has permission to build at a location.
-     * 
-     * @param player
-     * @param loc 
-     * @return
-     */
-    public boolean canBuild(Player player, Location loc) {
-        WorldConfiguration worldConfig =
-                configuration.forWorld(loc.getWorld().getName());
-        
-        if (worldConfig.useRegions) {
-            LocalPlayer localPlayer = wrapPlayer(player);
-
-            if (!hasPermission(player, "region.bypass")) {
-                RegionManager mgr = getGlobalRegionManager()
-                        .get(player.getWorld().getName());
-
-                if (!mgr.getApplicableRegions(BukkitUtil.toVector(loc))
-                        .canBuild(localPlayer)) {
-                    return false;
-                }
-            }
-
-            return true;
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * Check if a player has permission to build at a location.
-     * 
-     * @param player
-     * @param x
-     * @param y
-     * @param z
-     * @return
-     */
-    public boolean canBuild(Player player, int x, int y, int z) {
-        return canBuild(player, new Location(player.getWorld(), x, y, z));
     }
     
     /**

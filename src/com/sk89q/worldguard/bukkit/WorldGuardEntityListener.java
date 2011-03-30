@@ -75,7 +75,7 @@ public class WorldGuardEntityListener extends EntityListener {
             Player player = (Player) defender;
 
             ConfigurationManager cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
+            WorldConfiguration wcfg = cfg.get(player.getWorld());
 
             if (wcfg.disableLavaDamage && type == DamageCause.LAVA) {
                 event.setCancelled(true);
@@ -98,12 +98,12 @@ public class WorldGuardEntityListener extends EntityListener {
             Player player = (Player) defender;
 
             ConfigurationManager cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
+            WorldConfiguration wcfg = cfg.get(player.getWorld());
 
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
-                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld().getName());
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
                     if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP)) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
@@ -121,7 +121,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
-                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld().getName());
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
                     if (!set.allows(DefaultFlag.MOB_DAMAGE)) {
@@ -149,12 +149,12 @@ public class WorldGuardEntityListener extends EntityListener {
             Player player = (Player) defender;
 
             ConfigurationManager cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
+            WorldConfiguration wcfg = cfg.get(player.getWorld());
 
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
-                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld().getName());
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
                     if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP)) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
@@ -166,7 +166,7 @@ public class WorldGuardEntityListener extends EntityListener {
             if (attacker != null && attacker instanceof Skeleton) {
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
-                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld().getName());
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
                     if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.MOB_DAMAGE)) {
                         event.setCancelled(true);
@@ -203,7 +203,7 @@ public class WorldGuardEntityListener extends EntityListener {
             Player player = (Player) defender;
 
             ConfigurationManager cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
+            WorldConfiguration wcfg = cfg.get(player.getWorld());
 
             if (wcfg.disableFallDamage && type == DamageCause.FALL) {
                 event.setCancelled(true);
@@ -243,7 +243,8 @@ public class WorldGuardEntityListener extends EntityListener {
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
         Location l = event.getLocation();
-        WorldConfiguration wcfg = cfg.forWorld(l.getWorld().getName());
+        World world = l.getWorld();
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (event.getEntity() instanceof LivingEntity) {
 
@@ -260,7 +261,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
             if (wcfg.useRegions) {
                 Vector pt = toVector(l);
-                RegionManager mgr = plugin.getGlobalRegionManager().get(wcfg.getWorldName());
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
                 if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.CREEPER_EXPLOSION)) {
                     event.setCancelled(true);
@@ -275,7 +276,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
             if (wcfg.useRegions) {
                 Vector pt = toVector(l);
-                RegionManager mgr = plugin.getGlobalRegionManager().get(wcfg.getWorldName());
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
                 if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.TNT)) {
                     event.setCancelled(true);
@@ -292,7 +293,7 @@ public class WorldGuardEntityListener extends EntityListener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(event.getEntity().getWorld().getName());
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
         CreatureType creaType = event.getCreatureType();

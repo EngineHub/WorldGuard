@@ -20,6 +20,8 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -32,6 +34,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -78,11 +81,10 @@ public class RegionCommands {
 
         // Get the list of region owners
         if (args.argsLength() > 1) {
-            region.setOwners(RegionUtil.parseDomainString(args.getSlice(2), 1));
+            region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
         }
         
-        RegionManager mgr = plugin.getGlobalRegionManager().get(
-                sel.getWorld().getName());
+        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         mgr.addRegion(region);
         
         try {
@@ -133,13 +135,11 @@ public class RegionCommands {
 
         // Get the list of region owners
         if (args.argsLength() > 1) {
-            region.setOwners(RegionUtil.parseDomainString(args.getSlice(2), 1));
+            region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
         }
 
-        WorldConfiguration wcfg = plugin.getGlobalConfiguration()
-                .forWorld(player.getWorld().getName());
-        RegionManager mgr = plugin.getGlobalRegionManager().get(
-                sel.getWorld().getName());
+        WorldConfiguration wcfg = plugin.getGlobalConfiguration().get(player.getWorld());
+        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         
         // Check whether the player has created too many regions 
         if (wcfg.maxRegionCountPerPlayer >= 0
@@ -155,22 +155,20 @@ public class RegionCommands {
                 throw new CommandException("This region already exists and you don't own it.");
             }
         }
-/*
+        
         ApplicableRegionSet regions = mgr.getApplicableRegions(region);
         
         // Check if this region overlaps any other region
-        if (regions.isAnyRegionAffected()) {
-            if (!regions.isOwner(localPlayer)) {
+        if (regions.size() > 0) {
+            if (!regions.isOwnerOfAll(localPlayer)) {
                 throw new CommandException("This region overlaps with someone else's region.");
             }
-            
-            region.setPriority(regions.getAffectedRegionPriority() + 1);
         } else {
             if (wcfg.claimOnlyInsideExistingRegions) {
                 throw new CommandException("You may only claim regions inside " +
                 		"existing regions that you or your group own.");
             }
-        }*/
+        }
 
         /*if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
             if (iConomy.getBank().hasAccount(player.getName())) {
@@ -195,10 +193,10 @@ public class RegionCommands {
             }
         }*/
 
-        if (region.countBlocks() > wcfg.maxClaimVolume) {
+        if (region.volume() > wcfg.maxClaimVolume) {
             player.sendMessage(ChatColor.RED + "This region is to large to claim.");
             player.sendMessage(ChatColor.RED +
-                    "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.countBlocks());
+                    "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
             return;
         }
 
@@ -237,7 +235,7 @@ public class RegionCommands {
             id = args.getString(1).toLowerCase();
         }
         
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world.getName());
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         
         if (!mgr.hasRegion(id)) {
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");
@@ -267,11 +265,17 @@ public class RegionCommands {
         StringBuilder s = new StringBuilder();
 
         for (Flag<?> flag : DefaultFlag.getFlags()) {
+            Object val = region.getFlag(flag);
+            
+            if (val == null) {
+                continue;
+            }
+            
             if (s.length() > 0) {
                 s.append(", ");
             }
 
-            s.append(flag.getName() + ": " + String.valueOf(region.getFlag(flag)));
+            s.append(flag.getName() + ": " + String.valueOf(val));
         }
 
         sender.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());
@@ -281,5 +285,55 @@ public class RegionCommands {
                 + owners.toUserFriendlyString());
         sender.sendMessage(ChatColor.LIGHT_PURPLE + "Members: "
                 + members.toUserFriendlyString());
+    }
+    
+    @Command(aliases = {"list"},
+            usage = "[page] [world]",
+            desc = "Get a list of regions",
+            flags = "", min = 0, max = 2)
+    @CommandPermissions({"worldguard.region.list"})
+    public static void list(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        World world;
+        int page = 0;
+        
+        if (args.argsLength() > 0) {
+            page = args.getInteger(0);
+        }
+        
+        if (args.argsLength() > 1) {
+            world = plugin.matchWorld(sender, args.getString(1));
+        } else {
+            world = plugin.checkPlayer(sender).getWorld();
+        }
+        
+        int listSize = 5;
+
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        Map<String, ProtectedRegion> regions = mgr.getRegions();
+        int size = regions.size();
+        int pages = (int) Math.ceil(size / (float) listSize);
+
+        String[] regionIDList = new String[size];
+        int index = 0;
+        for (String id : regions.keySet()) {
+            regionIDList[index] = id;
+            index++;
+        }
+        Arrays.sort(regionIDList);
+
+        sender.sendMessage(ChatColor.RED + "Regions (page "
+                + (page + 1) + " of " + pages + "):");
+
+        if (page < pages) {
+            for (int i = page * listSize; i < page * listSize + listSize; i++) {
+                if (i >= size) {
+                    break;
+                }
+                sender.sendMessage(ChatColor.YELLOW.toString() + (i + 1) +
+                        ". " + regionIDList[i]);
+            }
+        }
     }
 }

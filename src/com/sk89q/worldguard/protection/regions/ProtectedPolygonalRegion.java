@@ -269,7 +269,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * @return
      */
     @Override
-    public int countBlocks() {
+    public int volume() {
         int volume = 0;
         int numPoints = points.size();
         if (numPoints < 3) {

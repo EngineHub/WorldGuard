@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import java.util.Iterator;
@@ -192,6 +193,28 @@ public class FlatRegionManager extends RegionManager {
     }
 
     /**
+     * Get an object for a region for rules to be applied with.
+     * 
+     * @return
+     */
+    @Override
+    public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
+
+        List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
+        appRegions.addAll(regions.values());
+
+        List<ProtectedRegion> intersectRegions;
+        
+        try {
+            intersectRegions = checkRegion.getIntersectingRegions(appRegions);
+        } catch (Exception e) {
+            intersectRegions = new ArrayList<ProtectedRegion>();
+        }
+
+        return new ApplicableRegionSet(intersectRegions, regions.get("__global__"));
+    }
+
+    /**
      * Returns true if the provided region overlaps with any other region that
      * is not owned by the player.
      * 
@@ -200,7 +223,6 @@ public class FlatRegionManager extends RegionManager {
      */
     @Override
     public boolean overlapsUnownedRegion(ProtectedRegion checkRegion, LocalPlayer player) {
-
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
 
         for (ProtectedRegion other : regions.values()) {
@@ -214,7 +236,7 @@ public class FlatRegionManager extends RegionManager {
         List<ProtectedRegion> intersectRegions;
         try {
             intersectRegions = checkRegion.getIntersectingRegions(appRegions);
-        } catch (Exception e) {
+        } catch (UnsupportedIntersectionException e) {
             intersectRegions = new ArrayList<ProtectedRegion>();
         }
 

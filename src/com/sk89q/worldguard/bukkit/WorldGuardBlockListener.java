@@ -68,11 +68,17 @@ public class WorldGuardBlockListener extends BlockListener {
         pm.registerEvent(Event.Type.BLOCK_BURN, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
     }
-
+    
+    protected WorldConfiguration getWorldConfig(World world) {
+        return plugin.getGlobalConfiguration().get(world);
+    }
+    
+    protected WorldConfiguration getWorldConfig(Player player) {
+        return plugin.getGlobalConfiguration().get(player.getWorld());
+    }
+    
     /**
-     * Called when a block is damaged (or broken)
-     *
-     * @param event Relevant event details
+     * Called when a block is damaged.
      */
     @Override
     public void onBlockDamage(BlockDamageEvent event) {
@@ -83,13 +89,11 @@ public class WorldGuardBlockListener extends BlockListener {
         Player player = event.getPlayer();
         Block blockDamaged = event.getBlock();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
-
-        if (wcfg.useRegions && blockDamaged.getType() == Material.CAKE_BLOCK) {
-            if (!plugin.canBuild(player, blockDamaged.getLocation())) {
+        // Cake are damaged and not broken when they are eaten, so we must
+        // handle them a bit separately
+        if (blockDamaged.getType() == Material.CAKE_BLOCK) {
+            if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
                 player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
-
                 event.setCancelled(true);
                 return;
             }
@@ -97,11 +101,9 @@ public class WorldGuardBlockListener extends BlockListener {
 
 
     }
-
+    
     /**
-     * Called when a block is destroyed by a player.
-     *
-     * @param event Relevant event details
+     * Called when a block is broken.
      */
     @Override
     public void onBlockBreak(BlockBreakEvent event) {
@@ -110,8 +112,7 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         Player player = event.getPlayer();
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
+        WorldConfiguration wcfg = getWorldConfig(player);
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getItemInHand();
@@ -121,12 +122,10 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (wcfg.useRegions) {
-            if (!plugin.canBuild(player, event.getBlock().getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-                event.setCancelled(true);
-                return;
-            }
+        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())) {
+            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            event.setCancelled(true);
+            return;
         }
 
         if (wcfg.getBlacklist() != null) {
@@ -149,13 +148,10 @@ public class WorldGuardBlockListener extends BlockListener {
     }
 
     /**
-     * Called when a block flows (water/lava)
-     *
-     * @param event Relevant event details
+     * Called when fluids flow.
      */
     @Override
     public void onBlockFlow(BlockFromToEvent event) {
-
         if (event.isCancelled()) {
             return;
         }
@@ -168,7 +164,7 @@ public class WorldGuardBlockListener extends BlockListener {
         boolean isLava = blockFrom.getTypeId() == 10 || blockFrom.getTypeId() == 11;
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(event.getBlock().getWorld().getName());
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (wcfg.simulateSponge && isWater) {
             int ox = blockTo.getX();
@@ -200,100 +196,51 @@ public class WorldGuardBlockListener extends BlockListener {
         }
         }*/
 
-        // Check the fluid block (from) whether it is air. If so and the target block is protected, cancel the event
-        if (wcfg.preventWaterDamage.size() > 0 && blockFrom.getTypeId() == 0) {
-            int targetId = world.getBlockTypeIdAt(
-                    blockTo.getX(), blockTo.getY(), blockTo.getZ());
-            if (wcfg.preventWaterDamage.contains(targetId)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (wcfg.preventWaterDamage.size() > 0 && isWater) {
-            int targetId = world.getBlockTypeIdAt(
-                    blockTo.getX(), blockTo.getY(), blockTo.getZ());
-            if (wcfg.preventWaterDamage.contains(targetId)) {
+        // Check the fluid block (from) whether it is air.
+        // If so and the target block is protected, cancel the event
+        if (wcfg.preventWaterDamage.size() > 0) {
+            int targetId = blockTo.getTypeId();
+            
+            if ((blockFrom.getTypeId() == 0 || isWater) && 
+                    wcfg.preventWaterDamage.contains(targetId)) {
                 event.setCancelled(true);
                 return;
             }
         }
 
         if (wcfg.allowedLavaSpreadOver.size() > 0 && isLava) {
-            int targetId = world.getBlockTypeIdAt(
-                    blockTo.getX(), blockTo.getY() - 1, blockTo.getZ());
+            int targetId = blockTo.getRelative(0, -1, 0).getTypeId();
+            
             if (!wcfg.allowedLavaSpreadOver.contains(targetId)) {
                 event.setCancelled(true);
                 return;
             }
         }
 
-        if (wcfg.useRegions) {
-            Vector pt = toVector(blockFrom.getLocation());
-            RegionManager mgr = plugin.getGlobalRegionManager().get(world.getName());
-
-            if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.WATER_FLOW)) {
-                event.setCancelled(true);
-                return;
-            }
+        if (!plugin.getGlobalRegionManager().allows(DefaultFlag.WATER_FLOW,
+                blockFrom.getLocation())) {
+            event.setCancelled(true);
+            return;
         }
     }
 
     /**
-     * Called when a block gets ignited
-     *
-     * @param event Relevant event details
+     * Called when a block gets ignited.
      */
     @Override
     public void onBlockIgnite(BlockIgniteEvent event) {
-
         if (event.isCancelled()) {
             return;
         }
-
 
         IgniteCause cause = event.getCause();
         Block block = event.getBlock();
         World world = block.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(world.getName());
+        WorldConfiguration wcfg = cfg.get(world);
 
         boolean isFireSpread = cause == IgniteCause.SPREAD;
-
-        if (wcfg.useRegions) {
-            Vector pt = toVector(block);
-            Player player = event.getPlayer();
-            RegionManager mgr = plugin.getGlobalRegionManager().get(world.getName());
-
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-            if (player != null && !plugin.hasPermission(player, "region.bypass")) {
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-                if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !set.canBuild(localPlayer)) {
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !set.allows(DefaultFlag.LIGHTER)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (isFireSpread && set.allows(DefaultFlag.FIRE_SPREAD)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (cause == IgniteCause.LAVA && !set.allows(DefaultFlag.LAVA_FIRE)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
 
         if (wcfg.preventLavaFire && cause == IgniteCause.LAVA) {
             event.setCancelled(true);
@@ -329,6 +276,39 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
+        
+        if (wcfg.useRegions) {
+            Vector pt = toVector(block);
+            Player player = event.getPlayer();
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+            if (player != null && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+                if (cause == IgniteCause.FLINT_AND_STEEL
+                        && !set.canBuild(localPlayer)) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (cause == IgniteCause.FLINT_AND_STEEL
+                        && !set.allows(DefaultFlag.LIGHTER)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            if (isFireSpread && set.allows(DefaultFlag.FIRE_SPREAD)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (cause == IgniteCause.LAVA && !set.allows(DefaultFlag.LAVA_FIRE)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
 
     }
 
@@ -345,7 +325,7 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(event.getBlock().getWorld().getName());
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (wcfg.disableFireSpread) {
             event.setCancelled(true);
@@ -380,7 +360,7 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(event.getBlock().getWorld().getName());
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         int id = event.getChangedTypeId();
 
@@ -484,10 +464,10 @@ public class WorldGuardBlockListener extends BlockListener {
         World world = blockPlaced.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(world.getName());
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
-            if (!plugin.canBuild(player, blockPlaced.getLocation())) {
+            if (!plugin.getGlobalRegionManager().canBuild(player, blockPlaced.getLocation())) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
@@ -638,7 +618,7 @@ public class WorldGuardBlockListener extends BlockListener {
         World world = blockTo.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(world.getName());
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
             int ox = blockTo.getX();
@@ -675,7 +655,7 @@ public class WorldGuardBlockListener extends BlockListener {
     private void clearSpongeWater(World world, int ox, int oy, int oz) {
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(world.getName());
+        WorldConfiguration wcfg = cfg.get(world);
 
         for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
             for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
@@ -699,7 +679,7 @@ public class WorldGuardBlockListener extends BlockListener {
     private void addSpongeWater(World world, int ox, int oy, int oz) {
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(world.getName());
+        WorldConfiguration wcfg = cfg.get(world);
 
         // The negative x edge
         int cx = ox - wcfg.spongeRadius - 1;

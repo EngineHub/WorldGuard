@@ -33,7 +33,7 @@ public class BukkitBlacklist extends Blacklist {
     @Override
     public void broadcastNotification(String msg) {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            if (plugin.hasPermission(player, "notify")) {
+            if (plugin.hasPermission(player, "worldguard.notify")) {
                 player.sendMessage(msg);
             }
         }

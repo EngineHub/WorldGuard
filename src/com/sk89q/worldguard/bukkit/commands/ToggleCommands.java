@@ -43,8 +43,7 @@ public class ToggleCommands {
             world = plugin.matchWorld(sender, args.getString(0));
         }
         
-        WorldConfiguration wcfg = plugin.getGlobalConfiguration()
-                .forWorld(world.getName());
+        WorldConfiguration wcfg = plugin.getGlobalConfiguration().get(world);
 
         if (!wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(
@@ -75,8 +74,7 @@ public class ToggleCommands {
             world = plugin.matchWorld(sender, args.getString(0));
         }
         
-        WorldConfiguration wcfg = plugin.getGlobalConfiguration()
-                .forWorld(world.getName());
+        WorldConfiguration wcfg = plugin.getGlobalConfiguration().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(ChatColor.YELLOW

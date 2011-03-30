@@ -280,11 +280,11 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
-     * Get the number of Blocks in this region
+     * Get the number of blocks in this region
      * 
      * @return
      */
-    public abstract int countBlocks();
+    public abstract int volume();
     
     /**
      * Check to see if a point is inside this region.

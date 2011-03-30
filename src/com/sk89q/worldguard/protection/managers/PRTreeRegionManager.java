@@ -170,7 +170,7 @@ public class PRTreeRegionManager extends RegionManager {
         return new ApplicableRegionSet(appRegions, regions.get("__global__"));
     }
 
-    /*@Override
+    @Override
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
         appRegions.addAll(regions.values());
@@ -183,7 +183,7 @@ public class PRTreeRegionManager extends RegionManager {
         }
 
         return new ApplicableRegionSet(intersectRegions, regions.get("__global__"));
-    }*/
+    }
 
     /**
      * Get a list of region IDs that contain a point.

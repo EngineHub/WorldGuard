@@ -72,7 +72,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
 
         if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW
@@ -172,7 +172,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(player.getWorld().getName());
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
 
         if (wcfg.enforceOneSession) {
             String name = player.getName();
@@ -198,7 +198,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(event.getPlayer().getWorld().getName());
+        WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
 
         if (wcfg.getBlacklist() != null) {
             Item ci = event.getItemDrop();
@@ -225,7 +225,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.forWorld(event.getPlayer().getWorld().getName());
+        WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
 
         if (wcfg.getBlacklist() != null) {
             Item ci = event.getItem();
