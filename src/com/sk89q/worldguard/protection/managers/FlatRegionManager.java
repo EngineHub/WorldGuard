@@ -80,7 +80,7 @@ public class FlatRegionManager extends RegionManager {
      */
     @Override
     public void addRegion(ProtectedRegion region) {
-        regions.put(region.getId(), region);
+        regions.put(region.getId().toLowerCase(), region);
     }
 
     /**
@@ -90,9 +90,8 @@ public class FlatRegionManager extends RegionManager {
      */
     @Override
     public void removeRegion(String id) {
-        ProtectedRegion region = regions.get(id);
-
-        regions.remove(id);
+        ProtectedRegion region = regions.get(id.toLowerCase());
+        regions.remove(id.toLowerCase());
 
         if (region != null) {
             List<String> removeRegions = new ArrayList<String>();
@@ -100,12 +99,11 @@ public class FlatRegionManager extends RegionManager {
             while (iter.hasNext()) {
                 ProtectedRegion curRegion = iter.next();
                 if (curRegion.getParent() == region) {
-                    removeRegions.add(curRegion.getId());
+                    removeRegions.add(curRegion.getId().toLowerCase());
                 }
             }
 
-            for(String remId : removeRegions)
-            {
+            for (String remId : removeRegions) {
                 removeRegion(remId);
             }
         }
@@ -119,7 +117,7 @@ public class FlatRegionManager extends RegionManager {
      */
     @Override
     public boolean hasRegion(String id) {
-        return regions.containsKey(id);
+        return regions.containsKey(id.toLowerCase());
     }
 
     /**
@@ -129,7 +127,7 @@ public class FlatRegionManager extends RegionManager {
      */
     @Override
     public ProtectedRegion getRegion(String id) {
-        return regions.get(id);
+        return regions.get(id.toLowerCase());
     }
 
     /**

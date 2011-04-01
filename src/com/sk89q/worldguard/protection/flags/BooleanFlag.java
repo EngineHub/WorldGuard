@@ -18,6 +18,9 @@
  */
 package com.sk89q.worldguard.protection.flags;
 
+import org.bukkit.command.CommandSender;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
 /**
  *
  * @author sk89q
@@ -30,6 +33,24 @@ public class BooleanFlag extends Flag<Boolean> {
 
     public BooleanFlag(String name) {
         super(name);
+    }
+
+    @Override
+    public Boolean parseInput(WorldGuardPlugin plugin, CommandSender sender,
+            String input) throws InvalidFlagFormat {
+        input = input.trim();
+        
+        if (input.equalsIgnoreCase("true") || input.equalsIgnoreCase("yes")
+                || input.equalsIgnoreCase("on")
+                || input.equalsIgnoreCase("1")) {
+            return true;
+        } else if (input.equalsIgnoreCase("false") || input.equalsIgnoreCase("no")
+                || input.equalsIgnoreCase("off")
+                || input.equalsIgnoreCase("0")) {
+            return false;
+        } else {
+            throw new InvalidFlagFormat("Not a yes/no value: " + input);
+        }
     }
     
 }

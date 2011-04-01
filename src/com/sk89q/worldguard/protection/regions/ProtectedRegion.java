@@ -276,7 +276,11 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @param val
      */
     public <T extends Flag<V>, V> void setFlag(T flag, V val) {
-        flags.put(flag, val);
+        if (val == null) {
+            flags.remove(flag);
+        } else {
+            flags.put(flag, val);
+        }
     }
 
     /**

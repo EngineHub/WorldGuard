@@ -18,6 +18,9 @@
  */
 package com.sk89q.worldguard.protection.flags;
 
+import org.bukkit.command.CommandSender;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
 /**
  *
  * @author sk89q
@@ -30,6 +33,12 @@ public class RegionGroupFlag extends Flag<String> {
 
     public RegionGroupFlag(String name) {
         super(name);
+    }
+
+    @Override
+    public String parseInput(WorldGuardPlugin plugin, CommandSender sender,
+            String input) throws InvalidFlagFormat {
+        return "";
     }
     
 }

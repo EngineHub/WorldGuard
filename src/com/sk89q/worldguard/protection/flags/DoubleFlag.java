@@ -18,6 +18,9 @@
  */
 package com.sk89q.worldguard.protection.flags;
 
+import org.bukkit.command.CommandSender;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
 /**
  *
  * @author sk89q
@@ -30,5 +33,17 @@ public class DoubleFlag extends Flag<Double> {
 
     public DoubleFlag(String name) {
         super(name);
+    }
+
+    @Override
+    public Double parseInput(WorldGuardPlugin plugin, CommandSender sender,
+            String input) throws InvalidFlagFormat {
+        input = input.trim();
+        
+        try {
+            return Double.parseDouble(input);
+        } catch (NumberFormatException e) {
+            throw new InvalidFlagFormat("Not a number: " + input);
+        }
     }
 }

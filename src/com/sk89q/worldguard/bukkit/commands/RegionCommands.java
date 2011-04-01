@@ -37,6 +37,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
 import com.sk89q.worldguard.util.RegionUtil;
@@ -245,14 +246,14 @@ public class RegionCommands {
 
         if (player != null) {
             if (region.isOwner(localPlayer)) {
-                plugin.checkPermission(sender, "region.info.own");
+                plugin.checkPermission(sender, "worldguard.region.info.own");
             } else if (region.isMember(localPlayer)) {
-                plugin.checkPermission(sender, "region.info.member");
+                plugin.checkPermission(sender, "worldguard.region.info.member");
             } else {
-                plugin.checkPermission(sender, "region.info");
+                plugin.checkPermission(sender, "worldguard.region.info");
             }
         } else {
-            plugin.checkPermission(sender, "region.info");
+            plugin.checkPermission(sender, "worldguard.region.info");
         }
 
         DefaultDomain owners = region.getOwners();
@@ -299,7 +300,7 @@ public class RegionCommands {
         int page = 0;
         
         if (args.argsLength() > 0) {
-            page = args.getInteger(0);
+            page = Math.max(0, args.getInteger(0) - 1);
         }
         
         if (args.argsLength() > 1) {
@@ -308,7 +309,7 @@ public class RegionCommands {
             world = plugin.checkPlayer(sender).getWorld();
         }
         
-        int listSize = 5;
+        int listSize = 10;
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         Map<String, ProtectedRegion> regions = mgr.getRegions();
@@ -335,5 +336,87 @@ public class RegionCommands {
                         ". " + regionIDList[i]);
             }
         }
+    }
+    
+    @Command(aliases = {"flag"},
+            usage = "<id> <flag> [value]",
+            desc = "Set flags",
+            flags = "", min = 2, max = -1)
+    public static void flag(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.checkPlayer(sender);
+        World world = player.getWorld();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        
+        String id = args.getString(0);
+        String flagName = args.getString(0);
+        String value = null;
+
+        if (args.argsLength() >= 3) {
+            value = args.getJoinedStrings(2);
+        }
+
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = mgr.getRegion(id);
+
+        if (region == null) {
+            throw new CommandException("Could not find a region by that ID.");
+        }
+        
+        if (region.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.flag.own");
+        } else if (region.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.flag.member");
+        } else {
+            plugin.checkPermission(sender, "worldguard.region.flag");
+        } 
+        
+        Flag<?> foundFlag = null;
+        
+        // Now time to find the flag!
+        for (Flag<?> flag : DefaultFlag.getFlags()) {
+            // Try to detect the flag
+            if (flag.getName().replace("-", "").equalsIgnoreCase(flagName.replace("-", ""))
+                    || flagName.equals(flag.getLegacyCode())) {
+                foundFlag = flag;
+                break;
+            }
+        }
+        
+        if (foundFlag == null) {
+            throw new CommandException("Unknown flag specified: " + flagName);
+        }
+        
+        if (value != null) {
+            try {
+                setFlag(region, foundFlag, plugin, sender, value);
+            } catch (InvalidFlagFormat e) {
+                throw new CommandException(e.getMessage());
+            }
+
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Region flag '" + foundFlag.getName() + " set.");
+        } else {
+            // Clear the flag
+            region.setFlag(foundFlag, null);
+
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Region flag '" + foundFlag.getName() + " cleared.");
+        }
+        
+        try {
+            mgr.save();
+            sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
+        } catch (IOException e) {
+            throw new CommandException("Failed to write regions file: "
+                    + e.getMessage());
+        }
+    }
+    
+    public static <V> void setFlag(ProtectedRegion region,
+            Flag<V> flag, WorldGuardPlugin plugin, CommandSender sender, String value)
+                throws InvalidFlagFormat {
+        region.setFlag(flag, flag.parseInput(plugin, sender, value));
     }
 }

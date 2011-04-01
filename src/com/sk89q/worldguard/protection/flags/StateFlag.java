@@ -18,6 +18,9 @@
  */
 package com.sk89q.worldguard.protection.flags;
 
+import org.bukkit.command.CommandSender;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
 /**
  *
  * @author sk89q
@@ -43,6 +46,22 @@ public class StateFlag extends Flag<StateFlag.State> {
 
     public boolean getDefault() {
         return def;
+    }
+
+    @Override
+    public State parseInput(WorldGuardPlugin plugin, CommandSender sender,
+            String input) throws InvalidFlagFormat {
+        input = input.trim();
+        
+        if (input.equalsIgnoreCase("allow")) {
+            return State.ALLOW;
+        } else if (input.equalsIgnoreCase("deny")) {
+            return State.DENY;
+        } else if (input.equalsIgnoreCase("none")) {
+            return null;
+        } else {
+            throw new InvalidFlagFormat("Not none/allow/deny: " + input);
+        }
     }
     
 }

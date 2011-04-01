@@ -19,6 +19,9 @@
 package com.sk89q.worldguard.protection.flags;
 
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 /**
  *
@@ -32,5 +35,17 @@ public class LocationFlag extends Flag<Location> {
 
     public LocationFlag(String name) {
         super(name);
+    }
+
+    @Override
+    public Location parseInput(WorldGuardPlugin plugin, CommandSender sender,
+            String input) throws InvalidFlagFormat {
+        input = input.trim();
+        
+        try {
+            return plugin.checkPlayer(sender).getLocation();
+        } catch (CommandException e) {
+            throw new InvalidFlagFormat(e.getMessage());
+        }
     }
 }
