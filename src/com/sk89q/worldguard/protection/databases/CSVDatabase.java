@@ -262,7 +262,11 @@ public class CSVDatabase extends AbstractProtectionDatabase {
                 }
                 
                 StateFlag flag = DefaultFlag.getLegacyFlag(flagStr);
-                region.setFlag(flag, curState);
+                if (flag != null) {
+                    region.setFlag(flag, curState);
+                } else {
+                    logger.warning("Legacy flag '" + flagStr + "' is unsupported");
+                }
             }
         }
     }

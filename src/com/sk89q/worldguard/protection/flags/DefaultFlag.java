@@ -74,7 +74,7 @@ public final class DefaultFlag {
      */
     public static StateFlag getLegacyFlag(String flagString) {
         for (Flag<?> flag : flagsList) {
-            if (flag instanceof StateFlag && flagString.equals(flag.getLegacyCode())) {
+            if (flag instanceof StateFlag && flagString.equals(String.valueOf(flag.getLegacyCode()))) {
                 return (StateFlag) flag;
             }
         }
