@@ -15,13 +15,12 @@
 # - If you want to check the format of this file before putting it
 #   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/
 #   and see if it gives "ERROR:".
-# - Lines starting with # are commentsand so they are ignored.
+# - Lines starting with # are comments and so they are ignored.
 #
 
 summary-on-start: on
 
 protection:
-    enforce-single-session: on
     item-durability: on
 
 simulation:

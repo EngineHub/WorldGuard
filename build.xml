@@ -43,7 +43,6 @@
     <copy tofile="${build.dir}/plugin.yml" file="plugin.yml"/>
     <replace file="${build.dir}/plugin.yml" token="WGVERSIONMACRO" value="${version}"/>
     <mkdir dir="${build.dir}/defaults"/>
-    <copy tofile="${build.dir}/defaults/global.yml" file="global.yml"/>
     <copy tofile="${build.dir}/defaults/config.yml" file="config.yml"/>
     <copy tofile="${build.dir}/defaults/config_world.yml" file="config_world.yml"/>
     <copy tofile="${build.dir}/defaults/blacklist.txt" file="blacklist.txt"/>
