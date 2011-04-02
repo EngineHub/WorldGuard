@@ -46,4 +46,18 @@ public class DoubleFlag extends Flag<Double> {
             throw new InvalidFlagFormat("Not a number: " + input);
         }
     }
+
+    @Override
+    public Double unmarshal(Object o) {
+        if (o instanceof Double) {
+            return (Double) o;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Object marshal(Double o) {
+        return o;
+    }
 }

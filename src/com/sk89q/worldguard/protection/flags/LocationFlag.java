@@ -48,4 +48,14 @@ public class LocationFlag extends Flag<Location> {
             throw new InvalidFlagFormat(e.getMessage());
         }
     }
+
+    @Override
+    public Location unmarshal(Object o) {
+        return null;
+    }
+
+    @Override
+    public Object marshal(Location o) {
+        return null;
+    }
 }

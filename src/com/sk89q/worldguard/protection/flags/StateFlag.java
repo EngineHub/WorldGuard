@@ -63,5 +63,28 @@ public class StateFlag extends Flag<StateFlag.State> {
             throw new InvalidFlagFormat("Not none/allow/deny: " + input);
         }
     }
+
+    @Override
+    public State unmarshal(Object o) {
+        String str = o.toString();
+        if (str.equalsIgnoreCase("allow")) {
+            return State.ALLOW;
+        } else if (str.equalsIgnoreCase("deny")) {
+            return State.DENY;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Object marshal(State o) {
+        if (o == State.ALLOW) {
+            return "allow";
+        } else if (o == State.DENY) {
+            return "deny";
+        } else {
+            return null;
+        }
+    }
     
 }

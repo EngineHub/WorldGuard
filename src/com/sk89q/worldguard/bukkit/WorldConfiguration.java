@@ -24,7 +24,6 @@ import com.sk89q.worldguard.blacklist.BlacklistLogger;
 import com.sk89q.worldguard.blacklist.loggers.ConsoleLoggerHandler;
 import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
 import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
-import com.sk89q.worldguard.util.yaml.Configuration;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,6 +32,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.entity.CreatureType;
+import org.bukkit.util.config.Configuration;
 
 /**
  * Holds the configuration for individual worlds.

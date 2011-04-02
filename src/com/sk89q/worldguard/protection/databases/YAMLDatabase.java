@@ -207,6 +207,9 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
     @SuppressWarnings("unchecked")
     private <V> void addMarshalledFlag(Map<String, Object> flagData,
             Flag<V> flag, Object val) {
+        if (val == null) {
+            return;
+        }
         flagData.put(flag.getName(), flag.marshal((V) val));
     }
     

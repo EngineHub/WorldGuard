@@ -52,5 +52,19 @@ public class BooleanFlag extends Flag<Boolean> {
             throw new InvalidFlagFormat("Not a yes/no value: " + input);
         }
     }
+
+    @Override
+    public Boolean unmarshal(Object o) {
+        if (o instanceof Boolean) {
+            return (Boolean) o;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Object marshal(Boolean o) {
+        return o;
+    }
     
 }

@@ -40,5 +40,19 @@ public class StringFlag extends Flag<String> {
             String input) throws InvalidFlagFormat {
         return input;
     }
+
+    @Override
+    public String unmarshal(Object o) {
+        if (o instanceof String) {
+            return (String) o;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Object marshal(String o) {
+        return o;
+    }
     
 }

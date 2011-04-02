@@ -46,4 +46,18 @@ public class IntegerFlag extends Flag<Integer> {
             throw new InvalidFlagFormat("Not a number: " + input);
         }
     }
+
+    @Override
+    public Integer unmarshal(Object o) {
+        if (o instanceof Integer) {
+            return (Integer) o;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Object marshal(Integer o) {
+        return o;
+    }
 }
