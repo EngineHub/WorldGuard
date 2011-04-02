@@ -26,6 +26,7 @@ import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
@@ -226,6 +227,15 @@ public class WorldGuardEntityListener extends EntityListener {
             }
             
             if (type == DamageCause.DROWNING && cfg.hasAmphibiousMode(player)) {
+                player.setRemainingAir(player.getMaximumAir());
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (type == DamageCause.DROWNING && wcfg.pumpkinScuba
+                    && (player.getInventory().getHelmet().getType() == Material.PUMPKIN
+                    || player.getInventory().getHelmet().getType() == Material.JACK_O_LANTERN)) {
+                player.setRemainingAir(player.getMaximumAir());
                 event.setCancelled(true);
                 return;
             }
@@ -242,6 +252,7 @@ public class WorldGuardEntityListener extends EntityListener {
             }
 
             if (wcfg.disableDrowningDamage && type == DamageCause.DROWNING) {
+                player.setRemainingAir(player.getMaximumAir());
                 event.setCancelled(true);
                 return;
             }

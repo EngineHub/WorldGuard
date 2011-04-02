@@ -19,6 +19,7 @@
 #
 
 summary-on-start: on
+pumpkin-scuba: off
 
 protection:
     item-durability: on

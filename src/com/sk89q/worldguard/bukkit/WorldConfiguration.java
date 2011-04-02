@@ -60,6 +60,7 @@ public class WorldConfiguration {
     public boolean classicWater;
     public boolean simulateSponge;
     public int spongeRadius;
+    public boolean pumpkinScuba;
     public boolean redstoneSponges;
     public boolean noPhysicsGravel;
     public boolean noPhysicsSand;
@@ -133,6 +134,8 @@ public class WorldConfiguration {
         simulateSponge = config.getBoolean("simulation.sponge.enable", true);
         spongeRadius = Math.max(1, config.getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = config.getBoolean("simulation.sponge.redstone", false);
+        
+        pumpkinScuba = config.getBoolean("pumpkin-scuba", false);
 
         noPhysicsGravel = config.getBoolean("physics.no-physics-gravel", false);
         noPhysicsSand = config.getBoolean("physics.no-physics-sand", false);
