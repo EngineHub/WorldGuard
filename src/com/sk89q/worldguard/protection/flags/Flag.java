@@ -45,7 +45,7 @@ public abstract class Flag<T> {
         return name;
     }
     
-    public char getLegacyCode() {
+    public Character getLegacyCode() {
         return legacyCode;
     }
     
