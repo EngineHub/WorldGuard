@@ -137,7 +137,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
 
-            if (wcfg.getBlacklist().check(
+            if (!wcfg.getBlacklist().check(
                     new DestroyWithBlacklistEvent(plugin.wrapPlayer(player),
                     toVector(event.getBlock()),
                     player.getItemInHand().getTypeId()), false, false)) {

@@ -72,6 +72,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         pm.registerEvent(Event.Type.PLAYER_JOIN, this, Priority.Normal, plugin);
         pm.registerEvent(Event.Type.PLAYER_LOGIN, this, Priority.Normal, plugin);
         pm.registerEvent(Event.Type.PLAYER_QUIT, this, Priority.Normal, plugin);
+        pm.registerEvent(Event.Type.PLAYER_BUCKET_FILL, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_BUCKET_EMPTY, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_RESPAWN, this, Priority.High, plugin);
     }
 
@@ -83,7 +85,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
     @Override
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            handleblockRightClick(event);
+            handleBlockRightClick(event);
+        } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+            handleAirRightClick(event);
         }
     }
     
@@ -92,7 +96,35 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * 
      * @param event 
      */
-    public void handleblockRightClick(PlayerInteractEvent event) {
+    public void handleAirRightClick(PlayerInteractEvent event) {
+        /*if (event.isCancelled()) {
+            return;
+        }*/
+
+        Player player = event.getPlayer();
+        World world = player.getWorld();
+        ItemStack item = player.getItemInHand();
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.getBlacklist() != null) {
+            if (!wcfg.getBlacklist().check(
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
+                            toVector(player.getLocation()),
+                    item.getTypeId()), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+    
+    /**
+     * Called when a block is damaged.
+     * 
+     * @param event 
+     */
+    public void handleBlockRightClick(PlayerInteractEvent event) {
         if (event.isCancelled()) {
             return;
         }
@@ -179,13 +211,11 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
 
         if (wcfg.getBlacklist() != null) {
-            if (item.getType() == Material.FLINT_AND_STEEL) {
-                if (!wcfg.getBlacklist().check(
-                        new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
-                        item.getTypeId()), false, false)) {
-                    event.setCancelled(true);
-                    return;
-                }
+            if (!wcfg.getBlacklist().check(
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
+                    item.getTypeId()), false, false)) {
+                event.setCancelled(true);
+                return;
             }
             
             if (!wcfg.getBlacklist().check(
@@ -388,7 +418,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
             Item ci = event.getItemDrop();
 
             if (!wcfg.getBlacklist().check(
-                    new ItemDropBlacklistEvent(plugin.wrapPlayer(event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
+                    new ItemDropBlacklistEvent(plugin.wrapPlayer(event.getPlayer()),
+                            toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -415,12 +446,68 @@ public class WorldGuardPlayerListener extends PlayerListener {
             Item ci = event.getItem();
 
             if (!wcfg.getBlacklist().check(
-                    new ItemAcquireBlacklistEvent(plugin.wrapPlayer(event.getPlayer()), toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
+                    new ItemAcquireBlacklistEvent(plugin.wrapPlayer(event.getPlayer()),
+                            toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, true)) {
                 event.setCancelled(true);
                 return;
             }
         }
     }
+
+    /**
+     * Called when a bucket is filled.
+     */
+    @Override
+    public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+        Player player = event.getPlayer();
+        World world = player.getWorld();
+        
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(world);
+        
+        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
+            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            event.setCancelled(true);
+            return;
+        }
+        
+        if (wcfg.getBlacklist() != null) {
+            if (!wcfg.getBlacklist().check(
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
+                            toVector(player.getLocation()), event.getBucket().getId()), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Called when a bucket is empty.
+     */
+    @Override
+    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        Player player = event.getPlayer();
+        World world = player.getWorld();
+        
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(world);
+        
+        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
+            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            event.setCancelled(true);
+            return;
+        }
+        
+        if (wcfg.getBlacklist() != null) {
+            if (!wcfg.getBlacklist().check(
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
+                            toVector(player.getLocation()), event.getBucket().getId()), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+    
 /*
     @Override
     public void onPlayerRespawn(PlayerRespawnEvent event) {

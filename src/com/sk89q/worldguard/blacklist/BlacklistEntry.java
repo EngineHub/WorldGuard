@@ -272,7 +272,7 @@ public class BlacklistEntry {
      * @param silent
      * @return
      */
-    public boolean check(Boolean useAsWhitelist, BlacklistEvent event, boolean forceRepeat, boolean silent) {
+    public boolean check(boolean useAsWhitelist, BlacklistEvent event, boolean forceRepeat, boolean silent) {
         LocalPlayer player = event.getPlayer();
         
         if (shouldIgnore(player)) {
