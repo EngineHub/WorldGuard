@@ -33,7 +33,7 @@ public final class DefaultFlag {
     public static final StateFlag LIGHTER = new StateFlag("lighter", 'l', true);
     public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", 'f', true);
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", 'F', true);
-    public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", 'C', true);
+    public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", 'C', false);
     public static final StateFlag WATER_FLOW = new StateFlag("water-flow", true);
     public static final StateFlag USE = new StateFlag("use", true);
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", true);
