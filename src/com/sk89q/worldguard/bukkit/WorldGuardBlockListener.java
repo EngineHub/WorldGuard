@@ -151,7 +151,7 @@ public class WorldGuardBlockListener extends BlockListener {
      * Called when fluids flow.
      */
     @Override
-    public void onBlockFlow(BlockFromToEvent event) {
+    public void onBlockFromTo(BlockFromToEvent event) {
         if (event.isCancelled()) {
             return;
         }

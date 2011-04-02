@@ -68,7 +68,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * @param event Relevant event details
      */
     @Override
-    public void onPlayerJoin(PlayerEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
@@ -86,7 +86,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * @param event Relevant event details
      */
     @Override
-    public void onPlayerQuit(PlayerEvent event) {
+    public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
