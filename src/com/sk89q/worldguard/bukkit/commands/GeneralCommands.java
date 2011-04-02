@@ -22,12 +22,14 @@ package com.sk89q.worldguard.bukkit.commands;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldedit.blocks.ItemType;
 
 public class GeneralCommands {
     
@@ -237,5 +239,77 @@ public class GeneralCommands {
             
             sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");
         }
+    }
+    
+    @Command(aliases = {"stack"},
+            usage = "",
+            desc = "Stack items",
+            flags = "", min = 0, max = 0)
+    @CommandPermissions({"worldguard.stack"})
+    public static void stack(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.checkPlayer(sender);
+        
+        ItemStack[] items = player.getInventory().getContents();
+        int len = items.length;
+
+        int affected = 0;
+        
+        for (int i = 0; i < len; i++) {
+            ItemStack item = items[i];
+
+            // Avoid infinite stacks and stacks with durability
+            if (item == null || item.getAmount() <= 0
+                    || ItemType.shouldNotStack(item.getTypeId())) {
+                continue;
+            }
+
+            // Ignore buckets
+            if (item.getTypeId() >= 325 && item.getTypeId() <= 327) {
+                continue;
+            }
+
+            if (item.getAmount() < 64) {
+                int needed = 64 - item.getAmount(); // Number of needed items until 64
+
+                // Find another stack of the same type
+                for (int j = i + 1; j < len; j++) {
+                    ItemStack item2 = items[j];
+
+                    // Avoid infinite stacks and stacks with durability
+                    if (item2 == null || item2.getAmount() <= 0
+                            || ItemType.shouldNotStack(item.getTypeId())) {
+                        continue;
+                    }
+
+                    // Same type?
+                    // Blocks store their color in the damage value
+                    if (item2.getTypeId() == item.getTypeId() &&
+                            (!ItemType.usesDamageValue(item.getTypeId())
+                                    || item.getDurability() == item2.getDurability())) {
+                        // This stack won't fit in the parent stack
+                        if (item2.getAmount() > needed) {
+                            item.setAmount(64);
+                            item2.setAmount(item2.getAmount() - needed);
+                            break;
+                        // This stack will
+                        } else {
+                            items[j] = null;
+                            item.setAmount(item.getAmount() + item2.getAmount());
+                            needed = 64 - item.getAmount();
+                        }
+
+                        affected++;
+                    }
+                }
+            }
+        }
+
+        if (affected > 0) {
+            player.getInventory().setContents(items);
+        }
+
+        player.sendMessage(ChatColor.YELLOW + "Items compacted into stacks!");
     }
 }
