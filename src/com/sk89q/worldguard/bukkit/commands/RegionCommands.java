@@ -432,6 +432,48 @@ public class RegionCommands {
         region.setFlag(flag, flag.parseInput(plugin, sender, value));
     }
     
+    @Command(aliases = {"setpriority"},
+            usage = "<id> <priority>",
+            desc = "Set the priority of a region",
+            flags = "", min = 2, max = 2)
+    public static void setPriority(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        Player player = plugin.checkPlayer(sender);
+        World world = player.getWorld();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        
+        String id = args.getString(0);
+        int priority = args.getInteger(1);
+        
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = mgr.getRegion(id);
+
+        if (region == null) {
+            throw new CommandException("Could not find a region by that ID.");
+        }
+        
+        if (region.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.setpriority.own");
+        } else if (region.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.setpriority.member");
+        } else {
+            plugin.checkPermission(sender, "worldguard.region.setpriority");
+        } 
+
+        region.setPriority(priority);
+
+        sender.sendMessage(ChatColor.YELLOW
+                + "Priority of '" + region.getId() + "' set to "
+                + priority + ".");
+        
+        try {
+            mgr.save();
+        } catch (IOException e) {
+            throw new CommandException("Failed to write regions file: "
+                    + e.getMessage());
+        }
+    }
+    
     @Command(aliases = {"setparent"},
             usage = "<id> <parent-id>",
             desc = "Set the parent of a region",
@@ -520,6 +562,9 @@ public class RegionCommands {
         }
         
         mgr.removeRegion(id);
+        
+        sender.sendMessage(ChatColor.YELLOW
+                + "Region '" + id + "' removed.");
         
         try {
             mgr.save();
