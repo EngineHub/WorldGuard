@@ -50,11 +50,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Holds the curParent.
      */
-    private transient ProtectedRegion parent;
-    /**
-     * Holds the curParent's Id. Used for serialization, don't touch it.
-     */
-    private String parentId;
+    private ProtectedRegion parent;
     /**
      * List of owners.
      */
@@ -82,31 +78,6 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      */
     public String getId() {
         return id;
-    }
-
-
-    /*
-     *  Important for serialization
-     */
-    public String getParentId() {
-
-        if (this.parent != null) {
-            this.parentId = parent.getId();
-        }
-
-        return this.parentId;
-    }
-
-    /**
-     * @setFlag the parentId. Used for serialization, don't touch it.
-     */
-    public void setParentId() {
-        
-        if (this.parent != null) {
-            this.parentId = parent.getId();
-        } else {
-            this.parentId = null;
-        }
     }
 
     /**

@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,7 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.util.yaml.Configuration;
 import com.sk89q.worldguard.util.yaml.ConfigurationNode;
 
@@ -62,8 +64,11 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
             this.regions = new HashMap<String, ProtectedRegion>();
             return;
         }
-        
-        regions = new HashMap<String, ProtectedRegion>();
+
+        Map<String,ProtectedRegion> regions =
+            new HashMap<String,ProtectedRegion>();
+        Map<ProtectedRegion,String> parentSets =
+            new LinkedHashMap<ProtectedRegion, String>();
         
         for (Map.Entry<String, ConfigurationNode> entry : regionData.entrySet()) {
             String id = entry.getKey().toLowerCase().replace(".", "");
@@ -100,10 +105,32 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                 region.setOwners(parseDomain(node.getNode("owners")));
                 region.setMembers(parseDomain(node.getNode("members")));
                 regions.put(id, region);
+                
+                String parentId = node.getString("parent");
+                if (parentId != null) {
+                    parentSets.put(region, parentId);
+                }
             } catch (NullPointerException e) {
                 logger.warning("Missing data for region '" + id + '"');
             }
         }
+        
+        // Relink parents
+        for (Map.Entry<ProtectedRegion, String> entry : parentSets.entrySet()) {
+            ProtectedRegion parent = regions.get(entry.getValue());
+            if (parent != null) {
+                try {
+                    entry.getKey().setParent(parent);
+                } catch (CircularInheritanceException e) {
+                    logger.warning("Circular inheritance detect with '"
+                            + entry.getValue() + "' detected as a parent");
+                }
+            } else {
+                logger.warning("Unknown region parent: " + entry.getValue());
+            }
+        }
+        
+        this.regions = regions;
     }
     
     private <V> V checkNonNull(V val) throws NullPointerException {
@@ -194,6 +221,10 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
             node.setProperty("flags", getFlagData(region));
             node.setProperty("owners", getDomainData(region.getOwners()));
             node.setProperty("members", getDomainData(region.getMembers()));
+            ProtectedRegion parent = region.getParent();
+            if (parent != null) {
+                node.setProperty("parent", parent.getId());
+            }
         }
         
         config.save();
