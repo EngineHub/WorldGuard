@@ -15,6 +15,7 @@
     <include name="WorldEdit.jar" />
   	<include name="iConomy.jar" />
     <include name="prtree.jar" />
+    <include name="snakeyaml.jar" />
   </fileset>
 
   <target name="init">
