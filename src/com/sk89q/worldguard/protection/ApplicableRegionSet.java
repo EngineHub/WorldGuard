@@ -314,4 +314,13 @@ public class ApplicableRegionSet {
     public int size() {
         return applicable.size();
     }
+    
+    /**
+     * Get an iterator of affected regions.
+     * 
+     * @return
+     */
+    public Iterator<ProtectedRegion> iterator() {
+        return applicable.iterator();
+    }
 }
