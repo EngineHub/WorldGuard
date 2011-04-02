@@ -22,7 +22,6 @@ package com.sk89q.worldguard.protection.databases;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -44,7 +43,7 @@ import com.sk89q.worldguard.util.ArrayReader;
  * 
  * @author sk89q
  */
-public class CSVDatabase implements ProtectionDatabase {
+public class CSVDatabase extends AbstractProtectionDatabase {
     private static Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
     /**
@@ -183,26 +182,6 @@ public class CSVDatabase implements ProtectionDatabase {
         }
         
         this.regions = regions;
-    }
-
-    /**
-     * Load the list of regions into a region manager.
-     * 
-     * @throws IOException
-     */
-    public void load(RegionManager manager) throws IOException {
-        load();
-        manager.setRegions(regions);
-    }
-    
-    /**
-     * Save the list of regions from a region manager.
-     * 
-     * @throws IOException
-     */
-    public void save(RegionManager manager) throws IOException {
-        regions = manager.getRegions();
-        save();
     }
     
     /**

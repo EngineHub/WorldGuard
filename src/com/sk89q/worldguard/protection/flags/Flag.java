@@ -51,4 +51,8 @@ public abstract class Flag<T> {
     
     public abstract T parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat;
+    
+    public abstract T unmarshal(Object o);
+    
+    public abstract Object marshal(T o);
 }
