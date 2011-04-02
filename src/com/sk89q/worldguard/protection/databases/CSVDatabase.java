@@ -94,7 +94,7 @@ public class CSVDatabase extends AbstractProtectionDatabase {
                     continue;
                 }
                 
-                String id = line[0].toLowerCase();
+                String id = line[0].toLowerCase().replace(".", "");
                 String type = line[1];
                 ArrayReader<String> entries = new ArrayReader<String>(line);
                 

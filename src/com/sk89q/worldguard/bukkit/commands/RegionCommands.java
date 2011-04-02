@@ -55,7 +55,7 @@ public class RegionCommands {
         
         Player player = plugin.checkPlayer(sender);
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
-        String id = args.getString(0);
+        String id = args.getString(0).replace(".", "");
         
         // Attempt to get the player's selection from WorldEdit
         Selection sel = worldEdit.getSelection(player);
@@ -182,7 +182,7 @@ public class RegionCommands {
         Player player = plugin.checkPlayer(sender);
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
-        String id = args.getString(0);
+        String id = args.getString(0).replace(".", "");
         
         // Attempt to get the player's selection from WorldEdit
         Selection sel = worldEdit.getSelection(player);

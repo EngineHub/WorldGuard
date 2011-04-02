@@ -65,7 +65,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         regions = new HashMap<String, ProtectedRegion>();
         
         for (Map.Entry<String, ConfigurationNode> entry : regionData.entrySet()) {
-            String id = entry.getKey().toLowerCase();
+            String id = entry.getKey().toLowerCase().replace(".", "");
             ConfigurationNode node = entry.getValue();
             
             String type = node.getString("type");
