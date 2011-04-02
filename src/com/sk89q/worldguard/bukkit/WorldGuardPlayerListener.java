@@ -295,7 +295,15 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
         if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW
-                    + "Fire spread is currently globally disabled.");
+                    + "Fire spread is currently globally disabled for this world.");
+        }
+        
+        if (plugin.inGroup(player, "wg-invincible")) {
+            cfg.enableGodMode(player);
+        }
+        
+        if (plugin.inGroup(player, "wg-amphibious")) {
+            cfg.enableAmphibiousMode(player);
         }
     }
 

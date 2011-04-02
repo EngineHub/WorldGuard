@@ -224,6 +224,11 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
+            
+            if (type == DamageCause.DROWNING && cfg.hasAmphibiousMode(player)) {
+                event.setCancelled(true);
+                return;
+            }
 
             if (wcfg.disableFallDamage && type == DamageCause.FALL) {
                 event.setCancelled(true);
