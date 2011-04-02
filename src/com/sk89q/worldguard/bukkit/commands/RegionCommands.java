@@ -350,7 +350,7 @@ public class RegionCommands {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         String id = args.getString(0);
-        String flagName = args.getString(0);
+        String flagName = args.getString(1);
         String value = null;
 
         if (args.argsLength() >= 3) {
@@ -377,15 +377,27 @@ public class RegionCommands {
         // Now time to find the flag!
         for (Flag<?> flag : DefaultFlag.getFlags()) {
             // Try to detect the flag
-            if (flag.getName().replace("-", "").equalsIgnoreCase(flagName.replace("-", ""))
-                    || flagName.equals(flag.getLegacyCode())) {
+            if (flag.getName().replace("-", "").equalsIgnoreCase(flagName.replace("-", ""))) {
                 foundFlag = flag;
                 break;
             }
         }
         
         if (foundFlag == null) {
-            throw new CommandException("Unknown flag specified: " + flagName);
+            StringBuilder list = new StringBuilder();
+            
+            // Need to build a list
+            for (Flag<?> flag : DefaultFlag.getFlags()) {
+                if (list.length() > 0) {
+                    list.append(", ");
+                }
+                
+                list.append(flag.getName());
+            }
+
+            player.sendMessage(ChatColor.RED + "Unknown flag specified: " + flagName);
+            player.sendMessage(ChatColor.RED + "Available flags: " + list);
+            return;
         }
         
         if (value != null) {

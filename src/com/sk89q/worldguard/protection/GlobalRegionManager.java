@@ -138,6 +138,9 @@ public class GlobalRegionManager {
             managers.put(name, manager);
             manager.load();
 
+            logger.warning("WorldGuard: " + manager.getRegions().size() + " "
+                    + " regions loaded for '" + name + "'");
+
             // Store the last modification date so we can track changes
             lastModified.put(name, file.lastModified());
         } catch (FileNotFoundException e) {

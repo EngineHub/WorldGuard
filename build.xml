@@ -15,7 +15,6 @@
     <include name="WorldEdit.jar" />
   	<include name="iConomy.jar" />
     <include name="prtree.jar" />
-    <include name="gson-1.7-SNAPSHOT.jar" />    
   </fileset>
 
   <target name="init">
@@ -50,7 +49,6 @@
     <copy tofile="${build.dir}/defaults/blacklist.txt" file="blacklist.txt"/>
     <jar jarfile="${dist.dir}/WorldGuard.jar" basedir="${build.dir}" manifest="manifest.mf">
         <zipgroupfileset dir="lib" includes="prtree.jar" />
-        <zipgroupfileset dir="lib" includes="gson-1.7-SNAPSHOT.jar" />
     </jar>
   </target>
 

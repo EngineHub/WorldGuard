@@ -65,4 +65,20 @@ public final class DefaultFlag {
     public static Flag<?>[] getFlags() {
         return flagsList;
     }
+    
+    /**
+     * Get the legacy flag.
+     * 
+     * @param flagString
+     * @return null if not found
+     */
+    public static StateFlag getLegacyFlag(String flagString) {
+        for (Flag<?> flag : flagsList) {
+            if (flag instanceof StateFlag && flagString.equals(flag.getLegacyCode())) {
+                return (StateFlag) flag;
+            }
+        }
+        
+        return null;
+    }
 }
