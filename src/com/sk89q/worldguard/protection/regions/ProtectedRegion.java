@@ -291,6 +291,15 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public Map<Flag<?>, Object> getFlags() {
         return flags;
     }
+    
+    /**
+     * Get the map of flags.
+     * 
+     * @param flags 
+     */
+    public void setFlags(Map<Flag<?>, Object> flags) {
+        this.flags = flags;
+    }
 
     /**
      * Get the number of blocks in this region

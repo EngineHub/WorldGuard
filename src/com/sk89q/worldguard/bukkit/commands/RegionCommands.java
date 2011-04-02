@@ -98,6 +98,79 @@ public class RegionCommands {
         }
     }
     
+    @Command(aliases = {"redefine", "update", "move"},
+            usage = "<id>",
+            desc = "Re-defines the shape of a region",
+            flags = "", min = 1, max = 1)
+    public static void redefine(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.checkPlayer(sender);
+        World world = player.getWorld();
+        WorldEditPlugin worldEdit = plugin.getWorldEdit();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        String id = args.getString(0);
+
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion existing = mgr.getRegion(id);
+
+        if (existing == null) {
+            throw new CommandException("Could not find a region by that ID.");
+        }
+        
+        if (existing.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.redefine.own");
+        } else if (existing.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.redefine.member");
+        } else {
+            plugin.checkPermission(sender, "worldguard.region.redefine");
+        } 
+        
+        // Attempt to get the player's selection from WorldEdit
+        Selection sel = worldEdit.getSelection(player);
+        
+        if (sel == null) {
+            throw new CommandException("Select a region with WorldEdit first.");
+        }
+        
+        ProtectedRegion region;
+        
+        // Detect the type of region from WorldEdit
+        if (sel instanceof Polygonal2DSelection) {
+            Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
+            int minY = polySel.getNativeMinimumPoint().getBlockY();
+            int maxY = polySel.getNativeMaximumPoint().getBlockY();
+            region = new ProtectedPolygonalRegion(id, polySel.getNativePoints(), minY, maxY);
+        } else if (sel instanceof CuboidSelection) {
+            BlockVector min = sel.getNativeMinimumPoint().toBlockVector();
+            BlockVector max = sel.getNativeMaximumPoint().toBlockVector();
+            region = new ProtectedCuboidRegion(id, min, max);
+        } else {
+            throw new CommandException(
+                    "The type of region selected in WorldEdit is unsupported in WorldGuard!");
+        }
+
+        region.setMembers(existing.getMembers());
+        region.setOwners(existing.getOwners());
+        region.setFlags(existing.getFlags());
+        region.setPriority(existing.getPriority());
+        try {
+            region.setParent(existing.getParent());
+        } catch (CircularInheritanceException e) {
+        }
+        
+        mgr.addRegion(region);
+        
+        sender.sendMessage(ChatColor.YELLOW + "Region updated with new area.");
+        
+        try {
+            mgr.save();
+        } catch (IOException e) {
+            throw new CommandException("Failed to write regions file: "
+                    + e.getMessage());
+        }
+    }
+    
     @Command(aliases = {"claim"},
             usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
             desc = "Claim a region",
