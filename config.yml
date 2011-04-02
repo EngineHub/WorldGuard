@@ -19,23 +19,6 @@
 # if any features are currently broken in your version of Bukkit.
 #
 
-summary-on-start: on
-
-blacklist:
-    logging:
-        console:
-            enable: on
-        database:
-            enable: off
-            dsn: jdbc:mysql://localhost:3306/minecraft
-            user: root
-            password: pass
-            table: blacklist_events
-        file:
-            enable: on
-            path: worldguard/logs/%w-%Y-%m-%d.log
-            open-files: 10
-
 # For permissions, see http://wiki.sk89q.com/wiki/WorldGuard/Permissions/Bukkit
 permissions:
     users:

@@ -82,3 +82,16 @@ iconomy:
 
 blacklist:
     use-as-whitelist: off
+    logging:
+        console:
+            enable: on
+        database:
+            enable: off
+            dsn: jdbc:mysql://localhost:3306/minecraft
+            user: root
+            password: pass
+            table: blacklist_events
+        file:
+            enable: on
+            path: worldguard/logs/%w-%Y-%m-%d.log
+            open-files: 10
