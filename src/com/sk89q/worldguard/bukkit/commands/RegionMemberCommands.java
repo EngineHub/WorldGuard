@@ -49,6 +49,10 @@ public class RegionMemberCommands {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         String id = args.getString(0);
+        
+        if (id.equalsIgnoreCase("__global__")) {
+            throw new CommandException("The region cannot be named __global__");
+        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
@@ -58,11 +62,11 @@ public class RegionMemberCommands {
         }
         
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.addmember.own");
+            plugin.checkPermission(sender, "worldguard.region.addmember.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.addmember.member");
+            plugin.checkPermission(sender, "worldguard.region.addmember.member." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.addmember");
+            plugin.checkPermission(sender, "worldguard.region.addmember." + id.toLowerCase());
         }
 
         RegionUtil.addToDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
@@ -90,6 +94,10 @@ public class RegionMemberCommands {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         String id = args.getString(0);
+        
+        if (id.equalsIgnoreCase("__global__")) {
+            throw new CommandException("The region cannot be named __global__");
+        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
@@ -99,11 +107,11 @@ public class RegionMemberCommands {
         }
         
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.addowner.own");
+            plugin.checkPermission(sender, "worldguard.region.addowner.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.addowner.member");
+            plugin.checkPermission(sender, "worldguard.region.addowner.member." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.addowner");
+            plugin.checkPermission(sender, "worldguard.region.addowner." + id.toLowerCase());
         }
 
         RegionUtil.addToDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
@@ -131,6 +139,10 @@ public class RegionMemberCommands {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         String id = args.getString(0);
+        
+        if (id.equalsIgnoreCase("__global__")) {
+            throw new CommandException("The region cannot be named __global__");
+        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
@@ -140,11 +152,11 @@ public class RegionMemberCommands {
         }
         
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.removemember.own");
+            plugin.checkPermission(sender, "worldguard.region.removemember.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.removemember.member");
+            plugin.checkPermission(sender, "worldguard.region.removemember.member." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.removemember");
+            plugin.checkPermission(sender, "worldguard.region.removemember." + id.toLowerCase());
         }
 
         RegionUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
@@ -172,6 +184,10 @@ public class RegionMemberCommands {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         String id = args.getString(0);
+        
+        if (id.equalsIgnoreCase("__global__")) {
+            throw new CommandException("The region cannot be named __global__");
+        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
@@ -181,11 +197,11 @@ public class RegionMemberCommands {
         }
         
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.removeowner.own");
+            plugin.checkPermission(sender, "worldguard.region.removeowner.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.removeowner.member");
+            plugin.checkPermission(sender, "worldguard.region.removeowner.member." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.removeowner");
+            plugin.checkPermission(sender, "worldguard.region.removeowner." + id.toLowerCase());
         }
 
         RegionUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);

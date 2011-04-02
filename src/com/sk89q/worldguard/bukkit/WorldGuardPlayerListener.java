@@ -196,10 +196,19 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 }
             }
 
-            if (wcfg.useRegions && type == Material.CAKE_BLOCK) {
+            if (type == Material.CAKE_BLOCK) {
                 if (!set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
-                    
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+            
+            if (type == Material.RAILS
+                        && (item.getType() == Material.MINECART || item.getType() == Material.BOAT)) {
+                if (!set.canBuild(localPlayer)
+                        && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                     event.setCancelled(true);
                     return;
                 }

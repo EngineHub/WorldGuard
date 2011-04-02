@@ -468,11 +468,11 @@ public class RegionCommands {
         }
         
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.flag.own");
+            plugin.checkPermission(sender, "worldguard.region.flag.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.flag.member");
+            plugin.checkPermission(sender, "worldguard.region.flag.member." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.flag");
+            plugin.checkPermission(sender, "worldguard.region.flag." + id.toLowerCase());
         } 
         
         Flag<?> foundFlag = null;
@@ -502,6 +502,17 @@ public class RegionCommands {
             player.sendMessage(ChatColor.RED + "Available flags: " + list);
             return;
         }
+
+        if (region.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.flag.flags."
+                    + foundFlag.getName() + ".owner." + id.toLowerCase());
+        } else if (region.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.flag.flags."
+                    + foundFlag.getName() + ".member." + id.toLowerCase());
+        } else {
+            plugin.checkPermission(sender, "worldguard.region.flag.flags."
+                    + foundFlag.getName() + "." + id.toLowerCase());
+        } 
         
         if (value != null) {
             try {
@@ -559,11 +570,11 @@ public class RegionCommands {
         }
         
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.setpriority.own");
+            plugin.checkPermission(sender, "worldguard.region.setpriority.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.setpriority.member");
+            plugin.checkPermission(sender, "worldguard.region.setpriority.member." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.setpriority");
+            plugin.checkPermission(sender, "worldguard.region.setpriority." + id.toLowerCase());
         } 
 
         region.setPriority(priority);
@@ -610,19 +621,19 @@ public class RegionCommands {
         }
         
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.setparent.own");
+            plugin.checkPermission(sender, "worldguard.region.setparent.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.setparent.member");
+            plugin.checkPermission(sender, "worldguard.region.setparent.member." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.setparent");
+            plugin.checkPermission(sender, "worldguard.region.setparent." + id.toLowerCase());
         } 
         
         if (parent.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.setparent.own");
+            plugin.checkPermission(sender, "worldguard.region.setparent.own." + id.toLowerCase());
         } else if (parent.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.setparent.member");
+            plugin.checkPermission(sender, "worldguard.region.setparent.member." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.setparent");
+            plugin.checkPermission(sender, "worldguard.region.setparent." + id.toLowerCase());
         }
         
         try {
@@ -664,11 +675,11 @@ public class RegionCommands {
         }
         
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.remove.own");
+            plugin.checkPermission(sender, "worldguard.region.remove.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.remove.member");
+            plugin.checkPermission(sender, "worldguard.region.remove.member." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.flag");
+            plugin.checkPermission(sender, "worldguard.region.remove." + id.toLowerCase());
         }
         
         mgr.removeRegion(id);
