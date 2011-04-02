@@ -40,6 +40,7 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.util.RegionUtil;
 
 public class RegionCommands {
@@ -408,13 +409,13 @@ public class RegionCommands {
             }
 
             sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag '" + foundFlag.getName() + " set.");
+                    + "Region flag '" + foundFlag.getName() + "' set.");
         } else {
             // Clear the flag
             region.setFlag(foundFlag, null);
 
             sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag '" + foundFlag.getName() + " cleared.");
+                    + "Region flag '" + foundFlag.getName() + "' cleared.");
         }
         
         try {
@@ -429,6 +430,65 @@ public class RegionCommands {
             Flag<V> flag, WorldGuardPlugin plugin, CommandSender sender, String value)
                 throws InvalidFlagFormat {
         region.setFlag(flag, flag.parseInput(plugin, sender, value));
+    }
+    
+    @Command(aliases = {"setparent"},
+            usage = "<id> <parent-id>",
+            desc = "Set the parent of a region",
+            flags = "", min = 2, max = 2)
+    public static void setParent(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        Player player = plugin.checkPlayer(sender);
+        World world = player.getWorld();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        
+        String id = args.getString(0);
+        String parentId = args.getString(1);
+        
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = mgr.getRegion(id);
+        ProtectedRegion parent = mgr.getRegion(parentId);
+
+        if (region == null) {
+            throw new CommandException("Could not find a target region by that ID.");
+        }
+
+        if (parent == null) {
+            throw new CommandException("Could not find the parent region by that ID.");
+        }
+        
+        if (region.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.setparent.own");
+        } else if (region.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.setparent.member");
+        } else {
+            plugin.checkPermission(sender, "worldguard.region.setparent");
+        } 
+        
+        if (parent.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.setparent.own");
+        } else if (parent.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.setparent.member");
+        } else {
+            plugin.checkPermission(sender, "worldguard.region.setparent");
+        }
+        
+        try {
+            region.setParent(parent);
+        } catch (CircularInheritanceException e) {
+            throw new CommandException("Circular inheritance detected!");
+        }
+
+        sender.sendMessage(ChatColor.YELLOW
+                + "Parent of '" + region.getId() + "' set to '"
+                + parent.getId() + "'.");
+        
+        try {
+            mgr.save();
+        } catch (IOException e) {
+            throw new CommandException("Failed to write regions file: "
+                    + e.getMessage());
+        }
     }
     
     @Command(aliases = {"remove", "delete"},
