@@ -98,7 +98,7 @@ public class GlobalRegionManager {
      */
     protected File getPath(String name) {
         return new File(plugin.getDataFolder(),
-                "worlds" + File.separator + name + File.separator + "regions.json");
+                "worlds" + File.separator + name + File.separator + "regions.yml");
     }
 
     /**
@@ -138,7 +138,7 @@ public class GlobalRegionManager {
             managers.put(name, manager);
             manager.load();
 
-            logger.warning("WorldGuard: " + manager.getRegions().size() + " "
+            logger.warning("WorldGuard: " + manager.getRegions().size()
                     + " regions loaded for '" + name + "'");
 
             // Store the last modification date so we can track changes
