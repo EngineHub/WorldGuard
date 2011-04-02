@@ -123,4 +123,96 @@ public class GeneralCommands {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players now have god mode.");
         }
     }
+    
+    @Command(aliases = {"heal"},
+            usage = "[player]",
+            desc = "Heal a player",
+            flags = "", min = 0, max = 1)
+    public static void heal(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Iterable<Player> targets = null;
+        boolean included = false;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "worldguard.heal");
+        } else if (args.argsLength() == 1) {            
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "worldguard.heal.other");
+        }
+
+        for (Player player : targets) {
+            player.setHealth(20);
+            
+            // Tell the user
+            if (player.equals(sender)) {
+                player.sendMessage(ChatColor.YELLOW + "Healed!");
+                
+                // Keep track of this
+                included = true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "Healed by "
+                        + plugin.toName(sender) + ".");
+                
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
+        }
+    }
+    
+    @Command(aliases = {"slay"},
+            usage = "[player]",
+            desc = "Slay a player",
+            flags = "", min = 0, max = 1)
+    public static void slay(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Iterable<Player> targets = null;
+        boolean included = false;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "worldguard.slay");
+        } else if (args.argsLength() == 1) {            
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "worldguard.slay.other");
+        }
+
+        for (Player player : targets) {
+            player.setHealth(0);
+            
+            // Tell the user
+            if (player.equals(sender)) {
+                player.sendMessage(ChatColor.YELLOW + "Slayed!");
+                
+                // Keep track of this
+                included = true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "Slayed by "
+                        + plugin.toName(sender) + ".");
+                
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players slayed.");
+        }
+    }
 }
