@@ -18,6 +18,9 @@
  */
 package com.sk89q.worldguard.protection.flags;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -26,7 +29,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  *
  * @author sk89q
  */
-public class RegionGroupFlag extends Flag<String> {
+public class RegionGroupFlag extends Flag<Set<String>> {
     
     public RegionGroupFlag(String name, char legacyCode) {
         super(name, legacyCode);
@@ -37,18 +40,35 @@ public class RegionGroupFlag extends Flag<String> {
     }
 
     @Override
-    public String parseInput(WorldGuardPlugin plugin, CommandSender sender,
+    public Set<String> parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat {
-        return "";
+        Set<String> list = new HashSet<String>();
+        
+        for (String i : input.split(",")) {
+            list.add(i.toLowerCase());
+        }
+        
+        return list;
     }
 
     @Override
-    public String unmarshal(Object o) {
+    public Set<String> unmarshal(Object o) {
+        if (o instanceof List) {
+            List<?> raw = (List<?>) o;
+            Set<String> list = new HashSet<String>();
+            
+            for (Object i : raw) {
+                list.add(i.toString().toLowerCase());
+            }
+            
+            return list;
+        }
+        
         return null;
     }
 
     @Override
-    public Object marshal(String o) {
+    public Object marshal(Set<String> o) {
         return null;
     }
     

@@ -44,9 +44,9 @@ public final class DefaultFlag {
     public static final StringFlag DENY_SPAWN = new StringFlag("deny-spawn");
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay");
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount");
-    public static final LocationFlag TELE_LOC = new LocationFlag("teleport-loc");
+    public static final VectorFlag TELE_LOC = new VectorFlag("teleport-loc");
     public static final RegionGroupFlag TELE_PERM = new RegionGroupFlag("teleport-groups");
-    public static final LocationFlag SPAWN_LOC = new LocationFlag("teleport-location");
+    public static final VectorFlag SPAWN_LOC = new VectorFlag("teleport-location");
     public static final RegionGroupFlag SPAWN_PERM = new RegionGroupFlag("spawn-groups");
     public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
     public static final DoubleFlag PRICE = new DoubleFlag("price");
