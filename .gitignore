@@ -12,3 +12,6 @@
 .classpath
 .project
 manifest.mf
+/oldcmds
+.settings
+*.bat
