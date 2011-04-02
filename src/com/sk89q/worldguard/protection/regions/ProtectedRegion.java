@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Represents a region of any shape and size that can be protected.
@@ -35,6 +36,9 @@ import java.util.Map;
  * @author sk89q
  */
 public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
+    
+    private static final Pattern idPattern = Pattern.compile("^[A-Za-z0-9_,'\\-\\+/]{1,}$");
+    
     /**
      * Holds the region's ID.
      */
@@ -342,6 +346,16 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public abstract List<ProtectedRegion> getIntersectingRegions(
             List<ProtectedRegion> regions)
             throws UnsupportedIntersectionException;
+    
+    /**
+     * Checks to see if the given ID is accurate.
+     * 
+     * @param id
+     * @return
+     */
+    public static boolean isValidId(String id) {
+        return idPattern.matcher(id).matches();
+    }
     
     /**
      * Thrown when setting a curParent would create a circular inheritance

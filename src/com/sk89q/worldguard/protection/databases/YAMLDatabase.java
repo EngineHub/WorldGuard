@@ -33,6 +33,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -86,6 +87,8 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                     Integer maxY = checkNonNull(node.getInt("max-y"));
                     List<BlockVector2D> points = node.getBlockVector2dList("points", null);
                     region = new ProtectedPolygonalRegion(id, points, minY, maxY);
+                } else if (type.equals("global")) {
+                    region = new GlobalProtectedRegion(id);
                 } else {
                     logger.warning("Unknown region type for region '" + id + '"');
                     continue;
@@ -181,6 +184,8 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                 }
                 
                 node.setProperty("points", points);
+            } else if (region instanceof GlobalProtectedRegion) {
+                node.setProperty("type", "global");
             } else {
                 node.setProperty("type", region.getClass().getCanonicalName());
             }

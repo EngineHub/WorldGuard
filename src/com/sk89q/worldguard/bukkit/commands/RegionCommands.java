@@ -55,7 +55,15 @@ public class RegionCommands {
         
         Player player = plugin.checkPlayer(sender);
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
-        String id = args.getString(0).replace(".", "");
+        String id = args.getString(0);
+        
+        if (!ProtectedRegion.isValidId(id)) {
+            throw new CommandException("Invalid region ID specified!");
+        }
+        
+        if (id.equalsIgnoreCase("__global__")) {
+            throw new CommandException("A region cannot be named __global__");
+        }
         
         // Attempt to get the player's selection from WorldEdit
         Selection sel = worldEdit.getSelection(player);
@@ -110,6 +118,10 @@ public class RegionCommands {
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         String id = args.getString(0);
+        
+        if (id.equalsIgnoreCase("__global__")) {
+            throw new CommandException("The region cannot be named __global__");
+        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion existing = mgr.getRegion(id);
@@ -182,7 +194,15 @@ public class RegionCommands {
         Player player = plugin.checkPlayer(sender);
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
-        String id = args.getString(0).replace(".", "");
+        String id = args.getString(0);
+        
+        if (!ProtectedRegion.isValidId(id)) {
+            throw new CommandException("Invalid region ID specified!");
+        }
+        
+        if (id.equalsIgnoreCase("__global__")) {
+            throw new CommandException("A region cannot be named __global__");
+        }
         
         // Attempt to get the player's selection from WorldEdit
         Selection sel = worldEdit.getSelection(player);
@@ -310,6 +330,10 @@ public class RegionCommands {
             id = args.getString(1).toLowerCase();
         }
         
+        if (!ProtectedRegion.isValidId(id)) {
+            throw new CommandException("Invalid region ID specified!");
+        }
+        
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         
         if (!mgr.hasRegion(id)) {
@@ -435,7 +459,12 @@ public class RegionCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            if (id.equalsIgnoreCase("__global__")) {
+                region = new GlobalProtectedRegion(id);
+                mgr.addRegion(region);
+            } else {
+                throw new CommandException("Could not find a region by that ID.");
+            }
         }
         
         if (region.isOwner(localPlayer)) {
@@ -518,6 +547,10 @@ public class RegionCommands {
         String id = args.getString(0);
         int priority = args.getInteger(1);
         
+        if (id.equalsIgnoreCase("__global__")) {
+            throw new CommandException("The region cannot be named __global__");
+        }
+        
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
@@ -559,6 +592,10 @@ public class RegionCommands {
         
         String id = args.getString(0);
         String parentId = args.getString(1);
+        
+        if (id.equalsIgnoreCase("__global__")) {
+            throw new CommandException("The region cannot be named __global__");
+        }
         
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
