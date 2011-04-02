@@ -468,4 +468,86 @@ public class RegionCommands {
                     + e.getMessage());
         }
     }
+    
+    @Command(aliases = {"load"},
+            usage = "[world]",
+            desc = "Reload regions from file",
+            flags = "", min = 0, max = 1)
+    public static void load(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        World world = null;
+        
+        if (args.argsLength() > 0) {
+            world = plugin.matchWorld(sender, args.getString(0));
+        }
+
+        if (world != null) {
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            
+            try {
+                mgr.load();
+                sender.sendMessage(ChatColor.YELLOW
+                        + "Regions for '" + world.getName() + "' load.");
+            } catch (IOException e) {
+                throw new CommandException("Failed to read regions file: "
+                        + e.getMessage());
+            }
+        } else {
+            for (World w : plugin.getServer().getWorlds()) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(w);
+                
+                try {
+                    mgr.load();
+                } catch (IOException e) {
+                    throw new CommandException("Failed to read regions file: "
+                            + e.getMessage());
+                }
+            }
+            
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Region databases loaded.");
+        }
+    }
+    
+    @Command(aliases = {"save", "write"},
+            usage = "[world]",
+            desc = "Re-save regions to file",
+            flags = "", min = 0, max = 1)
+    public static void save(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        World world = null;
+        
+        if (args.argsLength() > 0) {
+            world = plugin.matchWorld(sender, args.getString(0));
+        }
+
+        if (world != null) {
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            
+            try {
+                mgr.save();
+                sender.sendMessage(ChatColor.YELLOW
+                        + "Regions for '" + world.getName() + "' saved.");
+            } catch (IOException e) {
+                throw new CommandException("Failed to write regions file: "
+                        + e.getMessage());
+            }
+        } else {
+            for (World w : plugin.getServer().getWorlds()) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(w);
+                
+                try {
+                    mgr.save();
+                } catch (IOException e) {
+                    throw new CommandException("Failed to write regions file: "
+                            + e.getMessage());
+                }
+            }
+            
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Region databases saved.");
+        }
+    }
 }
