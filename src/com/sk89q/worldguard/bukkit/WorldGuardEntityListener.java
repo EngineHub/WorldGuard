@@ -76,6 +76,11 @@ public class WorldGuardEntityListener extends EntityListener {
 
             ConfigurationManager cfg = plugin.getGlobalConfiguration();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
+            
+            if (cfg.hasGodMode(player)) {
+                event.setCancelled(true);
+                return;
+            }
 
             if (wcfg.disableLavaDamage && type == DamageCause.LAVA) {
                 event.setCancelled(true);
@@ -99,6 +104,11 @@ public class WorldGuardEntityListener extends EntityListener {
 
             ConfigurationManager cfg = plugin.getGlobalConfiguration();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
+            
+            if (cfg.hasGodMode(player)) {
+                event.setCancelled(true);
+                return;
+            }
 
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
@@ -150,6 +160,11 @@ public class WorldGuardEntityListener extends EntityListener {
 
             ConfigurationManager cfg = plugin.getGlobalConfiguration();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
+            
+            if (cfg.hasGodMode(player)) {
+                event.setCancelled(true);
+                return;
+            }
 
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
@@ -204,6 +219,11 @@ public class WorldGuardEntityListener extends EntityListener {
 
             ConfigurationManager cfg = plugin.getGlobalConfiguration();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
+            
+            if (cfg.hasGodMode(player)) {
+                event.setCancelled(true);
+                return;
+            }
 
             if (wcfg.disableFallDamage && type == DamageCause.FALL) {
                 event.setCancelled(true);
