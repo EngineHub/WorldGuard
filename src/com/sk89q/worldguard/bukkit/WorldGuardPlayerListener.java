@@ -24,6 +24,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
@@ -40,6 +41,11 @@ public class WorldGuardPlayerListener extends PlayerListener {
     private WorldGuardPlugin plugin;
 
     /**
+     * Interact Handler
+     */
+    private WorldGuardInteractHandler interactHandler;
+
+    /**
      * Construct the object;
      * 
      * @param plugin
@@ -53,6 +59,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         PluginManager pm = plugin.getServer().getPluginManager();
 
         //pm.registerEvent(Event.Type.PLAYER_ITEM, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_INTERACT, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_JOIN, this, Priority.Normal, plugin);
@@ -61,6 +68,30 @@ public class WorldGuardPlayerListener extends PlayerListener {
         pm.registerEvent(Event.Type.PLAYER_RESPAWN, this, Priority.High, plugin);
     }
 
+    /**
+     * Called when a player interacts with an item.
+     * 
+     * @param event Relevant event details
+     */
+    @Override
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
+
+        if(event.getAction() == Action.LEFT_CLICK_AIR
+                || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            this.interactHandler.onBlockClick(event, cfg, wcfg,
+                    event.getAction(), event.getPlayer(), event.getClickedBlock(), event.getItem(), event.getItem().getTypeId());
+        }
+        if(event.getAction() == Action.RIGHT_CLICK_AIR
+                || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if(!this.interactHandler.itemInHand(event, wcfg, event.getAction(),
+                    event.getPlayer(), event.getClickedBlock(), event.getItem(), event.getItem().getTypeId())) {
+                this.interactHandler.onBlockRightclick(event, cfg, wcfg,
+                        event.getAction(), event.getPlayer(), event.getClickedBlock(), event.getItem(), event.getItem().getTypeId());
+            }
+        }
+    }
 
     /**
      * Called when a player joins a server
