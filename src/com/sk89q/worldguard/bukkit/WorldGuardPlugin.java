@@ -125,7 +125,6 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         // Load permissions
         (new PermissionsResolverServerListener(perms)).register(this);
-        perms.load();
 
         // Register events
         (new WorldGuardPlayerListener(this)).registerEvents();

@@ -30,4 +30,11 @@ public class ProtectionCommands {
     public static void region(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
     }
+
+    @Command(aliases = {"worldguard"},
+            desc = "WorldGuard commands")
+    @NestedCommand({WorldGuardCommands.class})
+    public static void worldGuard(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+    }
 }

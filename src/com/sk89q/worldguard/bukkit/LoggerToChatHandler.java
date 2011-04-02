@@ -22,7 +22,7 @@ package com.sk89q.worldguard.bukkit;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 /**
  * Sends all logger messages to a player.
@@ -33,14 +33,14 @@ public class LoggerToChatHandler extends Handler {
     /**
      * Player.
      */
-    private Player player;
+    private CommandSender player;
 
     /**
      * Construct the object.
      * 
      * @param player
      */
-    public LoggerToChatHandler(Player player) {
+    public LoggerToChatHandler(CommandSender player) {
         this.player = player;
     }
 
