@@ -75,8 +75,8 @@ public class Configuration extends ConfigurationNode {
         super(new HashMap<String, Object>());
         
         DumperOptions options = new DumperOptions();
-        options.setIndent(4);
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setIndent(2);
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.AUTO);
 
         yaml = new Yaml(new SafeConstructor(), new Representer(), options);
         

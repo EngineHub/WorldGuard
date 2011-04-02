@@ -158,9 +158,9 @@ public class ConfigurationNode {
      * @return
      */
     public ConfigurationNode addNode(String path) {
-        ConfigurationNode node = new ConfigurationNode(
-                new HashMap<String, Object>());
-        setProperty(path, node);
+        Map<String, Object> map = new HashMap<String, Object>();
+        ConfigurationNode node = new ConfigurationNode(map);
+        setProperty(path, map);
         return node;
     }
 

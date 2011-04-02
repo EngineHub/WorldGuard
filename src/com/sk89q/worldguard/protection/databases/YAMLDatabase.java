@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
@@ -216,10 +217,25 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
     private Map<String, Object> getDomainData(DefaultDomain domain) {
         Map<String, Object> domainData = new HashMap<String, Object>();
 
-        domainData.put("players", domain.getPlayers());
-        domainData.put("groups", domain.getGroups());
+        setDomainData(domainData, "players", domain.getPlayers());
+        setDomainData(domainData, "groups", domain.getGroups());
         
         return domainData;
+    }
+    
+    private void setDomainData(Map<String, Object> domainData,
+            String key, Set<String> domain) {
+        if (domain.size() == 0) {
+            return;
+        }
+        
+        List<String> list = new ArrayList<String>();
+        
+        for (String str : domain) {
+            list.add(str);
+        }
+        
+        domainData.put(key, list);
     }
 
     @Override
