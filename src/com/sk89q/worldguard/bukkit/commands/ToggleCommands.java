@@ -48,7 +48,7 @@ public class ToggleCommands {
         if (!wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(
                     ChatColor.YELLOW
-                    + "Fire spread has been globally disabled by "
+                    + "Fire spread has been globally disabled for '" + world.getName() + "' by "
                     + plugin.toName(sender) + ".");
         } else {
             sender.sendMessage(
@@ -78,7 +78,7 @@ public class ToggleCommands {
 
         if (wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "Fire spread has been globally re-enabled by "
+                    + "Fire spread has been globally for '" + world.getName() + "' re-enabled by "
                     + plugin.toName(sender) + ".");
         } else {
             sender.sendMessage(ChatColor.YELLOW
