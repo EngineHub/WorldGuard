@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
@@ -213,6 +214,28 @@ public class GeneralCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players slayed.");
+        }
+    }
+    
+    @Command(aliases = {"locate"},
+            usage = "[player]",
+            desc = "Locate a player",
+            flags = "", min = 0, max = 1)
+    @CommandPermissions({"worldguard.locate"})
+    public static void locate(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.checkPlayer(sender);
+        
+        if (args.argsLength() == 0) {
+            player.setCompassTarget(player.getWorld().getSpawnLocation());
+            
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Compass reset to spawn.");
+        } else {
+            Player target = plugin.matchSinglePlayer(sender, args.getString(0));
+            player.setCompassTarget(target.getLocation());
+            
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");
         }
     }
 }
