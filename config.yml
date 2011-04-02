@@ -21,79 +21,7 @@
 
 summary-on-start: on
 
-protection:
-    enforce-single-session: on
-    item-durability: on
-
-simulation:
-    sponge:
-        enable: on
-        redstone: off
-        radius: 3
-
-physics:
-    no-physics-gravel: off
-    no-physics-sand: off
-    allow-portal-anywhere: off
-    disable-water-damage-blocks: []
-
-ignition:
-    block-tnt: off
-    block-lighter: off
-
-fire:
-    disable-all-fire-spread: off
-    disable-fire-spread-blocks: []
-    disable-lava-fire-spread: on
-    lava-spread-blocks: []
-
-mobs:
-    block-creeper-explosions: off
-    block-creeper-block-damage: off
-    block-creature-spawn: []
-
-spawn:
-    login-protection: 3
-    spawn-protection: 0
-    kick-on-death: off
-    exact-respawn: off
-    teleport-to-home-on-death: off
-
-player-damage:
-    disable-fall-damage: off
-    disable-lava-damage: off
-    disable-fire-damage: off
-    disable-drowning-damage: off
-    disable-suffocation-damage: off
-    disable-contact-damage: off
-    teleport-on-suffocation: off
-
-regions:
-    enable: on
-    wand: 287
-    max-claim-volume: 30000
-    claim-only-inside-existing-regions: off
-    max-region-count-per-player: 7
-    default:
-        build: on
-        chest-access: off
-        pvp: on
-        lighter: on
-        tnt: on
-        creeper: on
-        mobdamage: on
-        waterflow: on
-        leverandbutton: on
-        placevehicle: on
-
-iconomy:
-    enable: on
-    buy-on-claim: on
-    # Price per Block for buying on claim
-    buy-on-claim-price: 2
-
 blacklist:
-    use-as-whitelist: off
     logging:
         console:
             enable: on
