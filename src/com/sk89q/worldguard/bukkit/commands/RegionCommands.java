@@ -419,7 +419,6 @@ public class RegionCommands {
         
         try {
             mgr.save();
-            sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
         } catch (IOException e) {
             throw new CommandException("Failed to write regions file: "
                     + e.getMessage());
@@ -430,5 +429,43 @@ public class RegionCommands {
             Flag<V> flag, WorldGuardPlugin plugin, CommandSender sender, String value)
                 throws InvalidFlagFormat {
         region.setFlag(flag, flag.parseInput(plugin, sender, value));
+    }
+    
+    @Command(aliases = {"remove", "delete"},
+            usage = "<id>",
+            desc = "Remove a region",
+            flags = "", min = 1, max = 1)
+    public static void remove(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.checkPlayer(sender);
+        World world = player.getWorld();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        
+        String id = args.getString(0);
+
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = mgr.getRegion(id);
+
+        if (region == null) {
+            throw new CommandException("Could not find a region by that ID.");
+        }
+        
+        if (region.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.remove.own");
+        } else if (region.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.remove.member");
+        } else {
+            plugin.checkPermission(sender, "worldguard.region.flag");
+        }
+        
+        mgr.removeRegion(id);
+        
+        try {
+            mgr.save();
+        } catch (IOException e) {
+            throw new CommandException("Failed to write regions file: "
+                    + e.getMessage());
+        }
     }
 }
