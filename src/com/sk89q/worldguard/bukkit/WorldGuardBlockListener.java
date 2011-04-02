@@ -57,14 +57,11 @@ public class WorldGuardBlockListener extends BlockListener {
 
         PluginManager pm = plugin.getServer().getPluginManager();
 
-        pm.registerEvent(Event.Type.BLOCK_DAMAGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_BREAK, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_FROMTO, this, Priority.Normal, plugin);
         pm.registerEvent(Event.Type.BLOCK_IGNITE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_PHYSICS, this, Priority.Normal, plugin);
-        //pm.registerEvent(Event.Type.BLOCK_INTERACT, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_PLACE, this, Priority.High, plugin);
-        //pm.registerEvent(Event.Type.BLOCK_RIGHTCLICK, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_BURN, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
     }
@@ -75,31 +72,6 @@ public class WorldGuardBlockListener extends BlockListener {
     
     protected WorldConfiguration getWorldConfig(Player player) {
         return plugin.getGlobalConfiguration().get(player.getWorld());
-    }
-    
-    /**
-     * Called when a block is damaged.
-     */
-    @Override
-    public void onBlockDamage(BlockDamageEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
-        Player player = event.getPlayer();
-        Block blockDamaged = event.getBlock();
-
-        // Cake are damaged and not broken when they are eaten, so we must
-        // handle them a bit separately
-        if (blockDamaged.getType() == Material.CAKE_BLOCK) {
-            if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
-                player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-
     }
     
     /**

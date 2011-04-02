@@ -198,13 +198,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
             if (wcfg.useRegions && type == Material.CAKE_BLOCK) {
                 if (!set.canBuild(localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-
-                    byte newData = (byte) (block.getData() - 1);
-                    newData = newData < 0 ? 0 : newData;
-                    block.setData(newData);
-                    player.setHealth(player.getHealth() - 3);
-
+                    player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
+                    
+                    event.setCancelled(true);
                     return;
                 }
             }
