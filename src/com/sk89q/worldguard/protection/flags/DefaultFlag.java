@@ -35,8 +35,8 @@ public final class DefaultFlag {
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", 'F', true);
     public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", 'C', false);
     public static final StateFlag WATER_FLOW = new StateFlag("water-flow", true);
-    public static final StateFlag USE = new StateFlag("use", true);
-    public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", true);
+    public static final StateFlag USE = new StateFlag("use", false);
+    public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greet-message");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell-message");
     public static final BooleanFlag NOTIFY_GREET = new BooleanFlag("notify-greet");
