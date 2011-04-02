@@ -108,6 +108,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Set up permissions
         perms = new PermissionsResolverManager(
                 getConfiguration(), getServer(), "WorldGuard", logger);
+        perms.load();
 
         // This must be done before configuration is laoded
         LegacyWorldGuardMigration.migrateBlacklist(this);
