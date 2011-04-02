@@ -9,50 +9,29 @@ commands:
         description: Re-enables fire spread if he has been disabled with /stopfire
         usage: /<command>
     god:
-        description: Toggles god mode
-        usage: /<command> [other player]
+        description: Enable god mode
+        usage: /<command> [player]
+    ungod:
+        description: Disable god mode
+        usage: /<command> [player]
     heal:
         description: Heal yourself or another
-        usage: /<command> [other player]
+        usage: /<command> [player]
     slay:
         description: Slay yourself or another
-        usage: /<command> [other player]
+        usage: /<command> [player]
     stack:
         description: Stacks items in the player's inventory
         usage: /<command>
         aliases: ;
     region:
         description: Adjust protected regions
-        usage: /<command> <define|claim|setparent|flag|delete|info|addowner|removeowner|addmember|removemember|list|save|load|priority> ...
+        usage: /<command> <action> ...
         aliases: [rg, regions]
-    rd:
-        description: Alias for /region define
-        usage: same as /region define  
-    rc:
-        description: Alias for /region claim
-        usage: same as /region claim
-    rf:
-        description: Alias for /region flag
-        usage: same as /region flag
-    ri:
-        description: Alias for /region info
-        usage: same as /region info
-    rlist:
-        description: Alias for /region list
-        usage: same as /region list
-    rp:
-        description: Alias for /region priority
-        usage: same as /region priority
     locate:
         description: Set your compass towards a person
         usage: /<command> <target>
-    reloadwg:
-        description: Reload WorldGuard's configuration
+    worldguard:
+        description: WorldGuard commands
+        aliases: wg
         usage: /<command>
-    tpregion:
-        description: Ports you to the region
-        usage: /<command> <region id> ...
-        aliases: tpr
-    buyregion:
-        description: Buy a buyable region
-        usage: /<command> <region id> [info]

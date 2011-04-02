@@ -22,8 +22,11 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
 /**
@@ -44,6 +47,16 @@ public class ConfigurationManager {
      * Holds configurations for different worlds.
      */
     private Map<String, WorldConfiguration> worlds;
+    
+    /**
+     * List of people with god mode.
+     */
+    private Set<String> hasGodMode = new HashSet<String>();
+    
+    /**
+     * List of people who can breathe underwater.
+     */
+    private Set<String> hasAmphibious = new HashSet<String>();
     
     public boolean suppressTickSyncWarnings;
 
@@ -116,7 +129,65 @@ public class ConfigurationManager {
             if (bl != null) {
                 bl.forgetPlayer(player);
             }
-            
         }
+        
+        hasGodMode.remove(player.getName());
+        hasAmphibious.remove(player.getName());
+    }
+    
+    /**
+     * Enable god mode for a player.
+     * 
+     * @param player
+     */
+    public void enableGodMode(Player player) {
+        hasGodMode.add(player.getName());
+    }
+    
+    /**
+     * Disable god mode for a player.
+     * 
+     * @param player
+     */
+    public void disableGodMode(Player player) {
+        hasGodMode.remove(player.getName());
+    }
+    
+    /**
+     * Check to see if god mode is enabled for a player.
+     * 
+     * @param player
+     * @return 
+     */
+    public boolean hasGodMode(Player player) {
+        return hasGodMode.contains(player.getName());
+    }
+    
+    /**
+     * Enable amphibious mode for a player.
+     * 
+     * @param player
+     */
+    public void enableAmphibiousMode(Player player) {
+        hasAmphibious.add(player.getName());
+    }
+    
+    /**
+     * Disable amphibious mode  for a player.
+     * 
+     * @param player
+     */
+    public void disableAmphibiousMode(Player player) {
+        hasAmphibious.remove(player.getName());
+    }
+    
+    /**
+     * Check to see if amphibious mode  is enabled for a player.
+     * 
+     * @param player
+     * @return 
+     */
+    public boolean hasAmphibiousMode(Player player) {
+        return hasAmphibious.contains(player.getName());
     }
 }

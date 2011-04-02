@@ -33,6 +33,7 @@ import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
+import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.protection.*;
@@ -96,6 +97,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Register command classes
         commands.register(ToggleCommands.class);
         commands.register(ProtectionCommands.class);
+        commands.register(GeneralCommands.class);
     }
     
     /**
