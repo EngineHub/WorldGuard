@@ -20,8 +20,10 @@
 package com.sk89q.worldguard.bukkit;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -649,5 +651,29 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
             }
         }
+    }
+    
+    /**
+     * Checks to see if a player can build at a location. This will return
+     * true if region protection is disabled.
+     * 
+     * @param player
+     * @param loc
+     * @return
+     */
+    public boolean canBuild(Player player, Location loc) {
+        return getGlobalRegionManager().canBuild(player, loc);
+    }
+    
+    /**
+     * Checks to see if a player can build at a location. This will return
+     * true if region protection is disabled.
+     * 
+     * @param player
+     * @param block
+     * @return
+     */
+    public boolean canBuild(Player player, Block block) {
+        return getGlobalRegionManager().canBuild(player, block);
     }
 }
