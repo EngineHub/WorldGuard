@@ -127,7 +127,7 @@ public class ApplicableRegionSet {
     private boolean internalGetState(StateFlag flag, LocalPlayer player) {
         boolean found = false;
         boolean allowed = false; // Used for ALLOW override
-        boolean def = false;
+        boolean def = flag.getDefault();
         
         // Handle defaults
         if (globalRegion != null) {
@@ -137,9 +137,6 @@ public class ApplicableRegionSet {
             if (globalState != null) {
                 def = (globalState == State.ALLOW);
             }
-        } else {
-            // There is no global region, so let's use the hard-coded default
-            def = flag.getDefault();
         }
         
         // The player argument is used if and only if the flag is the build
@@ -222,8 +219,8 @@ public class ApplicableRegionSet {
             lastPriority = region.getPriority();
         }
 
-        return (found == false ? def : allowed)
-                || (player != null && needsClear.size() == 0);
+        return found == false ? def :
+                (allowed || (player != null && needsClear.size() == 0));
     }
 
     /**
