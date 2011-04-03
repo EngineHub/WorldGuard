@@ -28,6 +28,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.*;
 import com.sk89q.worldguard.LocalPlayer;
@@ -304,6 +305,55 @@ public class RegionCommands {
         } catch (IOException e) {
             throw new CommandException("Failed to write regions file: "
                     + e.getMessage());
+        }
+    }
+    
+    @Command(aliases = {"select", "sel"},
+            usage = "<id>",
+            desc = "Load a region as a WorldEdit selection",
+            flags = "", min = 1, max = 1)
+    public static void select(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        
+        Player player = plugin.checkPlayer(sender);
+        World world = player.getWorld();
+        WorldEditPlugin worldEdit = plugin.getWorldEdit();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        
+        String id = args.getString(0);
+
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = mgr.getRegion(id);
+
+        if (region == null) {
+            throw new CommandException("Could not find a region by that ID.");
+        }
+        
+        if (region.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.select.own." + id.toLowerCase());
+        } else if (region.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.select.member." + id.toLowerCase());
+        } else {
+            plugin.checkPermission(sender, "worldguard.region.select." + id.toLowerCase());
+        }
+
+        if (region instanceof ProtectedCuboidRegion) {
+            ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
+            Vector pt1 = cuboid.getMinimumPoint();
+            Vector pt2 = cuboid.getMaximumPoint();
+            CuboidSelection selection = new CuboidSelection(world, pt1, pt2);
+            worldEdit.setSelection(player, selection);
+            sender.sendMessage(ChatColor.YELLOW + "Region selected as a cuboid.");
+        } else if (region instanceof ProtectedPolygonalRegion) {
+            ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
+            Polygonal2DSelection selection = new Polygonal2DSelection(world, poly2d.getPoints(),
+                    poly2d.getMinimumPoint().getBlockY(), poly2d.getMaximumPoint().getBlockY());
+            worldEdit.setSelection(player, selection);
+            sender.sendMessage(ChatColor.YELLOW + "Region selected as a polygon.");
+        } else if (region instanceof GlobalProtectedRegion) {
+            throw new CommandException("Can't select global regions.");
+        } else {
+            throw new CommandException("Unknown region type: " + region.getClass().getCanonicalName());
         }
     }
     
