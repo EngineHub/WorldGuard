@@ -36,6 +36,7 @@ public final class DefaultFlag {
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", 'F', true);
     public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", 'C', false);
     public static final StateFlag WATER_FLOW = new StateFlag("water-flow", true);
+    public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
     public static final StateFlag USE = new StateFlag("use", false);
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greet-message");
@@ -54,7 +55,7 @@ public final class DefaultFlag {
     
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, CREEPER_EXPLOSION,
-        TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW,
+        TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW, LAVA_FLOW,
         USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_GREET,
         NOTIFY_FAREWELL, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
         TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE

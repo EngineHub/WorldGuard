@@ -188,7 +188,13 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (!plugin.getGlobalRegionManager().allows(DefaultFlag.WATER_FLOW,
+        if (isWater && !plugin.getGlobalRegionManager().allows(DefaultFlag.WATER_FLOW,
+                blockFrom.getLocation())) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (isLava && !plugin.getGlobalRegionManager().allows(DefaultFlag.LAVA_FLOW,
                 blockFrom.getLocation())) {
             event.setCancelled(true);
             return;

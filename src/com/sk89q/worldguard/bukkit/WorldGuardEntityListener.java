@@ -124,7 +124,8 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
 
-            if (attacker != null && attacker instanceof Monster) {
+            if (attacker != null && attacker instanceof LivingEntity
+                    && !(attacker instanceof Player)) {
                 if (attacker instanceof Creeper && wcfg.blockCreeperExplosions) {
                     event.setCancelled(true);
                     return;
@@ -283,8 +284,6 @@ public class WorldGuardEntityListener extends EntityListener {
         WorldConfiguration wcfg = cfg.get(world);
 
         if (event.getEntity() instanceof LivingEntity) {
-
-
             if (wcfg.blockCreeperBlockDamage) {
                 event.setCancelled(true);
                 return;
