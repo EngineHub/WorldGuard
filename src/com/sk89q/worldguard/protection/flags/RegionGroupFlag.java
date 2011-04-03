@@ -18,10 +18,6 @@
  */
 package com.sk89q.worldguard.protection.flags;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
@@ -29,7 +25,12 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  *
  * @author sk89q
  */
-public class RegionGroupFlag extends Flag<Set<String>> {
+public class RegionGroupFlag extends Flag<RegionGroupFlag.RegionGroup> {
+    
+    public static enum RegionGroup {
+        MEMBERS,
+        OWNERS
+    }
     
     public RegionGroupFlag(String name, char legacyCode) {
         super(name, legacyCode);
@@ -40,36 +41,42 @@ public class RegionGroupFlag extends Flag<Set<String>> {
     }
 
     @Override
-    public Set<String> parseInput(WorldGuardPlugin plugin, CommandSender sender,
+    public RegionGroup parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat {
-        Set<String> list = new HashSet<String>();
+        input = input.trim();
         
-        for (String i : input.split(",")) {
-            list.add(i.toLowerCase());
+        if (input.equalsIgnoreCase("members") || input.equalsIgnoreCase("member")) {
+            return RegionGroup.MEMBERS;
+        } else if (input.equalsIgnoreCase("owners") || input.equalsIgnoreCase("owner")) {
+            return RegionGroup.OWNERS;
+        } else if (input.equalsIgnoreCase("everyone") || input.equalsIgnoreCase("anyone")) {
+            return null;
+        } else {
+            throw new InvalidFlagFormat("Not none/allow/deny: " + input);
         }
-        
-        return list;
     }
 
     @Override
-    public Set<String> unmarshal(Object o) {
-        if (o instanceof List) {
-            List<?> raw = (List<?>) o;
-            Set<String> list = new HashSet<String>();
-            
-            for (Object i : raw) {
-                list.add(i.toString().toLowerCase());
-            }
-            
-            return list;
+    public RegionGroup unmarshal(Object o) {
+        String str = o.toString();
+        if (str.equalsIgnoreCase("members")) {
+            return RegionGroup.MEMBERS;
+        } else if (str.equalsIgnoreCase("owners")) {
+            return RegionGroup.OWNERS;
+        } else {
+            return null;
         }
-        
-        return null;
     }
 
     @Override
-    public Object marshal(Set<String> o) {
-        return null;
+    public Object marshal(RegionGroup o) {
+        if (o == RegionGroup.MEMBERS) {
+            return "members";
+        } else if (o == RegionGroup.OWNERS) {
+            return "owners";
+        } else {
+            return null;
+        }
     }
     
 }

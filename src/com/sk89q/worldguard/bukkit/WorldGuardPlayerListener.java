@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.util.Iterator;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -40,6 +41,7 @@ import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -521,37 +523,41 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
     }
     
-/*
     @Override
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         Location location = player.getLocation();
-
-        ApplicableRegionSet regions = plugin.getGlobalRegionManager().get(
-                player.getWorld().getName()).getApplicableRegions(
-                BukkitUtil.toVector(location));
-
-        Location spawn = regions.getLocationFlag(DefaultFlag.SPAWN_LOC, true).getValue(player.getServer());
-
-        if (spawn != null) {
-            RegionGroup spawnconfig = regions.getRegionGroupFlag(DefaultFlag.SPAWN_PERM, true).getValue();
-            if (spawnconfig != null) {
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        
+        if (wcfg.useRegions) {
+            Vector pt = toVector(location);
+            RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+    
+            Vector spawn = set.getFlag(DefaultFlag.SPAWN_LOC);
+    
+            if (spawn != null) {
+                RegionGroup group = set.getFlag(DefaultFlag.SPAWN_PERM);
+                Location spawnLoc = BukkitUtil.toLocation(player.getWorld(), spawn);
                 
-                if (spawnconfig == RegionGroup.OWNER) {
-                    if (regions.isOwner(localPlayer)) {
-                        event.setRespawnLocation(spawn);
-                    }
-                } else if (spawnconfig == RegionGroup.MEMBER) {
-                    if (regions.isMember(localPlayer)) {
-                        event.setRespawnLocation(spawn);
+                if (group != null) {
+                    LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                    
+                    if (group == RegionGroup.OWNERS) {
+                        if (set.isOwnerOfAll(localPlayer)) {
+                            event.setRespawnLocation(spawnLoc);
+                        }
+                    } else if (group == RegionGroup.MEMBERS) {
+                        if (set.isMemberOfAll(localPlayer)) {
+                            event.setRespawnLocation(spawnLoc);
+                        }
                     }
                 } else {
-                    event.setRespawnLocation(spawn);
+                    event.setRespawnLocation(spawnLoc);
                 }
-            } else {
-                event.setRespawnLocation(spawn);
             }
         }
-    }*/
+    }
 }
