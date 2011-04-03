@@ -494,6 +494,23 @@ public class RegionCommands {
                 if (list.length() > 0) {
                     list.append(", ");
                 }
+
+                if (region.isOwner(localPlayer)) {
+                    if (!plugin.hasPermission(sender, "worldguard.region.flag.flags."
+                            + flag.getName() + ".owner." + id.toLowerCase())) {
+                        continue;
+                    }
+                } else if (region.isMember(localPlayer)) {
+                    if (!plugin.hasPermission(sender, "worldguard.region.flag.flags."
+                            + flag.getName() + ".member." + id.toLowerCase())) {
+                        continue;
+                    }
+                } else {
+                    if (!plugin.hasPermission(sender, "worldguard.region.flag.flags."
+                                + flag.getName() + "." + id.toLowerCase())) {
+                        continue;
+                    }
+                } 
                 
                 list.append(flag.getName());
             }
