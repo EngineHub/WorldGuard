@@ -87,6 +87,7 @@ public class WorldConfiguration {
     public boolean disableSuffocationDamage;
     public boolean teleportOnSuffocation;
     public boolean useRegions;
+    public boolean highFreqFlags;
     public int regionWand = 287;
     public Set<CreatureType> blockCreatureSpawn;
     public boolean useiConomy;
@@ -168,6 +169,7 @@ public class WorldConfiguration {
         teleportOnSuffocation = config.getBoolean("player-damage.teleport-on-suffocation", false);
 
         useRegions = config.getBoolean("regions.enable", true);
+        highFreqFlags = config.getBoolean("regions.high-frequency-flags", false);
         regionWand = config.getInt("regions.wand", 287);
         maxClaimVolume = config.getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = config.getBoolean("regions.claim-only-inside-existing-regions", false);

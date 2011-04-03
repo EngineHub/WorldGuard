@@ -188,13 +188,15 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (isWater && !plugin.getGlobalRegionManager().allows(DefaultFlag.WATER_FLOW,
+        if (wcfg.highFreqFlags && isWater
+                && !plugin.getGlobalRegionManager().allows(DefaultFlag.WATER_FLOW,
                 blockFrom.getLocation())) {
             event.setCancelled(true);
             return;
         }
 
-        if (isLava && !plugin.getGlobalRegionManager().allows(DefaultFlag.LAVA_FLOW,
+        if (wcfg.highFreqFlags && isLava
+                && !plugin.getGlobalRegionManager().allows(DefaultFlag.LAVA_FLOW,
                 blockFrom.getLocation())) {
             event.setCancelled(true);
             return;
@@ -276,12 +278,13 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
             }
 
-            if (isFireSpread && set.allows(DefaultFlag.FIRE_SPREAD)) {
+            if (wcfg.highFreqFlags && isFireSpread && set.allows(DefaultFlag.FIRE_SPREAD)) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (cause == IgniteCause.LAVA && !set.allows(DefaultFlag.LAVA_FIRE)) {
+            if (wcfg.highFreqFlags && cause == IgniteCause.LAVA
+                    && !set.allows(DefaultFlag.LAVA_FIRE)) {
                 event.setCancelled(true);
                 return;
             }
