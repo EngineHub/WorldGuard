@@ -62,7 +62,7 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "God mode enabled!");
+                player.sendMessage(ChatColor.YELLOW + "God mode enabled! Use /ungod to disable.");
                 
                 // Keep track of this
                 included = true;
