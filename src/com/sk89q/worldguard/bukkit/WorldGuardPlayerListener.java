@@ -206,11 +206,19 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 }
             }
             
-            if (type == Material.RAILS
-                        && (item.getType() == Material.MINECART || item.getType() == Material.BOAT)) {
+            if (type == Material.RAILS && item.getType() == Material.MINECART) {
                 if (!set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to place vehicles here.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+            
+            if (item.getType() == Material.BOAT) {
+                if (!set.canBuild(localPlayer)
+                        && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to place vehicles here.");
                     event.setCancelled(true);
                     return;
                 }
