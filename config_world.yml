@@ -50,6 +50,7 @@ mobs:
     block-creeper-explosions: off
     block-creeper-block-damage: off
     block-creature-spawn: []
+    anti-wolf-dumbness: false
 
 spawn:
     login-protection: 3

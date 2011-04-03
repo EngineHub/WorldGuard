@@ -96,6 +96,7 @@ public class WorldConfiguration {
     public int maxClaimVolume;
     public boolean claimOnlyInsideExistingRegions;
     public int maxRegionCountPerPlayer;
+    public boolean antiWolfDumbness;
 
     /* Configuration data end */
 
@@ -153,6 +154,7 @@ public class WorldConfiguration {
 
         blockCreeperExplosions = config.getBoolean("mobs.block-creeper-explosions", false);
         blockCreeperBlockDamage = config.getBoolean("mobs.block-creeper-block-damage", false);
+        antiWolfDumbness = config.getBoolean("mobs.anti-wolf-dumbness", false);
 
         loginProtection = config.getInt("spawn.login-protection", 3);
         spawnProtection = config.getInt("spawn.spawn-protection", 0);

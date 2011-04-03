@@ -33,8 +33,8 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import com.sk89q.worldedit.Vector;
@@ -216,11 +216,16 @@ public class WorldGuardEntityListener extends EntityListener {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
 
-        if (defender instanceof Player) {
-            Player player = (Player) defender;
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(defender.getWorld());
 
-            ConfigurationManager cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.get(player.getWorld());
+        if (defender instanceof Wolf) {
+            if (wcfg.antiWolfDumbness) {
+                event.setCancelled(true);
+                return;
+            }
+        } else if (defender instanceof Player) {
+            Player player = (Player) defender;
             
             if (cfg.hasGodMode(player)) {
                 event.setCancelled(true);
