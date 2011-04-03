@@ -181,7 +181,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     || block.getType() == Material.BURNING_FURNACE
                     || block.getType() == Material.NOTE_BLOCK)) {
                 
-                if (!set.allows(DefaultFlag.CHEST_ACCESS)
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.allows(DefaultFlag.CHEST_ACCESS)
                         && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                     event.setCancelled(true);
@@ -190,7 +191,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
     
             if (type == Material.LEVER || type == Material.STONE_BUTTON) {
-                if (!set.allows(DefaultFlag.USE)
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.allows(DefaultFlag.USE)
                         && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                     event.setCancelled(true);
