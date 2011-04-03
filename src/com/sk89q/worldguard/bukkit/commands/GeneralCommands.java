@@ -59,6 +59,7 @@ public class GeneralCommands {
 
         for (Player player : targets) {
             config.enableGodMode(player);
+            player.setFireTicks(0);
             
             // Tell the user
             if (player.equals(sender)) {
