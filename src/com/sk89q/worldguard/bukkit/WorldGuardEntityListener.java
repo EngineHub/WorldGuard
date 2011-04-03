@@ -92,7 +92,18 @@ public class WorldGuardEntityListener extends EntityListener {
                 event.setCancelled(true);
                 return;
             }
-            
+
+            if (wcfg.teleportOnVoid && type == DamageCause.VOID) {
+                findFreePosition(player);
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.disableVoidDamage && type == DamageCause.VOID) {
+                event.setCancelled(true);
+                return;
+            }
+
         }
     }
 
@@ -226,18 +237,18 @@ public class WorldGuardEntityListener extends EntityListener {
             }
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
-            
+
             if (cfg.hasGodMode(player)) {
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (type == DamageCause.DROWNING && cfg.hasAmphibiousMode(player)) {
                 player.setRemainingAir(player.getMaximumAir());
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (type == DamageCause.DROWNING && wcfg.pumpkinScuba
                     && (player.getInventory().getHelmet().getType() == Material.PUMPKIN
                     || player.getInventory().getHelmet().getType() == Material.JACK_O_LANTERN)) {
@@ -263,7 +274,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
 
-            if (wcfg.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
+           if (wcfg.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
                 findFreePosition(player);
                 event.setCancelled(true);
                 return;

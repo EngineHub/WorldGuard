@@ -36,7 +36,7 @@ import org.bukkit.util.config.Configuration;
 
 /**
  * Holds the configuration for individual worlds.
- * 
+ *
  * @author sk89q
  * @author Michael
  */
@@ -86,6 +86,8 @@ public class WorldConfiguration {
     public boolean disableDrowningDamage;
     public boolean disableSuffocationDamage;
     public boolean teleportOnSuffocation;
+    public boolean disableVoidDamage;
+    public boolean teleportOnVoid;
     public boolean useRegions;
     public boolean highFreqFlags;
     public int regionWand = 287;
@@ -102,18 +104,18 @@ public class WorldConfiguration {
 
     /**
      * Construct the object.
-     * 
-     * @param plugin 
-     * @param worldName 
+     *
+     * @param plugin
+     * @param worldName
      */
     public WorldConfiguration(WorldGuardPlugin plugin, String worldName) {
         File baseFolder = new File(plugin.getDataFolder(), "worlds/" + worldName);
         configFile = new File(baseFolder, "config.yml");
         blacklistFile = new File(baseFolder, "blacklist.txt");
-        
+
         this.plugin = plugin;
         this.worldName = worldName;
-        
+
         WorldGuardPlugin.createDefaultConfiguration(configFile, "config_world.yml");
         WorldGuardPlugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
 
@@ -128,7 +130,7 @@ public class WorldConfiguration {
     private void loadConfiguration() {
         Configuration config = new Configuration(this.configFile);
         config.load();
- 
+
         enforceOneSession = config.getBoolean("protection.enforce-single-session", true);
         itemDurability = config.getBoolean("protection.item-durability", true);
 
@@ -136,7 +138,7 @@ public class WorldConfiguration {
         simulateSponge = config.getBoolean("simulation.sponge.enable", true);
         spongeRadius = Math.max(1, config.getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = config.getBoolean("simulation.sponge.redstone", false);
-        
+
         pumpkinScuba = config.getBoolean("pumpkin-scuba", false);
 
         noPhysicsGravel = config.getBoolean("physics.no-physics-gravel", false);
@@ -169,6 +171,9 @@ public class WorldConfiguration {
         disableSuffocationDamage = config.getBoolean("player-damage.disable-suffocation-damage", false);
         disableContactDamage = config.getBoolean("player-damage.disable-contact-damage", false);
         teleportOnSuffocation = config.getBoolean("player-damage.teleport-on-suffocation", false);
+        disableVoidDamage = config.getBoolean("player-damage.disable-void-damage", false);
+        //this is pretty useless since presumably there won't be much above them if they fall into a big hole
+        teleportOnVoid = config.getBoolean("player-damage.teleport-on-void-falling", false);
 
         useRegions = config.getBoolean("regions.enable", true);
         highFreqFlags = config.getBoolean("regions.high-frequency-flags", false);
@@ -184,7 +189,7 @@ public class WorldConfiguration {
         blockCreatureSpawn = new HashSet<CreatureType>();
         for (String creatureName : config.getStringList("mobs.block-creature-spawn", null)) {
             CreatureType creature = CreatureType.fromName(creatureName);
-            
+
             if (creature == null) {
                 logger.warning("WorldGuard: Unknown mob type '" + creatureName + "'");
             } else {
@@ -265,7 +270,7 @@ public class WorldConfiguration {
             logger.log(Level.INFO, preventLavaFire
                     ? "WorldGuard: (" + worldName + ") Lava fire is blocked."
                     : "WorldGuard: (" + worldName + ") Lava fire is PERMITTED.");
-            
+
             if (disableFireSpread) {
                 logger.log(Level.INFO, "WorldGuard: (" + worldName + ") All fire spread is disabled.");
             } else {
