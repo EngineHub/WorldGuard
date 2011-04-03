@@ -628,7 +628,10 @@ public class RegionCommands {
         ProtectedRegion region = mgr.getRegion(id);
         
         if (args.argsLength() == 1) {
-            region.setParent(null);
+            try {
+                region.setParent(null);
+            } catch (CircularInheritanceException e) {
+            }
     
             sender.sendMessage(ChatColor.YELLOW
                     + "Parent of '" + region.getId() + "' cleared.");
