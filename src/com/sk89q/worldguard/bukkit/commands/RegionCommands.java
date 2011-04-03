@@ -46,7 +46,7 @@ import com.sk89q.worldguard.util.RegionUtil;
 
 public class RegionCommands {
     
-    @Command(aliases = {"define", "def"},
+    @Command(aliases = {"define", "def", "d"},
             usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
             desc = "Defines a region",
             flags = "", min = 1, max = -1)
@@ -308,7 +308,7 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"select", "sel"},
+    @Command(aliases = {"select", "sel", "s"},
             usage = "<id>",
             desc = "Load a region as a WorldEdit selection",
             flags = "", min = 1, max = 1)
@@ -357,7 +357,7 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"info"},
+    @Command(aliases = {"info", "i"},
             usage = "[world] <id>",
             desc = "Get information about a region",
             flags = "", min = 1, max = 2)
@@ -486,7 +486,7 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"flag"},
+    @Command(aliases = {"flag", "f"},
             usage = "<id> <flag> [value]",
             desc = "Set flags",
             flags = "", min = 2, max = -1)
@@ -612,7 +612,7 @@ public class RegionCommands {
         region.setFlag(flag, flag.parseInput(plugin, sender, value));
     }
     
-    @Command(aliases = {"setpriority"},
+    @Command(aliases = {"setpriority", "priority", "pri"},
             usage = "<id> <priority>",
             desc = "Set the priority of a region",
             flags = "", min = 2, max = 2)
@@ -658,7 +658,7 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"setparent"},
+    @Command(aliases = {"setparent", "parent", "par"},
             usage = "<id> [parent-id]",
             desc = "Set the parent of a region",
             flags = "", min = 1, max = 2)
@@ -732,7 +732,7 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"remove", "delete"},
+    @Command(aliases = {"remove", "delete", "del", "rem"},
             usage = "<id>",
             desc = "Remove a region",
             flags = "", min = 1, max = 1)
@@ -773,7 +773,7 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"load"},
+    @Command(aliases = {"load", "reload"},
             usage = "[world]",
             desc = "Reload regions from file",
             flags = "", min = 0, max = 1)
