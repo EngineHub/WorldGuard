@@ -611,7 +611,7 @@ public class RegionCommands {
     @Command(aliases = {"setparent"},
             usage = "<id> [parent-id]",
             desc = "Set the parent of a region",
-            flags = "", min = 2, max = 1)
+            flags = "", min = 1, max = 2)
     public static void setParent(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
