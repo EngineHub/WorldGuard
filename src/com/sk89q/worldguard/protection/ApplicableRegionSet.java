@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import com.sk89q.worldguard.LocalPlayer;
 
@@ -280,7 +281,11 @@ public class ApplicableRegionSet {
             lastPriority = region.getPriority();
         }
         
-        return needsClear.values().iterator().next();
+        try {
+            return needsClear.values().iterator().next();
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 
     /**
