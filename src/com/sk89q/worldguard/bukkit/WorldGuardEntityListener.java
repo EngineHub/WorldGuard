@@ -18,16 +18,15 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Skeleton;
@@ -37,9 +36,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
+
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
+
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
 public class WorldGuardEntityListener extends EntityListener {
 
@@ -72,12 +77,17 @@ public class WorldGuardEntityListener extends EntityListener {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
 
-        if (defender instanceof Player) {
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(defender.getWorld());
+
+        if (defender instanceof Wolf) {
+            if (wcfg.antiWolfDumbness && !(type == DamageCause.VOID)) {
+                event.setCancelled(true);
+                return;
+            }
+        } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            ConfigurationManager cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.get(player.getWorld());
-            
             if (cfg.hasGodMode(player)) {
                 event.setCancelled(true);
                 return;
@@ -402,13 +412,17 @@ public class WorldGuardEntityListener extends EntityListener {
             }
 
             if (free == 2) {
-                if (y - 1 != origY) {
+                if (y - 1 != origY || y == 1) {
                     loc.setX(x + 0.5);
                     loc.setY(y);
                     loc.setZ(z + 0.5);
+                    if (y <= 2 && world.getBlockAt(x,0,z).getType() == Material.AIR) {
+                        world.getBlockAt(x,0,z).setTypeId(20);
+                        loc.setY(2);
+                    }
+                    player.setFallDistance(0F);
                     player.teleport(loc);
                 }
-
                 return;
             }
 
