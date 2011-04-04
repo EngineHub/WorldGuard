@@ -374,6 +374,18 @@ public class WorldGuardEntityListener extends EntityListener {
             cancelEvent = true;
         }
         
+        Location eventLoc = event.getLocation();
+        
+        if (wcfg.useRegions) {
+            Vector pt = toVector(eventLoc);
+            RegionManager mgr = plugin.getGlobalRegionManager().get(eventLoc.getWorld());
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+            if (!set.allows(DefaultFlag.MOB_SPAWNING)) {
+            	cancelEvent = true;
+            }
+        }
+        
         // TODO: Monsters and stuff
 /*
         if (wcfg.useRegions) {
