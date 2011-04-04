@@ -172,7 +172,6 @@ public class WorldConfiguration {
         disableContactDamage = config.getBoolean("player-damage.disable-contact-damage", false);
         teleportOnSuffocation = config.getBoolean("player-damage.teleport-on-suffocation", false);
         disableVoidDamage = config.getBoolean("player-damage.disable-void-damage", false);
-        //this is pretty useless since presumably there won't be much above them if they fall into a big hole
         teleportOnVoid = config.getBoolean("player-damage.teleport-on-void-falling", false);
 
         useRegions = config.getBoolean("regions.enable", true);
