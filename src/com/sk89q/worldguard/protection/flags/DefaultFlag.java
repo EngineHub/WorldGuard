@@ -29,7 +29,7 @@ public final class DefaultFlag {
     public static final StateFlag BUILD = new StateFlag("build", 'b', true);
     public static final StateFlag PVP = new StateFlag("pvp", 'p', true);
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", 'm', true);
-    public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true);
+    public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", 'M', true);
     public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", 'c', true);
     public static final StateFlag SLEEP = new StateFlag("sleep", true);
     public static final StateFlag TNT = new StateFlag("tnt", 't', true);
