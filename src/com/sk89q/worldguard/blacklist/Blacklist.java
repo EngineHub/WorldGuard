@@ -88,6 +88,24 @@ public abstract class Blacklist {
     }
     
     /**
+     * Get the number of individual items that have blacklist entries.
+     * 
+     * @return
+     */
+    public int getItemCount() {
+        return blacklist.size();
+    }
+    
+    /**
+     * Returns whether the blacklist is used as a whitelist.
+     * 
+     * @return
+     */
+    public boolean isWhitelist() {
+        return useAsWhitelist;
+    }
+    
+    /**
      * Get the logger.
      * 
      * @return
