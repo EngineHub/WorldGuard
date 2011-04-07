@@ -128,7 +128,7 @@ public class GlobalRegionManager {
      * 
      * @param world
      */
-    public void load(World world) {
+    public RegionManager load(World world) {
         String name = world.getName();
         File file = getPath(name);
         
@@ -143,11 +143,16 @@ public class GlobalRegionManager {
 
             // Store the last modification date so we can track changes
             lastModified.put(name, file.lastModified());
+            
+            return manager;
         } catch (FileNotFoundException e) {
         } catch (IOException e) {
             logger.warning("WorldGuard: Failed to load regions from file "
                     + file.getAbsolutePath() + " : " + e.getMessage());
         }
+        
+        // @TODO: THIS CREATES PROBLEMS!!
+        return null;
     }
     
     /**
@@ -197,7 +202,7 @@ public class GlobalRegionManager {
         RegionManager manager = managers.get(world.getName());
 
         if (manager == null) {
-            load(world);
+            manager = load(world);
         }
 
         return manager;
