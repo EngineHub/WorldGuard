@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
@@ -40,50 +39,71 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.LogListBlock;
 
 public class ReportWriter {
 
     private static final SimpleDateFormat dateFmt =
         new SimpleDateFormat("yyyy-MM-dd kk:mm Z");
     
-    private WorldGuardPlugin plugin;
     private Date date = new Date();
     private StringBuilder output = new StringBuilder();
     
     public ReportWriter(WorldGuardPlugin plugin) {
-        this.plugin = plugin;
-        
-        appendHeader(plugin);
+        appendReportHeader(plugin);
         appendServerInformation(plugin.getServer());
         appendPluginInformation(plugin.getServer().getPluginManager().getPlugins());
         appendWorldInformation(plugin.getServer().getWorlds());
         appendGlobalConfiguration(plugin.getGlobalConfiguration());
         appendWorldConfigurations(plugin, plugin.getServer().getWorlds(),
                 plugin.getGlobalRegionManager(), plugin.getGlobalConfiguration());
-        appendRule();
+        appendln("-------------");
         appendln("END OF REPORT");
         appendln();
     }
     
-    private void appendln(String text) {
+    protected static String repeat(String str, int n) {
+        if(str == null) {
+            return null;
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            sb.append(str);
+        }
+        
+        return sb.toString();
+    }
+    
+    protected void appendln(String text) {
         output.append(text);
         output.append("\r\n");
     }
     
-    private void appendln(String text, Object ... args) {
+    protected void appendln(String text, Object ... args) {
         output.append(String.format(text, args));
         output.append("\r\n");
     }
     
-    private void appendln() {
+    protected void append(LogListBlock log) {
+        output.append(log.toString());
+    }
+    
+    protected void appendln() {
         output.append("\r\n");
     }
     
-    private void appendRule() {
-        output.append("--------------------------------------------------\r\n");
+    protected void appendHeader(String text) {
+        String rule = repeat("-", text.length());
+        output.append(rule);
+        output.append("\r\n");
+        appendln(text);
+        output.append(rule);
+        output.append("\r\n");
+        appendln();
     }
     
-    private void appendHeader(WorldGuardPlugin plugin) {
+    private void appendReportHeader(WorldGuardPlugin plugin) {
         appendln("WorldGuard Configuration Report");
         appendln("Generated " + dateFmt.format(date));
         appendln();
@@ -92,76 +112,104 @@ public class ReportWriter {
     }
     
     private void appendGlobalConfiguration(ConfigurationManager config) {
-        appendRule();
-        appendln("GLOBAL CONFIGURATION:");
-        appendRule();
-        appendln();
+        appendHeader("Global Configuration");
+        
+        LogListBlock log = new LogListBlock();
+        LogListBlock entitiesLog = log.putChild("Entities");
+        LogListBlock configLog = log.putChild("Configuration");
         
         Class<? extends ConfigurationManager> cls = config.getClass();
         for (Field field : cls.getFields()) {
             try {
                 Object val = field.get(config);
-                appendln("%-30s: %s", field.getName(), String.valueOf(val));
+                configLog.put(field.getName(), val);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
             }
         }
         
+        append(log);
         appendln();
     }
     
     private void appendServerInformation(Server server) {
-        appendRule();
-        appendln("SERVER:");
-        appendRule();
-        appendln();
-
-        appendln("%-15s: %s", "Server ID", server.getServerId());
-        appendln("%-15s: %s", "Server name", server.getServerName());
-        appendln("%-15s: %s", "Implementation", server.getVersion());
-        //appendln("%-15s: %s:%d", "Address", server.getIp(), server.getPort());
-        appendln("%-15s: %d/%d", "Player count", 
-                server.getOnlinePlayers().length, server.getMaxPlayers());
+        appendHeader("Server Information");
         
+        LogListBlock log = new LogListBlock();
+        
+        Runtime runtime = Runtime.getRuntime();
+
+        log.put("Java", "%s %s (%s)",
+                System.getProperty("java.vendor"),
+                System.getProperty("java.version"),
+                System.getProperty("java.vendor.url"));
+        log.put("Operating system", "%s %s (%s)",
+                System.getProperty("os.name"),
+                System.getProperty("os.version"),
+                System.getProperty("os.arch"));
+        log.put("Available processors", runtime.availableProcessors());
+        log.put("Free memory", runtime.freeMemory() / 1024 / 1024 + " MB");
+        log.put("Max memory", runtime.maxMemory() / 1024 / 1024 + " MB");
+        log.put("Total memory", runtime.totalMemory() / 1024 / 1024 + " MB");
+        log.put("Server ID", server.getServerId());
+        log.put("Server name", server.getServerName());
+        log.put("Implementation", server.getVersion());
+        //log.put("Address", server.getIp(), server.getPort());
+        log.put("Player count", "%d/%d",
+                server.getOnlinePlayers().length, server.getMaxPlayers());
+
+        append(log);
         appendln();
     }
     
     private void appendPluginInformation(Plugin[] plugins) {
-        appendRule();
-        appendln("PLUGINS (%d)", plugins.length);
-        appendRule();
-        appendln();
+        appendHeader("Plugins");
+        
+        LogListBlock log = new LogListBlock();
         
         for (Plugin plugin : plugins) {
-            appendln("%s %s <%s>:", plugin.getDescription().getName(),
-                    plugin.getDescription().getVersion(),
-                    plugin.getDescription().getWebsite());
-            appendln("    %-15s: %s", "Entry point", plugin.getDescription().getMain());
-            appendln("    %-15s: %s", "Data folder", plugin.getDataFolder().getAbsoluteFile());
+            log.put(plugin.getDescription().getName(), plugin.getDescription().getVersion());
         }
-        
+
+        append(log);
         appendln();
+        
+        /*appendHeader("Plugin Information");
+        
+        log = new LogListBlock();
+        
+        for (Plugin plugin : plugins) {
+            log.putChild(plugin.getDescription().getName())
+                .put("Data folder", plugin.getDataFolder())
+                .put("Website", plugin.getDescription().getWebsite())
+                .put("Entry point", plugin.getDescription().getMain());
+        }
+
+        append(log);
+        appendln();*/
     }
     
     private void appendWorldInformation(List<World> worlds) {
-        appendRule();
-        appendln("WORLDS (%d)", worlds.size());
-        appendRule();
-        appendln();
+        appendHeader("Worlds");
+        
+        LogListBlock log = new LogListBlock();
         
         int i = 0;
         for (World world : worlds) {
             int loadedChunkCount = world.getLoadedChunks().length;
             
-            appendln("%d. %s:", i, world.getName());
-            appendln("    Information:");
-            appendln("        %-15s: %s", "ID", world.getId());
-            appendln("        %-15s: %s", "Environment", world.getEnvironment().toString());
-            appendln("        %-15s: %d", "Player #", world.getPlayers().size());
-            appendln("        %-15s: %d", "Entity #", world.getEntities().size());
-            appendln("        %-15s: %d", "Loaded chunk #", loadedChunkCount);
-            appendln("    Entities:");
+            LogListBlock worldLog = log.putChild(world.getName() + " (" +  i + ")");
+            LogListBlock infoLog = worldLog.putChild("Information");
+            LogListBlock entitiesLog = worldLog.putChild("Entities");
+            
+            infoLog.put("ID", world.getId());
+            infoLog.put("Environment", world.getEnvironment().toString());
+            infoLog.put("Player count", world.getPlayers().size());
+            infoLog.put("Entity count", world.getEntities().size());
+            infoLog.put("Loaded chunk count", loadedChunkCount);
+            infoLog.put("Spawn location", world.getSpawnLocation());
+            infoLog.put("Raw time", world.getFullTime());
             
             Map<Class<? extends Entity>, Integer> entityCounts =
                     new HashMap<Class<? extends Entity>, Integer>();
@@ -180,83 +228,84 @@ public class ReportWriter {
             // Print entities
             for (Map.Entry<Class<? extends Entity>, Integer> entry
                     : entityCounts.entrySet()) {
-                appendln("        %-25s: %d [%f]", entry.getKey().getSimpleName(),
-                        entry.getValue(), (float) (entry.getValue() / (double) loadedChunkCount));
+                entitiesLog.put(entry.getKey().getSimpleName(),
+                        "%d [%f]",
+                        entry.getValue(),
+                        (float) (entry.getValue() / (double) loadedChunkCount));
             }
             
             i++;
         }
-        
+
+        append(log);
         appendln();
     }
     
     private void appendWorldConfigurations(WorldGuardPlugin plugin, List<World> worlds,
             GlobalRegionManager regionMgr, ConfigurationManager mgr) {
-        appendRule();
-        appendln("WORLD CONFIGURATIONS");
-        appendRule();
-        appendln();
+        appendHeader("World Configurations");
+        
+        LogListBlock log = new LogListBlock();
 
         int i = 0;
         for (World world : worlds) {
-            appendln("%d. %s:", i, world.getName());
+            LogListBlock worldLog = log.putChild(world.getName() + " (" +  i + ")");
+            LogListBlock infoLog = worldLog.putChild("Information");
+            LogListBlock configLog = worldLog.putChild("Configuration");
+            LogListBlock blacklistLog = worldLog.putChild("Blacklist");
+            LogListBlock regionsLog = worldLog.putChild("Region manager");
+
+            infoLog.put("Configuration file", (new File(plugin.getDataFolder(), "worlds/"
+                    + world.getName() + "/config.yml")).getAbsoluteFile());
+
+            infoLog.put("Blacklist file", (new File(plugin.getDataFolder(), "worlds/"
+                    + world.getName() + "/blacklist.txt")).getAbsoluteFile());
+            infoLog.put("Regions file", (new File(plugin.getDataFolder(), "worlds/"
+                    + world.getName() + "/regions.yml")).getAbsoluteFile());
             
             WorldConfiguration config = mgr.get(world);
-            
-            appendln("    Configuration:");
-            appendln("        %-30s: %s", "File",
-                    (new File(plugin.getDataFolder(), "worlds/"
-                            + world.getName() + "/config.yml")).getAbsoluteFile());
             
             Class<? extends WorldConfiguration> cls = config.getClass();
             for (Field field : cls.getFields()) {
                 try {
                     Object val = field.get(config);
-                    appendln("        %-30s: %s", field.getName(), String.valueOf(val));
+                    configLog.put(field.getName(), String.valueOf(val));
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
                 }
             }
-
-            appendln("    Blacklist:");
-            appendln("        %-15s: %s", "File",
-                    (new File(plugin.getDataFolder(), "worlds/"
-                            + world.getName() + "/blacklist.txt")).getAbsoluteFile());
+            
             if (config.getBlacklist() == null) {
-                appendln("        DISABLED / NO ENTRIES");
+                blacklistLog.put("State", "DISABLED");
             } else {
-                appendln("        %-15s: %s", "Number of items",
+                blacklistLog.put("State", "Enabled");
+                blacklistLog.put("Number of items",
                         config.getBlacklist().getItemCount());
-                appendln("        %-15s: %s", "Is whitelist",
-                        config.getBlacklist().isWhitelist() ? "YES" : "NO");
+                blacklistLog.put("Is whitelist",
+                        config.getBlacklist().isWhitelist());
             }
 
-            appendln("    Region manager:");
-            appendln("        %-15s: %s", "File",
-                    (new File(plugin.getDataFolder(), "worlds/"
-                            + world.getName() + "/regions.yml")).getAbsoluteFile());
             RegionManager worldRegions = regionMgr.get(world);
-            appendln("        %-15s: %s", "Type",
-                    worldRegions.getClass().getCanonicalName());
-            appendln("        %-15s: %s", "Number of regions",
-                    worldRegions.getRegions().size());
-            appendln("        Global region:");
+
+            regionsLog.put("Type", worldRegions.getClass().getCanonicalName());
+            regionsLog.put("Number of regions", worldRegions.getRegions().size());
+            LogListBlock globalRegionLog = regionsLog.putChild("Global region");
+            
             ProtectedRegion globalRegion = worldRegions.getRegion("__global__");
             if (globalRegion == null) {
-                appendln("            UNDEFINED");
+                globalRegionLog.put("Status", "UNDEFINED");
             } else {
-                appendln("            %-20s: %s", "Type",
-                        globalRegion.getClass().getCanonicalName());
                 for (Flag<?> flag : DefaultFlag.getFlags()) {
                     if (flag instanceof StateFlag) {
-                        appendln("            %-20s: %s", flag.getName(),
+                        globalRegionLog.put(flag.getName(),
                                 globalRegion.getFlag(flag));
                     }
                 }
             }
         }
-        
+
+        append(log);
         appendln();
     }
     
