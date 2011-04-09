@@ -148,7 +148,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
                             || (rMinPoint.getBlockY() > max.getBlockY() && rMaxPoint.getBlockY() > max.getBlockY()))
                     && ((rMinPoint.getBlockZ() < min.getBlockZ() && rMaxPoint.getBlockZ() < min.getBlockZ())
                             || (rMinPoint.getBlockZ() > max.getBlockZ() && rMaxPoint.getBlockZ() > max.getBlockZ())) ) {
-                intersectingRegions.add(regions.get(i));
+                //intersectingRegions.add(regions.get(i));
                 continue;
             }
 
