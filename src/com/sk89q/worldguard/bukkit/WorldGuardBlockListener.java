@@ -25,6 +25,7 @@ import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.block.Block;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.World;
 import org.bukkit.event.block.*;
@@ -62,6 +63,7 @@ public class WorldGuardBlockListener extends BlockListener {
         pm.registerEvent(Event.Type.BLOCK_PHYSICS, this, Priority.Normal, plugin);
         pm.registerEvent(Event.Type.BLOCK_PLACE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_BURN, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.SIGN_CHANGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
     }
     
@@ -115,6 +117,12 @@ public class WorldGuardBlockListener extends BlockListener {
                 event.setCancelled(true);
                 return;
             }
+        }
+        
+        if (wcfg.isChestProtected(event.getBlock(), player)) {
+            player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
+            event.setCancelled(true);
+            return;
         }
     }
 
@@ -447,6 +455,60 @@ public class WorldGuardBlockListener extends BlockListener {
 
             return;
         }
+    }
+
+    /**
+     * Called when a sign is changed.
+     */
+    @Override
+    public void onSignChange(SignChangeEvent event) {
+
+        Player player = event.getPlayer();
+        WorldConfiguration wcfg = getWorldConfig(player);
+        
+        if (wcfg.signChestProtection) {
+            if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
+                if (event.getBlock().getType() != Material.SIGN_POST) {
+                    player.sendMessage(ChatColor.RED
+                            + "The [Lock] sign must be a sign post, not a wall sign.");
+
+                    dropSign(event.getBlock());
+                    event.setCancelled(true);
+                    return;
+                } else if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
+                    player.sendMessage(ChatColor.RED
+                            + "The first owner line must be your name.");
+
+                    dropSign(event.getBlock());
+                    event.setCancelled(true);
+                    return;
+                } else {
+                    event.setLine(1, "[Lock]");
+                    player.sendMessage(ChatColor.YELLOW
+                            + "A chest or double chest above is now protected.");
+                }
+            }
+        } else {
+            if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
+                player.sendMessage(ChatColor.RED
+                        + "WorldGuard's sign chest protection is disabled.");
+                
+                dropSign(event.getBlock());
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+    
+    /**
+     * Drops a sign item and removes a sign.
+     * 
+     * @param block
+     */
+    private void dropSign(Block block) {
+        block.setTypeId(0);
+        block.getWorld().dropItemNaturally(block.getLocation(),
+                new ItemStack(Material.SIGN));
     }
 
     /**

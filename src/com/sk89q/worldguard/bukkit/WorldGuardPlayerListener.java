@@ -243,6 +243,18 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
 
+        if ((block.getType() == Material.CHEST
+                || block.getType() == Material.DISPENSER
+                || block.getType() == Material.FURNACE
+                || block.getType() == Material.BURNING_FURNACE)) {
+            
+            if (wcfg.isChestProtected(block, player)) {
+                player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         /*if (wcfg.useRegions && wcfg.useiConomy && cfg.getiConomy() != null
                     && (type == Material.SIGN_POST || type == Material.SIGN || type == Material.WALL_SIGN)) {
             BlockState block = blockClicked.getState();

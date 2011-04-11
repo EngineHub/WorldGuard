@@ -20,6 +20,7 @@ package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import org.bukkit.block.Block;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
@@ -319,6 +320,15 @@ public class WorldGuardEntityListener extends EntityListener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
                 if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.TNT)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+        
+        if (wcfg.signChestProtection) {
+            for (Block block : event.blockList()) {
+                if (wcfg.isChestProtected(block)) {
                     event.setCancelled(true);
                     return;
                 }

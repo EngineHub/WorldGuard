@@ -31,7 +31,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bukkit.block.Block;
 import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
 /**
@@ -52,6 +54,7 @@ public class WorldConfiguration {
     private File blacklistFile;
 
     private Blacklist blacklist;
+    private SignChestProtection chestProtection = new SignChestProtection();
 
     /* Configuration data start */
     public boolean fireSpreadDisableToggle;
@@ -97,6 +100,7 @@ public class WorldConfiguration {
     public boolean claimOnlyInsideExistingRegions;
     public int maxRegionCountPerPlayer;
     public boolean antiWolfDumbness;
+    public boolean signChestProtection;
 
     /* Configuration data end */
 
@@ -169,6 +173,8 @@ public class WorldConfiguration {
         disableSuffocationDamage = config.getBoolean("player-damage.disable-suffocation-damage", false);
         disableContactDamage = config.getBoolean("player-damage.disable-contact-damage", false);
         teleportOnSuffocation = config.getBoolean("player-damage.teleport-on-suffocation", false);
+        
+        signChestProtection = config.getBoolean("chest-protection.enable", false);
 
         useRegions = config.getBoolean("regions.enable", true);
         highFreqFlags = config.getBoolean("regions.high-frequency-flags", false);
@@ -287,6 +293,23 @@ public class WorldConfiguration {
 
     public String getWorldName() {
         return this.worldName;
+    }
+    
+    public boolean isChestProtected(Block block, Player player) {
+        if (!signChestProtection) {
+            return false;
+        }
+        if (plugin.hasPermission(player, "worldguard.chest-protection.override")) {
+            return false;
+        }
+        return chestProtection.isProtected(block, player);
+    }
+    
+    public boolean isChestProtected(Block block) {
+        if (!signChestProtection) {
+            return false;
+        }
+        return chestProtection.isProtected(block, null);
     }
 
 }
