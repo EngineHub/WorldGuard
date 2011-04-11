@@ -77,6 +77,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         pm.registerEvent(Event.Type.PLAYER_BUCKET_FILL, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_BUCKET_EMPTY, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_RESPAWN, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_ITEM_HELD, this, Priority.High, plugin);
     }
 
     /**
@@ -579,6 +580,27 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 } else {
                     event.setRespawnLocation(spawnLoc);
                 }
+            }
+        }
+    }
+
+    /**
+     * Called when a player changes their held item.
+     */
+    @Override
+    public void onItemHeldChange(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        
+        if (wcfg.removeInfiniteStacks
+                && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
+            int newSlot = event.getNewSlot();
+            ItemStack heldItem = player.getInventory().getItem(newSlot);
+            if (heldItem.getAmount() < 0) {
+                player.getInventory().setItem(newSlot, null);
+                player.sendMessage(ChatColor.RED + "Infinite stack removed.");
             }
         }
     }

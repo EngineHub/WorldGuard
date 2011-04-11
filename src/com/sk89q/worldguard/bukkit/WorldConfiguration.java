@@ -101,6 +101,7 @@ public class WorldConfiguration {
     public int maxRegionCountPerPlayer;
     public boolean antiWolfDumbness;
     public boolean signChestProtection;
+    public boolean removeInfiniteStacks;
 
     /* Configuration data end */
 
@@ -135,6 +136,7 @@ public class WorldConfiguration {
  
         enforceOneSession = config.getBoolean("protection.enforce-single-session", true);
         itemDurability = config.getBoolean("protection.item-durability", true);
+        removeInfiniteStacks = config.getBoolean("protection.remove-infinite-stacks", false);
 
         classicWater = config.getBoolean("simulation.classic-water", false);
         simulateSponge = config.getBoolean("simulation.sponge.enable", true);
