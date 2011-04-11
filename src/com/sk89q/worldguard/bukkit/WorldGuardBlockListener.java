@@ -483,7 +483,7 @@ public class WorldGuardBlockListener extends BlockListener {
                     event.setCancelled(true);
                     return;
                 } else {
-                    event.setLine(1, "[Lock]");
+                    event.setLine(0, "[Lock]");
                     player.sendMessage(ChatColor.YELLOW
                             + "A chest or double chest above is now protected.");
                 }
