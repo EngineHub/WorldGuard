@@ -266,7 +266,7 @@ public class RegionCommands {
             }
         }
 
-        /*if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
+        if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
             if (iConomy.getBank().hasAccount(player.getName())) {
                 Account account = iConomy.getBank().getAccount(player.getName());
                 double balance = account.getBalance();
@@ -275,7 +275,6 @@ public class RegionCommands {
                     account.subtract(regionCosts);
                     player.sendMessage(ChatColor.YELLOW + "You have bought that region for "
                             + iConomy.getBank().format(regionCosts));
-                    account.save();
                 } else {
                     player.sendMessage(ChatColor.RED + "You have not enough money.");
                     player.sendMessage(ChatColor.RED + "The region you want to claim costs "
@@ -287,7 +286,7 @@ public class RegionCommands {
                 player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
                 return;
             }
-        }*/
+        }
 
         if (region.volume() > wcfg.maxClaimVolume) {
             player.sendMessage(ChatColor.RED + "This region is to large to claim.");
