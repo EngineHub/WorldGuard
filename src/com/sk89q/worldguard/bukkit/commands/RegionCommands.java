@@ -265,7 +265,7 @@ public class RegionCommands {
                 		"existing regions that you or your group own.");
             }
         }
-
+        /* removed redundant save command, ignatio */
         if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
             if (iConomy.getBank().hasAccount(player.getName())) {
                 Account account = iConomy.getBank().getAccount(player.getName());
