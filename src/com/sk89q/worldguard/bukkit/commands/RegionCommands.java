@@ -31,6 +31,7 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.*;
+import com.sk89q.worldedit.regions.*;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -42,7 +43,11 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.protection.*;
 import com.sk89q.worldguard.util.RegionUtil;
+import com.nijiko.coelho.iConomy.*;
+import com.nijiko.coelho.iConomy.system.*;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
 
 public class RegionCommands {
     
@@ -265,12 +270,15 @@ public class RegionCommands {
                 		"existing regions that you or your group own.");
             }
         }
-        /* removed redundant save command, ignatio */
-        if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
+        /* replaced the old hooks, called new hook from protected region, 
+        removed redundant save command, and made the check for iconomy 
+        more simple. -ignatio */
+        double regionsize = region.volume();
+        if (iConomy.getBank().getAccount(player.getName()) != null && wcfg.useiConomy && wcfg.buyOnClaim) {
             if (iConomy.getBank().hasAccount(player.getName())) {
                 Account account = iConomy.getBank().getAccount(player.getName());
                 double balance = account.getBalance();
-                double regionCosts = region.countBlocks() * wcfg.buyOnClaimPrice;
+                double regionCosts = regionsize * wcfg.buyOnClaimPrice;
                 if (balance >= regionCosts) {
                     account.subtract(regionCosts);
                     player.sendMessage(ChatColor.YELLOW + "You have bought that region for "
