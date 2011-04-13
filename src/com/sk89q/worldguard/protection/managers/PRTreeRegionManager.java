@@ -19,9 +19,9 @@
 package com.sk89q.worldguard.protection.managers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.TreeMap;
 import org.khelekore.prtree.MBRConverter;
 import org.khelekore.prtree.PRTree;
@@ -154,8 +154,8 @@ public class PRTreeRegionManager extends RegionManager {
      */
     @Override
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
-        PriorityQueue<ProtectedRegion> appRegions =
-                new PriorityQueue<ProtectedRegion>();
+        List<ProtectedRegion> appRegions =
+                new ArrayList<ProtectedRegion>();
 
         int x = pt.getBlockX();
         int z = pt.getBlockZ();
@@ -165,6 +165,8 @@ public class PRTreeRegionManager extends RegionManager {
                 appRegions.add(region);
             }
         }
+        
+        Collections.sort(appRegions);
 
         return new ApplicableRegionSet(appRegions, regions.get("__global__"));
     }
