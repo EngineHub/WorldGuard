@@ -262,12 +262,12 @@ public class WorldGuardBlockListener extends BlockListener {
             event.setCancelled(true);
             return;
         }
-
+        /*
         if (wcfg.blockLighter && cause == IgniteCause.FLINT_AND_STEEL) {
             event.setCancelled(true);
             return;
         }
-
+        */
         if (wcfg.fireSpreadDisableToggle && isFireSpread) {
             event.setCancelled(true);
             return;
