@@ -91,11 +91,13 @@ public class WorldGuardPlayerListener extends PlayerListener {
             handleBlockRightClick(event);
         } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
             handleAirRightClick(event);
+        } else if (event.getAction() == Action.PHYSICAL) {
+            handlePhysicalInteract(event);
         }
     }
     
     /**
-     * Called when a block is damaged.
+     * Called when a player right clicks air.
      * 
      * @param event 
      */
@@ -123,7 +125,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     }
     
     /**
-     * Called when a block is damaged.
+     * Called when a player right clicks a block.
      * 
      * @param event 
      */
@@ -314,6 +316,24 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }*/
     }
 
+    /**
+     * Called when a player steps on a pressure plate or tramples crops.
+     *
+     * @param event
+     */
+    public void handlePhysicalInteract(PlayerInteractEvent event) {
+        if (event.isCancelled() == true) return;
+
+        Player player = event.getPlayer();
+        Block block = event.getClickedBlock(); //not actually clicked but whatever
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
+
+        if (block.getType() == Material.SOIL && wcfg.disablePlayerCropTrampling) {
+            event.setCancelled(true);
+        }
+    }
     /**
      * Called when a player joins a server
      *
