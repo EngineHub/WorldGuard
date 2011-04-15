@@ -104,6 +104,8 @@ public class WorldConfiguration {
     public boolean antiWolfDumbness;
     public boolean signChestProtection;
     public boolean removeInfiniteStacks;
+    public boolean disableCreatureCropTrampling;
+    public boolean disablePlayerCropTrampling;
 
     /* Configuration data end */
 
@@ -181,6 +183,9 @@ public class WorldConfiguration {
         teleportOnVoid = config.getBoolean("player-damage.teleport-on-void-falling", false);
 
         signChestProtection = config.getBoolean("chest-protection.enable", false);
+
+        disableCreatureCropTrampling = config.getBoolean("crops.disable-creature-trampling", false);
+        disablePlayerCropTrampling = config.getBoolean("crops.disable-player-trampling", false);
 
         useRegions = config.getBoolean("regions.enable", true);
         highFreqFlags = config.getBoolean("regions.high-frequency-flags", false);

@@ -88,6 +88,10 @@ iconomy:
 chest-protection:
     enable: off
 
+crops:
+    disable-creature-trampling: off
+    disable-player-trampling: off
+
 blacklist:
     use-as-whitelist: off
     logging:
