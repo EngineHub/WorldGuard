@@ -140,7 +140,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
         WorldConfiguration wcfg = cfg.get(world);
-        
+
+        if (wcfg.blockLighter && item.getType() == Material.FLINT_AND_STEEL) {
+            if (!plugin.hasPermission(player, "worldguard.lighter.override")) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         if (wcfg.useRegions) {
             Vector pt = toVector(block);
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -170,7 +177,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
 
             if (item.getType() == Material.FLINT_AND_STEEL) {
-                if (!set.allows(DefaultFlag.LIGHTER)) {
+                if (!set.allows(DefaultFlag.LIGHTER)
+                    && !plugin.hasPermission(player, "worldguard.lighter.override")) {
                     event.setCancelled(true);
                     return;
                 }
