@@ -28,13 +28,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.CreatureType;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
@@ -70,8 +64,24 @@ public class WorldGuardEntityListener extends EntityListener {
         pm.registerEvent(Event.Type.ENTITY_DAMAGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.ENTITY_EXPLODE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.CREATURE_SPAWN, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.ENTITY_INTERACT, this, Priority.High, plugin);
     }
 
+    @Override
+    public void onEntityInteract(EntityInteractEvent event) {
+        //bukkit doesn't actually throw this event yet, someone add a ticket to leaky
+        Entity entity = event.getEntity();
+        Block block = event.getBlock();
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(entity.getWorld());
+
+        if (block.getType() == Material.SOIL) {
+            if (entity instanceof Creature && wcfg.disableCreatureCropTrampling) {
+                event.setCancelled(true);
+            }
+        }
+    }
 
     public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
 
