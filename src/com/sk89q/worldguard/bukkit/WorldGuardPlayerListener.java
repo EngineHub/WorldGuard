@@ -78,6 +78,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         pm.registerEvent(Event.Type.PLAYER_BUCKET_EMPTY, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_RESPAWN, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_ITEM_HELD, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_BED_ENTER, this, Priority.High, plugin);
     }
 
     /**
@@ -91,20 +92,71 @@ public class WorldGuardPlayerListener extends PlayerListener {
             handleBlockRightClick(event);
         } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
             handleAirRightClick(event);
+        } else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            handleBlockLeftClick(event);
+        } else if (event.getAction() == Action.LEFT_CLICK_AIR) {
+            handleAirLeftClick(event);
         } else if (event.getAction() == Action.PHYSICAL) {
             handlePhysicalInteract(event);
         }
     }
-    
+
+    /**
+     * Called when a player left clicks air.
+     *
+     * @param event
+     */
+    public void handleAirLeftClick(PlayerInteractEvent event) {
+         //I don't think we have to do anything here yet.
+         return;
+    }
+
+    /**
+     * Called when a player left clicks a block.
+     *
+     * @param event
+     */
+    public void handleBlockLeftClick(PlayerInteractEvent event) {
+        if (event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+        Block block = event.getClickedBlock();
+        Material type = block.getType();
+        World world = player.getWorld();
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.useRegions) {
+            Vector pt = toVector(block);
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+            if (type == Material.STONE_BUTTON
+                  || type == Material.LEVER
+                  || type == Material.WOODEN_DOOR
+                  || type == Material.NOTE_BLOCK) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.allows(DefaultFlag.USE)
+                        && !set.canBuild(localPlayer)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
     /**
      * Called when a player right clicks air.
      * 
      * @param event 
      */
     public void handleAirRightClick(PlayerInteractEvent event) {
-        /*if (event.isCancelled()) {
+        if (event.isCancelled()) {
             return;
-        }*/
+        }
 
         Player player = event.getPlayer();
         World world = player.getWorld();
@@ -179,40 +231,47 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
 
             if (item.getType() == Material.FLINT_AND_STEEL) {
-                if (!set.allows(DefaultFlag.LIGHTER)
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                    && !set.allows(DefaultFlag.LIGHTER)
                     && !plugin.hasPermission(player, "worldguard.lighter.override")) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if ((block.getType() == Material.CHEST
-                    || block.getType() == Material.DISPENSER
-                    || block.getType() == Material.FURNACE
-                    || block.getType() == Material.BURNING_FURNACE
-                    || block.getType() == Material.NOTE_BLOCK)) {
-                
+            if (type == Material.CHEST
+                    || type == Material.JUKEBOX //stores the (arguably) most valuable item
+                    || type == Material.DISPENSER
+                    || type == Material.FURNACE
+                    || type == Material.BURNING_FURNACE) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.CHEST_ACCESS)
                         && !set.canBuild(localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to open that in this area.");
                     event.setCancelled(true);
                     return;
                 }
             }
     
-            if (type == Material.LEVER || type == Material.STONE_BUTTON) {
+            if (type == Material.LEVER
+                   || type == Material.STONE_BUTTON
+                   || type == Material.NOTE_BLOCK
+                   || type == Material.DIODE_BLOCK_OFF
+                   || type == Material.DIODE_BLOCK_ON
+                   || type == Material.WOODEN_DOOR
+                   || type == Material.WORKBENCH) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.USE)
                         && !set.canBuild(localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
                     event.setCancelled(true);
                     return;
                 }
             }
 
             if (type == Material.CAKE_BLOCK) {
-                if (!set.canBuild(localPlayer)) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
                     event.setCancelled(true);
                     return;
@@ -220,7 +279,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
             
             if (type == Material.RAILS && item.getType() == Material.MINECART) {
-                if (!set.canBuild(localPlayer)
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to place vehicles here.");
                     event.setCancelled(true);
@@ -229,7 +289,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
             
             if (item.getType() == Material.BOAT) {
-                if (!set.canBuild(localPlayer)
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to place vehicles here.");
                     event.setCancelled(true);
@@ -326,14 +387,36 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
         Player player = event.getPlayer();
         Block block = event.getClickedBlock(); //not actually clicked but whatever
+        Material type = block.getType();
+        World world = player.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (block.getType() == Material.SOIL && wcfg.disablePlayerCropTrampling) {
             event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.useRegions) {
+            Vector pt = toVector(block);
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+            if (type == Material.STONE_PLATE || type == Material.WOOD_PLATE) {
+               if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                      && (!set.canBuild(localPlayer))
+                      && (!set.allows(DefaultFlag.USE))) {
+                   player.sendMessage(ChatColor.DARK_RED + "You are not allowed"
+                       + " to trigger pressure plates in this area.");
+                   event.setCancelled(true);
+                   return;
+               }
+            }
         }
     }
+
     /**
      * Called when a player joins a server
      *
@@ -629,6 +712,32 @@ public class WorldGuardPlayerListener extends PlayerListener {
             if (heldItem.getAmount() < 0) {
                 player.getInventory().setItem(newSlot, null);
                 player.sendMessage(ChatColor.RED + "Infinite stack removed.");
+            }
+        }
+    }
+
+    @Override
+    public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        Location location = player.getLocation();
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
+
+        if (wcfg.useRegions) {
+            Vector pt = toVector(location);
+            RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+            if (!plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())
+                && !set.allows(DefaultFlag.SLEEP)) {
+                    event.setCancelled(true);
+                    player.sendMessage("This bed doesn't belong to you!");
+                    return;
             }
         }
     }
