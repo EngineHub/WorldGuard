@@ -19,14 +19,22 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.BukkitPlayer;
+import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.bukkit.entity.Player;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
@@ -63,104 +71,116 @@ public class TimedFlagsTimer implements Runnable {
     }
 
     public void run() {
-/*
-        // get players
         Player[] players = plugin.getServer().getOnlinePlayers();
 
         for (Player player : players) {
+        	TimedFlagPlayerInfo playerInfo = getPlayerInfo(player.getName());
+            ConfigurationManager config = plugin.getGlobalConfiguration();
+            WorldConfiguration worldConfig = config.get(player.getWorld());
 
-            TimedFlagPlayerInfo nfo = getPlayerInfo(player.getName());
-            long now = System.currentTimeMillis();
+            if (worldConfig.useRegions) {
+                Vector playerLocation = toVector(player.getLocation());
+                RegionManager regionManager = plugin.getGlobalRegionManager().get(player.getWorld());
+                ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(playerLocation);
 
-            // check healing flag
-            if (nfo.sheduledHealTick != null && now >= nfo.sheduledHealTick) {
-                player.setHealth(player.getHealth() + nfo.sheduledHealAmount);
-                nfo.sheduledHealTick = null;
-                nfo.lastHealTick = now;
-            }
-
-            if (player.getWorld().getName() == null) {
-                continue;
-            }
-            RegionManager mgr = plugin.getGlobalRegionManager().get(
-                    player.getWorld().getName());
-            ApplicableRegionSet regions = mgr
-                    .getApplicableRegions(toVector(player.getLocation()));
-
-            Integer healDelay = regions.getFlag(DefaultFlag.HEAL_DELAY);
-
-            if (healDelay > 0) {
-                healDelay *= 1000;
-                int healAmount = regions.getIntegerFlag(
-                        DefaultFlag.HEAL_AMOUNT, true).getValue(1);
-                if (now - nfo.lastHealTick > healDelay) {
-                    if (player.getHealth() < 20) {
-                        if (player.getHealth() + healAmount > 20) {
-                            player.setHealth(20);
-                        } else {
-                            player.setHealth(player.getHealth() + healAmount);
-                        }
-                    }
-                } else {
-                    nfo.sheduledHealTick = now + healDelay;
-                    nfo.sheduledHealAmount = healAmount;
+                List <ProtectedRegion> protectedRegions = new ArrayList<ProtectedRegion>();
+                Iterator<ProtectedRegion> protectedRegionsIterator = applicableRegions.iterator();
+                Iterator<ProtectedRegion> prevProtectedRegionIterator = null;
+                
+                if (playerInfo.lastRegions != null) 
+                	prevProtectedRegionIterator = playerInfo.lastRegions.iterator();
+                
+                // ----
+                // ==== Healing Flags ====
+                // ----
+                
+                long time = System.currentTimeMillis();
+                
+                if (playerInfo.sheduledHealTick != null && time >= playerInfo.sheduledHealTick) {
+                    player.setHealth(player.getHealth() + playerInfo.sheduledHealAmount);
+                    playerInfo.sheduledHealTick = null;
+                    playerInfo.lastHealTick = time;
                 }
-            }
+                                
+               while(protectedRegionsIterator.hasNext()) {
+                	ProtectedRegion protectedRegion = protectedRegionsIterator.next();
+                	
+                	Integer healDelay = protectedRegion.getFlag(DefaultFlag.HEAL_DELAY);
+                	Integer healAmount = protectedRegion.getFlag(DefaultFlag.HEAL_AMOUNT);
+                	
+                	if (healDelay != null && healAmount != null && healDelay > 0) {
+                		healDelay *= 1000;
 
-            // check greeting/farewell flag
-            String newRegionName = regions.getAffectedRegionId();
+                		if (time - playerInfo.lastHealTick > healDelay) {
+                			if (player.getHealth() < 20) {
+                				if (player.getHealth() + healAmount > 20)
+                					player.setHealth(20);
+                				else
+                					player.setHealth(player.getHealth() + healAmount);
+                			}
+                		}
+                		else {
+                			playerInfo.sheduledHealTick = time + healDelay;
+                			playerInfo.sheduledHealAmount = healAmount;
+                		}
+                	}
 
-            if (newRegionName != null) {
+                    // ----
+                    // ==== Greeting Flags ====
+                    // ----
 
-                if (nfo.lastRegion == null
-                        || !newRegionName.equals(nfo.lastRegion)) {
-                    String newGreetMsg = regions.getStringFlag(
-                            DefaultFlag.GREET_MESSAGE, true).getValue();
-                    String farewellMsg = regions.getStringFlag(
-                            DefaultFlag.FAREWELL_MESSAGE, true).getValue();
+                	if (playerInfo.lastRegions != null && !playerInfo.lastRegions.contains(protectedRegion)) {
+                    	String greetMsg = protectedRegion.getFlag(DefaultFlag.GREET_MESSAGE);
+                    	Boolean notifyGreet = protectedRegion.getFlag(DefaultFlag.NOTIFY_GREET);
 
-                    if (nfo.lastFarewellMsg != null) {
-                        player.sendMessage(nfo.lastFarewellMsg);
-                        nfo.lastFarewellMsg = null;
+                    	if (greetMsg != null)
+                    		player.sendMessage(greetMsg);
+                    	                   	
+                    	if (notifyGreet != null && notifyGreet)
+                            broadcastNotification(ChatColor.YELLOW + "Player " + player.getName() + " entered region " + protectedRegion.getId());
+                	}
+                	
+                    // ----
+                    // ==== Passthrough Flag ====
+                    // ----
+                	
+                	State passthrough = protectedRegion.getFlag(DefaultFlag.PASSTHROUGH);
+                	
+                    if (passthrough != null && passthrough == State.DENY) {
+                        Location newLoc = player.getLocation().clone();
+                        newLoc.setX(newLoc.getBlockX() - 30);
+                        newLoc.setY(newLoc.getWorld().getHighestBlockYAt(newLoc) + 1);
+                        player.teleport(newLoc);
                     }
-                    if (newGreetMsg != null) {
-                        player.sendMessage(newGreetMsg);
-                    }
-                    if (regions.getBooleanFlag(DefaultFlag.NOTIFY_GREET, false)
-                            .getValue(false)) {
-                        broadcastNotification(ChatColor.YELLOW + "Player "
-                                + player.getName() + " entered region "
-                                + newRegionName);
-                    }
-                    nfo.lastFarewellMsg = farewellMsg;
-                    nfo.lastRegion = newRegionName;
+                	
+                	if (!protectedRegions.contains(protectedRegion))
+                		protectedRegions.add(protectedRegion);
                 }
-            } else {
-                if (nfo.lastRegion != null) {
-                    if (nfo.lastFarewellMsg != null) {
-                        player.sendMessage(nfo.lastFarewellMsg);
-                        nfo.lastFarewellMsg = null;
+               
+               // ----
+               // ==== Farewell Flags ====
+               // ----
+                
+                if (prevProtectedRegionIterator != null) {
+                    while(prevProtectedRegionIterator.hasNext()) {
+                    	ProtectedRegion protectedRegion = prevProtectedRegionIterator.next();
+                    	
+                    	if (!protectedRegions.contains(protectedRegion)) {
+                        	String farewellMsg = protectedRegion.getFlag(DefaultFlag.FAREWELL_MESSAGE);
+                        	Boolean notifyFarewell = protectedRegion.getFlag(DefaultFlag.NOTIFY_FAREWELL);
+                        	
+                        	if (farewellMsg != null)
+                        		player.sendMessage(farewellMsg);
+                       
+                           	if (notifyFarewell != null && notifyFarewell)
+                                broadcastNotification(ChatColor.YELLOW + "Player " + player.getName() + " left region " + protectedRegion.getId());
+                    	}
                     }
-                    if (regions.getBooleanFlag(DefaultFlag.NOTIFY_FAREWELL,
-                            false).getValue(false)) {
-                        broadcastNotification(ChatColor.YELLOW + "Player "
-                                + player.getName() + " left region "
-                                + nfo.lastRegion);
-                    }
-                    nfo.lastRegion = null;
                 }
+                                
+                playerInfo.lastRegions = protectedRegions;
             }
-
-            // check passthrough flag
-            LocalPlayer lplayer = BukkitPlayer.wrapPlayer(plugin, player);
-            if (!regions.isStateFlagAllowed(DefaultFlag.PASSTHROUGH, lplayer)) {
-                Location newLoc = player.getLocation().clone();
-                newLoc.setX(newLoc.getBlockX() - 30);
-                newLoc.setY(newLoc.getWorld().getHighestBlockYAt(newLoc) + 1);
-                player.teleportTo(newLoc);
-            }
-
-        }*/
+        }
     }
 
     public void broadcastNotification(String msg) {
