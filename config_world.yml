@@ -23,6 +23,7 @@ pumpkin-scuba: off
 
 protection:
     item-durability: on
+    remove-infinite-stacks: off
 
 simulation:
     sponge:
@@ -67,6 +68,8 @@ player-damage:
     disable-suffocation-damage: off
     disable-contact-damage: off
     teleport-on-suffocation: off
+    disable-void-damage: off
+    teleport-on-void-falling: off
 
 regions:
     enable: on
@@ -81,6 +84,9 @@ iconomy:
     buy-on-claim: on
     # Price per block for buying on claim
     buy-on-claim-price: 2
+
+chest-protection:
+    enable: off
 
 blacklist:
     use-as-whitelist: off
