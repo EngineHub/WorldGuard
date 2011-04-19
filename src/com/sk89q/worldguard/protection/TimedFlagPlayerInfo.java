@@ -19,6 +19,10 @@
 
 package com.sk89q.worldguard.protection;
 
+import java.util.List;
+
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
 /**
  *
  * @author Redecouverte
@@ -28,13 +32,13 @@ public class TimedFlagPlayerInfo {
     public long lastHealTick;
     public Long sheduledHealTick;
     public int sheduledHealAmount;
-    public String lastRegion;
+    public List <ProtectedRegion> lastRegions;
     public String lastFarewellMsg;
 
     public TimedFlagPlayerInfo()
     {
         this.sheduledHealTick = null;
-        this.lastRegion = null;
+        this.lastRegions = null;
         this.lastFarewellMsg = null;
     }
 
