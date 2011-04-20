@@ -457,7 +457,7 @@ public class WorldGuardEntityListener extends EntityListener {
                         world.getBlockAt(x,0,z).setTypeId(20);
                         loc.setY(2);
                     }
-//                    player.setFallDistance(0F);
+                    player.setFallDistance(0F);
                     player.teleport(loc);
                 }
                 return;
