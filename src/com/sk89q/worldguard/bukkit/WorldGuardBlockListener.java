@@ -253,6 +253,11 @@ public class WorldGuardBlockListener extends BlockListener {
 
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
+        if (wcfg.preventLightningFire && cause == IgniteCause.LIGHTNING) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (wcfg.preventLavaFire && cause == IgniteCause.LAVA) {
             event.setCancelled(true);
             return;

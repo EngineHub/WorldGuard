@@ -143,6 +143,11 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
 
+            if (wcfg.disableLightningDamage && event.getCause() == DamageCause.LIGHTNING) {
+                event.setCancelled(true);
+                return;
+            }
+
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
