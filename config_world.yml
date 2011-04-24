@@ -48,14 +48,15 @@ fire:
     lava-spread-blocks: []
 
 weather:
+    disable-lightning-strike-fire: off
+    prevent-lightning-strike-blocks: []
+    # The following don't work yet
     disable-weather: off
     disable-thunderstorm: off
     disable-pig-zombification: off
-    disable-powered-creepers: off
-    disable-lightning-strike-fire: off
-    prevent-lightning-strike-blocks: []
     always-raining: off
     always-thundering: off
+    disable-powered-creepers: off
 
 mobs:
     block-creeper-explosions: off
