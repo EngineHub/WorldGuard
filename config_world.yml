@@ -47,6 +47,16 @@ fire:
     disable-lava-fire-spread: on
     lava-spread-blocks: []
 
+weather:
+    disable-weather: off
+    disable-thunderstorm: off
+    disable-pig-zombification: off
+    disable-powered-creepers: off
+    disable-lightning-strike-fire: off
+    prevent-lightning-strike-blocks: []
+    always-raining: off
+    always-thundering: off
+
 mobs:
     block-creeper-explosions: off
     block-creeper-block-damage: off
@@ -64,6 +74,7 @@ player-damage:
     disable-fall-damage: off
     disable-lava-damage: off
     disable-fire-damage: off
+    disable-lightning-damage: off
     disable-drowning-damage: off
     disable-suffocation-damage: off
     disable-contact-damage: off

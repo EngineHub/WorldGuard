@@ -278,7 +278,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 }
             }
             
-            if (type == Material.RAILS && item.getType() == Material.MINECART) {
+            if ((type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL)
+                   && item.getType() == Material.MINECART) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
