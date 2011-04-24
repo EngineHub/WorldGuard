@@ -86,6 +86,7 @@ public class WorldConfiguration {
     public boolean disableFallDamage;
     public boolean disableLavaDamage;
     public boolean disableFireDamage;
+    public boolean disableLightningDamage;
     public boolean disableDrowningDamage;
     public boolean disableSuffocationDamage;
     public boolean teleportOnSuffocation;
@@ -106,6 +107,14 @@ public class WorldConfiguration {
     public boolean removeInfiniteStacks;
     public boolean disableCreatureCropTrampling;
     public boolean disablePlayerCropTrampling;
+    public boolean preventLightningFire;
+    public Set<Integer> disallowedLightningBlocks;
+    public boolean disableThunder;
+    public boolean disableWeather;
+    public boolean alwaysRaining;
+    public boolean alwaysThundering;
+    public boolean disablePigZap;
+    public boolean disableCreeperPower;
 
     /* Configuration data end */
 
@@ -175,6 +184,7 @@ public class WorldConfiguration {
         disableFallDamage = config.getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = config.getBoolean("player-damage.disable-lava-damage", false);
         disableFireDamage = config.getBoolean("player-damage.disable-fire-damage", false);
+        disableLightningDamage = config.getBoolean("player-damage.disable-lightning-damage", false);
         disableDrowningDamage = config.getBoolean("player-damage.disable-drowning-damage", false);
         disableSuffocationDamage = config.getBoolean("player-damage.disable-suffocation-damage", false);
         disableContactDamage = config.getBoolean("player-damage.disable-contact-damage", false);
@@ -186,6 +196,15 @@ public class WorldConfiguration {
 
         disableCreatureCropTrampling = config.getBoolean("crops.disable-creature-trampling", false);
         disablePlayerCropTrampling = config.getBoolean("crops.disable-player-trampling", false);
+
+        disallowedLightningBlocks = new HashSet<Integer>(config.getIntList("weather.prevent-lightning-strike-blocks", null));
+        preventLightningFire = config.getBoolean("weather.disable-lightning-strike-fire", false);
+        disableThunder = config.getBoolean("weather.disable-thunderstorm", false);
+        disableWeather = config.getBoolean("weather.disable-weather", false);
+        disablePigZap = config.getBoolean("weather.disable-pig-zombification", false);
+        disableCreeperPower = config.getBoolean("weather.disable-powered-creepers", false);
+        alwaysRaining = config.getBoolean("weather.always-raining", false);
+        alwaysThundering = config.getBoolean("weather.always-thundering", false);
 
         useRegions = config.getBoolean("regions.enable", true);
         highFreqFlags = config.getBoolean("regions.high-frequency-flags", false);
