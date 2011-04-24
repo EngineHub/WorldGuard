@@ -29,13 +29,14 @@ public final class DefaultFlag {
     public static final StateFlag BUILD = new StateFlag("build", 'b', true);
     public static final StateFlag PVP = new StateFlag("pvp", 'p', true);
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", 'm', true);
-    public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true);
+    public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", 'M', true);
     public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", 'c', true);
     public static final StateFlag SLEEP = new StateFlag("sleep", true);
     public static final StateFlag TNT = new StateFlag("tnt", 't', true);
     public static final StateFlag LIGHTER = new StateFlag("lighter", 'l', true);
     public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", 'f', true);
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", 'F', true);
+    public static final StateFlag LIGHTNING = new StateFlag("lightning", true);
     public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", 'C', false);
     public static final StateFlag WATER_FLOW = new StateFlag("water-flow", true);
     public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
@@ -56,11 +57,12 @@ public final class DefaultFlag {
     public static final DoubleFlag PRICE = new DoubleFlag("price");
     
     public static final Flag<?>[] flagsList = new Flag<?>[] {
-        PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, MOB_SPAWNING, CREEPER_EXPLOSION, SLEEP,
-        TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW, LAVA_FLOW,
-        USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_GREET,
-        NOTIFY_FAREWELL, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
-        TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE
+        PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, MOB_SPAWNING, CREEPER_EXPLOSION,
+        TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, LIGHTNING, CHEST_ACCESS,
+        WATER_FLOW, LAVA_FLOW, USE, PLACE_VEHICLE, GREET_MESSAGE,
+        FAREWELL_MESSAGE, NOTIFY_GREET, NOTIFY_FAREWELL, DENY_SPAWN,
+        HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,TELE_PERM, SPAWN_LOC, SPAWN_PERM,
+        BUYABLE, PRICE, SLEEP
     };
     
     private DefaultFlag() {
