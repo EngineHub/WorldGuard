@@ -484,8 +484,11 @@ public class RegionCommands {
 
         String[] regionIDList = new String[size];
         int index = 0;
+        boolean show = false;
+        String prefix = "";
         for (String id : regions.keySet()) {
-            boolean show = false;
+            show = false;
+            prefix = "";
             if (name.isEmpty()) {
                 show = true;
             }
@@ -493,15 +496,26 @@ public class RegionCommands {
                 if (own) {
                     if (regions.get(id).isOwner(localPlayer)) {
                         show = true;
+                        prefix += "+";
+                    }
+                    else if (regions.get(id).isMember(localPlayer)) {
+                        show = true;
+                        prefix += "-";
                     }
                 }
                 else {
-                    if (regions.get(id).getOwners().getPlayers().contains(name))
+                    if (regions.get(id).getOwners().getPlayers().contains(name)) {
                         show = true;
+                        prefix += "+";
+                    }
+                    if (regions.get(id).getMembers().getPlayers().contains(name)) {
+                        show = true;
+                        prefix += "-";
+                    }
                 }
             }
             if (show) {
-                regionIDList[index] = id;
+                regionIDList[index] = prefix + " " + id;
                 index++;
             }
         }
@@ -521,7 +535,7 @@ public class RegionCommands {
                     break;
                 }
                 sender.sendMessage(ChatColor.YELLOW.toString() + (i + 1) +
-                        ". " + regionIDList[i]);
+                        "." + regionIDList[i]);
             }
         }
     }
