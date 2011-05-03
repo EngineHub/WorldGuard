@@ -30,6 +30,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.herocraftonline.dthielke.lists.Lists;
 import com.sk89q.bukkit.migration.*;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -79,6 +81,8 @@ public class WorldGuardPlugin extends JavaPlugin {
      * the permission methods.
      */
     protected PermissionsResolverManager perms;
+    
+    protected Lists listsPlugin;
 
     /**
      * Construct objects. Actual loading occurs when the plugin is enabled, so
@@ -133,6 +137,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardBlockListener(this)).registerEvents();
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
+        (new WorldGuardServerListener(this)).registerEvents();
 
         // 25 equals about 1s real time
         getServer().getScheduler().scheduleAsyncRepeatingTask(this, new TimedFlagsTimer(this), 0, 5);
@@ -221,6 +226,20 @@ public class WorldGuardPlugin extends JavaPlugin {
             t.printStackTrace();
             return false;
         }
+    }
+    
+    /**
+     * Check whether a player is on a list
+     * 
+     * @param player
+     * @param list
+     * @return
+     */
+    public boolean onList(Player player, String list) {
+    	if (listsPlugin == null) 
+    		return false;
+    	
+    	return listsPlugin.getList(list).contains(player.getName());
     }
 
     /**

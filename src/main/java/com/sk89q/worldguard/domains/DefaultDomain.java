@@ -27,10 +27,12 @@ import com.sk89q.worldguard.LocalPlayer;
 
 public class DefaultDomain implements Domain {
     private Set<String> groups;
+    private Set<String> lists;
     private Set<String> players;
     
     public DefaultDomain() {
         this.groups = new LinkedHashSet<String>();
+        this.lists = new LinkedHashSet<String>();
         this.players = new HashSet<String>();
     }
     
@@ -58,8 +60,20 @@ public class DefaultDomain implements Domain {
         groups.remove(name.toLowerCase());
     }
     
+    public void addList(String name) {
+        lists.add(name.toLowerCase());
+    }
+    
+    public void removeList(String name) {
+        lists.remove(name.toLowerCase());
+    }
+    
     public Set<String> getGroups() {
         return groups;
+    }
+    
+    public Set<String> getLists() {
+        return lists;
     }
     
     public Set<String> getPlayers() {
@@ -75,6 +89,12 @@ public class DefaultDomain implements Domain {
             if (player.hasGroup(group)) {
                 return true;
             }
+        }
+        
+        for (String list : lists) {
+        	if (player.isOnList(list)) {
+        		return true;
+        	}
         }
         
         return false;
@@ -107,6 +127,18 @@ public class DefaultDomain implements Domain {
         return str.toString();
     }
     
+    public String toListsString() {
+    	StringBuilder str = new StringBuilder();
+    	for (Iterator<String> it = lists.iterator(); it.hasNext(); ) {
+    		str.append("*");
+    		str.append(it.next());
+    		if (it.hasNext()) {
+    			str.append(", ");
+    		}
+    	}
+    	return str.toString();
+    }
+    
     public String toUserFriendlyString() {
         StringBuilder str = new StringBuilder();
         if (players.size() > 0) {
@@ -119,6 +151,14 @@ public class DefaultDomain implements Domain {
             }
             
             str.append(toGroupsString());
+        }
+        
+        if (lists.size() > 0) {
+            if (str.length() > 0) {
+                str.append("; ");
+            }
+            
+            str.append(toListsString());
         }
         
         return str.toString();

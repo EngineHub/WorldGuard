@@ -27,6 +27,7 @@ import com.sk89q.worldguard.LocalPlayer;
 public class TestPlayer extends LocalPlayer {
     private String name;
     private Set<String> groups = new HashSet<String>();
+    private Set<String> lists = new HashSet<String>();
     
     public TestPlayer(String name) {
         this.name = name;
@@ -34,6 +35,10 @@ public class TestPlayer extends LocalPlayer {
     
     public void addGroup(String group) {
         groups.add(group.toLowerCase());
+    }
+    
+    public void addList(String list) {
+    	lists.add(list.toLowerCase());
     }
 
     @Override
@@ -44,6 +49,11 @@ public class TestPlayer extends LocalPlayer {
     @Override
     public boolean hasGroup(String group) {
         return groups.contains(group.toLowerCase());
+    }
+    
+    @Override
+    public boolean isOnList(String list) {
+    	return lists.contains(list.toLowerCase());
     }
 
     @Override

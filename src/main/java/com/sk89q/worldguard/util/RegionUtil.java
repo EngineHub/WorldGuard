@@ -30,6 +30,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
  */
 public class RegionUtil {
     private static Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
+    private static Pattern listPattern = Pattern.compile("^[lL]:(.+)$");
     
     private RegionUtil() {
         
@@ -46,9 +47,12 @@ public class RegionUtil {
             int startIndex) {
         for (int i = startIndex; i < split.length; i++) {
             String s = split[i];
-            Matcher m = groupPattern.matcher(s);
-            if (m.matches()) {
-                domain.addGroup(m.group(1));
+            Matcher g_m = groupPattern.matcher(s);
+            Matcher l_m = listPattern.matcher(s);
+            if (g_m.matches()) {
+                domain.addGroup(g_m.group(1));
+            } else if (l_m.matches()) {
+            	domain.addList(l_m.group(1));
             } else {
                 domain.addPlayer(s);
             }
@@ -66,9 +70,12 @@ public class RegionUtil {
             int startIndex) {
         for (int i = startIndex; i < split.length; i++) {
             String s = split[i];
-            Matcher m = groupPattern.matcher(s);
-            if (m.matches()) {
-                domain.removeGroup(m.group(1));
+            Matcher g_m = groupPattern.matcher(s);
+            Matcher l_m = listPattern.matcher(s);
+            if (g_m.matches()) {
+                domain.removeGroup(g_m.group(1));
+            } else if (l_m.matches()) {
+            	domain.removeList(l_m.group(1));
             } else {
                 domain.removePlayer(s);
             }
@@ -87,9 +94,12 @@ public class RegionUtil {
 
         for (int i = startIndex; i < split.length; i++) {
             String s = split[i];
-            Matcher m = groupPattern.matcher(s);
-            if (m.matches()) {
-                domain.addGroup(m.group(1));
+            Matcher g_m = groupPattern.matcher(s);
+            Matcher l_m = listPattern.matcher(s);
+            if (g_m.matches()) {
+                domain.addGroup(g_m.group(1));
+            } else if (l_m.matches()) {
+            	domain.addList(l_m.group(1));
             } else {
                 domain.addPlayer(s);
             }
