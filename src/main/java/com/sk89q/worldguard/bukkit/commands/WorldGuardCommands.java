@@ -109,13 +109,11 @@ public class WorldGuardCommands {
             sender.sendMessage(ChatColor.YELLOW + "Now uploading to Pastebin...");
             PastebinPoster.paste(report.toString(), new PasteCallback() {
                 
-                @Override
                 public void handleSuccess(String url) {
                     // Hope we don't have a thread safety issue here
                     sender.sendMessage(ChatColor.YELLOW + "WorldGuard report (1 hour): " + url);
                 }
                 
-                @Override
                 public void handleError(String err) {
                     // Hope we don't have a thread safety issue here
                     sender.sendMessage(ChatColor.YELLOW + "WorldGuard report pastebin error: " + err);

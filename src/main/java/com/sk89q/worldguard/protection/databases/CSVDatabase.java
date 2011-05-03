@@ -68,7 +68,6 @@ public class CSVDatabase extends AbstractProtectionDatabase {
     /**
      * Saves the database.
      */
-    @Override
     public void save() throws IOException {
         throw new UnsupportedOperationException("CSV format is no longer implemented");
     }
@@ -76,7 +75,6 @@ public class CSVDatabase extends AbstractProtectionDatabase {
     /**
      * Load the database from file.
      */
-    @Override
     public void load() throws IOException {
         Map<String,ProtectedRegion> regions =
                 new HashMap<String,ProtectedRegion>();

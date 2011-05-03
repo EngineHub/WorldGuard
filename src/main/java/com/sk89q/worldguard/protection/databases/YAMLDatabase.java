@@ -53,7 +53,6 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         config = new Configuration(file);
     }
 
-    @Override
     public void load() throws IOException {
         config.load();
         
@@ -183,7 +182,6 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         return domain;
     }
 
-    @Override
     public void save() throws IOException {
         config.clear();
         
@@ -274,12 +272,10 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         domainData.put(key, list);
     }
 
-    @Override
     public Map<String, ProtectedRegion> getRegions() {
         return regions;
     }
 
-    @Override
     public void setRegions(Map<String, ProtectedRegion> regions) {
         this.regions = regions;
     }
