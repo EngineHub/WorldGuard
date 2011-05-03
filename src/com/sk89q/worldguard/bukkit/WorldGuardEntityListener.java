@@ -65,6 +65,8 @@ public class WorldGuardEntityListener extends EntityListener {
         pm.registerEvent(Event.Type.ENTITY_EXPLODE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.CREATURE_SPAWN, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.ENTITY_INTERACT, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.CREEPER_POWER, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PIG_ZAP, this, Priority.High, plugin);
     }
 
     @Override
@@ -420,6 +422,37 @@ public class WorldGuardEntityListener extends EntityListener {
         if (cancelEvent) {
             event.setCancelled(true);
             return;
+        }
+    }
+
+    /**
+     * Weather related entity events.
+     */
+    @Override
+    public void onPigZap(PigZapEvent event) {
+        if (event.isCancelled()) {
+           return;
+        }
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
+
+        if (wcfg.disablePigZap) {
+            event.setCancelled(true);
+        }
+    }
+
+    @Override
+    public void onCreeperPower(CreeperPowerEvent event) {
+        if (event.isCancelled()) {
+           return;
+        }
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
+
+        if (wcfg.disableCreeperPower) {
+            event.setCancelled(true);
         }
     }
 

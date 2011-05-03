@@ -101,6 +101,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
     }
 
+<<<<<<< HEAD
     /**
      * Called when a player left clicks air.
      *
@@ -149,6 +150,56 @@ public class WorldGuardPlayerListener extends PlayerListener {
     }
 
     /**
+=======
+    /**
+     * Called when a player left clicks air.
+     *
+     * @param event
+     */
+    public void handleAirLeftClick(PlayerInteractEvent event) {
+         //I don't think we have to do anything here yet.
+         return;
+    }
+
+    /**
+     * Called when a player left clicks a block.
+     *
+     * @param event
+     */
+    public void handleBlockLeftClick(PlayerInteractEvent event) {
+        if (event.isCancelled()) return;
+
+        Player player = event.getPlayer();
+        Block block = event.getClickedBlock();
+        Material type = block.getType();
+        World world = player.getWorld();
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.useRegions) {
+            Vector pt = toVector(block);
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+            if (type == Material.STONE_BUTTON
+                  || type == Material.LEVER
+                  || type == Material.WOODEN_DOOR
+                  || type == Material.NOTE_BLOCK) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.allows(DefaultFlag.USE)
+                        && !set.canBuild(localPlayer)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+>>>>>>> 19d447d67d0c4620368069a00c20812325916b2e
      * Called when a player right clicks air.
      * 
      * @param event 

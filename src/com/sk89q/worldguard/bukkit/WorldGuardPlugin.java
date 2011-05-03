@@ -132,6 +132,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardPlayerListener(this)).registerEvents();
         (new WorldGuardBlockListener(this)).registerEvents();
         (new WorldGuardEntityListener(this)).registerEvents();
+        (new WorldGuardWeatherListener(this)).registerEvents();
 
         // 25 equals about 1s real time
         getServer().getScheduler().scheduleAsyncRepeatingTask(this, new TimedFlagsTimer(this), 0, 5);
