@@ -301,19 +301,26 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
 
         if (wcfg.getBlacklist() != null) {
-            if (!wcfg.getBlacklist().check(
-                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
-                    item.getTypeId()), false, false)) {
-                event.setCancelled(true);
-                return;
+            if((block.getType() != Material.CHEST
+                && block.getType() != Material.DISPENSER
+                && block.getType() != Material.FURNACE
+                && block.getType() != Material.BURNING_FURNACE)) {
+                if (!wcfg.getBlacklist().check(
+                        new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
+                        item.getTypeId()), false, false)) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (!wcfg.getBlacklist().check(
+                        new BlockInteractBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
+                        block.getTypeId()), false, false)) {
+                    event.setCancelled(true);
+                    return;
+                }
+
             }
-            
-            if (!wcfg.getBlacklist().check(
-                    new BlockInteractBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
-                    block.getTypeId()), false, false)) {
-                event.setCancelled(true);
-                return;
-            }
+
         }
 
         if ((block.getType() == Material.CHEST
