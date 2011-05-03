@@ -18,7 +18,7 @@
 */
 
 package com.sk89q.worldguard.protection.regions;
-
+import com.sk89q.worldedit.regions.*;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
