@@ -15,3 +15,5 @@ manifest.mf
 /oldcmds
 .settings
 *.bat
+/target
+/true

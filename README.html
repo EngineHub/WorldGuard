@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WorldGuard ${version}</title>
+<style>
+body {
+  margin: 0;
+  padding: 20px;
+  background: #efefef;
+  color: #333;
+}
+#wrapper {
+  margin: 20px auto 20px auto;
+  width: 600px;
+  background: #fff;
+  padding: 40px;
+  border: 1px solid #fff;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  box-shadow: 0 0 2px #999;
+  -webkit-box-shadow: 0 0 3px #999;
+}
+a img {
+  border: 0;
+}
+body, th, td, input {
+  font: 13px/17px "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+}
+a:link, a:visited {
+  color: #00688f;
+  text-decoration: underline;
+}
+a:hover, a:active {
+  color: #000;
+  border: 0;
+}
+h1 {
+  font: 170% "Trebuchet MS", Georgia, serif;
+  font-weight: bold;
+  color: #b90000;
+  margin: 15px 0 5px 0;
+}
+h2 {
+  font: 130% "Trebuchet MS", Georgia, serif;
+  font-weight: bold;
+  color: #00a766;
+  margin: 50px 0 5px 0;
+    padding: 0 0 3px 0;
+    border-bottom: 1px solid #ccc;
+}
+.warning {
+  background: #fffedf;
+  padding: 8px;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  font-size: 90%;
+}
+.subtle {
+  color: #999;
+}
+.optional {
+  background: none repeat scroll 0 0 #FFE081;
+  border-radius: 3px 3px 3px 3px;
+  font-size: 80%;
+	font-weight: normal;
+  padding: 1px 4px;
+}
+</style>
+</head>
+<body>
+
+<div id="wrapper">
+
+<h1>WorldGuard ${version}</h1>
+<p>Thanks for choosing WorldGuard!</p>
+<h2>First Steps</h2>
+
+<p>Now, to begin, you want to:</p>
+<ol>
+  <li><strong>Install the plugin:</strong> Copy WorldGuard.jar into your Bukkit server's &quot;plugins&quot; directory. If the folder doesn't exist, create it.</li>
+  <li><strong>Change the configuration:</strong> Run your server once (with WorldGuard) to generate the default configuration files:
+    <ul>
+      <li><strong>Global configuration:</strong> A config.yml file  is generated inside &quot;plugins/WorldGuard&quot; containing <em>global</em> settings that affect all worlds. There is currently only one applicable setting in this file.</li>
+      <li><strong>World configurations:</strong> For <em>each world</em>, a config.yml will be generated inside &quot;plugins/WorldGuard/worlds/&lt;world&gt;/config.yml&quot;. Edit this file to disable fire and change other world-specific settings. Each world's configuration is entirely separate from one another</li>
+      </ul>
+  </li>
+  Use <em>/wg reload</em> in the console to reload the configuration.
+  <li><strong>Setup the blacklist <span class="optional">Optional</span>:</strong> For each world folder (see above), there is a blacklist.txt file that is generated. See <a href="http://wiki.sk89q.com/wiki/WorldGuard/Blacklist">the wiki for information</a> about WorldGuard's blacklist.</li>
+  <li><strong>Check out the spreadsheet:</strong> Sadly WorldGuard is not 100% complete. It's nearly there, but documentation is also currently lacking. Be sure to <a href="https://spreadsheets.google.com/ccc?key=0AocVHzayvfjAdG16TEplcmcyQUpHY3V0MXhSS0xLamc">read the information on the checklist</a>.</li>
+</ol>
+<p class="warning"><strong>Gotcha:</strong> You need to have <a href="http://www.sk89q.com/projects/worldedit/">WorldEdit</a> installed! It's used by WorldGuard in a number of places. If you don't want to install the plugin, that's okay &mdash; just put WorldEdit.jar into your Bukkit root folder (outside of plugins/) and WorldGuard will still be able use it.</p>
+<p>Be sure to:</p>
+<ul>
+  <li>Subscribe to <a href="http://minecraftnews.sk89q.com/">SK's Minecraft blog</a> for news about WorldGuard</li>
+  <li>Submit bug reports and suggestions to the <a href="http://redmine.sk89q.com/projects/worldguard/issues">issue tracker</a></li>
+  <li>Check out the <a href="http://wiki.sk89q.com/wiki/WorldGuard">WorldGuard wiki</a> (as of writing, a bit outdated)</li>
+</ul>
+<h2>Contributing</h2>
+<p>WorldGuard is entirely open source! You can download all of the plugin code to learn from it, modify it for your own self, or even contribute back!</p>
+<ul>
+  <li><a href="https://github.com/sk89q/worldguard">Download WorldGuard code from GitHub</a></li>
+  <li>You can also <a href="http://www.sk89q.com/donate/">donate</a></li>
+  </ul>
+<p>The code is covered under the GNU General Public License v3.</p>
+<p class="subtle">Maven information: ${groupId}/${artifactId}/${version}</p>
+</div>
+</body>
+</html>

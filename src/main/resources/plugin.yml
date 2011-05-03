@@ -1,6 +1,6 @@
 name: WorldGuard
 main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
-version: WGVERSIONMACRO
+version: "${project.version}"
 commands:
     stopfire:
         description: Halts all fire spread until it is disabled or the server is restarted

@@ -52,7 +52,6 @@ public class PastebinPoster {
             this.callback = callback;
         }
         
-        @Override
         public void run() {
             HttpURLConnection conn = null;
             OutputStream out = null; 
