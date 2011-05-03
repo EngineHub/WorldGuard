@@ -18,27 +18,19 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import org.bukkit.block.Block;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.ChatColor;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.*;
-import org.bukkit.event.weather.*;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.entity.PigZapEvent;
-import org.bukkit.event.entity.CreeperPowerEvent;
-
+import org.bukkit.event.Event;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.weather.LightningStrikeEvent;
+import org.bukkit.event.weather.ThunderChangeEvent;
+import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.event.weather.WeatherListener;
+import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockType;
-
-import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
-
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
 public class WorldGuardWeatherListener extends WeatherListener {
 

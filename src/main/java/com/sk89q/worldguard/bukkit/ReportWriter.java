@@ -115,7 +115,6 @@ public class ReportWriter {
         appendHeader("Global Configuration");
         
         LogListBlock log = new LogListBlock();
-        LogListBlock entitiesLog = log.putChild("Entities");
         LogListBlock configLog = log.putChild("Configuration");
         
         Class<? extends ConfigurationManager> cls = config.getClass();
