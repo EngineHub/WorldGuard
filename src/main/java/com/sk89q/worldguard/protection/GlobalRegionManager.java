@@ -127,6 +127,7 @@ public class GlobalRegionManager {
      * Load region information for a world.
      * 
      * @param world
+     * @return 
      */
     public RegionManager load(World world) {
         String name = world.getName();
