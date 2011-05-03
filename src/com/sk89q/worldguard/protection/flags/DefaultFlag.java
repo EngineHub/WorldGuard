@@ -36,6 +36,7 @@ public final class DefaultFlag {
     public static final StateFlag LIGHTER = new StateFlag("lighter", 'l', true);
     public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", 'f', true);
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", 'F', true);
+    public static final StateFlag LIGHTNING = new StateFlag("lightning", true);
     public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", 'C', false);
     public static final StateFlag WATER_FLOW = new StateFlag("water-flow", true);
     public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
@@ -56,11 +57,20 @@ public final class DefaultFlag {
     public static final DoubleFlag PRICE = new DoubleFlag("price");
     
     public static final Flag<?>[] flagsList = new Flag<?>[] {
+<<<<<<< HEAD
         PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, MOB_SPAWNING, CREEPER_EXPLOSION, SLEEP,
         TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW, LAVA_FLOW,
         USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_GREET,
         NOTIFY_FAREWELL, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
         TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE
+=======
+        PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, MOB_SPAWNING, CREEPER_EXPLOSION,
+        TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, LIGHTNING, CHEST_ACCESS,
+        WATER_FLOW, LAVA_FLOW, USE, PLACE_VEHICLE, GREET_MESSAGE,
+        FAREWELL_MESSAGE, NOTIFY_GREET, NOTIFY_FAREWELL, DENY_SPAWN,
+        HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,TELE_PERM, SPAWN_LOC, SPAWN_PERM,
+        BUYABLE, PRICE, SLEEP
+>>>>>>> 19d447d67d0c4620368069a00c20812325916b2e
     };
     
     private DefaultFlag() {
