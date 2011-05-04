@@ -346,5 +346,15 @@ public class WorldConfiguration {
         }
         return chestProtection.isProtected(block, null);
     }
+    
+    public boolean isChestProtectedPlacement(Block block, Player player) {
+        if (!signChestProtection) {
+            return false;
+        }
+        if (plugin.hasPermission(player, "worldguard.chest-protection.override")) {
+            return false;
+        }
+        return chestProtection.isProtectedPlacement(block, player);
+    }
 
 }

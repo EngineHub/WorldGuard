@@ -46,6 +46,10 @@ public class SignChestProtection {
         }
     }
     
+    public boolean isProtectedPlacement(Block block, Player player) {
+        return isProtectedSignAround(block, player);
+    }
+    
     private boolean isProtectedSignAround(Block searchBlock, Player player) {
         Block side;
         Boolean res;

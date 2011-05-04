@@ -365,6 +365,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
+        if (wcfg.isChestProtected(event.getBlock())) {            event.setCancelled(true);            return;        }
         if (wcfg.useRegions) {
             Block block = event.getBlock();
             Vector pt = toVector(block);
@@ -512,6 +513,13 @@ public class WorldGuardBlockListener extends BlockListener {
         
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
+                if (wcfg.isChestProtectedPlacement(event.getBlock(), player)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You do not own the adjacent chest.");
+                    dropSign(event.getBlock());
+                    event.setCancelled(true);
+                    return;
+                }
+                
                 if (event.getBlock().getType() != Material.SIGN_POST) {
                     player.sendMessage(ChatColor.RED
                             + "The [Lock] sign must be a sign post, not a wall sign.");
@@ -519,18 +527,32 @@ public class WorldGuardBlockListener extends BlockListener {
                     dropSign(event.getBlock());
                     event.setCancelled(true);
                     return;
-                } else if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
+                }
+
+                if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
                     player.sendMessage(ChatColor.RED
                             + "The first owner line must be your name.");
 
                     dropSign(event.getBlock());
                     event.setCancelled(true);
                     return;
-                } else {
-                    event.setLine(0, "[Lock]");
-                    player.sendMessage(ChatColor.YELLOW
-                            + "A chest or double chest above is now protected.");
                 }
+                
+                Material below = event.getBlock().getRelative(0, -1, 0).getType();
+
+                if (below == Material.TNT || below == Material.SAND
+                        || below == Material.GRAVEL || below == Material.SIGN_POST) {
+                    player.sendMessage(ChatColor.RED
+                            + "That is not a safe block that you're putting this sign on.");
+
+                    dropSign(event.getBlock());
+                    event.setCancelled(true);
+                    return;
+                }
+                
+                event.setLine(0, "[Lock]");
+                player.sendMessage(ChatColor.YELLOW
+                        + "A chest or double chest above is now protected.");
             }
         } else {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
