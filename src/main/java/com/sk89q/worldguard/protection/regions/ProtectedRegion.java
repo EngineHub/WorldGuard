@@ -43,22 +43,27 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * Holds the region's ID.
      */
     private String id;
+    
     /**
      * Priority.
      */
     private int priority = 0;
+    
     /**
      * Holds the curParent.
      */
     private ProtectedRegion parent;
+    
     /**
      * List of owners.
      */
     private DefaultDomain owners = new DefaultDomain();
+    
     /**
      * List of members.
      */
     private DefaultDomain members = new DefaultDomain();
+    
     /**
      * List of flags.
      */
@@ -314,6 +319,13 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      */
     public abstract String getTypeName();
 
+    /**
+     * Get a list of intersecting regions.
+     * 
+     * @param regions
+     * @return
+     * @throws UnsupportedIntersectionException
+     */
     public abstract List<ProtectedRegion> getIntersectingRegions(
             List<ProtectedRegion> regions)
             throws UnsupportedIntersectionException;

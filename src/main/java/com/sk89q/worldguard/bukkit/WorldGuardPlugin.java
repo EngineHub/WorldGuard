@@ -134,9 +134,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
 
-        // 25 equals about 1s real time
-        getServer().getScheduler().scheduleAsyncRepeatingTask(this, new TimedFlagsTimer(this), 0, 5);
-
         if (configuration.suppressTickSyncWarnings) {
             Logger.getLogger("Minecraft").setFilter(
                     new TickSyncDelayLoggerFilter());
