@@ -73,8 +73,13 @@ public class RegionCommands {
             throw new CommandException("Select a region with WorldEdit first.");
         }
         
-        ProtectedRegion region;
+        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
+        if (mgr.hasRegion(id)) {
+            throw new CommandException("That region is already defined. Use redefine instead.");
+        }
         
+        ProtectedRegion region;
+
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
@@ -95,7 +100,6 @@ public class RegionCommands {
             region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
         }
         
-        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         mgr.addRegion(region);
         
         try {
@@ -212,8 +216,14 @@ public class RegionCommands {
             throw new CommandException("Select a region with WorldEdit first.");
         }
         
-        ProtectedRegion region;
+        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
+
+        if (mgr.hasRegion(id)) {
+            throw new CommandException("That region already exists. Please choose a different name.");
+        }
         
+        ProtectedRegion region;
+
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
@@ -235,7 +245,6 @@ public class RegionCommands {
         }
 
         WorldConfiguration wcfg = plugin.getGlobalConfiguration().get(player.getWorld());
-        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         
         // Check whether the player has created too many regions 
         if (wcfg.maxRegionCountPerPlayer >= 0
