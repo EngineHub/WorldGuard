@@ -437,22 +437,40 @@ public class RegionCommands {
     }
     
     @Command(aliases = {"list"},
-            usage = "[page] [world]",
+            usage = "[.player] [page] [world]",
             desc = "Get a list of regions",
-            flags = "", min = 0, max = 2)
-    @CommandPermissions({"worldguard.region.list"})
+            flags = "", min = 0, max = 3)
+//    @CommandPermissions({"worldguard.region.list"})
     public static void list(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
 
         World world;
         int page = 0;
+        int argl = 0;
+        String name = "";
+        boolean own = false;
+        LocalPlayer localPlayer = null;
         
-        if (args.argsLength() > 0) {
-            page = Math.max(0, args.getInteger(0) - 1);
+        if (args.argsLength() > 0 && args.getString(0).startsWith(".")) {
+            name = args.getString(0).substring(1).toLowerCase();
+            argl = 1;
+            if (name.equals("me") || name.isEmpty() ||
+                    name.equals(plugin.checkPlayer(sender).getDisplayName().toLowerCase())) {
+                plugin.checkPermission(sender, "worldguard.region.list.own");
+                name = plugin.checkPlayer(sender).getDisplayName().toLowerCase();
+                localPlayer = plugin.wrapPlayer(plugin.checkPlayer(sender));
+                own = true;
+            }
+        }
+        if (!own)
+            plugin.checkPermission(sender, "worldguard.region.list");
+        
+        if (args.argsLength() > 0 + argl) {
+            page = Math.max(0, args.getInteger(0 + argl) - 1);
         }
         
-        if (args.argsLength() > 1) {
-            world = plugin.matchWorld(sender, args.getString(1));
+        if (args.argsLength() > 1 + argl) {
+            world = plugin.matchWorld(sender, args.getString(1 + argl));
         } else {
             world = plugin.checkPlayer(sender).getWorld();
         }
@@ -461,18 +479,40 @@ public class RegionCommands {
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         Map<String, ProtectedRegion> regions = mgr.getRegions();
+
         int size = regions.size();
-        int pages = (int) Math.ceil(size / (float) listSize);
 
         String[] regionIDList = new String[size];
         int index = 0;
         for (String id : regions.keySet()) {
-            regionIDList[index] = id;
-            index++;
+            boolean show = false;
+            if (name.isEmpty()) {
+                show = true;
+            }
+            else {
+                if (own) {
+                    if (regions.get(id).isOwner(localPlayer)) {
+                        show = true;
+                    }
+                }
+                else {
+                    if (regions.get(id).getOwners().getPlayers().contains(name))
+                        show = true;
+                }
+            }
+            if (show) {
+                regionIDList[index] = id;
+                index++;
+            }
         }
+        if (!name.isEmpty())
+            regionIDList = Arrays.copyOf(regionIDList, index);
         Arrays.sort(regionIDList);
+        size = index;
+        int pages = (int) Math.ceil(size / (float) listSize);
 
-        sender.sendMessage(ChatColor.RED + "Regions (page "
+        sender.sendMessage(ChatColor.RED
+                + (name == "" ? "Regions (page " : "Regions for " + name + " (page ")
                 + (page + 1) + " of " + pages + "):");
 
         if (page < pages) {
