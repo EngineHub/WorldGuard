@@ -1,0 +1,120 @@
+#
+# WorldGuard's configuration file.
+#
+# This is the a per-world configuration file. It only affects one
+# corresponding world.
+#
+# About editing this file:
+# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If
+#   you use an editor like Notepad++ (recommended for Windows users), you
+#   must configure it to "replace tabs with spaces." In Notepad++, this can
+#   be changed in Settings > Preferences > Language Menu.
+# - Don't get rid of the indents. They are indented so some entries are
+#   in categories (like "enforce-single-session" is in the "protection"
+#   category.
+# - If you want to check the format of this file before putting it
+#   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/
+#   and see if it gives "ERROR:".
+# - Lines starting with # are comments and so they are ignored.
+#
+
+summary-on-start: on
+pumpkin-scuba: off
+
+protection:
+    item-durability: on
+    remove-infinite-stacks: off
+
+simulation:
+    sponge:
+        enable: on
+        redstone: off
+        radius: 3
+
+physics:
+    no-physics-gravel: off
+    no-physics-sand: off
+    allow-portal-anywhere: off
+    disable-water-damage-blocks: []
+
+ignition:
+    block-tnt: off
+    block-lighter: off
+
+fire:
+    disable-all-fire-spread: off
+    disable-fire-spread-blocks: []
+    disable-lava-fire-spread: on
+    lava-spread-blocks: []
+
+weather:
+    disable-weather: off
+    disable-thunderstorm: off
+    disable-pig-zombification: off
+    disable-powered-creepers: off
+    disable-lightning-strike-fire: off
+    prevent-lightning-strike-blocks: []
+    always-raining: off
+    always-thundering: off
+
+mobs:
+    block-creeper-explosions: off
+    block-creeper-block-damage: off
+    block-creature-spawn: []
+    anti-wolf-dumbness: false
+
+spawn:
+    login-protection: 3
+    spawn-protection: 0
+    kick-on-death: off
+    exact-respawn: off
+    teleport-to-home-on-death: off
+
+player-damage:
+    disable-fall-damage: off
+    disable-lava-damage: off
+    disable-fire-damage: off
+    disable-lightning-damage: off
+    disable-drowning-damage: off
+    disable-suffocation-damage: off
+    disable-contact-damage: off
+    teleport-on-suffocation: off
+    disable-void-damage: off
+    teleport-on-void-falling: off
+
+regions:
+    enable: on
+    wand: 287
+    max-claim-volume: 30000
+    claim-only-inside-existing-regions: off
+    max-region-count-per-player: 7
+    high-frequency-flags: off
+
+iconomy:
+    enable: on
+    buy-on-claim: on
+    # Price per block for buying on claim
+    buy-on-claim-price: 2
+
+chest-protection:
+    enable: off
+
+crops:
+    disable-creature-trampling: off
+    disable-player-trampling: off
+
+blacklist:
+    use-as-whitelist: off
+    logging:
+        console:
+            enable: on
+        database:
+            enable: off
+            dsn: jdbc:mysql://localhost:3306/minecraft
+            user: root
+            password: pass
+            table: blacklist_events
+        file:
+            enable: on
+            path: worldguard/logs/%w-%Y-%m-%d.log
+            open-files: 10

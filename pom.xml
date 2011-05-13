@@ -1,0 +1,165 @@
+<!--
+  Maven build file for WorldGuard
+  Copyright (c) 2011 sk89q <http://www.sk89q.com> 
+  CommandBook is available under the GNU General Public License v3
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sk89q</groupId>
+  <artifactId>worldguard</artifactId>
+  <version>5.0.0-SNAPSHOT</version>
+  <name>WorldGuard</name>
+  <description>WorldGuard protects your Minecraft servers</description>
+
+  <scm>
+    <connection>scm:git:git://github.com/sk89q/worldguard.git</connection>
+    <url>https://github.com/sk89q/worldguard</url>
+    <developerConnection>scm:git:git@github.com:sk89q/worldguard.git</developerConnection>
+  </scm>
+
+  <repositories>
+    <!-- Repository for other dependencies of SK's -->
+    <repository>
+      <id>sk89q-mvn2</id>
+      <url>http://mvn2.sk89q.com/repo</url>
+    </repository>
+    <!-- Repository for Bukkit -->
+    <repository>
+      <id>bukkit-repo</id>
+      <url>http://repo.bukkit.org/artifactory/repo</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <!-- Required component -->
+    <dependency>
+      <groupId>com.sk89q</groupId>
+      <artifactId>worldedit</artifactId>
+      <version>4.4.2</version>
+    </dependency>
+    
+    <!-- Bukkit -->
+    <dependency>
+      <groupId>org.bukkit</groupId>
+      <artifactId>bukkit</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    
+    <!-- Additional libraries -->
+    <dependency>
+      <groupId>com.nijikokun</groupId>
+      <artifactId>iconomy</artifactId>
+      <version>5.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.khelekore</groupId>
+      <artifactId>prtree</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+
+    <!-- Resources -->
+    <resources>
+      <resource>
+        <targetPath>.</targetPath>
+        <filtering>true</filtering>
+        <directory>${basedir}/src/main/resources/</directory>
+        <includes>
+          <include>plugin.yml</include>
+        </includes>
+      </resource>
+      <resource>
+        <targetPath>defaults/</targetPath>
+        <filtering>true</filtering>
+        <directory>${basedir}/src/main/resources/</directory>
+        <includes>
+          <include>config.yml</include>
+          <include>config_world.yml</include>
+          <include>blacklist.txt</include>
+        </includes>
+      </resource>
+    </resources>
+
+    <!-- Plugins -->
+    <plugins>
+      <!-- Compile plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+      </plugin>
+
+      <!-- JAR creation plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <archive>
+            <addMavenDescriptor>true</addMavenDescriptor>
+            <pomPropertiesFile>true</pomPropertiesFile>
+            <manifest>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <Class-Path>WorldEdit.jar WorldGuard/WorldEdit.jar lib/WorldEdit.jar ../lib/WorldEdit.jar ../WorldEdit.jar</Class-Path>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- Shade -->
+      <!-- We want to bundle in some dependencies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <!-- We want to bundle in the modified CSV library -->
+                <includes>
+                  <include>net.sf.opencsv:opencsv</include>
+                </includes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Assembly -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-2</version>
+        <configuration>
+          <descriptor>${basedir}/src/main/assembly/default.xml</descriptor>
+        </configuration>
+      </plugin>
+
+      <!-- Release -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <preparationGoals>assembly:assembly</preparationGoals>
+          <goals>assembly:assembly</goals>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

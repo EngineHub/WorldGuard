@@ -1,0 +1,37 @@
+name: WorldGuard
+main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
+version: "${project.version}"
+commands:
+    stopfire:
+        description: Halts all fire spread until it is disabled or the server is restarted
+        usage: /<command>
+    allowfire:
+        description: Re-enables fire spread if he has been disabled with /stopfire
+        usage: /<command>
+    god:
+        description: Enable god mode
+        usage: /<command> [player]
+    ungod:
+        description: Disable god mode
+        usage: /<command> [player]
+    heal:
+        description: Heal yourself or another
+        usage: /<command> [player]
+    slay:
+        description: Slay yourself or another
+        usage: /<command> [player]
+    stack:
+        description: Stacks items in the player's inventory
+        usage: /<command>
+        aliases: ;
+    region:
+        description: Adjust protected regions
+        usage: /<command> <action> ...
+        aliases: [rg, regions]
+    locate:
+        description: Set your compass towards a person
+        usage: /<command> <target>
+    worldguard:
+        description: WorldGuard commands
+        aliases: wg
+        usage: /<command>
