@@ -66,6 +66,7 @@ public class WorldGuardBlockListener extends BlockListener {
         pm.registerEvent(Event.Type.BLOCK_BURN, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.SIGN_CHANGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.SNOW_FORM, this, Priority.High, plugin);
     }
     
     protected WorldConfiguration getWorldConfig(World world) {
@@ -529,6 +530,16 @@ public class WorldGuardBlockListener extends BlockListener {
         }
     }
     
+    @Override
+    public void onSnowForm(SnowFormEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SNOW_FALL, event.getBlock().getLocation())) {
+            event.setCancelled(true);
+        }
+    }
     /**
      * Drops a sign item and removes a sign.
      * 

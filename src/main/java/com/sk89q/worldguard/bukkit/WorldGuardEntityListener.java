@@ -27,8 +27,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.*;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.painting.*;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
@@ -62,6 +65,8 @@ public class WorldGuardEntityListener extends EntityListener {
         pm.registerEvent(Event.Type.ENTITY_INTERACT, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.CREEPER_POWER, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PIG_ZAP, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PAINTING_BREAK, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PAINTING_PLACE, this, Priority.High, plugin);
     }
 
     @Override
@@ -451,6 +456,60 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
+    /**
+     * Painting related events
+     */
+    /**
+     * Called when a painting is removed
+     *
+     * @param event Relevant event details
+     */
+    @Override
+    public void onPaintingBreak(PaintingBreakEvent breakEvent) {
+        if (breakEvent.isCancelled()) {
+            return;
+        }
+
+        if (!(breakEvent instanceof PaintingBreakByEntityEvent)) {
+            return;
+        }
+        PaintingBreakByEntityEvent event = (PaintingBreakByEntityEvent) breakEvent;
+        if (!(event.getRemover() instanceof Player)) {
+            return;
+        }
+        Painting painting= event.getPainting();
+        Player player = (Player) event.getRemover();
+        World world = painting.getWorld();
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.useRegions) {
+            if (!plugin.getGlobalRegionManager().canBuild(player, painting.getLocation())) {
+                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void onPaintingPlace(PaintingPlaceEvent event) {
+        Block placedOn = event.getBlock();
+        Player player = event.getPlayer();
+        World world = placedOn.getWorld();
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.useRegions) {
+            if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
+                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
     /**
      * Find a position for the player to stand that is not inside a block.
      * Blocks above the player will be iteratively tested until there is
