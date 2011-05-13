@@ -42,6 +42,7 @@ public final class DefaultFlag {
     public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
     public static final StateFlag USE = new StateFlag("use", false);
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
+    public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
     public static final BooleanFlag NOTIFY_GREET = new BooleanFlag("notify-greet");
@@ -55,13 +56,13 @@ public final class DefaultFlag {
     public static final RegionGroupFlag SPAWN_PERM = new RegionGroupFlag("spawn-group");
     public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
     public static final DoubleFlag PRICE = new DoubleFlag("price");
-    
+
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, MOB_SPAWNING, CREEPER_EXPLOSION, SLEEP,
         TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW, LAVA_FLOW,
         USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_GREET,
         NOTIFY_FAREWELL, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
-        TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE
+        TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL
     };
     
     private DefaultFlag() {
