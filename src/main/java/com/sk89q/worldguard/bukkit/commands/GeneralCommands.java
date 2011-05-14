@@ -36,7 +36,7 @@ public class GeneralCommands {
     @Command(aliases = {"god"},
             usage = "[player]",
             desc = "Enable godmode on a player",
-            flags = "", min = 0, max = 1)
+            flags = "s", min = 0, max = 1)
     public static void god(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalConfiguration();
@@ -84,7 +84,7 @@ public class GeneralCommands {
     @Command(aliases = {"ungod"},
             usage = "[player]",
             desc = "Disable godmode on a player",
-            flags = "", min = 0, max = 1)
+            flags = "s", min = 0, max = 1)
     public static void ungod(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalConfiguration();
@@ -124,14 +124,14 @@ public class GeneralCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players now have god mode.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players no longer have god mode.");
         }
     }
     
     @Command(aliases = {"heal"},
             usage = "[player]",
             desc = "Heal a player",
-            flags = "", min = 0, max = 1)
+            flags = "s", min = 0, max = 1)
     public static void heal(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
         
@@ -177,7 +177,7 @@ public class GeneralCommands {
     @Command(aliases = {"slay"},
             usage = "[player]",
             desc = "Slay a player",
-            flags = "", min = 0, max = 1)
+            flags = "s", min = 0, max = 1)
     public static void slay(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
         
@@ -202,12 +202,12 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Slayed!");
+                player.sendMessage(ChatColor.YELLOW + "Slain!");
                 
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Slayed by "
+                player.sendMessage(ChatColor.YELLOW + "Slain by "
                         + plugin.toName(sender) + ".");
                 
             }
@@ -216,7 +216,7 @@ public class GeneralCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players slayed.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
         }
     }
     
