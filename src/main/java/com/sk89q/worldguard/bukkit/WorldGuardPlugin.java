@@ -276,7 +276,14 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public boolean hasPermission(CommandSender sender, String perm) {
         if (sender.isOp()) {
-            return true;
+            if (sender instanceof Player) {
+                if (this.getGlobalConfiguration().get(((Player) sender).
+                        getWorld()).opPermissions) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
         }
         
         // Invoke the permissions resolver

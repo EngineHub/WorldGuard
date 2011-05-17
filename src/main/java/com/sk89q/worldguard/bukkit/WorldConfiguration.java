@@ -57,6 +57,7 @@ public class WorldConfiguration {
     private SignChestProtection chestProtection = new SignChestProtection();
 
     /* Configuration data start */
+    public boolean opPermissions;
     public boolean fireSpreadDisableToggle;
     public boolean enforceOneSession;
     public boolean itemDurability;
@@ -146,6 +147,8 @@ public class WorldConfiguration {
     private void loadConfiguration() {
         Configuration config = new Configuration(this.configFile);
         config.load();
+
+        opPermissions = config.getBoolean("op-permissions", true);
 
         enforceOneSession = config.getBoolean("protection.enforce-single-session", true);
         itemDurability = config.getBoolean("protection.item-durability", true);
