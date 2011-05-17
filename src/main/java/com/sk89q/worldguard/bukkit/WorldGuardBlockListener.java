@@ -293,7 +293,7 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
-        
+
         if (wcfg.useRegions) {
             Vector pt = toVector(block);
             Player player = event.getPlayer();
@@ -316,7 +316,8 @@ public class WorldGuardBlockListener extends BlockListener {
                 }
             }
 
-            if (wcfg.highFreqFlags && isFireSpread && set.allows(DefaultFlag.FIRE_SPREAD)) {
+            if (wcfg.highFreqFlags && isFireSpread
+                    && !set.allows(DefaultFlag.FIRE_SPREAD)) {
                 event.setCancelled(true);
                 return;
             }
@@ -362,6 +363,19 @@ public class WorldGuardBlockListener extends BlockListener {
                 event.setCancelled(true);
                 return;
             }
+        }
+
+        if (wcfg.useRegions) {
+            Block block = event.getBlock();
+            Vector pt = toVector(block);
+            RegionManager mgr = plugin.getGlobalRegionManager().get(block.getWorld());
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+            if (!set.allows(DefaultFlag.FIRE_SPREAD)) {
+                event.setCancelled(true);
+                return;
+            }
+
         }
     }
 
