@@ -357,4 +357,18 @@ public class WorldConfiguration {
         return chestProtection.isProtectedPlacement(block, player);
     }
 
+    public boolean isAdjacentChestProtected(Block block, Player player) {
+        if (!signChestProtection) {
+            return false;
+        }
+        if (plugin.hasPermission(player, "worldguard.chest-protection.override")) {
+            return false;
+        }
+        return chestProtection.isAdjacentChestProtected(block, player);
+    }
+
+    public SignChestProtection getChestProtection() {
+        return chestProtection;
+    }
+    
 }

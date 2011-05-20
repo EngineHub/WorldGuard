@@ -448,6 +448,14 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
+        
+        if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getType())) {
+            if (wcfg.isAdjacentChestProtected(event.getBlock(), player)) {
+                player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
+                event.setCancelled(true);
+                return;
+            }
+        }
 
         if (wcfg.simulateSponge && blockPlaced.getTypeId() == 19) {
             if (wcfg.redstoneSponges && blockPlaced.isBlockIndirectlyPowered()) {
