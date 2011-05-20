@@ -23,7 +23,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldStateManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class ToggleCommands {
@@ -43,7 +43,7 @@ public class ToggleCommands {
             world = plugin.matchWorld(sender, args.getString(0));
         }
         
-        WorldConfiguration wcfg = plugin.getGlobalConfiguration().get(world);
+        WorldStateManager wcfg = plugin.getGlobalConfiguration().get(world);
 
         if (!wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(
@@ -74,7 +74,7 @@ public class ToggleCommands {
             world = plugin.matchWorld(sender, args.getString(0));
         }
         
-        WorldConfiguration wcfg = plugin.getGlobalConfiguration().get(world);
+        WorldStateManager wcfg = plugin.getGlobalConfiguration().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(ChatColor.YELLOW

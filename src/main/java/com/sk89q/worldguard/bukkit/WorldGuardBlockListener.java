@@ -36,16 +36,19 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
+import static com.sk89q.worldguard.bukkit.SpongeUtil.*;
 
+/**
+ * The listener for block events.
+ * 
+ * @author sk89q
+ */
 public class WorldGuardBlockListener extends BlockListener {
 
-    /**
-     * Plugin.
-     */
     private WorldGuardPlugin plugin;
 
     /**
-     * Construct the object;
+     * Construct the object.
      * 
      * @param plugin
      */
@@ -53,8 +56,10 @@ public class WorldGuardBlockListener extends BlockListener {
         this.plugin = plugin;
     }
 
+    /**
+     * Register events.
+     */
     public void registerEvents() {
-
         PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.BLOCK_DAMAGE, this, Priority.High, plugin);
@@ -69,11 +74,23 @@ public class WorldGuardBlockListener extends BlockListener {
         pm.registerEvent(Event.Type.SNOW_FORM, this, Priority.High, plugin);
     }
     
-    protected WorldConfiguration getWorldConfig(World world) {
+    /**
+     * Get the world configuration given a world.
+     * 
+     * @param world
+     * @return
+     */
+    protected WorldStateManager getWorldConfig(World world) {
         return plugin.getGlobalConfiguration().get(world);
     }
     
-    protected WorldConfiguration getWorldConfig(Player player) {
+    /**
+     * Get the world configuration given a player.
+     * 
+     * @param player
+     * @return
+     */
+    protected WorldStateManager getWorldConfig(Player player) {
         return plugin.getGlobalConfiguration().get(player.getWorld());
     }
     
@@ -110,7 +127,7 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         Player player = event.getPlayer();
-        WorldConfiguration wcfg = getWorldConfig(player);
+        WorldStateManager wcfg = getWorldConfig(player);
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getItemInHand();
@@ -167,8 +184,8 @@ public class WorldGuardBlockListener extends BlockListener {
         boolean isWater = blockFrom.getTypeId() == 8 || blockFrom.getTypeId() == 9;
         boolean isLava = blockFrom.getTypeId() == 10 || blockFrom.getTypeId() == 11;
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(event.getBlock().getWorld());
 
         if (wcfg.simulateSponge && isWater) {
             int ox = blockTo.getX();
@@ -249,8 +266,8 @@ public class WorldGuardBlockListener extends BlockListener {
         Block block = event.getBlock();
         World world = block.getWorld();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
 
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
@@ -332,9 +349,7 @@ public class WorldGuardBlockListener extends BlockListener {
     }
 
     /**
-     * Called when a block is destroyed from burning
-     *
-     * @param event Relevant event details
+     * Called when a block is destroyed from burning.
      */
     @Override
     public void onBlockBurn(BlockBurnEvent event) {
@@ -343,8 +358,8 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(event.getBlock().getWorld());
 
         if (wcfg.disableFireSpread) {
             event.setCancelled(true);
@@ -385,9 +400,7 @@ public class WorldGuardBlockListener extends BlockListener {
     }
 
     /**
-     * Called when block physics occurs
-     *
-     * @param event Relevant event details
+     * Called when block physics occurs.
      */
     @Override
     public void onBlockPhysics(BlockPhysicsEvent event) {
@@ -396,8 +409,8 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(event.getBlock().getWorld());
 
         int id = event.getChangedTypeId();
 
@@ -418,9 +431,7 @@ public class WorldGuardBlockListener extends BlockListener {
     }
 
     /**
-     * Called when a player places a block
-     *
-     * @param event Relevant event details
+     * Called when a player places a block.
      */
     @Override
     public void onBlockPlace(BlockPlaceEvent event) {
@@ -433,8 +444,8 @@ public class WorldGuardBlockListener extends BlockListener {
         Player player = event.getPlayer();
         World world = blockPlaced.getWorld();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockPlaced.getLocation())) {
@@ -470,16 +481,12 @@ public class WorldGuardBlockListener extends BlockListener {
             int oy = blockPlaced.getY();
             int oz = blockPlaced.getZ();
 
-            clearSpongeWater(world, ox, oy, oz);
+            clearSpongeWater(plugin, world, ox, oy, oz);
         }
     }
 
     /**
-     * Called when redstone changes
-     * From: the source of the redstone change
-     * To: The redstone dust that changed
-     *
-     * @param event Relevant event details
+     * Called when redstone changes.
      */
     @Override
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
@@ -487,8 +494,8 @@ public class WorldGuardBlockListener extends BlockListener {
         Block blockTo = event.getBlock();
         World world = blockTo.getWorld();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
             int ox = blockTo.getX();
@@ -501,10 +508,10 @@ public class WorldGuardBlockListener extends BlockListener {
                         Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
                         if (sponge.getTypeId() == 19
                                 && sponge.isBlockIndirectlyPowered()) {
-                            clearSpongeWater(world, ox + cx, oy + cy, oz + cz);
+                            clearSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
                         } else if (sponge.getTypeId() == 19
                                 && !sponge.isBlockIndirectlyPowered()) {
-                            addSpongeWater(world, ox + cx, oy + cy, oz + cz);
+                            addSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
                         }
                     }
                 }
@@ -521,7 +528,7 @@ public class WorldGuardBlockListener extends BlockListener {
     public void onSignChange(SignChangeEvent event) {
 
         Player player = event.getPlayer();
-        WorldConfiguration wcfg = getWorldConfig(player);
+        WorldStateManager wcfg = getWorldConfig(player);
         
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
@@ -578,157 +585,18 @@ public class WorldGuardBlockListener extends BlockListener {
         }
     }
     
+    /**
+     * Called when snow is formed.
+     */
     @Override
     public void onSnowForm(SnowFormEvent event) {
         if (event.isCancelled()) {
             return;
         }
 
-        if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SNOW_FALL, event.getBlock().getLocation())) {
+        if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SNOW_FALL,
+                event.getBlock().getLocation())) {
             event.setCancelled(true);
-        }
-    }
-    /**
-     * Drops a sign item and removes a sign.
-     * 
-     * @param block
-     */
-    private void dropSign(Block block) {
-        block.setTypeId(0);
-        block.getWorld().dropItemNaturally(block.getLocation(),
-                new ItemStack(Material.SIGN));
-    }
-
-    /**
-     * Remove water around a sponge.
-     * 
-     * @param world
-     * @param ox
-     * @param oy
-     * @param oz
-     */
-    private void clearSpongeWater(World world, int ox, int oy, int oz) {
-
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
-            for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
-                for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
-                    if (isBlockWater(world, ox + cx, oy + cy, oz + cz)) {
-                        world.getBlockAt(ox + cx, oy + cy, oz + cz).setTypeId(0);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Add water around a sponge.
-     * 
-     * @param world
-     * @param ox
-     * @param oy
-     * @param oz
-     */
-    private void addSpongeWater(World world, int ox, int oy, int oz) {
-
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        // The negative x edge
-        int cx = ox - wcfg.spongeRadius - 1;
-        for (int cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
-            for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx + 1, cy, cz);
-                }
-            }
-        }
-
-        // The positive x edge
-        cx = ox + wcfg.spongeRadius + 1;
-        for (int cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
-            for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx - 1, cy, cz);
-                }
-            }
-        }
-
-        // The negative y edge
-        int cy = oy - wcfg.spongeRadius - 1;
-        for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
-            for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx, cy + 1, cz);
-                }
-            }
-        }
-
-        // The positive y edge
-        cy = oy + wcfg.spongeRadius + 1;
-        for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
-            for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx, cy - 1, cz);
-                }
-            }
-        }
-
-        // The negative z edge
-        int cz = oz - wcfg.spongeRadius - 1;
-        for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
-            for (cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx, cy, cz + 1);
-                }
-            }
-        }
-
-        // The positive z edge
-        cz = oz + wcfg.spongeRadius + 1;
-        for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
-            for (cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx, cy, cz - 1);
-                }
-            }
-        }
-    }
-
-    /**
-     * Sets the given block to fluid water.
-     * Used by addSpongeWater()
-     * 
-     * @param world
-     * @param ox
-     * @param oy
-     * @param oz
-     */
-    private void setBlockToWater(World world, int ox, int oy, int oz) {
-        Block block = world.getBlockAt(ox, oy, oz);
-        int id = block.getTypeId();
-        if (id == 0) {
-            block.setTypeId(8);
-        }
-    }
-
-    /**
-     * Checks if the given block is water
-     * 
-     * @param world
-     * @param ox
-     * @param oy
-     * @param oz
-     */
-    private boolean isBlockWater(World world, int ox, int oy, int oz) {
-        Block block = world.getBlockAt(ox, oy, oz);
-        int id = block.getTypeId();
-        if (id == 8 || id == 9) {
-            return true;
-        } else {
-            return false;
         }
     }
 }

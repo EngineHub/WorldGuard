@@ -111,13 +111,13 @@ public class ReportWriter {
         appendln();
     }
     
-    private void appendGlobalConfiguration(ConfigurationManager config) {
+    private void appendGlobalConfiguration(GlobalStateManager config) {
         appendHeader("Global Configuration");
         
         LogListBlock log = new LogListBlock();
         LogListBlock configLog = log.putChild("Configuration");
         
-        Class<? extends ConfigurationManager> cls = config.getClass();
+        Class<? extends GlobalStateManager> cls = config.getClass();
         for (Field field : cls.getFields()) {
             try {
                 Object val = field.get(config);
@@ -241,7 +241,7 @@ public class ReportWriter {
     }
     
     private void appendWorldConfigurations(WorldGuardPlugin plugin, List<World> worlds,
-            GlobalRegionManager regionMgr, ConfigurationManager mgr) {
+            GlobalRegionManager regionMgr, GlobalStateManager mgr) {
         appendHeader("World Configurations");
         
         LogListBlock log = new LogListBlock();
@@ -262,9 +262,9 @@ public class ReportWriter {
             infoLog.put("Regions file", (new File(plugin.getDataFolder(), "worlds/"
                     + world.getName() + "/regions.yml")).getAbsoluteFile());
             
-            WorldConfiguration config = mgr.get(world);
+            WorldStateManager config = mgr.get(world);
             
-            Class<? extends WorldConfiguration> cls = config.getClass();
+            Class<? extends WorldStateManager> cls = config.getClass();
             for (Field field : cls.getFields()) {
                 try {
                     Object val = field.get(config);

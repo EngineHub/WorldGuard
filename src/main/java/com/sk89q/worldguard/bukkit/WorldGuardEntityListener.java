@@ -18,32 +18,34 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import org.bukkit.block.Block;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event;
-import org.bukkit.plugin.PluginManager;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.Event;
+import org.bukkit.event.Event.Priority;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.painting.*;
-
+import org.bukkit.event.painting.PaintingBreakByEntityEvent;
+import org.bukkit.event.painting.PaintingBreakEvent;
+import org.bukkit.event.painting.PaintingPlaceEvent;
+import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
-import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
+/**
+ * Listener for entity related events.
+ * 
+ * @author sk89q
+ */
 public class WorldGuardEntityListener extends EntityListener {
 
-    /**
-     * Plugin.
-     */
     private WorldGuardPlugin plugin;
 
     /**
@@ -55,8 +57,10 @@ public class WorldGuardEntityListener extends EntityListener {
         this.plugin = plugin;
     }
 
+    /**
+     * Register events.
+     */
     public void registerEvents() {
-
         PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.ENTITY_DAMAGE, this, Priority.High, plugin);
@@ -69,14 +73,17 @@ public class WorldGuardEntityListener extends EntityListener {
         pm.registerEvent(Event.Type.PAINTING_PLACE, this, Priority.High, plugin);
     }
 
+    /**
+     * Called when an entity interacts with another object.
+     */
     @Override
     public void onEntityInteract(EntityInteractEvent event) {
         //bukkit doesn't actually throw this event yet, someone add a ticket to leaky
         Entity entity = event.getEntity();
         Block block = event.getBlock();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(entity.getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(entity.getWorld());
 
         if (block.getType() == Material.SOIL) {
             if (entity instanceof Creature && wcfg.disableCreatureCropTrampling) {
@@ -85,13 +92,17 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
-    public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
-
+    /**
+     * Called on entity damage by a block.
+     * 
+     * @param event
+     */
+    private void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(defender.getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(defender.getWorld());
 
         if (defender instanceof Wolf) {
             if (wcfg.antiWolfDumbness && !(type == DamageCause.VOID)) {
@@ -135,15 +146,20 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+    /**
+     * Called on entity damage by an entity.
+     * 
+     * @param event
+     */
+    private void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
 
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            ConfigurationManager cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.get(player.getWorld());
+            GlobalStateManager cfg = plugin.getGlobalConfiguration();
+            WorldStateManager wcfg = cfg.get(player.getWorld());
             
             if (cfg.hasGodMode(player)) {
                 event.setCancelled(true);
@@ -202,15 +218,20 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
-    public void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
+    /**
+     * Called on entity damage by a projectile.
+     * 
+     * @param event
+     */
+    private void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
         Entity defender = event.getEntity();
         Entity attacker = event.getDamager();
 
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            ConfigurationManager cfg = plugin.getGlobalConfiguration();
-            WorldConfiguration wcfg = cfg.get(player.getWorld());
+            GlobalStateManager cfg = plugin.getGlobalConfiguration();
+            WorldStateManager wcfg = cfg.get(player.getWorld());
             
             if (cfg.hasGodMode(player)) {
                 event.setCancelled(true);
@@ -244,9 +265,11 @@ public class WorldGuardEntityListener extends EntityListener {
 
     }
 
+    /**
+     * Called on entity damage.
+     */
     @Override
     public void onEntityDamage(EntityDamageEvent event) {
-
         if (event.isCancelled()) {
             return;
         }
@@ -265,8 +288,8 @@ public class WorldGuardEntityListener extends EntityListener {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(defender.getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(defender.getWorld());
 
         if (defender instanceof Wolf) {
             if (wcfg.antiWolfDumbness) {
@@ -326,17 +349,19 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
+    /**
+     * Called on entity explode.
+     */
     @Override
     public void onEntityExplode(EntityExplodeEvent event) {
-
         if (event.isCancelled()) {
             return;
         }
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
         Location l = event.getLocation();
         World world = l.getWorld();
-        WorldConfiguration wcfg = cfg.get(world);
+        WorldStateManager wcfg = cfg.get(world);
         Entity ent = event.getEntity();
 
         if (ent instanceof LivingEntity) {
@@ -396,14 +421,17 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
+    /**
+     * Called on creature spawn.
+     */
     @Override
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         if (event.isCancelled()) {
             return;
         }
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(event.getEntity().getWorld());
 
         //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
         CreatureType creaType = event.getCreatureType();
@@ -448,7 +476,7 @@ public class WorldGuardEntityListener extends EntityListener {
     }
 
     /**
-     * Weather related entity events.
+     * Called on pig zap.
      */
     @Override
     public void onPigZap(PigZapEvent event) {
@@ -456,22 +484,25 @@ public class WorldGuardEntityListener extends EntityListener {
            return;
         }
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(event.getEntity().getWorld());
 
         if (wcfg.disablePigZap) {
             event.setCancelled(true);
         }
     }
 
+    /**
+     * Called on creeper power.
+     */
     @Override
     public void onCreeperPower(CreeperPowerEvent event) {
         if (event.isCancelled()) {
            return;
         }
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(event.getEntity().getWorld());
 
         if (wcfg.disableCreeperPower) {
             event.setCancelled(true);
@@ -479,12 +510,7 @@ public class WorldGuardEntityListener extends EntityListener {
     }
 
     /**
-     * Painting related events
-     */
-    /**
-     * Called when a painting is removed
-     *
-     * @param event Relevant event details
+     * Called when a painting is removed.
      */
     @Override
     public void onPaintingBreak(PaintingBreakEvent breakEvent) {
@@ -495,16 +521,18 @@ public class WorldGuardEntityListener extends EntityListener {
         if (!(breakEvent instanceof PaintingBreakByEntityEvent)) {
             return;
         }
+        
         PaintingBreakByEntityEvent event = (PaintingBreakByEntityEvent) breakEvent;
         if (!(event.getRemover() instanceof Player)) {
             return;
         }
+        
         Painting painting= event.getPainting();
         Player player = (Player) event.getRemover();
         World world = painting.getWorld();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, painting.getLocation())) {
@@ -515,14 +543,17 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
+    /**
+     * Called on painting place.
+     */
     @Override
     public void onPaintingPlace(PaintingPlaceEvent event) {
         Block placedOn = event.getBlock();
         Player player = event.getPlayer();
         World world = placedOn.getWorld();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
@@ -532,6 +563,7 @@ public class WorldGuardEntityListener extends EntityListener {
             }
         }
     }
+    
     /**
      * Find a position for the player to stand that is not inside a block.
      * Blocks above the player will be iteratively tested until there is
