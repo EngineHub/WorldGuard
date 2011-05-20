@@ -365,7 +365,11 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (wcfg.isChestProtected(event.getBlock())) {            event.setCancelled(true);            return;        }
+        if (wcfg.isChestProtected(event.getBlock())) {
+            event.setCancelled(true);
+            return;
+        }
+        
         if (wcfg.useRegions) {
             Block block = event.getBlock();
             Vector pt = toVector(block);
