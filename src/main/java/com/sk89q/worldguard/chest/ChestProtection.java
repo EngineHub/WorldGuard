@@ -1,0 +1,67 @@
+// $Id$
+/*
+ * WorldGuard
+ * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.sk89q.worldguard.chest;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+
+/**
+ * Interface for chest protection.
+ */
+public interface ChestProtection {
+
+    /**
+     * Returns whether a block is protected.
+     * 
+     * @param block
+     * @param player
+     * @return
+     */
+    public boolean isProtected(Block block, Player player);
+
+    /**
+     * Returns whether a location where a chest block is trying to be created 
+     * is protected. 
+     * 
+     * @param block
+     * @param player
+     * @return
+     */
+    public boolean isProtectedPlacement(Block block, Player player);
+
+    /**
+     * Returns whether an adjacent chest is protected.
+     * 
+     * @param searchBlock
+     * @param player
+     * @return
+     */
+    public boolean isAdjacentChestProtected(Block searchBlock, Player player);
+
+    /**
+     * Returns whether a material is a chest.
+     * 
+     * @param material
+     * @return
+     */
+    public boolean isChest(Material material);
+
+}

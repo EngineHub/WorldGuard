@@ -24,6 +24,8 @@ import com.sk89q.worldguard.blacklist.BlacklistLogger;
 import com.sk89q.worldguard.blacklist.loggers.ConsoleLoggerHandler;
 import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
 import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
+import com.sk89q.worldguard.chest.ChestProtection;
+import com.sk89q.worldguard.chest.SignChestProtection;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,7 +56,7 @@ public class WorldStateManager {
     private File blacklistFile;
 
     private Blacklist blacklist;
-    private SignChestProtection chestProtection = new SignChestProtection();
+    private ChestProtection chestProtection = new SignChestProtection();
 
     /* Configuration data start */
     public boolean opPermissions;
@@ -367,7 +369,7 @@ public class WorldStateManager {
         return chestProtection.isAdjacentChestProtected(block, player);
     }
 
-    public SignChestProtection getChestProtection() {
+    public ChestProtection getChestProtection() {
         return chestProtection;
     }
     
