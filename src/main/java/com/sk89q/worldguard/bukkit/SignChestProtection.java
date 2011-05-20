@@ -56,23 +56,23 @@ public class SignChestProtection {
         
         side = searchBlock;
         res = isProtectedSign(side, player);
-        if (res != null) return res;
+        if (res != null && res == true) return res;
         
         side = searchBlock.getRelative(-1, 0, 0);
         res = isProtectedSignAndChest(side, player);
-        if (res != null) return res;
+        if (res != null && res == true) return res;
         
         side = searchBlock.getRelative(1, 0, 0);
         res = isProtectedSignAndChest(side, player);
-        if (res != null) return res;
+        if (res != null && res == true) return res;
         
         side = searchBlock.getRelative(0, 0, -1);
         res = isProtectedSignAndChest(side, player);
-        if (res != null) return res;
+        if (res != null && res == true) return res;
         
         side = searchBlock.getRelative(0, 0, 1);
         res = isProtectedSignAndChest(side, player);
-        if (res != null) return res;
+        if (res != null && res == true) return res;
         
         return false;
     }
@@ -120,10 +120,37 @@ public class SignChestProtection {
         return true;
     }
     
-    private boolean isChest(Material material) {
+    public boolean isChest(Material material) {
         return material == Material.CHEST
                 || material == Material.DISPENSER
                 || material == Material.FURNACE
                 || material == Material.BURNING_FURNACE;
+    }
+
+    public boolean isAdjacentChestProtected(Block searchBlock, Player player) {
+        Block side;
+        Boolean res;
+        
+        side = searchBlock;
+        res = isProtected(side, player);
+        if (res != null && res == true) return res;
+        
+        side = searchBlock.getRelative(-1, 0, 0);
+        res = isProtected(side, player);
+        if (res != null && res == true) return res;
+        
+        side = searchBlock.getRelative(1, 0, 0);
+        res = isProtected(side, player);
+        if (res != null && res == true) return res;
+        
+        side = searchBlock.getRelative(0, 0, -1);
+        res = isProtected(side, player);
+        if (res != null && res == true) return res;
+        
+        side = searchBlock.getRelative(0, 0, 1);
+        res = isProtected(side, player);
+        if (res != null && res == true) return res;
+        
+        return false;
     }
 }
