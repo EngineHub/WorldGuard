@@ -22,7 +22,9 @@ package com.sk89q.worldguard.bukkit;
 import java.util.List;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import com.sk89q.worldedit.BlockVector;
@@ -34,18 +36,54 @@ public class BukkitUtil {
     private BukkitUtil()  {
     }
     
+    /**
+     * Converts the location of a Bukkit block to a WorldEdit vector.
+     * 
+     * @param block
+     * @return
+     */
     public static BlockVector toVector(Block block) {
         return new BlockVector(block.getX(), block.getY(), block.getZ());
     }
     
+    /**
+     * Converts a Bukkit location to a WorldEdit vector.
+     * 
+     * @param loc
+     * @return
+     */
     public static Vector toVector(Location loc) {
         return new Vector(loc.getX(), loc.getY(), loc.getZ());
     }
     
+    /**
+     * Converts a Bukkit vector to a WorldEdit vector.
+     * 
+     * @param vector
+     * @return
+     */
     public static Vector toVector(org.bukkit.util.Vector vector) {
         return new Vector(vector.getX(), vector.getY(), vector.getZ());
     }
+
+    /**
+     * Converts a WorldEdit vector to a Bukkit location.
+     * 
+     * @param world
+     * @param vec 
+     * @return
+     */
+    public static Location toLocation(World world, Vector vec) {
+        return new Location(world, vec.getX(), vec.getY(), vec.getZ());
+    }
     
+    /**
+     * Matches one player based on name.
+     * 
+     * @param server
+     * @param name
+     * @return
+     */
     public static Player matchSinglePlayer(Server server, String name) {
         List<Player> players = server.matchPlayer(name);
         if (players.size() == 0) {
@@ -53,9 +91,52 @@ public class BukkitUtil {
         }
         return players.get(0);
     }
+    
+    /**
+     * Drops a sign item and removes a sign.
+     * 
+     * @param block
+     */
+    public static void dropSign(Block block) {
+        block.setTypeId(0);
+        block.getWorld().dropItemNaturally(block.getLocation(),
+                new ItemStack(Material.SIGN));
+    }
 
-    public static Location toLocation(World world, Vector vec) {
-        return new Location(world, vec.getX(), vec.getY(), vec.getZ());
+    /**
+     * Sets the given block to fluid water.
+     * Used by addSpongeWater()
+     * 
+     * @param world
+     * @param ox
+     * @param oy
+     * @param oz
+     */
+    public static void setBlockToWater(World world, int ox, int oy, int oz) {
+        Block block = world.getBlockAt(ox, oy, oz);
+        int id = block.getTypeId();
+        if (id == 0) {
+            block.setTypeId(8);
+        }
+    }
+
+    /**
+     * Checks if the given block is water
+     * 
+     * @param world
+     * @param ox
+     * @param oy
+     * @param oz
+     * @return 
+     */
+    public static boolean isBlockWater(World world, int ox, int oy, int oz) {
+        Block block = world.getBlockAt(ox, oy, oz);
+        int id = block.getTypeId();
+        if (id == 8 || id == 9) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

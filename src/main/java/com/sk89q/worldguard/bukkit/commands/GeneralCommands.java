@@ -27,7 +27,7 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.GlobalStateManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldedit.blocks.ItemType;
 
@@ -39,7 +39,7 @@ public class GeneralCommands {
             flags = "s", min = 0, max = 1)
     public static void god(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
-        ConfigurationManager config = plugin.getGlobalConfiguration();
+        GlobalStateManager config = plugin.getGlobalConfiguration();
         
         Iterable<Player> targets = null;
         boolean included = false;
@@ -87,7 +87,7 @@ public class GeneralCommands {
             flags = "s", min = 0, max = 1)
     public static void ungod(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
-        ConfigurationManager config = plugin.getGlobalConfiguration();
+        GlobalStateManager config = plugin.getGlobalConfiguration();
         
         Iterable<Player> targets = null;
         boolean included = false;

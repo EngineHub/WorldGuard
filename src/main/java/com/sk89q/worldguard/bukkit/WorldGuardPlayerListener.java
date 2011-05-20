@@ -35,10 +35,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
@@ -46,13 +43,10 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**
- * Handles all events thrown in relation to a Player
+ * Handles all events thrown in relation to a player.
  */
 public class WorldGuardPlayerListener extends PlayerListener {
 
-    /**
-     * Plugin.
-     */
     private WorldGuardPlugin plugin;
 
     /**
@@ -64,7 +58,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
         this.plugin = plugin;
     }
 
-
+    /**
+     * Register events.
+     */
     public void registerEvents() {
         PluginManager pm = plugin.getServer().getPluginManager();
 
@@ -82,9 +78,63 @@ public class WorldGuardPlayerListener extends PlayerListener {
     }
 
     /**
+     * Called when a player attempts to log in to the server.
+     */
+    @Override
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(player.getWorld());
+
+        if (wcfg.enforceOneSession) {
+            String name = player.getName();
+
+            for (Player pl : plugin.getServer().getOnlinePlayers()) {
+                if (pl.getName().equalsIgnoreCase(name)) {
+                    pl.kickPlayer("Logged in from another location.");
+                }
+            }
+        }
+    }
+
+    /**
+     * Called when a player joins a server.
+     */
+    @Override
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(player.getWorld());
+
+        if (wcfg.fireSpreadDisableToggle) {
+            player.sendMessage(ChatColor.YELLOW
+                    + "Fire spread is currently globally disabled for this world.");
+        }
+        
+        if (plugin.inGroup(player, "wg-invincible")) {
+            cfg.enableGodMode(player);
+        }
+        
+        if (plugin.inGroup(player, "wg-amphibious")) {
+            cfg.enableAmphibiousMode(player);
+        }
+    }
+
+    /**
+     * Called when a player leaves a server.
+     */
+    @Override
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        cfg.forgetPlayer(plugin.wrapPlayer(player));
+    }
+
+    /**
      * Called when a player interacts with an item.
-     * 
-     * @param event Relevant event details
      */
     @Override
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -100,13 +150,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
             handlePhysicalInteract(event);
         }
     }
+    
     /**
      * Called when a player left clicks air.
      *
      * @param event
      */
-    public void handleAirLeftClick(PlayerInteractEvent event) {
-         //I don't think we have to do anything here yet.
+    private void handleAirLeftClick(PlayerInteractEvent event) {
+         // I don't think we have to do anything here yet.
          return;
     }
 
@@ -115,7 +166,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      *
      * @param event
      */
-    public void handleBlockLeftClick(PlayerInteractEvent event) {
+    private void handleBlockLeftClick(PlayerInteractEvent event) {
         if (event.isCancelled()) return;
 
         Player player = event.getPlayer();
@@ -123,8 +174,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Material type = block.getType();
         World world = player.getWorld();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             Vector pt = toVector(block);
@@ -152,7 +203,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * 
      * @param event 
      */
-    public void handleAirRightClick(PlayerInteractEvent event) {
+    private void handleAirRightClick(PlayerInteractEvent event) {
         if (event.isCancelled()) {
             return;
         }
@@ -161,8 +212,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         World world = player.getWorld();
         ItemStack item = player.getItemInHand();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
@@ -180,7 +231,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * 
      * @param event 
      */
-    public void handleBlockRightClick(PlayerInteractEvent event) {
+    private void handleBlockRightClick(PlayerInteractEvent event) {
         if (event.isCancelled()) {
             return;
         }
@@ -191,8 +242,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         ItemStack item = player.getItemInHand();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.blockLighter && item.getType() == Material.FLINT_AND_STEEL) {
             if (!plugin.hasPermission(player, "worldguard.lighter.override")) {
@@ -389,7 +440,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      *
      * @param event
      */
-    public void handlePhysicalInteract(PlayerInteractEvent event) {
+    private void handlePhysicalInteract(PlayerInteractEvent event) {
         if (event.isCancelled() == true) return;
 
         Player player = event.getPlayer();
@@ -397,8 +448,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Material type = block.getType();
         World world = player.getWorld();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
 
         if (block.getType() == Material.SOIL && wcfg.disablePlayerCropTrampling) {
             event.setCancelled(true);
@@ -425,48 +476,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     }
 
     /**
-     * Called when a player joins a server
-     *
-     * @param event Relevant event details
-     */
-    @Override
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
-
-        if (wcfg.fireSpreadDisableToggle) {
-            player.sendMessage(ChatColor.YELLOW
-                    + "Fire spread is currently globally disabled for this world.");
-        }
-        
-        if (plugin.inGroup(player, "wg-invincible")) {
-            cfg.enableGodMode(player);
-        }
-        
-        if (plugin.inGroup(player, "wg-amphibious")) {
-            cfg.enableAmphibiousMode(player);
-        }
-    }
-
-    /**
-     * Called when a player leaves a server
-     *
-     * @param event Relevant event details
-     */
-    @Override
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        cfg.forgetPlayer(plugin.wrapPlayer(player));
-    }
-
-    /**
-     * Called when a player uses an item
-     * 
-     * @param event Relevant event details
+     * Called when a player uses an item.
      *//*
     @Override
     public void onPlayerItem(PlayerItemEvent event) {
@@ -533,42 +543,16 @@ public class WorldGuardPlayerListener extends PlayerListener {
     }*/
 
     /**
-     * Called when a player attempts to log in to the server
-     *
-     * @param event Relevant event details
-     */
-    @Override
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
-
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
-
-        if (wcfg.enforceOneSession) {
-            String name = player.getName();
-
-            for (Player pl : plugin.getServer().getOnlinePlayers()) {
-                if (pl.getName().equalsIgnoreCase(name)) {
-                    pl.kickPlayer("Logged in from another location.");
-                }
-            }
-        }
-    }
-
-    /**
-     * Called when a player attempts to drop an item
-     *
-     * @param event Relevant event details
+     * Called when a player attempts to drop an item.
      */
     @Override
     public void onPlayerDropItem(PlayerDropItemEvent event) {
-
         if (event.isCancelled()) {
             return;
         }
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(event.getPlayer().getWorld());
 
         if (wcfg.getBlacklist() != null) {
             Item ci = event.getItemDrop();
@@ -583,20 +567,16 @@ public class WorldGuardPlayerListener extends PlayerListener {
     }
 
     /**
-     * Called when a player attempts to pickup an item
-     * 
-     * @param event
-     *            Relevant event details
+     * Called when a player attempts to pickup an item.
      */
     @Override
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-
         if (event.isCancelled()) {
             return;
         }
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(event.getPlayer().getWorld());
 
         if (wcfg.getBlacklist() != null) {
             Item ci = event.getItem();
@@ -618,8 +598,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
         
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
@@ -645,8 +625,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(world);
         
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
@@ -664,13 +644,16 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
     }
     
+    /**
+     * Called when a player is respawned.
+     */
     @Override
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         Location location = player.getLocation();
         
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(player.getWorld());
         
         if (wcfg.useRegions) {
             Vector pt = toVector(location);
@@ -709,8 +692,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(player.getWorld());
         
         if (wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
@@ -723,6 +706,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
     }
 
+    /**
+     * Called when a player enters a bed.
+     */
     @Override
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
         if (event.isCancelled()) {
@@ -732,8 +718,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Location location = player.getLocation();
 
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        WorldStateManager wcfg = cfg.get(player.getWorld());
 
         if (wcfg.useRegions) {
             Vector pt = toVector(location);
