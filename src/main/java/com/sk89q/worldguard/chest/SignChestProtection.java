@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.bukkit;
+package com.sk89q.worldguard.chest;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -26,11 +26,11 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 /**
- * Utility class for sign chest protection.
+ * Sign-based chest protection.
  * 
  * @author sk89q
  */
-public class SignChestProtection {
+public class SignChestProtection implements ChestProtection {
     
     public boolean isProtected(Block block, Player player) {
         if (isChest(block.getType())) {
@@ -119,13 +119,6 @@ public class SignChestProtection {
         }
         return true;
     }
-    
-    public boolean isChest(Material material) {
-        return material == Material.CHEST
-                || material == Material.DISPENSER
-                || material == Material.FURNACE
-                || material == Material.BURNING_FURNACE;
-    }
 
     public boolean isAdjacentChestProtected(Block searchBlock, Player player) {
         Block side;
@@ -152,5 +145,12 @@ public class SignChestProtection {
         if (res != null && res == true) return res;
         
         return false;
+    }
+    
+    public boolean isChest(Material material) {
+        return material == Material.CHEST
+                || material == Material.DISPENSER
+                || material == Material.FURNACE
+                || material == Material.BURNING_FURNACE;
     }
 }
