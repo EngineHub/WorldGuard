@@ -26,4 +26,4 @@ permissions:
         sk89q:
             permissions:
                  - worldguard.region.*
-                 - worldgurad.god
+                 - worldguard.god
