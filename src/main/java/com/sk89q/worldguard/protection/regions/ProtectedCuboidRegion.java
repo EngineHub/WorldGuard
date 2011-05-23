@@ -167,7 +167,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
 
             // Check whether the other regions points are inside the current region
             if (region instanceof ProtectedPolygonalRegion) {
-                for (i2 = 0; i < ((ProtectedPolygonalRegion)region).getPoints().size(); i++) {
+                for (i2 = 0; i2 < ((ProtectedPolygonalRegion)region).getPoints().size(); i2++) {
                     BlockVector2D pt2Dr = ((ProtectedPolygonalRegion)region).getPoints().get(i2);
                     int minYr = ((ProtectedPolygonalRegion)region).minY;
                     int maxYr = ((ProtectedPolygonalRegion)region).maxY;
