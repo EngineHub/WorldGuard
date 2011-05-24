@@ -81,6 +81,7 @@ player-damage:
     teleport-on-suffocation: off
     disable-void-damage: off
     teleport-on-void-falling: off
+    disable-explosion-damage: off
 
 regions:
     enable: on

@@ -93,6 +93,7 @@ public class WorldConfiguration {
     public boolean teleportOnSuffocation;
     public boolean disableVoidDamage;
     public boolean teleportOnVoid;
+    public boolean disableExplosionDamage;
     public boolean useRegions;
     public boolean highFreqFlags;
     public int regionWand = 287;
@@ -194,6 +195,7 @@ public class WorldConfiguration {
         teleportOnSuffocation = config.getBoolean("player-damage.teleport-on-suffocation", false);
         disableVoidDamage = config.getBoolean("player-damage.disable-void-damage", false);
         teleportOnVoid = config.getBoolean("player-damage.teleport-on-void-falling", false);
+        disableExplosionDamage = config.getBoolean("player-damage.disable-explosion-damage", false);
 
         signChestProtection = config.getBoolean("chest-protection.enable", false);
 

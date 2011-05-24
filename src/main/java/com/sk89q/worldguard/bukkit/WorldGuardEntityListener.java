@@ -108,6 +108,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
             if (wcfg.disableLavaDamage && type == DamageCause.LAVA) {
                 event.setCancelled(true);
+                if (cfg.hasGodMode(player)) player.setFireTicks(0);
                 return;
             }
 
@@ -127,6 +128,10 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
 
+            if (wcfg.disableExplosionDamage && event.getCause() == DamageCause.BLOCK_EXPLOSION) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -146,6 +151,11 @@ public class WorldGuardEntityListener extends EntityListener {
             }
 
             if (wcfg.disableLightningDamage && event.getCause() == DamageCause.LIGHTNING) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.disableExplosionDamage && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
                 event.setCancelled(true);
                 return;
             }
@@ -268,6 +278,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
             if (cfg.hasGodMode(player)) {
                 event.setCancelled(true);
+                player.setFireTicks(0);
                 return;
             }
 
@@ -326,8 +337,9 @@ public class WorldGuardEntityListener extends EntityListener {
         Location l = event.getLocation();
         World world = l.getWorld();
         WorldConfiguration wcfg = cfg.get(world);
+        Entity ent = event.getEntity();
 
-        if (event.getEntity() instanceof LivingEntity) {
+        if (ent instanceof LivingEntity) {
             if (wcfg.blockCreeperBlockDamage) {
                 event.setCancelled(true);
                 return;
@@ -347,7 +359,17 @@ public class WorldGuardEntityListener extends EntityListener {
                     return;
                 }
             }
-        } else { // Shall assume that this is TNT
+        } else if (ent instanceof Fireball) {
+            if (wcfg.useRegions) {
+                Vector pt = toVector(l);
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.GHAST_FIREBALL)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        } else if (ent instanceof TNTPrimed) {
             if (wcfg.blockTNT) {
                 event.setCancelled(true);
                 return;
