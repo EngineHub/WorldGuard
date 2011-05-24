@@ -434,13 +434,11 @@ public class RegionCommands {
                 + owners.toUserFriendlyString());
         sender.sendMessage(ChatColor.LIGHT_PURPLE + "Members: "
                 + members.toUserFriendlyString());
-        if (plugin.hasPermission(sender, "worldguard.region.bounds")) {
-            BlockVector min = region.getMinimumPoint();
-            BlockVector max = region.getMaximumPoint();
-            String c = "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")";
-            c += " (" +max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")";
-            sender.sendMessage(ChatColor.LIGHT_PURPLE + "Bounds: " + c);
-        }
+        BlockVector min = region.getMinimumPoint();
+        BlockVector max = region.getMaximumPoint();
+        String c = "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")";
+        c += " (" +max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")";
+        sender.sendMessage(ChatColor.LIGHT_PURPLE + "Bounds: " + c);
     }
     
     @Command(aliases = {"list"},
