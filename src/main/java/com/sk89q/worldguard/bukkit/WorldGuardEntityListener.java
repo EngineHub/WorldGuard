@@ -128,6 +128,10 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
 
+            if (wcfg.disableExplosionDamage && event.getCause() == DamageCause.BLOCK_EXPLOSION) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -147,6 +151,11 @@ public class WorldGuardEntityListener extends EntityListener {
             }
 
             if (wcfg.disableLightningDamage && event.getCause() == DamageCause.LIGHTNING) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.disableExplosionDamage && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
                 event.setCancelled(true);
                 return;
             }
