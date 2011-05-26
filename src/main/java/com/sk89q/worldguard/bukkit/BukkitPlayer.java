@@ -42,6 +42,11 @@ public class BukkitPlayer extends LocalPlayer {
     public boolean hasGroup(String group) {
         return plugin.inGroup(player, group);
     }
+    
+    @Override
+    public boolean isOnList(String list) {
+        return plugin.onList(player, list);
+    }
 
     @Override
     public Vector getPosition() {

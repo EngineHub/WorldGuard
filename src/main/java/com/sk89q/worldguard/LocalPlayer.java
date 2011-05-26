@@ -38,6 +38,14 @@ public abstract class LocalPlayer {
     public abstract boolean hasGroup(String group);
     
     /**
+     * Returns true if the player is on a list.
+     * 
+     * @param list
+     * @return
+     */
+    public abstract boolean isOnList(String list);
+    
+    /**
      * Get the player's position.
      * 
      * @return

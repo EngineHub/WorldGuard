@@ -179,6 +179,10 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
             domain.addGroup(name);
         }
         
+        for (String name : node.getStringList("lists", null)) {
+        	domain.addList(name);
+        }
+        
         return domain;
     }
 
@@ -253,6 +257,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
 
         setDomainData(domainData, "players", domain.getPlayers());
         setDomainData(domainData, "groups", domain.getGroups());
+        setDomainData(domainData, "lists", domain.getLists());
         
         return domainData;
     }
