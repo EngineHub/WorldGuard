@@ -44,6 +44,7 @@ public final class DefaultFlag {
     public static final StateFlag USE = new StateFlag("use", false);
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
+    public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
     public static final BooleanFlag NOTIFY_GREET = new BooleanFlag("notify-greet");
@@ -63,7 +64,7 @@ public final class DefaultFlag {
         TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW, LAVA_FLOW,
         USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_GREET,
         NOTIFY_FAREWELL, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
-        TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL,
+        TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL, LEAF_DECAY,
         GHAST_FIREBALL
     };
     
