@@ -19,10 +19,10 @@
 package com.sk89q.worldguard.protection.managers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -138,16 +138,24 @@ public class FlatRegionManager extends RegionManager {
      */
     @Override
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
-        List<ProtectedRegion> appRegions =
-                new ArrayList<ProtectedRegion>();
+        TreeSet<ProtectedRegion> appRegions =
+                new TreeSet<ProtectedRegion>();
 
         for (ProtectedRegion region : regions.values()) {
             if (region.contains(pt)) {
                 appRegions.add(region);
+                
+                ProtectedRegion parent = region.getParent();
+                
+                while (parent != null) {
+                    if (!appRegions.contains(parent)) {
+                        appRegions.add(region);
+                    }
+                    
+                    parent = parent.getParent();
+                }       
             }
         }
-        
-        Collections.sort(appRegions);
 
         return new ApplicableRegionSet(appRegions, regions.get("__global__"));
     }

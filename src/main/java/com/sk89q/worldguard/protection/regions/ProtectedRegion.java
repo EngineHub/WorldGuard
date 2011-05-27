@@ -303,8 +303,10 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @return
      */
     public int compareTo(ProtectedRegion other) {
-        if (priority == other.priority) {
+        if (id.equals(other.id)) {
             return 0;
+        } else if (priority == other.priority) {
+            return 1;
         } else if (priority > other.priority) {
             return -1;
         } else {
@@ -338,6 +340,27 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      */
     public static boolean isValidId(String id) {
         return idPattern.matcher(id).matches();
+    }
+    
+    /**
+     * Returns the hash code.
+     */
+    @Override
+    public int hashCode(){
+        return id.hashCode();
+    }
+    
+    /**
+     * Returns whether this region has the same ID as another region.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ProtectedRegion)) {
+            return false;
+        }
+        
+        ProtectedRegion other = (ProtectedRegion) obj;
+        return other.getId().equals(getId());
     }
     
     /**
