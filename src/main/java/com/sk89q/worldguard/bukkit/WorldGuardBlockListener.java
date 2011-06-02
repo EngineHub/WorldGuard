@@ -574,7 +574,7 @@ public class WorldGuardBlockListener extends BlockListener {
     private void dropSign(Block block) {
         block.setTypeId(0);
         block.getWorld().dropItemNaturally(block.getLocation(),
-                new ItemStack(Material.SIGN));
+                new ItemStack(Material.SIGN, 1));
     }
 
     /**
