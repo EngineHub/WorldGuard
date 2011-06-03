@@ -135,6 +135,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             if (type == Material.STONE_BUTTON
                   || type == Material.LEVER
                   || type == Material.WOODEN_DOOR
+                  || type == Material.TRAP_DOOR
                   || type == Material.NOTE_BLOCK) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.USE)
@@ -258,6 +259,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                    || type == Material.DIODE_BLOCK_OFF
                    || type == Material.DIODE_BLOCK_ON
                    || type == Material.WOODEN_DOOR
+                   || type == Material.TRAP_DOOR
                    || type == Material.WORKBENCH) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.USE)
