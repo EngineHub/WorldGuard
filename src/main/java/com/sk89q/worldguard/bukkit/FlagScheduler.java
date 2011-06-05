@@ -60,6 +60,12 @@ public class FlagScheduler implements Runnable {
         GlobalStateManager config = plugin.getGlobalStateManager();
 
         for (Player player : players) {
+            WorldStateManager worldConfig = config.get(player.getWorld());
+            
+            if (!worldConfig.useRegions) {
+                continue;
+            }
+            
             PlayerFlagState state;
             
             synchronized (this) {
@@ -70,18 +76,14 @@ public class FlagScheduler implements Runnable {
                     states.put(player.getName(), state);
                 }
             }
-            
-            WorldStateManager worldConfig = config.get(player.getWorld());
 
-            if (worldConfig.useRegions) {
-                Vector playerLocation = toVector(player.getLocation());
-                RegionManager regionManager = plugin.getGlobalRegionManager()
-                        .get(player.getWorld());
-                ApplicableRegionSet applicable = regionManager
-                        .getApplicableRegions(playerLocation);
-                
-                processHeal(applicable, player, state);
-            }
+            Vector playerLocation = toVector(player.getLocation());
+            RegionManager regionManager = plugin.getGlobalRegionManager()
+                    .get(player.getWorld());
+            ApplicableRegionSet applicable = regionManager
+                    .getApplicableRegions(playerLocation);
+            
+            processHeal(applicable, player, state);
         }
     }
     

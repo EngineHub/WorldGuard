@@ -140,8 +140,11 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardWeatherListener(this)).registerEvents();
         
         flagScheduler = new FlagScheduler(this);
-        getServer().getScheduler().scheduleAsyncRepeatingTask(this,
-                flagScheduler, FlagScheduler.RUN_DELAY, FlagScheduler.RUN_DELAY);
+        
+        if (configuration.useRegionsScheduler) { 
+            getServer().getScheduler().scheduleAsyncRepeatingTask(this,
+                    flagScheduler, FlagScheduler.RUN_DELAY, FlagScheduler.RUN_DELAY);
+        }
 
         if (configuration.suppressTickSyncWarnings) {
             Logger.getLogger("Minecraft").setFilter(
@@ -210,6 +213,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return
      * @deprecated Use {@link #getGlobalStateManager()} instead
      */
+    @Deprecated
     public GlobalStateManager getGlobalConfiguration() {
         return getGlobalStateManager();
     }
