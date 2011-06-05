@@ -234,7 +234,7 @@ public class RegionCommands {
             region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
         }
 
-        WorldStateManager wcfg = plugin.getGlobalConfiguration().get(player.getWorld());
+        WorldStateManager wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         
         // Check whether the player has created too many regions 

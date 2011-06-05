@@ -53,24 +53,24 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Logger for messages.
      */
-    protected static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
     /**
      * Manager for commands. This automatically handles nested commands,
      * permissions checking, and a number of other fancy command things.
      * We just set it up and register commands against it.
      */
-    protected final CommandsManager<CommandSender> commands;
+    private final CommandsManager<CommandSender> commands;
 
     /**
      * Handles the region databases for all worlds.
      */
-    protected final GlobalRegionManager globalRegionManager;
+    private final GlobalRegionManager globalRegionManager;
     
     /**
      * Handles all configuration.
      */
-    protected final GlobalStateManager configuration;
+    private final GlobalStateManager configuration;
     
     /**
      * Processes queries for permissions information. The permissions manager
@@ -78,7 +78,12 @@ public class WorldGuardPlugin extends JavaPlugin {
      * systems and picking the right one. WorldGuard just needs to call
      * the permission methods.
      */
-    protected PermissionsResolverManager perms;
+    private PermissionsResolverManager perms;
+    
+    /**
+     * Used for scheduling flags.
+     */
+    private FlagScheduler flagScheduler;
 
     /**
      * Construct objects. Actual loading occurs when the plugin is enabled, so
@@ -133,6 +138,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardBlockListener(this)).registerEvents();
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
+        
+        flagScheduler = new FlagScheduler(this);
+        getServer().getScheduler().scheduleAsyncRepeatingTask(this,
+                flagScheduler, FlagScheduler.RUN_DELAY, FlagScheduler.RUN_DELAY);
 
         if (configuration.suppressTickSyncWarnings) {
             Logger.getLogger("Minecraft").setFilter(
@@ -199,8 +208,18 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Get the WorldGuardConfiguraton.
      *
      * @return
+     * @deprecated Use {@link #getGlobalStateManager()} instead
      */
     public GlobalStateManager getGlobalConfiguration() {
+        return getGlobalStateManager();
+    }
+
+    /**
+     * Get the WorldGuardConfiguraton.
+     *
+     * @return
+     */
+    public GlobalStateManager getGlobalStateManager() {
         return configuration;
     }
 
@@ -274,7 +293,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public boolean hasPermission(CommandSender sender, String perm) {
         if (sender.isOp()) {
             if (sender instanceof Player) {
-                if (this.getGlobalConfiguration().get(((Player) sender).
+                if (this.getGlobalStateManager().get(((Player) sender).
                         getWorld()).opPermissions) {
                     return true;
                 }
@@ -655,6 +674,15 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
             }
         }
+    }
+    
+    /**
+     * Forgets a player.
+     * 
+     * @param player
+     */
+    public void forgetPlayer(Player player) {
+        flagScheduler.forget(player);
     }
     
     /**

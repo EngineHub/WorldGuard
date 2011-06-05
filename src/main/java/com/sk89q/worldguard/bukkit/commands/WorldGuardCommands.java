@@ -69,9 +69,9 @@ public class WorldGuardCommands {
         }
 
         try {
-            plugin.getGlobalConfiguration().unload();
+            plugin.getGlobalStateManager().unload();
             plugin.getGlobalRegionManager().unload();
-            plugin.getGlobalConfiguration().load();
+            plugin.getGlobalStateManager().load();
             plugin.getGlobalRegionManager().preload();
             sender.sendMessage("WorldGuard configuration reloaded.");
         } catch (Throwable t) {

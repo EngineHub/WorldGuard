@@ -61,7 +61,7 @@ public class WorldGuardWeatherListener extends WeatherListener {
         if (event.isCancelled()) {
            return;
         }
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(event.getWorld());
 
         if (event.toWeatherState()) {
@@ -81,7 +81,7 @@ public class WorldGuardWeatherListener extends WeatherListener {
            return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(event.getWorld());
 
         if (event.toThunderState()) {
@@ -101,7 +101,7 @@ public class WorldGuardWeatherListener extends WeatherListener {
            return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(event.getWorld());
 
         if (wcfg.disallowedLightningBlocks.size() > 0) {

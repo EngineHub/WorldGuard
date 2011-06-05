@@ -77,7 +77,7 @@ public class GlobalRegionManager {
      */
     public GlobalRegionManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-        config = plugin.getGlobalConfiguration();
+        config = plugin.getGlobalStateManager();
         managers = new HashMap<String, RegionManager>();
         lastModified = new HashMap<String, Long>();
     }
