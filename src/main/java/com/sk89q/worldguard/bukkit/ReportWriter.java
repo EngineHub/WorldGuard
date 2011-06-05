@@ -54,9 +54,9 @@ public class ReportWriter {
         appendServerInformation(plugin.getServer());
         appendPluginInformation(plugin.getServer().getPluginManager().getPlugins());
         appendWorldInformation(plugin.getServer().getWorlds());
-        appendGlobalConfiguration(plugin.getGlobalConfiguration());
+        appendGlobalConfiguration(plugin.getGlobalStateManager());
         appendWorldConfigurations(plugin, plugin.getServer().getWorlds(),
-                plugin.getGlobalRegionManager(), plugin.getGlobalConfiguration());
+                plugin.getGlobalRegionManager(), plugin.getGlobalStateManager());
         appendln("-------------");
         appendln("END OF REPORT");
         appendln();

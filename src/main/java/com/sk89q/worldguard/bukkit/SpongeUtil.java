@@ -34,7 +34,7 @@ public class SpongeUtil {
      * @param oz
      */
     public static void clearSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(world);
 
         for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
@@ -58,7 +58,7 @@ public class SpongeUtil {
      * @param oz
      */
     public static void addSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(world);
 
         // The negative x edge

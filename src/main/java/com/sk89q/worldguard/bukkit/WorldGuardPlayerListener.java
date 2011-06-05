@@ -84,7 +84,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(player.getWorld());
 
         if (wcfg.enforceOneSession) {
@@ -105,7 +105,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(player.getWorld());
 
         if (wcfg.fireSpreadDisableToggle) {
@@ -129,8 +129,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         cfg.forgetPlayer(plugin.wrapPlayer(player));
+        plugin.forgetPlayer(player);
     }
 
     /**
@@ -174,7 +175,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Material type = block.getType();
         World world = player.getWorld();
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
@@ -212,7 +213,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         World world = player.getWorld();
         ItemStack item = player.getItemInHand();
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.getBlacklist() != null) {
@@ -242,7 +243,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         ItemStack item = player.getItemInHand();
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(world);
 
         if (wcfg.blockLighter && item.getType() == Material.FLINT_AND_STEEL) {
@@ -448,7 +449,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Material type = block.getType();
         World world = player.getWorld();
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(world);
 
         if (block.getType() == Material.SOIL && wcfg.disablePlayerCropTrampling) {
@@ -551,7 +552,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(event.getPlayer().getWorld());
 
         if (wcfg.getBlacklist() != null) {
@@ -575,7 +576,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(event.getPlayer().getWorld());
 
         if (wcfg.getBlacklist() != null) {
@@ -598,7 +599,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(world);
         
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
@@ -625,7 +626,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(world);
         
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
@@ -652,7 +653,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Location location = player.getLocation();
         
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(player.getWorld());
         
         if (wcfg.useRegions) {
@@ -692,7 +693,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(player.getWorld());
         
         if (wcfg.removeInfiniteStacks
@@ -718,7 +719,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Location location = player.getLocation();
 
-        GlobalStateManager cfg = plugin.getGlobalConfiguration();
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
         WorldStateManager wcfg = cfg.get(player.getWorld());
 
         if (wcfg.useRegions) {

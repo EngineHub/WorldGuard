@@ -39,7 +39,7 @@ public class GeneralCommands {
             flags = "s", min = 0, max = 1)
     public static void god(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
-        GlobalStateManager config = plugin.getGlobalConfiguration();
+        GlobalStateManager config = plugin.getGlobalStateManager();
         
         Iterable<Player> targets = null;
         boolean included = false;
@@ -87,7 +87,7 @@ public class GeneralCommands {
             flags = "s", min = 0, max = 1)
     public static void ungod(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
-        GlobalStateManager config = plugin.getGlobalConfiguration();
+        GlobalStateManager config = plugin.getGlobalStateManager();
         
         Iterable<Player> targets = null;
         boolean included = false;
