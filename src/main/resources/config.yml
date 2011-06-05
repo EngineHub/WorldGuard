@@ -18,7 +18,10 @@
 # Remember to check the compatibility spreadsheet for WorldGuard to see
 # if any features are currently broken in your version of Bukkit.
 #
+
 suppress-tick-sync-warnings: false
+regions:
+    use-scheduler: true
 
 # For permissions, see http://wiki.sk89q.com/wiki/WorldGuard/Permissions/Bukkit
 permissions:

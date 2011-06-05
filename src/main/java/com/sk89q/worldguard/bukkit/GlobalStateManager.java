@@ -59,6 +59,7 @@ public class GlobalStateManager {
     private Set<String> hasAmphibious = new HashSet<String>();
     
     public boolean suppressTickSyncWarnings;
+    public boolean useRegionsScheduler;
 
     /**
      * Construct the object.
@@ -83,6 +84,8 @@ public class GlobalStateManager {
 
         suppressTickSyncWarnings = config.getBoolean(
                 "suppress-tick-sync-warnings", false);
+        useRegionsScheduler = config.getBoolean(
+                "regions.use-scheduler", true);
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
