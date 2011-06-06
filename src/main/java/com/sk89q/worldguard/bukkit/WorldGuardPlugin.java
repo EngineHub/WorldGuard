@@ -70,7 +70,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Handles all configuration.
      */
-    private final GlobalStateManager configuration;
+    private final ConfigurationManager configuration;
     
     /**
      * Processes queries for permissions information. The permissions manager
@@ -90,7 +90,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * this merely instantiates the objects.
      */
     public WorldGuardPlugin() {
-        configuration = new GlobalStateManager(this);
+        configuration = new ConfigurationManager(this);
         globalRegionManager = new GlobalRegionManager(this);
         
         final WorldGuardPlugin plugin = this;
@@ -214,7 +214,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @deprecated Use {@link #getGlobalStateManager()} instead
      */
     @Deprecated
-    public GlobalStateManager getGlobalConfiguration() {
+    public ConfigurationManager getGlobalConfiguration() {
         return getGlobalStateManager();
     }
     
@@ -232,7 +232,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      *
      * @return
      */
-    public GlobalStateManager getGlobalStateManager() {
+    public ConfigurationManager getGlobalStateManager() {
         return configuration;
     }
 

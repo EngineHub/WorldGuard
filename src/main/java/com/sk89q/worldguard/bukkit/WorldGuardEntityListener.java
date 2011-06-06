@@ -82,8 +82,8 @@ public class WorldGuardEntityListener extends EntityListener {
         Entity entity = event.getEntity();
         Block block = event.getBlock();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(entity.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(entity.getWorld());
 
         if (block.getType() == Material.SOIL) {
             if (entity instanceof Creature && wcfg.disableCreatureCropTrampling) {
@@ -101,8 +101,8 @@ public class WorldGuardEntityListener extends EntityListener {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(defender.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(defender.getWorld());
 
         if (defender instanceof Wolf) {
             if (wcfg.antiWolfDumbness && !(type == DamageCause.VOID)) {
@@ -158,8 +158,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            GlobalStateManager cfg = plugin.getGlobalStateManager();
-            WorldStateManager wcfg = cfg.get(player.getWorld());
+            ConfigurationManager cfg = plugin.getGlobalStateManager();
+            WorldConfiguration wcfg = cfg.get(player.getWorld());
             
             if (cfg.hasGodMode(player)) {
                 event.setCancelled(true);
@@ -230,8 +230,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            GlobalStateManager cfg = plugin.getGlobalStateManager();
-            WorldStateManager wcfg = cfg.get(player.getWorld());
+            ConfigurationManager cfg = plugin.getGlobalStateManager();
+            WorldConfiguration wcfg = cfg.get(player.getWorld());
             
             if (cfg.hasGodMode(player)) {
                 event.setCancelled(true);
@@ -288,8 +288,8 @@ public class WorldGuardEntityListener extends EntityListener {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(defender.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(defender.getWorld());
 
         if (defender instanceof Wolf) {
             if (wcfg.antiWolfDumbness) {
@@ -358,10 +358,10 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
         Location l = event.getLocation();
         World world = l.getWorld();
-        WorldStateManager wcfg = cfg.get(world);
+        WorldConfiguration wcfg = cfg.get(world);
         Entity ent = event.getEntity();
 
         if (ent instanceof LivingEntity) {
@@ -430,8 +430,8 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getEntity().getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
         CreatureType creaType = event.getCreatureType();
@@ -484,8 +484,8 @@ public class WorldGuardEntityListener extends EntityListener {
            return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getEntity().getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         if (wcfg.disablePigZap) {
             event.setCancelled(true);
@@ -501,8 +501,8 @@ public class WorldGuardEntityListener extends EntityListener {
            return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getEntity().getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         if (wcfg.disableCreeperPower) {
             event.setCancelled(true);
@@ -531,8 +531,8 @@ public class WorldGuardEntityListener extends EntityListener {
         Player player = (Player) event.getRemover();
         World world = painting.getWorld();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, painting.getLocation())) {
@@ -552,8 +552,8 @@ public class WorldGuardEntityListener extends EntityListener {
         Player player = event.getPlayer();
         World world = placedOn.getWorld();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {

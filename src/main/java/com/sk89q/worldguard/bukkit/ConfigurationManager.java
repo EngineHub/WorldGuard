@@ -36,7 +36,7 @@ import org.bukkit.util.config.Configuration;
  * @author sk89q
  * @author Michael
  */
-public class GlobalStateManager {
+public class ConfigurationManager {
 
     /**
      * Reference to the plugin.
@@ -46,7 +46,7 @@ public class GlobalStateManager {
     /**
      * Holds configurations for different worlds.
      */
-    private Map<String, WorldStateManager> worlds;
+    private Map<String, WorldConfiguration> worlds;
     
     /**
      * List of people with god mode.
@@ -66,9 +66,9 @@ public class GlobalStateManager {
      * 
      * @param plugin
      */
-    public GlobalStateManager(WorldGuardPlugin plugin) {
+    public ConfigurationManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-        this.worlds = new HashMap<String, WorldStateManager>();
+        this.worlds = new HashMap<String, WorldConfiguration>();
     }
 
     /**
@@ -106,12 +106,12 @@ public class GlobalStateManager {
      * @param world
      * @return
      */
-    public WorldStateManager get(World world) {
+    public WorldConfiguration get(World world) {
         String worldName = world.getName();
-        WorldStateManager config = worlds.get(worldName);
+        WorldConfiguration config = worlds.get(worldName);
         
         if (config == null) {
-            config = new WorldStateManager(plugin, worldName);
+            config = new WorldConfiguration(plugin, worldName);
             worlds.put(worldName, config);
         }
 
@@ -124,7 +124,7 @@ public class GlobalStateManager {
      * @param player
      */
     public void forgetPlayer(LocalPlayer player) {
-        for (Map.Entry<String, WorldStateManager> entry
+        for (Map.Entry<String, WorldConfiguration> entry
                 : worlds.entrySet()) {
             
             // The blacklist needs to forget players

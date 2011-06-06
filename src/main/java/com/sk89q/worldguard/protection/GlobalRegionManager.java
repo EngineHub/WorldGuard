@@ -21,8 +21,8 @@ package com.sk89q.worldguard.protection;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.GlobalStateManager;
-import com.sk89q.worldguard.bukkit.WorldStateManager;
+import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -57,7 +57,7 @@ public class GlobalRegionManager {
     /**
      * Reference to the global configuration.
      */
-    private GlobalStateManager config;
+    private ConfigurationManager config;
     
     /**
      * Map of managers per-world.
@@ -241,7 +241,7 @@ public class GlobalRegionManager {
      */
     public boolean canBuild(Player player, Location loc) {
         World world = loc.getWorld();
-        WorldStateManager worldConfig = config.get(world);
+        WorldConfiguration worldConfig = config.get(world);
         
         if (!worldConfig.useRegions) {
             return true;
@@ -270,7 +270,7 @@ public class GlobalRegionManager {
      */
     public boolean allows(StateFlag flag, Location loc) {
         World world = loc.getWorld();
-        WorldStateManager worldConfig = config.get(world);
+        WorldConfiguration worldConfig = config.get(world);
         
         if (!worldConfig.useRegions) {
             return true;
