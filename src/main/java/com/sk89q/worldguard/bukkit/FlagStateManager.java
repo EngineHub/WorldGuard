@@ -97,7 +97,7 @@ public class FlagStateManager implements Runnable {
     private void processHeal(ApplicableRegionSet applicable, Player player,
             PlayerFlagState state) {
         
-        if (player.getHealth() >= 20) {
+        if (player.getHealth() >= 20 || player.getHealth() <= 0) {
             return;
         }
         
