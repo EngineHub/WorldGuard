@@ -182,14 +182,21 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
                 Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
                 
+                if (state.lastFarewell != null && (farewell == null 
+                        || !state.lastFarewell.equals(farewell))) {
+                    player.sendMessage(ChatColor.AQUA + " ** " + state.lastFarewell);
+                }
+                
                 if (greeting != null && (state.lastGreeting == null
                         || !state.lastGreeting.equals(greeting))) {
                     player.sendMessage(ChatColor.AQUA + " ** " + greeting);
                 }
                 
-                if (state.lastFarewell != null && (farewell == null 
-                        || !state.lastFarewell.equals(farewell))) {
-                    player.sendMessage(ChatColor.AQUA + " ** " + state.lastFarewell);
+                if ((notifyLeave == null || !notifyLeave)
+                        && state.notifiedForLeave != null && state.notifiedForLeave) {
+                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
+                            + ChatColor.LIGHT_PURPLE + player.getName()
+                            + ChatColor.GOLD + " left NOTIFY region");
                 }
                 
                 if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
@@ -208,13 +215,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
                             + ChatColor.GOLD + " entered NOTIFY region: "
                             + ChatColor.WHITE
                             + regionList);
-                }
-                
-                if ((notifyLeave == null || !notifyLeave)
-                        && state.notifiedForLeave != null && state.notifiedForLeave) {
-                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
-                            + ChatColor.LIGHT_PURPLE + player.getName()
-                            + ChatColor.GOLD + " left NOTIFY region");
                 }
 
                 state.lastGreeting = greeting;
