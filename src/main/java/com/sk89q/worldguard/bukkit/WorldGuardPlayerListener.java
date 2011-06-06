@@ -122,6 +122,17 @@ public class WorldGuardPlayerListener extends PlayerListener {
         if (plugin.inGroup(player, "wg-amphibious")) {
             cfg.enableAmphibiousMode(player);
         }
+        
+        if (wcfg.removeInfiniteStacks
+                && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
+            for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
+                ItemStack heldItem = player.getInventory().getItem(slot);
+                if (heldItem.getAmount() < 0) {
+                    player.getInventory().setItem(slot, null);
+                    player.sendMessage(ChatColor.RED + "Infinite stack in slot #" + slot + " removed.");
+                }
+            }
+        }
     }
 
     /**
@@ -141,6 +152,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
      */
     @Override
     public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        World world = player.getWorld();
+        
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             handleBlockRightClick(event);
         } else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -151,6 +165,19 @@ public class WorldGuardPlayerListener extends PlayerListener {
             handleAirLeftClick(event);
         } else if (event.getAction() == Action.PHYSICAL) {
             handlePhysicalInteract(event);
+        }
+        
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
+        
+        if (wcfg.removeInfiniteStacks
+                && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
+            int slot = player.getInventory().getHeldItemSlot();
+            ItemStack heldItem = player.getInventory().getItem(slot);
+            if (heldItem.getAmount() < 0) {
+                player.getInventory().setItem(slot, null);
+                player.sendMessage(ChatColor.RED + "Infinite stack removed.");
+            }
         }
     }
 
