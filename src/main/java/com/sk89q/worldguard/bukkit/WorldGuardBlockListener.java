@@ -72,6 +72,7 @@ public class WorldGuardBlockListener extends BlockListener {
         pm.registerEvent(Event.Type.SIGN_CHANGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.SNOW_FORM, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.LEAVES_DECAY, this, Priority.High, plugin);
     }
     
     /**
@@ -481,7 +482,7 @@ public class WorldGuardBlockListener extends BlockListener {
             int oy = blockPlaced.getY();
             int oz = blockPlaced.getZ();
 
-            clearSpongeWater(plugin, world, ox, oy, oz);
+            SpongeUtil.clearSpongeWater(plugin, world, ox, oy, oz);
         }
     }
 
@@ -508,10 +509,10 @@ public class WorldGuardBlockListener extends BlockListener {
                         Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
                         if (sponge.getTypeId() == 19
                                 && sponge.isBlockIndirectlyPowered()) {
-                            clearSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
+                            SpongeUtil.clearSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
                         } else if (sponge.getTypeId() == 19
                                 && !sponge.isBlockIndirectlyPowered()) {
-                            addSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
+                            SpongeUtil.addSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
                         }
                     }
                 }
@@ -597,6 +598,51 @@ public class WorldGuardBlockListener extends BlockListener {
         if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SNOW_FALL,
                 event.getBlock().getLocation())) {
             event.setCancelled(true);
+        }
+    }
+
+    @Override
+    public void onLeavesDecay(LeavesDecayEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        if (!plugin.getGlobalRegionManager().allows(DefaultFlag.LEAF_DECAY, event.getBlock().getLocation())) {
+            event.setCancelled(true);
+        }
+    }
+    /**
+     * Drops a sign item and removes a sign.
+     * 
+     * @param block
+     */
+    private void dropSign(Block block) {
+        block.setTypeId(0);
+        block.getWorld().dropItemNaturally(block.getLocation(),
+                new ItemStack(Material.SIGN, 1));
+    }
+
+    /**
+     * Remove water around a sponge.
+     * 
+     * @param world
+     * @param ox
+     * @param oy
+     * @param oz
+     */
+    private void clearSpongeWater(World world, int ox, int oy, int oz) {
+
+        ConfigurationManager cfg = plugin.getGlobalConfiguration();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
+            for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
+                for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
+                    if (isBlockWater(world, ox + cx, oy + cy, oz + cz)) {
+                        world.getBlockAt(ox + cx, oy + cy, oz + cz).setTypeId(0);
+                    }
+                }
+            }
         }
     }
 }
