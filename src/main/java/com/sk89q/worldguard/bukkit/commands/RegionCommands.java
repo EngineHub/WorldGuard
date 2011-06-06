@@ -32,7 +32,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.*;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.WorldStateManager;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -234,7 +234,7 @@ public class RegionCommands {
             region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
         }
 
-        WorldStateManager wcfg = plugin.getGlobalStateManager().get(player.getWorld());
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         
         // Check whether the player has created too many regions 

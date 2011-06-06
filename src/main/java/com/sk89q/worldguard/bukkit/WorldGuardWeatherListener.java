@@ -61,8 +61,8 @@ public class WorldGuardWeatherListener extends WeatherListener {
         if (event.isCancelled()) {
            return;
         }
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getWorld());
 
         if (event.toWeatherState()) {
             if (wcfg.disableWeather) {
@@ -81,8 +81,8 @@ public class WorldGuardWeatherListener extends WeatherListener {
            return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getWorld());
 
         if (event.toThunderState()) {
             if (wcfg.disableThunder) {
@@ -101,8 +101,8 @@ public class WorldGuardWeatherListener extends WeatherListener {
            return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getWorld());
 
         if (wcfg.disallowedLightningBlocks.size() > 0) {
             int targetId = event.getLightning().getLocation().getBlock().getTypeId();

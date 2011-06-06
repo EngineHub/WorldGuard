@@ -44,7 +44,7 @@ import org.bukkit.util.config.Configuration;
  * @author sk89q
  * @author Michael
  */
-public class WorldStateManager {
+public class WorldConfiguration {
 
     private static final Logger logger = Logger
             .getLogger("Minecraft.WorldGuard");
@@ -128,7 +128,7 @@ public class WorldStateManager {
      * @param plugin
      * @param worldName
      */
-    public WorldStateManager(WorldGuardPlugin plugin, String worldName) {
+    public WorldConfiguration(WorldGuardPlugin plugin, String worldName) {
         File baseFolder = new File(plugin.getDataFolder(), "worlds/" + worldName);
         configFile = new File(baseFolder, "config.yml");
         blacklistFile = new File(baseFolder, "blacklist.txt");

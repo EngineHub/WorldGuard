@@ -80,7 +80,7 @@ public class WorldGuardBlockListener extends BlockListener {
      * @param world
      * @return
      */
-    protected WorldStateManager getWorldConfig(World world) {
+    protected WorldConfiguration getWorldConfig(World world) {
         return plugin.getGlobalStateManager().get(world);
     }
     
@@ -90,7 +90,7 @@ public class WorldGuardBlockListener extends BlockListener {
      * @param player
      * @return
      */
-    protected WorldStateManager getWorldConfig(Player player) {
+    protected WorldConfiguration getWorldConfig(Player player) {
         return plugin.getGlobalStateManager().get(player.getWorld());
     }
     
@@ -127,7 +127,7 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         Player player = event.getPlayer();
-        WorldStateManager wcfg = getWorldConfig(player);
+        WorldConfiguration wcfg = getWorldConfig(player);
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getItemInHand();
@@ -184,8 +184,8 @@ public class WorldGuardBlockListener extends BlockListener {
         boolean isWater = blockFrom.getTypeId() == 8 || blockFrom.getTypeId() == 9;
         boolean isLava = blockFrom.getTypeId() == 10 || blockFrom.getTypeId() == 11;
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getBlock().getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (wcfg.simulateSponge && isWater) {
             int ox = blockTo.getX();
@@ -266,8 +266,8 @@ public class WorldGuardBlockListener extends BlockListener {
         Block block = event.getBlock();
         World world = block.getWorld();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
@@ -358,8 +358,8 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getBlock().getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (wcfg.disableFireSpread) {
             event.setCancelled(true);
@@ -409,8 +409,8 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getBlock().getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         int id = event.getChangedTypeId();
 
@@ -444,8 +444,8 @@ public class WorldGuardBlockListener extends BlockListener {
         Player player = event.getPlayer();
         World world = blockPlaced.getWorld();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockPlaced.getLocation())) {
@@ -494,8 +494,8 @@ public class WorldGuardBlockListener extends BlockListener {
         Block blockTo = event.getBlock();
         World world = blockTo.getWorld();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
             int ox = blockTo.getX();
@@ -528,7 +528,7 @@ public class WorldGuardBlockListener extends BlockListener {
     public void onSignChange(SignChangeEvent event) {
 
         Player player = event.getPlayer();
-        WorldStateManager wcfg = getWorldConfig(player);
+        WorldConfiguration wcfg = getWorldConfig(player);
         
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {

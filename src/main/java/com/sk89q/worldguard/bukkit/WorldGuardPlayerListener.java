@@ -86,8 +86,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(player.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
 
         if (wcfg.enforceOneSession) {
             String name = player.getName();
@@ -107,8 +107,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(player.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
 
         if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW
@@ -131,7 +131,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
         cfg.forgetPlayer(plugin.wrapPlayer(player));
         plugin.forgetPlayer(player);
     }
@@ -164,8 +164,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
         
         if (wcfg.useRegions) {
             // Did we move a block?
@@ -248,8 +248,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Material type = block.getType();
         World world = player.getWorld();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             Vector pt = toVector(block);
@@ -286,8 +286,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         World world = player.getWorld();
         ItemStack item = player.getItemInHand();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
@@ -316,8 +316,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         ItemStack item = player.getItemInHand();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.blockLighter && item.getType() == Material.FLINT_AND_STEEL) {
             if (!plugin.hasPermission(player, "worldguard.lighter.override")) {
@@ -522,8 +522,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Material type = block.getType();
         World world = player.getWorld();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (block.getType() == Material.SOIL && wcfg.disablePlayerCropTrampling) {
             event.setCancelled(true);
@@ -625,8 +625,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
             return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getPlayer().getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
 
         if (wcfg.getBlacklist() != null) {
             Item ci = event.getItemDrop();
@@ -649,8 +649,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
             return;
         }
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(event.getPlayer().getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
 
         if (wcfg.getBlacklist() != null) {
             Item ci = event.getItem();
@@ -672,8 +672,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
         
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
@@ -699,8 +699,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(world);
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
         
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
@@ -726,8 +726,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Location location = player.getLocation();
         
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(player.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
         
         if (wcfg.useRegions) {
             Vector pt = toVector(location);
@@ -766,8 +766,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(player.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
         
         if (wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
@@ -792,8 +792,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         Location location = player.getLocation();
 
-        GlobalStateManager cfg = plugin.getGlobalStateManager();
-        WorldStateManager wcfg = cfg.get(player.getWorld());
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
 
         if (wcfg.useRegions) {
             Vector pt = toVector(location);
