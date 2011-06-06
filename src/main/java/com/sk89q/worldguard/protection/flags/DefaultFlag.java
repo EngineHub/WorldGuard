@@ -46,8 +46,8 @@ public final class DefaultFlag {
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
-    public static final BooleanFlag NOTIFY_GREET = new BooleanFlag("notify-greet");
-    public static final BooleanFlag NOTIFY_FAREWELL = new BooleanFlag("notify-farewell");
+    public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
+    public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave");
     public static final StringFlag DENY_SPAWN = new StringFlag("deny-spawn");
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay");
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount");
@@ -61,8 +61,8 @@ public final class DefaultFlag {
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, MOB_SPAWNING, CREEPER_EXPLOSION, SLEEP,
         TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW, LAVA_FLOW,
-        USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_GREET,
-        NOTIFY_FAREWELL, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
+        USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER,
+        NOTIFY_LEAVE, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
         TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL,
         GHAST_FIREBALL
     };

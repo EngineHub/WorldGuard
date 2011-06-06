@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import org.bukkit.entity.Player;
 import com.sk89q.worldguard.blacklist.Blacklist;
 
 public class BukkitBlacklist extends Blacklist {
@@ -32,11 +31,7 @@ public class BukkitBlacklist extends Blacklist {
     
     @Override
     public void broadcastNotification(String msg) {
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
-            if (plugin.hasPermission(player, "worldguard.notify")) {
-                player.sendMessage(msg);
-            }
-        }
+        plugin.broadcastNotification(msg);
     }
 
 }
