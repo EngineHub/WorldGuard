@@ -36,7 +36,6 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
-import static com.sk89q.worldguard.bukkit.SpongeUtil.*;
 
 /**
  * The listener for block events.
@@ -609,40 +608,6 @@ public class WorldGuardBlockListener extends BlockListener {
 
         if (!plugin.getGlobalRegionManager().allows(DefaultFlag.LEAF_DECAY, event.getBlock().getLocation())) {
             event.setCancelled(true);
-        }
-    }
-    /**
-     * Drops a sign item and removes a sign.
-     * 
-     * @param block
-     */
-    private void dropSign(Block block) {
-        block.setTypeId(0);
-        block.getWorld().dropItemNaturally(block.getLocation(),
-                new ItemStack(Material.SIGN, 1));
-    }
-
-    /**
-     * Remove water around a sponge.
-     * 
-     * @param world
-     * @param ox
-     * @param oy
-     * @param oz
-     */
-    private void clearSpongeWater(World world, int ox, int oy, int oz) {
-
-        ConfigurationManager cfg = plugin.getGlobalConfiguration();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
-            for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
-                for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
-                    if (isBlockWater(world, ox + cx, oy + cy, oz + cz)) {
-                        world.getBlockAt(ox + cx, oy + cy, oz + cz).setTypeId(0);
-                    }
-                }
-            }
         }
     }
 }
