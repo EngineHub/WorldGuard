@@ -36,6 +36,7 @@ import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
+import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
@@ -75,6 +76,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         pm.registerEvent(Event.Type.PLAYER_RESPAWN, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_ITEM_HELD, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_BED_ENTER, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_MOVE, this, Priority.High, plugin);
     }
 
     /**
@@ -149,6 +151,77 @@ public class WorldGuardPlayerListener extends PlayerListener {
             handleAirLeftClick(event);
         } else if (event.getAction() == Action.PHYSICAL) {
             handlePhysicalInteract(event);
+        }
+    }
+
+    /**
+     * Called when a player attempts to move.
+     *
+     * @param event
+     */
+    @Override
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        World world = player.getWorld();
+        
+        GlobalStateManager cfg = plugin.getGlobalStateManager();
+        WorldStateManager wcfg = cfg.get(world);
+        
+        if (wcfg.useRegions) {
+            // Did we move a block?
+            if (event.getFrom().getBlockX() != event.getTo().getBlockX()
+                    || event.getFrom().getBlockY() != event.getTo().getBlockY()
+                    || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+                PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                Vector pt = toVector(event.getTo());
+                ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+                String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);
+                String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
+                Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
+                Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
+                
+                if (greeting != null && (state.lastGreeting == null
+                        || !state.lastGreeting.equals(greeting))) {
+                    player.sendMessage(ChatColor.AQUA + " ** " + greeting);
+                }
+                
+                if (state.lastFarewell != null && (farewell == null 
+                        || !state.lastFarewell.equals(farewell))) {
+                    player.sendMessage(ChatColor.AQUA + " ** " + state.lastFarewell);
+                }
+                
+                if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
+                        || !state.notifiedForEnter)) {
+                    StringBuilder regionList = new StringBuilder();
+                    
+                    for (ProtectedRegion region : set) {
+                        if (regionList.length() != 0) {
+                            regionList.append(", ");
+                        }
+                        regionList.append(region.getId());
+                    }
+                    
+                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
+                            + ChatColor.LIGHT_PURPLE + player.getName()
+                            + ChatColor.GOLD + " entered NOTIFY region: "
+                            + ChatColor.WHITE
+                            + regionList);
+                }
+                
+                if ((notifyLeave == null || !notifyLeave)
+                        && state.notifiedForLeave != null && state.notifiedForLeave) {
+                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
+                            + ChatColor.LIGHT_PURPLE + player.getName()
+                            + ChatColor.GOLD + " left NOTIFY region");
+                }
+
+                state.lastGreeting = greeting;
+                state.lastFarewell = farewell;
+                state.notifiedForEnter = notifyEnter;
+                state.notifiedForLeave = notifyLeave;
+            }
         }
     }
     

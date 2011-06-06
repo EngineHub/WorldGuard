@@ -83,7 +83,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Used for scheduling flags.
      */
-    private FlagScheduler flagScheduler;
+    private FlagStateManager flagStateManager;
 
     /**
      * Construct objects. Actual loading occurs when the plugin is enabled, so
@@ -139,11 +139,11 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
         
-        flagScheduler = new FlagScheduler(this);
+        flagStateManager = new FlagStateManager(this);
         
         if (configuration.useRegionsScheduler) { 
             getServer().getScheduler().scheduleAsyncRepeatingTask(this,
-                    flagScheduler, FlagScheduler.RUN_DELAY, FlagScheduler.RUN_DELAY);
+                    flagStateManager, FlagStateManager.RUN_DELAY, FlagStateManager.RUN_DELAY);
         }
 
         if (configuration.suppressTickSyncWarnings) {
@@ -216,6 +216,15 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Deprecated
     public GlobalStateManager getGlobalConfiguration() {
         return getGlobalStateManager();
+    }
+    
+    /**
+     * Gets the flag state manager.
+     * 
+     * @return
+     */
+    public FlagStateManager getFlagStateManager() {
+        return flagStateManager;
     }
 
     /**
@@ -681,12 +690,25 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
     
     /**
+     * Notifies all with the notify permission.
+     * 
+     * @param msg
+     */
+    public void broadcastNotification(String msg) {
+        for (Player player : getServer().getOnlinePlayers()) {
+            if (hasPermission(player, "worldguard.notify")) {
+                player.sendMessage(msg);
+            }
+        }
+    }
+    
+    /**
      * Forgets a player.
      * 
      * @param player
      */
     public void forgetPlayer(Player player) {
-        flagScheduler.forget(player);
+        flagStateManager.forget(player);
     }
     
     /**

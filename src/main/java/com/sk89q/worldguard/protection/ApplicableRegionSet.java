@@ -36,7 +36,7 @@ import com.sk89q.worldguard.LocalPlayer;
  * 
  * @author sk89q
  */
-public class ApplicableRegionSet {
+public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
 
     private Collection<ProtectedRegion> applicable;
     private ProtectedRegion globalRegion;

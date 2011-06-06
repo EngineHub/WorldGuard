@@ -29,12 +29,12 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 /**
- * This processed periodical tasks for flags that require them, such as with
- * the healing flag.
+ * This processes per-player state information and is also meant to be used
+ * as a scheduled task.
  * 
  * @author sk89q
  */
-public class FlagScheduler implements Runnable {
+public class FlagStateManager implements Runnable {
     
     public static final int RUN_DELAY = 20;
     
@@ -46,7 +46,7 @@ public class FlagScheduler implements Runnable {
      * 
      * @param plugin
      */
-    public FlagScheduler(WorldGuardPlugin plugin) {
+    public FlagStateManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
         
         states = new HashMap<String, PlayerFlagState>();
@@ -129,10 +129,31 @@ public class FlagScheduler implements Runnable {
     }
     
     /**
+     * Get a player's flag state.
+     * 
+     * @param player
+     * @return
+     */
+    public synchronized PlayerFlagState getState(Player player) {
+        PlayerFlagState state = states.get(player.getName());
+        
+        if (state == null) {
+            state = new PlayerFlagState();
+            states.put(player.getName(), state);
+        }
+        
+        return state;
+    }
+    
+    /**
      * Keeps state per player.
      */
-    private static class PlayerFlagState {
-        private long lastHeal;
+    public static class PlayerFlagState {
+        public long lastHeal;
+        public String lastGreeting;
+        public String lastFarewell;
+        public Boolean notifiedForEnter = false;
+        public Boolean notifiedForLeave = false;
     }
 
 }
