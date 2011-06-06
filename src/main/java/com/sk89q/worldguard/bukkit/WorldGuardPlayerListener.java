@@ -77,7 +77,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
         pm.registerEvent(Event.Type.PLAYER_ITEM_HELD, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_BED_ENTER, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.PLAYER_MOVE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PLAYER_INVENTORY, this, Priority.High, plugin);
     }
 
     /**
@@ -341,6 +340,23 @@ public class WorldGuardPlayerListener extends PlayerListener {
             if (!plugin.hasPermission(player, "worldguard.lighter.override")) {
                 event.setCancelled(true);
                 return;
+            }
+        }
+        
+        // Infinite stack removal
+        if ((type == Material.CHEST
+                || type == Material.JUKEBOX
+                || type == Material.DISPENSER
+                || type == Material.FURNACE
+                || type == Material.BURNING_FURNACE)
+                && wcfg.removeInfiniteStacks
+                && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
+            for (int slot = 0; slot < 40; slot++) {
+                ItemStack heldItem = player.getInventory().getItem(slot);
+                if (heldItem != null && heldItem.getAmount() < 0) {
+                    player.getInventory().setItem(slot, null);
+                    player.sendMessage(ChatColor.RED + "Infinite stack in slot #" + slot + " removed.");
+                }
             }
         }
 
@@ -824,28 +840,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     event.setCancelled(true);
                     player.sendMessage("This bed doesn't belong to you!");
                     return;
-            }
-        }
-    }
-
-    /**
-     * Called when a player opens an inventory.
-     */
-    @Override
-    public void onInventoryOpen(PlayerInventoryEvent event) {
-        Player player = event.getPlayer();
-        
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
-        
-        if (wcfg.removeInfiniteStacks
-                && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
-            for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
-                ItemStack heldItem = player.getInventory().getItem(slot);
-                if (heldItem.getAmount() < 0) {
-                    player.getInventory().setItem(slot, null);
-                    player.sendMessage(ChatColor.RED + "Infinite stack in slot #" + slot + " removed.");
-                }
             }
         }
     }
