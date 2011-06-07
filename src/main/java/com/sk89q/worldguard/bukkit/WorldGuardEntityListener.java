@@ -32,9 +32,11 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -154,6 +156,26 @@ public class WorldGuardEntityListener extends EntityListener {
     private void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
+        
+        if (attacker instanceof Player) {
+            Player player = (Player) attacker;
+
+            ConfigurationManager cfg = plugin.getGlobalStateManager();
+            WorldConfiguration wcfg = cfg.get(player.getWorld());
+
+            ItemStack held = player.getInventory().getItemInHand();
+            
+            if (held != null) {
+                if (wcfg.getBlacklist() != null) {
+                    if (!wcfg.getBlacklist().check(
+                            new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
+                                    toVector(player.getLocation()), held.getTypeId()), false, false)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
 
         if (defender instanceof Player) {
             Player player = (Player) defender;
