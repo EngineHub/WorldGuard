@@ -32,6 +32,8 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -131,7 +133,9 @@ public class WorldGuardBlockListener extends BlockListener {
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getItemInHand();
-            if (held.getTypeId() > 0) {
+            if (held.getTypeId() > 0
+                    && !(ItemType.usesDamageValue(held.getTypeId())
+                    || BlockType.usesData(held.getTypeId()))) {
                 held.setDurability((short) -1);
                 player.setItemInHand(held);
             }
