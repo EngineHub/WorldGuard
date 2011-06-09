@@ -74,7 +74,7 @@ public class PastebinPoster {
                         + "&api_paste_code=" + URLEncoder.encode(code, "utf-8")
                         + "&api_paste_private=" + URLEncoder.encode("0", "utf-8")
                         + "&api_paste_name=" + URLEncoder.encode("", "utf-8")
-                        + "&api_paste_expire_date=" + URLEncoder.encode("1H", "utf-8")
+                        + "&api_paste_expire_date=" + URLEncoder.encode("1D", "utf-8")
                         + "&api_paste_format=" + URLEncoder.encode("text", "utf-8")
                         + "&api_user_key=" + URLEncoder.encode("", "utf-8")).getBytes());
                 out.flush();
