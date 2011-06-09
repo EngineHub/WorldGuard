@@ -106,7 +106,7 @@ public class WorldGuardEntityListener extends EntityListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(defender.getWorld());
 
-        if (defender instanceof Wolf) {
+        if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
             if (wcfg.antiWolfDumbness && !(type == DamageCause.VOID)) {
                 event.setCancelled(true);
                 return;
@@ -313,7 +313,7 @@ public class WorldGuardEntityListener extends EntityListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(defender.getWorld());
 
-        if (defender instanceof Wolf) {
+        if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
             if (wcfg.antiWolfDumbness) {
                 event.setCancelled(true);
                 return;
