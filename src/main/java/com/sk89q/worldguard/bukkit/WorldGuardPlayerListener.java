@@ -29,6 +29,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
@@ -279,9 +280,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
                   || type == Material.TRAP_DOOR
                   || type == Material.NOTE_BLOCK) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.allows(DefaultFlag.USE)
-                        && !set.canBuild(localPlayer)) {
+                        && !set.canUse(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
+                    event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
                 }
@@ -312,6 +313,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                             toVector(player.getLocation()),
                     item.getTypeId()), false, false)) {
                 event.setCancelled(true);
+                event.setUseItemInHand(Result.DENY);
                 return;
             }
         }
@@ -420,9 +422,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
                    || type == Material.TRAP_DOOR
                    || type == Material.WORKBENCH) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.allows(DefaultFlag.USE)
-                        && !set.canBuild(localPlayer)) {
+                        && !set.canUse(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
+                    event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
                 }
@@ -573,10 +575,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
             if (type == Material.STONE_PLATE || type == Material.WOOD_PLATE) {
                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                      && (!set.canBuild(localPlayer))
-                      && (!set.allows(DefaultFlag.USE))) {
-                   player.sendMessage(ChatColor.DARK_RED + "You are not allowed"
-                       + " to trigger pressure plates in this area.");
+                      && !set.canUse(localPlayer)) {
+                   event.setUseInteractedBlock(Result.DENY);
                    event.setCancelled(true);
                    return;
                }
