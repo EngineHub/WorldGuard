@@ -41,7 +41,7 @@ public final class DefaultFlag {
     public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", 'C', false);
     public static final StateFlag WATER_FLOW = new StateFlag("water-flow", true);
     public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
-    public static final StateFlag USE = new StateFlag("use", false);
+    public static final StateFlag USE = new StateFlag("use", true);
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
