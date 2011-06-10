@@ -336,7 +336,8 @@ public class WorldConfiguration {
         if (!signChestProtection) {
             return false;
         }
-        if (plugin.hasPermission(player, "worldguard.chest-protection.override")) {
+        if (plugin.hasPermission(player, "worldguard.chest-protection.override")
+                || plugin.hasPermission(player, "worldguard.override.chest-protection")) {
             return false;
         }
         return chestProtection.isProtected(block, player);
@@ -353,7 +354,8 @@ public class WorldConfiguration {
         if (!signChestProtection) {
             return false;
         }
-        if (plugin.hasPermission(player, "worldguard.chest-protection.override")) {
+        if (plugin.hasPermission(player, "worldguard.chest-protection.override")
+                || plugin.hasPermission(player, "worldguard.override.chest-protection")) {
             return false;
         }
         return chestProtection.isProtectedPlacement(block, player);
@@ -363,7 +365,8 @@ public class WorldConfiguration {
         if (!signChestProtection) {
             return false;
         }
-        if (plugin.hasPermission(player, "worldguard.chest-protection.override")) {
+        if (plugin.hasPermission(player, "worldguard.chest-protection.override")
+                || plugin.hasPermission(player, "worldguard.override.chest-protection")) {
             return false;
         }
         return chestProtection.isAdjacentChestProtected(block, player);
