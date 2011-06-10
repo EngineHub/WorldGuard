@@ -338,13 +338,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
-        if (wcfg.blockLighter && item.getType() == Material.FLINT_AND_STEEL) {
-            if (!plugin.hasPermission(player, "worldguard.lighter.override")) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-        
         // Infinite stack removal
         if ((type == Material.CHEST
                 || type == Material.JUKEBOX
@@ -388,15 +381,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
                 event.setCancelled(true);
                 return;
-            }
-
-            if (item.getType() == Material.FLINT_AND_STEEL) {
-                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                    && !set.allows(DefaultFlag.LIGHTER)
-                    && !plugin.hasPermission(player, "worldguard.lighter.override")) {
-                    event.setCancelled(true);
-                    return;
-                }
             }
 
             if (type == Material.CHEST

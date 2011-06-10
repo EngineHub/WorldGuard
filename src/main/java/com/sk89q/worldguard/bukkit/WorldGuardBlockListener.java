@@ -289,12 +289,14 @@ public class WorldGuardBlockListener extends BlockListener {
             event.setCancelled(true);
             return;
         }
-        /*
-        if (wcfg.blockLighter && cause == IgniteCause.FLINT_AND_STEEL) {
+
+        if (wcfg.blockLighter && cause == IgniteCause.FLINT_AND_STEEL
+                && event.getPlayer() != null
+                && !plugin.hasPermission(event.getPlayer(), "worldguard.override.lighter")) {
             event.setCancelled(true);
             return;
         }
-        */
+
         if (wcfg.fireSpreadDisableToggle && isFireSpread) {
             event.setCancelled(true);
             return;
@@ -324,16 +326,16 @@ public class WorldGuardBlockListener extends BlockListener {
             if (player != null && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-                if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !set.canBuild(localPlayer)) {
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (cause == IgniteCause.FLINT_AND_STEEL
-                        && !set.allows(DefaultFlag.LIGHTER)) {
-                    event.setCancelled(true);
-                    return;
+                if (cause == IgniteCause.FLINT_AND_STEEL) {
+                    if (!set.canBuild(localPlayer)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                    if (!set.allows(DefaultFlag.LIGHTER)
+                            && !plugin.hasPermission(player, "worldguard.override.lighter")) {
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
             }
 
