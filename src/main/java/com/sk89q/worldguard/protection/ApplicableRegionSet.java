@@ -149,7 +149,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             allowed = def; 
         }
         
-        int lastPriority = 0;
+        int lastPriority = Integer.MIN_VALUE;
 
         // The algorithm is as follows:
         // While iterating through the list of regions, if an entry disallows
@@ -178,6 +178,8 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             if (found && region.getPriority() < lastPriority) {
                 break;
             }
+            
+            lastPriority = region.getPriority();
 
             // Ignore non-build regions
             if (player != null
@@ -217,7 +219,6 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             }
 
             found = true;
-            lastPriority = region.getPriority();
         }
 
         return found == false ? def :
