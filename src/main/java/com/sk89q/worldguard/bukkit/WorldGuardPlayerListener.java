@@ -382,6 +382,16 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 event.setCancelled(true);
                 return;
             }
+            if (item.getData().getItemType() == Material.INK_SACK
+                    && item.getData().getData() == 15 // bonemeal
+                    && type == Material.GRASS) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)) {
+                    event.setCancelled(true);
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setUseItemInHand(Result.DENY);
+                }
+            }
 
             if (type == Material.CHEST
                     || type == Material.JUKEBOX //stores the (arguably) most valuable item
