@@ -92,6 +92,7 @@ public class RegionPriorityTest {
         manager.addRegion(region);
         
         courtyard = region;
+        courtyard.setFlag(DefaultFlag.MOB_SPAWNING, StateFlag.State.DENY);
     }
     
     void setUpFountainRegion() throws Exception {
@@ -106,16 +107,22 @@ public class RegionPriorityTest {
         fountain = region;
         fountain.setParent(courtyard);
         fountain.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
+        fountain.setFlag(DefaultFlag.MOB_SPAWNING, StateFlag.State.ALLOW);
     }
     
     @Test
     public void testNoPriorities() throws Exception {
         ApplicableRegionSet appl;
 
+        courtyard.setPriority(0);
+        fountain.setPriority(0);
+        
         appl = manager.getApplicableRegions(inCourtyard);
         assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
         appl = manager.getApplicableRegions(inFountain);
         assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
     }
     
     @Test
@@ -123,6 +130,8 @@ public class RegionPriorityTest {
         ApplicableRegionSet appl;
 
         courtyard.setPriority(5);
+        fountain.setPriority(0);
+        
         appl = manager.getApplicableRegions(inCourtyard);
         assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
         appl = manager.getApplicableRegions(inFountain);
@@ -133,10 +142,12 @@ public class RegionPriorityTest {
     public void testPriorities2() throws Exception {
         ApplicableRegionSet appl;
 
+        fountain.setPriority(0);
         fountain.setPriority(5);
+        
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
         appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertTrue(appl.allows(DefaultFlag.MOB_SPAWNING));
     }
 }
