@@ -382,7 +382,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 event.setCancelled(true);
                 return;
             }
-            if (item.getData().getItemType() == Material.INK_SACK
+            if (item.getType() == Material.INK_SACK
+                    && item.getData() != null
                     && item.getData().getData() == 15 // bonemeal
                     && type == Material.GRASS) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
