@@ -280,7 +280,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                   || type == Material.TRAP_DOOR
                   || type == Material.NOTE_BLOCK) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.canUse(localPlayer)) {
+                        && !set.allows(DefaultFlag.USE)
+                        && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
@@ -417,7 +418,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                    || type == Material.TRAP_DOOR
                    || type == Material.WORKBENCH) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.canUse(localPlayer)) {
+                        && !set.allows(DefaultFlag.USE)
+                        && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
@@ -570,7 +572,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
             if (type == Material.STONE_PLATE || type == Material.WOOD_PLATE) {
                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                      && !set.canUse(localPlayer)) {
+                       && !set.allows(DefaultFlag.USE)
+                       && !set.canBuild(localPlayer)) {
                    event.setUseInteractedBlock(Result.DENY);
                    event.setCancelled(true);
                    return;
