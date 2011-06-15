@@ -82,6 +82,7 @@ player-damage:
     disable-void-damage: off
     teleport-on-void-falling: off
     disable-explosion-damage: off
+    disable-mob-damage: off
 
 regions:
     enable: on
