@@ -218,6 +218,11 @@ public class WorldGuardEntityListener extends EntityListener {
                     return;
                 }
 
+                if (wcfg.disableMobDamage) {
+                    event.setCancelled(true);
+                    return;
+                }
+
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
@@ -273,6 +278,10 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
             if (attacker != null && attacker instanceof Skeleton) {
+                if (wcfg.disableMobDamage) {
+                    event.setCancelled(true);
+                    return;
+                }
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
