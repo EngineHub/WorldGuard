@@ -237,10 +237,12 @@ public class RegionCommands {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         
-        // Check whether the player has created too many regions 
-        if (wcfg.maxRegionCountPerPlayer >= 0
-                && mgr.getRegionCountOfPlayer(localPlayer) >= wcfg.maxRegionCountPerPlayer) {
-            throw new CommandException("You own too many regions, delete one first to claim a new one.");
+        if (!plugin.hasPermission(sender, "worldguard.region.unlimited")) {
+            // Check whether the player has created too many regions 
+            if (wcfg.maxRegionCountPerPlayer >= 0
+                    && mgr.getRegionCountOfPlayer(localPlayer) >= wcfg.maxRegionCountPerPlayer) {
+                throw new CommandException("You own too many regions, delete one first to claim a new one.");
+            }
         }
 
         ProtectedRegion existing = mgr.getRegion(id);
@@ -289,11 +291,13 @@ public class RegionCommands {
             }
         }*/
 
-        if (region.volume() > wcfg.maxClaimVolume) {
-            player.sendMessage(ChatColor.RED + "This region is to large to claim.");
-            player.sendMessage(ChatColor.RED +
-                    "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
-            return;
+        if (!plugin.hasPermission(sender, "worldguard.region.unlimited")) {
+            if (region.volume() > wcfg.maxClaimVolume) {
+                player.sendMessage(ChatColor.RED + "This region is too large to claim.");
+                player.sendMessage(ChatColor.RED +
+                        "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
+                return;
+            }
         }
 
         region.getOwners().addPlayer(player.getName());
