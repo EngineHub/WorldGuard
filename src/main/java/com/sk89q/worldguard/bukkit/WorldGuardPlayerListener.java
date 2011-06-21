@@ -20,13 +20,14 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.util.Iterator;
+import java.util.logging.Logger;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Result;
@@ -48,6 +49,11 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
  * Handles all events thrown in relation to a player.
  */
 public class WorldGuardPlayerListener extends PlayerListener {
+
+    /**
+     * Logger for messages.
+     */
+    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     private WorldGuardPlugin plugin;
 
@@ -110,6 +116,26 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(player.getWorld());
+
+        if (cfg.activityHaltToggle) {
+            player.sendMessage(ChatColor.YELLOW
+                    + "Intensive server activity has been HALTED.");
+
+            int removed = 0;
+
+            for (Entity entity : player.getWorld().getEntities()) {
+                if (entity instanceof Item
+                        || (entity instanceof LivingEntity && !(entity instanceof Tameable))) {
+                    entity.remove();
+                    removed++;
+                }
+            }
+
+            if (removed > 10) {
+                logger.info("WG Halt-Act: " + removed + " entities (>10) auto-removed from "
+                        + player.getWorld().toString());
+            }
+        }
 
         if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW

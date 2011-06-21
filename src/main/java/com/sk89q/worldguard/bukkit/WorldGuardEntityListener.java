@@ -426,6 +426,11 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
         } else if (ent instanceof TNTPrimed) {
+            if (cfg.activityHaltToggle) {
+                event.setCancelled(true);
+                return;
+            }
+
             if (wcfg.blockTNT) {
                 event.setCancelled(true);
                 return;
@@ -462,6 +467,12 @@ public class WorldGuardEntityListener extends EntityListener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
+
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
