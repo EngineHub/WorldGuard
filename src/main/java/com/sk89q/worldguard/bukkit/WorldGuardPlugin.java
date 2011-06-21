@@ -138,6 +138,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardBlockListener(this)).registerEvents();
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
+        (new WorldGuardWorldListener(this)).registerEvents();
         
         flagStateManager = new FlagStateManager(this);
         

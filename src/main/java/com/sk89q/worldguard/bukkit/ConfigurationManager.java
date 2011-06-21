@@ -60,6 +60,7 @@ public class ConfigurationManager {
     
     public boolean suppressTickSyncWarnings;
     public boolean useRegionsScheduler;
+    public boolean activityHaltToggle = false;
 
     /**
      * Construct the object.

@@ -8,6 +8,10 @@ commands:
     allowfire:
         description: Re-enables fire spread if he has been disabled with /stopfire
         usage: /<command>
+    halt-activity:
+        aliases: [stoplag, haltactivity]
+        description: Attempts to stop all intensive operations (toggle)
+        usage: /<command> [-c]
     god:
         description: Enable god mode
         usage: /<command> [player]

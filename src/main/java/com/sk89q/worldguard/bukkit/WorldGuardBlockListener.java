@@ -74,6 +74,8 @@ public class WorldGuardBlockListener extends BlockListener {
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.SNOW_FORM, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.LEAVES_DECAY, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_FORM, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.BLOCK_SPREAD, this, Priority.High, plugin);
     }
     
     /**
@@ -191,6 +193,11 @@ public class WorldGuardBlockListener extends BlockListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (wcfg.simulateSponge && isWater) {
             int ox = blockTo.getX();
             int oy = blockTo.getY();
@@ -272,6 +279,11 @@ public class WorldGuardBlockListener extends BlockListener {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
+
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
 
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
@@ -367,6 +379,11 @@ public class WorldGuardBlockListener extends BlockListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (wcfg.disableFireSpread) {
             event.setCancelled(true);
             return;
@@ -417,6 +434,11 @@ public class WorldGuardBlockListener extends BlockListener {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
 
         int id = event.getChangedTypeId();
 
@@ -600,6 +622,13 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SNOW_FALL,
                 event.getBlock().getLocation())) {
             event.setCancelled(true);
@@ -612,8 +641,39 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (!plugin.getGlobalRegionManager().allows(DefaultFlag.LEAF_DECAY, event.getBlock().getLocation())) {
             event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Called when a block is formed based on world conditions.
+     */
+    public void onBlockForm(BlockFormEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+    }
+
+    /**
+     * Called when a block spreads based on world conditions.
+     */
+    public void onBlockSpread(BlockSpreadEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
         }
     }
 }

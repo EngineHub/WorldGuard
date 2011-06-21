@@ -19,12 +19,14 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import org.bukkit.entity.*;
 
 public class ToggleCommands {
 
@@ -86,5 +88,54 @@ public class ToggleCommands {
         }
 
         wcfg.fireSpreadDisableToggle = false;
+    }
+
+    @Command(aliases = {"halt-activity"},
+            usage = "", desc = "Attempts to cease as much activity in order to stop lag",
+            flags = "c", min = 0, max = 0)
+    @CommandPermissions({"worldguard.halt-activity"})
+    public static void stopLag(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+
+        ConfigurationManager configManager = plugin.getGlobalStateManager();
+
+        configManager.activityHaltToggle = !args.hasFlag('c');
+
+        if (configManager.activityHaltToggle) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(ChatColor.YELLOW
+                        + "ALL intensive server activity halted.");
+            }
+
+            plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                    + "ALL intensive server activity halted by "
+                    + plugin.toName(sender) + ".");
+
+            for (World world : plugin.getServer().getWorlds()) {
+                int removed = 0;
+
+                for (Entity entity : world.getEntities()) {
+                    if (entity instanceof Item
+                            || (entity instanceof LivingEntity && !(entity instanceof Tameable))) {
+                        entity.remove();
+                        removed++;
+                    }
+                }
+
+                if (removed > 10) {
+                    sender.sendMessage("" + removed + " entities (>10) auto-removed from "
+                            + world.toString());
+                }
+            }
+
+        } else {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(ChatColor.YELLOW
+                        + "ALL intensive server activity no longer halted.");
+            }
+
+            plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                    + "ALL intensive server activity is now allowed.");
+        }
     }
 }
