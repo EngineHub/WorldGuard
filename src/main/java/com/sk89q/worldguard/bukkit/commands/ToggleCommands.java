@@ -116,7 +116,9 @@ public class ToggleCommands {
 
                 for (Entity entity : world.getEntities()) {
                     if (entity instanceof Item
-                            || (entity instanceof LivingEntity && !(entity instanceof Tameable))) {
+                            || (entity instanceof LivingEntity
+                            && !(entity instanceof Tameable)
+                            && !(entity instanceof Player))) {
                         entity.remove();
                         removed++;
                     }

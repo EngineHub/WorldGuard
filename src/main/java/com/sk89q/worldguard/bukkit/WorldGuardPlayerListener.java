@@ -125,7 +125,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
             for (Entity entity : player.getWorld().getEntities()) {
                 if (entity instanceof Item
-                        || (entity instanceof LivingEntity && !(entity instanceof Tameable))) {
+                        || (entity instanceof LivingEntity
+                        && !(entity instanceof Tameable)
+                        && !(entity instanceof Player))) {
                     entity.remove();
                     removed++;
                 }
