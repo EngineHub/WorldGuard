@@ -133,13 +133,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Load permissions
         (new PermissionsResolverServerListener(perms)).register(this);
 
-        // Register events
-        (new WorldGuardPlayerListener(this)).registerEvents();
-        (new WorldGuardBlockListener(this)).registerEvents();
-        (new WorldGuardEntityListener(this)).registerEvents();
-        (new WorldGuardWeatherListener(this)).registerEvents();
-        (new WorldGuardWorldListener(this)).registerEvents();
-        
         flagStateManager = new FlagStateManager(this);
         
         if (configuration.useRegionsScheduler) { 
@@ -156,6 +149,13 @@ public class WorldGuardPlugin extends JavaPlugin {
                 Logger.getLogger("Minecraft").setFilter(null);
             }
         }
+
+        // Register events
+        (new WorldGuardPlayerListener(this)).registerEvents();
+        (new WorldGuardBlockListener(this)).registerEvents();
+        (new WorldGuardEntityListener(this)).registerEvents();
+        (new WorldGuardWeatherListener(this)).registerEvents();
+        (new WorldGuardWorldListener(this)).registerEvents();
         
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }
