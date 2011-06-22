@@ -37,6 +37,9 @@ import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+
+import java.util.logging.Logger;
+
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
 /**
@@ -45,6 +48,10 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
  * @author sk89q
  */
 public class WorldGuardBlockListener extends BlockListener {
+    /**
+     * Logger for messages.
+     */
+    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     private WorldGuardPlugin plugin;
 
@@ -72,10 +79,20 @@ public class WorldGuardBlockListener extends BlockListener {
         pm.registerEvent(Event.Type.BLOCK_BURN, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.SIGN_CHANGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.SNOW_FORM, this, Priority.High, plugin);
+        registerEventSafe("SNOW_FORM", Priority.High);
         pm.registerEvent(Event.Type.LEAVES_DECAY, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_FORM, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.BLOCK_SPREAD, this, Priority.High, plugin);
+    }
+
+    private void registerEventSafe(String typeName, Priority priority) {
+        try {
+            Event.Type type = Event.Type.valueOf(typeName);
+            PluginManager pm = plugin.getServer().getPluginManager();
+            pm.registerEvent(type, this, priority, plugin);
+        } catch (IllegalArgumentException e) {
+            logger.info("WorldGuard: Unable to register missing event type " + typeName);
+        }
     }
     
     /**
