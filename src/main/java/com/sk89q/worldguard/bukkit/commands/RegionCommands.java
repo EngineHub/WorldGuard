@@ -21,7 +21,10 @@ package com.sk89q.worldguard.bukkit.commands;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -185,84 +188,100 @@ public class RegionCommands {
     }
     
     @Command(aliases = {"claim"},
-            usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
-            desc = "Claim a region",
+            usage = "<id>",
+            desc = "Claim an existing region",
             flags = "", min = 1, max = -1)
     @CommandPermissions({"worldguard.region.claim"})
     public static void claim(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
         
+        // Get player information
         Player player = plugin.checkPlayer(sender);
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        WorldEditPlugin worldEdit = plugin.getWorldEdit();
+        World world = player.getWorld();
+        
+        // Check the number of arguments
+        if(args.argsLength() != 1) {
+            throw new CommandException("Incorrect parameter syntax!");
+        }        
         String id = args.getString(0);
         
-        if (!ProtectedRegion.isValidId(id)) {
-            throw new CommandException("Invalid region ID specified!");
-        }
-        
+        // Check that the region id is not __global__        
         if (id.equalsIgnoreCase("__global__")) {
             throw new CommandException("A region cannot be named __global__");
         }
         
-        // Attempt to get the player's selection from WorldEdit
-        Selection sel = worldEdit.getSelection(player);
+        // Get the region and region manager
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = mgr.getRegion(id);
         
-        if (sel == null) {
-            throw new CommandException("Select a region with WorldEdit first.");
+        // Check if the region id supplied is a valid one
+        if(region == null) {
+            throw new CommandException("Could not find a region by that ID.");
         }
         
-        ProtectedRegion region;
-        
-        // Detect the type of region from WorldEdit
-        if (sel instanceof Polygonal2DSelection) {
-            Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
-            int minY = polySel.getNativeMinimumPoint().getBlockY();
-            int maxY = polySel.getNativeMaximumPoint().getBlockY();
-            region = new ProtectedPolygonalRegion(id, polySel.getNativePoints(), minY, maxY);
-        } else if (sel instanceof CuboidSelection) {
-            BlockVector min = sel.getNativeMinimumPoint().toBlockVector();
-            BlockVector max = sel.getNativeMaximumPoint().toBlockVector();
-            region = new ProtectedCuboidRegion(id, min, max);
-        } else {
-            throw new CommandException(
-                    "The type of region selected in WorldEdit is unsupported in WorldGuard!");
-        }
-
-        // Get the list of region owners
-        if (args.argsLength() > 1) {
-            region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
-        }
-
+        // Get the world configuration
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
-        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
+
+        // Check whether the region has an owner
+        DefaultDomain owners = region.getOwners();
+        if (owners.getPlayers().size() > 0) {
+            // Is the player an owner?            
+            if(!owners.getPlayers().contains(player.getName())) {
+                throw new CommandException("This region already has an owner - you can't claim or redefine it.");
+            }
+            
+            // Do they have a WorldEdit selection?
+            WorldEditPlugin worldEdit = plugin.getWorldEdit();
+            Selection sel = worldEdit.getSelection(player);
+            if(sel != null) {
+                // Redefine region
+                // TODO Should we just copy the code rather than calling the method?
+                redefine(args, plugin, sender);
+            }
+            
+            // Reset owners list
+            synchronized(owners.getPlayers()) {
+                for(Iterator<String> i = owners.getPlayers().iterator(); i.hasNext();) {
+                    String s = i.next();
+                    if(!s.equals(player.getName())) {
+                        i.remove();
+                    }
+                }
+            }
+            
+            // Attempt to save
+            try {
+                mgr.save();
+                sender.sendMessage(ChatColor.YELLOW + "Region " + id + " has been redefined.");
+                return;
+            } catch (IOException e) {
+                throw new CommandException("Failed to write regions file: "
+                        + e.getMessage());
+            }
+        }
         
         // Check whether the player has created too many regions 
         if (wcfg.maxRegionCountPerPlayer >= 0
                 && mgr.getRegionCountOfPlayer(localPlayer) >= wcfg.maxRegionCountPerPlayer) {
             throw new CommandException("You own too many regions, delete one first to claim a new one.");
         }
-
-        ProtectedRegion existing = mgr.getRegion(id);
-
-        // Check for an existing region
-        if (existing != null) {
-            if (!existing.getOwners().contains(localPlayer)) {
-                throw new CommandException("This region already exists and you don't own it.");
-            }
-        }
         
+        // Get the applicable regions for the region selection
         ApplicableRegionSet regions = mgr.getApplicableRegions(region);
         
         // Check if this region overlaps any other region
         if (regions.size() > 0) {
-            if (!regions.isOwnerOfAll(localPlayer)) {
+            // This is for if a player is defining regions based on their own selection
+            /*if (!regions.isOwnerOfAll(localPlayer)) {
                 throw new CommandException("This region overlaps with someone else's region.");
-            }
+            }*/
         } else {
+            /* Good for "town" setups; players can't claim other regions unless it is inside
+             * of a parent. */
             if (wcfg.claimOnlyInsideExistingRegions) {
                 throw new CommandException("You may only claim regions inside " +
-                		"existing regions that you or your group own.");
+                        "existing regions that you or your group own.");
             }
         }
 
@@ -289,16 +308,19 @@ public class RegionCommands {
             }
         }*/
 
+        // Check if the region size is too large to claim
         if (region.volume() > wcfg.maxClaimVolume) {
-            player.sendMessage(ChatColor.RED + "This region is to large to claim.");
+            player.sendMessage(ChatColor.RED + "This region is too large to claim.");
             player.sendMessage(ChatColor.RED +
                     "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
             return;
         }
 
-        region.getOwners().addPlayer(player.getName());
+        // Add the player as the owner
+        owners.addPlayer(player.getName());
         mgr.addRegion(region);
         
+        // Attempt to save
         try {
             mgr.save();
             sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
