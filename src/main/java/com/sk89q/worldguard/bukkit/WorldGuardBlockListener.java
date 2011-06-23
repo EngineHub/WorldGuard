@@ -79,10 +79,10 @@ public class WorldGuardBlockListener extends BlockListener {
         pm.registerEvent(Event.Type.BLOCK_BURN, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.SIGN_CHANGE, this, Priority.High, plugin);
         pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
-        registerEventSafe("SNOW_FORM", Priority.High);
         pm.registerEvent(Event.Type.LEAVES_DECAY, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.BLOCK_FORM, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.BLOCK_SPREAD, this, Priority.High, plugin);
+        registerEventSafe("SNOW_FORM", Priority.High);
+        registerEventSafe("BLOCK_FORM", Priority.High);
+        registerEventSafe("BLOCK_SPREAD", Priority.High);
     }
 
     private void registerEventSafe(String typeName, Priority priority) {
