@@ -678,6 +678,7 @@ public class WorldGuardBlockListener extends BlockListener {
 						rgn.setFlag(DefaultFlag.PRICE, price);
 						player.sendMessage(ChatColor.YELLOW+"Price of \""+regionString+"\" set to "+currencySymbol+price+".");
 					}
+					rgn.setFlag(DefaultFlag.BUYABLE, true);
 					event.setLine(2, currencySymbol+String.valueOf(price)); //TODO Format better? (maybe)
 					event.setLine(3, ChatColor.GRAY + player.getName()); //Affix player name
 				}
