@@ -60,8 +60,9 @@ public class WorldGuardPlugin extends JavaPlugin {
      * permissions checking, and a number of other fancy command things.
      * We just set it up and register commands against it.
      */
+    
     private final CommandsManager<CommandSender> commands;
-
+    
     /**
      * Handles the region databases for all worlds.
      */
@@ -119,7 +120,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 getConfiguration(), getServer(), "WorldGuard", logger);
         perms.load();
 
-        // This must be done before configuration is laoded
+        // This must be done before configuration is loaded
         LegacyWorldGuardMigration.migrateBlacklist(this);
         
         // Load the configuration
@@ -156,6 +157,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardWorldListener(this)).registerEvents();
+        (new WorldGuardPluginListener(this)).registerEvents();
         
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }

@@ -36,14 +36,12 @@ import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldedit.data.InvalidFormatException;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.rmi.CORBA.Util;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
@@ -634,7 +632,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
         
-        if(wcfg.useiConomy){ //Economy Support - ALPHA (This section: Ok (Untested))
+        if(wcfg.useiConomy && iConomyManager.isloaded()){ //Economy Support 
         	Block block = event.getBlock();
 	        RegionManager mgr = plugin.getGlobalRegionManager().get(block.getWorld());
 	        LocalPlayer localPlayer = new BukkitPlayer(plugin,player);
@@ -645,47 +643,50 @@ public class WorldGuardBlockListener extends BlockListener {
 					String regionString = event.getLine(1);
 					
 					if (!mgr.hasRegion(regionString)){
-						throw new Exception("Region \""+regionString+"\"does not exist.");
+						throw new InvalidFormatException("Region \""+regionString+"\" does not exist.");
 					}
 					ProtectedRegion rgn = mgr.getRegion(regionString);
 					Vector signLocation = toVector(block.getLocation());
-					ApplicableRegionSet set = mgr.getApplicableRegions(signLocation);
-					String currencySymbol = "$"; //TODO get symbol from plugin
+					iConomyManager econMgr = new iConomyManager();
+	
 					if (!rgn.contains(signLocation)){
 						//To prevent confusion and scamming, region signs must be placed in specified region.
-						//Possible configuration option in the future. (above)
-						throw new Exception("Sell sign must be placed in stated region.");
+						//Possible config toggle in the future. 
+						throw new InvalidFormatException("Sell sign must be placed in stated region.");
 					}
 					
-					if (!set.isOwnerOfAll(localPlayer)){
+					if (!rgn.isOwner(localPlayer)){
 						if (player.isOp() || localPlayer.hasPermission("worldguard.region.bypass."+block.getWorld().getName()))
 							player.sendMessage(ChatColor.RED + "Bypass Alert: You are not the owner of all applicable regions!  Are you sure you have permission to sell it?");
 						else
-							throw new Exception("You are not the owner of \""+regionString+"\".");
+							throw new InvalidFormatException("You are not the owner of \""+regionString+"\" or other applicable area.");
 					}
 					
 					
 					double price = 0;
-					if (event.getLine(3) == null || event.getLine(3).equals("")){
+					if (event.getLine(2) == null || event.getLine(2).equals("")){
 						//Pull price from flag if possible, else set price from the sign
 						if (rgn.getFlag(DefaultFlag.PRICE) != null && rgn.getFlag(DefaultFlag.PRICE) > 0){
 							price = rgn.getFlag(DefaultFlag.PRICE);
 						}else{
-							throw new Exception("No price has been set previously or specified on the sign.");
+							throw new InvalidFormatException("No price has been set previously or specified on the sign.");
 						}
 					}else{ //A value is set on the sign
-						price = Double.parseDouble(event.getLine(3).replaceAll("[^0-9\\.]", ""));
+						try{
+							price = Double.parseDouble(event.getLine(2).replaceAll("[^0-9\\.]", ""));
+						}catch(Exception e){
+							throw new InvalidFormatException("Invalid price value.");
+						}
 						rgn.setFlag(DefaultFlag.PRICE, price);
-						player.sendMessage(ChatColor.YELLOW+"Price of \""+regionString+"\" set to "+currencySymbol+price+".");
+						player.sendMessage(ChatColor.YELLOW+"Price of \""+regionString+"\" set to "+econMgr.format(price)+".");
 					}
 					rgn.setFlag(DefaultFlag.BUYABLE, true);
-					event.setLine(2, currencySymbol+String.valueOf(price)); //TODO Format better? (maybe)
+					event.setLine(2, econMgr.format(price)); 
 					event.setLine(3, ChatColor.GRAY + player.getName()); //Affix player name
 				}
-				catch (Throwable ex){
-					player.sendMessage(ChatColor.RED + ex.getMessage());
-					//Set sign red and show proper formatting
-					event.setLine(0, "§4[Buy Region]");
+				catch (InvalidFormatException ex){
+					player.sendMessage(ChatColor.RED + ex.getMessage());//Send error message
+					event.setLine(0, "§4[Buy Region]");//Set sign red and show proper formatting
 					event.setLine(1, "<Region ID>");
 					event.setLine(2, "$<Price>");
 				}

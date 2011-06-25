@@ -19,7 +19,11 @@
 package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -27,6 +31,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -35,10 +40,13 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
+import com.sk89q.worldguard.bukkit.iConomyManager.EcoAccount;
+import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
@@ -484,6 +492,73 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     return;
                 }
             }
+            //FIXME if the price flag is set manually, update the signs...
+            if (wcfg.useiConomy && iConomyManager.isloaded()
+                    && (type == Material.SIGN_POST || type == Material.SIGN || type == Material.WALL_SIGN)) {
+            	if (plugin.hasPermission(player, "worldguard.region.buy.sign")){
+            		if (((Sign)block.getState()).getLine(0).trim().equals("§1[Buy Region]")) {
+    	                String regionId = ((Sign)block.getState()).getLine(1);
+    	                
+    	                if (regionId != null && regionId != "") {
+    	                    ProtectedRegion region = mgr.getRegion(regionId);
+    	                    
+    	                    if (region != null) {
+    	                    	
+    	                    	if(! ((Sign)block.getState()).getLine(3).equals(ChatColor.GRAY + player.getName()) ){
+    	                    		iConomyManager ico = new iConomyManager();
+    	                    		
+    		                        if (region.getFlag(DefaultFlag.BUYABLE)) {
+    		                        	
+    		                            if (ico.hasAccount(player.getName())) {
+    		                            	
+    		                                EcoAccount account = ico.getAccount(player.getName());
+    		                                double balance = account.balance();
+    		                                
+    		                                //Note: Currently a single owner, if there are multiple, CANNOT list a region as sellable
+    		                                //This would be a GREAT configuration toggle, thus the code below...
+    		                                Set<String> ownersSet = region.getOwners().getPlayers(); 
+    		                                List<EcoAccount> ownerAccounts = new ArrayList<EcoAccount>();
+    		                                for (String owner:ownersSet){
+    		                                	if (!ico.hasAccount(owner))
+    		                                		ico.createAccount(owner);
+    		                                	ownerAccounts.add(ico.getAccount(owner));
+    		                                }
+    		                                
+    		                                double regionPrice = region.getFlag(DefaultFlag.PRICE);
+    		
+    		                                if (balance >= regionPrice) {
+    		                                    account.subtract(regionPrice);
+    		                                    ico.dividAndDistribute(regionPrice,ownerAccounts);
+    		                                    player.sendMessage(ChatColor.YELLOW + "You have bought the region \"" + regionId + "\" for " +
+    		                                            ico.format(regionPrice));
+    		                                    DefaultDomain owners = new DefaultDomain();
+    		                                    owners.addPlayer(player.getName());
+    		                                    region.setOwners(owners);
+    		                                    region.setFlag(DefaultFlag.BUYABLE, false);
+    		                                    block.setTypeId(0); //Set sign to air
+    		                                } else {
+    		                                    player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
+    		                                }
+    		                            } else {
+    		                                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
+    		                            }
+    		                        } else {
+    		                            player.sendMessage(ChatColor.RED + "Region: " + regionId + " is not buyable");
+    		                        } 
+    	                    	} else {
+    	                    		player.sendMessage(ChatColor.RED + "You already own \""+regionId+".\"");
+    	                    	}
+    	                    } else {
+    	                        player.sendMessage(ChatColor.DARK_RED + "The region " + regionId + " does not exist.");
+    	                    }
+    	                } else {
+    	                    player.sendMessage(ChatColor.DARK_RED + "No region specified.");
+    	                }
+    	            }
+            	} else {
+            		player.sendMessage(ChatColor.RED + "You don't have permission for that command!");
+            	}
+            }
         }
 
         if (wcfg.getBlacklist() != null) {
@@ -520,55 +595,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 return;
             }
         }
-
-        /*if (wcfg.useRegions && wcfg.useiConomy && cfg.getiConomy() != null
-                    && (type == Material.SIGN_POST || type == Material.SIGN || type == Material.WALL_SIGN)) {
-            BlockState block = blockClicked.getState();
-
-            if (((Sign)block).getLine(0).equalsIgnoreCase("[WorldGuard]")
-                    && ((Sign)block).getLine(1).equalsIgnoreCase("For sale")) {
-                String regionId = ((Sign)block).getLine(2);
-                //String regionComment = ((Sign)block).getLine(3);
-
-                if (regionId != null && regionId != "") {
-                    RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(player.getWorld().getName());
-                    ProtectedRegion region = mgr.getRegion(regionId);
-
-                    if (region != null) {
-                        RegionFlags flags = region.getFlags();
-
-                        if (flags.getBooleanFlag(DefaultFlag.BUYABLE).getValue(false)) {
-                            if (iConomy.getBank().hasAccount(player.getName())) {
-                                Account account = iConomy.getBank().getAccount(player.getName());
-                                double balance = account.getBalance();
-                                double regionPrice = flags.getDoubleFlag(DefaultFlag.PRICE).getValue();
-
-                                if (balance >= regionPrice) {
-                                    account.subtract(regionPrice);
-                                    player.sendMessage(ChatColor.YELLOW + "You have bought the region " + regionId + " for " +
-                                            iConomy.getBank().format(regionPrice));
-                                    DefaultDomain owners = region.getOwners();
-                                    owners.addPlayer(player.getName());
-                                    region.setOwners(owners);
-                                    flags.getBooleanFlag(DefaultFlag.BUYABLE).setValue(false);
-                                    account.save();
-                                } else {
-                                    player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-                                }
-                            } else {
-                                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-                            }
-                        } else {
-                            player.sendMessage(ChatColor.RED + "Region: " + regionId + " is not buyable");
-                        } 
-                    } else {
-                        player.sendMessage(ChatColor.DARK_RED + "The region " + regionId + " does not exist.");
-                    }
-                } else {
-                    player.sendMessage(ChatColor.DARK_RED + "No region specified.");
-                }
-            }
-        }*/
     }
 
     /**
