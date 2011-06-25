@@ -9,7 +9,6 @@ import com.iConomy.system.Account;
 import com.iConomy.system.BankAccount;
 import com.iConomy.system.Holdings;
 import com.iConomy.util.Constants;
-import com.sk89q.worldguard.bukkit.iConomyManager.EcoAccount;
 
 /**
  * Manager to handle iConomy integration.  Note: ALL iConomy functions must be defined in this class.

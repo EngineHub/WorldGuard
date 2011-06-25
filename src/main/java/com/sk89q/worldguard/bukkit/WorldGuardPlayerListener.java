@@ -492,7 +492,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     return;
                 }
             }
-            //FIXME if the price flag is set manually, update the signs...
+            
             if (wcfg.useiConomy && iConomyManager.isloaded()
                     && (type == Material.SIGN_POST || type == Material.SIGN || type == Material.WALL_SIGN)) {
             	if (plugin.hasPermission(player, "worldguard.region.buy.sign")){
@@ -504,50 +504,57 @@ public class WorldGuardPlayerListener extends PlayerListener {
     	                    
     	                    if (region != null) {
     	                    	
-    	                    	if(! ((Sign)block.getState()).getLine(3).equals(ChatColor.GRAY + player.getName()) ){
-    	                    		iConomyManager ico = new iConomyManager();
+    	                    	iConomyManager ico = new iConomyManager();
+    	                    	if (region.getFlag(DefaultFlag.PRICE) == Double.parseDouble(((Sign)block.getState()).getLine(3).split(" ")[0]) ){
     	                    		
-    		                        if (region.getFlag(DefaultFlag.BUYABLE)) {
-    		                        	
-    		                            if (ico.hasAccount(player.getName())) {
-    		                            	
-    		                                EcoAccount account = ico.getAccount(player.getName());
-    		                                double balance = account.balance();
-    		                                
-    		                                //Note: Currently a single owner, if there are multiple, CANNOT list a region as sellable
-    		                                //This would be a GREAT configuration toggle, thus the code below...
-    		                                Set<String> ownersSet = region.getOwners().getPlayers(); 
-    		                                List<EcoAccount> ownerAccounts = new ArrayList<EcoAccount>();
-    		                                for (String owner:ownersSet){
-    		                                	if (!ico.hasAccount(owner))
-    		                                		ico.createAccount(owner);
-    		                                	ownerAccounts.add(ico.getAccount(owner));
-    		                                }
-    		                                
-    		                                double regionPrice = region.getFlag(DefaultFlag.PRICE);
-    		
-    		                                if (balance >= regionPrice) {
-    		                                    account.subtract(regionPrice);
-    		                                    ico.dividAndDistribute(regionPrice,ownerAccounts);
-    		                                    player.sendMessage(ChatColor.YELLOW + "You have bought the region \"" + regionId + "\" for " +
-    		                                            ico.format(regionPrice));
-    		                                    DefaultDomain owners = new DefaultDomain();
-    		                                    owners.addPlayer(player.getName());
-    		                                    region.setOwners(owners);
-    		                                    region.setFlag(DefaultFlag.BUYABLE, false);
-    		                                    block.setTypeId(0); //Set sign to air
-    		                                } else {
-    		                                    player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-    		                                }
-    		                            } else {
-    		                                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-    		                            }
-    		                        } else {
-    		                            player.sendMessage(ChatColor.RED + "Region: " + regionId + " is not buyable");
-    		                        } 
-    	                    	} else {
-    	                    		player.sendMessage(ChatColor.RED + "You already own \""+regionId+".\"");
-    	                    	}
+	     	                    	if(! ((Sign)block.getState()).getLine(3).equals(ChatColor.GRAY + player.getName()) ){
+	    	                    		
+	    	                    		
+	    		                        if (region.getFlag(DefaultFlag.BUYABLE)) {
+	    		                        	
+	    		                            if (ico.hasAccount(player.getName())) {
+	    		                            	
+	    		                                EcoAccount account = ico.getAccount(player.getName());
+	    		                                double balance = account.balance();
+	    		                                
+	    		                                //Note: Currently a single owner, if there are multiple, CANNOT list a region as sellable
+	    		                                //This would be a GREAT configuration toggle, thus the code below...
+	    		                                Set<String> ownersSet = region.getOwners().getPlayers(); 
+	    		                                List<EcoAccount> ownerAccounts = new ArrayList<EcoAccount>();
+	    		                                for (String owner:ownersSet){
+	    		                                	if (!ico.hasAccount(owner))
+	    		                                		ico.createAccount(owner);
+	    		                                	ownerAccounts.add(ico.getAccount(owner));
+	    		                                }
+	    		                                
+	    		                                double regionPrice = region.getFlag(DefaultFlag.PRICE);
+	    		
+	    		                                if (balance >= regionPrice) {
+	    		                                    account.subtract(regionPrice);
+	    		                                    ico.dividAndDistribute(regionPrice,ownerAccounts);
+	    		                                    player.sendMessage(ChatColor.YELLOW + "You have bought the region \"" + regionId + "\" for " +
+	    		                                            ico.format(regionPrice));
+	    		                                    DefaultDomain owners = new DefaultDomain();
+	    		                                    owners.addPlayer(player.getName());
+	    		                                    region.setOwners(owners);
+	    		                                    region.setFlag(DefaultFlag.BUYABLE, false);
+	    		                                    block.setTypeId(0); //Set sign to air
+	    		                                } else {
+	    		                                    player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
+	    		                                }
+	    		                            } else {
+	    		                                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
+	    		                            }
+	    		                        } else {
+	    		                            player.sendMessage(ChatColor.RED + "Region: " + regionId + " is not buyable");
+	    		                        } 
+	    	                    	} else {
+	    	                    		player.sendMessage(ChatColor.RED + "You already own \""+regionId+".\"");
+	    	                    	}   	                    		
+	                    		} else {//Sign price is wrong...  Fix and report to user.
+	                    			((Sign)block.getState()).setLine(2,ico.format(region.getFlag(DefaultFlag.PRICE)));
+	                    			player.sendMessage(ChatColor.YELLOW + "The price on this sign was out of date.  It has been updated.");
+	                    		}
     	                    } else {
     	                        player.sendMessage(ChatColor.DARK_RED + "The region " + regionId + " does not exist.");
     	                    }

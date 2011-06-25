@@ -36,7 +36,6 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.*;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.iConomyManager;
@@ -732,6 +731,15 @@ public class RegionCommands {
             sender.sendMessage(ChatColor.YELLOW
                     + "Region flag '" + foundFlag.getName() + "' cleared.");
         }
+        
+        
+        if( flagName.equals(DefaultFlag.PRICE.getName()) ){
+        	WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
+	        if(wcfg.useiConomy){
+	        	player.sendMessage(ChatColor.YELLOW + "Note: Right click on buy signs to update the price.");
+	        }
+        }
+        
         
         try {
             mgr.save();
