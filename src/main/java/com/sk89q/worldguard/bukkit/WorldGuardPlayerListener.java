@@ -53,6 +53,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+
 /**
  * Handles all events thrown in relation to a player.
  */
@@ -505,7 +506,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     	                    if (region != null) {
     	                    	
     	                    	iConomyManager ico = new iConomyManager();
-    	                    	if (region.getFlag(DefaultFlag.PRICE) == Double.parseDouble(((Sign)block.getState()).getLine(3).split(" ")[0]) ){
+    	                    	if (region.getFlag(DefaultFlag.PRICE) == Double.parseDouble(((Sign)block.getState()).getLine(2).split(" ")[0]) ){
     	                    		
 	     	                    	if(! ((Sign)block.getState()).getLine(3).equals(ChatColor.GRAY + player.getName()) ){
 	    	                    		
@@ -553,6 +554,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
 	    	                    	}   	                    		
 	                    		} else {//Sign price is wrong...  Fix and report to user.
 	                    			((Sign)block.getState()).setLine(2,ico.format(region.getFlag(DefaultFlag.PRICE)));
+	                    			((Sign) block.getState()).update(); //So the client sees the update
 	                    			player.sendMessage(ChatColor.YELLOW + "The price on this sign was out of date.  It has been updated.");
 	                    		}
     	                    } else {
