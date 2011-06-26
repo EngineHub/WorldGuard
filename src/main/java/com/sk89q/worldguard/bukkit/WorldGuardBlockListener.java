@@ -70,22 +70,28 @@ public class WorldGuardBlockListener extends BlockListener {
     public void registerEvents() {
         PluginManager pm = plugin.getServer().getPluginManager();
 
-        pm.registerEvent(Event.Type.BLOCK_DAMAGE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.BLOCK_BREAK, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.BLOCK_FROMTO, this, Priority.Normal, plugin);
-        pm.registerEvent(Event.Type.BLOCK_IGNITE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.BLOCK_PHYSICS, this, Priority.Normal, plugin);
-        pm.registerEvent(Event.Type.BLOCK_PLACE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.BLOCK_BURN, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.SIGN_CHANGE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.REDSTONE_CHANGE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.LEAVES_DECAY, this, Priority.High, plugin);
-        registerEventSafe("SNOW_FORM", Priority.High);
-        registerEventSafe("BLOCK_FORM", Priority.High);
-        registerEventSafe("BLOCK_SPREAD", Priority.High);
+        registerEvent("BLOCK_DAMAGE", Priority.High);
+        registerEvent("BLOCK_BREAK", Priority.High);
+        registerEvent("BLOCK_FROMTO", Priority.Normal);
+        registerEvent("BLOCK_IGNITE", Priority.High);
+        registerEvent("BLOCK_PHYSICS", Priority.Normal);
+        registerEvent("BLOCK_PLACE", Priority.High);
+        registerEvent("BLOCK_BURN", Priority.High);
+        registerEvent("SIGN_CHANGE", Priority.High);
+        registerEvent("REDSTONE_CHANGE", Priority.High);
+        registerEvent("SNOW_FORM", Priority.High);
+        registerEvent("LEAVES_DECAY", Priority.High);
+        registerEvent("BLOCK_FORM", Priority.High);
+        registerEvent("BLOCK_SPREAD", Priority.High);
     }
 
-    private void registerEventSafe(String typeName, Priority priority) {
+    /**
+     * Register an event, but not failing if the event is not implemented.
+     *
+     * @param typeName
+     * @param priority
+     */
+    private void registerEvent(String typeName, Priority priority) {
         try {
             Event.Type type = Event.Type.valueOf(typeName);
             PluginManager pm = plugin.getServer().getPluginManager();

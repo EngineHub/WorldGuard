@@ -41,12 +41,18 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
+import java.util.logging.Logger;
+
 /**
  * Listener for entity related events.
  * 
  * @author sk89q
  */
 public class WorldGuardEntityListener extends EntityListener {
+    /**
+     * Logger for messages.
+     */
+    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     private WorldGuardPlugin plugin;
 
@@ -65,14 +71,30 @@ public class WorldGuardEntityListener extends EntityListener {
     public void registerEvents() {
         PluginManager pm = plugin.getServer().getPluginManager();
 
-        pm.registerEvent(Event.Type.ENTITY_DAMAGE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.ENTITY_EXPLODE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.CREATURE_SPAWN, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.ENTITY_INTERACT, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.CREEPER_POWER, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PIG_ZAP, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PAINTING_BREAK, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PAINTING_PLACE, this, Priority.High, plugin);
+        registerEvent("ENTITY_DAMAGE", Priority.High);
+        registerEvent("ENTITY_EXPLODE", Priority.High);
+        registerEvent("CREATURE_SPAWN", Priority.High);
+        registerEvent("ENTITY_INTERACT", Priority.High);
+        registerEvent("CREEPER_POWER", Priority.High);
+        registerEvent("PIG_ZAP", Priority.High);
+        registerEvent("PAINTING_BREAK", Priority.High);
+        registerEvent("PAINTING_PLACE", Priority.High);
+    }
+
+    /**
+     * Register an event, but not failing if the event is not implemented.
+     *
+     * @param typeName
+     * @param priority
+     */
+    private void registerEvent(String typeName, Priority priority) {
+        try {
+            Event.Type type = Event.Type.valueOf(typeName);
+            PluginManager pm = plugin.getServer().getPluginManager();
+            pm.registerEvent(type, this, priority, plugin);
+        } catch (IllegalArgumentException e) {
+            logger.info("WorldGuard: Unable to register missing event type " + typeName);
+        }
     }
 
     /**

@@ -32,7 +32,14 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
+import java.util.logging.Logger;
+
 public class WorldGuardWeatherListener extends WeatherListener {
+
+    /**
+     * Logger for messages.
+     */
+    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     /**
      * Plugin.
@@ -51,9 +58,25 @@ public class WorldGuardWeatherListener extends WeatherListener {
     public void registerEvents() {
         PluginManager pm = plugin.getServer().getPluginManager();
 
-        pm.registerEvent(Event.Type.LIGHTNING_STRIKE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.THUNDER_CHANGE, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.WEATHER_CHANGE, this, Priority.High, plugin);
+        registerEvent("LIGHTNING_STRIKE", Priority.High);
+        registerEvent("THUNDER_CHANGE", Priority.High);
+        registerEvent("WEATHER_CHANGE", Priority.High);
+    }
+
+    /**
+     * Register an event, but not failing if the event is not implemented.
+     *
+     * @param typeName
+     * @param priority
+     */
+    private void registerEvent(String typeName, Priority priority) {
+        try {
+            Event.Type type = Event.Type.valueOf(typeName);
+            PluginManager pm = plugin.getServer().getPluginManager();
+            pm.registerEvent(type, this, priority, plugin);
+        } catch (IllegalArgumentException e) {
+            logger.info("WorldGuard: Unable to register missing event type " + typeName);
+        }
     }
 
     @Override
