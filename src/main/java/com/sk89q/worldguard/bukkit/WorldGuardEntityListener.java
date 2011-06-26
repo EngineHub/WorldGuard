@@ -478,6 +478,20 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
         }
+
+        if (wcfg.useRegions) {
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+            // Whoo, for each block
+            for (Block block : event.blockList()) {
+                Vector pt = toVector(block);
+
+                if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.TNT)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
     }
 
     /**
