@@ -19,6 +19,10 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import org.bukkit.entity.CreatureType;
+
+import java.util.Set;
+
 /**
  *
  * @author sk89q
@@ -49,7 +53,7 @@ public final class DefaultFlag {
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
     public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave");
-    public static final StringFlag DENY_SPAWN = new StringFlag("deny-spawn");
+    public static final SetFlag<CreatureType> DENY_SPAWN = new SetFlag<CreatureType>("deny-spawn", new CreatureTypeFlag(null));
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay");
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount");
     public static final VectorFlag TELE_LOC = new VectorFlag("teleport");
