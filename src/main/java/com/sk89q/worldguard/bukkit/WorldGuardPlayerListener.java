@@ -20,6 +20,7 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -84,6 +85,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         registerEvent("PLAYER_ITEM_HELD", Priority.High);
         registerEvent("PLAYER_BED_ENTER", Priority.High);
         registerEvent("PLAYER_MOVE", Priority.High);
+        registerEvent("PLAYER_COMMAND_PREPROCESS", Priority.High);
     }
 
     /**
@@ -882,6 +884,32 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     event.setCancelled(true);
                     player.sendMessage("This bed doesn't belong to you!");
                     return;
+            }
+        }
+    }
+
+    /**
+     * Called on command run.
+     */
+    @Override
+    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+        Player player = event.getPlayer();
+        World world = player.getWorld();
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.useRegions) {
+            Vector pt = toVector(player.getLocation());
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+            String[] parts = event.getMessage().split(" ");
+
+            Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS);
+            if (blockedCommands != null && blockedCommands.contains(parts[0].toLowerCase())) {
+                player.sendMessage(ChatColor.RED + parts[0].toLowerCase() + " is blocked in this area.");
+                event.setCancelled(true);
+                return;
             }
         }
     }
