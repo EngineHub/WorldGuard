@@ -60,17 +60,27 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return
      */
     public boolean canBuild(LocalPlayer player) {
-        return internalGetState(DefaultFlag.BUILD, player);
+        return internalGetState(DefaultFlag.BUILD, player, null, null);
     }
     
     /**
-     * Checks if a player can build in an area.
+     * Checks if a player can use items in an area.
      * 
      * @param player
      * @return
      */
     public boolean canUse(LocalPlayer player) {
-        return internalGetState(DefaultFlag.USE, player);
+        return internalGetState(DefaultFlag.USE, player, null, null);
+    }
+
+    /**
+     * Gets the state of a state flag. This cannot be used for the build flag.
+     *
+     * @param flag
+     * @return
+     */
+    public boolean allows(StateFlag flag) {
+        return internalGetState(flag, null, null, null);
     }
     
     /**
@@ -79,8 +89,8 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param flag
      * @return
      */
-    public boolean allows(StateFlag flag) {
-        return internalGetState(flag, null);
+    public boolean allows(StateFlag flag, LocalPlayer player) {
+        return internalGetState(flag, null, flag.getGroupFlag(), player);
     }
     
     /**
@@ -119,13 +129,15 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Checks to see if a flag is permitted.
      * 
-     * @param def
-     *            default state if there are no regions defined
-     * @param player
-     *            null to not check owners and members
+     * @param flag flag to check
+     * @param player null to not check owners and members
+     * @param groupFlag group flag to check
+     * @param groupPlayer player to use for the group flag check
      * @return
      */
-    private boolean internalGetState(StateFlag flag, LocalPlayer player) {
+    private boolean internalGetState(StateFlag flag, LocalPlayer player,
+                                     RegionGroupFlag groupFlag,
+                                     LocalPlayer groupPlayer) {
         boolean found = false;
         boolean allowed = false; // Used for ALLOW override
         boolean def = flag.getDefault();
@@ -185,6 +197,17 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             if (player != null
                     && region.getFlag(DefaultFlag.PASSTHROUGH) == State.ALLOW) {
                 continue;
+            }
+
+            // Check group permissions
+            if (groupPlayer != null && groupFlag != null) {
+                RegionGroupFlag.RegionGroup group = region.getFlag(groupFlag);
+                if (group == null) {
+                    group = groupFlag.getDefault();
+                }
+                if (!RegionGroupFlag.isMember(region, group, groupPlayer)) {
+                    continue;
+                }
             }
             
             State v = region.getFlag(flag);

@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -236,10 +238,34 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     || event.getFrom().getBlockY() != event.getTo().getBlockY()
                     || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
                 PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 Vector pt = toVector(event.getTo());
                 ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+                boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
+                if (!entryAllowed && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
+
+                    // Make sure that we don't get the player stuck
+                    /*if (event.getFrom().getBlockX() == event.getTo().getBlockX()
+                            && event.getFrom().getBlockZ() == event.getTo().getBlockZ()
+                            && event.getFrom().getBlockY() > event.getTo().getBlockY()
+                            && BlockType.canPassThrough(event.getFrom().getBlock().getRelative(0, -1, 0).getTypeId())) {
+                        event.setTo(world.getSpawnLocation());
+                        player.sendMessage(ChatColor.GRAY + "Because you fell vertically into a forbidden area, you have been sent to spawn so as to not get stuck.");
+                        return;
+                    }*/
+                    
+                    Location newLoc = event.getFrom();
+                    newLoc.setX(newLoc.getBlockX() + 0.5);
+                    newLoc.setY(newLoc.getBlockY());
+                    newLoc.setZ(newLoc.getBlockZ() + 0.5);
+                    event.setTo(newLoc);
+                    return;
+                }
+
                 String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);
                 String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
                 Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
@@ -821,15 +847,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 
                 if (group != null) {
                     LocalPlayer localPlayer = plugin.wrapPlayer(player);
-                    
-                    if (group == RegionGroup.OWNERS) {
-                        if (set.isOwnerOfAll(localPlayer)) {
-                            event.setRespawnLocation(spawnLoc);
-                        }
-                    } else if (group == RegionGroup.MEMBERS) {
-                        if (set.isMemberOfAll(localPlayer)) {
-                            event.setRespawnLocation(spawnLoc);
-                        }
+
+                    if (RegionGroupFlag.isMember(set, group, localPlayer)) {
+                        event.setRespawnLocation(spawnLoc);
                     }
                 } else {
                     event.setRespawnLocation(spawnLoc);
