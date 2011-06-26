@@ -63,6 +63,7 @@ public final class DefaultFlag {
     public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
     public static final DoubleFlag PRICE = new DoubleFlag("price");
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", new CommandStringFlag(null));
+    public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", new CommandStringFlag(null));
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, MOB_SPAWNING, CREEPER_EXPLOSION, SLEEP,
@@ -70,7 +71,7 @@ public final class DefaultFlag {
         USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER,
         NOTIFY_LEAVE, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
         TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL, LEAF_DECAY,
-        GHAST_FIREBALL, BLOCKED_CMDS
+        GHAST_FIREBALL, BLOCKED_CMDS, ALLOWED_CMDS
     };
     
     private DefaultFlag() {
