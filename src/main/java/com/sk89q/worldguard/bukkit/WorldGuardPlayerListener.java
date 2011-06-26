@@ -239,25 +239,28 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
                 PlayerFlagState state = plugin.getFlagStateManager().getState(player);
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
 
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 Vector pt = toVector(event.getTo());
                 ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
                 boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-                if (!entryAllowed && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
+                if (!hasBypass && !entryAllowed) {
                     player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
 
-                    // Make sure that we don't get the player stuck
-                    /*if (event.getFrom().getBlockX() == event.getTo().getBlockX()
-                            && event.getFrom().getBlockZ() == event.getTo().getBlockZ()
-                            && event.getFrom().getBlockY() > event.getTo().getBlockY()
-                            && BlockType.canPassThrough(event.getFrom().getBlock().getRelative(0, -1, 0).getTypeId())) {
-                        event.setTo(world.getSpawnLocation());
-                        player.sendMessage(ChatColor.GRAY + "Because you fell vertically into a forbidden area, you have been sent to spawn so as to not get stuck.");
-                        return;
-                    }*/
-                    
+                    Location newLoc = event.getFrom();
+                    newLoc.setX(newLoc.getBlockX() + 0.5);
+                    newLoc.setY(newLoc.getBlockY());
+                    newLoc.setZ(newLoc.getBlockZ() + 0.5);
+                    event.setTo(newLoc);
+                    return;
+                }
+
+                boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
+                if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
+                    player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
+
                     Location newLoc = event.getFrom();
                     newLoc.setX(newLoc.getBlockX() + 0.5);
                     newLoc.setY(newLoc.getBlockY());
@@ -310,6 +313,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 state.lastFarewell = farewell;
                 state.notifiedForEnter = notifyEnter;
                 state.notifiedForLeave = notifyLeave;
+                state.lastExitAllowed = exitAllowed;
             }
         }
     }
