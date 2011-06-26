@@ -49,6 +49,8 @@ public final class DefaultFlag {
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
     public static final RegionGroupFlag ENTRY_PERM = new RegionGroupFlag("entry-group", RegionGroupFlag.RegionGroup.NON_MEMBERS);
+    public static final StateFlag EXIT = new StateFlag("exit", true);
+    public static final RegionGroupFlag EXIT_PERM = new RegionGroupFlag("exit-group", RegionGroupFlag.RegionGroup.NON_MEMBERS);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
@@ -71,11 +73,12 @@ public final class DefaultFlag {
         USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER,
         NOTIFY_LEAVE, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
         TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL, LEAF_DECAY,
-        GHAST_FIREBALL, BLOCKED_CMDS, ALLOWED_CMDS, ENTRY, ENTRY_PERM
+        GHAST_FIREBALL, BLOCKED_CMDS, ALLOWED_CMDS, ENTRY, ENTRY_PERM, EXIT, EXIT_PERM
     };
 
     static {
         ENTRY.setGroupFlag(ENTRY_PERM);
+        EXIT.setGroupFlag(EXIT_PERM);
     }
     
     private DefaultFlag() {
