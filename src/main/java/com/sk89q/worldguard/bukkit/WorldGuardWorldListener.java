@@ -37,7 +37,23 @@ public class WorldGuardWorldListener extends WorldListener {
     public void registerEvents() {
         PluginManager pm = plugin.getServer().getPluginManager();
 
-        pm.registerEvent(Event.Type.CHUNK_LOAD, this, Event.Priority.Normal, plugin);
+        registerEvent("CHUNK_LOAD", Event.Priority.Normal);
+    }
+
+    /**
+     * Register an event, but not failing if the event is not implemented.
+     *
+     * @param typeName
+     * @param priority
+     */
+    private void registerEvent(String typeName, Event.Priority priority) {
+        try {
+            Event.Type type = Event.Type.valueOf(typeName);
+            PluginManager pm = plugin.getServer().getPluginManager();
+            pm.registerEvent(type, this, priority, plugin);
+        } catch (IllegalArgumentException e) {
+            logger.info("WorldGuard: Unable to register missing event type " + typeName);
+        }
     }
 
     /**

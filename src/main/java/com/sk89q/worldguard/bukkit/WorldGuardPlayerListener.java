@@ -72,18 +72,34 @@ public class WorldGuardPlayerListener extends PlayerListener {
     public void registerEvents() {
         PluginManager pm = plugin.getServer().getPluginManager();
 
-        pm.registerEvent(Event.Type.PLAYER_INTERACT, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PLAYER_JOIN, this, Priority.Normal, plugin);
-        pm.registerEvent(Event.Type.PLAYER_LOGIN, this, Priority.Normal, plugin);
-        pm.registerEvent(Event.Type.PLAYER_QUIT, this, Priority.Normal, plugin);
-        pm.registerEvent(Event.Type.PLAYER_BUCKET_FILL, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PLAYER_BUCKET_EMPTY, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PLAYER_RESPAWN, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PLAYER_ITEM_HELD, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PLAYER_BED_ENTER, this, Priority.High, plugin);
-        pm.registerEvent(Event.Type.PLAYER_MOVE, this, Priority.High, plugin);
+        registerEvent("PLAYER_INTERACT", Priority.High);
+        registerEvent("PLAYER_DROP_ITEM", Priority.High);
+        registerEvent("PLAYER_PICKUP_ITEM", Priority.High);
+        registerEvent("PLAYER_JOIN", Priority.Normal);
+        registerEvent("PLAYER_LOGIN", Priority.Normal);
+        registerEvent("PLAYER_QUIT", Priority.Normal);
+        registerEvent("PLAYER_BUCKET_FILL", Priority.High);
+        registerEvent("PLAYER_BUCKET_EMPTY", Priority.High);
+        registerEvent("PLAYER_RESPAWN", Priority.High);
+        registerEvent("PLAYER_ITEM_HELD", Priority.High);
+        registerEvent("PLAYER_BED_ENTER", Priority.High);
+        registerEvent("PLAYER_MOVE", Priority.High);
+    }
+
+    /**
+     * Register an event, but not failing if the event is not implemented.
+     *
+     * @param typeName
+     * @param priority
+     */
+    private void registerEvent(String typeName, Priority priority) {
+        try {
+            Event.Type type = Event.Type.valueOf(typeName);
+            PluginManager pm = plugin.getServer().getPluginManager();
+            pm.registerEvent(type, this, priority, plugin);
+        } catch (IllegalArgumentException e) {
+            logger.info("WorldGuard: Unable to register missing event type " + typeName);
+        }
     }
 
     /**
