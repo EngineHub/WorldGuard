@@ -41,6 +41,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -496,13 +497,11 @@ public class WorldGuardEntityListener extends EntityListener {
         }
 
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
-
-        //CreatureType creaType = (CreatureType) CreatureType.valueOf(event.getMobType().toString());
         CreatureType creaType = event.getCreatureType();
-        Boolean cancelEvent = false;
 
         if (wcfg.blockCreatureSpawn.contains(creaType)) {
-            cancelEvent = true;
+            event.setCancelled(true);
+            return;
         }
         
         Location eventLoc = event.getLocation();
@@ -513,29 +512,15 @@ public class WorldGuardEntityListener extends EntityListener {
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             if (!set.allows(DefaultFlag.MOB_SPAWNING)) {
-            	cancelEvent = true;
+                event.setCancelled(true);
+                return;
             }
-        }
-        
-        // TODO: Monsters and stuff
-/*
-        if (wcfg.useRegions) {
-            Vector pt = toVector(event.getEntity().getLocation());
-            RegionManager mgr = plugin.getGlobalRegionManager().get(event.getEntity().getWorld().getName());
 
-            Boolean flagValue = mgr.getApplicableRegions(pt).getFlag(DefaultFlag.DENY_SPAWN).getValue("").contains(creaType.getName());
-            if (flagValue != null) {
-                if (flagValue) {
-                    cancelEvent = true;
-                } else {
-                    cancelEvent = false;
-                }
+            Set<CreatureType> blockTypes = set.getFlag(DefaultFlag.DENY_SPAWN);
+            if (blockTypes != null && blockTypes.contains(creaType)) {
+                event.setCancelled(true);
+                return;
             }
-        }*/
-
-        if (cancelEvent) {
-            event.setCancelled(true);
-            return;
         }
     }
 
