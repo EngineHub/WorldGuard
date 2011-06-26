@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,12 +47,34 @@ import org.bukkit.util.config.Configuration;
  */
 public class WorldConfiguration {
 
+    public static final String CONFIG_HEADER = "#\r\n" +
+            "# WorldGuard's configuration file.\r\n" +
+            "#\r\n" +
+            "# This is the a per-world configuration file. It only affects one\r\n" +
+            "# corresponding world.\r\n" +
+            "#\r\n" +
+            "# About editing this file:\r\n" +
+            "# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If\r\n" +
+            "#   you use an editor like Notepad++ (recommended for Windows users), you\r\n" +
+            "#   must configure it to \"replace tabs with spaces.\" In Notepad++, this can\r\n" +
+            "#   be changed in Settings > Preferences > Language Menu.\r\n" +
+            "# - Don't get rid of the indents. They are indented so some entries are\r\n" +
+            "#   in categories (like \"enforce-single-session\" is in the \"protection\"\r\n" +
+            "#   category.\r\n" +
+            "# - If you want to check the format of this file before putting it\r\n" +
+            "#   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/\r\n" +
+            "#   and see if it gives \"ERROR:\".\r\n" +
+            "# - Lines starting with # are comments and so they are ignored.\r\n" +
+            "#\r\n";
+
     private static final Logger logger = Logger
             .getLogger("Minecraft.WorldGuard");
 
     private WorldGuardPlugin plugin;
 
     private String worldName;
+    private Configuration parentConfig;
+    private Configuration config;
     private File configFile;
     private File blacklistFile;
 
@@ -136,98 +159,147 @@ public class WorldConfiguration {
 
         this.plugin = plugin;
         this.worldName = worldName;
+        this.parentConfig = plugin.getConfiguration();
 
         WorldGuardPlugin.createDefaultConfiguration(configFile, "config_world.yml");
         WorldGuardPlugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
 
+        config = new Configuration(this.configFile);
         loadConfiguration();
 
         logger.info("WorldGuard: Loaded configuration for world '" + worldName + '"');
+    }
+
+    private boolean getBoolean(String node, boolean def) {
+        if (config.getProperty(node) != null) {
+            return config.getBoolean(node, def);
+        } else {
+            return parentConfig.getBoolean(node, def);
+        }
+    }
+
+    private String getString(String node, String def) {
+        if (config.getProperty(node) != null) {
+            return config.getString(node, def);
+        } else {
+            return parentConfig.getString(node, def);
+        }
+    }
+
+    private int getInt(String node, int def) {
+        if (config.getProperty(node) != null) {
+            return config.getInt(node, def);
+        } else {
+            return parentConfig.getInt(node, def);
+        }
+    }
+
+    private double getDouble(String node, double def) {
+        if (config.getProperty(node) != null) {
+            return config.getDouble(node, def);
+        } else {
+            return parentConfig.getDouble(node, def);
+        }
+    }
+
+    private List<Integer> getIntList(String node, List<Integer> def) {
+        if (config.getProperty(node) != null) {
+            return config.getIntList(node, def);
+        } else {
+            return parentConfig.getIntList(node, def);
+        }
+    }
+
+    private List<String> getStringList(String node, List<String> def) {
+        if (config.getProperty(node) != null) {
+            return config.getStringList(node, def);
+        } else {
+            return parentConfig.getStringList(node, def);
+        }
     }
 
     /**
      * Load the configuration.
      */
     private void loadConfiguration() {
-        Configuration config = new Configuration(this.configFile);
         config.load();
 
-        opPermissions = config.getBoolean("op-permissions", true);
+        opPermissions = getBoolean("op-permissions", true);
 
-        enforceOneSession = config.getBoolean("protection.enforce-single-session", true);
-        itemDurability = config.getBoolean("protection.item-durability", true);
-        removeInfiniteStacks = config.getBoolean("protection.remove-infinite-stacks", false);
+        enforceOneSession = getBoolean("protection.enforce-single-session", true);
+        itemDurability = getBoolean("protection.item-durability", true);
+        removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
 
-        classicWater = config.getBoolean("simulation.classic-water", false);
-        simulateSponge = config.getBoolean("simulation.sponge.enable", true);
-        spongeRadius = Math.max(1, config.getInt("simulation.sponge.radius", 3)) - 1;
-        redstoneSponges = config.getBoolean("simulation.sponge.redstone", false);
+        classicWater = getBoolean("simulation.classic-water", false);
+        simulateSponge = getBoolean("simulation.sponge.enable", true);
+        spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
+        redstoneSponges = getBoolean("simulation.sponge.redstone", false);
 
-        pumpkinScuba = config.getBoolean("pumpkin-scuba", false);
+        pumpkinScuba = getBoolean("pumpkin-scuba", false);
 
-        noPhysicsGravel = config.getBoolean("physics.no-physics-gravel", false);
-        noPhysicsSand = config.getBoolean("physics.no-physics-sand", false);
-        allowPortalAnywhere = config.getBoolean("physics.allow-portal-anywhere", false);
-        preventWaterDamage = new HashSet<Integer>(config.getIntList("physics.disable-water-damage-blocks", null));
+        noPhysicsGravel = getBoolean("physics.no-physics-gravel", false);
+        noPhysicsSand = getBoolean("physics.no-physics-sand", false);
+        allowPortalAnywhere = getBoolean("physics.allow-portal-anywhere", false);
+        preventWaterDamage = new HashSet<Integer>(getIntList("physics.disable-water-damage-blocks", null));
 
-        blockTNT = config.getBoolean("ignition.block-tnt", false);
-        blockLighter = config.getBoolean("ignition.block-lighter", false);
+        blockTNT = getBoolean("ignition.block-tnt", false);
+        blockLighter = getBoolean("ignition.block-lighter", false);
 
-        preventLavaFire = config.getBoolean("fire.disable-lava-fire-spread", true);
-        disableFireSpread = config.getBoolean("fire.disable-all-fire-spread", false);
-        disableFireSpreadBlocks = new HashSet<Integer>(config.getIntList("fire.disable-fire-spread-blocks", null));
-        allowedLavaSpreadOver = new HashSet<Integer>(config.getIntList("fire.lava-spread-blocks", null));
+        preventLavaFire = getBoolean("fire.disable-lava-fire-spread", true);
+        disableFireSpread = getBoolean("fire.disable-all-fire-spread", false);
+        disableFireSpreadBlocks = new HashSet<Integer>(getIntList("fire.disable-fire-spread-blocks", null));
+        allowedLavaSpreadOver = new HashSet<Integer>(getIntList("fire.lava-spread-blocks", null));
 
-        blockCreeperExplosions = config.getBoolean("mobs.block-creeper-explosions", false);
-        blockCreeperBlockDamage = config.getBoolean("mobs.block-creeper-block-damage", false);
-        antiWolfDumbness = config.getBoolean("mobs.anti-wolf-dumbness", false);
+        blockCreeperExplosions = getBoolean("mobs.block-creeper-explosions", false);
+        blockCreeperBlockDamage = getBoolean("mobs.block-creeper-block-damage", false);
+        antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
 
-        loginProtection = config.getInt("spawn.login-protection", 3);
-        spawnProtection = config.getInt("spawn.spawn-protection", 0);
-        kickOnDeath = config.getBoolean("spawn.kick-on-death", false);
-        exactRespawn = config.getBoolean("spawn.exact-respawn", false);
-        teleportToHome = config.getBoolean("spawn.teleport-to-home-on-death", false);
+        loginProtection = getInt("spawn.login-protection", 3);
+        spawnProtection = getInt("spawn.spawn-protection", 0);
+        kickOnDeath = getBoolean("spawn.kick-on-death", false);
+        exactRespawn = getBoolean("spawn.exact-respawn", false);
+        teleportToHome = getBoolean("spawn.teleport-to-home-on-death", false);
 
-        disableFallDamage = config.getBoolean("player-damage.disable-fall-damage", false);
-        disableLavaDamage = config.getBoolean("player-damage.disable-lava-damage", false);
-        disableFireDamage = config.getBoolean("player-damage.disable-fire-damage", false);
-        disableLightningDamage = config.getBoolean("player-damage.disable-lightning-damage", false);
-        disableDrowningDamage = config.getBoolean("player-damage.disable-drowning-damage", false);
-        disableSuffocationDamage = config.getBoolean("player-damage.disable-suffocation-damage", false);
-        disableContactDamage = config.getBoolean("player-damage.disable-contact-damage", false);
-        teleportOnSuffocation = config.getBoolean("player-damage.teleport-on-suffocation", false);
-        disableVoidDamage = config.getBoolean("player-damage.disable-void-damage", false);
-        teleportOnVoid = config.getBoolean("player-damage.teleport-on-void-falling", false);
-        disableExplosionDamage = config.getBoolean("player-damage.disable-explosion-damage", false);
-        disableMobDamage = config.getBoolean("player-damage.disable-mob-damage", false);
+        disableFallDamage = getBoolean("player-damage.disable-fall-damage", false);
+        disableLavaDamage = getBoolean("player-damage.disable-lava-damage", false);
+        disableFireDamage = getBoolean("player-damage.disable-fire-damage", false);
+        disableLightningDamage = getBoolean("player-damage.disable-lightning-damage", false);
+        disableDrowningDamage = getBoolean("player-damage.disable-drowning-damage", false);
+        disableSuffocationDamage = getBoolean("player-damage.disable-suffocation-damage", false);
+        disableContactDamage = getBoolean("player-damage.disable-contact-damage", false);
+        teleportOnSuffocation = getBoolean("player-damage.teleport-on-suffocation", false);
+        disableVoidDamage = getBoolean("player-damage.disable-void-damage", false);
+        teleportOnVoid = getBoolean("player-damage.teleport-on-void-falling", false);
+        disableExplosionDamage = getBoolean("player-damage.disable-explosion-damage", false);
+        disableMobDamage = getBoolean("player-damage.disable-mob-damage", false);
 
-        signChestProtection = config.getBoolean("chest-protection.enable", false);
+        signChestProtection = getBoolean("chest-protection.enable", false);
 
-        disableCreatureCropTrampling = config.getBoolean("crops.disable-creature-trampling", false);
-        disablePlayerCropTrampling = config.getBoolean("crops.disable-player-trampling", false);
+        disableCreatureCropTrampling = getBoolean("crops.disable-creature-trampling", false);
+        disablePlayerCropTrampling = getBoolean("crops.disable-player-trampling", false);
 
-        disallowedLightningBlocks = new HashSet<Integer>(config.getIntList("weather.prevent-lightning-strike-blocks", null));
-        preventLightningFire = config.getBoolean("weather.disable-lightning-strike-fire", false);
-        disableThunder = config.getBoolean("weather.disable-thunderstorm", false);
-        disableWeather = config.getBoolean("weather.disable-weather", false);
-        disablePigZap = config.getBoolean("weather.disable-pig-zombification", false);
-        disableCreeperPower = config.getBoolean("weather.disable-powered-creepers", false);
-        alwaysRaining = config.getBoolean("weather.always-raining", false);
-        alwaysThundering = config.getBoolean("weather.always-thundering", false);
+        disallowedLightningBlocks = new HashSet<Integer>(getIntList("weather.prevent-lightning-strike-blocks", null));
+        preventLightningFire = getBoolean("weather.disable-lightning-strike-fire", false);
+        disableThunder = getBoolean("weather.disable-thunderstorm", false);
+        disableWeather = getBoolean("weather.disable-weather", false);
+        disablePigZap = getBoolean("weather.disable-pig-zombification", false);
+        disableCreeperPower = getBoolean("weather.disable-powered-creepers", false);
+        alwaysRaining = getBoolean("weather.always-raining", false);
+        alwaysThundering = getBoolean("weather.always-thundering", false);
 
-        useRegions = config.getBoolean("regions.enable", true);
-        highFreqFlags = config.getBoolean("regions.high-frequency-flags", false);
-        regionWand = config.getInt("regions.wand", 287);
-        maxClaimVolume = config.getInt("regions.max-claim-volume", 30000);
-        claimOnlyInsideExistingRegions = config.getBoolean("regions.claim-only-inside-existing-regions", false);
-        maxRegionCountPerPlayer = config.getInt("regions.max-region-count-per-player", 7);
+        useRegions = getBoolean("regions.enable", true);
+        highFreqFlags = getBoolean("regions.high-frequency-flags", false);
+        regionWand = getInt("regions.wand", 287);
+        maxClaimVolume = getInt("regions.max-claim-volume", 30000);
+        claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
+        maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player", 7);
 
-        useiConomy = config.getBoolean("iconomy.enable", false);
-        buyOnClaim = config.getBoolean("iconomy.buy-on-claim", false);
-        buyOnClaimPrice = config.getDouble("iconomy.buy-on-claim-price", 1.0);
+        useiConomy = getBoolean("iconomy.enable", false);
+        buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
+        buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
 
         blockCreatureSpawn = new HashSet<CreatureType>();
-        for (String creatureName : config.getStringList("mobs.block-creature-spawn", null)) {
+        for (String creatureName : getStringList("mobs.block-creature-spawn", null)) {
             CreatureType creature = CreatureType.fromName(creatureName);
 
             if (creature == null) {
@@ -237,22 +309,22 @@ public class WorldConfiguration {
             }
         }
 
-        boolean useBlacklistAsWhitelist = config.getBoolean("blacklist.use-as-whitelist", false);
+        boolean useBlacklistAsWhitelist = getBoolean("blacklist.use-as-whitelist", false);
 
         // Console log configuration
-        boolean logConsole = config.getBoolean("blacklist.logging.console.enable", true);
+        boolean logConsole = getBoolean("blacklist.logging.console.enable", true);
 
         // Database log configuration
-        boolean logDatabase = config.getBoolean("blacklist.logging.database.enable", false);
-        String dsn = config.getString("blacklist.logging.database.dsn", "jdbc:mysql://localhost:3306/minecraft");
-        String user = config.getString("blacklist.logging.database.user", "root");
-        String pass = config.getString("blacklist.logging.database.pass", "");
-        String table = config.getString("blacklist.logging.database.table", "blacklist_events");
+        boolean logDatabase = getBoolean("blacklist.logging.database.enable", false);
+        String dsn = getString("blacklist.logging.database.dsn", "jdbc:mysql://localhost:3306/minecraft");
+        String user = getString("blacklist.logging.database.user", "root");
+        String pass = getString("blacklist.logging.database.pass", "");
+        String table = getString("blacklist.logging.database.table", "blacklist_events");
 
         // File log configuration
-        boolean logFile = config.getBoolean("blacklist.logging.file.enable", false);
-        String logFilePattern = config.getString("blacklist.logging.file.path", "worldguard/logs/%Y-%m-%d.log");
-        int logFileCacheSize = Math.max(1, config.getInt("blacklist.logging.file.open-files", 10));
+        boolean logFile = getBoolean("blacklist.logging.file.enable", false);
+        String logFilePattern = getString("blacklist.logging.file.path", "worldguard/logs/%Y-%m-%d.log");
+        int logFileCacheSize = Math.max(1, getInt("blacklist.logging.file.open-files", 10));
 
         // Load the blacklist
         try {
@@ -297,7 +369,7 @@ public class WorldConfiguration {
         }
 
         // Print an overview of settings
-        if (config.getBoolean("summary-on-start", true)) {
+        if (getBoolean("summary-on-start", true)) {
             logger.log(Level.INFO, enforceOneSession
                     ? "WorldGuard: (" + worldName + ") Single session is enforced."
                     : "WorldGuard: (" + worldName + ") Single session is NOT ENFORCED.");
@@ -324,6 +396,9 @@ public class WorldConfiguration {
                 }
             }
         }
+
+        config.setHeader(CONFIG_HEADER);
+        config.save();
     }
 
     public Blacklist getBlacklist() {
