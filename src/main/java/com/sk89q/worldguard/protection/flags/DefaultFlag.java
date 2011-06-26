@@ -21,8 +21,6 @@ package com.sk89q.worldguard.protection.flags;
 
 import org.bukkit.entity.CreatureType;
 
-import java.util.Set;
-
 /**
  *
  * @author sk89q
@@ -49,6 +47,8 @@ public final class DefaultFlag {
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
+    public static final StateFlag ENTRY = new StateFlag("entry", true);
+    public static final RegionGroupFlag ENTRY_PERM = new RegionGroupFlag("entry-group", RegionGroupFlag.RegionGroup.NON_MEMBERS);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
@@ -57,9 +57,9 @@ public final class DefaultFlag {
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay");
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount");
     public static final VectorFlag TELE_LOC = new VectorFlag("teleport");
-    public static final RegionGroupFlag TELE_PERM = new RegionGroupFlag("teleport-group");
+    public static final RegionGroupFlag TELE_PERM = new RegionGroupFlag("teleport-group", RegionGroupFlag.RegionGroup.MEMBERS);
     public static final VectorFlag SPAWN_LOC = new VectorFlag("spawn");
-    public static final RegionGroupFlag SPAWN_PERM = new RegionGroupFlag("spawn-group");
+    public static final RegionGroupFlag SPAWN_PERM = new RegionGroupFlag("spawn-group", RegionGroupFlag.RegionGroup.MEMBERS);
     public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
     public static final DoubleFlag PRICE = new DoubleFlag("price");
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", new CommandStringFlag(null));
@@ -71,8 +71,12 @@ public final class DefaultFlag {
         USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER,
         NOTIFY_LEAVE, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
         TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL, LEAF_DECAY,
-        GHAST_FIREBALL, BLOCKED_CMDS, ALLOWED_CMDS
+        GHAST_FIREBALL, BLOCKED_CMDS, ALLOWED_CMDS, ENTRY, ENTRY_PERM
     };
+
+    static {
+        ENTRY.setGroupFlag(ENTRY_PERM);
+    }
     
     private DefaultFlag() {
     }

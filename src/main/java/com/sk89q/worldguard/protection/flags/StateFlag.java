@@ -33,6 +33,7 @@ public class StateFlag extends Flag<StateFlag.State> {
     }
     
     private boolean def;
+    private RegionGroupFlag groupFlag;
     
     public StateFlag(String name, char legacyCode, boolean def) {
         super(name, legacyCode);
@@ -46,6 +47,14 @@ public class StateFlag extends Flag<StateFlag.State> {
 
     public boolean getDefault() {
         return def;
+    }
+
+    public RegionGroupFlag getGroupFlag() {
+        return groupFlag;
+    }
+
+    public void setGroupFlag(RegionGroupFlag groupFlag) {
+        this.groupFlag = groupFlag;
     }
 
     @Override
