@@ -44,10 +44,10 @@ h1 {
 h2 {
   font: 130% "Trebuchet MS", Georgia, serif;
   font-weight: bold;
-  color: #00a766;
+  color: #6a45ac;
   margin: 50px 0 5px 0;
-    padding: 0 0 3px 0;
-    border-bottom: 1px solid #ccc;
+  padding: 0 0 3px 0;
+  border-bottom: 1px solid #ccc;
 }
 .warning {
   background: #fffedf;
@@ -81,22 +81,22 @@ h2 {
 <p>Now, to begin, you want to:</p>
 <ol>
   <li><strong>Install the plugin:</strong> Copy WorldGuard.jar into your Bukkit server's &quot;plugins&quot; directory. If the folder doesn't exist, create it.</li>
-  <li><strong>Change the configuration:</strong> Run your server once (with WorldGuard) to generate the default configuration files:
+  <li><strong>Change the configuration:</strong> Run your server once (with WorldGuard) to generate the default configuration files. There are <em>two</em> types of configuration files.
     <ul>
-      <li><strong>Global configuration:</strong> A config.yml file  is generated inside &quot;plugins/WorldGuard&quot; containing <em>global</em> settings that affect all worlds. There is currently only one applicable setting in this file.</li>
-      <li><strong>World configurations:</strong> For <em>each world</em>, a config.yml will be generated inside &quot;plugins/WorldGuard/worlds/&lt;world&gt;/config.yml&quot;. Edit this file to disable fire and change other world-specific settings. Each world's configuration is entirely separate from one another</li>
-      </ul>
+      <li>A config.yml file  is generated inside &quot;plugins/WorldGuard&quot; that contains some non world-specific settings.</li>
+      <li>For <em>each world</em>, a config.yml is created inside the &quot;worlds&quot; folder within &quot;plugins/WorldGuard&quot;. Edit this file to disable fire and change other world-specific settings.</li>
+    </ul>
   </li>
   Use <em>/wg reload</em> in the console to reload the configuration.
   <li><strong>Setup the blacklist <span class="optional">Optional</span>:</strong> For each world folder (see above), there is a blacklist.txt file that is generated. See <a href="http://wiki.sk89q.com/wiki/WorldGuard/Blacklist">the wiki for information</a> about WorldGuard's blacklist.</li>
-  <li><strong>Check out the spreadsheet:</strong> Sadly WorldGuard is not 100% complete. It's nearly there, but documentation is also currently lacking. Be sure to <a href="https://spreadsheets.google.com/ccc?key=0AocVHzayvfjAdG16TEplcmcyQUpHY3V0MXhSS0xLamc">read the information on the checklist</a>.</li>
+  <li><strong>Learn how to use WorldGuard:</strong> Check <a href="http://wiki.sk89q.com/wiki/WorldGuard">out the wiki</a> to learn how to disable things like fire and to protect regions.</li>
 </ol>
-<p class="warning"><strong>Gotcha:</strong> You need to have <a href="http://www.sk89q.com/projects/worldedit/">WorldEdit</a> installed! It's used by WorldGuard in a number of places. If you don't want to install the plugin, that's okay &mdash; just put WorldEdit.jar into your Bukkit root folder (outside of plugins/) and WorldGuard will still be able use it.</p>
+<p class="warning"><strong>Gotcha:</strong> You need to have <a href="http://www.sk89q.com/projects/worldedit/">WorldEdit</a> installed. If you don't want to install the plugin, just put WorldEdit.jar into your Bukkit root folder (outside of plugins/). Note that region protection does require WorldEdit.</p>
 <p>Be sure to:</p>
 <ul>
   <li>Subscribe to <a href="http://minecraftnews.sk89q.com/">SK's Minecraft blog</a> for news about WorldGuard</li>
   <li>Submit bug reports and suggestions to the <a href="http://redmine.sk89q.com/projects/worldguard/issues">issue tracker</a></li>
-  <li>Check out the <a href="http://wiki.sk89q.com/wiki/WorldGuard">WorldGuard wiki</a> (as of writing, a bit outdated)</li>
+  <li>Check out the <a href="http://wiki.sk89q.com/wiki/WorldGuard">WorldGuard wiki</a></li>
 </ul>
 <h2>Contributing</h2>
 <p>WorldGuard is entirely open source! You can download all of the plugin code to learn from it, modify it for your own self, or even contribute back!</p>
