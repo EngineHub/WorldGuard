@@ -443,13 +443,13 @@ public class RegionCommands {
         sender.sendMessage(ChatColor.LIGHT_PURPLE + "Members: "
                 + members.toUserFriendlyString());
     }
+    
     @Command(aliases = {"buy"},
     		usage = "<id>",
     		desc = "Buy the region",
     		flags = "", min = 1, max = 1)
     public static void buy(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
-    	plugin.checkPermission(sender, "worldguard.region.buy.command");
     	
     	String id = args.getString(0);
     	Player player = plugin.checkPlayer(sender);
@@ -458,11 +458,13 @@ public class RegionCommands {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         String error = "";
         
+        plugin.checkPermission(sender, "worldguard.region.buy."+id);
+        
     	if (wcfg.useiConomy){
     		if (iConomyManager.isloaded()){
     			if (mgr.hasRegion(id)){
     				ProtectedRegion region = mgr.getRegion(id);
-    				if (region.getFlag(DefaultFlag.BUYABLE)){
+    				if (region.getFlag(DefaultFlag.BUYABLE) != null && region.getFlag(DefaultFlag.BUYABLE)){
     					if (!region.getOwners().contains(localPlayer)){
     						
     						iConomyManager ico = new iConomyManager();
