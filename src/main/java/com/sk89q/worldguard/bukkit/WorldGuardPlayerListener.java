@@ -898,12 +898,19 @@ public class WorldGuardPlayerListener extends PlayerListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
-        if (wcfg.useRegions) {
+        if (wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
             Vector pt = toVector(player.getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             String[] parts = event.getMessage().split(" ");
+
+            Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS);
+            if (allowedCommands != null && !allowedCommands.contains(parts[0].toLowerCase())) {
+                player.sendMessage(ChatColor.RED + parts[0].toLowerCase() + " is not allowed in this area.");
+                event.setCancelled(true);
+                return;
+            }
 
             Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS);
             if (blockedCommands != null && blockedCommands.contains(parts[0].toLowerCase())) {
