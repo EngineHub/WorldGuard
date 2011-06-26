@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.entity.Player;
+import org.bukkit.World;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -153,8 +154,12 @@ public class FlagStateManager implements Runnable {
         public String lastGreeting;
         public String lastFarewell;
         public Boolean lastExitAllowed = null;
-        public Boolean notifiedForEnter = false;
         public Boolean notifiedForLeave = false;
+        public Boolean notifiedForEnter = false;
+        public World lastWorld;
+        public int lastBlockX;
+        public int lastBlockY;
+        public int lastBlockZ;
     }
 
 }
