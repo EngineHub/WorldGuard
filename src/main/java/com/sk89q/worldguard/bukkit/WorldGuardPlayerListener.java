@@ -133,6 +133,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     @Override
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        World world = player.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(player.getWorld());
@@ -171,6 +172,15 @@ public class WorldGuardPlayerListener extends PlayerListener {
         if (plugin.inGroup(player, "wg-amphibious")) {
             cfg.enableAmphibiousMode(player);
         }
+
+        if (wcfg.useRegions) {
+            PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+            Location loc = player.getLocation();
+            state.lastWorld = loc.getWorld();
+            state.lastBlockX = loc.getBlockX();
+            state.lastBlockY = loc.getBlockY();
+            state.lastBlockZ = loc.getBlockZ();
+        }
     }
 
     /**
@@ -179,8 +189,41 @@ public class WorldGuardPlayerListener extends PlayerListener {
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        World world = player.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        // This is to make the enter/exit flags accurate -- move events are not
+        // sent constantly, so it is possible to move just a little enough to
+        // not trigger the event and then rejoin so that you are then considered
+        // outside the border. This should work around that.
+        if (wcfg.useRegions) {
+            boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
+            PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+
+            if (state.lastWorld != null && !hasBypass) {
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                Location loc = player.getLocation();
+                Vector pt = new Vector(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+                ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+                if (state.lastExitAllowed == null) {
+                    state.lastExitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
+                }
+
+                if (!state.lastExitAllowed || !set.allows(DefaultFlag.ENTRY, localPlayer)) {
+                    // Only if we have the last location cached
+                    if (state.lastWorld.equals(world)) {
+                        Location newLoc = new Location(world, state.lastBlockX + 0.5,
+                                state.lastBlockY, state.lastBlockZ + 0.5);
+                        player.teleport(newLoc);
+                    }
+                }
+            }
+        }
+
         cfg.forgetPlayer(plugin.wrapPlayer(player));
         plugin.forgetPlayer(player);
     }
@@ -320,6 +363,10 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 state.notifiedForEnter = notifyEnter;
                 state.notifiedForLeave = notifyLeave;
                 state.lastExitAllowed = exitAllowed;
+                state.lastWorld = event.getTo().getWorld();
+                state.lastBlockX = event.getTo().getBlockX();
+                state.lastBlockY = event.getTo().getBlockY();
+                state.lastBlockZ = event.getTo().getBlockZ();
             }
         }
     }
