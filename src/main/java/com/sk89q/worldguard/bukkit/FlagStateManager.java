@@ -98,7 +98,7 @@ public class FlagStateManager implements Runnable {
     private void processHeal(ApplicableRegionSet applicable, Player player,
             PlayerFlagState state) {
         
-        if (player.getHealth() >= 20 || player.getHealth() <= 0) {
+        if (player.getHealth() <= 0) {
             return;
         }
         
@@ -107,15 +107,19 @@ public class FlagStateManager implements Runnable {
         Integer healAmount = applicable.getFlag(DefaultFlag.HEAL_AMOUNT);
         Integer healDelay = applicable.getFlag(DefaultFlag.HEAL_DELAY);
         
-        if (healAmount == null || healDelay == null || healAmount < 1 || healDelay < 0) {
+        if (healAmount == null || healDelay == null || healAmount == 0 || healDelay < 0) {
+            return;
+        }
+
+        if (player.getHealth() >= 20 && healAmount > 0) {
             return;
         }
         
-        if (healDelay <= 0) {
+        if (healDelay <= 0 && healAmount > 0) {
             player.setHealth(20);
             state.lastHeal = now;
         } else if (now - state.lastHeal > healDelay * 1000) {
-            player.setHealth(Math.min(20, player.getHealth() + healAmount));
+            player.setHealth(Math.min(20, Math.max(0, player.getHealth() + healAmount)));
             state.lastHeal = now;
         }
     }
