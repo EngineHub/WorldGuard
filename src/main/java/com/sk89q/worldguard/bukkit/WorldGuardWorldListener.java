@@ -43,7 +43,8 @@ public class WorldGuardWorldListener extends WorldListener {
     /**
      * Called when a chunk is loaded.
      */
-    public void onChunkLoad(ChunkLoadEvent event) {
+    @Override
+	public void onChunkLoad(ChunkLoadEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
 
         if (cfg.activityHaltToggle) {

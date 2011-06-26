@@ -125,8 +125,8 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
                 z2 = zOld;
             }
             if ((xNew < targetX) == (targetX <= xOld)
-                    && ((long) targetZ - (long) z1) * (long) (x2 - x1) <= ((long) z2 - (long) z1)
-                    * (long) (targetX - x1)) {
+                    && ((long) targetZ - (long) z1) * (x2 - x1) <= ((long) z2 - (long) z1)
+                    * (targetX - x1)) {
                 inside = !inside;
             }
             xOld = xNew;

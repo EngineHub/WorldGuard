@@ -696,6 +696,7 @@ public class WorldGuardBlockListener extends BlockListener {
 									rgn.setFlag(DefaultFlag.BUYABLE, true);
 									event.setLine(2, econMgr.format(price)); 
 									event.setLine(3, ChatColor.GRAY + player.getName()); //Affix player name
+									return;
 								}					
 								else
 									player.sendMessage(ChatColor.RED + "No price has been set previously or specified on the sign.");
@@ -707,7 +708,7 @@ public class WorldGuardBlockListener extends BlockListener {
 									rgn.setFlag(DefaultFlag.BUYABLE, true);
 									event.setLine(2, econMgr.format(price)); 
 									event.setLine(3, ChatColor.GRAY + player.getName()); //Affix player name
-								
+									return;
 								}catch(Exception e){
 									player.sendMessage(ChatColor.RED + "Invalid price value.");
 								}
@@ -765,7 +766,8 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a block is formed based on world conditions.
      */
-    public void onBlockForm(BlockFormEvent event) {
+    @Override
+	public void onBlockForm(BlockFormEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
 
         if (cfg.activityHaltToggle) {
@@ -777,7 +779,8 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a block spreads based on world conditions.
      */
-    public void onBlockSpread(BlockSpreadEvent event) {
+    @Override
+	public void onBlockSpread(BlockSpreadEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
 
         if (cfg.activityHaltToggle) {
