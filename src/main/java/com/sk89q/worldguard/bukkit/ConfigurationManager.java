@@ -38,8 +38,12 @@ import org.bukkit.util.config.Configuration;
  */
 public class ConfigurationManager {
     
-    public static final String CONFIG_HEADER = "#\r\n" +
-            "# WorldGuard's configuration file\r\n" +
+    private static final String CONFIG_HEADER = "#\r\n" +
+            "# WorldGuard's main configuration file\r\n" +
+            "#\r\n" +
+            "# This is the global configuration file. Anything placed into here will\r\n" +
+            "# be applied to all worlds. However, each world has its own configuration\r\n" +
+            "# file to allow you to replace any setting in here for that world only.\r\n" +
             "#\r\n" +
             "# About editing this file:\r\n" +
             "# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If\r\n" +

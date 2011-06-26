@@ -48,23 +48,14 @@ import org.bukkit.util.config.Configuration;
 public class WorldConfiguration {
 
     public static final String CONFIG_HEADER = "#\r\n" +
-            "# WorldGuard's configuration file.\r\n" +
+            "# WorldGuard's world configuration file\r\n" +
             "#\r\n" +
-            "# This is the a per-world configuration file. It only affects one\r\n" +
-            "# corresponding world.\r\n" +
+            "# This is a world configuration file. Anything placed into here will only\r\n" +
+            "# affect this world. If you don't put anything in this file, then the\r\n" +
+            "# settings will be inherited from the main configuration file.\r\n" +
             "#\r\n" +
-            "# About editing this file:\r\n" +
-            "# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If\r\n" +
-            "#   you use an editor like Notepad++ (recommended for Windows users), you\r\n" +
-            "#   must configure it to \"replace tabs with spaces.\" In Notepad++, this can\r\n" +
-            "#   be changed in Settings > Preferences > Language Menu.\r\n" +
-            "# - Don't get rid of the indents. They are indented so some entries are\r\n" +
-            "#   in categories (like \"enforce-single-session\" is in the \"protection\"\r\n" +
-            "#   category.\r\n" +
-            "# - If you want to check the format of this file before putting it\r\n" +
-            "#   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/\r\n" +
-            "#   and see if it gives \"ERROR:\".\r\n" +
-            "# - Lines starting with # are comments and so they are ignored.\r\n" +
+            "# If you see {} below, that means that there are NO entries in this file.\r\n" +
+            "# Remove the {} and add your own entries.\r\n" +
             "#\r\n";
 
     private static final Logger logger = Logger
