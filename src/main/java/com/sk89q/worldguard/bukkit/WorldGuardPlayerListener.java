@@ -242,7 +242,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
 
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                Vector pt = toVector(event.getTo());
+                Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
                 ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
                 boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
@@ -255,6 +255,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     newLoc.setZ(newLoc.getBlockZ() + 0.5);
                     event.setTo(newLoc);
                     return;
+                }
+
+                // Have to set this state
+                if (state.lastExitAllowed == null) {
+                    state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))
+                            .allows(DefaultFlag.EXIT, localPlayer);
                 }
 
                 boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);

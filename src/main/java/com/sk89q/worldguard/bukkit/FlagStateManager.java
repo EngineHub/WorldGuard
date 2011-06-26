@@ -152,7 +152,7 @@ public class FlagStateManager implements Runnable {
         public long lastHeal;
         public String lastGreeting;
         public String lastFarewell;
-        public boolean lastExitAllowed = true;
+        public Boolean lastExitAllowed = null;
         public Boolean notifiedForEnter = false;
         public Boolean notifiedForLeave = false;
     }
