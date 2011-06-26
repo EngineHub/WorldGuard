@@ -496,18 +496,22 @@ public class WorldGuardPlayerListener extends PlayerListener {
             
             if (wcfg.useiConomy && iConomyManager.isloaded()
                     && (type == Material.SIGN_POST || type == Material.SIGN || type == Material.WALL_SIGN)) {
-            	if (plugin.hasPermission(player, "worldguard.region.buy.sign")){
-            		if (((Sign)block.getState()).getLine(0).trim().equals("§1[Buy Region]")) {
-    	                String regionId = ((Sign)block.getState()).getLine(1);
-    	                
-    	                if (regionId != null && regionId != "") {
-    	                    ProtectedRegion region = mgr.getRegion(regionId);
-    	                    
-    	                    if (region != null) {
-    	                    	
-    	                    	iConomyManager ico = new iConomyManager();
-    	                    	if (region.getFlag(DefaultFlag.PRICE) == Double.parseDouble(((Sign)block.getState()).getLine(2).split(" ")[0]) ){
-    	                    		
+            	
+        		if (((Sign)block.getState()).getLine(0).trim().equals("§1[Buy Region]")) {
+	                String regionId = ((Sign)block.getState()).getLine(1);
+	                
+	                if (regionId != null && regionId != "") {
+	                    ProtectedRegion region = mgr.getRegion(regionId);
+	                    
+	                    if (region != null) {
+	                    	
+	                    	if (plugin.hasPermission(player, "worldguard.region.buy."+region.getId())){
+	                    		System.out.println(region.getFlag(DefaultFlag.PRICE));		
+	                    		System.out.println(((Sign)block.getState()).getLine(2).replace(",", "").split(" ")[0]);
+	                    		System.out.println(Double.parseDouble(((Sign)block.getState()).getLine(2).replace(",", "").split(" ")[0]));	
+                		      	iConomyManager ico = new iConomyManager();
+		                    	if (region.getFlag(DefaultFlag.PRICE) == Double.parseDouble(((Sign)block.getState()).getLine(2).replace(",", "").split(" ")[0]) ){
+		                    		
 	     	                    	if(! ((Sign)block.getState()).getLine(3).equals(ChatColor.GRAY + player.getName()) ){
 	    	                    		
 	    	                    		
@@ -557,16 +561,16 @@ public class WorldGuardPlayerListener extends PlayerListener {
 	                    			((Sign) block.getState()).update(); //So the client sees the update
 	                    			player.sendMessage(ChatColor.YELLOW + "The price on this sign was out of date.  It has been updated.");
 	                    		}
-    	                    } else {
-    	                        player.sendMessage(ChatColor.DARK_RED + "The region " + regionId + " does not exist.");
-    	                    }
-    	                } else {
-    	                    player.sendMessage(ChatColor.DARK_RED + "No region specified.");
-    	                }
-    	            }
-            	} else {
-            		player.sendMessage(ChatColor.RED + "You don't have permission for that command!");
-            	}
+	                    	} else {
+	                    		player.sendMessage(ChatColor.RED + "You don't have permission for that command!");
+	                    	}
+	                    } else {
+	                        player.sendMessage(ChatColor.DARK_RED + "The region " + regionId + " does not exist.");
+	                    }
+	                } else {
+	                    player.sendMessage(ChatColor.DARK_RED + "No region specified.");
+	                }
+	            }
             }
         }
 
