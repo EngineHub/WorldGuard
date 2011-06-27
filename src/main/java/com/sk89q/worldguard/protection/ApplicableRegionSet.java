@@ -81,7 +81,6 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Gets the state of a state flag. This cannot be used for the build flag.
      *
-     * @see #allows(com.sk89q.worldguard.protection.flags.StateFlag, com.sk89q.worldguard.LocalPlayer) 
      * @param flag flag to check
      * @return whether it is allowed
      * @throws IllegalArgumentException if the build flag is given
@@ -161,15 +160,19 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         // Handle defaults
         if (globalRegion != null) {
             State globalState = globalRegion.getFlag(flag);
-            
+
             // The global region has this flag set
             if (globalState != null) {
-                // Special case for the build flag
+                // Build flag is very special
                 if (player != null && globalRegion.hasMembersOrOwners()) {
-                    def = globalRegion.isMember(player)
-                            ? (globalState == State.ALLOW) : false;
+                    def = globalRegion.isMember(player) && (globalState == State.ALLOW);
                 } else {
                     def = (globalState == State.ALLOW);
+                }
+            } else {
+                // Build flag is very special
+                if (player != null && globalRegion.hasMembersOrOwners()) {
+                    def = globalRegion.isMember(player);
                 }
             }
         }
@@ -252,6 +255,8 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             // on membership, so we have to check for parent-child
             // relationships
             if (player != null) {
+                hasFlagDefined = true;
+
                 if (hasCleared.contains(region)) {
                     // Already cleared, so do nothing
                 } else {
