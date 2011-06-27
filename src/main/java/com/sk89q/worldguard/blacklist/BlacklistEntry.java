@@ -42,10 +42,16 @@ public class BlacklistEntry {
      * Parent blacklist entry.
      */
     private Blacklist blacklist;
+
     /**
      * List of groups to not affect.
      */
     private Set<String> ignoreGroups;
+
+    /**
+     * List of permissions to not affect.
+     */
+    private Set<String> ignorePermissions;
     
     private String[] breakActions;
     private String[] destroyWithActions;
@@ -75,6 +81,13 @@ public class BlacklistEntry {
     }
 
     /**
+     * @return the ignoreGroups
+     */
+    public String[] getIgnorePermissions() {
+        return ignorePermissions.toArray(new String[ignorePermissions.size()]);
+    }
+
+    /**
      * @param ignoreGroups the ignoreGroups to set
      */
     public void setIgnoreGroups(String[] ignoreGroups) {
@@ -83,6 +96,17 @@ public class BlacklistEntry {
             ignoreGroupsSet.add(group.toLowerCase());
         }
         this.ignoreGroups = ignoreGroupsSet;
+    }
+
+    /**
+     * @param ignorePermissions the ignorePermissions to set
+     */
+    public void setIgnorePermissions(String[] ignorePermissions) {
+        Set<String> ignorePermissionsSet = new HashSet<String>();
+        for (String perm : ignorePermissions) {
+            ignorePermissionsSet.add(perm);
+        }
+        this.ignorePermissions = ignorePermissionsSet;
     }
 
     /**
@@ -218,12 +242,19 @@ public class BlacklistEntry {
      * @return
      */
     public boolean shouldIgnore(LocalPlayer player) {
-        if (ignoreGroups == null) {
-            return false;
+        if (ignoreGroups != null) {
+            for (String group : player.getGroups()) {
+                if (ignoreGroups.contains(group.toLowerCase())) {
+                    return true;
+                }
+            }
         }
-        for (String group : player.getGroups()) {
-            if (ignoreGroups.contains(group.toLowerCase())) {
-                return true;
+
+        if (ignorePermissions != null) {
+            for (String perm : ignorePermissions) {
+                if (player.hasPermission(perm)) {
+                    return true;
+                }
             }
         }
 

@@ -205,6 +205,8 @@ public abstract class Blacklist {
                     for (BlacklistEntry entry : currentEntries) {
                         if (parts[0].equalsIgnoreCase("ignore-groups")) {
                             entry.setIgnoreGroups(parts[1].split(","));
+                        } else if (parts[0].equalsIgnoreCase("ignore-perms")) {
+                            entry.setIgnorePermissions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-break")) {
                             entry.setBreakActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-destroy-with")) {
