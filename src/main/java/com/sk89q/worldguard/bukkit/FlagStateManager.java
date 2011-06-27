@@ -164,6 +164,13 @@ public class FlagStateManager implements Runnable {
         public int lastBlockX;
         public int lastBlockY;
         public int lastBlockZ;
+
+        /* Used to cache invincibility status */
+        public World lastInvincibleWorld;
+        public int lastInvincibleX;
+        public int lastInvincibleY;
+        public int lastInvincibleZ;
+        public boolean wasInvincible;
     }
 
 }
