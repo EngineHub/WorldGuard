@@ -117,7 +117,11 @@ public class ConfigurationManager {
             get(world);
         }
 
-        config.setHeader(CONFIG_HEADER);
+        try {
+            config.setHeader(CONFIG_HEADER);
+        } catch (Throwable t) {
+        }
+
         config.save();
     }
 

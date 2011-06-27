@@ -404,7 +404,11 @@ public class WorldConfiguration {
             }
         }
 
-        config.setHeader(CONFIG_HEADER);
+        try {
+            config.setHeader(CONFIG_HEADER);
+        } catch (Throwable t) {
+        }
+
         config.save();
     }
 
