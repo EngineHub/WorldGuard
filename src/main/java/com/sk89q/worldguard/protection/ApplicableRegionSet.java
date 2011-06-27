@@ -164,7 +164,13 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             
             // The global region has this flag set
             if (globalState != null) {
-                def = (globalState == State.ALLOW);
+                // Special case for the build flag
+                if (player != null && globalRegion.hasMembersOrOwners()) {
+                    def = globalRegion.isMember(player)
+                            ? (globalState == State.ALLOW) : false;
+                } else {
+                    def = (globalState == State.ALLOW);
+                }
             }
         }
         
