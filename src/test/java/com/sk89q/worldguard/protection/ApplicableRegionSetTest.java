@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.StringFlag;
 import com.sk89q.worldguard.protection.managers.FlatRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
@@ -39,140 +40,142 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class ApplicableRegionSetTest {
-    static String COURTYARD_ID = "courtyard";
-    static String FOUNTAIN_ID = "fountain";
-    static String NO_FIRE_ID = "nofire";
-    static String MEMBER_GROUP = "member";
-    static String COURTYARD_GROUP = "courtyard";
 
-    Vector inFountain = new Vector(2, 2, 2);
-    Vector inCourtyard = new Vector(7, 7, 7);
-    Vector outside = new Vector(15, 15, 15);
-    Vector inNoFire = new Vector(150, 150, 150);
-    RegionManager manager;
-    ProtectedRegion globalRegion;
-    ProtectedRegion courtyard;
-    ProtectedRegion fountain;
-    TestPlayer player1;
-    TestPlayer player2;
-
-    @Before
-    public void setUp() throws Exception {
-        setUpGlobalRegion();
-        
-        manager = new FlatRegionManager(null);
-
-        setUpPlayers();
-        setUpCourtyardRegion();
-        setUpFountainRegion();
-        setUpNoFireRegion();
-    }
-    
-    void setUpPlayers() {
-        player1 = new TestPlayer("tetsu");
-        player1.addGroup(MEMBER_GROUP);
-        player1.addGroup(COURTYARD_GROUP);
-
-        player2 = new TestPlayer("alex");
-        player2.addGroup(MEMBER_GROUP);
-    }
-    
-    void setUpGlobalRegion() {
-        globalRegion = new GlobalProtectedRegion("__global__");
-    }
-    
-    void setUpCourtyardRegion() {
-        DefaultDomain domain = new DefaultDomain();
-        domain.addGroup(COURTYARD_GROUP);
-        
-        ArrayList<BlockVector2D> points = new ArrayList<BlockVector2D>();
-        points.add(new BlockVector2D(0, 0));
-        points.add(new BlockVector2D(10, 0));
-        points.add(new BlockVector2D(10, 10));
-        points.add(new BlockVector2D(0, 10));
-        
-        //ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID, new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));
-        ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID, points, 0, 10);
-
-        region.setOwners(domain);
-        manager.addRegion(region);
-        
-        courtyard = region;
-    }
-    
-    void setUpFountainRegion() throws Exception {
-        DefaultDomain domain = new DefaultDomain();
-        domain.addGroup(MEMBER_GROUP);
-        
-        ProtectedRegion region = new ProtectedCuboidRegion(FOUNTAIN_ID,
-                new BlockVector(0, 0, 0), new BlockVector(5, 5, 5));
-        region.setMembers(domain);
-        manager.addRegion(region);
-
-        fountain = region;
-        fountain.setParent(courtyard);
-        fountain.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
-    }
-    
-    void setUpNoFireRegion() throws Exception {
-        ProtectedRegion region = new ProtectedCuboidRegion(NO_FIRE_ID,
-                new BlockVector(100, 100, 100), new BlockVector(200, 200, 200));
-        manager.addRegion(region);
-        region.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
-    }
-    
     @Test
-    public void testNonBuildFlag() {        
-        ApplicableRegionSet appl;
-        
-        // Outside
-        appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
-        // Inside courtyard
-        appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
-        // Inside fountain
-        appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
+    public void testStateFlagPriorityFallThrough() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
 
-        // Inside no fire zone
-        appl = manager.getApplicableRegions(inNoFire);
-        assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
+        StateFlag STATE1 = new StateFlag(null, false);
+        StateFlag STATE2 = new StateFlag(null, false);
+
+        region = mock.add(0);
+        region.setFlag(STATE1, StateFlag.State.ALLOW);
+        region.setFlag(STATE2, StateFlag.State.DENY);
+        
+        region = mock.add(1);
+        region.setFlag(STATE1, StateFlag.State.DENY);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertFalse(set.allows(STATE1));
+        assertFalse(set.allows(STATE2));
     }
-    
+
     @Test
-    public void testPlayer1BuildAccess() {        
-        ApplicableRegionSet appl;
-        
-        // Outside
-        appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.canBuild(player1));
-        // Inside courtyard
-        appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.canBuild(player1));
-        // Inside fountain
-        appl = manager.getApplicableRegions(inFountain);
-        assertTrue(appl.canBuild(player1));
+    public void testNonStateFlagPriorityFallThrough() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        StringFlag STRING1 = new StringFlag(null);
+        StringFlag STRING2 = new StringFlag(null);
+        StringFlag STRING3 = new StringFlag(null);
+        StringFlag STRING4 = new StringFlag(null);
+
+        region = mock.add(0);
+        region.setFlag(STRING1, "Beans");
+        region.setFlag(STRING2, "Apples");
+
+        region = mock.add(1);
+        region.setFlag(STRING1, "Cats");
+        region.setFlag(STRING3, "Bananas");
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertEquals(set.getFlag(STRING1), "Cats");
+        assertEquals(set.getFlag(STRING2), "Apples");
+        assertEquals(set.getFlag(STRING3), "Bananas");
+        assertEquals(set.getFlag(STRING4), null);
     }
-    
+
     @Test
-    public void testPlayer2BuildAccess() {        
-        ApplicableRegionSet appl;
-        
-        HashSet<ProtectedRegion> test = new HashSet<ProtectedRegion>();
-        test.add(courtyard);
-        test.add(fountain);
-        System.out.println(test);
-        
-        // Outside
-        appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.canBuild(player2));
-        // Inside courtyard
-        appl = manager.getApplicableRegions(inCourtyard);
-        assertFalse(appl.canBuild(player2));
-        // Inside fountain
-        appl = manager.getApplicableRegions(inFountain);
-        assertTrue(appl.canBuild(player2));
+    public void testStateFlagMultiplePriorityFallThrough() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        StringFlag STRING1 = new StringFlag(null);
+        StringFlag STRING2 = new StringFlag(null);
+        StringFlag STRING3 = new StringFlag(null);
+        StringFlag STRING4 = new StringFlag(null);
+
+        region = mock.add(0);
+        region.setFlag(STRING1, "Beans");
+        region.setFlag(STRING2, "Apples");
+        region.setFlag(STRING3, "Dogs");
+
+        region = mock.add(1);
+        region.setFlag(STRING1, "Cats");
+        region.setFlag(STRING3, "Bananas");
+
+        region = mock.add(10);
+        region.setFlag(STRING3, "Strings");
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertEquals(set.getFlag(STRING1), "Cats");
+        assertEquals(set.getFlag(STRING2), "Apples");
+        assertEquals(set.getFlag(STRING3), "Strings");
+        assertEquals(set.getFlag(STRING4), null);
+    }
+
+    @Test
+    public void testStateGlobalDefault() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        StateFlag STATE1 = new StateFlag(null, false);
+        StateFlag STATE2 = new StateFlag(null, false);
+        StateFlag STATE3 = new StateFlag(null, false);
+        StateFlag STATE4 = new StateFlag(null, true);
+        StateFlag STATE5 = new StateFlag(null, true);
+        StateFlag STATE6 = new StateFlag(null, true);
+
+        region = mock.global();
+        region.setFlag(STATE1, StateFlag.State.ALLOW);
+        region.setFlag(STATE2, StateFlag.State.DENY);
+        region.setFlag(STATE4, StateFlag.State.ALLOW);
+        region.setFlag(STATE5, StateFlag.State.DENY);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.allows(STATE1));
+        assertFalse(set.allows(STATE2));
+        assertFalse(set.allows(STATE3));
+        assertTrue(set.allows(STATE4));
+        assertFalse(set.allows(STATE5));
+        assertTrue(set.allows(STATE6));
+    }
+
+    @Test
+    public void testStateGlobalWithRegionsDefault() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        StateFlag STATE1 = new StateFlag(null, false);
+        StateFlag STATE2 = new StateFlag(null, false);
+        StateFlag STATE3 = new StateFlag(null, false);
+        StateFlag STATE4 = new StateFlag(null, true);
+        StateFlag STATE5 = new StateFlag(null, true);
+        StateFlag STATE6 = new StateFlag(null, true);
+
+        region = mock.global();
+        region.setFlag(STATE1, StateFlag.State.ALLOW);
+        region.setFlag(STATE2, StateFlag.State.DENY);
+        region.setFlag(STATE4, StateFlag.State.ALLOW);
+        region.setFlag(STATE5, StateFlag.State.DENY);
+
+        region = mock.add(0);
+        region.setFlag(STATE1, StateFlag.State.DENY);
+        region.setFlag(STATE2, StateFlag.State.DENY);
+        region.setFlag(STATE4, StateFlag.State.DENY);
+        region.setFlag(STATE5, StateFlag.State.DENY);
+
+        region = mock.add(1);
+        region.setFlag(STATE5, StateFlag.State.ALLOW);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertFalse(set.allows(STATE1));
+        assertFalse(set.allows(STATE2));
+        assertFalse(set.allows(STATE3));
+        assertFalse(set.allows(STATE4));
+        assertTrue(set.allows(STATE5));
+        assertTrue(set.allows(STATE6));
     }
 
 }
