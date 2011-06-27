@@ -89,6 +89,7 @@ public class WorldConfiguration {
     public Set<Integer> preventWaterDamage;
     public boolean blockTNT;
     public boolean blockLighter;
+    public boolean disableTNTDamage;
     public boolean disableFireSpread;
     public Set<Integer> disableFireSpreadBlocks;
     public boolean preventLavaFire;
@@ -277,6 +278,7 @@ public class WorldConfiguration {
         exactRespawn = getBoolean("spawn.exact-respawn", false);
         teleportToHome = getBoolean("spawn.teleport-to-home-on-death", false);
 
+        disableTNTDamage = getBoolean("player-damage.disable-tnt-damage", false);
         disableFallDamage = getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = getBoolean("player-damage.disable-lava-damage", false);
         disableFireDamage = getBoolean("player-damage.disable-fire-damage", false);

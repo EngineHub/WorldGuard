@@ -237,6 +237,11 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
 
+            if (attacker != null && attacker instanceof TNTPrimed && wcfg.disableTNTDamage) {
+                event.setCancelled(true);
+                return;
+            }
+
             if (attacker != null && attacker instanceof LivingEntity
                     && !(attacker instanceof Player)) {
                 if (attacker instanceof Creeper && wcfg.blockCreeperExplosions) {
