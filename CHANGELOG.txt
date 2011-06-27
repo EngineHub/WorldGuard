@@ -1,3 +1,14 @@
+5.2:
+- Added blocked-cmds region flag to block commands.
+- Added allowed-cmds region flag to whitelist commands.
+- Added entry region flag to block entry. Use entry-group to determine who
+    this affects.
+- Added exit region flag to block exit. Use exit-group to determine who
+    this affects.
+- Made negative healing possible via the healing flag.
+- Changed the configuration header messages to be more helpful to new users.
+- Added a warning about modifying region files by hand.
+
 5.1:
 - A lot of changes.
 
