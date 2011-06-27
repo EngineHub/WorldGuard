@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -734,6 +735,20 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public boolean canBuild(Player player, Block block) {
         return getGlobalRegionManager().canBuild(player, block);
+    }
+
+    /**
+     * Gets the region manager for a world.
+     *
+     * @param world world to get the region manager for
+     * @return the region manager or null if regions are not enabled
+     */
+    public RegionManager getRegionManager(World world) {
+        if (!getGlobalStateManager().get(world).useRegions) {
+            return null;
+        }
+
+        return getGlobalRegionManager().get(world);
     }
 
     /**

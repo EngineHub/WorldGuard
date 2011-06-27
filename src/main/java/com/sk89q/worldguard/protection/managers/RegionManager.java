@@ -50,9 +50,10 @@ public abstract class RegionManager {
     }
 
     /**
-     * Load the list of regions.
+     * Load the list of regions. If the regions do not load properly, then
+     * the existing list should be used (as stored previously).
      *
-     * @throws IOException
+     * @throws IOException thrown on load error
      */
     public void load() throws IOException {
         loader.load(this);
@@ -61,78 +62,86 @@ public abstract class RegionManager {
     /**
      * Save the list of regions.
      *
-     * @throws IOException
+     * @throws IOException thrown on save error
      */
     public void save() throws IOException {
         loader.save(this);
     }
 
     /**
-     * Get a list of protected regions.
+     * Get a map of protected regions. Use one of the region manager methods
+     * if possible if working with regions.
      * 
-     * @return
+     * @return map of regions, with keys being region IDs (lowercase)
      */
     public abstract Map<String, ProtectedRegion> getRegions();
 
     /**
-     * Set a list of protected regions.
+     * Set a list of protected regions. Keys should be lowercase in the given
+     * map fo regions.
      * 
-     * @param regions
+     * @param regions map of regions
      */
     public abstract void setRegions(Map<String, ProtectedRegion> regions);
 
     /**
-     * Adds a region.
+     * Adds a region. If a region by the given name already exists, then
+     * the existing region will be replaced.
      * 
-     * @param region
+     * @param region region to add
      */
     public abstract void addRegion(ProtectedRegion region);
 
     /**
      * Return whether a region exists by an ID.
      * 
-     * @param id
-     * @return
+     * @param id id of the region, can be mixed-case
+     * @return whether the region exists
      */
     public abstract boolean hasRegion(String id);
 
     /**
      * Get a region by its ID.
      * 
-     * @param id
-     * @return
+     * @param id id of the region, can be mixed-case
+     * @return region or null if it doesn't exist
      */
     public abstract ProtectedRegion getRegion(String id);
 
     /**
      * Removes a region, including inheriting children.
      * 
-     * @param id
+     * @param id id of the region, can be mixed-case
      */
     public abstract void removeRegion(String id);
 
     /**
-     * Get an object for a point for rules to be applied with.
+     * Get an object for a point for rules to be applied with. Use this
+     * in order to query for flag data or membership data for a given
+     * point. If checking multiple flags for a single location,
      * 
-     * @param pt
-     * @return
+     * @param pt point
+     * @return applicable region set
      */
     public abstract ApplicableRegionSet getApplicableRegions(Vector pt);
 
     /**
-     * Get an object for a point for rules to be applied with.
-     * 
-     * @param region
-     * @return
+     * Get an object for a point for rules to be applied with. This gets
+     * a set for the given reason.
+     *
+     * @deprecated not yet fully supported
+     * @param region region
+     * @return regino set
      */
+    @Deprecated
     public abstract ApplicableRegionSet getApplicableRegions(
             ProtectedRegion region);
 
     /**
      * Get a list of region IDs that contain a point.
      * 
-     * @param pt
-     * @return
+     * @param pt point
+     * @return list of region Ids
      */
     public abstract List<String> getApplicableRegionsIDs(Vector pt);
 
@@ -140,25 +149,25 @@ public abstract class RegionManager {
      * Returns true if the provided region overlaps with any other region that
      * is not owned by the player.
      * 
-     * @param region
-     * @param player
-     * @return
+     * @param region region to check
+     * @param player player to check against
+     * @return whether there is an overlap
      */
     public abstract boolean overlapsUnownedRegion(ProtectedRegion region,
             LocalPlayer player);
 
     /**
      * Get the number of regions.
-     * 
-     * @return
+     *
+     * @return number of regions
      */
     public abstract int size();
 
     /**
      * Get the number of regions for a player.
-     * 
-     * @param player
-     * @return
+     *
+     * @param player player
+     * @return name number of regions that a player owns
      */
     public abstract int getRegionCountOfPlayer(LocalPlayer player);
 }

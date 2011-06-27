@@ -31,8 +31,12 @@ import java.util.Set;
 import com.sk89q.worldguard.LocalPlayer;
 
 /**
- * Represents a setFlag of regions and their rules as applied to one point or
- * region.
+ * Represents a set of regions for a particular point or area and the rules
+ * that are represented by that set. An instance of this can be used to
+ * query the value of a flag or check if a player can build in the respective
+ * region or point. This object contains the list of applicable regions and so
+ * the expensive search of regions that are in the desired area has already
+ * been completed.
  * 
  * @author sk89q
  */
@@ -57,47 +61,60 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * Checks if a player can build in an area.
      * 
      * @param player
-     * @return
+     * @return build ability
      */
     public boolean canBuild(LocalPlayer player) {
         return internalGetState(DefaultFlag.BUILD, player, null, null);
     }
     
     /**
-     * Checks if a player can use items in an area.
+     * Checks if a player can use buttons and such in an area.
      * 
      * @param player
-     * @return
+     * @return able to use items
      */
     public boolean canUse(LocalPlayer player) {
-        return internalGetState(DefaultFlag.USE, player, null, null);
+        return !allows(DefaultFlag.USE, player)
+                && !canBuild(player);
     }
 
     /**
      * Gets the state of a state flag. This cannot be used for the build flag.
      *
-     * @param flag
-     * @return
+     * @see #allows(com.sk89q.worldguard.protection.flags.StateFlag, com.sk89q.worldguard.LocalPlayer) 
+     * @deprecated use the {@link #allows(StateFlag, LocalPlayer)} that takes a player
+     * @param flag flag to check
+     * @return whether it is allowed
+     * @throws IllegalArgumentException if the build flag is given
      */
+    @Deprecated
     public boolean allows(StateFlag flag) {
+        if (flag == DefaultFlag.BUILD) {
+            throw new IllegalArgumentException("Can't use build flag with allows()");
+        }
         return internalGetState(flag, null, null, null);
     }
     
     /**
      * Gets the state of a state flag. This cannot be used for the build flag.
      * 
-     * @param flag
-     * @return
+     * @param flag flag to check
+     * @param player player (used by some flags)
+     * @return whether the state is allows for it
+     * @throws IllegalArgumentException if the build flag is given
      */
     public boolean allows(StateFlag flag, LocalPlayer player) {
+        if (flag == DefaultFlag.BUILD) {
+            throw new IllegalArgumentException("Can't use build flag with allows()");
+        }
         return internalGetState(flag, null, flag.getGroupFlag(), player);
     }
     
     /**
      * Indicates whether a player is an owner of all regions in this set.
      * 
-     * @param player
-     * @return
+     * @param player player
+     * @return whether the player is an owner of all regions
      */
     public boolean isOwnerOfAll(LocalPlayer player) {
         for (ProtectedRegion region : applicable) {
@@ -113,8 +130,8 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * Indicates whether a player is an owner or member of all regions in
      * this set.
      * 
-     * @param player
-     * @return
+     * @param player player
+     * @return whether the player is a member of all regions
      */
     public boolean isMemberOfAll(LocalPlayer player) {
         for (ProtectedRegion region : applicable) {
@@ -269,14 +286,18 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     }
 
     /**
-     * Gets the value of a flag. Do not use this for state flags.
+     * Gets the value of a flag. Do not use this for state flags
+     * (use {@link #allows(StateFlag, LocalPlayer)} for that).
      * 
-     * @param flag 
-     * @param <T> 
-     * @param <V> 
-     * @return
+     * @param flag flag to check
+     * @return value of the flag
+     * @throws IllegalArgumentException if a StateFlag is given
      */
     public <T extends Flag<V>, V> V getFlag(T flag) {
+        if (flag instanceof StateFlag) {
+            throw new IllegalArgumentException("Cannot use StateFlag with getFlag()");
+        }
+
         int lastPriority = 0;
         boolean found = false;
 
