@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StringFlag;
@@ -48,6 +49,7 @@ public class ApplicableRegionSetTest {
 
         StateFlag STATE1 = new StateFlag(null, false);
         StateFlag STATE2 = new StateFlag(null, false);
+        StateFlag STATE3 = new StateFlag(null, false);
 
         region = mock.add(0);
         region.setFlag(STATE1, StateFlag.State.ALLOW);
@@ -55,10 +57,12 @@ public class ApplicableRegionSetTest {
         
         region = mock.add(1);
         region.setFlag(STATE1, StateFlag.State.DENY);
+        region.setFlag(STATE3, StateFlag.State.ALLOW);
 
         ApplicableRegionSet set = mock.getApplicableSet();
         assertFalse(set.allows(STATE1));
         assertFalse(set.allows(STATE2));
+        assertTrue(set.allows(STATE3));
     }
 
     @Test
@@ -176,6 +180,320 @@ public class ApplicableRegionSetTest {
         assertFalse(set.allows(STATE4));
         assertTrue(set.allows(STATE5));
         assertTrue(set.allows(STATE6));
+    }
+
+    @Test
+    public void testBuildAccess() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.add(0);
+        region.getOwners().addPlayer(member);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testBuildRegionPriorities() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer upperMember = mock.createPlayer();
+        LocalPlayer lowerMember = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.add(0);
+        region.getOwners().addPlayer(lowerMember);
+
+        region = mock.add(1);
+        region.getOwners().addPlayer(upperMember);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(upperMember));
+        assertFalse(set.canBuild(lowerMember));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testBuildDenyFlag() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.add(0);
+        region.getOwners().addPlayer(member);
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertFalse(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testBuildAllowFlag() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.add(0);
+        region.getOwners().addPlayer(member);
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.ALLOW);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertTrue(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testHigherPriorityOverrideBuildDenyFlag() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.add(0);
+        region.getOwners().addPlayer(member);
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+
+        region = mock.add(1);
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.ALLOW);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertTrue(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testHigherPriorityUnsetBuildDenyFlag() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.add(0);
+        region.getOwners().addPlayer(member);
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+
+        region = mock.add(1);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertFalse(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testPriorityDisjointBuildDenyFlagAndMembership() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.add(0);
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+
+        region = mock.add(1);
+        region.getOwners().addPlayer(member);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testPriorityDisjointBuildDenyFlagAndRegion() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.add(0);
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+
+        region = mock.add(1);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertFalse(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testPriorityDisjointMembershipAndBuildDenyFlag() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.add(0);
+        region.getOwners().addPlayer(member);
+
+        region = mock.add(1);
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertFalse(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testNoGlobalRegionDefaultBuild() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertTrue(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testGlobalRegionDefaultBuild() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        region = mock.global();
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertTrue(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testGlobalRegionBuildFlagAllow() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        region = mock.global();
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.ALLOW);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertTrue(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testGlobalRegionBuildFlagDeny() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        region = mock.global();
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertFalse(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testGlobalRegionBuildFlagAllowWithRegion() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.global();
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.ALLOW);
+
+        region = mock.add(0);
+        region.getOwners().addPlayer(member);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testGlobalRegionBuildFlagDenyWithRegion() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.global();
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+
+        region = mock.add(0);
+        region.getOwners().addPlayer(member);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testGlobalRegionHavingOwnershipBuildFlagUnset() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.global();
+        region.getOwners().addPlayer(member);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testGlobalRegionHavingOwnershipBuildFlagAllow() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.global();
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.ALLOW);
+        region.getOwners().addPlayer(member);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertTrue(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testGlobalRegionHavingOwnershipBuildFlagDeny() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.global();
+        region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
+        region.getOwners().addPlayer(member);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertFalse(set.canBuild(member));
+        assertFalse(set.canBuild(nonMember));
     }
 
 }
