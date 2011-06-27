@@ -143,6 +143,7 @@ public class WorldConfiguration {
     public boolean disableSnowFormation;
     public boolean disableIceFormation;
     public boolean disableLeafDecay;
+    public boolean regionInvinciblityRemovesMobs;
 
     /* Configuration data end */
 
@@ -318,6 +319,7 @@ public class WorldConfiguration {
         disableLeafDecay = getBoolean("dynamics.disable-leaf-decay", false);
 
         useRegions = getBoolean("regions.enable", true);
+        regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
         regionWand = getInt("regions.wand", 287);
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
