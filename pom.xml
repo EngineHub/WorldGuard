@@ -88,7 +88,6 @@
       </resource>
     </resources>
 
-    <!-- Plugins -->
     <plugins>
       <!-- Compile plugin -->
       <plugin>
@@ -170,4 +169,18 @@
       </plugin>
     </plugins>
   </build>
+  
+  <reporting>
+    <plugins>
+      <!-- Javadocs -->
+      <!-- TODO: Get Doclava working -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.8</version>
+        <configuration>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

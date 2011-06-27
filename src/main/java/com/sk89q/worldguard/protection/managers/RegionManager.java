@@ -62,7 +62,7 @@ public abstract class RegionManager {
     /**
      * Save the list of regions.
      *
-     * @throws IOException thrown on save error
+     * @throws IOException thrown on save eIf checking multiple flags for a single locationror
      */
     public void save() throws IOException {
         loader.save(this);
@@ -118,7 +118,7 @@ public abstract class RegionManager {
     /**
      * Get an object for a point for rules to be applied with. Use this
      * in order to query for flag data or membership data for a given
-     * point. If checking multiple flags for a single location,
+     * point.
      * 
      * @param pt point
      * @return applicable region set
