@@ -326,12 +326,16 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 
                 if (state.lastFarewell != null && (farewell == null 
                         || !state.lastFarewell.equals(farewell))) {
-                    player.sendMessage(ChatColor.AQUA + " ** " + state.lastFarewell);
+                    String replacedFarewell = plugin.replaceMacros(
+                            player, BukkitUtil.replaceColorMacros(state.lastFarewell));
+                    player.sendMessage(ChatColor.AQUA + " ** " + replacedFarewell);
                 }
                 
                 if (greeting != null && (state.lastGreeting == null
                         || !state.lastGreeting.equals(greeting))) {
-                    player.sendMessage(ChatColor.AQUA + " ** " + greeting);
+                    String replacedGreeting = plugin.replaceMacros(
+                            player, BukkitUtil.replaceColorMacros(greeting));
+                    player.sendMessage(ChatColor.AQUA + " ** " + replacedGreeting);
                 }
                 
                 if ((notifyLeave == null || !notifyLeave)
