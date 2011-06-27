@@ -47,6 +47,7 @@ public final class DefaultFlag {
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
+    public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
     public static final RegionGroupFlag ENTRY_PERM = new RegionGroupFlag("entry-group", RegionGroupFlag.RegionGroup.NON_MEMBERS);
     public static final StateFlag EXIT = new StateFlag("exit", true);
@@ -73,7 +74,8 @@ public final class DefaultFlag {
         USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER,
         NOTIFY_LEAVE, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
         TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL, LEAF_DECAY,
-        GHAST_FIREBALL, BLOCKED_CMDS, ALLOWED_CMDS, ENTRY, ENTRY_PERM, EXIT, EXIT_PERM
+        GHAST_FIREBALL, BLOCKED_CMDS, ALLOWED_CMDS, ENTRY, ENTRY_PERM, EXIT, EXIT_PERM,
+        INVINCIBILITY
     };
 
     static {

@@ -140,7 +140,8 @@ public class WorldGuardEntityListener extends EntityListener {
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            if (cfg.hasGodMode(player)) {
+            if (cfg.hasGodMode(player)
+                    || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
                 event.setCancelled(true);
                 return;
             }
@@ -209,7 +210,8 @@ public class WorldGuardEntityListener extends EntityListener {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
             
-            if (cfg.hasGodMode(player)) {
+            if (cfg.hasGodMode(player)
+                    || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
                 event.setCancelled(true);
                 return;
             }
@@ -291,7 +293,7 @@ public class WorldGuardEntityListener extends EntityListener {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
             
-            if (cfg.hasGodMode(player)) {
+            if (cfg.hasGodMode(player) || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
                 event.setCancelled(true);
                 return;
             }
@@ -361,7 +363,8 @@ public class WorldGuardEntityListener extends EntityListener {
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            if (cfg.hasGodMode(player)) {
+            if (cfg.hasGodMode(player)
+                    || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
                 event.setCancelled(true);
                 player.setFireTicks(0);
                 return;
@@ -423,11 +426,12 @@ public class WorldGuardEntityListener extends EntityListener {
         Entity entity = event.getEntity();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(entity.getWorld());
 
         if (entity instanceof Player) {
             Player player = (Player) entity;
 
-            if (cfg.hasGodMode(player)) {
+            if (cfg.hasGodMode(player) || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
                 event.setCancelled(true);
                 return;
             }
