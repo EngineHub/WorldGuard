@@ -735,4 +735,29 @@ public class WorldGuardPlugin extends JavaPlugin {
     public boolean canBuild(Player player, Block block) {
         return getGlobalRegionManager().canBuild(player, block);
     }
+
+    /**
+     * Replace macros in the text.
+     *
+     * @param sender
+     * @param message
+     * @return
+     */
+    public String replaceMacros(CommandSender sender, String message) {
+        Player[] online = getServer().getOnlinePlayers();
+
+        message = message.replace("%name%", toName(sender));
+        message = message.replace("%id%", toUniqueName(sender));
+
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            World world = player.getWorld();
+
+            message = message.replace("%world%", world.getName());
+            message = message.replace("%online%", String.valueOf(online.length));
+            message = message.replace("%health%", String.valueOf(player.getHealth()));
+        }
+
+        return message;
+    }
 }
