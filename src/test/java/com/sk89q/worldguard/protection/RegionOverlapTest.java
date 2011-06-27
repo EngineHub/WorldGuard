@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.protection;
 
-import java.util.ArrayList;
-import org.junit.Before;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
@@ -30,11 +28,19 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.FlatRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.*;
+import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 
-public class RegionPriorityTest {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class RegionOverlapTest {
     static String COURTYARD_ID = "courtyard";
     static String FOUNTAIN_ID = "fountain";
     static String NO_FIRE_ID = "nofire";
@@ -44,6 +50,7 @@ public class RegionPriorityTest {
     Vector inFountain = new Vector(2, 2, 2);
     Vector inCourtyard = new Vector(7, 7, 7);
     Vector outside = new Vector(15, 15, 15);
+    Vector inNoFire = new Vector(150, 150, 150);
     RegionManager manager;
     ProtectedRegion globalRegion;
     ProtectedRegion courtyard;
@@ -54,14 +61,15 @@ public class RegionPriorityTest {
     @Before
     public void setUp() throws Exception {
         setUpGlobalRegion();
-        
+
         manager = new FlatRegionManager(null);
 
         setUpPlayers();
         setUpCourtyardRegion();
         setUpFountainRegion();
+        setUpNoFireRegion();
     }
-    
+
     void setUpPlayers() {
         player1 = new TestPlayer("tetsu");
         player1.addGroup(MEMBER_GROUP);
@@ -70,35 +78,34 @@ public class RegionPriorityTest {
         player2 = new TestPlayer("alex");
         player2.addGroup(MEMBER_GROUP);
     }
-    
+
     void setUpGlobalRegion() {
         globalRegion = new GlobalProtectedRegion("__global__");
     }
-    
+
     void setUpCourtyardRegion() {
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup(COURTYARD_GROUP);
-        
+
         ArrayList<BlockVector2D> points = new ArrayList<BlockVector2D>();
         points.add(new BlockVector2D(0, 0));
         points.add(new BlockVector2D(10, 0));
         points.add(new BlockVector2D(10, 10));
         points.add(new BlockVector2D(0, 10));
-        
+
         //ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID, new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));
         ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID, points, 0, 10);
 
         region.setOwners(domain);
         manager.addRegion(region);
-        
+
         courtyard = region;
-        courtyard.setFlag(DefaultFlag.MOB_SPAWNING, StateFlag.State.DENY);
     }
-    
+
     void setUpFountainRegion() throws Exception {
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup(MEMBER_GROUP);
-        
+
         ProtectedRegion region = new ProtectedCuboidRegion(FOUNTAIN_ID,
                 new BlockVector(0, 0, 0), new BlockVector(5, 5, 5));
         region.setMembers(domain);
@@ -107,47 +114,66 @@ public class RegionPriorityTest {
         fountain = region;
         fountain.setParent(courtyard);
         fountain.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
-        fountain.setFlag(DefaultFlag.MOB_SPAWNING, StateFlag.State.ALLOW);
     }
-    
+
+    void setUpNoFireRegion() throws Exception {
+        ProtectedRegion region = new ProtectedCuboidRegion(NO_FIRE_ID,
+                new BlockVector(100, 100, 100), new BlockVector(200, 200, 200));
+        manager.addRegion(region);
+        region.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
+    }
+
     @Test
-    public void testNoPriorities() throws Exception {
+    public void testNonBuildFlag() {
         ApplicableRegionSet appl;
 
-        courtyard.setPriority(0);
-        fountain.setPriority(0);
-        
+        // Outside
+        appl = manager.getApplicableRegions(outside);
+        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
+        // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
         assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
-        assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
+        // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
         assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
-        assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
-    }
-    
-    @Test
-    public void testPriorities() throws Exception {
-        ApplicableRegionSet appl;
 
-        courtyard.setPriority(5);
-        fountain.setPriority(0);
-        
-        appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
-        appl = manager.getApplicableRegions(inFountain);
+        // Inside no fire zone
+        appl = manager.getApplicableRegions(inNoFire);
         assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
     }
-    
+
     @Test
-    public void testPriorities2() throws Exception {
+    public void testPlayer1BuildAccess() {
         ApplicableRegionSet appl;
 
-        fountain.setPriority(0);
-        fountain.setPriority(5);
-        
+        // Outside
+        appl = manager.getApplicableRegions(outside);
+        assertTrue(appl.canBuild(player1));
+        // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
+        assertTrue(appl.canBuild(player1));
+        // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        assertTrue(appl.allows(DefaultFlag.MOB_SPAWNING));
+        assertTrue(appl.canBuild(player1));
+    }
+
+    @Test
+    public void testPlayer2BuildAccess() {
+        ApplicableRegionSet appl;
+
+        HashSet<ProtectedRegion> test = new HashSet<ProtectedRegion>();
+        test.add(courtyard);
+        test.add(fountain);
+        System.out.println(test);
+
+        // Outside
+        appl = manager.getApplicableRegions(outside);
+        assertTrue(appl.canBuild(player2));
+        // Inside courtyard
+        appl = manager.getApplicableRegions(inCourtyard);
+        assertFalse(appl.canBuild(player2));
+        // Inside fountain
+        appl = manager.getApplicableRegions(inFountain);
+        assertTrue(appl.canBuild(player2));
     }
 }
