@@ -73,6 +73,7 @@ public class WorldGuardEntityListener extends EntityListener {
         PluginManager pm = plugin.getServer().getPluginManager();
 
         registerEvent("ENTITY_DAMAGE", Priority.High);
+        registerEvent("ENTITY_COMBUST", Priority.High);
         registerEvent("ENTITY_EXPLODE", Priority.High);
         registerEvent("CREATURE_SPAWN", Priority.High);
         registerEvent("ENTITY_INTERACT", Priority.High);
@@ -397,6 +398,29 @@ public class WorldGuardEntityListener extends EntityListener {
             }
 
             if (wcfg.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Called on entity combust.
+     */
+    @Override
+    public void onEntityCombust(EntityCombustEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        Entity entity = event.getEntity();
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
+
+            if (cfg.hasGodMode(player)) {
                 event.setCancelled(true);
                 return;
             }
