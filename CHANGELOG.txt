@@ -1,4 +1,6 @@
 5.2:
+- Gave the ability to use color colors and macros in greeting
+    and farewell messages.
 - Added disable-ice-melting, disable-snow-formation, disable-mushroom-spread,
     disable-snow-melting, disable-ice-formation.
 - Added paintings to blacklist support.
@@ -15,6 +17,7 @@
 - Made negative healing possible via the healing flag.
 - Changed the configuration header messages to be more helpful to new users.
 - Added a warning about modifying region files by hand.
+- Improved the API for plugin developers.
 
 5.1:
 - A lot of changes.
