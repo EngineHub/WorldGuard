@@ -19,6 +19,8 @@
 package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+
+import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -621,6 +623,15 @@ public class WorldGuardEntityListener extends EntityListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
+        if (wcfg.getBlacklist() != null) {
+            if (!wcfg.getBlacklist().check(
+                    new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                            toVector(player.getLocation()), 321), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, painting.getLocation())) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
@@ -641,6 +652,15 @@ public class WorldGuardEntityListener extends EntityListener {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.getBlacklist() != null) {
+            if (!wcfg.getBlacklist().check(
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
+                            toVector(player.getLocation()), 321), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
