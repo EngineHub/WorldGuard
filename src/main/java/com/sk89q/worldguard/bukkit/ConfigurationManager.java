@@ -82,6 +82,7 @@ public class ConfigurationManager {
     public boolean suppressTickSyncWarnings;
     public boolean useRegionsScheduler;
     public boolean activityHaltToggle = false;
+    public boolean autoGodMode;
 
     /**
      * Construct the object.
@@ -108,6 +109,8 @@ public class ConfigurationManager {
                 "suppress-tick-sync-warnings", false);
         useRegionsScheduler = config.getBoolean(
                 "regions.use-scheduler", true);
+        autoGodMode = config.getBoolean(
+                "auto-invincible-permission", false);
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
