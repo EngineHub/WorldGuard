@@ -82,12 +82,10 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * Gets the state of a state flag. This cannot be used for the build flag.
      *
      * @see #allows(com.sk89q.worldguard.protection.flags.StateFlag, com.sk89q.worldguard.LocalPlayer) 
-     * @deprecated use the {@link #allows(StateFlag, LocalPlayer)} that takes a player
      * @param flag flag to check
      * @return whether it is allowed
      * @throws IllegalArgumentException if the build flag is given
      */
-    @Deprecated
     public boolean allows(StateFlag flag) {
         if (flag == DefaultFlag.BUILD) {
             throw new IllegalArgumentException("Can't use build flag with allows()");
@@ -156,6 +154,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
                                      RegionGroupFlag groupFlag,
                                      LocalPlayer groupPlayer) {
         boolean found = false;
+        boolean hasFlagDefined = false;
         boolean allowed = false; // Used for ALLOW override
         boolean def = flag.getDefault();
         
@@ -204,7 +203,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             ProtectedRegion region = it.next();
 
             // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
+            if (hasFlagDefined && region.getPriority() < lastPriority) {
                 break;
             }
             
@@ -239,6 +238,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             if (v == State.ALLOW) {
                 allowed = true;
                 found = true;
+                hasFlagDefined = true;
                 continue;
             }
 
@@ -320,9 +320,10 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
                 clearParents(needsClear, hasCleared, region);
                 
                 needsClear.put(region, region.getFlag(flag));
+                
+                found = true;
             }
-            
-            found = true;
+
             lastPriority = region.getPriority();
         }
         
