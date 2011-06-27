@@ -20,6 +20,8 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -31,9 +33,16 @@ public class MockApplicableRegionSet {
     private TreeSet<ProtectedRegion> regions = new TreeSet<ProtectedRegion>();
     private ProtectedRegion global;
     private int id = 0;
+    private int playerIndex = 0;
 
     public void add(ProtectedRegion region) {
         regions.add(region);
+    }
+
+    public LocalPlayer createPlayer() {
+        playerIndex++;
+        LocalPlayer player = new TestPlayer("#PLAYER_" + playerIndex);
+        return player;
     }
 
     public ProtectedRegion global() {
