@@ -171,64 +171,68 @@ public class WorldConfiguration {
     }
 
     private boolean getBoolean(String node, boolean def) {
+        boolean val = parentConfig.getBoolean(node, def);
+
         if (config.getProperty(node) != null) {
             return config.getBoolean(node, def);
         } else {
-            return parentConfig.getBoolean(node, def);
+            return val;
         }
     }
 
     private String getString(String node, String def) {
+        String val = parentConfig.getString(node, def);
+
         if (config.getProperty(node) != null) {
             return config.getString(node, def);
         } else {
-            return parentConfig.getString(node, def);
+            return val;
         }
     }
 
     private int getInt(String node, int def) {
+        int val = parentConfig.getInt(node, def);
+
         if (config.getProperty(node) != null) {
             return config.getInt(node, def);
         } else {
-            return parentConfig.getInt(node, def);
+            return val;
         }
     }
 
     private double getDouble(String node, double def) {
+        double val = parentConfig.getDouble(node, def);
+
         if (config.getProperty(node) != null) {
             return config.getDouble(node, def);
         } else {
-            return parentConfig.getDouble(node, def);
+            return val;
         }
     }
 
     private List<Integer> getIntList(String node, List<Integer> def) {
-        List<Integer> res;
-
-        if (config.getProperty(node) != null) {
-            res = config.getIntList(node, def);
-        } else {
-            res = parentConfig.getIntList(node, def);
-        }
+        List<Integer> res = parentConfig.getIntList(node, def);
 
         if (res == null || res.size() == 0) {
             parentConfig.setProperty(node, new ArrayList<Integer>());
+        }
+
+        if (config.getProperty(node) != null) {
+            res = config.getIntList(node, def);
         }
 
         return res;
     }
 
     private List<String> getStringList(String node, List<String> def) {
-        List<String> res;
-
-        if (config.getProperty(node) != null) {
-            res = config.getStringList(node, def);
-        } else {
-            res = parentConfig.getStringList(node, def);
-        }
+        List<String> res = parentConfig.getStringList(node, def);
 
         if (res == null || res.size() == 0) {
             parentConfig.setProperty(node, new ArrayList<String>());
+        }
+
+        if (config.getProperty(node) != null) {
+            res = config.getStringList(node, def);
         }
 
         return res;
