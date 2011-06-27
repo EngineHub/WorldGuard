@@ -1,3 +1,12 @@
+5.2.1:
+- Add region bounds to /region info
+- Added the ability to add owners/members to the global region for
+    handling guest groups. Now if there's owners or members on the global
+    region, then those  that are not on the list cannot build.
+- Fixed some flag algorithm issues.
+- API: Fixed DefaultDomain.size() not counting players.
+- API: Undeprecated ApplicableRegionSet.allows(StateFlag).
+
 5.2:
 - Gave the ability to use color colors and macros in greeting
     and farewell messages.
