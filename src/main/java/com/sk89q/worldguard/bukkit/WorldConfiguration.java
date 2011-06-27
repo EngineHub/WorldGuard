@@ -29,6 +29,7 @@ import com.sk89q.worldguard.chest.SignChestProtection;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -201,19 +202,35 @@ public class WorldConfiguration {
     }
 
     private List<Integer> getIntList(String node, List<Integer> def) {
+        List<Integer> res;
+
         if (config.getProperty(node) != null) {
-            return config.getIntList(node, def);
+            res = config.getIntList(node, def);
         } else {
-            return parentConfig.getIntList(node, def);
+            res = parentConfig.getIntList(node, def);
         }
+
+        if (res == null || res.size() == 0) {
+            parentConfig.setProperty(node, new ArrayList<Integer>());
+        }
+
+        return res;
     }
 
     private List<String> getStringList(String node, List<String> def) {
+        List<String> res;
+
         if (config.getProperty(node) != null) {
-            return config.getStringList(node, def);
+            res = config.getStringList(node, def);
         } else {
-            return parentConfig.getStringList(node, def);
+            res = parentConfig.getStringList(node, def);
         }
+
+        if (res == null || res.size() == 0) {
+            parentConfig.setProperty(node, new ArrayList<String>());
+        }
+
+        return res;
     }
 
     /**
