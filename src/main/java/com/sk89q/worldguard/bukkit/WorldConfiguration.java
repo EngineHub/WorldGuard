@@ -134,6 +134,7 @@ public class WorldConfiguration {
     public boolean alwaysThundering;
     public boolean disablePigZap;
     public boolean disableCreeperPower;
+    public boolean disableHealthRegain;
 
     /* Configuration data end */
 
@@ -227,6 +228,8 @@ public class WorldConfiguration {
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
 
         pumpkinScuba = getBoolean("pumpkin-scuba", false);
+
+        disableHealthRegain = getBoolean("default.disable-health-regain", false);
 
         noPhysicsGravel = getBoolean("physics.no-physics-gravel", false);
         noPhysicsSand = getBoolean("physics.no-physics-sand", false);

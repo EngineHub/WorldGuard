@@ -20,6 +20,8 @@
 package com.sk89q.worldguard.bukkit;
 
 import java.util.List;
+
+import com.sk89q.worldedit.blocks.BlockType;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -139,4 +141,47 @@ public class BukkitUtil {
         }
     }
 
+    /**
+     * Find a position for the player to stand that is not inside a block.
+     * Blocks above the player will be iteratively tested until there is
+     * a series of two free blocks. The player will be teleported to
+     * that free position.
+     *
+     * @param player
+     */
+    public static void findFreePosition(Player player) {
+        Location loc = player.getLocation();
+        int x = loc.getBlockX();
+        int y = Math.max(0, loc.getBlockY());
+        int origY = y;
+        int z = loc.getBlockZ();
+        World world = player.getWorld();
+
+        byte free = 0;
+
+        while (y <= 129) {
+            if (BlockType.canPassThrough(world.getBlockTypeIdAt(x, y, z))) {
+                free++;
+            } else {
+                free = 0;
+            }
+
+            if (free == 2) {
+                if (y - 1 != origY || y == 1) {
+                    loc.setX(x + 0.5);
+                    loc.setY(y);
+                    loc.setZ(z + 0.5);
+                    if (y <= 2 && world.getBlockAt(x,0,z).getType() == Material.AIR) {
+                        world.getBlockAt(x,0,z).setTypeId(20);
+                        loc.setY(2);
+                    }
+                    player.setFallDistance(0F);
+                    player.teleport(loc);
+                }
+                return;
+            }
+
+            y++;
+        }
+    }
 }
