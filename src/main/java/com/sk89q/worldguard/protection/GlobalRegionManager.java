@@ -208,6 +208,18 @@ public class GlobalRegionManager {
 
         return manager;
     }
+
+    /**
+     * Returns whether the player can bypass.
+     *
+     * @param player
+     * @param world
+     * @return
+     */
+    public boolean hasBypass(LocalPlayer player, World world) {
+        return player.hasPermission("worldguard.region.bypass."
+                        + world.getName());
+    }
     
     /**
      * Returns whether the player can bypass.
