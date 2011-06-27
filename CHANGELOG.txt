@@ -1,4 +1,11 @@
 5.2:
+- Added disable-ice-melting, disable-snow-formation, disable-mushroom-spread,
+    disable-snow-melting, disable-ice-formation.
+- Added paintings to blacklist support.
+- Added default.disable-health-regain.
+- Added auto-invincible-permission setting, which lets you use the permission
+    'worldguard.auto-invincible' to become invincible on join automatically.
+- Flames won't appear if you are /god'ed now. 
 - Added blocked-cmds region flag to block commands.
 - Added allowed-cmds region flag to whitelist commands.
 - Added entry region flag to block entry. Use entry-group to determine who
