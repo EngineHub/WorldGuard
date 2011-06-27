@@ -763,13 +763,13 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         message = message.replace("%name%", toName(sender));
         message = message.replace("%id%", toUniqueName(sender));
+        message = message.replace("%online%", String.valueOf(online.length));
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
             World world = player.getWorld();
 
             message = message.replace("%world%", world.getName());
-            message = message.replace("%online%", String.valueOf(online.length));
             message = message.replace("%health%", String.valueOf(player.getHealth()));
         }
 
