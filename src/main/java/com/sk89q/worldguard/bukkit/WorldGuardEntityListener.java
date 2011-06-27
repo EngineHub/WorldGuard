@@ -210,8 +210,18 @@ public class WorldGuardEntityListener extends EntityListener {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
             
-            if (cfg.hasGodMode(player)
-                    || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if (cfg.hasGodMode(player)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player)) {
+                if (wcfg.regionInvinciblityRemovesMobs
+                        && attacker instanceof LivingEntity && !(attacker instanceof Player)
+                        && !(attacker instanceof Tameable && ((Tameable) attacker).isTamed())) {
+                    attacker.remove();
+                }
+
                 event.setCancelled(true);
                 return;
             }
