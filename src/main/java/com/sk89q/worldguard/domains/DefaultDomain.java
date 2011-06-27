@@ -81,7 +81,7 @@ public class DefaultDomain implements Domain {
     }
     
     public int size() {
-        return groups.size();
+        return groups.size() + players.size();
     }
     
     public String toPlayersString() {
