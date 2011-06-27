@@ -49,10 +49,6 @@ public class RegionMemberCommands {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         String id = args.getString(0);
-        
-        if (id.equalsIgnoreCase("__global__")) {
-            throw new CommandException("The region cannot be named __global__");
-        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
@@ -94,10 +90,6 @@ public class RegionMemberCommands {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         String id = args.getString(0);
-        
-        if (id.equalsIgnoreCase("__global__")) {
-            throw new CommandException("The region cannot be named __global__");
-        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
@@ -139,10 +131,6 @@ public class RegionMemberCommands {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         String id = args.getString(0);
-        
-        if (id.equalsIgnoreCase("__global__")) {
-            throw new CommandException("The region cannot be named __global__");
-        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
@@ -184,10 +172,6 @@ public class RegionMemberCommands {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         String id = args.getString(0);
-        
-        if (id.equalsIgnoreCase("__global__")) {
-            throw new CommandException("The region cannot be named __global__");
-        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
