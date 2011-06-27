@@ -83,6 +83,7 @@ public class WorldGuardBlockListener extends BlockListener {
         registerEvent("LEAVES_DECAY", Priority.High);
         registerEvent("BLOCK_FORM", Priority.High);
         registerEvent("BLOCK_SPREAD", Priority.High);
+        registerEvent("BLOCK_FADE", Priority.High);
     }
 
     /**
@@ -652,15 +653,23 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
             return;
         }
 
-        if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SNOW_FALL,
-                event.getBlock().getLocation())) {
+        if (wcfg.disableSnowFormation) {
             event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.useRegions) {
+            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SNOW_FALL,
+                    event.getBlock().getLocation())) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -671,14 +680,23 @@ public class WorldGuardBlockListener extends BlockListener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
             return;
         }
 
-        if (!plugin.getGlobalRegionManager().allows(DefaultFlag.LEAF_DECAY, event.getBlock().getLocation())) {
+        if (wcfg.disableLeafDecay) {
             event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.useRegions) {
+            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.LEAF_DECAY,
+                    event.getBlock().getLocation())) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -686,9 +704,26 @@ public class WorldGuardBlockListener extends BlockListener {
      * Called when a block is formed based on world conditions.
      */
     public void onBlockForm(BlockFormEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
         ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
+        Material type = event.getNewState().getType();
+
+        if (wcfg.disableIceFormation && type == Material.ICE) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.disableSnowFormation && type == Material.SNOW) {
             event.setCancelled(true);
             return;
         }
@@ -698,9 +733,46 @@ public class WorldGuardBlockListener extends BlockListener {
      * Called when a block spreads based on world conditions.
      */
     public void onBlockSpread(BlockSpreadEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
         ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
+        Material fromType = event.getSource().getType();
+
+        if (wcfg.disableMushroomSpread && (fromType == Material.RED_MUSHROOM
+                || fromType == Material.BROWN_MUSHROOM)) {
+            event.setCancelled(true);
+            return;
+        }
+    }
+
+    /**
+     * Called when a block fades.
+     */
+    public void onBlockFade(BlockFadeEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+
+        Material type = event.getBlock().getType();
+
+        if (wcfg.disableIceMelting && type == Material.ICE) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.disableSnowMelting && type == Material.SNOW) {
             event.setCancelled(true);
             return;
         }

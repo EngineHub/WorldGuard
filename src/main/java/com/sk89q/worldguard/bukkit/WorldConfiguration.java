@@ -135,6 +135,12 @@ public class WorldConfiguration {
     public boolean disablePigZap;
     public boolean disableCreeperPower;
     public boolean disableHealthRegain;
+    public boolean disableMushroomSpread;
+    public boolean disableIceMelting;
+    public boolean disableSnowMelting;
+    public boolean disableSnowFormation;
+    public boolean disableIceFormation;
+    public boolean disableLeafDecay;
 
     /* Configuration data end */
 
@@ -280,6 +286,13 @@ public class WorldConfiguration {
         disableCreeperPower = getBoolean("weather.disable-powered-creepers", false);
         alwaysRaining = getBoolean("weather.always-raining", false);
         alwaysThundering = getBoolean("weather.always-thundering", false);
+
+        disableMushroomSpread = getBoolean("dynamics.disable-mushroom-spread", false);
+        disableIceMelting = getBoolean("dynamics.disable-ice-melting", false);
+        disableSnowMelting = getBoolean("dynamics.disable-snow-melting", false);
+        disableSnowFormation = getBoolean("dynamics.disable-snow-formation", false);
+        disableIceFormation = getBoolean("dynamics.disable-ice-formation", false);
+        disableLeafDecay = getBoolean("dynamics.disable-leaf-decay", false);
 
         useRegions = getBoolean("regions.enable", true);
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
