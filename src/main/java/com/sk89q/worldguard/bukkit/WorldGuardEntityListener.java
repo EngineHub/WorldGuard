@@ -35,7 +35,6 @@ import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -81,6 +80,7 @@ public class WorldGuardEntityListener extends EntityListener {
         registerEvent("PIG_ZAP", Priority.High);
         registerEvent("PAINTING_BREAK", Priority.High);
         registerEvent("PAINTING_PLACE", Priority.High);
+        registerEvent("ENTITY_REGAIN_HEALTH", Priority.High);
     }
 
     /**
@@ -155,7 +155,7 @@ public class WorldGuardEntityListener extends EntityListener {
             }
 
             if (wcfg.teleportOnVoid && type == DamageCause.VOID) {
-                findFreePosition(player);
+                BukkitUtil.findFreePosition(player);
                 event.setCancelled(true);
                 return;
             }
@@ -392,7 +392,7 @@ public class WorldGuardEntityListener extends EntityListener {
             }
 
            if (wcfg.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
-                findFreePosition(player);
+                BukkitUtil.findFreePosition(player);
                 event.setCancelled(true);
                 return;
             }
@@ -650,48 +650,21 @@ public class WorldGuardEntityListener extends EntityListener {
             }
         }
     }
-    
+
     /**
-     * Find a position for the player to stand that is not inside a block.
-     * Blocks above the player will be iteratively tested until there is
-     * a series of two free blocks. The player will be teleported to
-     * that free position.
-     *
-     * @param player
+     * Called on entity health regain.
      */
-    public void findFreePosition(Player player) {
-        Location loc = player.getLocation();
-        int x = loc.getBlockX();
-        int y = Math.max(0, loc.getBlockY());
-        int origY = y;
-        int z = loc.getBlockZ();
-        World world = player.getWorld();
+    public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+        Entity ent = event.getEntity();
+        World world = ent.getWorld();
 
-        byte free = 0;
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
 
-        while (y <= 129) {
-            if (BlockType.canPassThrough(world.getBlockTypeIdAt(x, y, z))) {
-                free++;
-            } else {
-                free = 0;
-            }
-
-            if (free == 2) {
-                if (y - 1 != origY || y == 1) {
-                    loc.setX(x + 0.5);
-                    loc.setY(y);
-                    loc.setZ(z + 0.5);
-                    if (y <= 2 && world.getBlockAt(x,0,z).getType() == Material.AIR) {
-                        world.getBlockAt(x,0,z).setTypeId(20);
-                        loc.setY(2);
-                    }
-                    player.setFallDistance(0F);
-                    player.teleport(loc);
-                }
-                return;
-            }
-
-            y++;
+        if (wcfg.disableHealthRegain) {
+            event.setCancelled(true);
+            return;
         }
     }
+
 }
