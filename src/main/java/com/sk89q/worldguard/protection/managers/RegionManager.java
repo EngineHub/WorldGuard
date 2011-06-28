@@ -116,9 +116,19 @@ public abstract class RegionManager {
     public abstract void removeRegion(String id);
 
     /**
-     * Get an object for a point for rules to be applied with. Use this
-     * in order to query for flag data or membership data for a given
-     * point.
+     * Get an object for a point for rules to be applied with. Use this in order
+     * to query for flag data or membership data for a given point.
+     * 
+     * @param loc Bukkit location
+     * @return applicable region set
+     */
+    public ApplicableRegionSet getApplicableRegions(org.bukkit.Location loc) {
+        return getApplicableRegions(com.sk89q.worldedit.bukkit.BukkitUtil.toVector(loc));
+    }
+
+    /**
+     * Get an object for a point for rules to be applied with. Use this in order
+     * to query for flag data or membership data for a given point.
      * 
      * @param pt point
      * @return applicable region set
