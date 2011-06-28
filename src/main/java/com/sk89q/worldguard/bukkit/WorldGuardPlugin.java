@@ -157,7 +157,15 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardWorldListener(this)).registerEvents();
-        
+
+        // Check god mode for existing players, if any
+        for (Player player : getServer().getOnlinePlayers()) {
+            if (inGroup(player, "wg-invincible") ||
+                    (configuration.autoGodMode && hasPermission(player, "worldguard.auto-invincible"))) {
+                configuration.enableGodMode(player);
+            }
+        }
+
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }
 
