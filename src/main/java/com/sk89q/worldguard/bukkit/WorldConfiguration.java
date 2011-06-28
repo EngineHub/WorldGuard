@@ -96,6 +96,7 @@ public class WorldConfiguration {
     public Set<Integer> allowedLavaSpreadOver;
     public boolean blockCreeperExplosions;
     public boolean blockCreeperBlockDamage;
+    public boolean blockFireballBlockDamage;
     public int loginProtection;
     public int spawnProtection;
     public boolean kickOnDeath;
@@ -275,6 +276,7 @@ public class WorldConfiguration {
 
         blockCreeperExplosions = getBoolean("mobs.block-creeper-explosions", false);
         blockCreeperBlockDamage = getBoolean("mobs.block-creeper-block-damage", false);
+        blockFireballBlockDamage = getBoolean("mobs.block-fireball-block-damage", false);
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
 
         loginProtection = getInt("spawn.login-protection", 3);
