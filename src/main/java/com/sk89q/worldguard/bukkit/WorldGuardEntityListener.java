@@ -484,6 +484,11 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
         } else if (ent instanceof Fireball) {
+        	if (wcfg.blockFireballBlockDamage) {
+        		event.setCancelled(true);
+        		return;
+        	}
+        	
             if (wcfg.useRegions) {
                 Vector pt = toVector(l);
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
