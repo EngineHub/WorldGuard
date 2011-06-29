@@ -486,6 +486,7 @@ public class WorldGuardEntityListener extends EntityListener {
             }
         } else if (ent instanceof TNTPrimed) {
             if (cfg.activityHaltToggle) {
+                ent.remove();
                 event.setCancelled(true);
                 return;
             }

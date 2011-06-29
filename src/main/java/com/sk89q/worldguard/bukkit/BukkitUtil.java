@@ -24,7 +24,7 @@ import java.util.List;
 import com.sk89q.worldedit.blocks.BlockType;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
@@ -218,5 +218,19 @@ public class BukkitUtil {
         str = str.replace("&w", ChatColor.WHITE.toString());
 
         return str;
+    }
+
+    /**
+     * Returns whether an entity should be removed for the halt activity mode.
+     *
+     * @param entity
+     * @return
+     */
+    public static boolean isIntensiveEntity(Entity entity) {
+        return entity instanceof Item
+                || entity instanceof TNTPrimed
+                || (entity instanceof LivingEntity
+                && !(entity instanceof Tameable)
+                && !(entity instanceof Player));
     }
 }
