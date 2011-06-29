@@ -76,6 +76,7 @@ public class WorldGuardEntityListener extends EntityListener {
         registerEvent("ENTITY_DAMAGE", Priority.High);
         registerEvent("ENTITY_COMBUST", Priority.High);
         registerEvent("ENTITY_EXPLODE", Priority.High);
+        registerEvent("ENTITY_PRIME", Priority.High);
         registerEvent("CREATURE_SPAWN", Priority.High);
         registerEvent("ENTITY_INTERACT", Priority.High);
         registerEvent("CREEPER_POWER", Priority.High);
@@ -483,21 +484,6 @@ public class WorldGuardEntityListener extends EntityListener {
                     return;
                 }
             }
-        } else if (ent instanceof Fireball) {
-            if (wcfg.blockFireballBlockDamage) {
-                event.setCancelled(true);
-                return;
-            }
-        	
-            if (wcfg.useRegions) {
-                Vector pt = toVector(l);
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.GHAST_FIREBALL)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
         } else if (ent instanceof TNTPrimed) {
             if (cfg.activityHaltToggle) {
                 event.setCancelled(true);
@@ -537,6 +523,39 @@ public class WorldGuardEntityListener extends EntityListener {
                 Vector pt = toVector(block);
 
                 if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.TNT)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * Called on explosion prime
+     */
+    @Override
+    public void onExplosionPrime(ExplosionPrimeEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        Location l = event.getEntity().getLocation();
+        World world = l.getWorld();
+        WorldConfiguration wcfg = cfg.get(world);
+        Entity ent = event.getEntity();
+
+        if (ent instanceof Fireball) {
+            if (wcfg.blockFireballBlockDamage) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions) {
+                Vector pt = toVector(l);
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.GHAST_FIREBALL)) {
                     event.setCancelled(true);
                     return;
                 }
