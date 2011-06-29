@@ -76,7 +76,7 @@ public class WorldGuardEntityListener extends EntityListener {
         registerEvent("ENTITY_DAMAGE", Priority.High);
         registerEvent("ENTITY_COMBUST", Priority.High);
         registerEvent("ENTITY_EXPLODE", Priority.High);
-        registerEvent("ENTITY_PRIME", Priority.High);
+        registerEvent("EXPLOSION_PRIME", Priority.High);
         registerEvent("CREATURE_SPAWN", Priority.High);
         registerEvent("ENTITY_INTERACT", Priority.High);
         registerEvent("CREEPER_POWER", Priority.High);
@@ -464,6 +464,12 @@ public class WorldGuardEntityListener extends EntityListener {
         WorldConfiguration wcfg = cfg.get(world);
         Entity ent = event.getEntity();
 
+        if (cfg.activityHaltToggle) {
+            ent.remove();
+            event.setCancelled(true);
+            return;
+        }
+
         if (ent instanceof LivingEntity) {
             if (wcfg.blockCreeperBlockDamage) {
                 event.setCancelled(true);
@@ -485,12 +491,6 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
         } else if (ent instanceof TNTPrimed) {
-            if (cfg.activityHaltToggle) {
-                ent.remove();
-                event.setCancelled(true);
-                return;
-            }
-
             if (wcfg.blockTNT) {
                 event.setCancelled(true);
                 return;
@@ -540,11 +540,20 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
+        logger.info("PRIME");
+
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         Location l = event.getEntity().getLocation();
         World world = l.getWorld();
         WorldConfiguration wcfg = cfg.get(world);
         Entity ent = event.getEntity();
+
+        if (cfg.activityHaltToggle) {
+            logger.info("WG Halt-Act: Blocking " + ent.getClass().getName());
+            ent.remove();
+            event.setCancelled(true);
+            return;
+        }
 
         if (ent instanceof Fireball) {
             if (wcfg.blockFireballBlockDamage) {
