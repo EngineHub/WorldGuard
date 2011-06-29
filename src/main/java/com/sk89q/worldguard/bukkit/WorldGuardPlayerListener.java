@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -145,10 +144,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             int removed = 0;
 
             for (Entity entity : player.getWorld().getEntities()) {
-                if (entity instanceof Item
-                        || (entity instanceof LivingEntity
-                        && !(entity instanceof Tameable)
-                        && !(entity instanceof Player))) {
+                if (BukkitUtil.isIntensiveEntity(entity)) {
                     entity.remove();
                     removed++;
                 }

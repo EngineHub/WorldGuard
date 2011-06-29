@@ -66,10 +66,7 @@ public class WorldGuardWorldListener extends WorldListener {
             int removed = 0;
 
             for (Entity entity : event.getChunk().getEntities()) {
-                if (entity instanceof Item
-                        || (entity instanceof LivingEntity
-                        && !(entity instanceof Tameable)
-                        && !(entity instanceof Player))) {
+                if (BukkitUtil.isIntensiveEntity(entity)) {
                     entity.remove();
                     removed++;
                 }

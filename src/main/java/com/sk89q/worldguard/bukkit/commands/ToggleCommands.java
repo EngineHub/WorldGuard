@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -115,10 +116,7 @@ public class ToggleCommands {
                 int removed = 0;
 
                 for (Entity entity : world.getEntities()) {
-                    if (entity instanceof Item
-                            || (entity instanceof LivingEntity
-                            && !(entity instanceof Tameable)
-                            && !(entity instanceof Player))) {
+                    if (BukkitUtil.isIntensiveEntity(entity)) {
                         entity.remove();
                         removed++;
                     }
