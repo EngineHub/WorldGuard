@@ -540,8 +540,6 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        logger.info("PRIME");
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         Location l = event.getEntity().getLocation();
         World world = l.getWorld();
@@ -549,7 +547,6 @@ public class WorldGuardEntityListener extends EntityListener {
         Entity ent = event.getEntity();
 
         if (cfg.activityHaltToggle) {
-            logger.info("WG Halt-Act: Blocking " + ent.getClass().getName());
             ent.remove();
             event.setCancelled(true);
             return;
