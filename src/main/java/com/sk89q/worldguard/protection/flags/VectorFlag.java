@@ -54,7 +54,7 @@ public class VectorFlag extends Flag<Vector> {
 
     @Override
     public Vector unmarshal(Object o) {
-        if (o instanceof Map) {
+        if (o instanceof Map<?, ?>) {
             Map<?, ?> map  = (Map<?, ?>) o;
 
             Object rawX = map.get("x");
