@@ -256,6 +256,8 @@ public class RegionCommands {
         
         ApplicableRegionSet regions = mgr.getApplicableRegions(region);
         
+        
+        
         // Check if this region overlaps any other region
         if (regions.size() > 0) {
             if (!regions.isOwnerOfAll(localPlayer)) {
@@ -264,7 +266,7 @@ public class RegionCommands {
         } else {
             if (wcfg.claimOnlyInsideExistingRegions) {
                 throw new CommandException("You may only claim regions inside " +
-                		"existing regions that you or your group own.");
+                        "existing regions that you or your group own.");
             }
         }
 

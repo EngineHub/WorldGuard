@@ -492,5 +492,4 @@ public class WorldConfiguration {
     public ChestProtection getChestProtection() {
         return chestProtection;
     }
-    
 }
