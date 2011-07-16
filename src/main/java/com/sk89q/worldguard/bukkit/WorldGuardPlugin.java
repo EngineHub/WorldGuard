@@ -19,7 +19,17 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Filter;
+import java.util.logging.Logger;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -31,19 +41,23 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.sk89q.bukkit.migration.*;
-import com.sk89q.minecraft.util.commands.*;
+
+import com.sk89q.bukkit.migration.PermissionsResolverManager;
+import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.minecraft.util.commands.CommandUsageException;
+import com.sk89q.minecraft.util.commands.CommandsManager;
+import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
+import com.sk89q.minecraft.util.commands.WrappedCommandException;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
 import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
-import com.sk89q.worldguard.protection.*;
-import java.io.*;
-import java.util.*;
-import java.util.logging.Filter;
-import java.util.logging.Logger;
+import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
