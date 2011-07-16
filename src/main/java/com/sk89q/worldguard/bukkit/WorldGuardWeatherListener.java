@@ -147,5 +147,4 @@ public class WorldGuardWeatherListener extends WeatherListener {
             }
         }
     }
-
 }
