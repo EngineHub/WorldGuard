@@ -20,8 +20,9 @@
 package com.sk89q.worldguard.domains;
 
 import java.util.Arrays;
-import java.util.Set;
 import java.util.LinkedHashSet;
+import java.util.Set;
+
 import com.sk89q.worldguard.LocalPlayer;
 
 public class GroupDomain implements Domain {

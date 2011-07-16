@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.protection.databases;
 
 import java.io.IOException;
+
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 public abstract class AbstractProtectionDatabase implements ProtectionDatabase {

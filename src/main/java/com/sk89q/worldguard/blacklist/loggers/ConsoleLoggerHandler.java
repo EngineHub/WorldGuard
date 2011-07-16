@@ -19,10 +19,18 @@
 
 package com.sk89q.worldguard.blacklist.loggers;
 
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.sk89q.worldedit.blocks.ItemType;
-import com.sk89q.worldguard.blacklist.events.*;
+import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 
 /**
  *
