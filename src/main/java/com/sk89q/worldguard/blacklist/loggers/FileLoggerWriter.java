@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.blacklist.loggers;
 
-import java.io.*;
+import java.io.BufferedWriter;
 
 /**
  *

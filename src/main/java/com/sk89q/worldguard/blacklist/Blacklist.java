@@ -19,14 +19,19 @@
 
 package com.sk89q.worldguard.blacklist;
 
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.logging.Logger;
+import java.util.Map;
 import java.util.logging.Level;
-import java.io.*;
+import java.util.logging.Logger;
+
 import org.bukkit.ChatColor;
+
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
@@ -60,11 +65,9 @@ public abstract class Blacklist {
     Map<String,BlacklistTrackedEvent> lastAffected =
             new HashMap<String,BlacklistTrackedEvent>();
 
-
     private boolean useAsWhitelist;
 
-    public Blacklist(Boolean useAsWhitelist)
-    {
+    public Blacklist(Boolean useAsWhitelist) {
         this.useAsWhitelist = useAsWhitelist;
     }
 
