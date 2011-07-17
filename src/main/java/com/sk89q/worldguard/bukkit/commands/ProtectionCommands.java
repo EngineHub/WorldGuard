@@ -20,7 +20,11 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import org.bukkit.command.CommandSender;
-import com.sk89q.minecraft.util.commands.*;
+
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class ProtectionCommands {

@@ -33,5 +33,4 @@ public class BukkitBlacklist extends Blacklist {
     public void broadcastNotification(String msg) {
         plugin.broadcastNotification(msg);
     }
-
 }

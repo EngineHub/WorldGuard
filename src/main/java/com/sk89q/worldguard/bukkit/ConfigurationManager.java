@@ -18,16 +18,18 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.Blacklist;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
+
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.Blacklist;
 
 /**
  * Represents the global configuration and also delegates configuration

@@ -5,13 +5,13 @@
 */
 package com.sk89q.worldguard.bukkit;
 
-import org.bukkit.entity.*;
+import java.util.logging.Logger;
+
+import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldListener;
 import org.bukkit.plugin.PluginManager;
-
-import java.util.logging.Logger;
 
 public class WorldGuardWorldListener extends WorldListener {
 
@@ -35,7 +35,7 @@ public class WorldGuardWorldListener extends WorldListener {
      * Register events.
      */
     public void registerEvents() {
-        PluginManager pm = plugin.getServer().getPluginManager();
+//        PluginManager pm = plugin.getServer().getPluginManager();
 
         registerEvent("CHUNK_LOAD", Event.Priority.Normal);
     }

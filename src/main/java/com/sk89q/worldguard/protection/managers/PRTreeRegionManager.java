@@ -18,21 +18,23 @@
  */
 package com.sk89q.worldguard.protection.managers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.khelekore.prtree.MBRConverter;
 import org.khelekore.prtree.PRTree;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
-import java.io.IOException;
-import java.util.Iterator;
 
 public class PRTreeRegionManager extends RegionManager {
 

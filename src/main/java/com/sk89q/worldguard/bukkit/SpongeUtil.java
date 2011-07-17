@@ -19,7 +19,9 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.isBlockWater;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.setBlockToWater;
+
 import org.bukkit.World;
 
 public class SpongeUtil {

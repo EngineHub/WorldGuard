@@ -20,7 +20,9 @@ package com.sk89q.worldguard.protection.flags;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.bukkit.command.CommandSender;
+
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
@@ -54,7 +56,7 @@ public class VectorFlag extends Flag<Vector> {
 
     @Override
     public Vector unmarshal(Object o) {
-        if (o instanceof Map) {
+        if (o instanceof Map<?, ?>) {
             Map<?, ?> map  = (Map<?, ?>) o;
 
             Object rawX = map.get("x");
