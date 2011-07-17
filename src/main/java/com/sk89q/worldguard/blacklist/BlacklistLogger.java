@@ -19,8 +19,9 @@
 
 package com.sk89q.worldguard.blacklist;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
+
 import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.loggers.BlacklistLoggerHandler;
 

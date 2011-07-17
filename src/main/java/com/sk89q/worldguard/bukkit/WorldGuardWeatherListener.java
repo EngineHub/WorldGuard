@@ -19,6 +19,9 @@
 package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+
+import java.util.logging.Logger;
+
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -27,12 +30,11 @@ import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.weather.WeatherListener;
 import org.bukkit.plugin.PluginManager;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-
-import java.util.logging.Logger;
 
 public class WorldGuardWeatherListener extends WeatherListener {
 
@@ -56,7 +58,7 @@ public class WorldGuardWeatherListener extends WeatherListener {
     }
 
     public void registerEvents() {
-        PluginManager pm = plugin.getServer().getPluginManager();
+//        PluginManager pm = plugin.getServer().getPluginManager();
 
         registerEvent("LIGHTNING_STRIKE", Priority.High);
         registerEvent("THUNDER_CHANGE", Priority.High);
@@ -145,5 +147,4 @@ public class WorldGuardWeatherListener extends WeatherListener {
             }
         }
     }
-
 }

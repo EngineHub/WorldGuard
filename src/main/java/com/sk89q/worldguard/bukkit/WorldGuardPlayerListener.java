@@ -19,30 +19,50 @@
 package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.*;
+import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -72,7 +92,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * Register events.
      */
     public void registerEvents() {
-        PluginManager pm = plugin.getServer().getPluginManager();
+//        PluginManager pm = plugin.getServer().getPluginManager();
 
         registerEvent("PLAYER_INTERACT", Priority.High);
         registerEvent("PLAYER_DROP_ITEM", Priority.High);
@@ -135,7 +155,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         World world = player.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        WorldConfiguration wcfg = cfg.get(world);
 
         if (cfg.activityHaltToggle) {
             player.sendMessage(ChatColor.YELLOW
@@ -143,7 +163,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
             int removed = 0;
 
-            for (Entity entity : player.getWorld().getEntities()) {
+            for (Entity entity : world.getEntities()) {
                 if (BukkitUtil.isIntensiveEntity(entity)) {
                     entity.remove();
                     removed++;
@@ -152,7 +172,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
             if (removed > 10) {
                 logger.info("WG Halt-Act: " + removed + " entities (>10) auto-removed from "
-                        + player.getWorld().toString());
+                		+ player.getWorld().toString());
             }
         }
 

@@ -18,10 +18,13 @@
  */
 package com.sk89q.worldguard.protection.regions;
 
-import com.sk89q.worldedit.*;
-import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 
 /**
  * Represents a cuboid region that can be protected.
