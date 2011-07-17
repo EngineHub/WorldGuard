@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 import com.sk89q.worldguard.LocalPlayer;
 
 public class DefaultDomain implements Domain {

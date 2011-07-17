@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.util;
 
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class LogListBlock {
     private LinkedHashMap <String, Object> items

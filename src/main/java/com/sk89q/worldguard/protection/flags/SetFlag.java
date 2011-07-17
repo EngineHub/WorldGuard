@@ -18,10 +18,15 @@
  */
 package com.sk89q.worldguard.protection.flags;
 
-import org.bukkit.command.CommandSender;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import java.util.*;
+import org.bukkit.command.CommandSender;
+
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 /**
  * Represents a flag that consists of a set.
@@ -56,8 +61,8 @@ public class SetFlag<T> extends Flag<Set<T>> {
 
     @Override
     public Set<T> unmarshal(Object o) {
-        if (o instanceof Collection) {
-            Collection collection = (Collection) o;
+        if (o instanceof Collection<?>) {
+            Collection<?> collection = (Collection<?>) o;
             Set<T> items = new HashSet<T>();
 
             for (Object sub : collection) {

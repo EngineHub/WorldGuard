@@ -37,5 +37,4 @@ public class ProtectedRegionMBRConverter implements MBRConverter<ProtectedRegion
     public double getMaxY(ProtectedRegion t) {
         return t.getMaximumPoint().getBlockZ();
     }
-
 }

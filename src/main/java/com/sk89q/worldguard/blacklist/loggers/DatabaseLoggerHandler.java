@@ -19,12 +19,13 @@
 
 package com.sk89q.worldguard.blacklist.loggers;
 
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.BlacklistEvent;

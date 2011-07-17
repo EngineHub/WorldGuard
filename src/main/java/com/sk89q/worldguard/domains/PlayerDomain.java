@@ -19,8 +19,9 @@
 
 package com.sk89q.worldguard.domains;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
+
 import com.sk89q.worldguard.LocalPlayer;
 
 public class PlayerDomain implements Domain {

@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit;
 
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 

@@ -19,13 +19,6 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldguard.blacklist.BlacklistLogger;
-import com.sk89q.worldguard.blacklist.loggers.ConsoleLoggerHandler;
-import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
-import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
-import com.sk89q.worldguard.chest.ChestProtection;
-import com.sk89q.worldguard.chest.SignChestProtection;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,10 +28,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.bukkit.block.Block;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
+
+import com.sk89q.worldguard.blacklist.Blacklist;
+import com.sk89q.worldguard.blacklist.BlacklistLogger;
+import com.sk89q.worldguard.blacklist.loggers.ConsoleLoggerHandler;
+import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
+import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
+import com.sk89q.worldguard.chest.ChestProtection;
+import com.sk89q.worldguard.chest.SignChestProtection;
 
 /**
  * Holds the configuration for individual worlds.
@@ -490,5 +492,4 @@ public class WorldConfiguration {
     public ChestProtection getChestProtection() {
         return chestProtection;
     }
-    
 }
