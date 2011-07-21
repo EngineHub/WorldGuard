@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;

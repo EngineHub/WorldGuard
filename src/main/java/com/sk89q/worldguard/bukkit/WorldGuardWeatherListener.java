@@ -56,7 +56,6 @@ public class WorldGuardWeatherListener extends WeatherListener {
     }
 
     public void registerEvents() {
-        PluginManager pm = plugin.getServer().getPluginManager();
 
         registerEvent("LIGHTNING_STRIKE", Priority.High);
         registerEvent("THUNDER_CHANGE", Priority.High);

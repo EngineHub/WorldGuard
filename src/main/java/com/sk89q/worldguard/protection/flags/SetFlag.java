@@ -57,7 +57,8 @@ public class SetFlag<T> extends Flag<Set<T>> {
     @Override
     public Set<T> unmarshal(Object o) {
         if (o instanceof Collection) {
-            Collection collection = (Collection) o;
+            @SuppressWarnings("rawtypes")
+			Collection collection = (Collection<?>) o;
             Set<T> items = new HashSet<T>();
 
             for (Object sub : collection) {

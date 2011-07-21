@@ -71,7 +71,6 @@ public class WorldGuardEntityListener extends EntityListener {
      * Register events.
      */
     public void registerEvents() {
-        PluginManager pm = plugin.getServer().getPluginManager();
 
         registerEvent("ENTITY_DAMAGE", Priority.High);
         registerEvent("ENTITY_COMBUST", Priority.High);

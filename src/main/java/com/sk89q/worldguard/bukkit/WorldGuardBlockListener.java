@@ -20,6 +20,8 @@ package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
@@ -68,7 +70,6 @@ public class WorldGuardBlockListener extends BlockListener {
      * Register events.
      */
     public void registerEvents() {
-        PluginManager pm = plugin.getServer().getPluginManager();
 
         registerEvent("BLOCK_DAMAGE", Priority.High);
         registerEvent("BLOCK_BREAK", Priority.High);
@@ -635,12 +636,120 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
-
+         
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
         }
+        
+        if(wcfg.useiConomy && iConomyManager.isloaded()){  
+        	
+        	LocalPlayer localPlayer = new BukkitPlayer(plugin,player);
+        	
+        	Block block = event.getBlock();
+	        RegionManager mgr = plugin.getGlobalRegionManager().get(block.getWorld()); //Region of sign
+	        String regionString = event.getLine(1); //Specified Region
+	        
+			if ((event.getLine(0).equalsIgnoreCase("[Buy Region]") || event.getLine(0)
+					.equalsIgnoreCase("#1[Buy Region]"))){
+				
+				event.setLine(0, "§1[Buy Region]");
+				
+				if (mgr.hasRegion(regionString)){
+					
+					ProtectedRegion rgn = mgr.getRegion(regionString);
+					boolean hasFlagCommand = false, allowedToUseRequiredFlags = false;
+					
+					if (rgn.isOwner(localPlayer)){
+						hasFlagCommand = localPlayer.hasPermission("worldguard.region.flag.own." 
+								+ rgn.getId().toLowerCase());
+					} else if (rgn.isMember(localPlayer)){
+			        	hasFlagCommand = localPlayer.hasPermission("worldguard.region.flag.member." 
+			        			+ rgn.getId().toLowerCase());
+					} else { 
+			        	hasFlagCommand = localPlayer.hasPermission("worldguard.region.flag." 
+			        			+ rgn.getId().toLowerCase());
+					}
+					
+					if (rgn.isOwner(localPlayer)) {
+						allowedToUseRequiredFlags = 
+							localPlayer.hasPermission("worldguard.region.flag.flags." + DefaultFlag.BUYABLE.getName() + 
+								".owner." + rgn.getId().toLowerCase()) 
+								&& localPlayer.hasPermission("worldguard.region.flag.flags." + DefaultFlag.PRICE.getName() + 
+								".owner." + rgn.getId().toLowerCase());
+	                } else if (rgn.isMember(localPlayer)) {
+	                	allowedToUseRequiredFlags = 
+							localPlayer.hasPermission("worldguard.region.flag.flags." + DefaultFlag.BUYABLE.getName() + 
+								".member." + rgn.getId().toLowerCase()) 
+								&& localPlayer.hasPermission("worldguard.region.flag.flags." + DefaultFlag.PRICE.getName() + 
+								".member." + rgn.getId().toLowerCase());
+	                } else {
+	                	allowedToUseRequiredFlags = 
+							localPlayer.hasPermission("worldguard.region.flag.flags." + DefaultFlag.BUYABLE.getName() + 
+								"." + rgn.getId().toLowerCase()) 
+								&& localPlayer.hasPermission("worldguard.region.flag.flags." + DefaultFlag.PRICE.getName() + 
+								"." + rgn.getId().toLowerCase());
+	                } 
+					
+					if (hasFlagCommand && allowedToUseRequiredFlags){
+						
+						Vector signLocation = toVector(block.getLocation());
+						iConomyManager econMgr = new iConomyManager();
+		
+						if (rgn.contains(signLocation)){
+							
+							double price = -1;
+							
+							//Pull price from flag if possible, else set price from the sign
+							if (event.getLine(2) == null || event.getLine(2).trim().equals("")){
+								
+								if (rgn.getFlag(DefaultFlag.PRICE) != null && rgn.getFlag(DefaultFlag.PRICE) >= 0){
+									
+									price = rgn.getFlag(DefaultFlag.PRICE);
+									
+									rgn.setFlag(DefaultFlag.BUYABLE, true);
+									event.setLine(2, econMgr.format(price)); 
+									event.setLine(3, ChatColor.GRAY + player.getName());
+								} else{
+									player.sendMessage(ChatColor.RED + "No price has been set previously or specified on the sign.");
+									
+									event.setLine(0, "§4[Buy Region]");
+									event.setLine(1, "<Region ID>");
+									event.setLine(2, "$<Price>");
+								}
+							} else {
+								
+								try{
+									price = Double.parseDouble(event.getLine(2).replaceAll("[^0-9\\.]", ""));
+								}catch(Exception e){
+									player.sendMessage(ChatColor.RED + "Invalid price value.");
+									
+									event.setLine(0, "§4[Buy Region]");
+									event.setLine(1, "<Region ID>");
+									event.setLine(2, "$<Price>");
+								}	
+								
+								rgn.setFlag(DefaultFlag.PRICE, price);
+								rgn.setFlag(DefaultFlag.BUYABLE, true);
+								
+								player.sendMessage(ChatColor.YELLOW+"Price of \""+regionString+"\" set to "+econMgr.format(price)+".");
+								
+								event.setLine(2, econMgr.format(price)); 
+								event.setLine(3, ChatColor.GRAY + player.getName());
+							}
+						} else {
+							player.sendMessage(ChatColor.RED + "Sell sign must be placed in stated region.");
+						}
+					} else {
+						player.sendMessage(ChatColor.DARK_RED + "You don't have permission.");
+						event.setCancelled(true);
+					} 
+				} else {
+					player.sendMessage(ChatColor.RED + "Region \""+regionString+"\" does not exist.");
+				} 
+			} 
+		}
     }
     
     /**

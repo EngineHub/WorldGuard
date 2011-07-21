@@ -18,8 +18,6 @@
  */
 package com.sk89q.worldguard.protection.flags;
 
-import org.bukkit.command.CommandSender;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.entity.CreatureType;
 
 /**

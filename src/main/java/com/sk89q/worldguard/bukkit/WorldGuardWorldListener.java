@@ -35,7 +35,6 @@ public class WorldGuardWorldListener extends WorldListener {
      * Register events.
      */
     public void registerEvents() {
-        PluginManager pm = plugin.getServer().getPluginManager();
 
         registerEvent("CHUNK_LOAD", Event.Priority.Normal);
     }

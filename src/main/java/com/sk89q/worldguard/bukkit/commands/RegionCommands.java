@@ -20,8 +20,12 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -34,6 +38,8 @@ import com.sk89q.worldedit.bukkit.selections.*;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.iConomyManager;
+import com.sk89q.worldguard.bukkit.iConomyManager.EcoAccount;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -268,35 +274,33 @@ public class RegionCommands {
             }
         }
 
-        /*if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
-            if (iConomy.getBank().hasAccount(player.getName())) {
-                Account account = iConomy.getBank().getAccount(player.getName());
-                double balance = account.getBalance();
-                double regionCosts = region.countBlocks() * wcfg.buyOnClaimPrice;
-                if (balance >= regionCosts) {
-                    account.subtract(regionCosts);
-                    player.sendMessage(ChatColor.YELLOW + "You have bought that region for "
-                            + iConomy.getBank().format(regionCosts));
-                    account.save();
-                } else {
-                    player.sendMessage(ChatColor.RED + "You have not enough money.");
-                    player.sendMessage(ChatColor.RED + "The region you want to claim costs "
-                            + iConomy.getBank().format(regionCosts));
-                    player.sendMessage(ChatColor.RED + "You have " + iConomy.getBank().format(balance));
-                    return;
-                }
-            } else {
-                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-                return;
-            }
-        }*/
-
         if (!plugin.hasPermission(sender, "worldguard.region.unlimited")) {
             if (region.volume() > wcfg.maxClaimVolume) {
                 player.sendMessage(ChatColor.RED + "This region is too large to claim.");
                 player.sendMessage(ChatColor.RED +
                         "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
                 return;
+            }
+        }
+        
+        if (iConomyManager.isloaded() && wcfg.useiConomy && wcfg.buyOnClaim) {
+        	
+        	iConomyManager econ = new iConomyManager();
+        	
+            if (!econ.hasAccount(player.getName())) {
+            	throw new CommandException("You have not any money.");
+            }
+            
+            EcoAccount account = econ.getAccount(player.getName());
+            double balance = account.balance();
+            double regionCosts = region.volume() * wcfg.buyOnClaimPrice;
+            
+            if (balance >= regionCosts) {
+                account.subtract(regionCosts);
+                player.sendMessage(ChatColor.GREEN + "You have bought the region for "
+                        + econ.format(regionCosts));
+            } else {
+            	throw new CommandException("You have not enough money.");
             }
         }
 
@@ -309,6 +313,79 @@ public class RegionCommands {
         } catch (IOException e) {
             throw new CommandException("Failed to write regions file: "
                     + e.getMessage());
+        }
+    }
+    
+    @Command(aliases = {"buy"},
+    		usage = "<id>",
+    		desc = "Buy the region",
+    		flags = "", min = 1, max = 1)
+    public static void buy(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+    	
+    	String id = args.getString(0);
+    	Player player = plugin.checkPlayer(sender);
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
+        
+        plugin.checkPermission(sender, "worldguard.region.buy."+id);
+        
+    	if (!wcfg.useiConomy){
+    		throw new CommandException("iConomy support in not enabled on this server.");
+    	}
+    		
+		if (!iConomyManager.isloaded()){
+			throw new CommandException("iConomy is not currently loaded!");
+		}
+    			
+		if (mgr.hasRegion(id)){
+			throw new CommandException("Region \""+id+"\" does not exist.");
+		}
+    				
+		ProtectedRegion region = mgr.getRegion(id);
+    				
+		if (region.getFlag(DefaultFlag.BUYABLE) != null && region.getFlag(DefaultFlag.BUYABLE)){
+			throw new CommandException("That region is not for sale.");
+		}
+			
+		if (!region.getOwners().contains(localPlayer)){
+			throw new CommandException("You already own that region");
+		}
+			
+		iConomyManager ico = new iConomyManager();
+			
+		if (ico.hasAccount(player.getName())) {
+			throw new CommandException("You have not any money.");
+        }	
+		
+        EcoAccount buyerAccount = ico.getAccount(player.getName());
+        double balance = buyerAccount.balance();
+            
+        Set<String> ownersSet = region.getOwners().getPlayers(); 
+        List<EcoAccount> ownerAccounts = new ArrayList<EcoAccount>();
+        for (String owner:ownersSet){
+        	if (!ico.hasAccount(owner))
+        		ico.createAccount(owner);
+        	ownerAccounts.add(ico.getAccount(owner));
+        }
+        
+        double regionPrice = region.getFlag(DefaultFlag.PRICE);
+
+        if (balance >= regionPrice) {
+        	region.setFlag(DefaultFlag.BUYABLE, false);
+        	
+            buyerAccount.subtract(regionPrice); 
+            ico.dividAndDistribute(regionPrice,ownerAccounts);
+            
+            DefaultDomain owners = new DefaultDomain();
+            owners.addPlayer(player.getName());
+            region.setOwners(owners);
+            
+            player.sendMessage(ChatColor.YELLOW + "You have bought the region \"" + id + "\" for " +
+                    ico.format(regionPrice));
+        } else {
+        	throw new CommandException("You have not enough money.");
         }
     }
     

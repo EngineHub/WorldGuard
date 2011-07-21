@@ -157,6 +157,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardWorldListener(this)).registerEvents();
+        (new WorldGuardPluginListener(this)).registerEvents();
 
         // Check god mode for existing players, if any
         for (Player player : getServer().getOnlinePlayers()) {
