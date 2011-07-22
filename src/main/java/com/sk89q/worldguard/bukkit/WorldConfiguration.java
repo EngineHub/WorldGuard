@@ -330,6 +330,8 @@ public class WorldConfiguration {
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
         maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player", 7);
 
+        buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
+        buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
         useRegister = getBoolean("register.enable", false);
 
         blockCreatureSpawn = new HashSet<CreatureType>();

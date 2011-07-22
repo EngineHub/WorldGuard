@@ -56,10 +56,14 @@ Issues
 
 - WorldGuard stores region owner names in lowercase while economy
   plugins are case-sensitive for account names. As the result, we
-  don't have an easy way to pay region owners when a their region is
+  don't have an (easy) way to pay region owners when a their region is
   bought.
 
   iConomy 6 is [promised][ico6-case] to have lowercase account names.
+
+- Buy-on-claim is a separate feature which differs from buying since
+  price depends on region size and there's no payment recipient. It
+  will use Register integration as well.
 
 Hacking notes
 =============
