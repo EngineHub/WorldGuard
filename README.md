@@ -14,6 +14,14 @@ console, similar to this:
 How to use it
 =============
 
+Configuration
+-------------
+
+Set `register.enable` to true in order to enable `/region buy` command.
+
+Selling
+-------
+
 Suppose you want to sell region with ID `lot9` for 19.45 economy
 credits.
 
@@ -42,17 +50,6 @@ option to just add a new owner instead may be implemented).
 If a group owns a region, they will not receive any payment as well
 (to be implemented).
 
-Configuration
--------------
-
-Set `register.enable` to true.
-
-Selling
--------
-
-Set `buyable` flag for region to true and `price` flag to region cost
-(in iConomy units). Now user can do `/region buy` to own the region
-by paying this price.
 
 Issues
 ======
