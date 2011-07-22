@@ -21,12 +21,16 @@ package com.sk89q.worldguard.bukkit.commands;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.nijikokun.register.payment.Method;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -194,6 +198,75 @@ public class RegionCommands {
         }
     }
     
+    @Command(aliases = {"buy"},
+            usage = "<id>",
+            desc = "Buy a region",
+            flags = "", min = 1, max = 1)
+    public static void buy(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        Player buyer = plugin.checkPlayer(sender);
+        String id = args.getString(0);
+        RegionManager mgr = plugin.getGlobalRegionManager().get(buyer.getWorld());
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(buyer.getWorld());
+
+        if (!mgr.hasRegion(id))
+            throw new CommandException("A region with ID '" + id + "' doesn't exist.");
+
+        ProtectedRegion region = mgr.getRegion(id);
+        DefaultDomain owners = region.getOwners();
+        Boolean buyable = region.getFlag(DefaultFlag.BUYABLE);
+        Double price = region.getFlag(DefaultFlag.PRICE);
+
+        if ((buyable == null)|| !buyable)
+            throw new CommandException("This region is not buyable.");
+
+        plugin.checkPermission(sender, "worldguard.region.buy." + id.toLowerCase());
+
+        if (!plugin.paymentMethod.hasAccount(buyer.getName()))
+            throw new CommandException("You have no account.");
+        
+        Method.MethodAccount pAccount = plugin.paymentMethod.getAccount(buyer.getName());
+
+        if (!pAccount.hasEnough(price))
+            throw new CommandException("You have not enough money.");
+
+        if (price == null)
+            price = 0.0;
+
+        pAccount.subtract(price);
+
+        Set<String> players = owners.getPlayers();
+
+        /// @todo Distribute money over owner groups as well
+        /// 
+        /// @bug WorldGuard stores owner names lowercased while
+        /// economy plugins have case-sensitive account names. As the
+        /// result, we're unable to pay to region owners for their
+        /// land. Currently we try to at least pick those with
+        /// lowercase names and pay them.
+        for (String p : players)
+            if (plugin.paymentMethod.hasAccount(p))
+                {
+                    buyer.sendMessage(p + " has received payment");
+                    plugin.paymentMethod.getAccount(p).add(price / players.size());
+                }
+        
+        owners = new DefaultDomain();
+        owners.addPlayer(buyer.getName());
+        region.setOwners(owners);
+        
+        buyer.sendMessage(ChatColor.YELLOW + "You have bought that region for " + 
+                          ChatColor.WHITE + plugin.paymentMethod.format(price));
+        region.setFlag(DefaultFlag.BUYABLE, false);
+
+        try {
+            mgr.save();
+        } catch (IOException e) {
+            throw new CommandException("Failed to write regions file: "
+                                       + e.getMessage());
+        }
+    }
+
     @Command(aliases = {"claim"},
             usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
             desc = "Claim a region",
