@@ -120,7 +120,7 @@ public class WorldConfiguration {
     public boolean highFreqFlags;
     public int regionWand = 287;
     public Set<CreatureType> blockCreatureSpawn;
-    public boolean useiConomy;
+    public boolean useRegister;
     public boolean buyOnClaim;
     public double buyOnClaimPrice;
     public int maxClaimVolume;
@@ -330,9 +330,7 @@ public class WorldConfiguration {
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
         maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player", 7);
 
-        useiConomy = getBoolean("iconomy.enable", false);
-        buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
-        buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
+        useRegister = getBoolean("register.enable", false);
 
         blockCreatureSpawn = new HashSet<CreatureType>();
         for (String creatureName : getStringList("mobs.block-creature-spawn", null)) {

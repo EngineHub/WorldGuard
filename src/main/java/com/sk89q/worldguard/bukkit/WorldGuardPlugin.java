@@ -42,6 +42,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.nijikokun.register.payment.Method;
+
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
 import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -100,6 +102,11 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     private FlagStateManager flagStateManager;
 
+    /**
+     * Register integration.
+     */
+    public Method paymentMethod = null;
+    
     /**
      * Construct objects. Actual loading occurs when the plugin is enabled, so
      * this merely instantiates the objects.
@@ -166,6 +173,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         // Register events
+        (new WorldGuardServerListener(this)).registerEvents();
         (new WorldGuardPlayerListener(this)).registerEvents();
         (new WorldGuardBlockListener(this)).registerEvents();
         (new WorldGuardEntityListener(this)).registerEvents();
