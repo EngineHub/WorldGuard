@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit.commands;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +44,7 @@ import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -230,7 +232,7 @@ public class RegionCommands {
 
         if (!plugin.paymentMethod.hasAccount(buyer.getName()))
             throw new CommandException("You have no account.");
-        
+
         Method.MethodAccount pAccount = plugin.paymentMethod.getAccount(buyer.getName());
 
         if (!pAccount.hasEnough(price))
@@ -241,26 +243,51 @@ public class RegionCommands {
 
         pAccount.subtract(price);
 
-        Set<String> players = owners.getPlayers();
+        Set<String> ownerPlayers = owners.getPlayers();
+        double share = price / ownerPlayers.size();
 
         /// @todo Distribute money over owner groups as well
-        /// 
-        /// @bug WorldGuard stores owner names lowercased while
+        ///
+        /// @todo Support operating through banks (realism)
+        ///
+        /// @todo WorldGuard stores owner names lowercased while
         /// economy plugins have case-sensitive account names. As the
-        /// result, we're unable to pay to region owners for their
-        /// land. Currently we try to at least pick those with
-        /// lowercase names and pay them.
-        for (String p : players)
-            if (plugin.paymentMethod.hasAccount(p))
-                {
-                    buyer.sendMessage(p + " has received payment");
-                    plugin.paymentMethod.getAccount(p).add(price / players.size());
-                }
-        
+        /// result, we're unable to directly pay to region owners for
+        /// their land. Currently we have to use Bukkit's MatchPlayer
+        /// to perform a reverse search for region owners. See also
+        /// Bukkit issue #140
+        for (String p : ownerPlayers) {
+            boolean paid = false;
+            List<Player> matches = plugin.getServer().matchPlayer(p);
+            for (Player m : matches) {
+                String name = m.getName();
+                if (region.isOwner(plugin.wrapPlayer(m)))
+                    if (plugin.paymentMethod.hasAccount(name)) {
+
+                        plugin.paymentMethod.getAccount(name).add(share);
+                        paid = true;
+                        buyer.sendMessage(ChatColor.YELLOW + name +
+                                          " has received a share of payment");
+                        if (m.isOnline())
+                            m.sendMessage(ChatColor.YELLOW + "You have received a payment of " +
+                                          ChatColor.WHITE + plugin.paymentMethod.format(share) +
+                                          ChatColor.YELLOW + " for selling region '" + id +
+                                          "' to " + buyer.getName());
+                    } else {
+                        buyer.sendMessage(ChatColor.YELLOW + name +
+                                          " has no account");
+                        m.sendMessage(ChatColor.YELLOW + "Region '" + id + "' was sold to " +
+                                      buyer.getName() + ", but you have no account to receive you share");
+                    }
+            }
+            if (!paid)
+                buyer.sendMessage(ChatColor.YELLOW + "Owner " + p + " has not been found");
+        }
+
         owners = new DefaultDomain();
         owners.addPlayer(buyer.getName());
         region.setOwners(owners);
-        
+
         buyer.sendMessage(ChatColor.YELLOW + "You have bought that region for " + 
                           ChatColor.WHITE + plugin.paymentMethod.format(price));
         region.setFlag(DefaultFlag.BUYABLE, false);

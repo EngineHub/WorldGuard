@@ -40,16 +40,16 @@ credits.
 
 And he will become the owner of the region. Region price is deducted
 from his economy account and each of previous region owners will get
-equal share of the payment (this currently doesn't work due to case
-incompatibility between WG and economy plugins and this has not yet
-been resolved).
+equal share of the payment if they have economy accounts.
 
 All previous region owners will lose their rights for that region (an
 option to just add a new owner instead may be implemented).
 
-If a group owns a region, they will not receive any payment as well
-(to be implemented).
+If a group is among owners of a region, they will not receive any
+payment at all (to be implemented, perhaps).
 
+`buyable` region flag is set back to `false` upon buying, but `price`
+flag is preserved.
 
 Issues
 ======
@@ -57,9 +57,10 @@ Issues
 - WorldGuard stores region owner names in lowercase while economy
   plugins are case-sensitive for account names. As the result, we
   don't have an (easy) way to pay region owners when a their region is
-  bought.
-
-  iConomy 6 is [promised][ico6-case] to have lowercase account names.
+  bought. We use Bukkit's `matchPlayer` coupled with `region.isOwner`
+  to reverse search for region owners. Whatever action is finally
+  taken, buyer/owner are notified. iConomy 6 is [promised][ico6-case]
+  to have lowercase account names.
 
 - Buy-on-claim is a separate feature which differs from buying since
   price depends on region size and there's no payment recipient. It
