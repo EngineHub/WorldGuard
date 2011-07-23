@@ -329,7 +329,7 @@ public class RegionCommands {
         RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         
-        plugin.checkPermission(sender, "worldguard.region.buy."+id);
+        plugin.checkPermission(sender, "worldguard.region.buy."+id.toLowerCase());
         
     	if (!wcfg.useiConomy){
     		throw new CommandException("iConomy support in not enabled on this server.");
@@ -339,23 +339,23 @@ public class RegionCommands {
 			throw new CommandException("iConomy is not currently loaded!");
 		}
     			
-		if (mgr.hasRegion(id)){
+		if (!mgr.hasRegion(id)){
 			throw new CommandException("Region \""+id+"\" does not exist.");
 		}
     				
 		ProtectedRegion region = mgr.getRegion(id);
     				
-		if (region.getFlag(DefaultFlag.BUYABLE) != null && region.getFlag(DefaultFlag.BUYABLE)){
+		if (region.getFlag(DefaultFlag.BUYABLE) != null && ! region.getFlag(DefaultFlag.BUYABLE)){
 			throw new CommandException("That region is not for sale.");
 		}
 			
-		if (!region.getOwners().contains(localPlayer)){
+		if (region.getOwners().contains(localPlayer)){
 			throw new CommandException("You already own that region");
 		}
 			
 		iConomyManager ico = new iConomyManager();
 			
-		if (ico.hasAccount(player.getName())) {
+		if (!ico.hasAccount(player.getName())) {
 			throw new CommandException("You have not any money.");
         }	
 		
@@ -373,8 +373,9 @@ public class RegionCommands {
         double regionPrice = region.getFlag(DefaultFlag.PRICE);
 
         if (balance >= regionPrice) {
-        	region.setFlag(DefaultFlag.BUYABLE, false);
-        	
+        	region.setFlag(DefaultFlag.BUYABLE, null);
+            region.setFlag(DefaultFlag.PRICE, null);
+            
             buyerAccount.subtract(regionPrice); 
             ico.dividAndDistribute(regionPrice,ownerAccounts);
             

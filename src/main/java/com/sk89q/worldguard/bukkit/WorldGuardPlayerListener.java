@@ -20,12 +20,12 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -45,8 +45,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.*;
 import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
-import com.sk89q.worldguard.bukkit.iConomyManager.EcoAccount;
-import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.bukkit.commands.RegionCommands;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
@@ -590,7 +589,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     event.setCancelled(true);
                     return;
                 }
-            }            
+            } 
+            
             if (wcfg.useiConomy && iConomyManager.isloaded()
                     && (type == Material.SIGN_POST || type == Material.SIGN || type == Material.WALL_SIGN)
                     && ((Sign)block.getState()).getLine(0).equals("§1[Buy Region]")) {
@@ -603,65 +603,25 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     
                     if (region != null) {
                     	
-                    	if (plugin.hasPermission(player, "worldguard.region.buy."+region.getId())){
+                    	if (region.getFlag(DefaultFlag.PRICE) == 
+                				Double.parseDouble(((Sign)block.getState()).getLine(2).replace(",", "").split(" ")[0])){
                     		
-            		      	iConomyManager ico = new iConomyManager();
-            		      	
-	                    	if (region.getFlag(DefaultFlag.PRICE) == 
-	                    		Double.parseDouble(((Sign)block.getState()).getLine(2).replace(",", "").split(" ")[0])){
-	                    		
-     	                    	if(! ((Sign)block.getState()).getLine(3).equals(ChatColor.GRAY + player.getName()) ){
-    	                    		
-    		                        if (region.getFlag(DefaultFlag.BUYABLE)) {
-    		                        	
-    		                            if (ico.hasAccount(player.getName())) {
-    		                            	
-    		                                EcoAccount account = ico.getAccount(player.getName());
-    		                                double balance = account.balance();
-    		                                double regionPrice = region.getFlag(DefaultFlag.PRICE);
-    		                                
-    		                                Set<String> ownersSet = region.getOwners().getPlayers(); 
-    		                                List<EcoAccount> ownerAccounts = new ArrayList<EcoAccount>();
-    		                                
-    		                                for (String owner:ownersSet){
-    		                                	if (!ico.hasAccount(owner))
-    		                                		ico.createAccount(owner);
-    		                                	ownerAccounts.add(ico.getAccount(owner));
-    		                                }
-    		                                
-    		                                if (balance >= regionPrice) {
-    		                                    account.subtract(regionPrice);
-    		                                    ico.dividAndDistribute(regionPrice,ownerAccounts);
-    		                                     
-    		                                    DefaultDomain owners = new DefaultDomain();
-    		                                    owners.addPlayer(player.getName());
-    		                                    region.setOwners(owners);
-    		                                    
-    		                                    region.setFlag(DefaultFlag.BUYABLE, null);
-    		                                    region.setFlag(DefaultFlag.PRICE, null);
-    		                                    block.setTypeId(0); //Destroy Sign
-    		                                    
-    		                                    player.sendMessage(ChatColor.YELLOW + "You have bought the region \"" 
-    		                                    		+ regionId + "\" for " + ico.format(regionPrice) + ".");
-    		                                } else {
-    		                                    player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-    		                                }
-    		                            } else {
-    		                                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-    		                            }
-    		                        } else {
-    		                            player.sendMessage(ChatColor.RED + "Region: " + regionId + " is not buyable");
-    		                        } 
-    	                    	} else {
-    	                    		player.sendMessage(ChatColor.RED + "You cannot sell \""+regionId+"\" to yourself.");
-    	                    	}   	                    		
-                    		} else {
-                    			((Sign)block.getState()).setLine(2,ico.format(region.getFlag(DefaultFlag.PRICE)));
-                    			((Sign) block.getState()).update();
-                    			player.sendMessage(ChatColor.YELLOW + "The price on this sign was out of date.  It has been updated.");
-                    		}
+                    		try {
+                                RegionCommands.buy(new CommandContext(regionId), plugin, player);
+                                block.setTypeId(0); //Destroy Sign
+                            } catch (CommandException e) {
+                                player.sendMessage(e.getMessage());
+                                event.setCancelled(true);
+                            }
                     	} else {
-                    		player.sendMessage(ChatColor.RED + "You don't have permission for that command!");
+                    		
+                			if (iConomyManager.isloaded()){
+                				((Sign)block.getState()).setLine(2, new iConomyManager().format(region.getFlag(DefaultFlag.PRICE)));
+                				((Sign) block.getState()).update();
+                				player.sendMessage(ChatColor.YELLOW + "The price on this sign was out of date.  It has been updated.");
+                			} else {
+                				player.sendMessage(ChatColor.DARK_RED + "iConomy is not loaded!");
+                			}
                     	}
                     } else {
                         player.sendMessage(ChatColor.DARK_RED + "The region " + regionId + " does not exist.");
