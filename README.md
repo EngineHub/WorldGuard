@@ -137,6 +137,11 @@ Issues
 
 - Cannot pick up signs dropped by `dropSign`.
 
+- `/region` commands are not disabled when `regions.enable` is
+  `false`. In `WorldGuardPlugin.java`:
+
+    commands.register(ProtectionCommands.class);
+
 Hacking notes
 =============
 

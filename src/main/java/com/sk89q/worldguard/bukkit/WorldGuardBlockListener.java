@@ -670,7 +670,8 @@ public class WorldGuardBlockListener extends BlockListener {
         }
         
         /// Selling with signs
-        if (wcfg.useBuySigns && event.getLine(0).equalsIgnoreCase(wcfg.buySignsTag)) {
+        if (wcfg.useRegions && wcfg.useRegister && wcfg.useBuySigns && 
+            event.getLine(0).equalsIgnoreCase(wcfg.buySignsTag)) {
             RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
             String id = event.getLine(1);
 
