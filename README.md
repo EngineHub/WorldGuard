@@ -2,7 +2,8 @@ WorldGuard buy/sell fork
 ========================
 
 This [WorldGuard][wg] fork aims at implementing region buying/selling
-as specified in <http://wiki.sk89q.com/wiki/Buying_and_Selling_Regions>.
+as specified in [WorldGuard/Buying and Selling Regions][wg-buyspec]
+spec.
 
 We use Register to support all major economy plugins like iConomy or
 BOSEconomy. Upon starting, WorldGuard should issue a notice to
@@ -77,16 +78,16 @@ To make region with ID `lot_name` buyable for this price.
 - Second line _must_ contain region ID.
 
 - Buyable flag will be set to `true` (if not set already). This
-requires (requires `worldguard.region.flag.{owner,member,}.lot_name`
-*and* `worldguard.region.flag.flags.buyable.{owner,member,}.lot_name`,
+requires (requires `worldguard.region.flag.{own,member,}.lot_name`
+*and* `worldguard.region.flag.flags.buyable.{own,member,}.lot_name`,
 depending on whether player is owner, member or none for the region).
 
 - If price line is missing, it is auto-filled from current `price`
 flag value for the region (remember that if the flag is not set,
 *price is considered zero credits*). Otherwise, `price` flag is set to
 the value specified in the sign (requires
-`worldguard.region.flag.{owner,member,}.lot_name` *and*
-`worldguard.region.flag.flags.price.{owner,member,}.lot_name`,
+`worldguard.region.flag.{own,member,}.lot_name` *and*
+`worldguard.region.flag.flags.price.{own,member,}.lot_name`,
 depending on whether player is owner, member or none for the region).
 
 - If last line of the sign is empty, it is auto-filled with the name
@@ -111,6 +112,9 @@ Issues
 - Perhaps we want to block buying when price is not set (instead of
   considering it zero).
 
+- There used to be permissions nodes both with `.owner` and `.own` in
+  upstream WG and [spec][wg-buyspec]. We streamlined them to `.own`.
+
 Hacking notes
 =============
 
@@ -126,3 +130,4 @@ Possible package name clash issue is yet to be inspected.
 
 [wg]: http://github.com/sk89q/worldguard
 [ico6-case]: https://github.com/iConomy/Core/issues/95
+[wg-buyspec]: http://wiki.sk89q.com/wiki/Buying_and_Selling_Regions

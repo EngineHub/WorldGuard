@@ -729,7 +729,7 @@ public class RegionCommands {
 
                 if (region.isOwner(localPlayer)) {
                     if (!plugin.hasPermission(sender, "worldguard.region.flag.flags."
-                            + flag.getName() + ".owner." + id.toLowerCase())) {
+                            + flag.getName() + ".own." + id.toLowerCase())) {
                         continue;
                     }
                 } else if (region.isMember(localPlayer)) {
@@ -754,7 +754,7 @@ public class RegionCommands {
 
         if (region.isOwner(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.flag.flags."
-                    + foundFlag.getName() + ".owner." + id.toLowerCase());
+                    + foundFlag.getName() + ".own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.flag.flags."
                     + foundFlag.getName() + ".member." + id.toLowerCase());
