@@ -52,8 +52,6 @@ payment at all (to be implemented, perhaps).
 `buyable` region flag is set back to `false` upon buying, but `price`
 flag is preserved.
 
-Note that negative `price` flag value is not prohibited by WG.
-
 Signs
 -----
 
@@ -96,6 +94,19 @@ the way WorldGuard stores owner lists)
 
 If sign is created successfully, its first line is colored with color
 set in `register.signs.tag-color` (default is `'DARK_BLUE'`).
+
+Important notes
+===============
+
+- Negative `price` flag value is not prohibited by WG.
+
+- When `price` flag is not set, price is considered *zero*.
+
+- Destroying sell sign does not withdraw sell offer (`buyable` flag
+  does not change).
+
+- Buying a region does not destroy sell sign (although `buyable` is
+  still reverted to `false`). This behaviour may be implemented later.
 
 Issues
 ======
