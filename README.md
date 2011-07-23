@@ -15,13 +15,10 @@ console, similar to this:
 How to use it
 =============
 
-Configuration
--------------
+Commands
+-------
 
 Set `register.enable` to true in order to enable `/region buy` command.
-
-Selling
--------
 
 Suppose you want to sell region with ID `lot9` for 19.45 economy
 credits.
@@ -95,18 +92,24 @@ the way WorldGuard stores owner lists)
 If sign is created successfully, its first line is colored with color
 set in `register.signs.tag-color` (default is `'DARK_BLUE'`).
 
+### Buying ###
+
+By right-clicking a sign the user can buy the region. Sign is
+destroyed afterwards.
+
 Important notes
 ===============
 
 - Negative `price` flag value is not prohibited by WG.
 
-- When `price` flag is not set, price is considered *zero*.
+- When `price` flag is not set, it is considered *zero*.
 
 - Destroying sell sign does not withdraw sell offer (`buyable` flag
   does not change).
 
-- Buying a region does not destroy sell sign (although `buyable` is
-  still reverted to `false`). This behaviour may be implemented later.
+- Buying a region by manually issuing `/region buy` command does not
+  destroy sell sign, as well as changing region buyable state, price
+  or owners is not reflected on the sign.
 
 Issues
 ======
@@ -128,6 +131,8 @@ Issues
 
 - There used to be permissions nodes both with `.owner` and `.own` in
   upstream WG and [spec][wg-buyspec]. We streamlined them to `.own`.
+
+- Cannot pick up signs dropped by `dropSign`.
 
 Hacking notes
 =============
