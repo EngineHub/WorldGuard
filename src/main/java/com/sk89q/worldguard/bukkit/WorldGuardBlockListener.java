@@ -723,8 +723,10 @@ public class WorldGuardBlockListener extends BlockListener {
                 event.setLine(2, regionPrice.toString());
 
             /// Set last line to first owner name
-            if (!ownerPlayers.isEmpty())
+            if (event.getLine(3).equals("") && !ownerPlayers.isEmpty())
                 event.setLine(3, ownerPlayers.iterator().next());
+
+            event.setLine(0, ChatColor.valueOf(wcfg.buySignsTagColor) + wcfg.buySignsTag);
 
             try {
                 mgr.save();

@@ -73,7 +73,7 @@ Place a sign with lines
 To make region with ID `lot_name` buyable for this price.
 
 - First line _must_ be equal to string set in `register.signs.tag`
-  (default is `[ForSale]`).
+  (default is `'[ForSale]'`).
 
 - Second line _must_ contain region ID.
 
@@ -93,6 +93,9 @@ depending on whether player is owner, member or none for the region).
 - If last line of the sign is empty, it is auto-filled with the name
 of the first member of owners list (name will be in lower case due to
 the way WorldGuard stores owner lists)
+
+If sign is created successfully, its first line is colored with color
+set in `register.signs.tag-color` (default is `'DARK_BLUE'`).
 
 Issues
 ======
