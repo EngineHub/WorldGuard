@@ -121,6 +121,8 @@ public class WorldConfiguration {
     public int regionWand = 287;
     public Set<CreatureType> blockCreatureSpawn;
     public boolean useRegister;
+    public boolean useBuySigns;
+    public String buySignsTag;
     public boolean buyOnClaim;
     public double buyOnClaimPrice;
     public int maxClaimVolume;
@@ -332,7 +334,10 @@ public class WorldConfiguration {
 
         buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
         buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
+
         useRegister = getBoolean("register.enable", false);
+        useBuySigns = getBoolean("register.signs.enable", false);
+        buySignsTag = getString("register.signs.tag", "[ForSale]");
 
         blockCreatureSpawn = new HashSet<CreatureType>();
         for (String creatureName : getStringList("mobs.block-creature-spawn", null)) {

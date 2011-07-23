@@ -51,6 +51,48 @@ payment at all (to be implemented, perhaps).
 `buyable` region flag is set back to `false` upon buying, but `price`
 flag is preserved.
 
+Note that negative `price` flag value is not prohibited by WG.
+
+Signs
+-----
+
+Signs may be used as a convenient way to put a region on sale through
+`buy` and `price` flags.
+
+Set `register.signs.enable` to `true` to enable this feature.
+
+### Selling ###
+
+Place a sign with lines
+
+    [ForSale]
+    lot_name
+    price
+
+To make region with ID `lot_name` buyable for this price.
+
+- First line _must_ be equal to string set in `register.signs.tag`
+  (default is `[ForSale]`).
+
+- Second line _must_ contain region ID.
+
+- Buyable flag will be set to `true` (if not set already). This
+requires (requires `worldguard.region.flag.{owner,member,}.lot_name`
+*and* `worldguard.region.flag.flags.buyable.{owner,member,}.lot_name`,
+depending on whether player is owner, member or none for the region).
+
+- If price line is missing, it is auto-filled from current `price`
+flag value for the region (remember that if the flag is not set,
+*price is considered zero credits*). Otherwise, `price` flag is set to
+the value specified in the sign (requires
+`worldguard.region.flag.{owner,member,}.lot_name` *and*
+`worldguard.region.flag.flags.price.{owner,member,}.lot_name`,
+depending on whether player is owner, member or none for the region).
+
+- If last line of the sign is empty, it is auto-filled with the name
+of the first member of owners list (name will be in lower case due to
+the way WorldGuard stores owner lists)
+
 Issues
 ======
 
@@ -65,6 +107,9 @@ Issues
 - Buy-on-claim is a separate feature which differs from buying since
   price depends on region size and there's no payment recipient. It
   will use Register integration as well.
+
+- Perhaps we want to block buying when price is not set (instead of
+  considering it zero).
 
 Hacking notes
 =============
