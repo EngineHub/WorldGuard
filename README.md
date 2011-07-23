@@ -87,10 +87,13 @@ depending on whether player is owner, member or none for the region).
 
 - If last line of the sign is empty, it is auto-filled with the name
 of the first member of owners list (name will be in lower case due to
-the way WorldGuard stores owner lists)
+the way WorldGuard stores owner lists). If last line is `#`, it's
+replaced with region dimensions (width×length×height, which is *xzy*
+in terms of Minecraft coordinates).
 
 If sign is created successfully, its first line is colored with color
-set in `register.signs.tag-color` (default is `'DARK_BLUE'`).
+set in `register.signs.tag-color` (default is `'DARK_BLUE'`, any color
+from ChatColor Bukkit enumeration is available for use).
 
 ### Buying ###
 

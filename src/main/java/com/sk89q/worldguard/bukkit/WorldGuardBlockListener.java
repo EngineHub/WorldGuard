@@ -53,6 +53,7 @@ import org.bukkit.plugin.PluginManager;
 
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
@@ -725,6 +726,12 @@ public class WorldGuardBlockListener extends BlockListener {
             /// Set last line to first owner name
             if (event.getLine(3).equals("") && !ownerPlayers.isEmpty())
                 event.setLine(3, ownerPlayers.iterator().next());
+            else if (event.getLine(3).equals("#")) {
+                Vector d = region.getMaximumPoint().subtract(region.getMinimumPoint());
+                BlockVector diag = d.toBlockVector();
+                event.setLine(3, diag.getBlockX() + "x" + diag.getBlockZ() + 
+                              "x" + diag.getBlockY());
+            }
 
             event.setLine(0, ChatColor.valueOf(wcfg.buySignsTagColor) + wcfg.buySignsTag);
 
