@@ -212,10 +212,10 @@ public class RegionCommands {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(buyer.getWorld());
 
         if (!wcfg.useRegister)
-            throw new CommandException("Region buying is not available");
+            throw new CommandException("Region buying is not available.");
 
         if (plugin.paymentMethod == null)
-            throw new CommandException("No economy system is available");
+            throw new CommandException("No economy system is available.");
 
         if (!mgr.hasRegion(id))
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");
