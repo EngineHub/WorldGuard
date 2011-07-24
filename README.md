@@ -154,7 +154,9 @@ Installing Register artifact in local Maven repository:
 
     mvn install:install-file -DgroupdId=com.nijikokun -DartifactId=register -Dversion=1.0 -Dpackaging=jar -Dfile=Register.jar
 
-Possible package name clash issue is yet to be inspected.
+We use Maven shade plugin to relocate `com.nijikokun.register.*`
+classes under `com.sk89q.worldguard.register` to avoid conflicts with
+other plugins using Register.
 
 [wg]: http://github.com/sk89q/worldguard
 [ico6-case]: https://github.com/iConomy/Core/issues/95

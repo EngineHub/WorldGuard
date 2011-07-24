@@ -141,6 +141,12 @@
                   <include>com.nijikokun:register</include>
                 </includes>
               </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>com.nijikokun.register</pattern>
+                  <shadedPattern>com.sk89q.worldguard.register</shadedPattern>
+                </relocation>
+              </relocations>
             </configuration>
           </execution>
         </executions>
