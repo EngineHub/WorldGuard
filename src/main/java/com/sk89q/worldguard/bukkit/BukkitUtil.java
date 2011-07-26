@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -242,5 +245,23 @@ public class BukkitUtil {
                 || (entity instanceof LivingEntity
                 && !(entity instanceof Tameable)
                 && !(entity instanceof Player));
+    }
+
+    /**
+     * Get a list of all players ever seen on server for given world
+     * by looking into its save folder.
+     */
+    public static List<String> getPossiblePlayerNames(World w) {
+        List<String> names = new ArrayList<String>();
+        File playersFolder = new File(w.getName() + "/players/");
+        String[] arr = playersFolder.list(new FilenameFilter() {
+                public boolean accept(File f, String s) {
+                    return s.endsWith(".dat");
+                }
+            });
+        for (String a : arr)
+            names.add(a.replaceAll(".dat$", ""));
+
+        return names;
     }
 }

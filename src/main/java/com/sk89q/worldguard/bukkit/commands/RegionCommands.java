@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -45,6 +46,7 @@ import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
+import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -210,6 +212,7 @@ public class RegionCommands {
         String id = args.getString(0);
         RegionManager mgr = plugin.getGlobalRegionManager().get(buyer.getWorld());
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(buyer.getWorld());
+        Server server = plugin.getServer();
 
         if (!wcfg.useRegister)
             throw new CommandException("Region buying is not available.");
@@ -244,6 +247,7 @@ public class RegionCommands {
         pAccount.subtract(price);
 
         Set<String> ownerPlayers = owners.getPlayers();
+        Set<String> unpaidOwners = ownerPlayers;
         double share = price / ownerPlayers.size();
 
         /// @todo Distribute money over owner groups as well
@@ -253,19 +257,15 @@ public class RegionCommands {
         /// @todo WorldGuard stores owner names lowercased while
         /// economy plugins have case-sensitive account names. As the
         /// result, we're unable to directly pay to region owners for
-        /// their land. Currently we have to use Bukkit's MatchPlayer
-        /// to perform a reverse search for region owners. See also
-        /// Bukkit issue #140
-        for (String p : ownerPlayers) {
-            boolean paid = false;
-            List<Player> matches = plugin.getServer().matchPlayer(p);
-            for (Player m : matches) {
-                String name = m.getName();
+        /// their land.
+        List<String> allNames = BukkitUtil.getPossiblePlayerNames();
+        for (String name : allNames) {
+            Player m = server.getPlayer(name);
                 if (region.isOwner(plugin.wrapPlayer(m)))
                     if (plugin.paymentMethod.hasAccount(name)) {
 
                         plugin.paymentMethod.getAccount(name).add(share);
-                        paid = true;
+                        unpaidOwners.remove(name.toLowerCase());
                         buyer.sendMessage(ChatColor.YELLOW + name +
                                           " has received a share of payment");
                         if (m.isOnline())
@@ -280,9 +280,10 @@ public class RegionCommands {
                                       buyer.getName() + ", but you have no account to receive you share");
                     }
             }
-            if (!paid)
-                buyer.sendMessage(ChatColor.YELLOW + "Owner " + p + " has not been found");
-        }
+
+        for (String p : unpaidOwners)
+            buyer.sendMessage(ChatColor.YELLOW + "Owner " + p + " does not exist or has no account");
+        
 
         owners = new DefaultDomain();
         owners.addPlayer(buyer.getName());
