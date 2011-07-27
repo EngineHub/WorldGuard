@@ -31,6 +31,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
@@ -155,8 +156,8 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
                     evt.getType(), comment);
             
         // Block interact
-        } else if (event instanceof BlockPlaceBlacklistEvent) {
-            BlockPlaceBlacklistEvent evt = (BlockPlaceBlacklistEvent)event;
+        } else if (event instanceof BlockInteractBlacklistEvent) {
+            BlockInteractBlacklistEvent evt = (BlockInteractBlacklistEvent)event;
             logEvent("INTERACT", evt.getPlayer(), evt.getPosition(),
                     evt.getType(), comment);
         
