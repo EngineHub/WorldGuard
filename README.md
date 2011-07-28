@@ -1,9 +1,8 @@
-WorldGuard buy/sell fork
-========================
+WorldGuard buy/sell features
+============================
 
-This [WorldGuard][wg] fork aims at implementing region buying/selling
-as specified in [WorldGuard/Buying and Selling Regions][wg-buyspec]
-spec.
+Region buying/selling is implemented as specified in
+[WorldGuard/Buying and Selling Regions][wg-buyspec] spec.
 
 We use Register to support all major economy plugins like iConomy or
 BOSEconomy. Upon starting, WorldGuard should issue a notice to
@@ -152,7 +151,7 @@ Compiling the package using Maven:
 
 Installing Register artifact in local Maven repository:
 
-    mvn install:install-file -DgroupdId=com.nijikokun -DartifactId=register -Dversion=1.0 -Dpackaging=jar -Dfile=Register.jar
+    mvn install:install-file -DgroupId=com.nijikokun -DartifactId=register -Dversion=1.0 -Dpackaging=jar -Dfile=Register.jar
 
 We use Maven shade plugin to relocate `com.nijikokun.register.*`
 classes under `com.sk89q.worldguard.register` to avoid conflicts with
