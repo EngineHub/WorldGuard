@@ -258,7 +258,7 @@ public class RegionCommands {
         /// economy plugins have case-sensitive account names. As the
         /// result, we're unable to directly pay to region owners for
         /// their land.
-        List<String> allNames = BukkitUtil.getPossiblePlayerNames();
+        List<String> allNames = BukkitUtil.getPossiblePlayerNames(buyer.getWorld());
         for (String name : allNames) {
             Player m = server.getPlayer(name);
                 if (region.isOwner(plugin.wrapPlayer(m)))
