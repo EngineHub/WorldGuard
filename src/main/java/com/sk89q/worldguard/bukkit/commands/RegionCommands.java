@@ -345,7 +345,8 @@ public class RegionCommands {
     				
 		ProtectedRegion region = mgr.getRegion(id);
     				
-		if (region.getFlag(DefaultFlag.BUYABLE) != null && ! region.getFlag(DefaultFlag.BUYABLE)){
+		if (region.getFlag(DefaultFlag.BUYABLE) == null || ! region.getFlag(DefaultFlag.BUYABLE) 
+				|| region.getFlag(DefaultFlag.PRICE) == null){
 			throw new CommandException("That region is not for sale.");
 		}
 			

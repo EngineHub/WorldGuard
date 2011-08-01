@@ -24,30 +24,48 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
+
+import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.*;
+import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
 import com.sk89q.worldguard.bukkit.commands.RegionCommands;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -597,7 +615,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             	
                 String regionId = ((Sign)block.getState()).getLine(1);
                 
-                if (regionId != null && regionId != "") {
+                if (regionId != null && ! regionId.equals("")) {
                 	
                     ProtectedRegion region = mgr.getRegion(regionId);
                     
@@ -606,13 +624,13 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     	if (region.getFlag(DefaultFlag.PRICE) == 
                 				Double.parseDouble(((Sign)block.getState()).getLine(2).replace(",", "").split(" ")[0])){
                     		
-                    		try {
-                                RegionCommands.buy(new CommandContext(regionId), plugin, player);
-                                block.setTypeId(0); //Destroy Sign
-                            } catch (CommandException e) {
-                                player.sendMessage(e.getMessage());
+                            try {
+								RegionCommands.buy(new CommandContext(" "+regionId), plugin, player);
+								block.setTypeId(0); //Destroy Sign
+							} catch (Exception e) {
+								player.sendMessage(ChatColor.RED + e.getMessage());
                                 event.setCancelled(true);
-                            }
+							}
                     	} else {
                     		
                 			if (iConomyManager.isloaded()){
