@@ -44,7 +44,6 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.block.SnowFormEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
@@ -97,7 +96,6 @@ public class WorldGuardBlockListener extends BlockListener {
         registerEvent("BLOCK_BURN", Priority.High);
         registerEvent("SIGN_CHANGE", Priority.High);
         registerEvent("REDSTONE_CHANGE", Priority.High);
-        registerEvent("SNOW_FORM", Priority.High);
         registerEvent("LEAVES_DECAY", Priority.High);
         registerEvent("BLOCK_FORM", Priority.High);
         registerEvent("BLOCK_SPREAD", Priority.High);
@@ -660,36 +658,6 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
     }
-    
-    /**
-     * Called when snow is formed.
-     */
-    @Override
-    public void onSnowForm(SnowFormEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.disableSnowFormation) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SNOW_FALL,
-                    event.getBlock().getLocation())) {
-                event.setCancelled(true);
-            }
-        }
-    }
 
     @Override
     public void onLeavesDecay(LeavesDecayEvent event) {
@@ -736,14 +704,28 @@ public class WorldGuardBlockListener extends BlockListener {
 
         Material type = event.getNewState().getType();
 
-        if (wcfg.disableIceFormation && type == Material.ICE) {
-            event.setCancelled(true);
-            return;
+        if (type == Material.ICE) {
+            if (wcfg.disableIceFormation) {
+                event.setCancelled(true);
+                return;
+            }
+            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.ICE_FORM, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
         }
 
-        if (wcfg.disableSnowFormation && type == Material.SNOW) {
-            event.setCancelled(true);
-            return;
+        if (type == Material.SNOW) {
+            if (wcfg.disableSnowFormation) {
+                event.setCancelled(true);
+                return;
+            }
+            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.SNOW_FALL, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -765,10 +747,16 @@ public class WorldGuardBlockListener extends BlockListener {
 
         Material fromType = event.getSource().getType();
 
-        if (wcfg.disableMushroomSpread && (fromType == Material.RED_MUSHROOM
-                || fromType == Material.BROWN_MUSHROOM)) {
-            event.setCancelled(true);
-            return;
+        if (fromType == Material.RED_MUSHROOM || fromType == Material.BROWN_MUSHROOM) {
+            if (wcfg.disableMushroomSpread) {
+                event.setCancelled(true);
+                return;
+            }
+            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.MUSHROOMS, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -785,14 +773,28 @@ public class WorldGuardBlockListener extends BlockListener {
 
         Material type = event.getBlock().getType();
 
-        if (wcfg.disableIceMelting && type == Material.ICE) {
-            event.setCancelled(true);
-            return;
+        if (type == Material.ICE) {
+            if (wcfg.disableIceMelting) {
+                event.setCancelled(true);
+                return;
+            }
+            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.ICE_MELT, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
         }
 
-        if (wcfg.disableSnowMelting && type == Material.SNOW) {
-            event.setCancelled(true);
-            return;
+        if (type == Material.SNOW) {
+            if (wcfg.disableSnowMelting) {
+                event.setCancelled(true);
+                return;
+            }
+            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.SNOW_MELT, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 }
