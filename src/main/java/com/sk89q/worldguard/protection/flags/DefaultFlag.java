@@ -46,6 +46,10 @@ public final class DefaultFlag {
     public static final StateFlag USE = new StateFlag("use", true);
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
+    public static final StateFlag SNOW_MELT = new StateFlag("snow-melt", true);
+    public static final StateFlag ICE_FORM = new StateFlag("ice-form", true);
+    public static final StateFlag ICE_MELT = new StateFlag("ice-melt", true);
+    public static final StateFlag MUSHROOMS = new StateFlag("mushroom-growth", true);
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
     public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
@@ -75,7 +79,7 @@ public final class DefaultFlag {
         NOTIFY_LEAVE, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
         TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL, LEAF_DECAY,
         GHAST_FIREBALL, BLOCKED_CMDS, ALLOWED_CMDS, ENTRY, ENTRY_PERM, EXIT, EXIT_PERM,
-        INVINCIBILITY
+        INVINCIBILITY, SNOW_MELT, ICE_MELT, ICE_FORM, MUSHROOMS
     };
 
     static {
