@@ -189,6 +189,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public void onDisable() {
         globalRegionManager.unload();
         configuration.unload();
+        this.getServer().getScheduler().cancelTasks(this);
 
         logger.info("WorldGuard " + getDescription().getVersion() + " disabled.");
     }
