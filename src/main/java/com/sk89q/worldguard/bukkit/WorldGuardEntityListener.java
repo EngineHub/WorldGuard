@@ -36,6 +36,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
@@ -47,7 +48,6 @@ import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
@@ -206,6 +206,11 @@ public class WorldGuardEntityListener extends EntityListener {
      * @param event
      */
     private void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getCause() == DamageCause.PROJECTILE) {
+            onEntityDamageByProjectile(event);
+            return;
+        }
+
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
         
@@ -318,9 +323,9 @@ public class WorldGuardEntityListener extends EntityListener {
      * 
      * @param event
      */
-    private void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
+    private void onEntityDamageByProjectile(EntityDamageByEntityEvent event) {
         Entity defender = event.getEntity();
-        Entity attacker = event.getDamager();
+        Entity attacker = ((Projectile) event.getDamager()).getShooter();
 
         if (defender instanceof Player) {
             Player player = (Player) defender;
@@ -373,10 +378,7 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        if (event instanceof EntityDamageByProjectileEvent) {
-            this.onEntityDamageByProjectile((EntityDamageByProjectileEvent) event);
-            return;
-        } else if (event instanceof EntityDamageByEntityEvent) {
+        if (event instanceof EntityDamageByEntityEvent) {
             this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
             return;
         } else if (event instanceof EntityDamageByBlockEvent) {
