@@ -38,6 +38,7 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -128,6 +129,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a player attempts to log in to the server.
      */
+    /*
     @Override
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
@@ -145,6 +147,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
     }
+    */
 
     /**
      * Called when a player joins a server.
@@ -858,7 +861,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
         
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
+        if (!plugin.getGlobalRegionManager().canBuild(
+                player, event.getBlockClicked().getRelative(event.getBlockFace()))) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
@@ -885,7 +889,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
         
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
+        if (!plugin.getGlobalRegionManager().canBuild(
+                player, event.getBlockClicked().getRelative(event.getBlockFace()))) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
