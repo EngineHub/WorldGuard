@@ -87,7 +87,9 @@ public class FlagStateManager implements Runnable {
             ApplicableRegionSet applicable = regionManager
                     .getApplicableRegions(playerLocation);
             
-            processHeal(applicable, player, state);
+            if (!RegionQueryUtil.isInvincible(plugin, player, applicable)) {
+                processHeal(applicable, player, state);
+            }
         }
     }
     
@@ -109,20 +111,25 @@ public class FlagStateManager implements Runnable {
 
         Integer healAmount = applicable.getFlag(DefaultFlag.HEAL_AMOUNT);
         Integer healDelay = applicable.getFlag(DefaultFlag.HEAL_DELAY);
+        Integer minHealth = applicable.getFlag(DefaultFlag.MIN_HEAL);
+        Integer maxHealth = applicable.getFlag(DefaultFlag.MAX_HEAL);
         
         if (healAmount == null || healDelay == null || healAmount == 0 || healDelay < 0) {
             return;
         }
+        if (minHealth == null) minHealth = 0;
+        if (maxHealth == null) maxHealth = 20;
 
-        if (player.getHealth() >= 20 && healAmount > 0) {
+        if (player.getHealth() >= maxHealth && healAmount > 0) {
             return;
         }
         
-        if (healDelay <= 0 && healAmount > 0) {
-            player.setHealth(20);
+        if (healDelay <= 0) {
+            player.setHealth(healAmount > 0 ? maxHealth : minHealth); // this will insta-kill if the flag is unset
             state.lastHeal = now;
         } else if (now - state.lastHeal > healDelay * 1000) {
-            player.setHealth(Math.min(20, Math.max(0, player.getHealth() + healAmount)));
+            // clamp health between minimum and maximum
+            player.setHealth(Math.min(maxHealth, Math.max(minHealth, player.getHealth() + healAmount)));
             state.lastHeal = now;
         }
     }
