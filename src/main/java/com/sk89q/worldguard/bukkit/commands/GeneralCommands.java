@@ -252,6 +252,7 @@ public class GeneralCommands {
             CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
+        boolean ignoreMax = plugin.hasPermission(player, "worldguard.stack.illegitimate");
         
         ItemStack[] items = player.getInventory().getContents();
         int len = items.length;
@@ -263,17 +264,14 @@ public class GeneralCommands {
 
             // Avoid infinite stacks and stacks with durability
             if (item == null || item.getAmount() <= 0
-                    || ItemType.shouldNotStack(item.getTypeId())) {
+                    || (!ignoreMax && item.getMaxStackSize() == 1)) {
                 continue;
             }
 
-            // Ignore buckets
-            if (item.getTypeId() >= 325 && item.getTypeId() <= 327) {
-                continue;
-            }
+            int max = ignoreMax ? 64 : item.getMaxStackSize();
 
-            if (item.getAmount() < 64) {
-                int needed = 64 - item.getAmount(); // Number of needed items until 64
+            if (item.getAmount() < max) {
+                int needed = max - item.getAmount(); // Number of needed items until max
 
                 // Find another stack of the same type
                 for (int j = i + 1; j < len; j++) {
@@ -281,7 +279,7 @@ public class GeneralCommands {
 
                     // Avoid infinite stacks and stacks with durability
                     if (item2 == null || item2.getAmount() <= 0
-                            || ItemType.shouldNotStack(item.getTypeId())) {
+                            || (!ignoreMax && item.getMaxStackSize() == 1)) {
                         continue;
                     }
 
