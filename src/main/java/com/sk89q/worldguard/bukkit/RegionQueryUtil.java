@@ -26,6 +26,7 @@ import org.bukkit.entity.Player;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 public class RegionQueryUtil {
@@ -62,5 +63,22 @@ public class RegionQueryUtil {
         }
 
         return state.wasInvincible;
+    }
+
+    public static Boolean isAllowedInvinciblity(WorldGuardPlugin plugin, Player player) {
+        Location loc = player.getLocation();
+        World world = player.getWorld();
+        FlagStateManager.PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+        Vector vec = new Vector(state.lastInvincibleX, state.lastInvincibleY, state.lastInvincibleZ);
+
+        StateFlag.State regionState = plugin.getGlobalRegionManager().get(world).
+                getApplicableRegions(vec).getFlag(DefaultFlag.INVINCIBILITY);
+        if (regionState == StateFlag.State.ALLOW) {
+            return true;
+        } else if (regionState == StateFlag.State.DENY) {
+            return false;
+        } else {
+            return null;
+        }
     }
 }
