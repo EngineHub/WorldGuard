@@ -67,6 +67,7 @@ import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
@@ -164,8 +165,7 @@ public class WorldGuardEntityListener extends EntityListener {
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            if (cfg.hasGodMode(player)
-                    || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if (isInvincible(player)) {
                 event.setCancelled(true);
                 return;
             }
@@ -238,13 +238,8 @@ public class WorldGuardEntityListener extends EntityListener {
 
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
-            
-            if (cfg.hasGodMode(player)) {
-                event.setCancelled(true);
-                return;
-            }
 
-            if (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player)) {
+            if (isInvincible(player)) {
                 if (wcfg.regionInvinciblityRemovesMobs
                         && attacker instanceof LivingEntity && !(attacker instanceof Player)
                         && !(attacker instanceof Tameable && ((Tameable) attacker).isTamed())) {
@@ -359,7 +354,7 @@ public class WorldGuardEntityListener extends EntityListener {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
             
-            if (cfg.hasGodMode(player) || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if (isInvincible(player)) {
                 event.setCancelled(true);
                 return;
             }
@@ -426,8 +421,7 @@ public class WorldGuardEntityListener extends EntityListener {
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            if (cfg.hasGodMode(player)
-                    || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if (isInvincible(player)) {
                 event.setCancelled(true);
                 player.setFireTicks(0);
                 return;
@@ -772,4 +766,26 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
+    /**
+     * Check if a player is invincible, via either god mode or region flag. If
+     * the region denies invincibility, the player must have the another
+     * permission to override it.
+     * 
+     * @param player
+     * @return
+     */
+    private boolean isInvincible(Player player) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
+
+        boolean god = cfg.hasGodMode(player);
+        Boolean allowed = wcfg.useRegions && RegionQueryUtil.isAllowedInvinciblity(plugin, player);
+        if (allowed == false && wcfg.useRegions) {
+            return god && plugin.hasPermission(player, "worldguard.god.override-regions");
+        } else if (allowed == true || !wcfg.useRegions) {
+            return god;
+        } else {
+            return RegionQueryUtil.isInvincible(plugin, player);
+        }
+    }
 }

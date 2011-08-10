@@ -87,7 +87,8 @@ public class FlagStateManager implements Runnable {
             ApplicableRegionSet applicable = regionManager
                     .getApplicableRegions(playerLocation);
             
-            if (!RegionQueryUtil.isInvincible(plugin, player, applicable)) {
+            if (!RegionQueryUtil.isInvincible(plugin, player, applicable)
+                    && !plugin.getGlobalStateManager().hasGodMode(player)) {
                 processHeal(applicable, player, state);
             }
         }
