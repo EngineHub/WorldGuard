@@ -32,6 +32,7 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -592,14 +593,20 @@ public class RegionCommands {
                 throw new CommandException("Could not find a region by that ID.");
             }
         }
-        
+
+        // @TODO deprecate "flag.[own./member./blank]"
+        boolean hasPerm = false;
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.flag.own." + id.toLowerCase());
+            if (plugin.hasPermission(sender, "worldguard.region.flag.own." + id.toLowerCase())) hasPerm = true;
+            else if (plugin.hasPermission(sender, "worldguard.region.flag.regions.own." + id.toLowerCase())) hasPerm = true;
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.flag.member." + id.toLowerCase());
+            if (plugin.hasPermission(sender, "worldguard.region.flag.member." + id.toLowerCase())) hasPerm = true;
+            else if (plugin.hasPermission(sender, "worldguard.region.flag.regions.member." + id.toLowerCase())) hasPerm = true;
         } else {
-            plugin.checkPermission(sender, "worldguard.region.flag." + id.toLowerCase());
-        } 
+            if (plugin.hasPermission(sender, "worldguard.region.flag." + id.toLowerCase())) hasPerm = true;
+            else if (plugin.hasPermission(sender, "worldguard.region.flag.regions." + id.toLowerCase())) hasPerm = true;
+        }
+        if (!hasPerm) throw new CommandPermissionsException();
         
         Flag<?> foundFlag = null;
         
@@ -621,9 +628,12 @@ public class RegionCommands {
                     list.append(", ");
                 }
 
+                // @TODO deprecate inconsistant "owner" permission
                 if (region.isOwner(localPlayer)) {
                     if (!plugin.hasPermission(sender, "worldguard.region.flag.flags."
-                            + flag.getName() + ".owner." + id.toLowerCase())) {
+                            + flag.getName() + ".owner." + id.toLowerCase())
+                            && !plugin.hasPermission(sender, "worldguard.region.flag.flags."
+                                    + flag.getName() + ".own." + id.toLowerCase())) {
                         continue;
                     }
                 } else if (region.isMember(localPlayer)) {
