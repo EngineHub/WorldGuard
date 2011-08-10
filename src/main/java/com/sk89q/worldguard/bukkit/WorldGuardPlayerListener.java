@@ -106,8 +106,10 @@ public class WorldGuardPlayerListener extends PlayerListener {
         registerEvent("PLAYER_RESPAWN", Priority.High);
         registerEvent("PLAYER_ITEM_HELD", Priority.High);
         registerEvent("PLAYER_BED_ENTER", Priority.High);
-        registerEvent("PLAYER_MOVE", Priority.High);
         registerEvent("PLAYER_COMMAND_PREPROCESS", Priority.High);
+        if (plugin.getGlobalStateManager().usePlayerMove) {
+            registerEvent("PLAYER_MOVE", Priority.High);
+        }
     }
 
     /**
@@ -175,7 +177,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
             if (removed > 10) {
                 logger.info("WG Halt-Act: " + removed + " entities (>10) auto-removed from "
-                		+ player.getWorld().toString());
+                        + player.getWorld().toString());
             }
         }
 

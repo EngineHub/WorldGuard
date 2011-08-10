@@ -45,7 +45,7 @@ public class ConfigurationManager {
             "#\r\n" +
             "# This is the global configuration file. Anything placed into here will\r\n" +
             "# be applied to all worlds. However, each world has its own configuration\r\n" +
-            "# file to allow you to replace any setting in here for that world only.\r\n" +
+            "# file to allow you to replace most settings in here for that world only.\r\n" +
             "#\r\n" +
             "# About editing this file:\r\n" +
             "# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If\r\n" +
@@ -85,6 +85,7 @@ public class ConfigurationManager {
     public boolean useRegionsScheduler;
     public boolean activityHaltToggle = false;
     public boolean autoGodMode;
+    public boolean usePlayerMove;
 
     /**
      * Construct the object.
@@ -113,6 +114,8 @@ public class ConfigurationManager {
                 "regions.use-scheduler", true);
         autoGodMode = config.getBoolean(
                 "auto-invincible-permission", false);
+        usePlayerMove = config.getBoolean(
+                "use-player-move-event", true);
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
