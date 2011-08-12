@@ -628,6 +628,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (wcfg.useRegions) {
             Vector pt = toVector(eventLoc);
             RegionManager mgr = plugin.getGlobalRegionManager().get(eventLoc.getWorld());
+            // @TODO get victims' stacktraces and find out why it's null anyway
+            if (mgr == null) return;
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             if (!set.allows(DefaultFlag.MOB_SPAWNING)) {
@@ -635,8 +637,8 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
 
-            Set<CreatureType> blockTypes = set.getFlag(DefaultFlag.DENY_SPAWN);
-            if (blockTypes != null && blockTypes.contains(creaType)) {
+            Set<CreatureType> creatureTypes = set.getFlag(DefaultFlag.DENY_SPAWN);
+            if (creatureTypes != null && creatureTypes.contains(creaType)) {
                 event.setCancelled(true);
                 return;
             }
