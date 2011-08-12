@@ -768,8 +768,8 @@ public class WorldGuardEntityListener extends EntityListener {
 
     /**
      * Check if a player is invincible, via either god mode or region flag. If
-     * the region denies invincibility, the player must have the another
-     * permission to override it.
+     * the region denies invincibility, the player must have an extra permission
+     * to override it. (worldguard.god.override-regions)
      * 
      * @param player
      * @return
@@ -779,13 +779,19 @@ public class WorldGuardEntityListener extends EntityListener {
         WorldConfiguration wcfg = cfg.get(player.getWorld());
 
         boolean god = cfg.hasGodMode(player);
-        Boolean allowed = wcfg.useRegions && RegionQueryUtil.isAllowedInvinciblity(plugin, player);
-        if (allowed == false && wcfg.useRegions) {
-            return god && plugin.hasPermission(player, "worldguard.god.override-regions");
-        } else if (allowed == true || !wcfg.useRegions) {
-            return god;
+        if (wcfg.useRegions) {
+            Boolean flag = RegionQueryUtil.isAllowedInvinciblity(plugin, player);
+            boolean allowed = flag == null || flag == true;
+            boolean invincible = RegionQueryUtil.isInvincible(plugin, player);
+
+            if (allowed) {
+                return god || invincible;
+            } else {
+                return (god && plugin.hasPermission(player, "worldguard.god.override-regions"))
+                    || invincible;
+            }
         } else {
-            return RegionQueryUtil.isInvincible(plugin, player);
+            return god;
         }
     }
 }

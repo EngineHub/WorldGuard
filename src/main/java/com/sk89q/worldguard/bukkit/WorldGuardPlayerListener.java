@@ -1007,17 +1007,25 @@ public class WorldGuardPlayerListener extends PlayerListener {
             Vector pt = toVector(player.getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            ProtectedRegion globalRegion = mgr.getRegion("__global__");
 
             String[] parts = event.getMessage().split(" ");
 
             Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS);
+            if (allowedCommands == null && globalRegion != null) {
+                allowedCommands = globalRegion.getFlag(DefaultFlag.ALLOWED_CMDS);
+            }
             if (allowedCommands != null && !allowedCommands.contains(parts[0].toLowerCase())) {
+
                 player.sendMessage(ChatColor.RED + parts[0].toLowerCase() + " is not allowed in this area.");
                 event.setCancelled(true);
                 return;
             }
 
             Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS);
+            if (blockedCommands == null && globalRegion != null) {
+                blockedCommands = globalRegion.getFlag(DefaultFlag.BLOCKED_CMDS);
+            }
             if (blockedCommands != null && blockedCommands.contains(parts[0].toLowerCase())) {
                 player.sendMessage(ChatColor.RED + parts[0].toLowerCase() + " is blocked in this area.");
                 event.setCancelled(true);
