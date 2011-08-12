@@ -150,9 +150,14 @@ public class GlobalRegionManager {
             
             return manager;
         } catch (FileNotFoundException e) {
+            logger.warning("WorldGuard: Region file for world \""
+                    + name + "\" missing or inaccessible.");
         } catch (IOException e) {
             logger.warning("WorldGuard: Failed to load regions from file "
                     + file.getAbsolutePath() + " : " + e.getMessage());
+        } catch (Exception e) {
+            logger.warning("WorldGuard: Error loading regions for world \""
+                    + name + "\":" + e.getMessage());
         }
         
         // @TODO: THIS CREATES PROBLEMS!!
