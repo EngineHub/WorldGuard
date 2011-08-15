@@ -23,22 +23,9 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StringFlag;
-import com.sk89q.worldguard.protection.managers.FlatRegionManager;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.TestPlayer;
-import com.sk89q.worldguard.domains.DefaultDomain;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 public class ApplicableRegionSetTest {
 
@@ -351,7 +338,6 @@ public class ApplicableRegionSetTest {
     @Test
     public void testNoGlobalRegionDefaultBuild() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -364,9 +350,8 @@ public class ApplicableRegionSetTest {
     @Test
     public void testGlobalRegionDefaultBuild() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
-
-        region = mock.global();
+        @SuppressWarnings("unused")
+        ProtectedRegion region = mock.global();
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
