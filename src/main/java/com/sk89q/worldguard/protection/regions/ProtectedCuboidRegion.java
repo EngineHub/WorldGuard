@@ -98,12 +98,12 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      */
     @Override
     public boolean contains(Vector pt) {
-        int x = pt.getBlockX();
-        int y = pt.getBlockY();
-        int z = pt.getBlockZ();
-        return x >= min.getBlockX() && x <= max.getBlockX()
-                && y >= min.getBlockY() && y <= max.getBlockY()
-                && z >= min.getBlockZ() && z <= max.getBlockZ();
+        final double x = pt.getX();
+        final double y = pt.getY();
+        final double z = pt.getZ();
+        return x >= min.getBlockX() && x < max.getBlockX()+1
+                && y >= min.getBlockY() && y < max.getBlockY()+1
+                && z >= min.getBlockZ() && z < max.getBlockZ()+1;
     }
 
 
