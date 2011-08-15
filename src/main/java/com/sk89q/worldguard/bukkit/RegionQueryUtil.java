@@ -66,7 +66,6 @@ public class RegionQueryUtil {
     }
 
     public static Boolean isAllowedInvinciblity(WorldGuardPlugin plugin, Player player) {
-        Location loc = player.getLocation();
         World world = player.getWorld();
         FlagStateManager.PlayerFlagState state = plugin.getFlagStateManager().getState(player);
         Vector vec = new Vector(state.lastInvincibleX, state.lastInvincibleY, state.lastInvincibleZ);
