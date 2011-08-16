@@ -548,6 +548,16 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 }
             }
 
+            if (type == Material.BED_BLOCK) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.allows(DefaultFlag.SLEEP)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to use that bed.");
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
             if (type == Material.CHEST
                     || type == Material.JUKEBOX //stores the (arguably) most valuable item
                     || type == Material.DISPENSER
