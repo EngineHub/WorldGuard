@@ -84,8 +84,13 @@ public class RegionCommands {
             throw new CommandException("Select a region with WorldEdit first.");
         }
         
-        ProtectedRegion region;
+        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
+        if (mgr.hasRegion(id)) {
+            throw new CommandException("That region is already defined. Use redefine instead.");
+        }
         
+        ProtectedRegion region;
+
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
@@ -106,7 +111,6 @@ public class RegionCommands {
             region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
         }
         
-        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         mgr.addRegion(region);
         
         try {
@@ -223,8 +227,14 @@ public class RegionCommands {
             throw new CommandException("Select a region with WorldEdit first.");
         }
         
-        ProtectedRegion region;
+        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
+
+        if (mgr.hasRegion(id)) {
+            throw new CommandException("That region already exists. Please choose a different name.");
+        }
         
+        ProtectedRegion region;
+
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
@@ -246,7 +256,6 @@ public class RegionCommands {
         }
 
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
-        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         
         if (!plugin.hasPermission(sender, "worldguard.region.unlimited")) {
             // Check whether the player has created too many regions 
@@ -266,8 +275,6 @@ public class RegionCommands {
         }
         
         ApplicableRegionSet regions = mgr.getApplicableRegions(region);
-        
-        
         
         // Check if this region overlaps any other region
         if (regions.size() > 0) {
