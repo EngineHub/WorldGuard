@@ -281,7 +281,7 @@ public class WorldConfiguration {
 
         blockCreeperExplosions = getBoolean("mobs.block-creeper-explosions", false);
         blockCreeperBlockDamage = getBoolean("mobs.block-creeper-block-damage", false);
-        blockFireballExplosions = getBoolean("mob.block-fireball-explosions", false);
+        blockFireballExplosions = getBoolean("mobs.block-fireball-explosions", false);
         blockFireballBlockDamage = getBoolean("mobs.block-fireball-block-damage", false);
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
 

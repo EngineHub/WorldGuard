@@ -39,6 +39,8 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
@@ -85,8 +87,6 @@ public class WorldGuardBlockListener extends BlockListener {
      * Register events.
      */
     public void registerEvents() {
-//        PluginManager pm = plugin.getServer().getPluginManager();
-
         registerEvent("BLOCK_DAMAGE", Priority.High);
         registerEvent("BLOCK_BREAK", Priority.High);
         registerEvent("BLOCK_FROMTO", Priority.Normal);
@@ -100,6 +100,8 @@ public class WorldGuardBlockListener extends BlockListener {
         registerEvent("BLOCK_FORM", Priority.High);
         registerEvent("BLOCK_SPREAD", Priority.High);
         registerEvent("BLOCK_FADE", Priority.High);
+        registerEvent("BLOCK_PISTON_EXTEND", Priority.High);
+        registerEvent("BLOCK_PISTON_RETRACT", Priority.High);
     }
 
     /**
@@ -794,6 +796,51 @@ public class WorldGuardBlockListener extends BlockListener {
                     DefaultFlag.SNOW_MELT, event.getBlock().getLocation())) {
                 event.setCancelled(true);
                 return;
+            }
+        }
+    }
+
+    /**
+     * Called when a piston extends
+     */
+    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+
+        if (wcfg.useRegions) {
+            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
+            for (Block block : event.getBlocks()) {
+                if (!plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, block.getLocation())) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * Called when a piston retracts
+     */
+    public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+
+        if (wcfg.useRegions) {
+            if (!(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getRetractLocation()) && event.isSticky())
+                    || !plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation())) {
+                    event.setCancelled(true);
+                    return;
             }
         }
     }
