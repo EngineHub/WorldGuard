@@ -404,13 +404,12 @@ public class RegionCommands {
             id = args.getString(1).toLowerCase();
         }
         
-        if (!ProtectedRegion.isValidId(id)) {
-            throw new CommandException("Invalid region ID specified!");
-        }
-        
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         
         if (!mgr.hasRegion(id)) {
+            if (!ProtectedRegion.isValidId(id)) {
+                throw new CommandException("Invalid region ID specified!");
+            }
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");
         }
 
@@ -433,6 +432,10 @@ public class RegionCommands {
 
         sender.sendMessage(ChatColor.YELLOW + "Region: " + id
                 + ChatColor.GRAY + " (type: " + region.getTypeName() + ")");
+        if (!ProtectedRegion.isValidId(id)) {
+            sender.sendMessage(ChatColor.RED + "This region has an invalid ID. "
+                    + "Please ask the owner to delete it and recreate it.");
+        }
         sender.sendMessage(ChatColor.BLUE + "Priority: " + region.getPriority());
 
         StringBuilder s = new StringBuilder();
