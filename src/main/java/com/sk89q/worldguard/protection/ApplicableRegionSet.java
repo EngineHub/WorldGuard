@@ -347,6 +347,10 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         try {
             return needsClear.values().iterator().next();
         } catch (NoSuchElementException e) {
+            if (globalRegion != null) {
+                V gFlag = globalRegion.getFlag(flag);
+                if (gFlag != null) return gFlag;
+            }
             return null;
         }
     }
