@@ -19,9 +19,12 @@
 
 package com.sk89q.worldguard.domains;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.sk89q.worldguard.LocalPlayer;
@@ -87,7 +90,9 @@ public class DefaultDomain implements Domain {
     
     public String toPlayersString() {
         StringBuilder str = new StringBuilder();
-        for (Iterator<String> it = players.iterator(); it.hasNext(); ) {
+        List<String> output = new ArrayList<String>(players);
+        Collections.sort(output, String.CASE_INSENSITIVE_ORDER);
+        for (Iterator<String> it = output.iterator(); it.hasNext();) {
             str.append(it.next());
             if (it.hasNext()) {
                 str.append(", ");
