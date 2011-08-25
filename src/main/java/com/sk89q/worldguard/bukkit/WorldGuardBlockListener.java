@@ -836,11 +836,10 @@ public class WorldGuardBlockListener extends BlockListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
-        if (wcfg.useRegions) {
-            if (!(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getRetractLocation()) && event.isSticky())
-                    || !plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation())) {
-                    event.setCancelled(true);
-                    return;
+        if (wcfg.useRegions && event.isSticky()) {
+            if (!(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getRetractLocation()))
+                    && !(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation()))) {
+                event.setCancelled(true);
             }
         }
     }
