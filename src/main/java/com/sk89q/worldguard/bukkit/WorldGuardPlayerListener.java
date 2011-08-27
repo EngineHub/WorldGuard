@@ -54,6 +54,7 @@ import org.bukkit.plugin.PluginManager;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
@@ -451,6 +452,18 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 }
             }
 
+        }
+
+        if (type == Material.TNT && player.getItemInHand().getType() == Material.FLINT_AND_STEEL) {
+            if (wcfg.getBlacklist() != null) {
+                if (!wcfg.getBlacklist().check(
+                        new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                        toVector(event.getClickedBlock()),
+                        event.getClickedBlock().getTypeId()), false, false)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         }
     }
 
