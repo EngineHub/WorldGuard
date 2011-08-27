@@ -441,6 +441,16 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     return;
                 }
             }
+
+            if (block.getRelative(event.getBlockFace()).getType() == Material.FIRE) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)) {
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
         }
     }
 
