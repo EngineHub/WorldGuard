@@ -72,16 +72,16 @@ To make region with ID `lot_name` buyable for this price.
 - Second line _must_ contain region ID.
 
 - Buyable flag will be set to `true` (if not set already). This
-requires (requires `worldguard.region.flag.{own.,member.,}lot_name`
-*and* `worldguard.region.flag.flags.buyable.{own.,member.,}.lot_name`,
+requires (requires `worldguard.region.flag.{owner.,member.,}lot_name`
+*and* `worldguard.region.flag.flags.buyable.{owner.,member.,}.lot_name`,
 depending on whether player is owner, member or none for the region).
 
 - If price line is missing, it is auto-filled from current `price`
 flag value for the region (remember that if the flag is not set,
 *price is considered zero credits*). Otherwise, `price` flag is set to
 the value specified in the sign (requires
-`worldguard.region.flag.{own.,member.,}.lot_name` *and*
-`worldguard.region.flag.flags.price.{own.,member.,}.lot_name`,
+`worldguard.region.flag.{owner.,member.,}.lot_name` *and*
+`worldguard.region.flag.flags.price.{owner.,member.,}.lot_name`,
 depending on whether player is owner, member or none for the region).
 
 - If last line of the sign is empty, it is auto-filled with the name
