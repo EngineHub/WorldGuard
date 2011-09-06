@@ -36,6 +36,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
@@ -47,7 +48,6 @@ import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
@@ -131,7 +131,6 @@ public class WorldGuardEntityListener extends EntityListener {
      */
     @Override
     public void onEntityInteract(EntityInteractEvent event) {
-        //bukkit doesn't actually throw this event yet, someone add a ticket to leaky
         Entity entity = event.getEntity();
         Block block = event.getBlock();
 
@@ -165,8 +164,7 @@ public class WorldGuardEntityListener extends EntityListener {
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            if (cfg.hasGodMode(player)
-                    || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if (isInvincible(player)) {
                 event.setCancelled(true);
                 return;
             }
@@ -193,7 +191,7 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
 
-            if (wcfg.disableExplosionDamage && event.getCause() == DamageCause.BLOCK_EXPLOSION) {
+            if (wcfg.disableExplosionDamage && type == DamageCause.BLOCK_EXPLOSION) {
                 event.setCancelled(true);
                 return;
             }
@@ -206,6 +204,11 @@ public class WorldGuardEntityListener extends EntityListener {
      * @param event
      */
     private void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getCause() == DamageCause.PROJECTILE) {
+            onEntityDamageByProjectile(event);
+            return;
+        }
+
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
         
@@ -234,13 +237,8 @@ public class WorldGuardEntityListener extends EntityListener {
 
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
-            
-            if (cfg.hasGodMode(player)) {
-                event.setCancelled(true);
-                return;
-            }
 
-            if (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player)) {
+            if (isInvincible(player)) {
                 if (wcfg.regionInvinciblityRemovesMobs
                         && attacker instanceof LivingEntity && !(attacker instanceof Player)
                         && !(attacker instanceof Tameable && ((Tameable) attacker).isTamed())) {
@@ -274,9 +272,36 @@ public class WorldGuardEntityListener extends EntityListener {
                 }
             }
 
-            if (attacker != null && attacker instanceof TNTPrimed && wcfg.disableTNTDamage) {
-                event.setCancelled(true);
-                return;
+            if (attacker != null && attacker instanceof TNTPrimed) {
+                if (wcfg.blockTNTExplosions) {
+                    event.setCancelled(true);
+                    return;
+                }
+                if (wcfg.useRegions) {
+                    Vector pt = toVector(defender.getLocation());
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
+                    ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+                    if (!set.allows(DefaultFlag.TNT)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+
+            if (attacker != null && attacker instanceof Fireball) {
+                if (wcfg.blockFireballExplosions) {
+                    event.setCancelled(true);
+                    return;
+                }
+                if (wcfg.useRegions) {
+                    Vector pt = toVector(defender.getLocation());
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
+                    ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+                    if (!set.allows(DefaultFlag.GHAST_FIREBALL)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
 
             if (attacker != null && attacker instanceof LivingEntity
@@ -318,9 +343,9 @@ public class WorldGuardEntityListener extends EntityListener {
      * 
      * @param event
      */
-    private void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
+    private void onEntityDamageByProjectile(EntityDamageByEntityEvent event) {
         Entity defender = event.getEntity();
-        Entity attacker = event.getDamager();
+        Entity attacker = ((Projectile) event.getDamager()).getShooter();
 
         if (defender instanceof Player) {
             Player player = (Player) defender;
@@ -328,7 +353,7 @@ public class WorldGuardEntityListener extends EntityListener {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
             
-            if (cfg.hasGodMode(player) || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if (isInvincible(player)) {
                 event.setCancelled(true);
                 return;
             }
@@ -373,10 +398,7 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        if (event instanceof EntityDamageByProjectileEvent) {
-            this.onEntityDamageByProjectile((EntityDamageByProjectileEvent) event);
-            return;
-        } else if (event instanceof EntityDamageByEntityEvent) {
+        if (event instanceof EntityDamageByEntityEvent) {
             this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
             return;
         } else if (event instanceof EntityDamageByBlockEvent) {
@@ -398,8 +420,7 @@ public class WorldGuardEntityListener extends EntityListener {
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            if (cfg.hasGodMode(player)
-                    || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if (isInvincible(player)) {
                 event.setCancelled(true);
                 player.setFireTicks(0);
                 return;
@@ -495,42 +516,57 @@ public class WorldGuardEntityListener extends EntityListener {
         }
 
         if (ent instanceof LivingEntity) {
-            if (wcfg.blockCreeperBlockDamage) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.blockCreeperExplosions) {
+            if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
                 return;
             }
 
             if (wcfg.useRegions) {
-                Vector pt = toVector(l);
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                if (wcfg.useRegions) {
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
-                if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.CREEPER_EXPLOSION)) {
-                    event.setCancelled(true);
-                    return;
+                    for (Block block : event.blockList()) {
+                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
                 }
             }
         } else if (ent instanceof TNTPrimed) {
-            if (wcfg.blockTNT) {
+            if (wcfg.blockTNTBlockDamage || wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
             }
 
             if (wcfg.useRegions) {
-                Vector pt = toVector(l);
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
-                if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.TNT)) {
-                    event.setCancelled(true);
-                    return;
+                for (Block block : event.blockList()) {
+                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        } else if (ent instanceof Fireball) {
+            if (wcfg.blockFireballBlockDamage || wcfg.blockFireballExplosions) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                for (Block block : event.blockList()) {
+                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
             }
         }
-        
+
         if (wcfg.signChestProtection) {
             for (Block block : event.blockList()) {
                 if (wcfg.isChestProtected(block)) {
@@ -540,19 +576,6 @@ public class WorldGuardEntityListener extends EntityListener {
             }
         }
 
-        if (wcfg.useRegions) {
-            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-            // Whoo, for each block
-            for (Block block : event.blockList()) {
-                Vector pt = toVector(block);
-
-                if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.TNT)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        }
     }
 
     /**
@@ -565,9 +588,6 @@ public class WorldGuardEntityListener extends EntityListener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        Location l = event.getEntity().getLocation();
-        World world = l.getWorld();
-        WorldConfiguration wcfg = cfg.get(world);
         Entity ent = event.getEntity();
 
         if (cfg.activityHaltToggle) {
@@ -576,22 +596,6 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        if (ent instanceof Fireball) {
-            if (wcfg.blockFireballBlockDamage) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.useRegions) {
-                Vector pt = toVector(l);
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.GHAST_FIREBALL)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        }
     }
 
     /**
@@ -623,6 +627,8 @@ public class WorldGuardEntityListener extends EntityListener {
         if (wcfg.useRegions) {
             Vector pt = toVector(eventLoc);
             RegionManager mgr = plugin.getGlobalRegionManager().get(eventLoc.getWorld());
+            // @TODO get victims' stacktraces and find out why it's null anyway
+            if (mgr == null) return;
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             if (!set.allows(DefaultFlag.MOB_SPAWNING)) {
@@ -630,8 +636,8 @@ public class WorldGuardEntityListener extends EntityListener {
                 return;
             }
 
-            Set<CreatureType> blockTypes = set.getFlag(DefaultFlag.DENY_SPAWN);
-            if (blockTypes != null && blockTypes.contains(creaType)) {
+            Set<CreatureType> creatureTypes = set.getFlag(DefaultFlag.DENY_SPAWN);
+            if (creatureTypes != null && creatureTypes.contains(creaType)) {
                 event.setCancelled(true);
                 return;
             }
@@ -761,4 +767,32 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
+    /**
+     * Check if a player is invincible, via either god mode or region flag. If
+     * the region denies invincibility, the player must have an extra permission
+     * to override it. (worldguard.god.override-regions)
+     * 
+     * @param player
+     * @return
+     */
+    private boolean isInvincible(Player player) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
+
+        boolean god = cfg.hasGodMode(player);
+        if (wcfg.useRegions) {
+            Boolean flag = RegionQueryUtil.isAllowedInvinciblity(plugin, player);
+            boolean allowed = flag == null || flag == true;
+            boolean invincible = RegionQueryUtil.isInvincible(plugin, player);
+
+            if (allowed) {
+                return god || invincible;
+            } else {
+                return (god && plugin.hasPermission(player, "worldguard.god.override-regions"))
+                    || invincible;
+            }
+        } else {
+            return god;
+        }
+    }
 }

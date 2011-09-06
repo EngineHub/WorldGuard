@@ -47,7 +47,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -59,6 +58,7 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
@@ -110,8 +110,10 @@ public class WorldGuardPlayerListener extends PlayerListener {
         registerEvent("PLAYER_RESPAWN", Priority.High);
         registerEvent("PLAYER_ITEM_HELD", Priority.High);
         registerEvent("PLAYER_BED_ENTER", Priority.High);
-        registerEvent("PLAYER_MOVE", Priority.High);
         registerEvent("PLAYER_COMMAND_PREPROCESS", Priority.High);
+        if (plugin.getGlobalStateManager().usePlayerMove) {
+            registerEvent("PLAYER_MOVE", Priority.High);
+        }
     }
 
     /**
@@ -133,6 +135,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a player attempts to log in to the server.
      */
+    /*
     @Override
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
@@ -150,6 +153,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
     }
+    */
 
     /**
      * Called when a player joins a server.
@@ -177,7 +181,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
             if (removed > 10) {
                 logger.info("WG Halt-Act: " + removed + " entities (>10) auto-removed from "
-                		+ player.getWorld().toString());
+                        + player.getWorld().toString());
             }
         }
 
@@ -443,6 +447,28 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     return;
                 }
             }
+
+            if (block.getRelative(event.getBlockFace()).getType() == Material.FIRE) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)) {
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+        }
+
+        if (type == Material.TNT && player.getItemInHand().getType() == Material.FLINT_AND_STEEL) {
+            if (wcfg.getBlacklist() != null) {
+                if (!wcfg.getBlacklist().check(
+                        new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                        toVector(event.getClickedBlock()),
+                        event.getClickedBlock().getTypeId()), false, false)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         }
     }
 
@@ -550,6 +576,16 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 }
             }
 
+            if (type == Material.BED_BLOCK) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.allows(DefaultFlag.SLEEP)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to use that bed.");
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
             if (type == Material.CHEST
                     || type == Material.JUKEBOX //stores the (arguably) most valuable item
                     || type == Material.DISPENSER
@@ -615,23 +651,24 @@ public class WorldGuardPlayerListener extends PlayerListener {
 
         if (wcfg.getBlacklist() != null) {
             if((block.getType() != Material.CHEST
-                && block.getType() != Material.DISPENSER
-                && block.getType() != Material.FURNACE
-                && block.getType() != Material.BURNING_FURNACE)) {
+                    && block.getType() != Material.DISPENSER
+                    && block.getType() != Material.FURNACE
+                    && block.getType() != Material.BURNING_FURNACE)) {
                 if (!wcfg.getBlacklist().check(
                         new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
-                        item.getTypeId()), false, false)) {
+                                item.getTypeId()), false, false)) {
+                    event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                     return;
                 }
+            }
 
-                if (!wcfg.getBlacklist().check(
-                        new BlockInteractBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
-                        block.getTypeId()), false, false)) {
-                    event.setCancelled(true);
-                    return;
-                }
-
+            if (!wcfg.getBlacklist().check(
+                    new BlockInteractBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
+                            block.getTypeId()), false, false)) {
+                event.setUseInteractedBlock(Result.DENY);
+                event.setCancelled(true);
+                return;
             }
 
         }
@@ -832,7 +869,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
         
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
+        if (!plugin.getGlobalRegionManager().canBuild(
+                player, event.getBlockClicked().getRelative(event.getBlockFace()))) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
@@ -859,7 +897,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
         
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlockClicked())) {
+        if (!plugin.getGlobalRegionManager().canBuild(
+                player, event.getBlockClicked().getRelative(event.getBlockFace()))) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
@@ -974,17 +1013,25 @@ public class WorldGuardPlayerListener extends PlayerListener {
             Vector pt = toVector(player.getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            ProtectedRegion globalRegion = mgr.getRegion("__global__");
 
             String[] parts = event.getMessage().split(" ");
 
             Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS);
+            if (allowedCommands == null && globalRegion != null) {
+                allowedCommands = globalRegion.getFlag(DefaultFlag.ALLOWED_CMDS);
+            }
             if (allowedCommands != null && !allowedCommands.contains(parts[0].toLowerCase())) {
+
                 player.sendMessage(ChatColor.RED + parts[0].toLowerCase() + " is not allowed in this area.");
                 event.setCancelled(true);
                 return;
             }
 
             Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS);
+            if (blockedCommands == null && globalRegion != null) {
+                blockedCommands = globalRegion.getFlag(DefaultFlag.BLOCKED_CMDS);
+            }
             if (blockedCommands != null && blockedCommands.contains(parts[0].toLowerCase())) {
                 player.sendMessage(ChatColor.RED + parts[0].toLowerCase() + " is blocked in this area.");
                 event.setCancelled(true);

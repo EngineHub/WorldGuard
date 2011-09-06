@@ -156,10 +156,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new PermissionsResolverServerListener(perms)).register(this);
 
         flagStateManager = new FlagStateManager(this);
-        
-        if (configuration.useRegionsScheduler) { 
-            getServer().getScheduler().scheduleAsyncRepeatingTask(this,
-                    flagStateManager, FlagStateManager.RUN_DELAY, FlagStateManager.RUN_DELAY);
+
+        if (configuration.useRegionsScheduler) {
+            getServer().getScheduler().scheduleAsyncRepeatingTask(this, flagStateManager, FlagStateManager.RUN_DELAY, FlagStateManager.RUN_DELAY);
         }
 
         if (configuration.suppressTickSyncWarnings) {
@@ -197,6 +196,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public void onDisable() {
         globalRegionManager.unload();
         configuration.unload();
+        this.getServer().getScheduler().cancelTasks(this);
 
         logger.info("WorldGuard " + getDescription().getVersion() + " disabled.");
     }

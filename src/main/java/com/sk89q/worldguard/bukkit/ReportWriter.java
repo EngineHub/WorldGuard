@@ -122,6 +122,7 @@ public class ReportWriter {
         Class<? extends ConfigurationManager> cls = config.getClass();
         for (Field field : cls.getFields()) {
             try {
+                if (field.getName().equalsIgnoreCase("CONFIG_HEADER")) continue;
                 Object val = field.get(config);
                 configLog.put(field.getName(), val);
             } catch (IllegalArgumentException e) {
@@ -204,7 +205,7 @@ public class ReportWriter {
             LogListBlock infoLog = worldLog.putChild("Information");
             LogListBlock entitiesLog = worldLog.putChild("Entities");
             
-            infoLog.put("ID", world.getId());
+            infoLog.put("Seed", world.getSeed());
             infoLog.put("Environment", world.getEnvironment().toString());
             infoLog.put("Player count", world.getPlayers().size());
             infoLog.put("Entity count", world.getEntities().size());

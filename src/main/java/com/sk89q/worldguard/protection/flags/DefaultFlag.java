@@ -45,7 +45,12 @@ public final class DefaultFlag {
     public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
     public static final StateFlag USE = new StateFlag("use", true);
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
+    public static final StateFlag PISTONS = new StateFlag("pistons", true);
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
+    public static final StateFlag SNOW_MELT = new StateFlag("snow-melt", true);
+    public static final StateFlag ICE_FORM = new StateFlag("ice-form", true);
+    public static final StateFlag ICE_MELT = new StateFlag("ice-melt", true);
+    public static final StateFlag MUSHROOMS = new StateFlag("mushroom-growth", true);
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
     public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
@@ -59,6 +64,8 @@ public final class DefaultFlag {
     public static final SetFlag<CreatureType> DENY_SPAWN = new SetFlag<CreatureType>("deny-spawn", new CreatureTypeFlag(null));
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay");
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount");
+    public static final IntegerFlag MIN_HEAL = new IntegerFlag("heal-min-health");
+    public static final IntegerFlag MAX_HEAL = new IntegerFlag("heal-max-health");
     public static final VectorFlag TELE_LOC = new VectorFlag("teleport");
     public static final RegionGroupFlag TELE_PERM = new RegionGroupFlag("teleport-group", RegionGroupFlag.RegionGroup.MEMBERS);
     public static final VectorFlag SPAWN_LOC = new VectorFlag("spawn");
@@ -69,13 +76,16 @@ public final class DefaultFlag {
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", new CommandStringFlag(null));
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
-        PASSTHROUGH, BUILD, PVP, MOB_DAMAGE, MOB_SPAWNING, CREEPER_EXPLOSION, SLEEP,
-        TNT, LIGHTER, FIRE_SPREAD, LAVA_FIRE, CHEST_ACCESS, WATER_FLOW, LAVA_FLOW,
-        USE, PLACE_VEHICLE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER,
-        NOTIFY_LEAVE, DENY_SPAWN, HEAL_DELAY, HEAL_AMOUNT, TELE_LOC,
-        TELE_PERM, SPAWN_LOC, SPAWN_PERM, BUYABLE, PRICE, SNOW_FALL, LEAF_DECAY,
-        GHAST_FIREBALL, BLOCKED_CMDS, ALLOWED_CMDS, ENTRY, ENTRY_PERM, EXIT, EXIT_PERM,
-        INVINCIBILITY
+        PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
+        TNT, LIGHTER, USE, PLACE_VEHICLE, SLEEP,
+        MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, CREEPER_EXPLOSION, GHAST_FIREBALL,
+        GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
+        EXIT, EXIT_PERM, ENTRY, ENTRY_PERM,
+        HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL, INVINCIBILITY,
+        SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, MUSHROOMS, LEAF_DECAY,
+        FIRE_SPREAD,  LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
+        TELE_LOC, TELE_PERM, SPAWN_LOC, SPAWN_PERM,
+        BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
     };
 
     static {

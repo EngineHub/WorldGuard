@@ -89,15 +89,16 @@ public class WorldConfiguration {
     public boolean noPhysicsSand;
     public boolean allowPortalAnywhere;
     public Set<Integer> preventWaterDamage;
-    public boolean blockTNT;
     public boolean blockLighter;
-    public boolean disableTNTDamage;
     public boolean disableFireSpread;
     public Set<Integer> disableFireSpreadBlocks;
     public boolean preventLavaFire;
     public Set<Integer> allowedLavaSpreadOver;
+    public boolean blockTNTExplosions;
+    public boolean blockTNTBlockDamage;
     public boolean blockCreeperExplosions;
     public boolean blockCreeperBlockDamage;
+    public boolean blockFireballExplosions;
     public boolean blockFireballBlockDamage;
     public int loginProtection;
     public int spawnProtection;
@@ -271,7 +272,9 @@ public class WorldConfiguration {
         allowPortalAnywhere = getBoolean("physics.allow-portal-anywhere", false);
         preventWaterDamage = new HashSet<Integer>(getIntList("physics.disable-water-damage-blocks", null));
 
-        blockTNT = getBoolean("ignition.block-tnt", false);
+        blockTNTExplosions = getBoolean("ignition.block-tnt", false);
+        // any better place to put this?
+        blockTNTBlockDamage = getBoolean("ignition.block-tnt-block-damage", false);
         blockLighter = getBoolean("ignition.block-lighter", false);
 
         preventLavaFire = getBoolean("fire.disable-lava-fire-spread", true);
@@ -281,6 +284,7 @@ public class WorldConfiguration {
 
         blockCreeperExplosions = getBoolean("mobs.block-creeper-explosions", false);
         blockCreeperBlockDamage = getBoolean("mobs.block-creeper-block-damage", false);
+        blockFireballExplosions = getBoolean("mobs.block-fireball-explosions", false);
         blockFireballBlockDamage = getBoolean("mobs.block-fireball-block-damage", false);
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
 
@@ -290,7 +294,6 @@ public class WorldConfiguration {
         exactRespawn = getBoolean("spawn.exact-respawn", false);
         teleportToHome = getBoolean("spawn.teleport-to-home-on-death", false);
 
-        disableTNTDamage = getBoolean("player-damage.disable-tnt-damage", false);
         disableFallDamage = getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = getBoolean("player-damage.disable-lava-damage", false);
         disableFireDamage = getBoolean("player-damage.disable-fire-damage", false);
@@ -416,7 +419,7 @@ public class WorldConfiguration {
             logger.log(Level.INFO, enforceOneSession
                     ? "WorldGuard: (" + worldName + ") Single session is enforced."
                     : "WorldGuard: (" + worldName + ") Single session is NOT ENFORCED.");
-            logger.log(Level.INFO, blockTNT
+            logger.log(Level.INFO, blockTNTExplosions
                     ? "WorldGuard: (" + worldName + ") TNT ignition is blocked."
                     : "WorldGuard: (" + worldName + ") TNT ignition is PERMITTED.");
             logger.log(Level.INFO, blockLighter

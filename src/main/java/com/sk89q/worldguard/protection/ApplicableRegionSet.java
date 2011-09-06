@@ -309,9 +309,11 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @throws IllegalArgumentException if a StateFlag is given
      */
     public <T extends Flag<V>, V> V getFlag(T flag) {
+        /*
         if (flag instanceof StateFlag) {
             throw new IllegalArgumentException("Cannot use StateFlag with getFlag()");
         }
+        */
 
         int lastPriority = 0;
         boolean found = false;
@@ -345,6 +347,10 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         try {
             return needsClear.values().iterator().next();
         } catch (NoSuchElementException e) {
+            if (globalRegion != null) {
+                V gFlag = globalRegion.getFlag(flag);
+                if (gFlag != null) return gFlag;
+            }
             return null;
         }
     }

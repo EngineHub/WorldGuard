@@ -38,6 +38,7 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -91,8 +92,13 @@ public class RegionCommands {
             throw new CommandException("Select a region with WorldEdit first.");
         }
         
-        ProtectedRegion region;
+        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
+        if (mgr.hasRegion(id)) {
+            throw new CommandException("That region is already defined. Use redefine instead.");
+        }
         
+        ProtectedRegion region;
+
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
@@ -113,7 +119,6 @@ public class RegionCommands {
             region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
         }
         
-        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         mgr.addRegion(region);
         
         try {
@@ -329,8 +334,14 @@ public class RegionCommands {
             throw new CommandException("Select a region with WorldEdit first.");
         }
         
-        ProtectedRegion region;
+        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
+
+        if (mgr.hasRegion(id)) {
+            throw new CommandException("That region already exists. Please choose a different name.");
+        }
         
+        ProtectedRegion region;
+
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
@@ -352,7 +363,6 @@ public class RegionCommands {
         }
 
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
-        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         
         if (!plugin.hasPermission(sender, "worldguard.region.unlimited")) {
             // Check whether the player has created too many regions 
@@ -372,8 +382,6 @@ public class RegionCommands {
         }
         
         ApplicableRegionSet regions = mgr.getApplicableRegions(region);
-        
-        
         
         // Check if this region overlaps any other region
         if (regions.size() > 0) {
@@ -503,13 +511,12 @@ public class RegionCommands {
             id = args.getString(1).toLowerCase();
         }
         
-        if (!ProtectedRegion.isValidId(id)) {
-            throw new CommandException("Invalid region ID specified!");
-        }
-        
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         
         if (!mgr.hasRegion(id)) {
+            if (!ProtectedRegion.isValidId(id)) {
+                throw new CommandException("Invalid region ID specified!");
+            }
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");
         }
 
@@ -532,6 +539,10 @@ public class RegionCommands {
 
         sender.sendMessage(ChatColor.YELLOW + "Region: " + id
                 + ChatColor.GRAY + " (type: " + region.getTypeName() + ")");
+        if (!ProtectedRegion.isValidId(id)) {
+            sender.sendMessage(ChatColor.RED + "This region has an invalid ID. "
+                    + "Please ask the owner to delete it and recreate it.");
+        }
         sender.sendMessage(ChatColor.BLUE + "Priority: " + region.getPriority());
 
         StringBuilder s = new StringBuilder();
@@ -699,14 +710,20 @@ public class RegionCommands {
                 throw new CommandException("Could not find a region by that ID.");
             }
         }
-        
+
+        // @TODO deprecate "flag.[own./member./blank]"
+        boolean hasPerm = false;
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.flag.own." + id.toLowerCase());
+            if (plugin.hasPermission(sender, "worldguard.region.flag.own." + id.toLowerCase())) hasPerm = true;
+            else if (plugin.hasPermission(sender, "worldguard.region.flag.regions.own." + id.toLowerCase())) hasPerm = true;
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.flag.member." + id.toLowerCase());
+            if (plugin.hasPermission(sender, "worldguard.region.flag.member." + id.toLowerCase())) hasPerm = true;
+            else if (plugin.hasPermission(sender, "worldguard.region.flag.regions.member." + id.toLowerCase())) hasPerm = true;
         } else {
-            plugin.checkPermission(sender, "worldguard.region.flag." + id.toLowerCase());
-        } 
+            if (plugin.hasPermission(sender, "worldguard.region.flag." + id.toLowerCase())) hasPerm = true;
+            else if (plugin.hasPermission(sender, "worldguard.region.flag.regions." + id.toLowerCase())) hasPerm = true;
+        }
+        if (!hasPerm) throw new CommandPermissionsException();
         
         Flag<?> foundFlag = null;
         
@@ -728,9 +745,12 @@ public class RegionCommands {
                     list.append(", ");
                 }
 
+                // @TODO deprecate inconsistant "owner" permission
                 if (region.isOwner(localPlayer)) {
                     if (!plugin.hasPermission(sender, "worldguard.region.flag.flags."
-                            + flag.getName() + ".own." + id.toLowerCase())) {
+                            + flag.getName() + ".owner." + id.toLowerCase())
+                            && !plugin.hasPermission(sender, "worldguard.region.flag.flags."
+                                    + flag.getName() + ".own." + id.toLowerCase())) {
                         continue;
                     }
                 } else if (region.isMember(localPlayer)) {

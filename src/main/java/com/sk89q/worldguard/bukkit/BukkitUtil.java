@@ -112,7 +112,7 @@ public class BukkitUtil {
     public static void dropSign(Block block) {
         block.setTypeId(0);
         block.getWorld().dropItemNaturally(block.getLocation(),
-                new ItemStack(Material.SIGN));
+                new ItemStack(Material.SIGN, 1));
     }
 
     /**
