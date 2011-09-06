@@ -151,7 +151,7 @@ Compiling the package using Maven:
 
 Installing Register artifact in local Maven repository:
 
-    mvn install:install-file -DgroupId=com.nijikokun -DartifactId=register -Dversion=1.0 -Dpackaging=jar -Dfile=Register.jar
+    mvn install:install-file -DgroupId=com.nijikokun -DartifactId=register -Dversion=1.1 -Dpackaging=jar -Dfile=register-1.1.jar
 
 We use Maven shade plugin to relocate `com.nijikokun.register.*`
 classes under `com.sk89q.worldguard.register` to avoid conflicts with
