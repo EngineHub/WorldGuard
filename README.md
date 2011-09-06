@@ -4,7 +4,7 @@ WorldGuard buy/sell features
 Region buying/selling is implemented as specified in
 [WorldGuard/Buying and Selling Regions][wg-buyspec] spec.
 
-We use Register to support all major economy plugins like iConomy or
+We use [Register][] to support all major economy plugins like iConomy or
 BOSEconomy. Upon starting, WorldGuard should issue a notice to
 console, similar to this:
  
@@ -120,10 +120,10 @@ Issues
 - WorldGuard stores region owner names in lowercase while economy
   plugins are case-sensitive for account names. As the result, we
   don't have an (easy) way to pay region owners when a their region is
-  bought. We use Bukkit's `matchPlayer` coupled with `region.isOwner`
-  to reverse search for region owners. Whatever action is finally
-  taken, buyer/owner are notified. iConomy 6 is [promised][ico6-case]
-  to have lowercase account names.
+  bought. We use homebrew getPossiblePlayerNames function coupled with
+  `region.isOwner` to reverse search for region owners. Whatever
+  action is finally taken, buyer/owner are notified. iConomy 6 is
+  [promised][ico6-case] to have lowercase account names.
 
 - Buy-on-claim is a separate feature which differs from buying since
   price depends on region size and there's no payment recipient. It
@@ -131,9 +131,6 @@ Issues
 
 - Perhaps we want to block buying when price is not set (instead of
   considering it zero).
-
-- There used to be permissions nodes both with `.owner` and `.own` in
-  upstream WG and [spec][wg-buyspec]. We streamlined them to `.own`.
 
 - Cannot pick up signs dropped by `dropSign`.
 
@@ -159,4 +156,5 @@ other plugins using Register.
 
 [wg]: http://github.com/sk89q/worldguard
 [ico6-case]: https://github.com/iConomy/Core/issues/95
+[register]: https://github.com/iConomy/Register
 [wg-buyspec]: http://wiki.sk89q.com/wiki/Buying_and_Selling_Regions
