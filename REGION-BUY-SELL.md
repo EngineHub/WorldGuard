@@ -1,5 +1,4 @@
-WorldGuard buy/sell features
-============================
+# WorldGuard buy/sell features
 
 Region buying/selling is implemented as specified in
 [WorldGuard/Buying and Selling Regions][wg-buyspec] spec.
@@ -11,11 +10,9 @@ console, similar to this:
     [INFO] [WorldGuard] Payment method found (iConomy version: 5)
 
 
-How to use it
-=============
+## How to use it
 
-Commands
--------
+### Commands
 
 Set `register.enable` to true in order to enable `/region buy` command.
 
@@ -48,15 +45,14 @@ payment at all (to be implemented, perhaps).
 `buyable` region flag is set back to `false` upon buying, but `price`
 flag is preserved.
 
-Signs
------
+### Signs
 
 Signs may be used as a convenient way to put a region on sale through
 `buy` and `price` flags.
 
 Set `register.signs.enable` to `true` to enable this feature.
 
-### Selling ###
+#### Selling
 
 Place a sign with lines
 
@@ -95,13 +91,12 @@ If sign is created successfully, its first line is colored with color
 set in `register.signs.tag-color` (default is `'DARK_BLUE'`, any color
 from ChatColor Bukkit enumeration is available for use).
 
-### Buying ###
+#### Buying
 
 By right-clicking a sign the user can buy the region. Sign is
 destroyed afterwards.
 
-Important notes
-===============
+## Important notes
 
 - Negative `price` flag value is not prohibited by WG.
 
@@ -114,8 +109,7 @@ Important notes
   destroy sell sign, as well as changing region buyable state, price
   or owners is not reflected on the sign.
 
-Issues
-======
+## Issues
 
 - WorldGuard stores region owner names in lowercase while economy
   plugins are case-sensitive for account names. As the result, we
@@ -139,8 +133,7 @@ Issues
   
       commands.register(ProtectionCommands.class);
 
-Hacking notes
-=============
+## Hacking notes
 
 Compiling the package using Maven:
 
