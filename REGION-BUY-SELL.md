@@ -19,11 +19,17 @@ Set `register.enable` to true in order to enable `/region buy` command.
 Suppose you want to sell region with ID `lot9` for 19.45 economy
 credits.
 
-1. Set a price for your region:
+1. Set a price for your region (requires
+`worldguard.region.flag.regions.{own.,member.,}lot_name` *and*
+`worldguard.region.flag.flags.price.{own.,member.,}lot_name`
+permissions, depending on whether player is owner, member or none for
+the region):
 
     /region flag lot9 price 19.45
 
-2. Mark you region for sale:
+2. Mark you region for sale (requires
+`worldguard.region.flag.regions.{own.,member.,}lot_name` *and*
+`worldguard.region.flag.flags.buyable.{own.,member.,}lot_name`):
    
     /region flag lot9 buyable true
 
@@ -67,18 +73,12 @@ To make region with ID `lot_name` buyable for this price.
 
 - Second line _must_ contain region ID.
 
-- Buyable flag will be set to `true` (if not set already). This
-requires (requires `worldguard.region.flag.{owner.,member.,}lot_name`
-*and* `worldguard.region.flag.flags.buyable.{owner.,member.,}.lot_name`,
-depending on whether player is owner, member or none for the region).
+- Buyable flag will be set to `true` (if not set already).
 
 - If price line is missing, it is auto-filled from current `price`
 flag value for the region (remember that if the flag is not set,
 *price is considered zero credits*). Otherwise, `price` flag is set to
-the value specified in the sign (requires
-`worldguard.region.flag.{owner.,member.,}.lot_name` *and*
-`worldguard.region.flag.flags.price.{owner.,member.,}.lot_name`,
-depending on whether player is owner, member or none for the region).
+the value specified in the sign.
 
 - If last line of the sign is empty, it is auto-filled with the name
 of the first member of owners list (it looks like it's always the
@@ -86,6 +86,8 @@ first name in list ordered alphabetically, name will be in lower case due to
 the way WorldGuard stores owner lists). If last line is `#`, it's
 replaced with region dimensions (width×length×height, which is *xzy*
 in terms of Minecraft coordinates).
+
+Permissions required for signs are the same as for textual commands.
 
 If sign is created successfully, its first line is colored with color
 set in `register.signs.tag-color` (default is `'DARK_BLUE'`, any color
