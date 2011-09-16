@@ -617,6 +617,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
+                    event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
                 }
