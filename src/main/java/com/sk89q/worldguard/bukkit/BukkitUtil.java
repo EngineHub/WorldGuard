@@ -28,6 +28,7 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -239,6 +240,7 @@ public class BukkitUtil {
     public static boolean isIntensiveEntity(Entity entity) {
         return entity instanceof Item
                 || entity instanceof TNTPrimed
+                || entity instanceof ExperienceOrb
                 || (entity instanceof LivingEntity
                 && !(entity instanceof Tameable)
                 && !(entity instanceof Player));
