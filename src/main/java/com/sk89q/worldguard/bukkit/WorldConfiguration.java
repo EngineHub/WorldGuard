@@ -147,6 +147,7 @@ public class WorldConfiguration {
     public boolean disableSnowFormation;
     public boolean disableIceFormation;
     public boolean disableLeafDecay;
+    public boolean disableEndermanGriefing;
     public boolean regionInvinciblityRemovesMobs;
 
     /* Configuration data end */
@@ -284,6 +285,7 @@ public class WorldConfiguration {
         blockFireballExplosions = getBoolean("mobs.block-fireball-explosions", false);
         blockFireballBlockDamage = getBoolean("mobs.block-fireball-block-damage", false);
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
+        disableEndermanGriefing = getBoolean("mobs.disable-enderman-griefing", false);
 
         loginProtection = getInt("spawn.login-protection", 3);
         spawnProtection = getInt("spawn.spawn-protection", 0);
