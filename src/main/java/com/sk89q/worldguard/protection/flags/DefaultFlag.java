@@ -52,6 +52,7 @@ public final class DefaultFlag {
     public static final StateFlag ICE_MELT = new StateFlag("ice-melt", true);
     public static final StateFlag MUSHROOMS = new StateFlag("mushroom-growth", true);
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
+    public static final StateFlag ENDER_BUILD = new StateFlag("enderman-grief", true);
     public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
     public static final RegionGroupFlag ENTRY_PERM = new RegionGroupFlag("entry-group", RegionGroupFlag.RegionGroup.NON_MEMBERS);
@@ -66,6 +67,10 @@ public final class DefaultFlag {
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount");
     public static final IntegerFlag MIN_HEAL = new IntegerFlag("heal-min-health");
     public static final IntegerFlag MAX_HEAL = new IntegerFlag("heal-max-health");
+    public static final IntegerFlag FEED_DELAY = new IntegerFlag("feed-delay");
+    public static final IntegerFlag FEED_AMOUNT = new IntegerFlag("feed-amount");
+    public static final IntegerFlag MIN_FOOD = new IntegerFlag("feed-min-hunger");
+    public static final IntegerFlag MAX_FOOD = new IntegerFlag("feed-max-hunger");
     public static final VectorFlag TELE_LOC = new VectorFlag("teleport");
     public static final RegionGroupFlag TELE_PERM = new RegionGroupFlag("teleport-group", RegionGroupFlag.RegionGroup.MEMBERS);
     public static final VectorFlag SPAWN_LOC = new VectorFlag("spawn");
@@ -78,7 +83,8 @@ public final class DefaultFlag {
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, SLEEP,
-        MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, CREEPER_EXPLOSION, GHAST_FIREBALL,
+        MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN,
+        CREEPER_EXPLOSION, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
         EXIT, EXIT_PERM, ENTRY, ENTRY_PERM,
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL, INVINCIBILITY,

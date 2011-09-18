@@ -24,6 +24,7 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -88,8 +89,10 @@ public class FlagStateManager implements Runnable {
                     .getApplicableRegions(playerLocation);
             
             if (!RegionQueryUtil.isInvincible(plugin, player, applicable)
-                    && !plugin.getGlobalStateManager().hasGodMode(player)) {
+                    && !plugin.getGlobalStateManager().hasGodMode(player)
+                    && !(player.getGameMode() == GameMode.CREATIVE)) {
                 processHeal(applicable, player, state);
+                processFeed(applicable, player, state);
             }
         }
     }
@@ -135,6 +138,39 @@ public class FlagStateManager implements Runnable {
         }
     }
     
+    /**
+     * Process restoring hunger for a player.
+     * 
+     * @param applicable
+     * @param player
+     * @param state
+     */
+    private void processFeed(ApplicableRegionSet applicable, Player player,
+            PlayerFlagState state) {
+
+        Integer feedAmount = applicable.getFlag(DefaultFlag.FEED_AMOUNT);
+        Integer feedDelay = applicable.getFlag(DefaultFlag.FEED_DELAY);
+        Integer minHunger = applicable.getFlag(DefaultFlag.MIN_FOOD);
+        Integer maxHunger = applicable.getFlag(DefaultFlag.MAX_FOOD);
+        
+        if (feedAmount == null || feedDelay == null || feedAmount == 0 || feedDelay < 0) {
+            return;
+        }
+        if (minHunger == null) minHunger = 0;
+        if (maxHunger == null) maxHunger = 20;
+
+        if (player.getFoodLevel() >= maxHunger && feedAmount > 0) {
+            return;
+        }
+
+        if (feedDelay <= 0) {
+            player.setFoodLevel(feedAmount > 0 ? maxHunger : minHunger); // this will insta-kill if the flag is unset
+        } else {
+            // clamp health between minimum and maximum
+            player.setFoodLevel(Math.min(maxHunger, Math.max(minHunger, player.getFoodLevel() + feedAmount)));
+        }
+    }
+
     /**
      * Forget a player.
      * 
