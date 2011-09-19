@@ -21,6 +21,8 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.dropSign;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import java.io.IOException;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -50,16 +52,21 @@ import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.commands.RegionCommands;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**
  * The listener for block events.
@@ -593,6 +600,8 @@ public class WorldGuardBlockListener extends BlockListener {
 
     /**
      * Called when a sign is changed.
+     *
+     * @todo Refactor sendMessage-dropSign-setCancelled code duplication
      */
     @Override
     public void onSignChange(SignChangeEvent event) {
@@ -658,6 +667,81 @@ public class WorldGuardBlockListener extends BlockListener {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
+        }
+        
+        /// Selling with signs
+        if (wcfg.useRegions && wcfg.useRegister && wcfg.useBuySigns && 
+            event.getLine(0).equalsIgnoreCase(wcfg.buySignsTag)) {
+            RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
+            String id = event.getLine(1);
+
+            if (!mgr.hasRegion(id)) {
+                player.sendMessage(ChatColor.RED + "A region with ID '" + id + "' doesn't exist.");
+                dropSign(event.getBlock());
+                event.setCancelled(true);
+                return;
+            }
+             
+            ProtectedRegion region = mgr.getRegion(id);
+            Set<String> ownerPlayers = region.getOwners().getPlayers();
+            Boolean buyable = region.getFlag(DefaultFlag.BUYABLE);
+            Double regionPrice = region.getFlag(DefaultFlag.PRICE);
+
+            if (regionPrice == null)
+                regionPrice = 0.0;
+
+            /// Mark region as buyable
+            if ((buyable == null)|| !buyable)
+                try {
+                    RegionCommands.flag(new CommandContext(" " + id + " " + "buyable true"),
+                                        plugin, player);
+                } catch (CommandException e) {
+                    player.sendMessage(ChatColor.RED + "Failed to flag region as buyable: "
+                                       + e.getMessage());
+                    dropSign(event.getBlock());
+                    event.setCancelled(true);
+                    return;
+                }
+
+            /// Set price flag from sign line
+            if (!event.getLine(2).equals("")) {
+                try {
+                    Double signPrice = Double.valueOf(event.getLine(2));
+                    RegionCommands.flag(new CommandContext(" " + id + " " + "price " + signPrice),
+                                        plugin, player);
+                } catch (NumberFormatException e) {
+                    player.sendMessage(ChatColor.RED + "Could not read price for region.");
+                    dropSign(event.getBlock());
+                    event.setCancelled(true);
+                } catch (CommandException e) {
+                    player.sendMessage(ChatColor.RED + "Failed to set price flag for region: "
+                                       + e.getMessage());
+                    dropSign(event.getBlock());
+                    event.setCancelled(true);
+                    return;
+                }
+            } else
+                /// Set sign line from price flag
+                event.setLine(2, regionPrice.toString());
+
+            /// Set last line to first owner name
+            if (event.getLine(3).equals("") && !ownerPlayers.isEmpty())
+                event.setLine(3, ownerPlayers.iterator().next());
+            else if (event.getLine(3).equals("#")) {
+                Vector d = region.getMaximumPoint().subtract(region.getMinimumPoint());
+                BlockVector diag = d.toBlockVector();
+                event.setLine(3, diag.getBlockX() + "x" + diag.getBlockZ() + 
+                              "x" + diag.getBlockY());
+            }
+
+            event.setLine(0, ChatColor.valueOf(wcfg.buySignsTagColor) + wcfg.buySignsTag);
+
+            try {
+                mgr.save();
+            } catch (IOException e) {
+                player.sendMessage(ChatColor.RED + "Failed to write regions file: "
+                                   + e.getMessage());
+            }
         }
     }
 

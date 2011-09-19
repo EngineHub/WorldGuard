@@ -18,6 +18,7 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import static com.sk89q.worldguard.bukkit.BukkitUtil.dropSign;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Iterator;
@@ -29,6 +30,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -52,6 +54,8 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
@@ -59,6 +63,7 @@ import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.bukkit.commands.RegionCommands;
 import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -674,7 +679,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 || block.getType() == Material.DISPENSER
                 || block.getType() == Material.FURNACE
                 || block.getType() == Material.BURNING_FURNACE)) {
-            
+
             if (wcfg.isChestProtected(block, player)) {
                 player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
                 event.setCancelled(true);
@@ -682,54 +687,23 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
 
-        /*if (wcfg.useRegions && wcfg.useiConomy && cfg.getiConomy() != null
-                    && (type == Material.SIGN_POST || type == Material.SIGN || type == Material.WALL_SIGN)) {
-            BlockState block = blockClicked.getState();
+        /// Buying regions with signs
+        if (wcfg.useRegions && wcfg.useRegister && wcfg.useBuySigns
+            && (type == Material.SIGN_POST || type == Material.SIGN || type == Material.WALL_SIGN)) {
 
-            if (((Sign)block).getLine(0).equalsIgnoreCase("[WorldGuard]")
-                    && ((Sign)block).getLine(1).equalsIgnoreCase("For sale")) {
-                String regionId = ((Sign)block).getLine(2);
-                //String regionComment = ((Sign)block).getLine(3);
+            Sign sign = (Sign)block.getState();
 
-                if (regionId != null && regionId != "") {
-                    RegionManager mgr = cfg.getWorldGuardPlugin().getGlobalRegionManager().get(player.getWorld().getName());
-                    ProtectedRegion region = mgr.getRegion(regionId);
-
-                    if (region != null) {
-                        RegionFlags flags = region.getFlags();
-
-                        if (flags.getBooleanFlag(DefaultFlag.BUYABLE).getValue(false)) {
-                            if (iConomy.getBank().hasAccount(player.getName())) {
-                                Account account = iConomy.getBank().getAccount(player.getName());
-                                double balance = account.getBalance();
-                                double regionPrice = flags.getDoubleFlag(DefaultFlag.PRICE).getValue();
-
-                                if (balance >= regionPrice) {
-                                    account.subtract(regionPrice);
-                                    player.sendMessage(ChatColor.YELLOW + "You have bought the region " + regionId + " for " +
-                                            iConomy.getBank().format(regionPrice));
-                                    DefaultDomain owners = region.getOwners();
-                                    owners.addPlayer(player.getName());
-                                    region.setOwners(owners);
-                                    flags.getBooleanFlag(DefaultFlag.BUYABLE).setValue(false);
-                                    account.save();
-                                } else {
-                                    player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-                                }
-                            } else {
-                                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-                            }
-                        } else {
-                            player.sendMessage(ChatColor.RED + "Region: " + regionId + " is not buyable");
-                        } 
-                    } else {
-                        player.sendMessage(ChatColor.DARK_RED + "The region " + regionId + " does not exist.");
-                    }
-                } else {
-                    player.sendMessage(ChatColor.DARK_RED + "No region specified.");
+            if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase(wcfg.buySignsTag)) {
+                String id = sign.getLine(1);
+                try {
+                    RegionCommands.buy(new CommandContext(" " + id), plugin, player);
+                    dropSign(block);
+                } catch (CommandException e) {
+                    player.sendMessage(ChatColor.RED + "Could not buy region: " + e.getMessage());
+                    event.setCancelled(true);
                 }
             }
-        }*/
+        }
     }
 
     /**

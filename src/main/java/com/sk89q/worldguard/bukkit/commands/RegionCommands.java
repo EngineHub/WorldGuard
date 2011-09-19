@@ -21,12 +21,18 @@ package com.sk89q.worldguard.bukkit.commands;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.nijikokun.register.payment.Method;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -40,6 +46,8 @@ import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
+import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -199,6 +207,105 @@ public class RegionCommands {
         }
     }
     
+    @Command(aliases = {"buy"},
+            usage = "<id>",
+            desc = "Buy a region",
+            flags = "", min = 1, max = 1)
+    public static void buy(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        Player buyer = plugin.checkPlayer(sender);
+        String id = args.getString(0);
+        RegionManager mgr = plugin.getGlobalRegionManager().get(buyer.getWorld());
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(buyer.getWorld());
+        Server server = plugin.getServer();
+
+        if (!wcfg.useRegister)
+            throw new CommandException("Region buying is not available.");
+
+        if (plugin.paymentMethod == null)
+            throw new CommandException("No economy system is available.");
+
+        if (!mgr.hasRegion(id))
+            throw new CommandException("A region with ID '" + id + "' doesn't exist.");
+
+        ProtectedRegion region = mgr.getRegion(id);
+        DefaultDomain owners = region.getOwners();
+        Boolean buyable = region.getFlag(DefaultFlag.BUYABLE);
+        Double price = region.getFlag(DefaultFlag.PRICE);
+
+        if ((buyable == null)|| !buyable)
+            throw new CommandException("This region is not buyable.");
+
+        plugin.checkPermission(sender, "worldguard.region.buy." + id.toLowerCase());
+
+        if (!plugin.paymentMethod.hasAccount(buyer.getName()))
+            throw new CommandException("You have no account.");
+
+        Method.MethodAccount pAccount = plugin.paymentMethod.getAccount(buyer.getName());
+
+        if (!pAccount.hasEnough(price))
+            throw new CommandException("You have not enough money.");
+
+        if (price == null)
+            price = 0.0;
+
+        pAccount.subtract(price);
+
+        Set<String> ownerPlayers = owners.getPlayers();
+        Set<String> unpaidOwners = ownerPlayers;
+        double share = price / ownerPlayers.size();
+
+        /// @todo Distribute money over owner groups as well
+        ///
+        /// @todo Support operating through banks (realism)
+        ///
+        /// @todo WorldGuard stores owner names lowercased while
+        /// economy plugins have case-sensitive account names. As the
+        /// result, we're unable to directly pay to region owners for
+        /// their land.
+        List<String> allNames = BukkitUtil.getPossiblePlayerNames(buyer.getWorld());
+        for (String name : allNames) {
+            Player m = server.getPlayer(name);
+                if (region.isOwner(plugin.wrapPlayer(m)))
+                    if (plugin.paymentMethod.hasAccount(name)) {
+
+                        plugin.paymentMethod.getAccount(name).add(share);
+                        unpaidOwners.remove(name.toLowerCase());
+                        buyer.sendMessage(ChatColor.YELLOW + name +
+                                          " has received a share of payment");
+                        if (m.isOnline())
+                            m.sendMessage(ChatColor.YELLOW + "You have received a payment of " +
+                                          ChatColor.WHITE + plugin.paymentMethod.format(share) +
+                                          ChatColor.YELLOW + " for selling region '" + id +
+                                          "' to " + buyer.getName());
+                    } else {
+                        buyer.sendMessage(ChatColor.YELLOW + name +
+                                          " has no account");
+                        m.sendMessage(ChatColor.YELLOW + "Region '" + id + "' was sold to " +
+                                      buyer.getName() + ", but you have no account to receive you share");
+                    }
+            }
+
+        for (String p : unpaidOwners)
+            buyer.sendMessage(ChatColor.YELLOW + "Owner " + p + " does not exist or has no account");
+        
+
+        owners = new DefaultDomain();
+        owners.addPlayer(buyer.getName());
+        region.setOwners(owners);
+
+        buyer.sendMessage(ChatColor.YELLOW + "You have bought that region for " + 
+                          ChatColor.WHITE + plugin.paymentMethod.format(price));
+        region.setFlag(DefaultFlag.BUYABLE, false);
+
+        try {
+            mgr.save();
+        } catch (IOException e) {
+            throw new CommandException("Failed to write regions file: "
+                                       + e.getMessage());
+        }
+    }
+
     @Command(aliases = {"claim"},
             usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
             desc = "Claim a region",
@@ -668,7 +775,7 @@ public class RegionCommands {
 
         if (region.isOwner(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.flag.flags."
-                    + foundFlag.getName() + ".owner." + id.toLowerCase());
+                    + foundFlag.getName() + ".own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.flag.flags."
                     + foundFlag.getName() + ".member." + id.toLowerCase());
