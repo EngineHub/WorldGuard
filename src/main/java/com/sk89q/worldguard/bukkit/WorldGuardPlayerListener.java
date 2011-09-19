@@ -602,6 +602,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                    || type == Material.DIODE_BLOCK_ON
                    || type == Material.WOODEN_DOOR
                    || type == Material.TRAP_DOOR
+                   || type == Material.FENCE_GATE
                    || type == Material.WORKBENCH) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.USE)
