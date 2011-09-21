@@ -460,6 +460,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                         new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
                         toVector(event.getClickedBlock()),
                         event.getClickedBlock().getTypeId()), false, false)) {
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                     return;
                 }
@@ -590,6 +592,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                         && !set.allows(DefaultFlag.CHEST_ACCESS)
                         && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to open that in this area.");
+                    event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
                 }
@@ -630,6 +633,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to place vehicles here.");
+                    event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                     return;
                 }
@@ -640,6 +644,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to place vehicles here.");
+                    event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                     return;
                 }
@@ -677,6 +682,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             
             if (wcfg.isChestProtected(block, player)) {
                 player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
+                event.setUseInteractedBlock(Result.DENY);
                 event.setCancelled(true);
                 return;
             }
