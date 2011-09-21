@@ -83,6 +83,7 @@ public class WorldConfiguration {
     public boolean classicWater;
     public boolean simulateSponge;
     public int spongeRadius;
+    public boolean disableExpDrops;
     public boolean pumpkinScuba;
     public boolean redstoneSponges;
     public boolean noPhysicsGravel;
@@ -149,6 +150,7 @@ public class WorldConfiguration {
     public boolean disableLeafDecay;
     public boolean disableEndermanGriefing;
     public boolean regionInvinciblityRemovesMobs;
+    public boolean disableDeathMessages;
 
     /* Configuration data end */
 
@@ -255,6 +257,7 @@ public class WorldConfiguration {
         enforceOneSession = getBoolean("protection.enforce-single-session", true);
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
+        disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
 
         classicWater = getBoolean("simulation.classic-water", false);
         simulateSponge = getBoolean("simulation.sponge.enable", true);
@@ -305,6 +308,7 @@ public class WorldConfiguration {
         teleportOnVoid = getBoolean("player-damage.teleport-on-void-falling", false);
         disableExplosionDamage = getBoolean("player-damage.disable-explosion-damage", false);
         disableMobDamage = getBoolean("player-damage.disable-mob-damage", false);
+        disableDeathMessages = getBoolean("player-damage.disable-death-messages", false);
 
         signChestProtection = getBoolean("chest-protection.enable", false);
 

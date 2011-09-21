@@ -51,12 +51,14 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PigZapEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
@@ -112,6 +114,7 @@ public class WorldGuardEntityListener extends EntityListener {
         registerEvent("ENTITY_REGAIN_HEALTH", Priority.High);
         registerEvent("ENDERMAN_PICKUP", Priority.High);
         registerEvent("ENDERMAN_PLACE", Priority.High);
+        registerEvent("ENTITY_DEATH", Priority.High);
     }
 
     /**
@@ -145,6 +148,20 @@ public class WorldGuardEntityListener extends EntityListener {
             if (entity instanceof Creature && wcfg.disableCreatureCropTrampling) {
                 event.setCancelled(true);
             }
+        }
+    }
+
+    /**
+     * Called when an entity dies.
+     */
+    @Override
+    public void onEntityDeath(EntityDeathEvent event) {
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
+        if (wcfg.disableExpDrops) {
+            event.setDroppedExp(0);
+        }
+        if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
+            ((PlayerDeathEvent) event).setDeathMessage("");
         }
     }
 
