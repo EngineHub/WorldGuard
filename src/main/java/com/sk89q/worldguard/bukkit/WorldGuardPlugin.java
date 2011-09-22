@@ -169,7 +169,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardBlockListener(this)).registerEvents();
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
-        (new WorldGuardWorldListener(this)).registerEvents();
+
+        // handle worlds separately to initialize already loaded worlds
+        WorldGuardWorldListener worldListener = (new WorldGuardWorldListener(this));
+        for (World world : getServer().getWorlds()) {
+            worldListener.initWorld(world);
+        }
 
         // Check god mode for existing players, if any
         for (Player player : getServer().getOnlinePlayers()) {

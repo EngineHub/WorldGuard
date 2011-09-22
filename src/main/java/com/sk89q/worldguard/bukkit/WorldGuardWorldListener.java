@@ -7,10 +7,12 @@ package com.sk89q.worldguard.bukkit;
 
 import java.util.logging.Logger;
 
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldListener;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.PluginManager;
 
 public class WorldGuardWorldListener extends WorldListener {
@@ -38,6 +40,7 @@ public class WorldGuardWorldListener extends WorldListener {
 //        PluginManager pm = plugin.getServer().getPluginManager();
 
         registerEvent("CHUNK_LOAD", Event.Priority.Normal);
+        registerEvent("WORLD_LOAD", Event.Priority.Normal);
     }
 
     /**
@@ -76,6 +79,28 @@ public class WorldGuardWorldListener extends WorldListener {
                 logger.info("WG Halt-Act: " + removed + " entities (>50) auto-removed from "
                         + event.getChunk().toString());
             }
+        }
+    }
+
+    /**
+     * Called when a world is loaded.
+     */
+    public void onWorldLoad(WorldLoadEvent event) {
+        initWorld(event.getWorld());
+    }
+
+    public void initWorld(World world) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
+        if (wcfg.alwaysRaining && !wcfg.disableWeather) {
+            world.setStorm(true);
+        } else if (wcfg.disableWeather && !wcfg.alwaysRaining) {
+            world.setStorm(false);
+        }
+        if (wcfg.alwaysThundering && !wcfg.disableThunder) {
+            world.setThundering(true);
+        } else if (wcfg.disableThunder && !wcfg.alwaysThundering) {
+            world.setStorm(false);
         }
     }
 }
