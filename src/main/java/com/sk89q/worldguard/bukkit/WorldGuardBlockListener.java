@@ -760,6 +760,18 @@ public class WorldGuardBlockListener extends BlockListener {
                 return;
             }
         }
+
+        if (fromType == Material.GRASS) {
+            if (wcfg.disableGrassGrowth) {
+                event.setCancelled(true);
+                return;
+            }
+            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.GRASS_SPREAD, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     /**
