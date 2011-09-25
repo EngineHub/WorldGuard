@@ -179,7 +179,14 @@ public class FlagStateManager implements Runnable {
     public synchronized void forget(Player player) {
         states.remove(player.getName());
     }
-    
+
+    /**
+     * Forget all managed players. Use with caution.
+     */
+    public synchronized void forgetAll() {
+        states.clear();
+    }
+
     /**
      * Get a player's flag state.
      * 

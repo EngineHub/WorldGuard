@@ -124,4 +124,24 @@ public class WorldGuardCommands {
         }
 
     }
+
+    @Command(aliases = {"flushstates", "clearstates"},
+            usage = "[player]",
+            desc = "Flush the state manager",
+            flags = "", min = 0, max = 1)
+    @CommandPermissions("worldguard.flushstates")
+    public static void flushStates(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        if (args.argsLength() == 0) {
+            plugin.getFlagStateManager().forgetAll();
+            sender.sendMessage("Cleared all states.");
+        } else {
+            Player player = plugin.getServer().getPlayer(args.getString(0));
+            if (player != null) {
+                plugin.getFlagStateManager().forget(player);
+                sender.sendMessage("Cleared states for player \"" + player.getName() + "\".");
+            }
+        }
+    }
+
 }
