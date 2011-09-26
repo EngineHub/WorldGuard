@@ -243,7 +243,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"stack"},
+    @Command(aliases = {"stack", ";"},
             usage = "",
             desc = "Stack items",
             flags = "", min = 0, max = 0)

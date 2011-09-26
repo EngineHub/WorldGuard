@@ -42,7 +42,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.bukkit.migration.PermissionsResolverManager;
-import com.sk89q.bukkit.migration.PermissionsResolverServerListener;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
@@ -129,8 +128,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         getDataFolder().mkdirs();
 
         // Set up permissions
-        perms = new PermissionsResolverManager(
-                getConfiguration(), getServer(), "WorldGuard", logger);
+        perms = new PermissionsResolverManager(this, getDescription().getName(), logger);
         perms.load();
 
         // This must be done before configuration is laoded
@@ -143,9 +141,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Migrate regions after the regions were loaded because
         // the migration code reuses the loaded region managers
         LegacyWorldGuardMigration.migrateRegions(this);
-
-        // Load permissions
-        (new PermissionsResolverServerListener(perms)).register(this);
 
         flagStateManager = new FlagStateManager(this);
 

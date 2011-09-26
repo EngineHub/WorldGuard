@@ -80,7 +80,7 @@ public class WorldConfiguration {
     public boolean fireSpreadDisableToggle;
     public boolean enforceOneSession;
     public boolean itemDurability;
-    public boolean classicWater;
+    // public boolean classicWater;
     public boolean simulateSponge;
     public int spongeRadius;
     public boolean disableExpDrops;
@@ -101,11 +101,11 @@ public class WorldConfiguration {
     public boolean blockCreeperBlockDamage;
     public boolean blockFireballExplosions;
     public boolean blockFireballBlockDamage;
-    public int loginProtection;
-    public int spawnProtection;
-    public boolean kickOnDeath;
-    public boolean exactRespawn;
-    public boolean teleportToHome;
+    // public int loginProtection;
+    // public int spawnProtection;
+    // public boolean kickOnDeath;
+    // public boolean exactRespawn;
+    // public boolean teleportToHome;
     public boolean disableContactDamage;
     public boolean disableFallDamage;
     public boolean disableLavaDamage;
@@ -122,9 +122,9 @@ public class WorldConfiguration {
     public boolean highFreqFlags;
     public int regionWand = 287;
     public Set<CreatureType> blockCreatureSpawn;
-    public boolean useiConomy;
-    public boolean buyOnClaim;
-    public double buyOnClaimPrice;
+    // public boolean useiConomy;
+    // public boolean buyOnClaim;
+    // public double buyOnClaimPrice;
     public int maxClaimVolume;
     public boolean claimOnlyInsideExistingRegions;
     public int maxRegionCountPerPlayer;
@@ -260,13 +260,12 @@ public class WorldConfiguration {
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
 
-        classicWater = getBoolean("simulation.classic-water", false);
+        // classicWater = getBoolean("simulation.classic-water", false);
         simulateSponge = getBoolean("simulation.sponge.enable", true);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
 
-        pumpkinScuba = getBoolean("pumpkin-scuba", false);
-
+        pumpkinScuba = getBoolean("default.pumpkin-scuba", false);
         disableHealthRegain = getBoolean("default.disable-health-regain", false);
 
         noPhysicsGravel = getBoolean("physics.no-physics-gravel", false);
@@ -275,7 +274,6 @@ public class WorldConfiguration {
         preventWaterDamage = new HashSet<Integer>(getIntList("physics.disable-water-damage-blocks", null));
 
         blockTNTExplosions = getBoolean("ignition.block-tnt", false);
-        // any better place to put this?
         blockTNTBlockDamage = getBoolean("ignition.block-tnt-block-damage", false);
         blockLighter = getBoolean("ignition.block-lighter", false);
 
@@ -291,11 +289,11 @@ public class WorldConfiguration {
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
         disableEndermanGriefing = getBoolean("mobs.disable-enderman-griefing", false);
 
-        loginProtection = getInt("spawn.login-protection", 3);
-        spawnProtection = getInt("spawn.spawn-protection", 0);
-        kickOnDeath = getBoolean("spawn.kick-on-death", false);
-        exactRespawn = getBoolean("spawn.exact-respawn", false);
-        teleportToHome = getBoolean("spawn.teleport-to-home-on-death", false);
+        // loginProtection = getInt("spawn.login-protection", 3);
+        // spawnProtection = getInt("spawn.spawn-protection", 0);
+        // kickOnDeath = getBoolean("spawn.kick-on-death", false);
+        // exactRespawn = getBoolean("spawn.exact-respawn", false);
+        // teleportToHome = getBoolean("spawn.teleport-to-home-on-death", false);
 
         disableFallDamage = getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = getBoolean("player-damage.disable-lava-damage", false);
@@ -341,9 +339,9 @@ public class WorldConfiguration {
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
         maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player", 7);
 
-        useiConomy = getBoolean("iconomy.enable", false);
-        buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
-        buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
+        // useiConomy = getBoolean("iconomy.enable", false);
+        // buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
+        // buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
 
         blockCreatureSpawn = new HashSet<CreatureType>();
         for (String creatureName : getStringList("mobs.block-creature-spawn", null)) {
