@@ -32,6 +32,10 @@ commands:
         description: Adjust protected regions
         usage: /<command> <action> ...
         aliases: [rg, regions]
+    flushstates:
+        descripton: Clear state manager.
+        usage: /<command> [player]
+        aliases: clearstates
     locate:
         description: Set your compass towards a person
         usage: /<command> <target>
