@@ -37,7 +37,6 @@ import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -68,7 +67,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Logger for messages.
      */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+    static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
     /**
      * Manager for commands. This automatically handles nested commands,
@@ -557,7 +556,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         if (filter.equalsIgnoreCase("#console")
                 || filter.equalsIgnoreCase("*console*")
                 || filter.equalsIgnoreCase("!")) {
-            return getServer().getConsoleSender();
+            try {
+                return getServer().getConsoleSender();
+            } catch (Throwable t) {
+                // Legacy support
+                return new LegacyConsoleSender(getServer());
+            }
         }
         
         return matchSinglePlayer(sender, filter);
