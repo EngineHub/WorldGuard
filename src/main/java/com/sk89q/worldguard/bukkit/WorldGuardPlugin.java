@@ -340,7 +340,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         
         // Invoke the permissions resolver
         if (sender instanceof Player) {
-            return perms.hasPermission(((Player) sender).getName(), perm);
+            Player player = (Player) sender;
+            return perms.hasPermission(player.getWorld().getName(), player.getName(), perm);
         }
         
         return false;
