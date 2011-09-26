@@ -147,114 +147,59 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         int numRegions = regions.size();
         int numPoints = points.size();
         List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
-        int i, i2, i3;
-
+        int i, i2;
+    
         for (i = 0; i < numRegions; i++) {
             ProtectedRegion region = regions.get(i);
             BlockVector rMinPoint = region.getMinimumPoint();
             BlockVector rMaxPoint = region.getMaximumPoint();
-
+    
             // Check whether the region is outside the min and max vector
             if ((rMinPoint.getBlockX() < min.getBlockX() && rMaxPoint.getBlockX() < min.getBlockX()) 
-                            || (rMinPoint.getBlockX() > max.getBlockX() && rMaxPoint.getBlockX() > max.getBlockX())
-                    && ((rMinPoint.getBlockY() < min.getBlockY() && rMaxPoint.getBlockY() < min.getBlockY())
-                            || (rMinPoint.getBlockY() > max.getBlockY() && rMaxPoint.getBlockY() > max.getBlockY()))
-                    && ((rMinPoint.getBlockZ() < min.getBlockZ() && rMaxPoint.getBlockZ() < min.getBlockZ())
-                            || (rMinPoint.getBlockZ() > max.getBlockZ() && rMaxPoint.getBlockZ() > max.getBlockZ())) ) {
-                intersectingRegions.add(regions.get(i));
-                continue;
-            }
+                    || (rMinPoint.getBlockX() > max.getBlockX() && rMaxPoint.getBlockX() > max.getBlockX())
+                    || (rMinPoint.getBlockY() < min.getBlockY() && rMaxPoint.getBlockY() < min.getBlockY())
+                    || (rMinPoint.getBlockY() > max.getBlockY() && rMaxPoint.getBlockY() > max.getBlockY())
+                    || (rMinPoint.getBlockZ() < min.getBlockZ() && rMaxPoint.getBlockZ() < min.getBlockZ())
+                    || (rMinPoint.getBlockZ() > max.getBlockZ() && rMaxPoint.getBlockZ() > max.getBlockZ())) {
 
-            // Check whether the regions points are inside the other region
-            for (i2 = 0; i < numPoints; i++) {
-                Vector pt = new Vector(points.get(i2).getBlockX(), minY, points.get(i2).getBlockZ());
-                Vector pt2 = new Vector(points.get(i2).getBlockX(), maxY, points.get(i2).getBlockZ());
-                if (region.contains(pt) || region.contains(pt2)) {
-                    intersectingRegions.add(regions.get(i));
+                    // One or more dimensions wholly outside. Regions aren't overlapping.
                     continue;
-                }
             }
 
-            // Check whether the other regions points are inside the current region
-            if (region instanceof ProtectedPolygonalRegion) {
-                for (i2 = 0; i < ((ProtectedPolygonalRegion)region).getPoints().size(); i++) {
-                    BlockVector2D pt2Dr = ((ProtectedPolygonalRegion)region).getPoints().get(i2);
-                    int minYr = ((ProtectedPolygonalRegion)region).minY;
-                    int maxYr = ((ProtectedPolygonalRegion)region).maxY;
-                    Vector ptr = new Vector(pt2Dr.getBlockX(), minYr, pt2Dr.getBlockZ());
-                    Vector ptr2 = new Vector(pt2Dr.getBlockX(), maxYr, pt2Dr.getBlockZ());
-
-                    if (this.contains(ptr) || this.contains(ptr2)) {
-                        intersectingRegions.add(regions.get(i));
-                        continue;
-                    }
-                }
-            } else if (region instanceof ProtectedCuboidRegion) {
-                BlockVector ptcMin = region.getMinimumPoint(); 
-                BlockVector ptcMax = region.getMaximumPoint();
-
-                if (this.contains(new Vector(ptcMin.getBlockX(), ptcMin.getBlockY(), ptcMin.getBlockZ()))
-                        || this.contains(new Vector(ptcMin.getBlockX(), ptcMin.getBlockY(), ptcMax.getBlockZ()))
-                        || this.contains(new Vector(ptcMin.getBlockX(), ptcMax.getBlockY(), ptcMax.getBlockZ()))
-                        || this.contains(new Vector(ptcMin.getBlockX(), ptcMax.getBlockY(), ptcMin.getBlockZ()))
-                        || this.contains(new Vector(ptcMax.getBlockX(), ptcMax.getBlockY(), ptcMax.getBlockZ()))
-                        || this.contains(new Vector(ptcMax.getBlockX(), ptcMax.getBlockY(), ptcMin.getBlockZ()))
-                        || this.contains(new Vector(ptcMax.getBlockX(), ptcMin.getBlockY(), ptcMin.getBlockZ()))
-                        || this.contains(new Vector(ptcMax.getBlockX(), ptcMin.getBlockY(), ptcMax.getBlockZ())) ) {
-                    intersectingRegions.add(regions.get(i));
-                    continue;
-                }
-            } else {
-                throw new UnsupportedOperationException("Not supported yet."); 
-            }
-
-            // Check whether the current regions edges collide with the regions edges
             boolean regionIsIntersecting = false;
+            // Check whether the regions points are inside the other region
             for (i2 = 0; i2 < numPoints; i2++) {
-                boolean checkNextPoint = false;
-                BlockVector2D currPoint = points.get(i2);
-                BlockVector2D nextPoint;
-
-                if (i2 == (numPoints - 1)) {
-                    nextPoint = points.get(0);
-                } else {
-                    nextPoint = points.get(i2 + 1);
-                }
-
-                int currX = currPoint.getBlockX();
-                int currZ = currPoint.getBlockZ();
-
-                while (!checkNextPoint) {
-                    for(i3 = this.minY; i3 <= this.maxY; i3++) {
-                        if (region.contains(new Vector(currX, i3, currZ))) {
-                            intersectingRegions.add(regions.get(i));
-                            regionIsIntersecting = true;
-                            break;
-                        }
-                    }
-
-                    if (currX == nextPoint.getBlockX() || currZ == nextPoint.getBlockZ() || regionIsIntersecting) {
-                        checkNextPoint = true;
-                    }
-
-                    if (nextPoint.getBlockX() > currPoint.getBlockX()) {
-                        currX++;
-                    } else {
-                        currX--;
-                    }
-                    if (nextPoint.getBlockZ() > currPoint.getBlockZ()) {
-                        currZ++;
-                    } else {
-                        currZ--;
-                    }
-                }
-
-                if (regionIsIntersecting) {
+                BlockVector2D pt = points.get(i2);
+                int pointX = Math.min(Math.max(rMinPoint.getBlockX(), pt.getBlockX()), rMaxPoint.getBlockX());
+                int pointZ = Math.min(Math.max(rMinPoint.getBlockZ(), pt.getBlockZ()), rMaxPoint.getBlockZ());
+                int pointY1 = Math.min(Math.max(rMinPoint.getBlockY(), minY), rMaxPoint.getBlockY());
+                int pointY2 = Math.min(Math.max(rMinPoint.getBlockY(), maxY), rMaxPoint.getBlockY());
+                Vector pt1 = new Vector(pointX, pointY1, pointZ);
+                Vector pt2 = new Vector(pointX, pointY2, pointZ);
+                if (region.contains(pt1) || region.contains(pt2)) {
+                    intersectingRegions.add(regions.get(i));
+                    regionIsIntersecting = true;
                     break;
                 }
             }
+            if (region instanceof ProtectedPolygonalRegion && !regionIsIntersecting) {
+                // Check whether the other regions points are inside the current region
+                for (i2 = 0; i2 < ((ProtectedPolygonalRegion)region).getPoints().size(); i2++) {
+                    BlockVector2D pt2Dr = ((ProtectedPolygonalRegion)region).getPoints().get(i2);
+                    int pointX = Math.min(Math.max(min.getBlockX(), pt2Dr.getBlockX()), max.getBlockX());
+                    int pointZ = Math.min(Math.max(min.getBlockZ(), pt2Dr.getBlockZ()), max.getBlockZ());
+                    int pointY1 = Math.min(Math.max(min.getBlockY(), ((ProtectedPolygonalRegion)region).minY), max.getBlockY());
+                    int pointY2 = Math.min(Math.max(min.getBlockY(), ((ProtectedPolygonalRegion)region).maxY), max.getBlockY());
+                    Vector pt1 = new Vector(pointX, pointY1, pointZ);
+                    Vector pt2 = new Vector(pointX, pointY2, pointZ);
+                    if (this.contains(pt1) || this.contains(pt2)) {
+                        intersectingRegions.add(regions.get(i));
+                        break;
+                    }
+                }
+            }
         }
-
+    
         return intersectingRegions;
     }
 
@@ -284,7 +229,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
         double area = 0;
         int xa, z1, z2;
-
+/* this just does not work
         for (int i = 0; i <= numPoints - 1; i++) {
             xa = points.get(i).getBlockX();
             //za = points.get(i).getBlockZ();
@@ -309,7 +254,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         area = area + (xa * (points.get(1).getBlockZ() - points.get(numPoints - 1).getBlockZ()));
 
         volume = (Math.abs(maxY - minY) + 1) * (int) Math.ceil((Math.abs(area) / 2));
-
+*/
         return volume;
     }
 }
