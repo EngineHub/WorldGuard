@@ -160,8 +160,12 @@ public class WorldGuardEntityListener extends EntityListener {
         if (wcfg.disableExpDrops) {
             event.setDroppedExp(0);
         }
-        if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
-            ((PlayerDeathEvent) event).setDeathMessage("");
+        try {
+            if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
+                ((PlayerDeathEvent) event).setDeathMessage("");
+            }
+        } catch (Throwable t) {
+            // old CraftBukkit, eat it
         }
     }
 
