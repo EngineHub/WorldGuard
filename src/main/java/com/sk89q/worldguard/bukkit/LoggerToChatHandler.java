@@ -38,7 +38,7 @@ public class LoggerToChatHandler extends Handler {
 
     /**
      * Construct the object.
-     * 
+     *
      * @param player
      */
     public LoggerToChatHandler(CommandSender player) {

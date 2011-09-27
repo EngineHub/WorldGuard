@@ -27,7 +27,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author sk89q
  */
 public class DoubleFlag extends Flag<Double> {
-    
+
     public DoubleFlag(String name, char legacyCode) {
         super(name, legacyCode);
     }
@@ -40,7 +40,7 @@ public class DoubleFlag extends Flag<Double> {
     public Double parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat {
         input = input.trim();
-        
+
         try {
             return Double.parseDouble(input);
         } catch (NumberFormatException e) {

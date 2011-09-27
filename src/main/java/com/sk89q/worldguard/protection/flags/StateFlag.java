@@ -27,15 +27,15 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author sk89q
  */
 public class StateFlag extends Flag<StateFlag.State> {
-    
+
     public enum State {
         ALLOW,
         DENY
     }
-    
+
     private boolean def;
     private RegionGroupFlag groupFlag;
-    
+
     public StateFlag(String name, char legacyCode, boolean def) {
         super(name, legacyCode);
         this.def = def;
@@ -62,7 +62,7 @@ public class StateFlag extends Flag<StateFlag.State> {
     public State parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat {
         input = input.trim();
-        
+
         if (input.equalsIgnoreCase("allow")) {
             return State.ALLOW;
         } else if (input.equalsIgnoreCase("deny")) {
@@ -96,5 +96,5 @@ public class StateFlag extends Flag<StateFlag.State> {
             return null;
         }
     }
-    
+
 }

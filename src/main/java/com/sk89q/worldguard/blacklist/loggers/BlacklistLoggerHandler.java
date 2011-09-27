@@ -34,7 +34,7 @@ public interface BlacklistLoggerHandler {
      * @param comment
      */
     public void logEvent(BlacklistEvent event, String comment);
-    
+
     /**
      * Close the logger.
      */

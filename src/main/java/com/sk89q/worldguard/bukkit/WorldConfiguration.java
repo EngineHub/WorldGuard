@@ -457,7 +457,7 @@ public class WorldConfiguration {
     public String getWorldName() {
         return this.worldName;
     }
-    
+
     public boolean isChestProtected(Block block, Player player) {
         if (!signChestProtection) {
             return false;
@@ -468,14 +468,14 @@ public class WorldConfiguration {
         }
         return chestProtection.isProtected(block, player);
     }
-    
+
     public boolean isChestProtected(Block block) {
         if (!signChestProtection) {
             return false;
         }
         return chestProtection.isProtected(block, null);
     }
-    
+
     public boolean isChestProtectedPlacement(Block block, Player player) {
         if (!signChestProtection) {
             return false;

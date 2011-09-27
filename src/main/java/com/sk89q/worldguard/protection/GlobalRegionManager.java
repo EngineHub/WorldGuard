@@ -44,29 +44,29 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 /**
  * This class keeps track of region information for every world. It loads
  * world region information as needed.
- * 
+ *
  * @author sk89q
  * @author Redecouverte
  */
 public class GlobalRegionManager {
 
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-    
+
     /**
      * Reference to the plugin.
      */
     private WorldGuardPlugin plugin;
-    
+
     /**
      * Reference to the global configuration.
      */
     private ConfigurationManager config;
-    
+
     /**
      * Map of managers per-world.
      */
     private HashMap<String, RegionManager> managers;
-    
+
     /**
      * Stores the list of modification dates for the world files. This allows
      * WorldGuard to reload files as needed.
@@ -75,8 +75,8 @@ public class GlobalRegionManager {
 
     /**
      * Construct the object.
-     * 
-     * @param plugin 
+     *
+     * @param plugin
      */
     public GlobalRegionManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -92,10 +92,10 @@ public class GlobalRegionManager {
         managers.clear();
         lastModified.clear();
     }
-    
+
     /**
      * Get the path for a world's regions file.
-     * 
+     *
      * @param name
      * @return
      */
@@ -106,7 +106,7 @@ public class GlobalRegionManager {
 
     /**
      * Unload region information for a world.
-     * 
+     *
      * @param name
      */
     public void unload(String name) {
@@ -128,14 +128,14 @@ public class GlobalRegionManager {
 
     /**
      * Load region information for a world.
-     * 
+     *
      * @param world
-     * @return 
+     * @return
      */
     public RegionManager load(World world) {
         String name = world.getName();
         File file = getPath(name);
-        
+
         try {
             // Create a manager
             RegionManager manager = new FlatRegionManager(new YAMLDatabase(file));
@@ -147,7 +147,7 @@ public class GlobalRegionManager {
 
             // Store the last modification date so we can track changes
             lastModified.put(name, file.lastModified());
-            
+
             return manager;
         } catch (FileNotFoundException e) {
             logger.warning("WorldGuard: Region file for world \""
@@ -159,11 +159,11 @@ public class GlobalRegionManager {
             logger.warning("WorldGuard: Error loading regions for world \""
                     + name + "\":" + e.getMessage());
         }
-        
+
         // @TODO: THIS CREATES PROBLEMS!!
         return null;
     }
-    
+
     /**
      * Preloads region managers for all worlds.
      */
@@ -183,7 +183,7 @@ public class GlobalRegionManager {
             File file = getPath(name);
 
             Long oldDate = lastModified.get(name);
-            
+
             if (oldDate == null) {
                 oldDate = 0L;
             }
@@ -191,7 +191,7 @@ public class GlobalRegionManager {
             try {
                 if (file.lastModified() > oldDate) {
                     World world = plugin.getServer().getWorld(name);
-                    
+
                     if (world != null) {
                         load(world);
                     }
@@ -203,7 +203,7 @@ public class GlobalRegionManager {
 
     /**
      * Get the region manager for a particular world.
-     * 
+     *
      * @param world
      * @return
      */
@@ -228,10 +228,10 @@ public class GlobalRegionManager {
         return player.hasPermission("worldguard.region.bypass."
                         + world.getName());
     }
-    
+
     /**
      * Returns whether the player can bypass.
-     * 
+     *
      * @param player
      * @param world
      * @return
@@ -240,33 +240,33 @@ public class GlobalRegionManager {
         return plugin.hasPermission(player, "worldguard.region.bypass."
                         + world.getName());
     }
-    
+
     /**
      * Check if a player has permission to build at a block.
-     * 
+     *
      * @param player
-     * @param block 
+     * @param block
      * @return
      */
     public boolean canBuild(Player player, Block block) {
         return canBuild(player, block.getLocation());
     }
-    
+
     /**
      * Check if a player has permission to build at a location.
-     * 
+     *
      * @param player
-     * @param loc 
+     * @param loc
      * @return
      */
     public boolean canBuild(Player player, Location loc) {
         World world = loc.getWorld();
         WorldConfiguration worldConfig = config.get(world);
-        
+
         if (!worldConfig.useRegions) {
             return true;
         }
-    
+
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
         if (!hasBypass(player, world)) {
@@ -280,10 +280,10 @@ public class GlobalRegionManager {
 
         return true;
     }
-    
+
     /**
      * Checks to see whether a flag is allowed.
-     * 
+     *
      * @param flag
      * @param loc
      * @return
@@ -291,11 +291,11 @@ public class GlobalRegionManager {
     public boolean allows(StateFlag flag, Location loc) {
         World world = loc.getWorld();
         WorldConfiguration worldConfig = config.get(world);
-        
+
         if (!worldConfig.useRegions) {
             return true;
         }
-        
+
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         return mgr.getApplicableRegions(toVector(loc)).allows(flag);
     }

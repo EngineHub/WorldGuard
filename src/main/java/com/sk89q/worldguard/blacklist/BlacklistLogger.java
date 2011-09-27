@@ -60,7 +60,7 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
     public void clearHandlers() {
         handlers.clear();
     }
-    
+
     /**
      * Log an event.
      *

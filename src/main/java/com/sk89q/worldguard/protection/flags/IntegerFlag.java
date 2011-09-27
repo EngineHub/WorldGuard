@@ -27,7 +27,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author sk89q
  */
 public class IntegerFlag extends Flag<Integer> {
-    
+
     public IntegerFlag(String name, char legacyCode) {
         super(name, legacyCode);
     }
@@ -40,7 +40,7 @@ public class IntegerFlag extends Flag<Integer> {
     public Integer parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat {
         input = input.trim();
-        
+
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {

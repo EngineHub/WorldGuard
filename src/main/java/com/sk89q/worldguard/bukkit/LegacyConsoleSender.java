@@ -16,11 +16,11 @@ import org.bukkit.plugin.Plugin;
 */
 class LegacyConsoleSender implements CommandSender {
     private Server server;
-    
+
     public LegacyConsoleSender(Server server) {
         this.server = server;
     }
-    
+
     public void sendMessage(String message) {
         WorldGuardPlugin.logger.info(message);
     }
@@ -28,7 +28,7 @@ class LegacyConsoleSender implements CommandSender {
     public Server getServer() {
         return server;
     }
-    
+
     public String getName() {
         return "CONSOLE";
     }

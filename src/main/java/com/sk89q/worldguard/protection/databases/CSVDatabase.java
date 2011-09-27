@@ -44,12 +44,12 @@ import com.sk89q.worldguard.util.ArrayReader;
 
 /**
  * Represents a protected area database that uses CSV files.
- * 
+ *
  * @author sk89q
  */
 public class CSVDatabase extends AbstractProtectionDatabase {
     private static Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-    
+
     /**
      * References the CSV file.
      */
@@ -58,11 +58,11 @@ public class CSVDatabase extends AbstractProtectionDatabase {
      * Holds the list of regions.
      */
     private Map<String,ProtectedRegion> regions;
-    
+
     /**
      * Construct the database with a path to a file. No file is read or
      * written at this time.
-     * 
+     *
      * @param file
      */
     public CSVDatabase(File file) {
@@ -84,28 +84,28 @@ public class CSVDatabase extends AbstractProtectionDatabase {
                 new HashMap<String,ProtectedRegion>();
         Map<ProtectedRegion,String> parentSets =
                 new LinkedHashMap<ProtectedRegion, String>();
-        
+
         CSVReader reader = new CSVReader(new FileReader(file));
-        
+
         try {
             String[] line;
-            
+
             while ((line = reader.readNext()) != null) {
                 if (line.length < 2) {
                     logger.warning("Invalid region definition: " + line);
                     continue;
                 }
-                
+
                 String id = line[0].toLowerCase().replace(".", "");
                 String type = line[1];
                 ArrayReader<String> entries = new ArrayReader<String>(line);
-                
+
                 if (type.equalsIgnoreCase("cuboid")) {
                     if (line.length < 8) {
                         logger.warning("Invalid region definition: " + line);
                         continue;
                     }
-                    
+
                     Vector pt1 = new Vector(
                             Integer.parseInt(line[2]),
                             Integer.parseInt(line[3]),
@@ -117,12 +117,12 @@ public class CSVDatabase extends AbstractProtectionDatabase {
 
                     BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
                     BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
-                    
+
                     int priority = entries.get(8) == null ? 0 : Integer.parseInt(entries.get(8));
                     String ownersData = entries.get(9);
                     String flagsData = entries.get(10);
                     //String enterMessage = nullEmptyString(entries.get(11));
-                    
+
                     ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
                     region.setPriority(priority);
                     parseFlags(region, flagsData);
@@ -140,7 +140,7 @@ public class CSVDatabase extends AbstractProtectionDatabase {
 
                     BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
                     BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
-                    
+
                     int priority = entries.get(8) == null ? 0 : Integer.parseInt(entries.get(8));
                     String parentId = entries.get(9);
                     String ownersData = entries.get(10);
@@ -148,14 +148,14 @@ public class CSVDatabase extends AbstractProtectionDatabase {
                     String flagsData = entries.get(12);
                     //String enterMessage = nullEmptyString(entries.get(13));
                     //String leaveMessage = nullEmptyString(entries.get(14));
-                    
+
                     ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
                     region.setPriority(priority);
                     parseFlags(region, flagsData);
                     region.setOwners(this.parseDomains(ownersData));
                     region.setMembers(this.parseDomains(membersData));
                     regions.put(id, region);
-                    
+
                     // Link children to parents later
                     if (parentId.length() > 0) {
                         parentSets.put(region, parentId);
@@ -168,7 +168,7 @@ public class CSVDatabase extends AbstractProtectionDatabase {
             } catch (IOException e) {
             }
         }
-        
+
         for (Map.Entry<ProtectedRegion, String> entry : parentSets.entrySet()) {
             ProtectedRegion parent = regions.get(entry.getValue());
             if (parent != null) {
@@ -182,13 +182,13 @@ public class CSVDatabase extends AbstractProtectionDatabase {
                 logger.warning("Unknown region parent: " + entry.getValue());
             }
         }
-        
+
         this.regions = regions;
     }
-    
+
     /**
      * Used to parse the specified domain in the CSV file.
-     * 
+     *
      * @param data
      * @return
      */
@@ -196,19 +196,19 @@ public class CSVDatabase extends AbstractProtectionDatabase {
         if (data == null) {
             return new DefaultDomain();
         }
-        
+
         DefaultDomain domain = new DefaultDomain();
         Pattern pattern = Pattern.compile("^([A-Za-z]):(.*)$");
-        
+
         String[] parts = data.split(",");
-        
+
         for (String part : parts) {
             if (part.trim().length() == 0) {
                 continue;
             }
-            
+
             Matcher matcher = pattern.matcher(part);
-            
+
             if (!matcher.matches()) {
                 logger.warning("Invalid owner specification: " + part);
                 continue;
@@ -225,22 +225,22 @@ public class CSVDatabase extends AbstractProtectionDatabase {
                 logger.warning("Unknown owner specification: " + type);
             }
         }
-        
+
         return domain;
     }
-    
+
     /**
      * Used to parse the list of flags.
-     * 
+     *
      * @param data
      */
     private void parseFlags(ProtectedRegion region, String data) {
         if (data == null) {
             return;
         }
-        
+
         State curState = State.ALLOW;
-        
+
         for (int i = 0; i < data.length(); i++) {
             char k = data.charAt(i);
             if (k == '+') {
@@ -262,7 +262,7 @@ public class CSVDatabase extends AbstractProtectionDatabase {
                 } else {
                     flagStr = String.valueOf(k);
                 }
-                
+
                 StateFlag flag = DefaultFlag.getLegacyFlag(flagStr);
                 if (flag != null) {
                     region.setFlag(flag, curState);
@@ -275,29 +275,29 @@ public class CSVDatabase extends AbstractProtectionDatabase {
 
     /**
      * Used to write the list of domains.
-     * 
+     *
      * @param domain
      * @return
      */
 /*    private String writeDomains(DefaultDomain domain) {
         StringBuilder str = new StringBuilder();
-        
+
         for (String player : domain.getPlayers()) {
             str.append("u:" + player + ",");
         }
-        
+
         for (String group : domain.getGroups()) {
             str.append("g:" + group + ",");
         }
-        
+
         return str.length() > 0 ?
                 str.toString().substring(0, str.length() - 1) : "";
     }*/
-    
+
     /**
      * Helper method to prepend '+' or '-' in front of a flag according
      * to the flag's state.
-     * 
+     *
      * @param state
      * @param flag
      * @return
@@ -309,14 +309,14 @@ public class CSVDatabase extends AbstractProtectionDatabase {
         } else if (state == State.DENY) {
             return "-" + flag;
         }
-        
+
         return "";
     }
 */
 
     /**
      * Returns a null if a string is null or empty.
-     * 
+     *
      * @param str
      * @return
      */

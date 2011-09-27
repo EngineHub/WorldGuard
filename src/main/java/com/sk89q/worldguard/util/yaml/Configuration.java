@@ -38,10 +38,10 @@ import org.yaml.snakeyaml.representer.Representer;
  * a file and call its load() method. For specifying node paths in the
  * various get*() methods, they support SK's path notation, allowing you to
  * select child nodes by delimiting node names with periods.
- * 
+ *
  * <p>
  * For example, given the following configuration file:</p>
- * 
+ *
  * <pre>members:
  *     - Hollie
  *     - Jason
@@ -56,41 +56,41 @@ import org.yaml.snakeyaml.representer.Representer;
  *     cool: false
  *     eats:
  *         babies: true</pre>
- * 
+ *
  * <p>Calling code could access sturmeh's baby eating state by using
  * <code>getBoolean("sturmeh.eats.babies", false)</code>. For lists, there are
  * methods such as <code>getStringList</code> that will return a type safe list.
- * 
+ *
  * <p>This class is currently incomplete. It is not yet possible to get a node.
  * </p>
- * 
+ *
  * @author sk89q
  */
 public class Configuration extends ConfigurationNode {
     private Yaml yaml;
     private File file;
     private String header = null;
-    
+
     public Configuration(File file) {
         super(new HashMap<String, Object>());
-        
+
         DumperOptions options = new DumperOptions();
         options.setIndent(2);
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.AUTO);
 
         yaml = new Yaml(new SafeConstructor(), new Representer(), options);
-        
+
         this.file = file;
     }
-    
+
     /**
      * Loads the configuration file.
-     * 
-     * @throws IOException 
+     *
+     * @throws IOException
      */
-    public void load() throws IOException {        
+    public void load() throws IOException {
         FileInputStream stream = null;
-        
+
         try {
             stream = new FileInputStream(file);
             read(yaml.load(new UnicodeReader(stream)));
@@ -179,7 +179,7 @@ public class Configuration extends ConfigurationNode {
 
         return false;
     }
-    
+
     @SuppressWarnings("unchecked")
     private void read(Object input) throws ConfigurationException {
         try {
@@ -192,9 +192,9 @@ public class Configuration extends ConfigurationNode {
             throw new ConfigurationException("Root document must be an key-value structure");
         }
     }
-    
+
     /**
-     * This method returns an empty ConfigurationNode for using as a 
+     * This method returns an empty ConfigurationNode for using as a
      * default in methods that select a node from a node list.
      * @return
      */

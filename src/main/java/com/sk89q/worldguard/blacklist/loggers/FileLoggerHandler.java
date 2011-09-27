@@ -88,7 +88,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * Construct the object.
      *
      * @param pathPattern
-     * @param worldName 
+     * @param worldName
      */
     public FileLoggerHandler(String pathPattern, String worldName) {
         this.pathPattern = pathPattern;
@@ -100,7 +100,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      *
      * @param pathPattern
      * @param cacheSize
-     * @param worldName 
+     * @param worldName
      */
     public FileLoggerHandler(String pathPattern, int cacheSize, String worldName) {
         if (cacheSize < 1) {
@@ -113,7 +113,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
 
     /**
      * Build the path.
-     * 
+     *
      * @return
      */
     private String buildPath(String playerName) {
@@ -159,18 +159,18 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
             } else if (group.matches("%s")) {
                 rep = String.format("%02d", calendar.get(Calendar.SECOND));
             }
-            
+
             m.appendReplacement(buffer, rep);
         }
 
         m.appendTail(buffer);
-        
+
         return buffer.toString();
     }
 
     /**
      * Log a message.
-     * 
+     *
      * @param player
      * @param message
      */
@@ -180,7 +180,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
             String date = dateFormat.format(new Date());
             String line = "[" + date + "] " + player.getName() + ": " + message
                     + (comment != null ? " (" + comment + ")" : "") + "\r\n";
-            
+
             FileLoggerWriter writer = writers.get(path);
 
             // Writer already exists!
@@ -202,7 +202,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
             if (parent != null && !parent.exists()) {
                 parent.mkdirs();
             }
-            
+
             FileWriter stream = new FileWriter(path, true);
             BufferedWriter out = new BufferedWriter(stream);
             out.write(line);
@@ -239,19 +239,19 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
 
     /**
      * Gets the coordinates in text form for the log.
-     * 
+     *
      * @param pos
      * @return
      */
     private String getCoordinates(Vector pos) {
         return "@" + pos.getBlockX() + "," + pos.getBlockY() + "," + pos.getBlockZ();
     }
-    
+
     private void logEvent(BlacklistEvent event, String text, int id, Vector pos, String comment) {
         log(event.getPlayer(), "Tried to " + text + " " + getFriendlyItemName(id)
                 + " " + getCoordinates(pos), comment);
     }
-    
+
     /**
      * Log an event.
      *
@@ -262,37 +262,37 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
         if (event instanceof BlockBreakBlacklistEvent) {
             BlockBreakBlacklistEvent evt = (BlockBreakBlacklistEvent)event;
             logEvent(event, "break", evt.getType(), evt.getPosition(), comment);
-        
+
         // Block place
         } else if (event instanceof BlockPlaceBlacklistEvent) {
             BlockPlaceBlacklistEvent evt = (BlockPlaceBlacklistEvent)event;
             logEvent(event, "place", evt.getType(), evt.getPosition(), comment);
-        
+
         // Block interact
         } else if (event instanceof BlockInteractBlacklistEvent) {
             BlockInteractBlacklistEvent evt = (BlockInteractBlacklistEvent)event;
             logEvent(event, "interact with", evt.getType(), evt.getPosition(), comment);
-        
+
         // Destroy with
         } else if (event instanceof DestroyWithBlacklistEvent) {
             DestroyWithBlacklistEvent evt = (DestroyWithBlacklistEvent)event;
             logEvent(event, "destroy with", evt.getType(), evt.getPosition(), comment);
-            
+
         // Acquire
         } else if (event instanceof ItemAcquireBlacklistEvent) {
             ItemAcquireBlacklistEvent evt = (ItemAcquireBlacklistEvent)event;
             logEvent(event, "acquire", evt.getType(), evt.getPosition(), comment);
-        
+
         // Drop
         } else if (event instanceof ItemDropBlacklistEvent) {
             ItemDropBlacklistEvent evt = (ItemDropBlacklistEvent)event;
             logEvent(event, "drop", evt.getType(), evt.getPosition(), comment);
-            
+
         // Use
         } else if (event instanceof ItemUseBlacklistEvent) {
             ItemUseBlacklistEvent evt = (ItemUseBlacklistEvent)event;
             logEvent(event, "use", evt.getType(), evt.getPosition(), comment);
-        
+
         // Unknown
         } else {
             log(event.getPlayer(), "Unknown event: "

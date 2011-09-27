@@ -45,7 +45,7 @@ public abstract class Blacklist {
      * Logger.
      */
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-    
+
     /**
      * List of entries by block ID.
      */
@@ -73,7 +73,7 @@ public abstract class Blacklist {
 
     /**
      * Returns whether the list is empty.
-     * 
+     *
      * @return
      */
     public boolean isEmpty() {
@@ -82,35 +82,35 @@ public abstract class Blacklist {
 
     /**
      * Get the entries for an item or list.
-     * 
-     * @param id 
-     * @return 
+     *
+     * @param id
+     * @return
      */
     public List<BlacklistEntry> getEntries(int id) {
         return blacklist.get(id);
     }
-    
+
     /**
      * Get the number of individual items that have blacklist entries.
-     * 
+     *
      * @return
      */
     public int getItemCount() {
         return blacklist.size();
     }
-    
+
     /**
      * Returns whether the blacklist is used as a whitelist.
-     * 
+     *
      * @return
      */
     public boolean isWhitelist() {
         return useAsWhitelist;
     }
-    
+
     /**
      * Get the logger.
-     * 
+     *
      * @return
      */
     public BlacklistLogger getLogger() {
@@ -119,7 +119,7 @@ public abstract class Blacklist {
 
     /**
      * Method to handle the event.
-     * 
+     *
      * @param event
      * @param forceRepeat
      * @param silent
@@ -253,36 +253,36 @@ public abstract class Blacklist {
             }
         }
     }
-    
+
     /**
      * Get the last event.
-     * 
+     *
      * @return
      */
     public BlacklistEvent getLastEvent() {
         return lastEvent;
     }
-    
+
     /**
      * Notify administrators.
-     * 
+     *
      * @param event
-     * @param comment 
+     * @param comment
      */
     public void notify(BlacklistEvent event, String comment) {
         lastEvent = event;
-        
-        broadcastNotification(ChatColor.GRAY + "WG: " 
+
+        broadcastNotification(ChatColor.GRAY + "WG: "
                 + ChatColor.LIGHT_PURPLE + event.getPlayer().getName()
                 + ChatColor.GOLD + " (" + event.getDescription() + ") "
                 + ChatColor.WHITE
                 + getFriendlyItemName(event.getType())
                 + (comment != null ? " (" + comment + ")" : "") + ".");
     }
-    
+
     /**
      * Sends a notification to all subscribing users.
-     * 
+     *
      * @param msg
      */
     public abstract void broadcastNotification(String msg);
@@ -305,7 +305,7 @@ public abstract class Blacklist {
 
     /**
      * Get an item's ID from its name.
-     * 
+     *
      * @param name
      */
     private static int getItemID(String name) {
@@ -319,7 +319,7 @@ public abstract class Blacklist {
 
     /**
      * Get an item's friendly name with its ID.
-     * 
+     *
      * @param id
      */
     private static String getFriendlyItemName(int id) {

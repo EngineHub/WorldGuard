@@ -34,16 +34,16 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
  * simple implementation uses a flat list and iterates through the entire list
  * to look for applicable regions, but a more complicated (and more efficient)
  * implementation may use space partitioning techniques.
- * 
+ *
  * @author sk89q
  */
 public abstract class RegionManager {
-    
+
     protected ProtectionDatabase loader;
 
     /**
      * Construct the object.
-     * 
+     *
      * @param loader
      */
     public RegionManager(ProtectionDatabase loader) {
@@ -72,7 +72,7 @@ public abstract class RegionManager {
     /**
      * Get a map of protected regions. Use one of the region manager methods
      * if possible if working with regions.
-     * 
+     *
      * @return map of regions, with keys being region IDs (lowercase)
      */
     public abstract Map<String, ProtectedRegion> getRegions();
@@ -80,7 +80,7 @@ public abstract class RegionManager {
     /**
      * Set a list of protected regions. Keys should be lowercase in the given
      * map fo regions.
-     * 
+     *
      * @param regions map of regions
      */
     public abstract void setRegions(Map<String, ProtectedRegion> regions);
@@ -88,14 +88,14 @@ public abstract class RegionManager {
     /**
      * Adds a region. If a region by the given name already exists, then
      * the existing region will be replaced.
-     * 
+     *
      * @param region region to add
      */
     public abstract void addRegion(ProtectedRegion region);
 
     /**
      * Return whether a region exists by an ID.
-     * 
+     *
      * @param id id of the region, can be mixed-case
      * @return whether the region exists
      */
@@ -103,7 +103,7 @@ public abstract class RegionManager {
 
     /**
      * Get a region by its ID.
-     * 
+     *
      * @param id id of the region, can be mixed-case
      * @return region or null if it doesn't exist
      */
@@ -111,7 +111,7 @@ public abstract class RegionManager {
 
     /**
      * Removes a region, including inheriting children.
-     * 
+     *
      * @param id id of the region, can be mixed-case
      */
     public abstract void removeRegion(String id);
@@ -119,7 +119,7 @@ public abstract class RegionManager {
     /**
      * Get an object for a point for rules to be applied with. Use this in order
      * to query for flag data or membership data for a given point.
-     * 
+     *
      * @param loc Bukkit location
      * @return applicable region set
      */
@@ -130,7 +130,7 @@ public abstract class RegionManager {
     /**
      * Get an object for a point for rules to be applied with. Use this in order
      * to query for flag data or membership data for a given point.
-     * 
+     *
      * @param pt point
      * @return applicable region set
      */
@@ -150,7 +150,7 @@ public abstract class RegionManager {
 
     /**
      * Get a list of region IDs that contain a point.
-     * 
+     *
      * @param pt point
      * @return list of region Ids
      */
@@ -159,7 +159,7 @@ public abstract class RegionManager {
     /**
      * Returns true if the provided region overlaps with any other region that
      * is not owned by the player.
-     * 
+     *
      * @param region region to check
      * @param player player to check against
      * @return whether there is an overlap
