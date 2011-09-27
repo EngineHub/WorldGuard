@@ -25,35 +25,35 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 /**
  *
  * @author sk89q
- * @param <T> 
+ * @param <T>
  */
 public abstract class Flag<T> {
-    
+
     private String name;
     private Character legacyCode;
-    
+
     public Flag(String name, char legacyCode) {
         this.name = name;
         this.legacyCode = legacyCode;
     }
-    
+
     public Flag(String name) {
         this.name = name;
         this.legacyCode = null;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public Character getLegacyCode() {
         return legacyCode;
     }
-    
+
     public abstract T parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat;
-    
+
     public abstract T unmarshal(Object o);
-    
+
     public abstract Object marshal(T o);
 }

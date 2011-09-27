@@ -33,38 +33,38 @@ import com.sk89q.worldguard.protection.flags.Flag;
 
 /**
  * Represents a region of any shape and size that can be protected.
- * 
+ *
  * @author sk89q
  */
 public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
-    
+
     private static final Pattern idPattern = Pattern.compile("^[A-Za-z0-9_,'\\-\\+/]{1,}$");
-    
+
     /**
      * Holds the region's ID.
      */
     private String id;
-    
+
     /**
      * Priority.
      */
     private int priority = 0;
-    
+
     /**
      * Holds the curParent.
      */
     private ProtectedRegion parent;
-    
+
     /**
      * List of owners.
      */
     private DefaultDomain owners = new DefaultDomain();
-    
+
     /**
      * List of members.
      */
     private DefaultDomain members = new DefaultDomain();
-    
+
     /**
      * List of flags.
      */
@@ -113,7 +113,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public void setPriority(int priority) {
         this.priority = priority;
     }
-    
+
     /**
      * @return the curParent
      */
@@ -124,20 +124,20 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Set the curParent. This checks to make sure that it will not result
      * in circular inheritance.
-     * 
+     *
      * @param parent the curParent to setFlag
-     * @throws CircularInheritanceException 
+     * @throws CircularInheritanceException
      */
     public void setParent(ProtectedRegion parent) throws CircularInheritanceException {
         if (parent == null) {
             this.parent = null;
             return;
         }
-        
+
         if (parent == this) {
             throw new CircularInheritanceException();
         }
-        
+
         ProtectedRegion p = parent.getParent();
         while (p != null) {
             if (p == this) {
@@ -145,7 +145,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
             }
             p = p.getParent();
         }
-        
+
         this.parent = parent;
     }
 
@@ -181,16 +181,16 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
     /**
      * Checks whether a region has members or owners.
-     * 
+     *
      * @return whether there are members or owners
      */
     public boolean hasMembersOrOwners() {
         return owners.size() > 0 || members.size() > 0;
     }
-    
+
     /**
      * Checks whether a player is an owner of region or any of its parents.
-     * 
+     *
      * @param player player to check
      * @return whether an owner
      */
@@ -198,23 +198,23 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         if (owners.contains(player)) {
             return true;
         }
-        
+
         ProtectedRegion curParent = getParent();
         while (curParent != null) {
             if (curParent.getOwners().contains(player)) {
                 return true;
             }
-            
+
             curParent = curParent.getParent();
         }
-        
+
         return false;
     }
 
     /**
      * Checks whether a player is a member OR OWNER of the region
      * or any of its parents.
-     * 
+     *
      * @param player player to check
      * @return whether an owner or member
      */
@@ -222,17 +222,17 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         if (owners.contains(player) || members.contains(player)) {
             return true;
         }
-        
+
         ProtectedRegion curParent = getParent();
         while (curParent != null) {
             if (curParent.getOwners().contains(player)
                     || curParent.getMembers().contains(player)) {
                 return true;
             }
-            
+
             curParent = curParent.getParent();
         }
-        
+
         return false;
     }
 
@@ -259,10 +259,10 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
         return false;
     }
-    
+
     /**
      * Get a flag's value.
-     * 
+     *
      * @param <T>
      * @param <V>
      * @param flag
@@ -279,10 +279,10 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         }
         return val;
     }
-    
+
     /**
      * Set a flag's value.
-     * 
+     *
      * @param <T>
      * @param <V>
      * @param flag
@@ -295,20 +295,20 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
             flags.put(flag, val);
         }
     }
-    
+
     /**
      * Get the map of flags.
-     * 
+     *
      * @return
      */
     public Map<Flag<?>, Object> getFlags() {
         return flags;
     }
-    
+
     /**
      * Get the map of flags.
-     * 
-     * @param flags 
+     *
+     * @param flags
      */
     public void setFlags(Map<Flag<?>, Object> flags) {
         this.flags = flags;
@@ -316,22 +316,22 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
     /**
      * Get the number of blocks in this region
-     * 
+     *
      * @return
      */
     public abstract int volume();
-    
+
     /**
      * Check to see if a point is inside this region.
-     * 
+     *
      * @param pt
      * @return
      */
     public abstract boolean contains(Vector pt);
-    
+
     /**
      * Compares to another region.
-     * 
+     *
      * @param other
      * @return
      */
@@ -349,14 +349,14 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
     /**
      * Return the type of region as a user-friendly, lowercase name.
-     * 
+     *
      * @return type of region
      */
     public abstract String getTypeName();
 
     /**
      * Get a list of intersecting regions.
-     * 
+     *
      * @param regions
      * @return
      * @throws UnsupportedIntersectionException
@@ -364,17 +364,17 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public abstract List<ProtectedRegion> getIntersectingRegions(
             List<ProtectedRegion> regions)
             throws UnsupportedIntersectionException;
-    
+
     /**
      * Checks to see if the given ID is accurate.
-     * 
+     *
      * @param id
      * @return
      */
     public static boolean isValidId(String id) {
         return idPattern.matcher(id).matches();
     }
-    
+
     /**
      * Returns the hash code.
      */
@@ -382,7 +382,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public int hashCode(){
         return id.hashCode();
     }
-    
+
     /**
      * Returns whether this region has the same ID as another region.
      */
@@ -391,15 +391,15 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         if (!(obj instanceof ProtectedRegion)) {
             return false;
         }
-        
+
         ProtectedRegion other = (ProtectedRegion) obj;
         return other.getId().equals(getId());
     }
-    
+
     /**
      * Thrown when setting a curParent would create a circular inheritance
      * situation.
-     * 
+     *
      */
     public static class CircularInheritanceException extends Exception {
         private static final long serialVersionUID = 7479613488496776022L;

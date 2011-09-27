@@ -39,7 +39,7 @@ public class RegionGroupFlag extends Flag<RegionGroupFlag.RegionGroup> {
     }
 
     private RegionGroup def;
-    
+
     public RegionGroupFlag(String name, char legacyCode, RegionGroup def) {
         super(name, legacyCode);
         this.def = def;
@@ -58,7 +58,7 @@ public class RegionGroupFlag extends Flag<RegionGroupFlag.RegionGroup> {
     public RegionGroup parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat {
         input = input.trim();
-        
+
         if (input.equalsIgnoreCase("members") || input.equalsIgnoreCase("member")) {
             return RegionGroup.MEMBERS;
         } else if (input.equalsIgnoreCase("owners") || input.equalsIgnoreCase("owner")) {
@@ -149,5 +149,5 @@ public class RegionGroupFlag extends Flag<RegionGroupFlag.RegionGroup> {
 
         return false;
     }
-    
+
 }

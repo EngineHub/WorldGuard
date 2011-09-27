@@ -155,7 +155,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
             BlockVector rMaxPoint = region.getMaximumPoint();
 
             // Check whether the region is outside the min and max vector
-            if ((rMinPoint.getBlockX() < min.getBlockX() && rMaxPoint.getBlockX() < min.getBlockX()) 
+            if ((rMinPoint.getBlockX() < min.getBlockX() && rMaxPoint.getBlockX() < min.getBlockX())
                             || (rMinPoint.getBlockX() > max.getBlockX() && rMaxPoint.getBlockX() > max.getBlockX())
                     && ((rMinPoint.getBlockY() < min.getBlockY() && rMaxPoint.getBlockY() < min.getBlockY())
                             || (rMinPoint.getBlockY() > max.getBlockY() && rMaxPoint.getBlockY() > max.getBlockY()))
@@ -190,7 +190,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
                     }
                 }
             } else if (region instanceof ProtectedCuboidRegion) {
-                BlockVector ptcMin = region.getMinimumPoint(); 
+                BlockVector ptcMin = region.getMinimumPoint();
                 BlockVector ptcMax = region.getMaximumPoint();
 
                 if (this.contains(new Vector(ptcMin.getBlockX(), ptcMin.getBlockY(), ptcMin.getBlockZ()))
@@ -205,7 +205,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
                     continue;
                 }
             } else {
-                throw new UnsupportedOperationException("Not supported yet."); 
+                throw new UnsupportedOperationException("Not supported yet.");
             }
 
             // Check whether the current regions edges collide with the regions edges
@@ -261,7 +261,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     /**
      * Return the type of region as a user-friendly name.
-     * 
+     *
      * @return type of region
      */
     @Override
@@ -271,7 +271,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     /**
      * Get the number of Blocks in this region
-     * 
+     *
      * @return
      */
     @Override

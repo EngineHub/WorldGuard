@@ -34,12 +34,12 @@ import com.sk89q.worldguard.blacklist.Blacklist;
 /**
  * Represents the global configuration and also delegates configuration
  * for individual worlds.
- * 
+ *
  * @author sk89q
  * @author Michael
  */
 public class ConfigurationManager {
-    
+
     private static final String CONFIG_HEADER = "#\r\n" +
             "# WorldGuard's main configuration file\r\n" +
             "#\r\n" +
@@ -65,22 +65,22 @@ public class ConfigurationManager {
      * Reference to the plugin.
      */
     private WorldGuardPlugin plugin;
-    
+
     /**
      * Holds configurations for different worlds.
      */
     private Map<String, WorldConfiguration> worlds;
-    
+
     /**
      * List of people with god mode.
      */
     private Set<String> hasGodMode = new HashSet<String>();
-    
+
     /**
      * List of people who can breathe underwater.
      */
     private Set<String> hasAmphibious = new HashSet<String>();
-    
+
     public boolean suppressTickSyncWarnings;
     public boolean useRegionsScheduler;
     public boolean activityHaltToggle = false;
@@ -89,7 +89,7 @@ public class ConfigurationManager {
 
     /**
      * Construct the object.
-     * 
+     *
      * @param plugin
      */
     public ConfigurationManager(WorldGuardPlugin plugin) {
@@ -104,7 +104,7 @@ public class ConfigurationManager {
         // Create the default configuration file
         WorldGuardPlugin.createDefaultConfiguration(
                 new File(plugin.getDataFolder(), "config.yml"), "config.yml");
-        
+
         Configuration config = plugin.getConfiguration();
         config.load();
 
@@ -139,14 +139,14 @@ public class ConfigurationManager {
 
     /**
      * Get the configuration for a world.
-     * 
+     *
      * @param world
      * @return
      */
     public WorldConfiguration get(World world) {
         String worldName = world.getName();
         WorldConfiguration config = worlds.get(worldName);
-        
+
         if (config == null) {
             config = new WorldConfiguration(plugin, worldName);
             worlds.put(worldName, config);
@@ -157,75 +157,75 @@ public class ConfigurationManager {
 
     /**
      * Forget a player.
-     * 
+     *
      * @param player
      */
     public void forgetPlayer(LocalPlayer player) {
         for (Map.Entry<String, WorldConfiguration> entry
                 : worlds.entrySet()) {
-            
+
             // The blacklist needs to forget players
             Blacklist bl = entry.getValue().getBlacklist();
             if (bl != null) {
                 bl.forgetPlayer(player);
             }
         }
-        
+
         hasGodMode.remove(player.getName());
         hasAmphibious.remove(player.getName());
     }
-    
+
     /**
      * Enable god mode for a player.
-     * 
+     *
      * @param player
      */
     public void enableGodMode(Player player) {
         hasGodMode.add(player.getName());
     }
-    
+
     /**
      * Disable god mode for a player.
-     * 
+     *
      * @param player
      */
     public void disableGodMode(Player player) {
         hasGodMode.remove(player.getName());
     }
-    
+
     /**
      * Check to see if god mode is enabled for a player.
-     * 
+     *
      * @param player
-     * @return 
+     * @return
      */
     public boolean hasGodMode(Player player) {
         return hasGodMode.contains(player.getName());
     }
-    
+
     /**
      * Enable amphibious mode for a player.
-     * 
+     *
      * @param player
      */
     public void enableAmphibiousMode(Player player) {
         hasAmphibious.add(player.getName());
     }
-    
+
     /**
      * Disable amphibious mode  for a player.
-     * 
+     *
      * @param player
      */
     public void disableAmphibiousMode(Player player) {
         hasAmphibious.remove(player.getName());
     }
-    
+
     /**
      * Check to see if amphibious mode  is enabled for a player.
-     * 
+     *
      * @param player
-     * @return 
+     * @return
      */
     public boolean hasAmphibiousMode(Player player) {
         return hasAmphibious.contains(player.getName());

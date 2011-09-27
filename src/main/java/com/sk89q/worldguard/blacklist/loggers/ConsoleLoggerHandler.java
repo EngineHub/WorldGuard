@@ -41,13 +41,13 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
      * Logger.
      */
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-    
-    
+
+
     private String worldName;
-    
+
     public ConsoleLoggerHandler(String worldName)
     {
-       this.worldName = worldName;    
+       this.worldName = worldName;
     }
 
     /**
@@ -62,49 +62,49 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
             logger.log(Level.INFO, "WorldGuard: [" + worldName + "] " + event.getPlayer().getName()
                     + " tried to break " + getFriendlyItemName(evt.getType())
                     + (comment != null ? " (" + comment + ")" : ""));
-        
+
         // Block place
         } else if (event instanceof BlockPlaceBlacklistEvent) {
             BlockPlaceBlacklistEvent evt = (BlockPlaceBlacklistEvent)event;
             logger.log(Level.INFO, "WorldGuard: [" + worldName + "] " + event.getPlayer().getName()
                     + " tried to place " + getFriendlyItemName(evt.getType())
                     + (comment != null ? " (" + comment + ")" : ""));
-        
+
         // Block interact
         } else if (event instanceof BlockInteractBlacklistEvent) {
             BlockInteractBlacklistEvent evt = (BlockInteractBlacklistEvent)event;
             logger.log(Level.INFO, "WorldGuard: [" + worldName + "] " + event.getPlayer().getName()
                     + " tried to interact with " + getFriendlyItemName(evt.getType())
                     + (comment != null ? " (" + comment + ")" : ""));
-        
+
         // Destroy with
         } else if (event instanceof DestroyWithBlacklistEvent) {
             DestroyWithBlacklistEvent evt = (DestroyWithBlacklistEvent)event;
             logger.log(Level.INFO, "WorldGuard: [" + worldName + "] " + event.getPlayer().getName()
                     + " tried to destroy with " + getFriendlyItemName(evt.getType())
                     + (comment != null ? " (" + comment + ")" : ""));
-        
+
         // Acquire
         } else if (event instanceof ItemAcquireBlacklistEvent) {
             ItemAcquireBlacklistEvent evt = (ItemAcquireBlacklistEvent)event;
             logger.log(Level.INFO, "WorldGuard: [" + worldName + "] " + event.getPlayer().getName()
                     + " tried to acquire " + getFriendlyItemName(evt.getType())
                     + (comment != null ? " (" + comment + ")" : ""));
-        
+
         // Drop
         } else if (event instanceof ItemDropBlacklistEvent) {
             ItemDropBlacklistEvent evt = (ItemDropBlacklistEvent)event;
             logger.log(Level.INFO, "WorldGuard: [" + worldName + "] " + event.getPlayer().getName()
                     + " tried to drop " + getFriendlyItemName(evt.getType())
                     + (comment != null ? " (" + comment + ")" : ""));
-        
+
         // Use
         } else if (event instanceof ItemUseBlacklistEvent) {
             ItemUseBlacklistEvent evt = (ItemUseBlacklistEvent)event;
             logger.log(Level.INFO, "WorldGuard: [" + worldName + "] " + event.getPlayer().getName()
                     + " tried to use " + getFriendlyItemName(evt.getType())
                     + (comment != null ? " (" + comment + ")" : ""));
-        
+
         // Unknown
         } else {
             logger.log(Level.INFO, "WorldGuard: [" + worldName + "] " + event.getPlayer().getName()
@@ -114,7 +114,7 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
 
     /**
      * Get an item's friendly name with its ID.
-     * 
+     *
      * @param id
      */
     private static String getFriendlyItemName(int id) {

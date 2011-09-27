@@ -54,9 +54,9 @@ public class PRTreeRegionManager extends RegionManager {
 
     /**
      * Construct the manager.
-     * 
-     * @param regionloader 
-     * @throws IOException 
+     *
+     * @param regionloader
+     * @throws IOException
      */
     public PRTreeRegionManager(ProtectionDatabase regionloader) throws IOException {
         super(regionloader);
@@ -87,7 +87,7 @@ public class PRTreeRegionManager extends RegionManager {
 
     /**
      * Adds a region.
-     * 
+     *
      * @param region
      */
     @Override
@@ -99,7 +99,7 @@ public class PRTreeRegionManager extends RegionManager {
 
     /**
      * Return whether a region exists by an ID.
-     * 
+     *
      * @param id
      * @return
      */
@@ -110,7 +110,7 @@ public class PRTreeRegionManager extends RegionManager {
 
     /**
      * Get a region by its ID.
-     * 
+     *
      * @param id
      */
     @Override
@@ -120,7 +120,7 @@ public class PRTreeRegionManager extends RegionManager {
 
     /**
      * Removes a region and its children.
-     * 
+     *
      * @param id
      */
     @Override
@@ -150,7 +150,7 @@ public class PRTreeRegionManager extends RegionManager {
 
     /**
      * Get an object for a point for rules to be applied with.
-     * 
+     *
      * @param pt
      * @return
      */
@@ -167,7 +167,7 @@ public class PRTreeRegionManager extends RegionManager {
                 appRegions.add(region);
             }
         }
-        
+
         Collections.sort(appRegions);
 
         return new ApplicableRegionSet(appRegions, regions.get("__global__"));
@@ -190,7 +190,7 @@ public class PRTreeRegionManager extends RegionManager {
 
     /**
      * Get a list of region IDs that contain a point.
-     * 
+     *
      * @param pt
      * @return
      */
@@ -213,7 +213,7 @@ public class PRTreeRegionManager extends RegionManager {
     /**
      * Returns true if the provided region overlaps with any other region that
      * is not owned by the player.
-     * 
+     *
      * @param player
      * @return
      */
@@ -241,7 +241,7 @@ public class PRTreeRegionManager extends RegionManager {
 
     /**
      * Get the number of regions.
-     * 
+     *
      * @return
      */
     @Override

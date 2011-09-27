@@ -31,8 +31,8 @@ public class BlacklistTrackedEvent {
 
     /**
      * Construct the object.
-     * 
-     * @param event 
+     *
+     * @param event
      * @param time
      */
     public BlacklistTrackedEvent(BlacklistEvent event, long time) {

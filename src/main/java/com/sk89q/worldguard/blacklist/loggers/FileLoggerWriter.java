@@ -41,8 +41,8 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
 
     /**
      * Construct the object.
-     * 
-     * @param path 
+     *
+     * @param path
      * @param writer
      */
     public FileLoggerWriter(String path, BufferedWriter writer) {
@@ -53,7 +53,7 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
 
     /**
      * File path.
-     * 
+     *
      * @return
      */
     public String getPath() {
@@ -73,7 +73,7 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
     public long getLastUse() {
         return lastUse;
     }
-    
+
     /**
      * Update last use time.
      */
@@ -83,7 +83,7 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
 
     /**
      * Comparison function.
-     * 
+     *
      * @param other
      * @return
      */

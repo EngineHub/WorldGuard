@@ -33,7 +33,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author sk89q
  */
 public class VectorFlag extends Flag<Vector> {
-    
+
     public VectorFlag(String name, char legacyCode) {
         super(name, legacyCode);
     }
@@ -46,7 +46,7 @@ public class VectorFlag extends Flag<Vector> {
     public Vector parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat {
         input = input.trim();
-        
+
         try {
             return BukkitUtil.toVector(plugin.checkPlayer(sender).getLocation());
         } catch (CommandException e) {
@@ -62,14 +62,14 @@ public class VectorFlag extends Flag<Vector> {
             Object rawX = map.get("x");
             Object rawY = map.get("y");
             Object rawZ = map.get("z");
-            
+
             if (rawX == null || rawY == null || rawZ == null) {
                 return null;
             }
-            
+
             return new Vector(toNumber(rawX), toNumber(rawY), toNumber(rawZ));
         }
-        
+
         return null;
     }
 
@@ -81,7 +81,7 @@ public class VectorFlag extends Flag<Vector> {
         vec.put("z", o.getZ());
         return vec;
     }
-    
+
     private double toNumber(Object o) {
         if (o instanceof Integer) {
             return (Integer) o;

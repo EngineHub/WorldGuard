@@ -27,7 +27,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author sk89q
  */
 public class StringFlag extends Flag<String> {
-    
+
     public StringFlag(String name, char legacyCode) {
         super(name, legacyCode);
     }
@@ -55,5 +55,5 @@ public class StringFlag extends Flag<String> {
     public Object marshal(String o) {
         return o;
     }
-    
+
 }

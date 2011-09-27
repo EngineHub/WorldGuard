@@ -74,12 +74,12 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
 
     /**
      * Construct the object.
-     * 
+     *
      * @param dsn
      * @param user
      * @param pass
-     * @param table 
-     * @param worldName 
+     * @param table
+     * @param worldName
      */
     public DatabaseLoggerHandler(String dsn, String user, String pass, String table, String worldName) {
         this.dsn = dsn;
@@ -91,7 +91,7 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
 
     /**
      * Gets the database connection.
-     * 
+     *
      * @return
      * @throws SQLException
      */
@@ -104,7 +104,7 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
 
     /**
      * Log an event to the database.
-     * 
+     *
      * @param event
      * @param name
      * @param x
@@ -136,7 +136,7 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
                     + e.getMessage());
         }
     }
-    
+
     /**
      * Log an event.
      *
@@ -148,43 +148,43 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
             BlockBreakBlacklistEvent evt = (BlockBreakBlacklistEvent)event;
             logEvent("BREAK", evt.getPlayer(), evt.getPosition(),
                     evt.getType(), comment);
-        
+
         // Block place
         } else if (event instanceof BlockPlaceBlacklistEvent) {
             BlockPlaceBlacklistEvent evt = (BlockPlaceBlacklistEvent)event;
             logEvent("PLACE", evt.getPlayer(), evt.getPosition(),
                     evt.getType(), comment);
-            
+
         // Block interact
         } else if (event instanceof BlockInteractBlacklistEvent) {
             BlockInteractBlacklistEvent evt = (BlockInteractBlacklistEvent)event;
             logEvent("INTERACT", evt.getPlayer(), evt.getPosition(),
                     evt.getType(), comment);
-        
+
         // Destroy with
         } else if (event instanceof DestroyWithBlacklistEvent) {
             DestroyWithBlacklistEvent evt = (DestroyWithBlacklistEvent)event;
             logEvent("DESTROY_WITH", evt.getPlayer(), evt.getPosition(),
                     evt.getType(), comment);
-        
+
         // Acquire
         } else if (event instanceof ItemAcquireBlacklistEvent) {
             ItemAcquireBlacklistEvent evt = (ItemAcquireBlacklistEvent)event;
             logEvent("ACQUIRE", evt.getPlayer(), evt.getPlayer().getPosition(),
                     evt.getType(), comment);
-        
+
         // Drop
         } else if (event instanceof ItemDropBlacklistEvent) {
             ItemDropBlacklistEvent evt = (ItemDropBlacklistEvent)event;
             logEvent("DROP", evt.getPlayer(), evt.getPlayer().getPosition(),
                     evt.getType(), comment);
-        
+
         // Use
         } else if (event instanceof ItemUseBlacklistEvent) {
             ItemUseBlacklistEvent evt = (ItemUseBlacklistEvent)event;
             logEvent("USE", evt.getPlayer(), evt.getPlayer().getPosition(),
                     evt.getType(), comment);
-        
+
         // Unknown
         } else {
             logEvent("UNKNOWN", event.getPlayer(), event.getPlayer().getPosition(),
@@ -201,7 +201,7 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
                 conn.close();
             }
         } catch (SQLException e) {
-            
+
         }
     }
 }

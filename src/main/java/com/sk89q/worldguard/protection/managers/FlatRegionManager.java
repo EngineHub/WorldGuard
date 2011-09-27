@@ -36,7 +36,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
  * A very simple implementation of the region manager that uses a flat list
  * and iterates through the list to identify applicable regions. This method
  * is not very efficient.
- * 
+ *
  * @author sk89q
  */
 public class FlatRegionManager extends RegionManager {
@@ -48,8 +48,8 @@ public class FlatRegionManager extends RegionManager {
 
     /**
      * Construct the manager.
-     * 
-     * @param regionloader 
+     *
+     * @param regionloader
      */
     public FlatRegionManager(ProtectionDatabase regionloader) {
         super(regionloader);
@@ -76,7 +76,7 @@ public class FlatRegionManager extends RegionManager {
 
     /**
      * Adds a region.
-     * 
+     *
      * @param region
      */
     @Override
@@ -86,7 +86,7 @@ public class FlatRegionManager extends RegionManager {
 
     /**
      * Removes a region and its children.
-     * 
+     *
      * @param id
      */
     @Override
@@ -112,7 +112,7 @@ public class FlatRegionManager extends RegionManager {
 
     /**
      * Return whether a region exists by an ID.
-     * 
+     *
      * @param id
      * @return
      */
@@ -123,7 +123,7 @@ public class FlatRegionManager extends RegionManager {
 
     /**
      * Get a region by its ID.
-     * 
+     *
      * @param id
      */
     @Override
@@ -133,7 +133,7 @@ public class FlatRegionManager extends RegionManager {
 
     /**
      * Get an object for a point for rules to be applied with.
-     * 
+     *
      * @param pt
      * @return
      */
@@ -145,16 +145,16 @@ public class FlatRegionManager extends RegionManager {
         for (ProtectedRegion region : regions.values()) {
             if (region.contains(pt)) {
                 appRegions.add(region);
-                
+
                 ProtectedRegion parent = region.getParent();
-                
+
                 while (parent != null) {
                     if (!appRegions.contains(parent)) {
                         appRegions.add(region);
                     }
-                    
+
                     parent = parent.getParent();
-                }       
+                }
             }
         }
 
@@ -184,7 +184,7 @@ public class FlatRegionManager extends RegionManager {
 
     /**
      * Get a list of region IDs that contain a point.
-     * 
+     *
      * @param pt
      * @return
      */
@@ -203,7 +203,7 @@ public class FlatRegionManager extends RegionManager {
 
     /**
      * Get an object for a region for rules to be applied with.
-     * 
+     *
      * @return
      */
     @Override
@@ -213,7 +213,7 @@ public class FlatRegionManager extends RegionManager {
         appRegions.addAll(regions.values());
 
         List<ProtectedRegion> intersectRegions;
-        
+
         try {
             intersectRegions = checkRegion.getIntersectingRegions(appRegions);
         } catch (Exception e) {
@@ -226,7 +226,7 @@ public class FlatRegionManager extends RegionManager {
     /**
      * Returns true if the provided region overlaps with any other region that
      * is not owned by the player.
-     * 
+     *
      * @param player
      * @return
      */
@@ -254,7 +254,7 @@ public class FlatRegionManager extends RegionManager {
 
     /**
      * Get the number of regions.
-     * 
+     *
      * @return
      */
     @Override

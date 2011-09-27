@@ -26,7 +26,7 @@ import org.bukkit.entity.CreatureType;
  * @author sk89q
  */
 public final class DefaultFlag {
-    
+
     public static final StateFlag PASSTHROUGH = new StateFlag("passthrough", 'z', false);
     public static final StateFlag BUILD = new StateFlag("build", 'b', true);
     public static final StateFlag PVP = new StateFlag("pvp", 'p', true);
@@ -101,17 +101,17 @@ public final class DefaultFlag {
         ENTRY.setGroupFlag(ENTRY_PERM);
         EXIT.setGroupFlag(EXIT_PERM);
     }
-    
+
     private DefaultFlag() {
     }
-    
+
     public static Flag<?>[] getFlags() {
         return flagsList;
     }
-    
+
     /**
      * Get the legacy flag.
-     * 
+     *
      * @param flagString
      * @return null if not found
      */
@@ -121,7 +121,7 @@ public final class DefaultFlag {
                 return (StateFlag) flag;
             }
         }
-        
+
         return null;
     }
 }

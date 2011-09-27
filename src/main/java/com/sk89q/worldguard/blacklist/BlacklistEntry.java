@@ -54,7 +54,7 @@ public class BlacklistEntry {
      * List of permissions to not affect.
      */
     private Set<String> ignorePermissions;
-    
+
     private String[] breakActions;
     private String[] destroyWithActions;
     private String[] placeActions;
@@ -62,13 +62,13 @@ public class BlacklistEntry {
     private String[] useActions;
     private String[] dropActions;
     private String[] acquireActions;
-    
+
     private String message;
     private String comment;
 
     /**
      * Construct the object.
-     * 
+     *
      * @param blacklist
      */
     public BlacklistEntry(Blacklist blacklist) {
@@ -262,35 +262,35 @@ public class BlacklistEntry {
 
         return false;
     }
-    
+
     /**
      * Get the associated actions with an event.
-     * 
+     *
      * @param event
      * @return
      */
     private String[] getActions(BlacklistEvent event) {
         if (event instanceof BlockBreakBlacklistEvent) {
             return breakActions;
-            
+
         } else if (event instanceof BlockPlaceBlacklistEvent) {
             return placeActions;
-            
+
         } else if (event instanceof BlockInteractBlacklistEvent) {
             return interactActions;
-            
+
         } else if (event instanceof DestroyWithBlacklistEvent) {
             return destroyWithActions;
-            
+
         } else if (event instanceof ItemAcquireBlacklistEvent) {
             return acquireActions;
-            
+
         } else if (event instanceof ItemDropBlacklistEvent) {
             return dropActions;
-            
+
         } else if (event instanceof ItemUseBlacklistEvent) {
             return useActions;
-            
+
         } else {
             return null;
         }
@@ -298,8 +298,8 @@ public class BlacklistEntry {
 
     /**
      * Method to handle the event.
-     * 
-     * @param useAsWhitelist 
+     *
+     * @param useAsWhitelist
      * @param event
      * @param forceRepeat
      * @param silent
@@ -307,7 +307,7 @@ public class BlacklistEntry {
      */
     public boolean check(boolean useAsWhitelist, BlacklistEvent event, boolean forceRepeat, boolean silent) {
         LocalPlayer player = event.getPlayer();
-        
+
         if (shouldIgnore(player)) {
             return true;
         }
@@ -328,21 +328,21 @@ public class BlacklistEntry {
 
         String actions[] = getActions(event);
 
-        
+
         boolean ret = useAsWhitelist ? false : true;
-        
+
         // Nothing to do
         if (actions == null) {
             return useAsWhitelist ? false : true;
         }
-        
+
         for (String action : actions) {
             // Deny
             if (action.equalsIgnoreCase("deny")) {
                 if (silent) {
                     return false;
                 }
-                
+
                 ret = false;
 
             // Allow
@@ -358,7 +358,7 @@ public class BlacklistEntry {
                 if (silent) {
                     continue;
                 }
-                
+
                 if (this.message != null) {
                     player.kick(String.format(this.message,
                             getFriendlyItemName(event.getType())));
@@ -372,7 +372,7 @@ public class BlacklistEntry {
                 if (silent) {
                     continue;
                 }
-                
+
                 if (this.message != null) {
                     player.ban("Banned: " + String.format(this.message,
                             getFriendlyItemName(event.getType())));
@@ -381,12 +381,12 @@ public class BlacklistEntry {
                             + event.getDescription() + " "
                             + getFriendlyItemName(event.getType()));
                 }
-            
+
             } else if (!silent && (!repeating || forceRepeat)) {
                 // Notify
                 if (action.equalsIgnoreCase("notify")) {
                     blacklist.notify(event, comment);
-                
+
                 // Log
                 } else if (action.equalsIgnoreCase("log")) {
                     blacklist.getLogger().logEvent(event, comment);
@@ -411,7 +411,7 @@ public class BlacklistEntry {
 
     /**
      * Get an item's friendly name with its ID.
-     * 
+     *
      * @param id
      */
     private static String getFriendlyItemName(int id) {

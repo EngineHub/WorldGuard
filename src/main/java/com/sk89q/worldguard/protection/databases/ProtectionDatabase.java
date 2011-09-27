@@ -27,46 +27,46 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**
  * Represents a database to read and write lists of regions from and to.
- * 
+ *
  * @author sk89q
  */
 public interface ProtectionDatabase {
     /**
      * Load the list of regions. The method should not modify the list returned
      * by getRegions() unless the load finishes successfully.
-     * 
+     *
      * @throws IOException
      */
     public void load() throws IOException;
     /**
      * Save the list of regions.
-     * 
+     *
      * @throws IOException
      */
     public void save() throws IOException;
     /**
      * Load the list of regions into a region manager.
-     * 
-     * @param manager 
+     *
+     * @param manager
      * @throws IOException
      */
     public void load(RegionManager manager) throws IOException;
     /**
      * Save the list of regions from a region manager.
-     * 
-     * @param manager 
+     *
+     * @param manager
      * @throws IOException
      */
     public void save(RegionManager manager) throws IOException;
     /**
      * Get a list of regions.
-     * 
+     *
      * @return
      */
     public Map<String,ProtectedRegion> getRegions();
     /**
      * Set the list of regions.
-     * 
+     *
      * @param regions
      */
     public void setRegions(Map<String,ProtectedRegion> regions);
