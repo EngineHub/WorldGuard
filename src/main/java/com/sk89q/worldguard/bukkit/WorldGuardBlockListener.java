@@ -231,6 +231,7 @@ public class WorldGuardBlockListener extends BlockListener {
 
         boolean isWater = blockFrom.getTypeId() == 8 || blockFrom.getTypeId() == 9;
         boolean isLava = blockFrom.getTypeId() == 10 || blockFrom.getTypeId() == 11;
+        boolean isAir = blockFrom.getTypeId() == 0;
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
@@ -275,7 +276,7 @@ public class WorldGuardBlockListener extends BlockListener {
         if (wcfg.preventWaterDamage.size() > 0) {
             int targetId = blockTo.getTypeId();
             
-            if ((blockFrom.getTypeId() == 0 || isWater) && 
+            if ((isAir || isWater) &&
                     wcfg.preventWaterDamage.contains(targetId)) {
                 event.setCancelled(true);
                 return;
@@ -302,6 +303,12 @@ public class WorldGuardBlockListener extends BlockListener {
                 && !plugin.getGlobalRegionManager().allows(DefaultFlag.LAVA_FLOW,
                 blockFrom.getLocation())) {
             event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.disableObsidianGenerators && (isAir || isLava)
+                && blockTo.getTypeId() == 55) {
+            blockTo.setTypeId(0);
             return;
         }
     }
