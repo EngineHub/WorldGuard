@@ -152,6 +152,7 @@ public class WorldConfiguration {
     public boolean disableEndermanGriefing;
     public boolean regionInvinciblityRemovesMobs;
     public boolean disableDeathMessages;
+    public boolean disableObsidianGenerators;
 
     /* Configuration data end */
 
@@ -259,6 +260,7 @@ public class WorldConfiguration {
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
+        disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
 
         // classicWater = getBoolean("simulation.classic-water", false);
         simulateSponge = getBoolean("simulation.sponge.enable", true);
