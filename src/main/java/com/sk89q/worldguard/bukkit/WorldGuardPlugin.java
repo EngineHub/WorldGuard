@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +28,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.jar.JarFile;
 import java.util.logging.Filter;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -669,7 +672,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param actual 
      * @param defaultName 
      */
-    public static void createDefaultConfiguration(File actual,
+    public void createDefaultConfiguration(File actual,
             String defaultName) {
         
         // Make parent directories
@@ -682,8 +685,16 @@ public class WorldGuardPlugin extends JavaPlugin {
             return;
         }
 
-        InputStream input = WorldGuardPlugin.class
-                .getResourceAsStream("/defaults/" + defaultName);
+        InputStream input =
+                    null;
+            try {
+                JarFile file = new JarFile(getFile());
+                ZipEntry copy = file.getEntry("defaults" + File.separator + defaultName);
+                if (copy == null) throw new FileNotFoundException();
+                input = file.getInputStream(copy);
+            } catch (IOException e) {
+                logger.severe(getDescription().getName() + ": Unable to read default configuration: " + defaultName);
+            }
         
         if (input != null) {
             FileOutputStream output = null;

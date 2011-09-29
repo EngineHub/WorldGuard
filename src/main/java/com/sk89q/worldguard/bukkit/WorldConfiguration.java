@@ -170,8 +170,8 @@ public class WorldConfiguration {
         this.worldName = worldName;
         this.parentConfig = plugin.getConfiguration();
 
-        WorldGuardPlugin.createDefaultConfiguration(configFile, "config_world.yml");
-        WorldGuardPlugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
+        plugin.createDefaultConfiguration(configFile, "config_world.yml");
+        plugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
 
         config = new Configuration(this.configFile);
         loadConfiguration();
