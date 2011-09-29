@@ -102,7 +102,7 @@ public class ConfigurationManager {
      */
     public void load() {
         // Create the default configuration file
-        WorldGuardPlugin.createDefaultConfiguration(
+        plugin.createDefaultConfiguration(
                 new File(plugin.getDataFolder(), "config.yml"), "config.yml");
 
         Configuration config = plugin.getConfiguration();
