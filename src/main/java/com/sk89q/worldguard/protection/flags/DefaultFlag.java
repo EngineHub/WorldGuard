@@ -45,6 +45,7 @@ public final class DefaultFlag {
     public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
     public static final StateFlag USE = new StateFlag("use", true);
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
+    public static final StateFlag DESTROY_VEHICLE = new StateFlag("vehicle-destroy", false);
     public static final StateFlag PISTONS = new StateFlag("pistons", true);
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
     public static final StateFlag SNOW_MELT = new StateFlag("snow-melt", true);
@@ -83,7 +84,7 @@ public final class DefaultFlag {
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
-        TNT, LIGHTER, USE, PLACE_VEHICLE, SLEEP,
+        TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY,
         CREEPER_EXPLOSION, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
