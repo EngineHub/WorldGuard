@@ -166,6 +166,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardBlockListener(this)).registerEvents();
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
+        (new WorldGuardVehicleListener(this)).registerEvents();
 
         // handle worlds separately to initialize already loaded worlds
         WorldGuardWorldListener worldListener = (new WorldGuardWorldListener(this));

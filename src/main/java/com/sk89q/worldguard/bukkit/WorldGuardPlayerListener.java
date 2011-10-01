@@ -53,6 +53,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
@@ -295,7 +296,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
         
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
-        
+
+        if (player.getVehicle() != null) return; // handled in vehicle listener
         if (wcfg.useRegions) {
             // Did we move a block?
             if (event.getFrom().getBlockX() != event.getTo().getBlockX()
@@ -627,8 +629,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 }
             }
             
-            if ((type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL)
-                   && item.getType() == Material.MINECART) {
+            if (BlockType.isRailBlock(type.getId()) && item.getType() == Material.MINECART) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
