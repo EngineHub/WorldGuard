@@ -690,7 +690,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     null;
             try {
                 JarFile file = new JarFile(getFile());
-                ZipEntry copy = file.getEntry("defaults" + File.separator + defaultName);
+                ZipEntry copy = file.getEntry("defaults/" + defaultName);
                 if (copy == null) throw new FileNotFoundException();
                 input = file.getInputStream(copy);
             } catch (IOException e) {
