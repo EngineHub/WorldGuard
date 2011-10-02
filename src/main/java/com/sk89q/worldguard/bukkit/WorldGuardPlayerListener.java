@@ -106,7 +106,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         registerEvent("PLAYER_RESPAWN", Priority.High);
         registerEvent("PLAYER_ITEM_HELD", Priority.High);
         registerEvent("PLAYER_BED_ENTER", Priority.High);
-        registerEvent("PLAYER_COMMAND_PREPROCESS", Priority.High);
+        registerEvent("PLAYER_COMMAND_PREPROCESS", Priority.Lowest);
         if (plugin.getGlobalStateManager().usePlayerMove) {
             registerEvent("PLAYER_MOVE", Priority.High);
         }
