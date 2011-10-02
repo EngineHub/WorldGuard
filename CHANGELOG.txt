@@ -1,3 +1,55 @@
+5.3:
+- Added new config options and flags to better handle explosions of all types
+- Added config options and flags for snow, ice, mushroom spread, grass spread,
+    and leaf decay
+- Added min and max health flags to clamp the values for the existing healing
+    flags
+- Added hunger flags similar to the existing healing flags
+- Added an option to disable the use of the move event. This can boost
+    performance on large servers but will disable the greeting/farewell
+    and entry/exit flags
+- Added flag to prevent pistons (including those that are outside the
+    region, but would affect blocks inside the region)
+- Added a /wg flushstates [player] command to free players stuck in a
+    region that was exit-deny but no longer exists or the flag was removed
+- Added a config option to disable xp orb dropping
+- Added config option to disable redstone wire obsidian generators
+- Added a vehicle-destroy flag
+- Added enderman protection config and flag
+- Allowed and blocked command flags will now fall back to the global region
+- The worldguard.region.flag.own/member permissions are now
+    worldguard.region.flag.regions.own/member! Please change your permissions
+    accordingly.
+- Made //stack respect max stack sizes unless the player has the
+    worldguard.stack.illegitimate permission
+- Setting invincibility flag to deny will override god mode unless the player
+    has worldguard.god.override-regions
+- The sleep flag will now prevent beds in the nether from
+    exploding if set to deny
+- Existing regions can no longer be accidentally overwritten.
+    Use /region redefine to move an existing region.
+- The info command will now sort players alphabetically
+- Priming TNT by punching it with flint and steal should throw a blacklist
+    event (consistent with old Minecraft versions)
+- The /stoplag command will now remove xp orbs
+- Permissions system will use per-world permissions if the provider supports it
+- Players in vehicles are now subject to entry/exit and greeting/farewell flags
+- Fixed interact blacklist event not logging correctly
+- Fixed heal flag taking effect half a block northeast of the region
+- Fixed a infinite sign dropping bug
+- Fixed players being able to douse fire by punching it in regions they
+    couldn't build it
+- Fixed players being able to eat protected cake
+- Fence gate usage can be blocked with the use flag
+- Fixed chests being unprotected when they should be in 1.8
+- Fixed weather config settings not applying when a world was loaded
+- Fixed explosion handling in certain cases
+- Fixed arrows working in non-pvp zones
+- Fixed buckets working on the border of protected regions in certain cases
+Contributions thanks to:
+wizjany, zml2008, imjake9, Droolio, epuidokas,
+EduardBaer, TomyLobo, and halvors
+
 5.2.2:
 - Changed configuration saving so empty lists will be added to
     the configuration files.
