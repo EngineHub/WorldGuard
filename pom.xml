@@ -35,7 +35,7 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>4.7-SNAPSHOT</version>
+      <version>4.7</version>
     </dependency>
     
     <!-- Bukkit -->
