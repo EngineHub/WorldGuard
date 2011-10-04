@@ -51,6 +51,12 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
     private Map<String, ProtectedRegion> regions;
     
     public YAMLDatabase(File file) {
+        if (!file.exists()) { // shouldn't be necessary, but check anyways
+            try {
+                file.createNewFile();
+            } catch (IOException e) {}
+            // if this is thrown, we can't do anything (caught elsewhere anyway)
+        }
         config = new Configuration(file);
     }
 
