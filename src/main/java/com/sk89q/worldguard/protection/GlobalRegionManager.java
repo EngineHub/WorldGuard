@@ -149,18 +149,18 @@ public class GlobalRegionManager {
             lastModified.put(name, file.lastModified());
 
             return manager;
-        } catch (FileNotFoundException e) {
-            logger.warning("WorldGuard: Region file for world \""
+        } catch (FileNotFoundException e) { // this should no longer happen hopefully
+            logger.info("WorldGuard: Region file for world \""
                     + name + "\" missing or inaccessible.");
         } catch (IOException e) {
-            logger.warning("WorldGuard: Failed to load regions from file "
+            logger.info("WorldGuard: Failed to load regions from file "
                     + file.getAbsolutePath() + " : " + e.getMessage());
         } catch (Exception e) {
-            logger.warning("WorldGuard: Error loading regions for world \""
+            logger.info("WorldGuard: Error loading regions for world \""
                     + name + "\":" + e.getMessage());
         }
 
-        // @TODO: THIS CREATES PROBLEMS!!
+        // @TODO: THIS CREATES PROBLEMS!!one!!1!!eleven!!1!!!
         return null;
     }
 
