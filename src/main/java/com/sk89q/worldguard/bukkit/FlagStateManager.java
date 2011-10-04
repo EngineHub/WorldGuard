@@ -148,6 +148,8 @@ public class FlagStateManager implements Runnable {
     private void processFeed(ApplicableRegionSet applicable, Player player,
             PlayerFlagState state) {
 
+        long now = System.currentTimeMillis();
+
         Integer feedAmount = applicable.getFlag(DefaultFlag.FEED_AMOUNT);
         Integer feedDelay = applicable.getFlag(DefaultFlag.FEED_DELAY);
         Integer minHunger = applicable.getFlag(DefaultFlag.MIN_FOOD);
@@ -164,8 +166,8 @@ public class FlagStateManager implements Runnable {
         }
 
         if (feedDelay <= 0) {
-            player.setFoodLevel(feedAmount > 0 ? maxHunger : minHunger); // this will insta-kill if the flag is unset
-        } else {
+            player.setFoodLevel(feedAmount > 0 ? maxHunger : minHunger);
+        } else if (now - state.lastFeed > feedDelay * 1000) {
             // clamp health between minimum and maximum
             player.setFoodLevel(Math.min(maxHunger, Math.max(minHunger, player.getFoodLevel() + feedAmount)));
         }
@@ -209,6 +211,7 @@ public class FlagStateManager implements Runnable {
      */
     public static class PlayerFlagState {
         public long lastHeal;
+        public long lastFeed;
         public String lastGreeting;
         public String lastFarewell;
         public Boolean lastExitAllowed = null;
