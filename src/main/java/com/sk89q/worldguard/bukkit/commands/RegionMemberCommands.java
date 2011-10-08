@@ -31,6 +31,8 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.RegionUtil;
@@ -99,13 +101,23 @@ public class RegionMemberCommands {
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
-        
-        if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.addowner.own." + id.toLowerCase());
-        } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.addowner.member." + id.toLowerCase());
+
+        Boolean flag = region.getFlag(DefaultFlag.BUYABLE);
+        DefaultDomain owners = region.getOwners();
+        if (flag != null && flag == true && owners != null && owners.size() == 0) {
+            if (mgr.getRegionCountOfPlayer(localPlayer)
+                    >= plugin.getGlobalStateManager().get(world).maxRegionCountPerPlayer) {
+                throw new CommandException("You already own the maximum allowed amount of regions.");
+            }
+            plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
         } else {
-            plugin.checkPermission(sender, "worldguard.region.addowner." + id.toLowerCase());
+            if (region.isOwner(localPlayer)) {
+                plugin.checkPermission(sender, "worldguard.region.addowner.own." + id.toLowerCase());
+            } else if (region.isMember(localPlayer)) {
+                plugin.checkPermission(sender, "worldguard.region.addowner.member." + id.toLowerCase());
+            } else {
+                plugin.checkPermission(sender, "worldguard.region.addowner." + id.toLowerCase());
+            }
         }
 
         RegionUtil.addToDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
