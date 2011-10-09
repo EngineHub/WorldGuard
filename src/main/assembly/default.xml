@@ -28,6 +28,7 @@
       <includes>
         <include>LICENSE.txt</include>
         <include>NOTICE.txt</include>
+        <include>CHANGELOG.txt</include>
         <include>blacklist_table.sql</include>
       </includes>
     </fileSet>
