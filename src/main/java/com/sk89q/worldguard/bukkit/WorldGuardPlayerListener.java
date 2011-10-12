@@ -57,6 +57,7 @@ import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
@@ -563,6 +564,17 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 event.setCancelled(true);
                 return;
             }
+
+            if (item.getType() == Material.TNT) {
+                Block placedOn = block.getRelative(event.getBlockFace());
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !plugin.getGlobalRegionManager().allows(
+                                DefaultFlag.TNT, placedOn.getLocation())) {
+                    event.setUseItemInHand(Result.DENY);
+                    event.setCancelled(true);
+                }
+            }
+
             if (item.getType() == Material.INK_SACK
                     && item.getData() != null
                     && item.getData().getData() == 15 // bonemeal
@@ -570,7 +582,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)) {
                     event.setCancelled(true);
-                    event.setUseInteractedBlock(Result.DENY);
                     event.setUseItemInHand(Result.DENY);
                 }
             }
@@ -599,7 +610,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     return;
                 }
             }
-    
+
             if (type == Material.LEVER
                    || type == Material.STONE_BUTTON
                    || type == Material.NOTE_BLOCK
@@ -628,7 +639,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     return;
                 }
             }
-            
+
             if (BlockType.isRailBlock(type.getId()) && item.getType() == Material.MINECART) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
@@ -674,6 +685,17 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 return;
             }
 
+            // Workaround for http://leaky.bukkit.org/issues/1034
+            if (item.getType() == Material.TNT) {
+                Block placedOn = block.getRelative(event.getBlockFace());
+                if (!wcfg.getBlacklist().check(
+                        new BlockPlaceBlacklistEvent(plugin.wrapPlayer(player), toVector(placedOn),
+                              item.getTypeId()), false, false)) {
+                    event.setUseItemInHand(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         }
 
         if ((block.getType() == Material.CHEST
