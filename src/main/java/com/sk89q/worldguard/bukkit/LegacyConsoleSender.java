@@ -3,7 +3,7 @@ package com.sk89q.worldguard.bukkit;
 import java.util.Set;
 
 import org.bukkit.Server;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -14,10 +14,11 @@ import org.bukkit.plugin.Plugin;
 *
 * @author sk89q
 */
-class LegacyConsoleSender implements CommandSender {
+class LegacyConsoleSender extends ConsoleCommandSender {
     private Server server;
 
     public LegacyConsoleSender(Server server) {
+        super(server);
         this.server = server;
     }
 
