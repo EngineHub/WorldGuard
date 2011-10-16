@@ -57,6 +57,7 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -115,6 +116,7 @@ public class WorldGuardEntityListener extends EntityListener {
         registerEvent("ENDERMAN_PICKUP", Priority.High);
         registerEvent("ENDERMAN_PLACE", Priority.High);
         registerEvent("ENTITY_DEATH", Priority.High);
+        registerEvent("FOOD_LEVEL_CHANGE", Priority.High);
     }
 
     /**
@@ -852,6 +854,16 @@ public class WorldGuardEntityListener extends EntityListener {
             if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, loc)) {
                 event.setCancelled(true);
                 return;
+            }
+        }
+    }
+
+    @Override
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (event.getFoodLevel() < player.getFoodLevel() && isInvincible(player)) {
+                event.setCancelled(true);
             }
         }
     }
