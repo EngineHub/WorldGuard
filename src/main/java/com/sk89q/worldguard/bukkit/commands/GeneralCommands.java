@@ -154,6 +154,7 @@ public class GeneralCommands {
 
         for (Player player : targets) {
             player.setHealth(20);
+            player.setFoodLevel(20);
             
             // Tell the user
             if (player.equals(sender)) {
