@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection.regions;
 
+import java.awt.geom.Line2D;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -470,6 +471,40 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         if (rMinPoint.getBlockZ() > max.getBlockZ()) return false;
 
         return true;
+    }
+
+    /**
+     * Compares all edges of two regions to see if any of them intersect
+     *
+     * @param region
+     * @return
+     */
+    protected boolean intersectsEdges(ProtectedRegion region) {
+        List<BlockVector2D> pts1 = getPoints();
+        List<BlockVector2D> pts2 = region.getPoints();
+        BlockVector2D lastPt1 = pts1.get(pts1.size() - 1);
+        BlockVector2D lastPt2 = pts2.get(pts2.size() - 1);
+        for (int i = 0; i < pts1.size(); i++ ) {
+            for (int j = 0; j < pts2.size(); j++) {
+
+                Line2D line1 = new Line2D.Double(
+                        lastPt1.getBlockX(),
+                        lastPt1.getBlockZ(),
+                        pts1.get(i).getBlockX(),
+                        pts1.get(i).getBlockZ());
+
+                if (line1.intersectsLine(
+                                lastPt2.getBlockX(),
+                                lastPt2.getBlockZ(),
+                                pts2.get(j).getBlockX(),
+                                pts2.get(j).getBlockZ())) {
+                    return true;
+                }
+                lastPt2 = pts2.get(j);
+            }
+            lastPt1 = pts1.get(i);
+        }
+        return false;
     }
 
     /**
