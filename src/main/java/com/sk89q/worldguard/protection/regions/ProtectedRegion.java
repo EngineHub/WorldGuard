@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -37,6 +38,9 @@ import com.sk89q.worldguard.protection.flags.Flag;
  * @author sk89q
  */
 public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
+
+    protected BlockVector min;
+    protected BlockVector max;
 
     private static final Pattern idPattern = Pattern.compile("^[A-Za-z0-9_,'\\-\\+/]{1,}$");
 
@@ -80,6 +84,37 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
+     * Sets the minimum and maximum points of the bounding box for a region
+     *
+     * @param points
+     */
+    protected void setMinMaxPoints(List<Vector> points) {
+        int minX = points.get(0).getBlockX();
+        int minY = points.get(0).getBlockY();
+        int minZ = points.get(0).getBlockZ();
+        int maxX = minX;
+        int maxY = minY;
+        int maxZ = minZ;
+
+        for (Vector v : points) {
+            int x = v.getBlockX();
+            int y = v.getBlockY();
+            int z = v.getBlockZ();
+
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (z < minZ) minZ = z;
+
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+            if (z > maxZ) maxZ = z;
+        }
+        
+        min = new BlockVector(minX, minY, minZ);
+        max = new BlockVector(maxX, maxY, maxZ);
+    }
+
+    /**
      * @return the id
      */
     public String getId() {
@@ -91,14 +126,18 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      *
      * @return min point
      */
-    public abstract BlockVector getMinimumPoint();
+    public BlockVector getMinimumPoint() {
+        return min;
+    }
 
     /**
      * Get the upper point of the cuboid.
      *
      * @return max point
      */
-    public abstract BlockVector getMaximumPoint();
+    public BlockVector getMaximumPoint() {
+        return max;
+    }
 
     /**
      * @return the priority
@@ -315,6 +354,13 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
+     * Gets the 2D points for this region
+     *
+     * @return
+     */
+    public abstract List<BlockVector2D> getPoints();
+
+    /**
      * Get the number of blocks in this region
      *
      * @return
@@ -328,6 +374,43 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @return
      */
     public abstract boolean contains(Vector pt);
+
+    /**
+     * Check to see if a point is inside this region.
+     *
+     * @param pt
+     * @return
+     */
+    public boolean contains(BlockVector2D pt) {
+        return contains(new Vector(pt.getBlockX(), min.getBlockY(), pt.getBlockZ()));
+    }
+
+    /**
+     * Check to see if a point is inside this region.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public boolean contains(int x, int y, int z) {
+        return contains(new Vector(x, y, z));
+    }
+
+    /**
+     * Check to see if any of the 2D points are inside this region.
+     *
+     * @param pts
+     * @return
+     */
+    public boolean containsAny(List<BlockVector2D> pts) {
+        for (BlockVector2D pt : pts) {
+            if (contains(pt)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Compares to another region.
@@ -364,6 +447,30 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     public abstract List<ProtectedRegion> getIntersectingRegions(
             List<ProtectedRegion> regions)
             throws UnsupportedIntersectionException;
+
+    /**
+     * Checks if the bounding box of a region intersects with with the bounding
+     * box of this region
+     *
+     * @param region
+     */
+    protected boolean intersectsBoundingBox(ProtectedRegion region) {
+        BlockVector rMaxPoint = region.getMaximumPoint();
+        BlockVector min = getMinimumPoint();
+
+        if (rMaxPoint.getBlockX() < min.getBlockX()) return false;
+        if (rMaxPoint.getBlockY() < min.getBlockY()) return false;
+        if (rMaxPoint.getBlockZ() < min.getBlockZ()) return false;
+
+        BlockVector rMinPoint = region.getMinimumPoint();
+        BlockVector max = getMaximumPoint();
+
+        if (rMinPoint.getBlockX() > max.getBlockX()) return false;
+        if (rMinPoint.getBlockY() > max.getBlockY()) return false;
+        if (rMinPoint.getBlockZ() > max.getBlockZ()) return false;
+
+        return true;
+    }
 
     /**
      * Checks to see if the given ID is accurate.
