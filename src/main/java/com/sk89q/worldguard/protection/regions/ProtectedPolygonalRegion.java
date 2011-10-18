@@ -71,7 +71,6 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     /**
      * Checks to see if a point is inside this region.
      */
-    // @TODO rewrite this because it doesn't actually work
     @Override
     public boolean contains(Vector pt) {
         int targetX = pt.getBlockX(); //wide

@@ -55,7 +55,7 @@ public class RegionIntersectTest {
         triangle_no_overlap.add(new BlockVector2D(90, 5));
 
         assertIntersection(region, new ProtectedPolygonalRegion("triangle_no_overlap",
-                triangle_overlap, 0, 128),
+                triangle_no_overlap, 0, 128),
                 false);
 
         List<BlockVector2D> triangle_overlap_no_points = new ArrayList<BlockVector2D>();
