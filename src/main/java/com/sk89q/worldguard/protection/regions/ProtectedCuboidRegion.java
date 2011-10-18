@@ -174,12 +174,11 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
                 intersectingRegions.add(region);
                 continue;
             } else if (region instanceof ProtectedPolygonalRegion) {
-                // If either region contains the points of the other, they intersect
-                if (containsAny(region.getPoints())) {
-                    intersectingRegions.add(region);
-                    continue;
-                }
-                if (region.containsAny(getPoints())) {
+                // If either region contains the points of the other,
+                // or if any edges intersect, the regions intersect
+                if (containsAny(region.getPoints())
+                        || region.containsAny(getPoints())
+                        || intersectsEdges(region)) {
                     intersectingRegions.add(region);
                     continue;
                 }
