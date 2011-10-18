@@ -857,7 +857,7 @@ public class WorldGuardBlockListener extends BlockListener {
 
         if (wcfg.useRegions && event.isSticky()) {
             if (!(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getRetractLocation()))
-                    && !(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation()))) {
+                    || !(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation()))) {
                 event.setCancelled(true);
             }
         }
