@@ -13,7 +13,6 @@ import java.util.List;
 public class RegionIntersectTest {
 
     @Test
-    @Ignore
     public void testCuboidGetIntersectingRegions() {
         ProtectedRegion region = new ProtectedCuboidRegion("square",
                 new BlockVector(100, 40, 0), new BlockVector(140, 128, 40));
