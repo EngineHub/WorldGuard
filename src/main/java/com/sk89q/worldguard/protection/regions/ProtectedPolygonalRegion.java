@@ -46,18 +46,10 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         for (BlockVector2D v : points) {
             int x = v.getBlockX();
             int z = v.getBlockZ();
-            if (x < minX) {
-                minX = x;
-            }
-            if (z < minZ) {
-                minZ = z;
-            }
-            if (x > maxX) {
-                maxX = x;
-            }
-            if (z > maxZ) {
-                maxZ = z;
-            }
+            if (x < minX) minX = x;
+            if (z < minZ) minZ = z;
+            if (x > maxX) maxX = x;
+            if (z > maxZ) maxZ = z;
         }
 
         min = new BlockVector(minX, minY, minZ);
@@ -135,8 +127,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
 
         for (ProtectedRegion region : regions) {
-            if (!intersectsBoundingBox(region))
-                continue;
+            if (!intersectsBoundingBox(region)) continue;
 
             if (region instanceof ProtectedPolygonalRegion || region instanceof ProtectedCuboidRegion) {
                 // If either region contains the points of the other,
@@ -147,8 +138,9 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
                     intersectingRegions.add(region);
                     continue;
                 }
-            } else
+            } else {
                 throw new UnsupportedOperationException("Not supported yet.");
+            }
         }
         return intersectingRegions;
     }

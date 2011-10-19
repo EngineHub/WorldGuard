@@ -166,8 +166,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
 
         for (ProtectedRegion region : regions) {
-            if (!intersectsBoundingBox(region))
-                continue;
+            if (!intersectsBoundingBox(region)) continue;
 
             // If both regions are Cuboids and their bounding boxes intersect, they intersect
             if (region instanceof ProtectedCuboidRegion) {
@@ -182,8 +181,9 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
                     intersectingRegions.add(region);
                     continue;
                 }
-            } else
+            } else {
                 throw new UnsupportedOperationException("Not supported yet.");
+            }
         }
         return intersectingRegions;
     }

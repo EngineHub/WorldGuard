@@ -456,17 +456,20 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         BlockVector2D lastPt2 = pts2.get(pts2.size() - 1);
         for (int i = 0; i < pts1.size(); i++ ) {
             for (int j = 0; j < pts2.size(); j++) {
+
                 Line2D line1 = new Line2D.Double(
                         lastPt1.getBlockX(),
                         lastPt1.getBlockZ(),
                         pts1.get(i).getBlockX(),
                         pts1.get(i).getBlockZ());
+
                 if (line1.intersectsLine(
                                 lastPt2.getBlockX(),
                                 lastPt2.getBlockZ(),
                                 pts2.get(j).getBlockX(),
-                                pts2.get(j).getBlockZ()))
+                                pts2.get(j).getBlockZ())) {
                     return true;
+                }
                 lastPt2 = pts2.get(j);
             }
             lastPt1 = pts1.get(i);
