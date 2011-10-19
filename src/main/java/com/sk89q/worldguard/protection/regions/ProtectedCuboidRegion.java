@@ -52,41 +52,10 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * @param pt2
      */
     private void setMinMaxPoints(BlockVector pt1, BlockVector pt2) {
-        int minX, minY, minZ, maxX, maxY, maxZ;
-
-        int x1 = pt1.getBlockX();
-        int x2 = pt2.getBlockX();
-        int y1 = pt1.getBlockY();
-        int y2 = pt2.getBlockY();
-        int z1 = pt1.getBlockZ();
-        int z2 = pt2.getBlockZ();
-
-        if (x1 < x2) {
-            minX = x1;
-            maxX = x2;
-        } else {
-            minX = x2;
-            maxX = x1;
-        }
-
-        if (y1 < y2) {
-            minY = y1;
-            maxY = y2;
-        } else {
-            minY = y2;
-            maxY = y1;
-        }
-
-        if (z1 < z2) {
-            minZ = z1;
-            maxZ = z2;
-        } else {
-            minZ = z2;
-            maxZ = z1;
-        }
-
-        min = new BlockVector(minX, minY, minZ);
-        max = new BlockVector(maxX, maxY, maxZ);
+        List<Vector> points = new ArrayList<Vector>();
+        points.add(pt1);
+        points.add(pt2);
+        setMinMaxPoints(points);
     }
 
     /**

@@ -86,6 +86,37 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
+     * Sets the minimum and maximum points of the bounding box for a region
+     *
+     * @param points
+     */
+    protected void setMinMaxPoints(List<Vector> points) {
+        int minX = points.get(0).getBlockX();
+        int minY = points.get(0).getBlockY();
+        int minZ = points.get(0).getBlockZ();
+        int maxX = minX;
+        int maxY = minY;
+        int maxZ = minZ;
+
+        for (Vector v : points) {
+            int x = v.getBlockX();
+            int y = v.getBlockY();
+            int z = v.getBlockZ();
+
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (z < minZ) minZ = z;
+
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+            if (z > maxZ) maxZ = z;
+        }
+        
+        min = new BlockVector(minX, minY, minZ);
+        max = new BlockVector(maxX, maxY, maxZ);
+    }
+
+    /**
      * @return the id
      */
     public String getId() {

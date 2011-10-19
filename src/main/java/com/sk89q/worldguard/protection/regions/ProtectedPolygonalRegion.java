@@ -35,25 +35,26 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     public ProtectedPolygonalRegion(String id, List<BlockVector2D> points, int minY, int maxY) {
         super(id);
         this.points = points;
-        this.minY = minY;
-        this.maxY = maxY;
+        setMinMaxPoints(points, minY, maxY);
+        this.minY = min.getBlockY();
+        this.maxY = max.getBlockY();
+    }
 
-        int minX = points.get(0).getBlockX();
-        int minZ = points.get(0).getBlockZ();
-        int maxX = points.get(0).getBlockX();
-        int maxZ = points.get(0).getBlockZ();
-
-        for (BlockVector2D v : points) {
-            int x = v.getBlockX();
-            int z = v.getBlockZ();
-            if (x < minX) minX = x;
-            if (z < minZ) minZ = z;
-            if (x > maxX) maxX = x;
-            if (z > maxZ) maxZ = z;
+    /**
+     * Sets the min and max points from all the 2d points and the min/max Y values
+     *
+     * @param points2D
+     * @param minY
+     * @param maxY
+     */
+    private void setMinMaxPoints(List<BlockVector2D> points2D, int minY, int maxY) {
+        List<Vector> points = new ArrayList<Vector>();
+        int y = minY;
+        for (BlockVector2D point2D : points2D) {
+            points.add(new Vector(point2D.getBlockX(), y, point2D.getBlockZ()));
+            y = maxY;
         }
-
-        min = new BlockVector(minX, minY, minZ);
-        max = new BlockVector(maxX, maxY, maxZ);
+        setMinMaxPoints(points);
     }
 
     public List<BlockVector2D> getPoints() {
