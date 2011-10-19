@@ -34,35 +34,28 @@ import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 public class ProtectedCuboidRegion extends ProtectedRegion {
 
     /**
-     * Store the first point.
-     */
-    private BlockVector min;
-    /**
-     * Store the second point.
-     */
-    private BlockVector max;
-
-    /**
      * Construct a new instance of this cuboid region.
      *
      * @param id
-     * @param min
-     * @param max
+     * @param pt1
+     * @param pt2
      */
-    public ProtectedCuboidRegion(String id, BlockVector min, BlockVector max) {
+    public ProtectedCuboidRegion(String id, BlockVector pt1, BlockVector pt2) {
         super(id);
-        this.min = min;
-        this.max = max;
+        setMinMaxPoints(pt1, pt2);
     }
 
     /**
-     * Get the lower point of the cuboid.
+     * Given any two points, sets the minimum and maximum points
      *
-     * @return min point
+     * @param pt1
+     * @param pt2
      */
-    @Override
-    public BlockVector getMinimumPoint() {
-        return min;
+    private void setMinMaxPoints(BlockVector pt1, BlockVector pt2) {
+        List<Vector> points = new ArrayList<Vector>();
+        points.add(pt1);
+        points.add(pt2);
+        setMinMaxPoints(points);
     }
 
     /**
@@ -71,17 +64,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * @param pt
      */
     public void setMinimumPoint(BlockVector pt) {
-        min = pt;
-    }
-
-    /**
-     * Get the upper point of the cuboid.
-     *
-     * @return max point
-     */
-    @Override
-    public BlockVector getMaximumPoint() {
-        return max;
+        setMinMaxPoints(pt, max);
     }
 
     /**
@@ -90,7 +73,22 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * @param pt
      */
     public void setMaximumPoint(BlockVector pt) {
-        max = pt;
+        setMinMaxPoints(min, pt);
+    }
+
+    public List<BlockVector2D> getPoints() {
+        List<BlockVector2D> pts = new ArrayList<BlockVector2D>();
+        int x1 = min.getBlockX();
+        int x2 = max.getBlockX();
+        int z1 = min.getBlockZ();
+        int z2 = max.getBlockZ();
+
+        pts.add(new BlockVector2D(x1, z1));
+        pts.add(new BlockVector2D(x2, z1));
+        pts.add(new BlockVector2D(x1, z2));
+        pts.add(new BlockVector2D(x2, z2));
+
+        return pts;
     }
 
     /**
@@ -98,9 +96,9 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      */
     @Override
     public boolean contains(Vector pt) {
-        final double x = pt.getX();
-        final double y = pt.getY();
-        final double z = pt.getZ();
+        final double x = pt.getBlockX();
+        final double y = pt.getBlockY();
+        final double z = pt.getBlockZ();
         return x >= min.getBlockX() && x < max.getBlockX()+1
                 && y >= min.getBlockY() && y < max.getBlockY()+1
                 && z >= min.getBlockZ() && z < max.getBlockZ()+1;
@@ -134,124 +132,28 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
 
     @Override
     public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
-        int numRegions = regions.size();
         List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
-        int i, i2, i3;
 
-        for (i = 0; i < numRegions; i++) {
-            ProtectedRegion region = regions.get(i);
-            BlockVector rMinPoint = region.getMinimumPoint();
-            BlockVector rMaxPoint = region.getMaximumPoint();
+        for (ProtectedRegion region : regions) {
+            if (!intersectsBoundingBox(region)) continue;
 
-            // Check whether the region is outside the min and max vector
-            if ((rMinPoint.getBlockX() < min.getBlockX() && rMaxPoint.getBlockX() < min.getBlockX())
-                            || (rMinPoint.getBlockX() > max.getBlockX() && rMaxPoint.getBlockX() > max.getBlockX())
-                    && ((rMinPoint.getBlockY() < min.getBlockY() && rMaxPoint.getBlockY() < min.getBlockY())
-                            || (rMinPoint.getBlockY() > max.getBlockY() && rMaxPoint.getBlockY() > max.getBlockY()))
-                    && ((rMinPoint.getBlockZ() < min.getBlockZ() && rMaxPoint.getBlockZ() < min.getBlockZ())
-                            || (rMinPoint.getBlockZ() > max.getBlockZ() && rMaxPoint.getBlockZ() > max.getBlockZ())) ) {
-                //intersectingRegions.add(regions.get(i));
+            // If both regions are Cuboids and their bounding boxes intersect, they intersect
+            if (region instanceof ProtectedCuboidRegion) {
+                intersectingRegions.add(region);
                 continue;
-            }
-
-            // Check whether the regions points are inside the other region
-            if (region.contains(new Vector(min.getBlockX(), min.getBlockY(), min.getBlockZ()))
-                    || region.contains(new Vector(min.getBlockX(), min.getBlockY(), max.getBlockZ()))
-                    || region.contains(new Vector(min.getBlockX(), max.getBlockY(), max.getBlockZ()))
-                    || region.contains(new Vector(min.getBlockX(), max.getBlockY(), min.getBlockZ()))
-                    || region.contains(new Vector(max.getBlockX(), max.getBlockY(), max.getBlockZ()))
-                    || region.contains(new Vector(max.getBlockX(), max.getBlockY(), min.getBlockZ()))
-                    || region.contains(new Vector(max.getBlockX(), min.getBlockY(), min.getBlockZ()))
-                    || region.contains(new Vector(max.getBlockX(), min.getBlockY(), max.getBlockZ())) ) {
-                intersectingRegions.add(regions.get(i));
-                continue;
-            }
-
-            // Check whether the other regions points are inside the current region
-            if (region instanceof ProtectedPolygonalRegion) {
-                for (i2 = 0; i2 < ((ProtectedPolygonalRegion)region).getPoints().size(); i2++) {
-                    BlockVector2D pt2Dr = ((ProtectedPolygonalRegion)region).getPoints().get(i2);
-                    int minYr = ((ProtectedPolygonalRegion)region).minY;
-                    int maxYr = ((ProtectedPolygonalRegion)region).maxY;
-                    Vector ptr = new Vector(pt2Dr.getBlockX(), minYr, pt2Dr.getBlockZ());
-                    Vector ptr2 = new Vector(pt2Dr.getBlockX(), maxYr, pt2Dr.getBlockZ());
-
-                    if (this.contains(ptr) || this.contains(ptr2)) {
-                        intersectingRegions.add(regions.get(i));
-                        continue;
-                    }
-                }
-            } else if (region instanceof ProtectedCuboidRegion) {
-                BlockVector ptcMin = region.getMinimumPoint();
-                BlockVector ptcMax = region.getMaximumPoint();
-
-                if (this.contains(new Vector(ptcMin.getBlockX(), ptcMin.getBlockY(), ptcMin.getBlockZ()))
-                        || this.contains(new Vector(ptcMin.getBlockX(), ptcMin.getBlockY(), ptcMax.getBlockZ()))
-                        || this.contains(new Vector(ptcMin.getBlockX(), ptcMax.getBlockY(), ptcMax.getBlockZ()))
-                        || this.contains(new Vector(ptcMin.getBlockX(), ptcMax.getBlockY(), ptcMin.getBlockZ()))
-                        || this.contains(new Vector(ptcMax.getBlockX(), ptcMax.getBlockY(), ptcMax.getBlockZ()))
-                        || this.contains(new Vector(ptcMax.getBlockX(), ptcMax.getBlockY(), ptcMin.getBlockZ()))
-                        || this.contains(new Vector(ptcMax.getBlockX(), ptcMin.getBlockY(), ptcMin.getBlockZ()))
-                        || this.contains(new Vector(ptcMax.getBlockX(), ptcMin.getBlockY(), ptcMax.getBlockZ())) ) {
-                    intersectingRegions.add(regions.get(i));
+            } else if (region instanceof ProtectedPolygonalRegion) {
+                // If either region contains the points of the other,
+                // or if any edges intersect, the regions intersect
+                if (containsAny(region.getPoints())
+                        || region.containsAny(getPoints())
+                        || intersectsEdges(region)) {
+                    intersectingRegions.add(region);
                     continue;
                 }
             } else {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
-
-            // Check whether the current regions edges collide with the regions edges
-            boolean regionIsIntersecting = false;
-            List<BlockVector2D> points = new ArrayList<BlockVector2D>();
-            points.add(new BlockVector2D(min.getBlockX(), min.getBlockZ()));
-            points.add(new BlockVector2D(min.getBlockX(), max.getBlockZ()));
-            points.add(new BlockVector2D(max.getBlockX(), max.getBlockZ()));
-            points.add(new BlockVector2D(max.getBlockX(), min.getBlockZ()));
-
-            for (i2 = 0; i2 < points.size(); i2++) {
-                boolean checkNextPoint = false;
-                BlockVector2D currPoint = points.get(i2);
-                BlockVector2D nextPoint;
-
-                if (i2 == (points.size() - 1)) {
-                    nextPoint = points.get(0);
-                } else {
-                    nextPoint = points.get(i2 + 1);
-                }
-
-                int currX = currPoint.getBlockX();
-                int currZ = currPoint.getBlockZ();
-                while (!checkNextPoint) {
-                    for(i3 = min.getBlockY(); i3 <= max.getBlockY(); i3++) {
-                        if (region.contains(new Vector(currX, i3, currZ))) {
-                            intersectingRegions.add(regions.get(i));
-                            regionIsIntersecting = true;
-                            break;
-                        }
-                    }
-
-                    if (currX == nextPoint.getBlockX() || currZ == nextPoint.getBlockZ() || regionIsIntersecting) {
-                        checkNextPoint = true;
-                    }
-
-                    if (nextPoint.getBlockX() > currPoint.getBlockX()) {
-                        currX++;
-                    } else {
-                        currX--;
-                    }
-                    if (nextPoint.getBlockZ() > currPoint.getBlockZ()) {
-                        currZ++;
-                    } else {
-                        currZ--;
-                    }
-                }
-
-                if (regionIsIntersecting) {
-                    break;
-                }
-            }
         }
-
         return intersectingRegions;
     }
 
@@ -280,6 +182,4 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         int volume = xLength * yLength * zLength;
         return volume;
     }
-
-
 }

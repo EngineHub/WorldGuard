@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 
@@ -30,16 +31,14 @@ public class GlobalProtectedRegion extends ProtectedRegion {
 
     public GlobalProtectedRegion(String id) {
         super(id);
+        min = new BlockVector(0, 0, 0);
+        max = new BlockVector(0, 0, 0);
     }
 
-    @Override
-    public BlockVector getMinimumPoint() {
-        return new BlockVector(0, 0, 0);
-    }
-
-    @Override
-    public BlockVector getMaximumPoint() {
-        return new BlockVector(0, 0, 0);
+    public List<BlockVector2D> getPoints() {
+        List<BlockVector2D> pts = new ArrayList<BlockVector2D>();
+        pts.add(new BlockVector2D(min.getBlockX(),min.getBlockZ()));
+        return pts;
     }
 
     @Override
