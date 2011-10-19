@@ -352,28 +352,20 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @param pt
      * @return
      */
-    public boolean contains(BlockVector pt) {
-        return contains(new Vector(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()));
-    }
-
-    /**
-     * Check to see if a point is inside this region.
-     *
-     * @param pt
-     * @return
-     */
-    public boolean contains(Vector2D pt) {
-        return contains(new Vector(pt.getX(), min.getBlockY(), pt.getZ()));
-    }
-
-    /**
-     * Check to see if a point is inside this region.
-     *
-     * @param pt
-     * @return
-     */
     public boolean contains(BlockVector2D pt) {
         return contains(new Vector(pt.getBlockX(), min.getBlockY(), pt.getBlockZ()));
+    }
+
+    /**
+     * Check to see if a point is inside this region.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public boolean contains(int x, int y, int z) {
+        return contains(new Vector(x, y, z));
     }
 
     /**
