@@ -22,8 +22,10 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -66,6 +68,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -926,7 +929,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
         
-        if (!plugin.getGlobalRegionManager().canBuild(
+        if (event.getItemStack().getType() == Material.MILK_BUCKET) {
+        	if (!plugin.getGlobalRegionManager().allows(DefaultFlag.USE, player.getLocation().add(0, 1, 0))) {
+                player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use this in this area.");
+                event.setCancelled(true);
+                return;
+        	}
+        	
+        } else if (!plugin.getGlobalRegionManager().canBuild(
                 player, event.getBlockClicked().getRelative(event.getBlockFace()))) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
