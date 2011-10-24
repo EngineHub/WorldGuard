@@ -943,7 +943,14 @@ public class WorldGuardPlayerListener extends PlayerListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
         
-        if (!plugin.getGlobalRegionManager().canBuild(
+        if (event.getItemStack().getType() == Material.MILK_BUCKET) {
+        	if (!plugin.getGlobalRegionManager().allows(DefaultFlag.USE, player.getLocation().add(0, 1, 0))) {
+                player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use this in this area.");
+                event.setCancelled(true);
+                return;
+        	}
+        	
+        } else if (!plugin.getGlobalRegionManager().canBuild(
                 player, event.getBlockClicked().getRelative(event.getBlockFace()))) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
