@@ -179,6 +179,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             if (inGroup(player, "wg-invincible") ||
                     (configuration.autoGodMode && hasPermission(player, "worldguard.auto-invincible"))) {
                 configuration.enableGodMode(player);
+                configuration.enablePeaceMode(player);
             }
         }
 

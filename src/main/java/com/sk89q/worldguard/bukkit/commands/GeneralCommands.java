@@ -99,7 +99,7 @@ public class GeneralCommands {
             
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god");
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
@@ -128,7 +128,101 @@ public class GeneralCommands {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players no longer have god mode.");
         }
     }
+
+    @Command(aliases = {"peace"},
+            usage = "[player]",
+            desc = "Enable peace mode on a player",
+            flags = "s", min = 0, max = 1)
+    public static void peace(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        ConfigurationManager config = plugin.getGlobalStateManager();
+        
+        Iterable<Player> targets = null;
+        boolean included = false;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "worldguard.god");
+        } else if (args.argsLength() == 1) {
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "worldguard.god.other");
+        }
+
+        for (Player player : targets) {
+            config.enablePeaceMode(player);
+
+            // Tell the user
+            if (player.equals(sender)) {
+                player.sendMessage(ChatColor.YELLOW + "Peace mode enabled! Use /unpeace to disable.");
+                
+                // Keep track of this
+                included = true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "Peace enabled by "
+                        + plugin.toName(sender) + ".");
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players now have peace mode.");
+        }
+    }
     
+    @Command(aliases = {"unpeace"},
+            usage = "[player]",
+            desc = "Disable peace mode on a player",
+            flags = "s", min = 0, max = 1)
+    public static void unpeace(CommandContext args, WorldGuardPlugin plugin,
+            CommandSender sender) throws CommandException {
+        ConfigurationManager config = plugin.getGlobalStateManager();
+        
+        Iterable<Player> targets = null;
+        boolean included = false;
+        
+        // Detect arguments based on the number of arguments provided
+        if (args.argsLength() == 0) {
+            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "worldguard.god");
+        } else if (args.argsLength() == 1) {
+            targets = plugin.matchPlayers(sender, args.getString(0));
+            
+            // Check permissions!
+            plugin.checkPermission(sender, "worldguard.god.other");
+        }
+
+        for (Player player : targets) {
+            config.disablePeaceMode(player);
+            
+            // Tell the user
+            if (player.equals(sender)) {
+                player.sendMessage(ChatColor.YELLOW + "Peace mode disabled!");
+                
+                // Keep track of this
+                included = true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "Peace disabled by "
+                        + plugin.toName(sender) + ".");
+                
+            }
+        }
+        
+        // The player didn't receive any items, then we need to send the
+        // user a message so s/he know that something is indeed working
+        if (!included && args.hasFlag('s')) {
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Players no longer have peace mode.");
+        }
+    }
+
+
     @Command(aliases = {"heal"},
             usage = "[player]",
             desc = "Heal a player",
