@@ -70,7 +70,7 @@ public class RegionGroupFlag extends Flag<RegionGroupFlag.RegionGroup> {
         } else if (input.equalsIgnoreCase("everyone") || input.equalsIgnoreCase("anyone")) {
             return null;
         } else {
-            throw new InvalidFlagFormat("Not none/allow/deny: " + input);
+            throw new InvalidFlagFormat("Expected [non]member/[non]owner/anyone but got '" + input + "'");
         }
     }
 

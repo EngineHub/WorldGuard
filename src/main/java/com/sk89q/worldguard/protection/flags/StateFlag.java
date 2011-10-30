@@ -70,7 +70,7 @@ public class StateFlag extends Flag<StateFlag.State> {
         } else if (input.equalsIgnoreCase("none")) {
             return null;
         } else {
-            throw new InvalidFlagFormat("Not none/allow/deny: " + input);
+            throw new InvalidFlagFormat("Expected none/allow/deny but got '" + input + "'");
         }
     }
 
