@@ -20,6 +20,7 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -667,6 +668,25 @@ public class WorldGuardEntityListener extends EntityListener {
             if (creatureTypes != null && creatureTypes.contains(creaType)) {
                 event.setCancelled(true);
                 return;
+            }
+
+            Integer limitBoundingBoxSize = set.getFlag(DefaultFlag.MOB_SPAWN_LIMIT_BOX_SIZE);
+            if (limitBoundingBoxSize != null && limitBoundingBoxSize > 0) {
+                Integer limitPerBoundingBox = set.getFlag(DefaultFlag.MOB_SPAWN_LIMIT_PER_BOX);
+                if (limitPerBoundingBox == null || limitPerBoundingBox < 1) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                List<Entity> nearbyEntities = event.getEntity().getNearbyEntities(limitBoundingBoxSize, limitBoundingBoxSize, limitBoundingBoxSize);
+                int nearbyCreatureCount = 0;
+                for (Entity nearbyEntity : nearbyEntities) {
+                    if (nearbyEntity instanceof Creature) nearbyCreatureCount++;
+                    if (nearbyCreatureCount >= limitPerBoundingBox) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
         }
     }

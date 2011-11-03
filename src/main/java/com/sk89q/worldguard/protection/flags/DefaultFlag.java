@@ -31,6 +31,8 @@ public final class DefaultFlag {
     public static final StateFlag BUILD = new StateFlag("build", 'b', true);
     public static final StateFlag PVP = new StateFlag("pvp", 'p', true);
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", 'm', true);
+    public static final IntegerFlag MOB_SPAWN_LIMIT_BOX_SIZE = new IntegerFlag("mob-spawn-limit-box-size");
+    public static final IntegerFlag MOB_SPAWN_LIMIT_PER_BOX = new IntegerFlag("mob-spawn-limit-per-box");
     public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true);
     public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", 'c', true);
     public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true);
@@ -85,7 +87,8 @@ public final class DefaultFlag {
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
-        MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY,
+        MOB_DAMAGE, MOB_SPAWNING, MOB_SPAWN_LIMIT_BOX_SIZE,
+        MOB_SPAWN_LIMIT_PER_BOX, DENY_SPAWN, INVINCIBILITY,
         CREEPER_EXPLOSION, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
         EXIT, EXIT_PERM, ENTRY, ENTRY_PERM,
