@@ -54,7 +54,7 @@ public final class DefaultFlag {
     public static final StateFlag MUSHROOMS = new StateFlag("mushroom-growth", true);
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
     public static final StateFlag GRASS_SPREAD = new StateFlag("grass-growth", true);
-    public static final StateFlag ENDER_BUILD = new StateFlag("enderman-grief", true);
+    public static final StateFlag ENDER_BUILD = new StateFlag("enderman-grief", false);
     public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
     public static final RegionGroupFlag ENTRY_PERM = new RegionGroupFlag("entry-group", RegionGroupFlag.RegionGroup.NON_MEMBERS);
