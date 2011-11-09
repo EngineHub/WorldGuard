@@ -36,19 +36,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
-import org.bukkit.event.player.PlayerBucketFillEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
@@ -110,6 +98,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         registerEvent("PLAYER_COMMAND_PREPROCESS", Priority.Lowest);
         if (plugin.getGlobalStateManager().usePlayerMove) {
             registerEvent("PLAYER_MOVE", Priority.High);
+            registerEvent("PLAYER_TELEPORT", Priority.High);
         }
     }
 
@@ -286,117 +275,147 @@ public class WorldGuardPlayerListener extends PlayerListener {
     }
 
     /**
+     * Called when a player attempts to teleport.
+     *
+     * @param event
+     */
+    @Override
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        handlePlayerMove(event);
+    }
+
+    /**
      * Called when a player attempts to move.
      *
      * @param event
      */
     @Override
     public void onPlayerMove(PlayerMoveEvent event) {
+        handlePlayerMove(event);
+    }
+
+    /**
+     * Handles region state on player movement for both onPlayerMove and onPlayerTeleport
+     * @param event
+     */
+    private void handlePlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
-        
+
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
         if (player.getVehicle() != null) return; // handled in vehicle listener
-        if (wcfg.useRegions) {
-            // Did we move a block?
-            if (event.getFrom().getBlockX() != event.getTo().getBlockX()
-                    || event.getFrom().getBlockY() != event.getTo().getBlockY()
-                    || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-                PlayerFlagState state = plugin.getFlagStateManager().getState(player);
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-                boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
 
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
-                ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+        if (!wcfg.useRegions) return;
 
-                boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-                if (!hasBypass && !entryAllowed) {
-                    player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
+        // Did we move a block?
+        if (hasPlayerMoved(event)) {
+            PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+            boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
 
-                    Location newLoc = event.getFrom();
-                    newLoc.setX(newLoc.getBlockX() + 0.5);
-                    newLoc.setY(newLoc.getBlockY());
-                    newLoc.setZ(newLoc.getBlockZ() + 0.5);
-                    event.setTo(newLoc);
-                    return;
-                }
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-                // Have to set this state
-                if (state.lastExitAllowed == null) {
-                    state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))
-                            .allows(DefaultFlag.EXIT, localPlayer);
-                }
-
-                boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
-                if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
-                    player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
-
-                    Location newLoc = event.getFrom();
-                    newLoc.setX(newLoc.getBlockX() + 0.5);
-                    newLoc.setY(newLoc.getBlockY());
-                    newLoc.setZ(newLoc.getBlockZ() + 0.5);
-                    event.setTo(newLoc);
-                    return;
-                }
-
-                String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);
-                String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
-                Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
-                Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
-                
-                if (state.lastFarewell != null && (farewell == null 
-                        || !state.lastFarewell.equals(farewell))) {
-                    String replacedFarewell = plugin.replaceMacros(
-                            player, BukkitUtil.replaceColorMacros(state.lastFarewell));
-                    player.sendMessage(ChatColor.AQUA + " ** " + replacedFarewell);
-                }
-                
-                if (greeting != null && (state.lastGreeting == null
-                        || !state.lastGreeting.equals(greeting))) {
-                    String replacedGreeting = plugin.replaceMacros(
-                            player, BukkitUtil.replaceColorMacros(greeting));
-                    player.sendMessage(ChatColor.AQUA + " ** " + replacedGreeting);
-                }
-                
-                if ((notifyLeave == null || !notifyLeave)
-                        && state.notifiedForLeave != null && state.notifiedForLeave) {
-                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
-                            + ChatColor.LIGHT_PURPLE + player.getName()
-                            + ChatColor.GOLD + " left NOTIFY region");
-                }
-                
-                if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
-                        || !state.notifiedForEnter)) {
-                    StringBuilder regionList = new StringBuilder();
-                    
-                    for (ProtectedRegion region : set) {
-                        if (regionList.length() != 0) {
-                            regionList.append(", ");
-                        }
-                        regionList.append(region.getId());
-                    }
-                    
-                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
-                            + ChatColor.LIGHT_PURPLE + player.getName()
-                            + ChatColor.GOLD + " entered NOTIFY region: "
-                            + ChatColor.WHITE
-                            + regionList);
-                }
-
-                state.lastGreeting = greeting;
-                state.lastFarewell = farewell;
-                state.notifiedForEnter = notifyEnter;
-                state.notifiedForLeave = notifyLeave;
-                state.lastExitAllowed = exitAllowed;
-                state.lastWorld = event.getTo().getWorld();
-                state.lastBlockX = event.getTo().getBlockX();
-                state.lastBlockY = event.getTo().getBlockY();
-                state.lastBlockZ = event.getTo().getBlockZ();
+            boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
+            if (!hasBypass && !entryAllowed) {
+                player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
+                undoPlayerMove(event);
+                return;
             }
+
+            // Have to set this state
+            if (state.lastExitAllowed == null) {
+                state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))
+                        .allows(DefaultFlag.EXIT, localPlayer);
+            }
+
+            boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
+            if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
+                player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
+                undoPlayerMove(event);
+                return;
+            }
+
+            String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);
+            String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
+            Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
+            Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
+
+            if (state.lastFarewell != null && (farewell == null
+                    || !state.lastFarewell.equals(farewell))) {
+                String replacedFarewell = plugin.replaceMacros(
+                        player, BukkitUtil.replaceColorMacros(state.lastFarewell));
+                player.sendMessage(ChatColor.AQUA + " ** " + replacedFarewell);
+            }
+
+            if (greeting != null && (state.lastGreeting == null
+                    || !state.lastGreeting.equals(greeting))) {
+                String replacedGreeting = plugin.replaceMacros(
+                        player, BukkitUtil.replaceColorMacros(greeting));
+                player.sendMessage(ChatColor.AQUA + " ** " + replacedGreeting);
+            }
+
+            if ((notifyLeave == null || !notifyLeave)
+                    && state.notifiedForLeave != null && state.notifiedForLeave) {
+                plugin.broadcastNotification(ChatColor.GRAY + "WG: "
+                        + ChatColor.LIGHT_PURPLE + player.getName()
+                        + ChatColor.GOLD + " left NOTIFY region");
+            }
+
+            if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
+                    || !state.notifiedForEnter)) {
+                StringBuilder regionList = new StringBuilder();
+
+                for (ProtectedRegion region : set) {
+                    if (regionList.length() != 0) {
+                        regionList.append(", ");
+                    }
+                    regionList.append(region.getId());
+                }
+
+                plugin.broadcastNotification(ChatColor.GRAY + "WG: "
+                        + ChatColor.LIGHT_PURPLE + player.getName()
+                        + ChatColor.GOLD + " entered NOTIFY region: "
+                        + ChatColor.WHITE
+                        + regionList);
+            }
+
+            state.lastGreeting = greeting;
+            state.lastFarewell = farewell;
+            state.notifiedForEnter = notifyEnter;
+            state.notifiedForLeave = notifyLeave;
+            state.lastExitAllowed = exitAllowed;
+            state.lastWorld = event.getTo().getWorld();
+            state.lastBlockX = event.getTo().getBlockX();
+            state.lastBlockY = event.getTo().getBlockY();
+            state.lastBlockZ = event.getTo().getBlockZ();
         }
+    }
+
+    /**
+     * Checks if a player has moved across blocks
+     * @param event
+     * @return
+     */
+    private boolean hasPlayerMoved(PlayerMoveEvent event) {
+        return event.getFrom().getBlockX() != event.getTo().getBlockX()
+                || event.getFrom().getBlockY() != event.getTo().getBlockY()
+                || event.getFrom().getBlockZ() != event.getTo().getBlockZ();
+    }
+
+    /**
+     * Resets player to their previous position
+     * @param event
+     */
+    private void undoPlayerMove(PlayerMoveEvent event) {
+        Location loc = event.getFrom();
+        loc.setX(loc.getBlockX() + 0.5);
+        loc.setY(loc.getBlockY());
+        loc.setZ(loc.getBlockZ() + 0.5);
+        event.setTo(loc);
     }
     
     /**
