@@ -210,6 +210,7 @@ public class WorldConfiguration {
         }
     }
 
+    @SuppressWarnings("unused")
     private double getDouble(String node, double def) {
         double val = parentConfig.getDouble(node, def);
 
