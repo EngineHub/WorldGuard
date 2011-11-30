@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.protection.databases;
 
-import java.io.IOException;
-
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 public abstract class AbstractProtectionDatabase implements ProtectionDatabase {
@@ -28,9 +26,9 @@ public abstract class AbstractProtectionDatabase implements ProtectionDatabase {
     /**
      * Load the list of regions into a region manager.
      * 
-     * @throws IOException
+     * @throws ProtectionDatabaseException
      */
-    public void load(RegionManager manager) throws IOException {
+    public void load(RegionManager manager) throws ProtectionDatabaseException {
         load();
         manager.setRegions(getRegions());
     }
@@ -38,9 +36,9 @@ public abstract class AbstractProtectionDatabase implements ProtectionDatabase {
     /**
      * Save the list of regions from a region manager.
      * 
-     * @throws IOException
+     * @throws ProtectionDatabaseException
      */
-    public void save(RegionManager manager) throws IOException {
+    public void save(RegionManager manager) throws ProtectionDatabaseException {
         setRegions(manager.getRegions());
         save();
     }

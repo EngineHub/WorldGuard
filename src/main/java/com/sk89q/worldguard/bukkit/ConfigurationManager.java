@@ -86,6 +86,15 @@ public class ConfigurationManager {
     public boolean activityHaltToggle = false;
     public boolean autoGodMode;
     public boolean usePlayerMove;
+    
+    /**
+     * Region Storage Configuration method, and config values
+     */
+    public boolean useSqlDatabase = false;
+    public String sqlDsn;
+    public String sqlUsername;
+    public String sqlPassword;
+    public String sqlPrefix;
 
     /**
      * Construct the object.
@@ -116,6 +125,16 @@ public class ConfigurationManager {
                 "auto-invincible-permission", false);
         usePlayerMove = config.getBoolean(
                 "use-player-move-event", true);
+
+        useSqlDatabase = config.getBoolean(
+                "regions.sql.use", false);
+
+        if (useSqlDatabase) {
+            sqlDsn = config.getString("regions.sql.dsn");
+            sqlUsername = config.getString("regions.sql.username");
+            sqlPassword = config.getString("regions.sql.password");
+            sqlPrefix = config.getString("regions.sql.prefix", "worldguard_");
+        }
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {

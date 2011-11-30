@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import java.io.IOException;
-
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -35,6 +33,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.util.RegionUtil;
 
 // @TODO: A lot of code duplication here! Need to fix.
@@ -78,8 +77,8 @@ public class RegionMemberCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -129,8 +128,8 @@ public class RegionMemberCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -167,8 +166,8 @@ public class RegionMemberCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -206,8 +205,8 @@ public class RegionMemberCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }

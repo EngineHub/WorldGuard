@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -53,6 +52,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.util.RegionUtil;
 
 public class RegionCommands {
@@ -118,8 +118,8 @@ public class RegionCommands {
         try {
             mgr.save();
             sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -192,8 +192,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -323,8 +323,8 @@ public class RegionCommands {
         try {
             mgr.save();
             sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -681,8 +681,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -730,8 +730,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -801,8 +801,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -839,8 +839,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -862,8 +862,8 @@ public class RegionCommands {
                 mgr.load();
                 sender.sendMessage(ChatColor.YELLOW
                         + "Regions for '" + world.getName() + "' load.");
-            } catch (IOException e) {
-                throw new CommandException("Failed to read regions file: "
+            } catch (ProtectionDatabaseException e) {
+                throw new CommandException("Failed to read regions: "
                         + e.getMessage());
             }
         } else {
@@ -872,8 +872,8 @@ public class RegionCommands {
                 
                 try {
                     mgr.load();
-                } catch (IOException e) {
-                    throw new CommandException("Failed to read regions file: "
+                } catch (ProtectionDatabaseException e) {
+                    throw new CommandException("Failed to read regions: "
                             + e.getMessage());
                 }
             }
@@ -900,8 +900,8 @@ public class RegionCommands {
                 mgr.save();
                 sender.sendMessage(ChatColor.YELLOW
                         + "Regions for '" + world.getName() + "' saved.");
-            } catch (IOException e) {
-                throw new CommandException("Failed to write regions file: "
+            } catch (ProtectionDatabaseException e) {
+                throw new CommandException("Failed to write regions: "
                         + e.getMessage());
             }
         } else {
@@ -910,8 +910,8 @@ public class RegionCommands {
                 
                 try {
                     mgr.save();
-                } catch (IOException e) {
-                    throw new CommandException("Failed to write regions file: "
+                } catch (ProtectionDatabaseException e) {
+                    throw new CommandException("Failed to write regions: "
                             + e.getMessage());
                 }
             }

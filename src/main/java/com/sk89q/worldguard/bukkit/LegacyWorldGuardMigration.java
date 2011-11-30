@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import org.bukkit.World;
 
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.CSVDatabase;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
@@ -105,8 +106,7 @@ public class LegacyWorldGuardMigration {
             oldDatabase.renameTo(new File(plugin.getDataFolder(), "regions.txt.old"));
 
             logger.info("WorldGuard: Regions database converted!");
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
+        } catch (ProtectionDatabaseException e) {
             logger.warning("WorldGuard: Failed to load regions: "
                     + e.getMessage());
         }

@@ -21,8 +21,6 @@ package com.sk89q.worldguard.protection;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -36,6 +34,7 @@ import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.FlatRegionManager;
@@ -149,10 +148,11 @@ public class GlobalRegionManager {
             lastModified.put(name, file.lastModified());
 
             return manager;
-        } catch (FileNotFoundException e) { // this should no longer happen hopefully
-            logger.info("WorldGuard: Region file for world \""
-                    + name + "\" missing or inaccessible.");
-        } catch (IOException e) {
+        // TODO: Work out where this belongs
+        //} catch (FileNotFoundException e) { // this should no longer happen hopefully
+        //    logger.info("WorldGuard: Region file for world \""
+        //            + name + "\" missing or inaccessible.");
+        } catch (ProtectionDatabaseException e) {
             logger.info("WorldGuard: Failed to load regions from file "
                     + file.getAbsolutePath() + " : " + e.getMessage());
         } catch (Exception e) {
