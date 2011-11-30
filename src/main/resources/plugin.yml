@@ -18,6 +18,12 @@ commands:
     ungod:
         description: Disable god mode
         usage: /<command> [player]
+    peace:
+        description: Enable peace mode
+        usage: /<command> [player]
+    unpeace:
+        description: Disable peace mode
+        usage: /<command> [player]
     heal:
         description: Heal yourself or another
         usage: /<command> [player]

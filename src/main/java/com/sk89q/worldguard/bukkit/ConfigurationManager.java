@@ -77,6 +77,11 @@ public class ConfigurationManager {
     private Set<String> hasGodMode = new HashSet<String>();
 
     /**
+     * List of people with peace mode.
+     */
+    private Set<String> hasPeaceMode = new HashSet<String>();
+
+    /**
      * List of people who can breathe underwater.
      */
     private Set<String> hasAmphibious = new HashSet<String>();
@@ -172,6 +177,7 @@ public class ConfigurationManager {
         }
 
         hasGodMode.remove(player.getName());
+        hasPeaceMode.remove(player.getName());
         hasAmphibious.remove(player.getName());
     }
 
@@ -201,6 +207,34 @@ public class ConfigurationManager {
      */
     public boolean hasGodMode(Player player) {
         return hasGodMode.contains(player.getName());
+    }
+
+    /**
+     * Enable peace mode for a player.
+     *
+     * @param player
+     */
+    public void enablePeaceMode(Player player) {
+        hasPeaceMode.add(player.getName());
+    }
+
+    /**
+     * Disable peace mode for a player.
+     *
+     * @param player
+     */
+    public void disablePeaceMode(Player player) {
+        hasPeaceMode.remove(player.getName());
+    }
+
+    /**
+     * Check to see if peace mode is enabled for a player.
+     *
+     * @param player
+     * @return
+     */
+    public boolean hasPeaceMode(Player player) {
+        return hasPeaceMode.contains(player.getName());
     }
 
     /**

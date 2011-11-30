@@ -56,6 +56,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
@@ -117,6 +118,7 @@ public class WorldGuardEntityListener extends EntityListener {
         registerEvent("ENDERMAN_PLACE", Priority.High);
         registerEvent("ENTITY_DEATH", Priority.High);
         registerEvent("FOOD_LEVEL_CHANGE", Priority.High);
+        registerEvent("ENTITY_TARGET", Priority.High);
     }
 
     /**
@@ -864,6 +866,18 @@ public class WorldGuardEntityListener extends EntityListener {
             Player player = (Player) event.getEntity();
             if (event.getFoodLevel() < player.getFoodLevel() && isInvincible(player)) {
                 event.setCancelled(true);
+            }
+        }
+    }
+
+    @Override
+    public void onEntityTarget(EntityTargetEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        if (event.getTarget() instanceof Player) {
+            Player player = (Player) event.getTarget();
+            if (event.getReason() == EntityTargetEvent.TargetReason.CLOSEST_PLAYER && cfg.hasPeaceMode(player)) {
+                event.setCancelled(true);
+                
             }
         }
     }
