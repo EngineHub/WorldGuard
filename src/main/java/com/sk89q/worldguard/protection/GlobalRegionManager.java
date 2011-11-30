@@ -21,8 +21,6 @@ package com.sk89q.worldguard.protection;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -36,7 +34,10 @@ import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import com.sk89q.worldguard.protection.databases.YAMLDatabase;
+import com.sk89q.worldguard.protection.databases.MySQLDatabase;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.FlatRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -134,30 +135,44 @@ public class GlobalRegionManager {
      */
     public RegionManager load(World world) {
         String name = world.getName();
-        File file = getPath(name);
-
+        ProtectionDatabase database = null;
+        File file = null;
+        
         try {
+            if (!config.useSqlDatabase) {
+                file = getPath(name);
+                database = new YAMLDatabase(file);
+
+                // Store the last modification date so we can track changes
+                lastModified.put(name, file.lastModified());
+            } else {
+                database = new MySQLDatabase(config, name);
+            }
+
             // Create a manager
-            RegionManager manager = new FlatRegionManager(new YAMLDatabase(file));
+            RegionManager manager = new FlatRegionManager(database);
+
             managers.put(name, manager);
             manager.load();
 
             logger.info("WorldGuard: " + manager.getRegions().size()
                     + " regions loaded for '" + name + "'");
 
-            // Store the last modification date so we can track changes
-            lastModified.put(name, file.lastModified());
-
             return manager;
-        } catch (FileNotFoundException e) { // this should no longer happen hopefully
-            logger.info("WorldGuard: Region file for world \""
-                    + name + "\" missing or inaccessible.");
-        } catch (IOException e) {
-            logger.info("WorldGuard: Failed to load regions from file "
-                    + file.getAbsolutePath() + " : " + e.getMessage());
+        } catch (ProtectionDatabaseException e) {
+            String logStr = "WorldGuard: Failed to load regions from ";
+            if (config.useSqlDatabase) {
+                logStr += "SQL Database <" + config.sqlDsn + "> ";
+            } else {
+                logStr += "file \"" + file + "\" ";
+            }
+
+            logger.info(logStr + " : " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
             logger.info("WorldGuard: Error loading regions for world \""
-                    + name + "\":" + e.getMessage());
+                    + name + "\": " + e.toString() + "\n\t" + e.getMessage());
+            e.printStackTrace();
         }
 
         // @TODO: THIS CREATES PROBLEMS!!one!!1!!eleven!!1!!!
@@ -179,6 +194,8 @@ public class GlobalRegionManager {
      * have changed.
      */
     public void reloadChanged() {
+        if (config.useSqlDatabase) return;
+
         for (String name : managers.keySet()) {
             File file = getPath(name);
 
