@@ -167,9 +167,11 @@ public class FlagStateManager implements Runnable {
 
         if (feedDelay <= 0) {
             player.setFoodLevel(feedAmount > 0 ? maxHunger : minHunger);
+            state.lastFeed = now;
         } else if (now - state.lastFeed > feedDelay * 1000) {
             // clamp health between minimum and maximum
             player.setFoodLevel(Math.min(maxHunger, Math.max(minHunger, player.getFoodLevel() + feedAmount)));
+            state.lastFeed = now;
         }
     }
 
