@@ -104,7 +104,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         registerEvent("PLAYER_QUIT", Priority.Normal);
         registerEvent("PLAYER_BUCKET_FILL", Priority.High);
         registerEvent("PLAYER_BUCKET_EMPTY", Priority.High);
-        registerEvent("PLAYER_RESPAWN", Priority.High);
+        registerEvent("PLAYER_RESPAWN", Priority.Highest);
         registerEvent("PLAYER_ITEM_HELD", Priority.High);
         registerEvent("PLAYER_BED_ENTER", Priority.High);
         registerEvent("PLAYER_COMMAND_PREPROCESS", Priority.Lowest);
