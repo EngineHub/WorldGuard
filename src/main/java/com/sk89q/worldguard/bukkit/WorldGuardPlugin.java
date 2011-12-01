@@ -121,7 +121,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         commands.setInjector(new Injector() {
             public Object getInstance(Class<?> cls) throws InvocationTargetException, IllegalAccessException, InstantiationException {
                 try {
-                    return cls.getConstructor(WorldGuardPlugin.class).newInstance(this);
+                    return cls.getConstructor(WorldGuardPlugin.class).newInstance(plugin);
                 } catch (NoSuchMethodException e) {
                     e.printStackTrace();
                     return null;
