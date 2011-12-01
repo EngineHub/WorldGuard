@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.sk89q.worldguard.blacklist.events.ItemDetectHaveBlacklistEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -525,7 +526,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 || type == Material.JUKEBOX
                 || type == Material.DISPENSER
                 || type == Material.FURNACE
-                || type == Material.BURNING_FURNACE)
+                || type == Material.BURNING_FURNACE
+                || type == Material.BREWING_STAND
+                || type == Material.ENCHANTMENT_TABLE)
                 && wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
             for (int slot = 0; slot < 40; slot++) {
@@ -569,7 +572,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 Block placedOn = block.getRelative(event.getBlockFace());
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !plugin.getGlobalRegionManager().allows(
-                                DefaultFlag.TNT, placedOn.getLocation())) {
+                        DefaultFlag.TNT, placedOn.getLocation())) {
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                 }
@@ -600,7 +603,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     || type == Material.JUKEBOX //stores the (arguably) most valuable item
                     || type == Material.DISPENSER
                     || type == Material.FURNACE
-                    || type == Material.BURNING_FURNACE) {
+                    || type == Material.BURNING_FURNACE
+                    || type == Material.BREWING_STAND) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.CHEST_ACCESS)
                         && !set.canBuild(localPlayer)) {
@@ -612,14 +616,20 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
 
             if (type == Material.LEVER
-                   || type == Material.STONE_BUTTON
-                   || type == Material.NOTE_BLOCK
-                   || type == Material.DIODE_BLOCK_OFF
-                   || type == Material.DIODE_BLOCK_ON
-                   || type == Material.WOODEN_DOOR
-                   || type == Material.TRAP_DOOR
-                   || type == Material.FENCE_GATE
-                   || type == Material.WORKBENCH) {
+                    || type == Material.STONE_BUTTON
+                    || type == Material.NOTE_BLOCK
+                    || type == Material.DIODE_BLOCK_OFF
+                    || type == Material.DIODE_BLOCK_ON
+                    || type == Material.WOODEN_DOOR
+                    || type == Material.TRAP_DOOR
+                    || type == Material.FENCE_GATE
+                    || type == Material.JUKEBOX //stores the (arguably) most valuable item
+                    || type == Material.DISPENSER
+                    || type == Material.FURNACE
+                    || type == Material.BURNING_FURNACE
+                    || type == Material.WORKBENCH
+                    || type == Material.BREWING_STAND
+                    || type == Material.ENCHANTMENT_TABLE) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.USE)
                         && !set.canBuild(localPlayer)) {
@@ -664,10 +674,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
 
         if (wcfg.getBlacklist() != null) {
-            if((block.getType() != Material.CHEST
-                    && block.getType() != Material.DISPENSER
-                    && block.getType() != Material.FURNACE
-                    && block.getType() != Material.BURNING_FURNACE)) {
+            if(type != Material.CHEST
+                    && type != Material.DISPENSER
+                    && type != Material.FURNACE
+                    && type != Material.BURNING_FURNACE
+                    && type != Material.BREWING_STAND
+                    && type != Material.ENCHANTMENT_TABLE) {
                 if (!wcfg.getBlacklist().check(
                         new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
                                 item.getTypeId()), false, false)) {
@@ -698,10 +710,11 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
         }
 
-        if ((block.getType() == Material.CHEST
-                || block.getType() == Material.DISPENSER
-                || block.getType() == Material.FURNACE
-                || block.getType() == Material.BURNING_FURNACE)) {
+        if ((type == Material.CHEST
+                || type == Material.DISPENSER
+                || type == Material.FURNACE
+                || type == Material.BURNING_FURNACE
+                || type == Material.ENCHANTMENT_TABLE)) {
             
             if (wcfg.isChestProtected(block, player)) {
                 player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
