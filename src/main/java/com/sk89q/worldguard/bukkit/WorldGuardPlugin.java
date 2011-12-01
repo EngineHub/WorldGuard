@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -51,6 +52,7 @@ import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import com.sk89q.minecraft.util.commands.Injector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
@@ -116,6 +118,16 @@ public class WorldGuardPlugin extends JavaPlugin {
                 return plugin.hasPermission(player, perm);
             }
         };
+        commands.setInjector(new Injector() {
+            public Object getInstance(Class<?> cls) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+                try {
+                    return cls.getConstructor(WorldGuardPlugin.class).newInstance(this);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        });
         
         // Register command classes
         commands.register(ToggleCommands.class);
@@ -203,7 +215,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command cmd, String label,
             String[] args) {
         try {
-            commands.execute(cmd.getName(), args, sender, this, sender);
+            commands.execute(cmd.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
             sender.sendMessage(ChatColor.RED + "You don't have permission.");
         } catch (MissingNestedCommandException e) {

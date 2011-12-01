@@ -33,13 +33,15 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class GeneralCommands {
+    private final WorldGuardPlugin plugin;
+
+    public GeneralCommands(WorldGuardPlugin plugin) {
+        this.plugin = plugin;
+    }
     
-    @Command(aliases = {"god"},
-            usage = "[player]",
-            desc = "Enable godmode on a player",
-            flags = "s", min = 0, max = 1)
-    public static void god(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"god"}, usage = "[player]",
+            desc = "Enable godmode on a player", flags = "s", max = 1)
+    public void god(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
         
         Iterable<Player> targets = null;
@@ -82,12 +84,9 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"ungod"},
-            usage = "[player]",
-            desc = "Disable godmode on a player",
-            flags = "s", min = 0, max = 1)
-    public static void ungod(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"ungod"}, usage = "[player]",
+            desc = "Disable godmode on a player", flags = "s", max = 1)
+    public void ungod(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
         
         Iterable<Player> targets = null;
@@ -129,12 +128,8 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"heal"},
-            usage = "[player]",
-            desc = "Heal a player",
-            flags = "s", min = 0, max = 1)
-    public static void heal(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"heal"}, usage = "[player]", desc = "Heal a player", flags = "s", max = 1)
+    public void heal(CommandContext args,CommandSender sender) throws CommandException {
         
         Iterable<Player> targets = null;
         boolean included = false;
@@ -176,10 +171,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"slay"},
-            usage = "[player]",
-            desc = "Slay a player",
-            flags = "s", min = 0, max = 1)
+    @Command(aliases = {"slay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
     public static void slay(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
         
@@ -222,13 +214,9 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"locate"},
-            usage = "[player]",
-            desc = "Locate a player",
-            flags = "", min = 0, max = 1)
+    @Command(aliases = {"locate"}, usage = "[player]", desc = "Locate a player", max = 1)
     @CommandPermissions({"worldguard.locate"})
-    public static void locate(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void locate(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         
@@ -244,13 +232,9 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"stack", ";"},
-            usage = "",
-            desc = "Stack items",
-            flags = "", min = 0, max = 0)
+    @Command(aliases = {"stack", ";"}, usage = "", desc = "Stack items", max = 0)
     @CommandPermissions({"worldguard.stack"})
-    public static void stack(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void stack(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         boolean ignoreMax = plugin.hasPermission(player, "worldguard.stack.illegitimate");
@@ -288,7 +272,8 @@ public class GeneralCommands {
                     // Blocks store their color in the damage value
                     if (item2.getTypeId() == item.getTypeId() &&
                             (!ItemType.usesDamageValue(item.getTypeId())
-                                    || item.getDurability() == item2.getDurability())) {
+                                    || item.getDurability() == item2.getDurability()) &&
+                            item.getEnchantments().equals(item2.getEnchantments())) {
                         // This stack won't fit in the parent stack
                         if (item2.getAmount() > needed) {
                             item.setAmount(64);

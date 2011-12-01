@@ -23,22 +23,21 @@ import org.bukkit.command.CommandSender;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class ProtectionCommands {
-    @Command(aliases = {"region"},
-            desc = "Region management commands")
-    @NestedCommand({RegionCommands.class, RegionMemberCommands.class})
-    public static void region(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    private final WorldGuardPlugin plugin;
+
+    public ProtectionCommands(WorldGuardPlugin plugin) {
+        this.plugin = plugin;
     }
 
-    @Command(aliases = {"worldguard"},
-            desc = "WorldGuard commands")
+    @Command(aliases = {"region"}, desc = "Region management commands")
+    @NestedCommand({RegionCommands.class, RegionMemberCommands.class})
+    public void region(CommandContext args, CommandSender sender) {}
+
+    @Command(aliases = {"worldguard"}, desc = "WorldGuard commands")
     @NestedCommand({WorldGuardCommands.class})
-    public static void worldGuard(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
-    }
+    public void worldGuard(CommandContext args, CommandSender sender) {}
 }

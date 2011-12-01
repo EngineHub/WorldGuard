@@ -35,13 +35,16 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class ToggleCommands {
+    private final WorldGuardPlugin plugin;
 
-    @Command(aliases = {"stopfire"},
-            usage = "[<world>]", desc = "Disables all fire spread temporarily",
-            flags = "", min = 0, max = 1)
+    public ToggleCommands(WorldGuardPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    @Command(aliases = {"stopfire"}, usage = "[<world>]",
+            desc = "Disables all fire spread temporarily", max = 1)
     @CommandPermissions({"worldguard.fire-toggle.stop"})
-    public static void stopFire(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void stopFire(CommandContext args, CommandSender sender) throws CommandException {
         
         World world;
         
@@ -67,12 +70,10 @@ public class ToggleCommands {
         wcfg.fireSpreadDisableToggle = true;
     }
 
-    @Command(aliases = {"allowfire"},
-            usage = "[<world>]", desc = "Allows all fire spread temporarily",
-            flags = "", min = 0, max = 1)
+    @Command(aliases = {"allowfire"}, usage = "[<world>]",
+            desc = "Allows all fire spread temporarily", max = 1)
     @CommandPermissions({"worldguard.fire-toggle.stop"})
-    public static void allowFire(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void allowFire(CommandContext args, CommandSender sender) throws CommandException {
         
         World world;
         
@@ -97,8 +98,7 @@ public class ToggleCommands {
     }
 
     @Command(aliases = {"halt-activity"},
-            usage = "", desc = "Attempts to cease as much activity in order to stop lag",
-            flags = "c", min = 0, max = 0)
+            desc = "Attempts to cease as much activity in order to stop lag", flags = "c", max = 0)
     @CommandPermissions({"worldguard.halt-activity"})
     public static void stopLag(CommandContext args, WorldGuardPlugin plugin,
             CommandSender sender) throws CommandException {
