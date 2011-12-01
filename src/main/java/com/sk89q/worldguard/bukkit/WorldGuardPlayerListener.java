@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.sk89q.worldguard.blacklist.events.ItemDetectHaveBlacklistEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
