@@ -39,26 +39,23 @@ import com.sk89q.worldguard.util.PastebinPoster;
 import com.sk89q.worldguard.util.PastebinPoster.PasteCallback;
 
 public class WorldGuardCommands {
+    private final WorldGuardPlugin plugin;
 
-    @Command(aliases = {"version"},
-            usage = "",
-            desc = "Get the WorldGuard version",
-            flags = "", min = 0, max = 0)
-    public static void version(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public WorldGuardCommands(WorldGuardPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    @Command(aliases = {"version"}, desc = "Get the WorldGuard version", max = 0)
+    public void version(CommandContext args, CommandSender sender) throws CommandException {
         sender.sendMessage(ChatColor.YELLOW
                 + "WorldGuard " + plugin.getDescription().getVersion());
         sender.sendMessage(ChatColor.YELLOW
                 + "http://www.sk89q.com");
     }
 
-    @Command(aliases = {"reload"},
-            usage = "",
-            desc = "Reload WorldGuard configuration",
-            flags = "", min = 0, max = 0)
+    @Command(aliases = {"reload"}, desc = "Reload WorldGuard configuration", max = 0)
     @CommandPermissions({"worldguard.reload"})
-    public static void relload(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void reload(CommandContext args, CommandSender sender) throws CommandException {
         
         LoggerToChatHandler handler = null;
         Logger minecraftLogger = null;
@@ -86,10 +83,7 @@ public class WorldGuardCommands {
         }
     }
     
-    @Command(aliases = {"report"},
-            usage = "",
-            desc = "Writes a report on WorldGuard",
-            flags = "p", min = 0, max = 0)
+    @Command(aliases = {"report"}, desc = "Writes a report on WorldGuard", flags = "p", max = 0)
     @CommandPermissions({"worldguard.report"})
     public static void report(CommandContext args, WorldGuardPlugin plugin,
             final CommandSender sender) throws CommandException {
@@ -126,12 +120,9 @@ public class WorldGuardCommands {
     }
 
     @Command(aliases = {"flushstates", "clearstates"},
-            usage = "[player]",
-            desc = "Flush the state manager",
-            flags = "", min = 0, max = 1)
+            usage = "[player]", desc = "Flush the state manager", max = 1)
     @CommandPermissions("worldguard.flushstates")
-    public static void flushStates(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void flushStates(CommandContext args, CommandSender sender) throws CommandException {
         if (args.argsLength() == 0) {
             plugin.getFlagStateManager().forgetAll();
             sender.sendMessage("Cleared all states.");

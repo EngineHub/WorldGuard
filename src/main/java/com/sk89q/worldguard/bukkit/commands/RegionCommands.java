@@ -56,14 +56,16 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritan
 import com.sk89q.worldguard.util.RegionUtil;
 
 public class RegionCommands {
+    private final WorldGuardPlugin plugin;
+
+    public RegionCommands(WorldGuardPlugin plugin) {
+        this.plugin = plugin;
+    }
     
-    @Command(aliases = {"define", "def", "d"},
-            usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
-            desc = "Defines a region",
-            flags = "", min = 1, max = -1)
+    @Command(aliases = {"define", "def", "d"}, usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
+            desc = "Defines a region", min = 1)
     @CommandPermissions({"worldguard.region.define"})
-    public static void define(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void define(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
@@ -122,12 +124,9 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"redefine", "update", "move"},
-            usage = "<id>",
-            desc = "Re-defines the shape of a region",
-            flags = "", min = 1, max = 1)
-    public static void redefine(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"redefine", "update", "move"}, usage = "<id>",
+            desc = "Re-defines the shape of a region", min = 1, max = 1)
+    public void redefine(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
@@ -199,13 +198,10 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"claim"},
-            usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
-            desc = "Claim a region",
-            flags = "", min = 1, max = -1)
+    @Command(aliases = {"claim"}, usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
+            desc = "Claim a region", min = 1)
     @CommandPermissions({"worldguard.region.claim"})
-    public static void claim(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void claim(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
@@ -332,12 +328,9 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"select", "sel", "s"},
-            usage = "<id>",
-            desc = "Load a region as a WorldEdit selection",
-            flags = "", min = 1, max = 1)
-    public static void select(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"select", "sel", "s"}, usage = "<id>",
+            desc = "Load a region as a WorldEdit selection", min = 1, max = 1)
+    public void select(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
@@ -381,12 +374,9 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"info", "i"},
-            usage = "[world] <id>",
-            desc = "Get information about a region",
-            flags = "", min = 1, max = 2)
-    public static void info(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"info", "i"}, usage = "[world] <id>",
+            desc = "Get information about a region", min = 1, max = 2)
+    public void info(CommandContext args, CommandSender sender) throws CommandException {
 
         Player player = null;
         LocalPlayer localPlayer = null;
@@ -468,13 +458,10 @@ public class RegionCommands {
         sender.sendMessage(ChatColor.LIGHT_PURPLE + "Bounds: " + c);
     }
     
-    @Command(aliases = {"list"},
-            usage = "[.player] [page] [world]",
-            desc = "Get a list of regions",
-            flags = "", min = 0, max = 3)
+    @Command(aliases = {"list"}, usage = "[.player] [page] [world]",
+            desc = "Get a list of regions", max = 3)
 //    @CommandPermissions({"worldguard.region.list"})
-    public static void list(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void list(CommandContext args, CommandSender sender) throws CommandException {
 
         World world;
         int page = 0;
@@ -559,7 +546,7 @@ public class RegionCommands {
         int pages = (int) Math.ceil(size / (float) listSize);
 
         sender.sendMessage(ChatColor.RED
-                + (name == "" ? "Regions (page " : "Regions for " + name + " (page ")
+                + (name.equals("") ? "Regions (page " : "Regions for " + name + " (page ")
                 + (page + 1) + " of " + pages + "):");
 
         if (page < pages) {
@@ -573,12 +560,9 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"flag", "f"},
-            usage = "<id> <flag> [value]",
-            desc = "Set flags",
-            flags = "", min = 2, max = -1)
-    public static void flag(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"flag", "f"}, usage = "<id> <flag> [value]",
+            desc = "Set flags", min = 2)
+    public void flag(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
@@ -679,7 +663,7 @@ public class RegionCommands {
         
         if (value != null) {
             try {
-                setFlag(region, foundFlag, plugin, sender, value);
+                setFlag(region, foundFlag, sender, value);
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }
@@ -702,18 +686,15 @@ public class RegionCommands {
         }
     }
     
-    public static <V> void setFlag(ProtectedRegion region,
-            Flag<V> flag, WorldGuardPlugin plugin, CommandSender sender, String value)
+    public <V> void setFlag(ProtectedRegion region,
+            Flag<V> flag, CommandSender sender, String value)
                 throws InvalidFlagFormat {
         region.setFlag(flag, flag.parseInput(plugin, sender, value));
     }
     
-    @Command(aliases = {"setpriority", "priority", "pri"},
-            usage = "<id> <priority>",
-            desc = "Set the priority of a region",
-            flags = "", min = 2, max = 2)
-    public static void setPriority(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"setpriority", "priority", "pri"}, usage = "<id> <priority>",
+            desc = "Set the priority of a region", min = 2, max = 2)
+    public void setPriority(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
@@ -754,12 +735,9 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"setparent", "parent", "par"},
-            usage = "<id> [parent-id]",
-            desc = "Set the parent of a region",
-            flags = "", min = 1, max = 2)
-    public static void setParent(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"setparent", "parent", "par"}, usage = "<id> [parent-id]",
+            desc = "Set the parent of a region", min = 1, max = 2)
+    public void setParent(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
@@ -828,12 +806,9 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"remove", "delete", "del", "rem"},
-            usage = "<id>",
-            desc = "Remove a region",
-            flags = "", min = 1, max = 1)
-    public static void remove(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"remove", "delete", "del", "rem"}, usage = "<id>",
+            desc = "Remove a region", min = 1, max = 1)
+    public void remove(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
@@ -869,12 +844,9 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"load", "reload"},
-            usage = "[world]",
-            desc = "Reload regions from file",
-            flags = "", min = 0, max = 1)
-    public static void load(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"load", "reload"}, usage = "[world]",
+            desc = "Reload regions from file", max = 1)
+    public void load(CommandContext args, CommandSender sender) throws CommandException {
         
         World world = null;
         
@@ -910,12 +882,9 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"save", "write"},
-            usage = "[world]",
-            desc = "Re-save regions to file",
-            flags = "", min = 0, max = 1)
-    public static void save(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"save", "write"}, usage = "[world]",
+            desc = "Re-save regions to file", max = 1)
+    public void save(CommandContext args, CommandSender sender) throws CommandException {
         
         World world = null;
         

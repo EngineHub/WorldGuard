@@ -40,13 +40,15 @@ import com.sk89q.worldguard.util.RegionUtil;
 // @TODO: A lot of code duplication here! Need to fix.
 
 public class RegionMemberCommands {
+    private final WorldGuardPlugin plugin;
+
+    public RegionMemberCommands(WorldGuardPlugin plugin) {
+        this.plugin = plugin;
+    }
     
-    @Command(aliases = {"addmember", "addmember"},
-            usage = "<id> <members...>",
-            desc = "Add a member to a region",
-            flags = "", min = 2, max = -1)
-    public static void addMember(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"addmember", "addmember"}, usage = "<id> <members...>",
+            desc = "Add a member to a region", min = 2)
+    public void addMember(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
@@ -82,12 +84,9 @@ public class RegionMemberCommands {
         }
     }
     
-    @Command(aliases = {"addowner", "addowner"},
-            usage = "<id> <owners...>",
-            desc = "Add an owner to a region",
-            flags = "", min = 2, max = -1)
-    public static void addOwner(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"addowner", "addowner"}, usage = "<id> <owners...>",
+            desc = "Add an owner to a region", min = 2)
+    public void addOwner(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
@@ -133,12 +132,9 @@ public class RegionMemberCommands {
         }
     }
     
-    @Command(aliases = {"removemember", "remmember", "removemem", "remmem"},
-            usage = "<id> <owners...>",
-            desc = "Remove an owner to a region",
-            flags = "", min = 2, max = -1)
-    public static void removeMember(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    @Command(aliases = {"removemember", "remmember", "removemem", "remmem"}, usage = "<id> <owners...>",
+            desc = "Remove an owner to a region", min = 2)
+    public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
@@ -174,11 +170,9 @@ public class RegionMemberCommands {
         }
     }
     
-    @Command(aliases = {"removeowner", "remowner"},
-            usage = "<id> <owners...>",
-            desc = "Remove an owner to a region",
-            flags = "", min = 2, max = -1)
-    public static void removeOwner(CommandContext args, WorldGuardPlugin plugin,
+    @Command(aliases = {"removeowner", "remowner"}, usage = "<id> <owners...>",
+            desc = "Remove an owner to a region", min = 2)
+    public void removeOwner(CommandContext args,
             CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
