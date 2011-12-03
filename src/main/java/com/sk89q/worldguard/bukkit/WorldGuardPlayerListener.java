@@ -527,7 +527,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 || type == Material.FURNACE
                 || type == Material.BURNING_FURNACE
                 || type == Material.BREWING_STAND
-                || type == Material.ENCHANTMENT_TABLE)
+                || type == Material.ENCHANTMENT_TABLE
+                || type == Material.CAULDRON)
                 && wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
             for (int slot = 0; slot < 40; slot++) {
@@ -628,7 +629,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     || type == Material.BURNING_FURNACE
                     || type == Material.WORKBENCH
                     || type == Material.BREWING_STAND
-                    || type == Material.ENCHANTMENT_TABLE) {
+                    || type == Material.ENCHANTMENT_TABLE
+                    || type == Material.CAULDRON
+                    || type == Material.DRAGON_EGG) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.USE)
                         && !set.canBuild(localPlayer)) {
@@ -678,7 +681,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     && type != Material.FURNACE
                     && type != Material.BURNING_FURNACE
                     && type != Material.BREWING_STAND
-                    && type != Material.ENCHANTMENT_TABLE) {
+                    && type != Material.ENCHANTMENT_TABLE
+                    && type != Material.CAULDRON) {
                 if (!wcfg.getBlacklist().check(
                         new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
                                 item.getTypeId()), false, false)) {
@@ -713,7 +717,8 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 || type == Material.DISPENSER
                 || type == Material.FURNACE
                 || type == Material.BURNING_FURNACE
-                || type == Material.ENCHANTMENT_TABLE)) {
+                || type == Material.ENCHANTMENT_TABLE
+                || type == Material.BREWING_STAND)) {
             
             if (wcfg.isChestProtected(block, player)) {
                 player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
