@@ -255,8 +255,9 @@ public class RegionCommands {
         
         if (!plugin.hasPermission(sender, "worldguard.region.unlimited")) {
             // Check whether the player has created too many regions 
-            if (wcfg.maxRegionCountPerPlayer >= 0
-                    && mgr.getRegionCountOfPlayer(localPlayer) >= wcfg.maxRegionCountPerPlayer) {
+            int maxRegionCount = wcfg.getMaxRegionCount(player);
+            if (maxRegionCount >= 0
+                    && mgr.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
                 throw new CommandException("You own too many regions, delete one first to claim a new one.");
             }
         }

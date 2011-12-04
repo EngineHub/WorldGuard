@@ -23,8 +23,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -153,6 +155,8 @@ public class WorldConfiguration {
     public boolean regionInvinciblityRemovesMobs;
     public boolean disableDeathMessages;
     public boolean disableObsidianGenerators;
+    
+    private Map<String, Integer> maxRegionCounts;
 
     /* Configuration data end */
 
@@ -249,6 +253,30 @@ public class WorldConfiguration {
         return res;
     }
 
+    private List<String> getKeys(String node) {
+        List<String> res = parentConfig.getKeys(node);
+
+        if (res == null || res.size() == 0) {
+            parentConfig.setProperty(node, new ArrayList<String>());
+        }
+
+        if (config.getProperty(node) != null) {
+            res = config.getKeys(node);
+        }
+
+        return res;
+    }
+
+    private Object getProperty(String node) {
+        Object res = parentConfig.getProperty(node);
+
+        if (config.getProperty(node) != null) {
+            res = config.getProperty(node);
+        }
+
+        return res;
+    }
+
     /**
      * Load the configuration.
      */
@@ -340,8 +368,20 @@ public class WorldConfiguration {
         regionWand = getInt("regions.wand", 287);
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
-        maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player", 7);
-
+        
+        maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player.default", 7);
+        maxRegionCounts = new HashMap<String, Integer>();
+        maxRegionCounts.put(null, maxRegionCountPerPlayer);
+        
+        for (String key : getKeys("regions.max-region-count-per-player")) {
+            if (!key.equalsIgnoreCase("default")) {
+                Object val = getProperty("regions.max-region-count-per-player." + key);
+                if (val != null && val instanceof Number) {
+                    maxRegionCounts.put(key, ((Number) val).intValue());
+                }
+            }
+        }
+        
         // useiConomy = getBoolean("iconomy.enable", false);
         // buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
         // buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
@@ -503,5 +543,19 @@ public class WorldConfiguration {
 
     public ChestProtection getChestProtection() {
         return chestProtection;
+    }
+    
+    public int getMaxRegionCount(Player player) {
+        int max = -1;
+        for (String group : plugin.getGroups(player)) {
+            if (maxRegionCounts.containsKey(group)) {
+                int groupMax = maxRegionCounts.get(group);
+                if (max < groupMax) max = groupMax;
+            }
+        }
+        if (max <= -1) {
+            max = maxRegionCountPerPlayer;
+        }
+        return max;
     }
 }
