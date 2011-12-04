@@ -104,9 +104,12 @@ public class RegionMemberCommands {
         Boolean flag = region.getFlag(DefaultFlag.BUYABLE);
         DefaultDomain owners = region.getOwners();
         if (flag != null && flag == true && owners != null && owners.size() == 0) {
-            if (mgr.getRegionCountOfPlayer(localPlayer)
-                    >= plugin.getGlobalStateManager().get(world).maxRegionCountPerPlayer) {
-                throw new CommandException("You already own the maximum allowed amount of regions.");
+            if (!plugin.hasPermission(player, "worldguard.region.unlimited")) {
+                int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
+                if (maxRegionCount >= 0 && mgr.getRegionCountOfPlayer(localPlayer)
+                        >= maxRegionCount) {
+                    throw new CommandException("You already own the maximum allowed amount of regions.");
+                }
             }
             plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
         } else {
