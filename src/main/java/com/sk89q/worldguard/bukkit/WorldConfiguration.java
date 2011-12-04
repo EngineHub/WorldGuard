@@ -257,11 +257,10 @@ public class WorldConfiguration {
         List<String> res = parentConfig.getKeys(node);
 
         if (res == null || res.size() == 0) {
-            parentConfig.setProperty(node, new ArrayList<String>());
-        }
-
-        if (config.getProperty(node) != null) {
             res = config.getKeys(node);
+        }
+        if (res == null) {
+            res = new ArrayList<String>();
         }
 
         return res;
