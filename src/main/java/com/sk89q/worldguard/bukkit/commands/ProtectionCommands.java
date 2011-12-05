@@ -27,6 +27,7 @@ import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class ProtectionCommands {
+    @SuppressWarnings("unused")
     private final WorldGuardPlugin plugin;
 
     public ProtectionCommands(WorldGuardPlugin plugin) {
