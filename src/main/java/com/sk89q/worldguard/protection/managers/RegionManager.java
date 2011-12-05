@@ -140,11 +140,9 @@ public abstract class RegionManager {
      * Get an object for a point for rules to be applied with. This gets
      * a set for the given reason.
      *
-     * @deprecated not yet fully supported
      * @param region region
      * @return regino set
      */
-    @Deprecated
     public abstract ApplicableRegionSet getApplicableRegions(
             ProtectedRegion region);
 
