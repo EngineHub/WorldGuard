@@ -569,12 +569,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         if (filter.equalsIgnoreCase("#console")
                 || filter.equalsIgnoreCase("*console*")
                 || filter.equalsIgnoreCase("!")) {
-            try {
-                return getServer().getConsoleSender();
-            } catch (Throwable t) {
-                // Legacy support
-                return new LegacyConsoleSender(getServer());
-            }
+            return getServer().getConsoleSender();
         }
         
         return matchSinglePlayer(sender, filter);
