@@ -94,7 +94,6 @@ public class ConfigurationManager {
     public String sqlDsn;
     public String sqlUsername;
     public String sqlPassword;
-    public String sqlPrefix;
 
     /**
      * Construct the object.
@@ -133,7 +132,6 @@ public class ConfigurationManager {
             sqlDsn = config.getString("regions.sql.dsn");
             sqlUsername = config.getString("regions.sql.username");
             sqlPassword = config.getString("regions.sql.password");
-            sqlPrefix = config.getString("regions.sql.prefix", "worldguard_");
         }
 
         // Load configurations for each world
