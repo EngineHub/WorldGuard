@@ -100,8 +100,7 @@ public class ToggleCommands {
     @Command(aliases = {"halt-activity"},
             desc = "Attempts to cease as much activity in order to stop lag", flags = "c", max = 0)
     @CommandPermissions({"worldguard.halt-activity"})
-    public static void stopLag(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void stopLag(CommandContext args, CommandSender sender) throws CommandException {
 
         ConfigurationManager configManager = plugin.getGlobalStateManager();
 

@@ -172,8 +172,7 @@ public class GeneralCommands {
     }
     
     @Command(aliases = {"slay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
-    public static void slay(CommandContext args, WorldGuardPlugin plugin,
-            CommandSender sender) throws CommandException {
+    public void slay(CommandContext args, CommandSender sender) throws CommandException {
         
         Iterable<Player> targets = null;
         boolean included = false;
