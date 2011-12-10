@@ -8,9 +8,8 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `username_unique` (`name` ASC) )
+  `name` VARCHAR(45) NOT NULL UNIQUE,
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
 
@@ -19,9 +18,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `group` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `group_name_unique` (`name` ASC) )
+  `name` VARCHAR(45) NOT NULL UNIQUE,
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
 
@@ -30,9 +28,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `world` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(64) NOT NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `unique_name` (`name` ASC) )
+  `name` VARCHAR(64) NOT NULL UNIQUE,
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
 
