@@ -85,8 +85,7 @@ public class WorldGuardCommands {
     
     @Command(aliases = {"report"}, desc = "Writes a report on WorldGuard", flags = "p", max = 0)
     @CommandPermissions({"worldguard.report"})
-    public static void report(CommandContext args, WorldGuardPlugin plugin,
-            final CommandSender sender) throws CommandException {
+    public void report(CommandContext args, final CommandSender sender) throws CommandException {
         
         File dest = new File(plugin.getDataFolder(), "report.txt");
         ReportWriter report = new ReportWriter(plugin);
