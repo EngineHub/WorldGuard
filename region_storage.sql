@@ -8,7 +8,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NOT NULL UNIQUE,
+  `name` VARCHAR(64) NOT NULL UNIQUE,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -18,7 +18,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `group` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(45) NOT NULL UNIQUE,
+  `name` VARCHAR(64) NOT NULL UNIQUE,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -28,7 +28,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `world` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(64) NOT NULL UNIQUE,
+  `name` VARCHAR(128) NOT NULL UNIQUE,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -37,11 +37,11 @@ ENGINE = InnoDB;
 -- Table `region`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `region` (
-  `id` VARCHAR(64) NOT NULL ,
+  `id` VARCHAR(128) NOT NULL ,
   `world_id` INT UNSIGNED NOT NULL ,
   `type` ENUM('cuboid','poly2d','global') NOT NULL ,
   `priority` SMALLINT NOT NULL DEFAULT 0 ,
-  `parent` VARCHAR(64) NULL ,
+  `parent` VARCHAR(128) NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `parent` (`parent` ASC) ,
   INDEX `fk_region_world` (`world_id` ASC) ,
@@ -63,7 +63,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `region_flag` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `region_id` VARCHAR(64) NOT NULL ,
+  `region_id` VARCHAR(128) NOT NULL ,
   `flag` VARCHAR(45) NOT NULL ,
   `value` VARCHAR(45) NOT NULL ,
   INDEX `fk_flags_region` (`region_id` ASC) ,
@@ -80,7 +80,7 @@ ENGINE = InnoDB;
 -- Table `region_cuboid`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `region_cuboid` (
-  `region_id` VARCHAR(64) NOT NULL ,
+  `region_id` VARCHAR(128) NOT NULL ,
   `min_z` BIGINT NOT NULL ,
   `min_y` BIGINT NOT NULL ,
   `min_x` BIGINT NOT NULL ,
@@ -101,7 +101,7 @@ ENGINE = InnoDB;
 -- Table `region_poly2d`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `region_poly2d` (
-  `region_id` VARCHAR(64) NOT NULL ,
+  `region_id` VARCHAR(128) NOT NULL ,
   `max_y` INT NOT NULL ,
   `min_y` INT NOT NULL ,
   PRIMARY KEY (`region_id`) ,
@@ -118,7 +118,7 @@ ENGINE = InnoDB;
 -- Table `region_players`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `region_players` (
-  `region_id` VARCHAR(64) NOT NULL ,
+  `region_id` VARCHAR(128) NOT NULL ,
   `user_id` INT UNSIGNED NOT NULL ,
   `owner` TINYINT(1)  NOT NULL ,
   PRIMARY KEY (`region_id`, `user_id`) ,
@@ -141,7 +141,7 @@ ENGINE = InnoDB;
 -- Table `region_groups`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `region_groups` (
-  `region_id` VARCHAR(64) NOT NULL ,
+  `region_id` VARCHAR(128) NOT NULL ,
   `group_id` INT UNSIGNED NOT NULL ,
   `owner` TINYINT(1)  NOT NULL ,
   PRIMARY KEY (`region_id`, `group_id`) ,
@@ -165,7 +165,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `region_poly2d_point` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `region_id` VARCHAR(64) NOT NULL ,
+  `region_id` VARCHAR(128) NOT NULL ,
   `z` BIGINT NOT NULL ,
   `x` BIGINT NOT NULL ,
   PRIMARY KEY (`id`) ,
