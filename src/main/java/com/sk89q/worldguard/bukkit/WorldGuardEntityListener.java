@@ -289,9 +289,10 @@ public class WorldGuardEntityListener extends EntityListener {
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
+                    Vector pt2 = toVector(attacker.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
-                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP)) {
+                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP) || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP)) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
                         return;
