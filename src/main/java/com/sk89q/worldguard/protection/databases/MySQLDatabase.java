@@ -272,7 +272,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         try {
         	PreparedStatement cuboidRegionStatement = this.conn.prepareStatement(
 	    			"SELECT " +
-	    			"`region_cuboid`.`min_Z`, " +
+	    			"`region_cuboid`.`min_z`, " +
 	    			"`region_cuboid`.`min_y`, " +
 	    			"`region_cuboid`.`min_x`, " +
 	    			"`region_cuboid`.`max_z`, " +
@@ -294,14 +294,14 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         	
         	while (cuboidResultSet.next()) {
         		Vector pt1 = new Vector(
-        				cuboidResultSet.getInt("min_z"),
         				cuboidResultSet.getInt("min_x"),
-        				cuboidResultSet.getInt("min_y")
+        				cuboidResultSet.getInt("min_y"),
+        				cuboidResultSet.getInt("min_z")
         			);
         		Vector pt2 = new Vector(
-        				cuboidResultSet.getInt("max_z"),
         				cuboidResultSet.getInt("max_x"),
-        				cuboidResultSet.getInt("max_y")
+        				cuboidResultSet.getInt("max_y"),
+        				cuboidResultSet.getInt("max_z")
         			);
         		
         		BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
