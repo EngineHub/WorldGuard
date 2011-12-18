@@ -33,6 +33,7 @@ public final class DefaultFlag {
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", 'm', true);
     public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true);
     public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", 'c', true);
+    public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = new StateFlag("enderdragon-block-damage", true);
     public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true);
     public static final StateFlag SLEEP = new StateFlag("sleep", true);
     public static final StateFlag TNT = new StateFlag("tnt", 't', true);
@@ -86,7 +87,7 @@ public final class DefaultFlag {
         PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY,
-        CREEPER_EXPLOSION, GHAST_FIREBALL, ENDER_BUILD,
+        CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
         EXIT, EXIT_PERM, ENTRY, ENTRY_PERM,
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
