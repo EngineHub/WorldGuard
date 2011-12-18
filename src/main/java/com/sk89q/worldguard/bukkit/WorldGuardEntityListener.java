@@ -31,6 +31,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -543,7 +544,7 @@ public class WorldGuardEntityListener extends EntityListener {
             return;
         }
 
-        if (ent instanceof LivingEntity) {
+        if (ent instanceof Creeper) {
             if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
                 return;
@@ -555,6 +556,24 @@ public class WorldGuardEntityListener extends EntityListener {
 
                     for (Block block : event.blockList()) {
                         if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+        } else if (ent instanceof EnderDragon) {
+            if (wcfg.blockEnderDragonBlockDamage) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions) {
+                if (wcfg.useRegions) {
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                    for (Block block : event.blockList()) {
+                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
                             event.setCancelled(true);
                             return;
                         }

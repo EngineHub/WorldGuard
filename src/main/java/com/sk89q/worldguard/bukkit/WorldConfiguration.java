@@ -101,6 +101,7 @@ public class WorldConfiguration {
     public boolean blockTNTBlockDamage;
     public boolean blockCreeperExplosions;
     public boolean blockCreeperBlockDamage;
+    public boolean blockEnderDragonBlockDamage;
     public boolean blockFireballExplosions;
     public boolean blockFireballBlockDamage;
     // public int loginProtection;
@@ -314,6 +315,7 @@ public class WorldConfiguration {
 
         blockCreeperExplosions = getBoolean("mobs.block-creeper-explosions", false);
         blockCreeperBlockDamage = getBoolean("mobs.block-creeper-block-damage", false);
+        blockEnderDragonBlockDamage = getBoolean("mobs.block-enderdragon-block-damage", false);
         blockFireballExplosions = getBoolean("mobs.block-fireball-explosions", false);
         blockFireballBlockDamage = getBoolean("mobs.block-fireball-block-damage", false);
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
