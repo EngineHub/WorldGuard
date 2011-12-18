@@ -1,3 +1,18 @@
+5.4:
+- Fixed configuration generation on Windows
+- Fixed intersection calculation for regions
+- Fixed timer and feeding delay for food flags
+- Fixed region managers not being created properly (This caused errors related to CREATURE_SPAWN)
+- Added support for Minecraft 1.0.1 blocks
+- Added support for enchantments and tool damage (worldguard.stack.damaged is the node) with /stack
+- Made being in the wg-invincible group respect the configuration's auto-invincible setting
+- Added per-group region claim limit maximum
+- Added worldguard.region.addowner.unclaimed.* permission for non-economy region 'buying'
+- Checking allowed/blocked commands now occurs earlier to override more plugins
+- Made PVP flag check whether either player is in a pvp deny region for blocking
+
+Contributions thanks to: epuidokas, wizjany, Turtle9598, and DerFlash
+
 5.3:
 - Added new config options and flags to better handle explosions of all types
 - Added config options and flags for snow, ice, mushroom spread, grass spread,
