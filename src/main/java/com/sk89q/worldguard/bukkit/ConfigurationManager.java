@@ -128,11 +128,9 @@ public class ConfigurationManager {
         useSqlDatabase = config.getBoolean(
                 "regions.sql.use", false);
 
-        if (useSqlDatabase) {
-            sqlDsn = config.getString("regions.sql.dsn");
-            sqlUsername = config.getString("regions.sql.username");
-            sqlPassword = config.getString("regions.sql.password");
-        }
+        sqlDsn = config.getString("regions.sql.dsn", "jdbc:mysql://localhost/worldguard");
+        sqlUsername = config.getString("regions.sql.username", "worldguard");
+        sqlPassword = config.getString("regions.sql.password", "worldguard");
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
