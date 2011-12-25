@@ -34,6 +34,9 @@ import java.util.logging.Filter;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
+import com.sk89q.minecraft.util.commands.*;
+import com.sk89q.wepif.PermissionsResolverManager;
+import com.sk89q.worldguard.util.CommandRegistration;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -45,14 +48,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.bukkit.migration.PermissionsResolverManager;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.minecraft.util.commands.CommandUsageException;
-import com.sk89q.minecraft.util.commands.CommandsManager;
-import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
-import com.sk89q.minecraft.util.commands.WrappedCommandException;
-import com.sk89q.minecraft.util.commands.Injector;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
@@ -91,14 +86,6 @@ public class WorldGuardPlugin extends JavaPlugin {
     private final ConfigurationManager configuration;
     
     /**
-     * Processes queries for permissions information. The permissions manager
-     * is from WorldEdit and it automatically handles looking up permissions
-     * systems and picking the right one. WorldGuard just needs to call
-     * the permission methods.
-     */
-    private PermissionsResolverManager perms;
-    
-    /**
      * Used for scheduling flags.
      */
     private FlagStateManager flagStateManager;
@@ -110,7 +97,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public WorldGuardPlugin() {
         configuration = new ConfigurationManager(this);
         globalRegionManager = new GlobalRegionManager(this);
-        
+
         final WorldGuardPlugin plugin = this;
         commands = new CommandsManager<CommandSender>() {
             @Override
@@ -118,35 +105,28 @@ public class WorldGuardPlugin extends JavaPlugin {
                 return plugin.hasPermission(player, perm);
             }
         };
-        commands.setInjector(new Injector() {
-            public Object getInstance(Class<?> cls) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-                try {
-                    return cls.getConstructor(WorldGuardPlugin.class).newInstance(plugin);
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        });
-        
-        // Register command classes
-        commands.register(ToggleCommands.class);
-        commands.register(ProtectionCommands.class);
-        commands.register(GeneralCommands.class);
     }
     
     /**
      * Called on plugin enable.
      */
     public void onEnable() {
+
+        // Set the proper command injector
+        commands.setInjector(new SimpleInjector(this));
+
+        // Register command classes
+        final CommandRegistration reg = new CommandRegistration(this, commands);
+        reg.register(ToggleCommands.class);
+        reg.register(ProtectionCommands.class);
+        reg.register(GeneralCommands.class);
+
         // Need to create the plugins/WorldGuard folder
         getDataFolder().mkdirs();
 
-        // Set up permissions
-        perms = new PermissionsResolverManager(this, getDescription().getName(), logger);
-        perms.load();
+        PermissionsResolverManager.initialize(this);
 
-        // This must be done before configuration is laoded
+        // This must be done before configuration is loaded
         LegacyWorldGuardMigration.migrateBlacklist(this);
         
         // Load the configuration
@@ -285,7 +265,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public boolean inGroup(Player player, String group) {
         try {
-            return perms.inGroup(player.getName(), group);
+            return PermissionsResolverManager.getInstance().inGroup(player, group);
         } catch (Throwable t) {
             t.printStackTrace();
             return false;
@@ -300,7 +280,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public String[] getGroups(Player player) {
         try {
-            return perms.getGroups(player.getName());
+            return PermissionsResolverManager.getInstance().getGroups(player);
         } catch (Throwable t) {
             t.printStackTrace();
             return new String[0];
@@ -358,7 +338,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Invoke the permissions resolver
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            return perms.hasPermission(player.getWorld().getName(), player.getName(), perm);
+            return PermissionsResolverManager.getInstance().hasPermission(player.getWorld().getName(), player.getName(), perm);
         }
         
         return false;

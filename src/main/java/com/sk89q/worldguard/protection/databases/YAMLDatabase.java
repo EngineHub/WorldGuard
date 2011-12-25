@@ -29,6 +29,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.sk89q.util.yaml.YAMLFormat;
+import com.sk89q.util.yaml.YAMLNode;
+import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
@@ -40,14 +43,12 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
-import com.sk89q.worldguard.util.yaml.Configuration;
-import com.sk89q.worldguard.util.yaml.ConfigurationNode;
 
 public class YAMLDatabase extends AbstractProtectionDatabase {
     
     private static Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
-    private Configuration config;
+    private YAMLProcessor config;
     private Map<String, ProtectedRegion> regions;
     
     public YAMLDatabase(File file) {
@@ -57,13 +58,13 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
             } catch (IOException e) {}
             // if this is thrown, we can't do anything (caught elsewhere anyway)
         }
-        config = new Configuration(file);
+        config = new YAMLProcessor(file, false, YAMLFormat.COMPACT);
     }
 
     public void load() throws IOException {
         config.load();
         
-        Map<String, ConfigurationNode> regionData = config.getNodes("regions");
+        Map<String, YAMLNode> regionData = config.getNodes("regions");
         
         // No regions are even configured
         if (regionData == null) {
@@ -76,9 +77,9 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         Map<ProtectedRegion,String> parentSets =
             new LinkedHashMap<ProtectedRegion, String>();
         
-        for (Map.Entry<String, ConfigurationNode> entry : regionData.entrySet()) {
+        for (Map.Entry<String, YAMLNode> entry : regionData.entrySet()) {
             String id = entry.getKey().toLowerCase().replace(".", "");
-            ConfigurationNode node = entry.getValue();
+            YAMLNode node = entry.getValue();
             
             String type = node.getString("type");
             ProtectedRegion region;
@@ -147,7 +148,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         return val;
     }
     
-    private void setFlags(ProtectedRegion region, ConfigurationNode flagsData) {
+    private void setFlags(ProtectedRegion region, YAMLNode flagsData) {
         if (flagsData == null) {
             return;
         }
@@ -171,7 +172,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         region.setFlag(flag, val);
     }
     
-    private DefaultDomain parseDomain(ConfigurationNode node) {
+    private DefaultDomain parseDomain(YAMLNode node) {
         if (node == null) {
             return new DefaultDomain();
         }
@@ -194,7 +195,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         
         for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
             ProtectedRegion region = entry.getValue();
-            ConfigurationNode node = config.addNode("regions." + entry.getKey());
+            YAMLNode node = config.addNode("regions." + entry.getKey());
             
             if (region instanceof ProtectedCuboidRegion) {
                 ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
