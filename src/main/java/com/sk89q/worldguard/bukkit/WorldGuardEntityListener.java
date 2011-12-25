@@ -323,13 +323,24 @@ public class WorldGuardEntityListener extends EntityListener {
                     return;
                 }
                 if (wcfg.useRegions) {
+                    Fireball fireball = (Fireball) attacker;
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                    if (!set.allows(DefaultFlag.GHAST_FIREBALL)) {
-                        event.setCancelled(true);
-                        return;
+                    if (fireball.getShooter() instanceof Player) {
+                        Vector pt2 = toVector(fireball.getShooter().getLocation());
+                        if (!set.allows(DefaultFlag.PVP) || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP)) {
+                            ((Player) fireball.getShooter()).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
+                            event.setCancelled(true);
+                            return;
+                        }
+                    } else {
+                        if (!set.allows(DefaultFlag.GHAST_FIREBALL)) {
+                            event.setCancelled(true);
+                            return;
+                        }
                     }
+
                 }
             }
 
