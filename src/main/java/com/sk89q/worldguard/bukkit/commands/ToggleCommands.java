@@ -97,7 +97,7 @@ public class ToggleCommands {
         wcfg.fireSpreadDisableToggle = false;
     }
 
-    @Command(aliases = {"halt-activity"},
+    @Command(aliases = {"halt-activity", "stoplag", "haltactivity"},
             desc = "Attempts to cease as much activity in order to stop lag", flags = "c", max = 0)
     @CommandPermissions({"worldguard.halt-activity"})
     public void stopLag(CommandContext args, CommandSender sender) throws CommandException {

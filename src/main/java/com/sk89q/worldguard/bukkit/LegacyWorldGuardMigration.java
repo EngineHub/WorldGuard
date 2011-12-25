@@ -87,7 +87,7 @@ public class LegacyWorldGuardMigration {
             File oldDatabase = new File(plugin.getDataFolder(), "regions.txt");
             if (!oldDatabase.exists()) return;
             
-            logger.info("WorldGuard: The regions database has changed in 4.x. "
+            logger.info("WorldGuard: The regions database has changed in 5.x. "
                     + "Your old regions database will be converted to the new format "
                     + "and set as your primarily world's database.");
 
