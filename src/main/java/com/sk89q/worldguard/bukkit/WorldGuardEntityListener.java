@@ -551,7 +551,6 @@ public class WorldGuardEntityListener extends EntityListener {
         World world = l.getWorld();
         WorldConfiguration wcfg = cfg.get(world);
         Entity ent = event.getEntity();
-        List<Block> blocks = event.blockList();
 
         if (cfg.activityHaltToggle) {
             ent.remove();
