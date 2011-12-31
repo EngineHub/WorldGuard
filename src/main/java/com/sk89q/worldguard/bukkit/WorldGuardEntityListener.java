@@ -160,9 +160,12 @@ public class WorldGuardEntityListener extends EntityListener {
     @Override
     public void onEntityDeath(EntityDeathEvent event) {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
-        if (wcfg.disableExpDrops) {
+
+        if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
+                event.getEntity().getLocation())) {
             event.setDroppedExp(0);
         }
+
         try {
             if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
                 ((PlayerDeathEvent) event).setDeathMessage("");
