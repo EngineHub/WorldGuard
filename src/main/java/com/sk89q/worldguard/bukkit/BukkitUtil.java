@@ -21,9 +21,10 @@ package com.sk89q.worldguard.bukkit;
 
 import java.util.List;
 
+import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldedit.blocks.ItemID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -110,7 +111,7 @@ public class BukkitUtil {
     public static void dropSign(Block block) {
         block.setTypeId(0);
         block.getWorld().dropItemNaturally(block.getLocation(),
-                new ItemStack(Material.SIGN, 1));
+                new ItemStack(ItemID.SIGN, 1));
     }
 
     /**
@@ -179,7 +180,7 @@ public class BukkitUtil {
                     loc.setX(x + 0.5);
                     loc.setY(y);
                     loc.setZ(z + 0.5);
-                    if (y <= 2 && world.getBlockAt(x,0,z).getType() == Material.AIR) {
+                    if (y <= 2 && world.getBlockAt(x,0,z).getTypeId() == BlockID.AIR) {
                         world.getBlockAt(x,0,z).setTypeId(20);
                         loc.setY(2);
                     }

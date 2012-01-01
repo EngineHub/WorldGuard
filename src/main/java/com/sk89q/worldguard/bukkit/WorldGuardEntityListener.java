@@ -23,9 +23,9 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.sk89q.worldedit.blocks.BlockID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
@@ -147,7 +147,7 @@ public class WorldGuardEntityListener extends EntityListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(entity.getWorld());
 
-        if (block.getType() == Material.SOIL) {
+        if (block.getTypeId() == BlockID.SOIL) {
             if (entity instanceof Creature && wcfg.disableCreatureCropTrampling) {
                 event.setCancelled(true);
             }
@@ -476,8 +476,8 @@ public class WorldGuardEntityListener extends EntityListener {
             }
 
             if (type == DamageCause.DROWNING && wcfg.pumpkinScuba
-                    && (player.getInventory().getHelmet().getType() == Material.PUMPKIN
-                    || player.getInventory().getHelmet().getType() == Material.JACK_O_LANTERN)) {
+                    && (player.getInventory().getHelmet().getTypeId() == BlockID.PUMPKIN
+                    || player.getInventory().getHelmet().getTypeId() == BlockID.JACKOLANTERN)) {
                 player.setRemainingAir(player.getMaximumAir());
                 event.setCancelled(true);
                 return;

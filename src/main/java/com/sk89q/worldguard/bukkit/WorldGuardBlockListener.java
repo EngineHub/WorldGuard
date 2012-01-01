@@ -24,7 +24,6 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -53,6 +52,7 @@ import org.bukkit.plugin.PluginManager;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
@@ -154,7 +154,7 @@ public class WorldGuardBlockListener extends BlockListener {
 
         // Cake are damaged and not broken when they are eaten, so we must
         // handle them a bit separately
-        if (blockDamaged.getType() == Material.CAKE_BLOCK) {
+        if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
                 player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
                 event.setCancelled(true);
@@ -541,7 +541,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
         
-        if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getType())) {
+        if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getTypeId())) {
             if (wcfg.isAdjacentChestProtected(event.getBlock(), player)) {
                 player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
                 event.setCancelled(true);
@@ -616,7 +616,7 @@ public class WorldGuardBlockListener extends BlockListener {
                     return;
                 }
                 
-                if (event.getBlock().getType() != Material.SIGN_POST) {
+                if (event.getBlock().getTypeId() != BlockID.SIGN_POST) {
                     player.sendMessage(ChatColor.RED
                             + "The [Lock] sign must be a sign post, not a wall sign.");
 
@@ -634,10 +634,10 @@ public class WorldGuardBlockListener extends BlockListener {
                     return;
                 }
                 
-                Material below = event.getBlock().getRelative(0, -1, 0).getType();
+                int below = event.getBlock().getRelative(0, -1, 0).getTypeId();
 
-                if (below == Material.TNT || below == Material.SAND
-                        || below == Material.GRAVEL || below == Material.SIGN_POST) {
+                if (below == BlockID.TNT || below == BlockID.SAND
+                        || below == BlockID.GRAVEL || below == BlockID.SIGN_POST) {
                     player.sendMessage(ChatColor.RED
                             + "That is not a safe block that you're putting this sign on.");
 
@@ -711,9 +711,9 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        Material type = event.getNewState().getType();
+        int type = event.getNewState().getTypeId();
 
-        if (type == Material.ICE) {
+        if (type == BlockID.ICE) {
             if (wcfg.disableIceFormation) {
                 event.setCancelled(true);
                 return;
@@ -725,7 +725,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (type == Material.SNOW) {
+        if (type == BlockID.SNOW) {
             if (wcfg.disableSnowFormation) {
                 event.setCancelled(true);
                 return;
@@ -754,9 +754,9 @@ public class WorldGuardBlockListener extends BlockListener {
             return;
         }
 
-        Material fromType = event.getSource().getType();
+        int fromType = event.getSource().getTypeId();
 
-        if (fromType == Material.RED_MUSHROOM || fromType == Material.BROWN_MUSHROOM) {
+        if (fromType == BlockID.RED_MUSHROOM || fromType == BlockID.BROWN_MUSHROOM) {
             if (wcfg.disableMushroomSpread) {
                 event.setCancelled(true);
                 return;
@@ -768,7 +768,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (fromType == Material.GRASS) {
+        if (fromType == BlockID.GRASS) {
             if (wcfg.disableGrassGrowth) {
                 event.setCancelled(true);
                 return;
@@ -792,9 +792,9 @@ public class WorldGuardBlockListener extends BlockListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
-        Material type = event.getBlock().getType();
+        int type = event.getBlock().getTypeId();
 
-        if (type == Material.ICE) {
+        if (type == BlockID.ICE) {
             if (wcfg.disableIceMelting) {
                 event.setCancelled(true);
                 return;
@@ -806,7 +806,7 @@ public class WorldGuardBlockListener extends BlockListener {
             }
         }
 
-        if (type == Material.SNOW) {
+        if (type == BlockID.SNOW) {
             if (wcfg.disableSnowMelting) {
                 event.setCancelled(true);
                 return;

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.chest;
 
+import com.sk89q.worldedit.blocks.BlockID;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -33,10 +34,10 @@ import org.bukkit.entity.Player;
 public class SignChestProtection implements ChestProtection {
     
     public boolean isProtected(Block block, Player player) {
-        if (isChest(block.getType())) {
+        if (isChest(block.getTypeId())) {
             Block below = block.getRelative(0, -1, 0);
             return isProtectedSignAround(below, player);
-        } else if (block.getType() == Material.SIGN_POST) {
+        } else if (block.getTypeId() == BlockID.SIGN_POST) {
             return isProtectedSignAndChestBinary(block, player);
         } else {
             Block above = block.getRelative(0, 1, 0);
@@ -56,23 +57,23 @@ public class SignChestProtection implements ChestProtection {
         
         side = searchBlock;
         res = isProtectedSign(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         side = searchBlock.getRelative(-1, 0, 0);
         res = isProtectedSignAndChest(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         side = searchBlock.getRelative(1, 0, 0);
         res = isProtectedSignAndChest(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         side = searchBlock.getRelative(0, 0, -1);
         res = isProtectedSignAndChest(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         side = searchBlock.getRelative(0, 0, 1);
         res = isProtectedSignAndChest(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         return false;
     }
@@ -106,7 +107,7 @@ public class SignChestProtection implements ChestProtection {
     }
     
     private Boolean isProtectedSignAndChest(Block block, Player player) {
-        if (!isChest(block.getRelative(0, 1, 0).getType())) {
+        if (!isChest(block.getRelative(0, 1, 0).getTypeId())) {
             return null;
         }
         return isProtectedSign(block, player);
@@ -114,7 +115,7 @@ public class SignChestProtection implements ChestProtection {
     
     private boolean isProtectedSignAndChestBinary(Block block, Player player) {
         Boolean res = isProtectedSignAndChest(block, player);
-        if (res == null || res == false) {
+        if (res == null || res == Boolean.FALSE) {
             return false;
         }
         return true;
@@ -126,31 +127,37 @@ public class SignChestProtection implements ChestProtection {
         
         side = searchBlock;
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         side = searchBlock.getRelative(-1, 0, 0);
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         side = searchBlock.getRelative(1, 0, 0);
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         side = searchBlock.getRelative(0, 0, -1);
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         side = searchBlock.getRelative(0, 0, 1);
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res == Boolean.TRUE) return res;
         
         return false;
     }
-    
+
+    @Deprecated
     public boolean isChest(Material material) {
-        return material == Material.CHEST
-                || material == Material.DISPENSER
-                || material == Material.FURNACE
-                || material == Material.BURNING_FURNACE;
+        return isChest(material.getId());
+    }
+
+    @Override
+    public boolean isChest(int type) {
+        return type == BlockID.CHEST
+                || type == BlockID.DISPENSER
+                || type == BlockID.FURNACE
+                || type == BlockID.BURNING_FURNACE;
     }
 }
