@@ -62,6 +62,15 @@ public interface ChestProtection {
      * @param material
      * @return
      */
+    @Deprecated
     public boolean isChest(Material material);
+
+    /**
+     * Returns whether a material is a chest.
+     *
+     * @param type
+     * @return
+     */
+    public boolean isChest(int type);
 
 }
