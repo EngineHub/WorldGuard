@@ -103,7 +103,9 @@ public class ProtectedChunkRegion extends ProtectedRegion {
                 intersecting.add(pr);
             } else if (pr instanceof ProtectedChunkRegion && this.containsAny(((ProtectedChunkRegion)pr).getChunks())) {
                 intersecting.add(pr);
-            } else if ((pr instanceof ProtectedCuboidRegion || pr instanceof ProtectedPolygonalRegion) && containsAny(pr.getPoints())) {
+            } else if (pr instanceof ProtectedCuboidRegion) {
+                intersecting.add(pr);
+            } else if (pr instanceof ProtectedPolygonalRegion && containsAny(pr.getPoints())) {
                 intersecting.add(pr);
             } else {
                 throw new UnsupportedIntersectionException();

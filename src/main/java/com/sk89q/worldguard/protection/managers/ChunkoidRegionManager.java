@@ -21,7 +21,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedChunkRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;;;
 
-public class ChunkoidRegionManager extends RegionManager {
+public class ChunkoidRegionManager extends SubRegionManager {
 
     /**
      * List of protected regions.
@@ -29,8 +29,8 @@ public class ChunkoidRegionManager extends RegionManager {
     private Map<String, ProtectedRegion> regions;
     private Map<ChunkVector, Set<ProtectedRegion>> chunkToRegions;
 
-    public ChunkoidRegionManager(ProtectionDatabase loader) throws IOException {
-        super(loader);
+    public ChunkoidRegionManager(ProtectionDatabase loader, RegionManager parent) throws IOException {
+        super(loader, parent);
         regions = new HashMap<String, ProtectedRegion>();
     }
 

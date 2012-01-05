@@ -108,7 +108,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
             }
             if (x1 <= targetX && targetX <= x2) {
                 crossproduct = ((long) targetZ - (long) z1) * (long) (x2 - x1)
-                    - ((long) z2 - (long) z1) * (long) (targetX - x1);
+                        - ((long) z2 - (long) z1) * (long) (targetX - x1);
                 if (crossproduct == 0) {
                     if ((z1 <= targetZ) == (targetZ <= z2)) return true; // on edge
                 } else if (crossproduct < 0 && (x1 != targetX)) {
@@ -135,6 +135,12 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
                 if (containsAny(region.getPoints())
                         || region.containsAny(getPoints())
                         || intersectsEdges(region)) {
+                    intersectingRegions.add(region);
+                    continue;
+                }
+            } else if (region instanceof ProtectedChunkoidRegion || region instanceof ProtectedChunkRegion) {
+                //TODO: polygonoal region intersection may not work properly for wholly contained regions
+                if (region.containsAny(getPoints())) {
                     intersectingRegions.add(region);
                     continue;
                 }

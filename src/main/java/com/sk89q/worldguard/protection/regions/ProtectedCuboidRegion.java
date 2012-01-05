@@ -138,7 +138,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
             if (!intersectsBoundingBox(region)) continue;
 
             // If both regions are Cuboids and their bounding boxes intersect, they intersect
-            if (region instanceof ProtectedCuboidRegion) {
+            if (region instanceof ProtectedCuboidRegion || region instanceof ProtectedChunkRegion || region instanceof ProtectedChunkoidRegion) {
                 intersectingRegions.add(region);
                 continue;
             } else if (region instanceof ProtectedPolygonalRegion) {

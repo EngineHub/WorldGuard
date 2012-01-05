@@ -20,8 +20,10 @@
 package com.sk89q.worldguard.protection.managers;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
@@ -40,6 +42,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 public abstract class RegionManager {
 
     protected ProtectionDatabase loader;
+    protected Set<SubRegionManager> subManagers = new HashSet<SubRegionManager>();
 
     /**
      * Construct the object.
@@ -179,4 +182,40 @@ public abstract class RegionManager {
      * @return name number of regions that a player owns
      */
     public abstract int getRegionCountOfPlayer(LocalPlayer player);
+    
+    /**
+     * Adds a SubRegionManager from this RegionManager
+     * The submanager being added must have been constructed with this Manager as it's parent.
+     * @param manager
+     * @return true if the operation completed successfully and the manager was not 
+     * already in the set of SubManagers
+     */
+    public boolean addSubRegionManager(SubRegionManager manager) {
+        if (!manager.getParentManager().equals(this)) {
+            return false;
+        }
+        return this.subManagers.add(manager);
+    }
+    
+    /**
+     * Removes a SubRegionManager from this RegionManager
+     * The SubManager being removed must have been constructed with this Manager as it's parent.
+     * @param manager
+     * @return true if the operation completed successfully and the SubManager was in the 
+     * set of SubManagers
+     */
+    public boolean removeSubRegionManager(SubRegionManager manager) {
+        if (!manager.getParentManager().equals(this)) {
+            return false;
+        }
+        return this.subManagers.remove(manager);
+    }
+    
+    /**
+     * Returns all current active SubRegionManagers that are linked to this RegionManager
+     * @return the set of all SubRegionManagers
+     */
+    public Set<SubRegionManager> getSubManagers() {
+        return subManagers;
+    }
 }

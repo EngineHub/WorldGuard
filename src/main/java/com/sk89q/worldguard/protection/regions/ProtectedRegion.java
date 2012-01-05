@@ -450,7 +450,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
             throws UnsupportedIntersectionException;
 
     /**
-     * Checks if the bounding box of a region intersects with with the bounding
+     * Checks if the bounding box of a region intersects with the bounding
      * box of this region
      *
      * @param region

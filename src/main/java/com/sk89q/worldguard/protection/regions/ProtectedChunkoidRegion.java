@@ -106,24 +106,27 @@ public class ProtectedChunkoidRegion extends ProtectedRegion {
     protected boolean intersectsEdges(ProtectedRegion region) {
         if (region instanceof ProtectedChunkoidRegion) {
             return containsAny(((ProtectedChunkoidRegion) region).getChunkoids());
+        } else if (region instanceof ProtectedChunkRegion) {
+            return containsAny(((ProtectedChunkRegion) region).getChunks());
         }
-        return (containsAny(region.getPoints()));
+        return containsAny(region.getPoints());
     }
 
     @Override
     public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
         List<ProtectedRegion> intersecting = new ArrayList<ProtectedRegion>();
-        for (ProtectedRegion pr : regions) {
-            if (!intersectsBoundingBox(pr)) {
+        for (ProtectedRegion region : regions) {
+            if (!intersectsBoundingBox(region)) {
                 continue;
             }
 
-            if (pr instanceof ProtectedChunkoidRegion && this.containsAny(((ProtectedChunkoidRegion) pr).getChunkoids())) {
-                intersecting.add(pr);
-            } else if (pr instanceof ProtectedChunkRegion) {
-
-            } else if ((pr instanceof ProtectedCuboidRegion || pr instanceof ProtectedPolygonalRegion) && containsAny(pr.getPoints())) {
-                intersecting.add(pr);
+            if (region instanceof ProtectedChunkoidRegion && this.containsAny(((ProtectedChunkoidRegion) region).getChunkoids())) {
+                intersecting.add(region);
+            } else if (region instanceof ProtectedChunkRegion && region.containsAny(getChunks())) {
+                intersecting.add(region);
+            } else if ((region instanceof ProtectedCuboidRegion || (region instanceof ProtectedPolygonalRegion) && containsAny(region.getPoints()))) {
+                //TODO: Polygonol intersection may not work for wholly contained regions
+                intersecting.add(region);
             } else {
                 throw new UnsupportedIntersectionException();
             }
