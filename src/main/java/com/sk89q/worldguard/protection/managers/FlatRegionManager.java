@@ -150,7 +150,7 @@ public class FlatRegionManager extends RegionManager {
 
                 while (parent != null) {
                     if (!appRegions.contains(parent)) {
-                        appRegions.add(region);
+                        appRegions.add(parent);
                     }
 
                     parent = parent.getParent();
