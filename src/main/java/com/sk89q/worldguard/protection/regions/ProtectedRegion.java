@@ -414,21 +414,22 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
-     * Compares to another region.
+     * Compares to another region.<br>
+     *<br>
+     * Orders primarily by the priority, descending<br>
+     * Orders secondarily by the id, ascending
      *
      * @param other
      * @return
      */
     public int compareTo(ProtectedRegion other) {
-        if (id.equals(other.id)) {
-            return 0;
-        } else if (priority == other.priority) {
-            return 1;
-        } else if (priority > other.priority) {
+        if (priority > other.priority) {
             return -1;
-        } else {
+        } else if (priority < other.priority) {
             return 1;
         }
+
+        return id.compareTo(other.id);
     }
 
     /**
