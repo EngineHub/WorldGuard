@@ -124,7 +124,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 	    			"WHERE `region_flag`.`region_id` = ? "
 	    		);
     		
-        	flagsStatement.setString(1, region.getId());
+        	flagsStatement.setString(1, region.getId().toLowerCase());
         	ResultSet flagsResultSet = flagsStatement.executeQuery();
         	
         	Map<String,Object> regionFlags = new HashMap<String,Object>();
@@ -145,7 +145,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         } catch (SQLException ex) {
         	logger.warning(
         			"Unable to load flags for region "
-        			+ region.getId() + ": " + ex.getMessage()
+        			+ region.getId().toLowerCase() + ": " + ex.getMessage()
         		);
         }
     }
@@ -176,7 +176,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 	        		"WHERE `region_players`.`region_id` = ? "
 	        	);
     		
-    		usersStatement.setString(1, region.getId());    		
+    		usersStatement.setString(1, region.getId().toLowerCase());    		
     		ResultSet userSet = usersStatement.executeQuery();
     		while(userSet.next()) {
     			if (userSet.getBoolean("owner")) {
@@ -186,7 +186,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     			}
     		}
     	} catch (SQLException ex) {
-    		logger.warning("Unable to load users for region " + region.getId() + ": " + ex.getMessage());
+    		logger.warning("Unable to load users for region " + region.getId().toLowerCase() + ": " + ex.getMessage());
     	}
 
     	try {
@@ -201,7 +201,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             		"WHERE `region_groups`.`region_id` = ? "
             	);
     		
-    		groupsStatement.setString(1, region.getId());
+    		groupsStatement.setString(1, region.getId().toLowerCase());
     		ResultSet groupSet = groupsStatement.executeQuery();
     		while(groupSet.next()) {
     			if (groupSet.getBoolean("owner")) {
@@ -211,7 +211,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     			}
     		}
     	} catch (SQLException ex) {
-    		logger.warning("Unable to load groups for region " + region.getId() + ": " + ex.getMessage());
+    		logger.warning("Unable to load groups for region " + region.getId().toLowerCase() + ": " + ex.getMessage());
     	}
     	
     	region.setOwners(owners);
@@ -631,7 +631,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 		    		}
 	            }
 			} catch (SQLException ex) {
-				logger.warning("Could not save region " + region.getId() + ": " + ex.getMessage());
+				logger.warning("Could not save region " + region.getId().toLowerCase() + ": " + ex.getMessage());
 				throw new ProtectionDatabaseException(ex);
 			}
 		}
@@ -646,12 +646,12 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 						"WHERE `id` = ? "
 					);
 				
-				setParentStatement.setString(1, entry.getValue().getParent().getId());
-				setParentStatement.setString(2, entry.getValue().getId());
+				setParentStatement.setString(1, entry.getValue().getParent().getId().toLowerCase());
+				setParentStatement.setString(2, entry.getValue().getId().toLowerCase());
 				
 				setParentStatement.execute();
 			} catch (SQLException ex) {
-				logger.warning("Could not save region parents " + entry.getValue().getId() + ": " + ex.getMessage());
+				logger.warning("Could not save region parents " + entry.getValue().getId().toLowerCase() + ": " + ex.getMessage());
 				throw new ProtectionDatabaseException(ex);
 			}
 		}
@@ -678,7 +678,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 					"WHERE `region_id` = ? "
 				);
 		
-		clearCurrentFlagStatement.setString(1, region.getId());
+		clearCurrentFlagStatement.setString(1, region.getId().toLowerCase());
 		clearCurrentFlagStatement.execute();
 		
 		for (Map.Entry<Flag<?>, Object> entry : region.getFlags().entrySet()) {
@@ -695,7 +695,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             		") VALUES (null, ?, ?, ?)"
             	);
             
-            insertFlagStatement.setString(1, region.getId());
+            insertFlagStatement.setString(1, region.getId().toLowerCase());
             insertFlagStatement.setString(2, entry.getKey().getName());
             insertFlagStatement.setObject(3, flag);
             
@@ -717,7 +717,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 				"WHERE `region_id` = ? "
 			);
 		
-		deleteUsersForRegion.setString(1, region.getId());
+		deleteUsersForRegion.setString(1, region.getId().toLowerCase());
 		deleteUsersForRegion.execute();
 		
 		PreparedStatement insertUsersForRegion = this.conn.prepareStatement(
@@ -728,7 +728,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 		Map<String,Integer> players = getUserIds(domain.getPlayers().toArray(new String[0]));
 		
 		for (Integer player : players.values()) {
-			insertUsersForRegion.setString(1, region.getId());
+			insertUsersForRegion.setString(1, region.getId().toLowerCase());
 			insertUsersForRegion.setInt(2, player);
 			insertUsersForRegion.setBoolean(3, owners);
 			
@@ -743,7 +743,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 		Map<String,Integer> groups = getGroupIds(domain.getGroups().toArray(new String[0]));
 		
 		for (Integer group : groups.values()) {
-			insertGroupsForRegion.setString(1, region.getId());
+			insertGroupsForRegion.setString(1, region.getId().toLowerCase());
 			insertGroupsForRegion.setInt(2, group);
 			insertGroupsForRegion.setBoolean(3, owners);
 			
@@ -767,7 +767,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 				") VALUES (?, " + this.worldDbId  + ", ?, ?, null)"
 			);
 		
-		insertRegionStatement.setString(1, region.getId());
+		insertRegionStatement.setString(1, region.getId().toLowerCase());
 		insertRegionStatement.setString(2, type);
 		insertRegionStatement.setInt(3, region.getPriority());
 		
@@ -797,7 +797,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 		BlockVector min = region.getMinimumPoint();
 		BlockVector max = region.getMaximumPoint();
 	
-		insertCuboidRegionStatement.setString(1, region.getId());
+		insertCuboidRegionStatement.setString(1, region.getId().toLowerCase());
 		insertCuboidRegionStatement.setInt(2, min.getBlockZ());
 		insertCuboidRegionStatement.setInt(3, min.getBlockY());
 		insertCuboidRegionStatement.setInt(4, min.getBlockX());
@@ -819,7 +819,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 				") VALUES (?, ?, ?)"
 			);
 		
-		insertPoly2dRegionStatement.setString(1, region.getId());
+		insertPoly2dRegionStatement.setString(1, region.getId().toLowerCase());
 		insertPoly2dRegionStatement.setInt(2, region.getMaximumPoint().getBlockY());
 		insertPoly2dRegionStatement.setInt(3, region.getMinimumPoint().getBlockY());
 
@@ -834,7 +834,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 				"WHERE `region_id` = ? "
 			);
 		
-		clearPoly2dPointsForRegionStatement.setString(1, region.getId());
+		clearPoly2dPointsForRegionStatement.setString(1, region.getId().toLowerCase());
 		
 		clearPoly2dPointsForRegionStatement.execute();
 		
@@ -848,7 +848,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 			);
 		
 		for (BlockVector2D point : region.getPoints()) {
-			insertPoly2dPointStatement.setString(1, region.getId());
+			insertPoly2dPointStatement.setString(1, region.getId().toLowerCase());
 			insertPoly2dPointStatement.setInt(2, point.getBlockZ());
 			insertPoly2dPointStatement.setInt(3, point.getBlockX());
             
@@ -867,7 +867,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 			);
 		
 		updateRegionStatement.setInt(1, region.getPriority());
-		updateRegionStatement.setString(2, region.getId());
+		updateRegionStatement.setString(2, region.getId().toLowerCase());
 		
 		updateRegionStatement.execute();
 		
@@ -900,7 +900,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 		updateCuboidRegionStatement.setInt(4, max.getBlockZ());
 		updateCuboidRegionStatement.setInt(5, max.getBlockY());
 		updateCuboidRegionStatement.setInt(6, max.getBlockX());
-		updateCuboidRegionStatement.setString(7, region.getId());
+		updateCuboidRegionStatement.setString(7, region.getId().toLowerCase());
 		
 		updateCuboidRegionStatement.execute();
 	}
@@ -917,7 +917,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 		
 		updatePoly2dRegionStatement.setInt(1, region.getMaximumPoint().getBlockY());
 		updatePoly2dRegionStatement.setInt(2, region.getMinimumPoint().getBlockY());
-		updatePoly2dRegionStatement.setString(3, region.getId());
+		updatePoly2dRegionStatement.setString(3, region.getId().toLowerCase());
 
 		updatePoly2dRegionStatement.execute();
 		
