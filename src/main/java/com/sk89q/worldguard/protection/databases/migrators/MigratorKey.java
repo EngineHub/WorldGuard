@@ -12,7 +12,7 @@ public class MigratorKey {
 	public boolean equals(Object o) {
 		MigratorKey other = (MigratorKey) o;
 		
-		return other.from == this.from && other.to == this.to;
+		return other.from.equals(this.from) && other.to.equals(this.to);
 	}
 	
 	public int hashCode() {

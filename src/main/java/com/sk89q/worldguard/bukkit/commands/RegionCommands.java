@@ -22,6 +22,8 @@ package com.sk89q.worldguard.bukkit.commands;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -929,10 +931,10 @@ public class RegionCommands {
             desc = "Migrate from one Protection Database to another.", min = 1)
     @CommandPermissions({"worldguard.region.migratedb"})
     public void migratedb(CommandContext args, CommandSender sender) throws CommandException {
-    	String from = args.getString(0);
-    	String to = args.getString(1);
+    	String from = args.getString(0).toLowerCase().trim();
+    	String to = args.getString(1).toLowerCase().trim();
     	
-    	if (from == to) {
+    	if (from.equals(to)) {
     		throw new CommandException("Will not migrate with common source and target.");
     	}
     	
