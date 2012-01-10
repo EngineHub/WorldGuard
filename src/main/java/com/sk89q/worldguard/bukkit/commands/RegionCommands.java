@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -53,6 +54,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.databases.migrators.AbstractDatabaseMigrator;
+import com.sk89q.worldguard.protection.databases.migrators.MigrationException;
+import com.sk89q.worldguard.protection.databases.migrators.MigratorKey;
 import com.sk89q.worldguard.util.RegionUtil;
 
 public class RegionCommands {
@@ -919,5 +923,41 @@ public class RegionCommands {
             sender.sendMessage(ChatColor.YELLOW
                     + "Region databases saved.");
         }
+    }
+    
+    @Command(aliases = {"migratedb"}, usage = "<from> <to>",
+            desc = "Migrate from one Protection Database to another.", min = 1)
+    @CommandPermissions({"worldguard.region.migratedb"})
+    public void migratedb(CommandContext args, CommandSender sender) throws CommandException {
+    	String from = args.getString(0);
+    	String to = args.getString(1);
+    	
+    	if (from == to) {
+    		throw new CommandException("Will not migrate with common source and target.");
+    	}
+    	
+    	Map<MigratorKey, Class<? extends AbstractDatabaseMigrator>> migrators = AbstractDatabaseMigrator.getMigrators();
+    	MigratorKey key = new MigratorKey(from,to);
+    	
+    	if (!migrators.containsKey(key)) {
+    		throw new CommandException("No migrator found for that combination and direction.");
+    	}
+    	
+    	Class<? extends AbstractDatabaseMigrator> cls = migrators.get(key);    	
+   	
+    	try {
+			AbstractDatabaseMigrator migrator = cls.getConstructor(WorldGuardPlugin.class).newInstance(plugin);
+	    	
+	    	migrator.migrate();
+		} catch (IllegalArgumentException e) {
+		} catch (SecurityException e) {
+		} catch (InstantiationException e) {
+		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
+		} catch (NoSuchMethodException e) {
+		} catch (MigrationException e) {
+			throw new CommandException("Error migrating database: " + e.getMessage());
+		}
+    	
     }
 }
