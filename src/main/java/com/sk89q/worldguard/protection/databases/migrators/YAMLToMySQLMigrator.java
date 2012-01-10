@@ -27,7 +27,7 @@ public class YAMLToMySQLMigrator extends AbstractDatabaseMigrator {
 		for (File item : files) {
 			if (item.isDirectory()) {
 				for (File subItem : item.listFiles()) {
-					if (item.getName() == "regions.yml") {
+					if (item.getName().equals("regions.yml")) {
 						this.regionYamlFiles.put(item.getName(), subItem);
 					}
 				}
