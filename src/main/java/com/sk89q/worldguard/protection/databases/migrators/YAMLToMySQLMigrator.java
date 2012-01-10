@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.databases.MySQLDatabase;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;

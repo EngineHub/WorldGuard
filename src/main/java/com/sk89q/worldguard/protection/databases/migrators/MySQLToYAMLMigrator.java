@@ -4,13 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,7 +32,7 @@ public class MySQLToYAMLMigrator extends AbstractDatabaseMigrator {
 		try {
 			Connection conn = DriverManager.getConnection(config.sqlDsn, config.sqlUsername, config.sqlPassword);
 			
-			ResultSet worlds = conn.prepareStatement("SELECT `id` FROM `world`;").executeQuery();
+			ResultSet worlds = conn.prepareStatement("SELECT `name` FROM `world`;").executeQuery();
 			
 			while(worlds.next()) {
 				this.worlds.add(worlds.getString(1));
