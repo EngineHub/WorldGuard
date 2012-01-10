@@ -22,11 +22,11 @@ public class YAMLToMySQLMigrator extends AbstractDatabaseMigrator {
 		this.plugin = plugin;
 		
 		this.regionYamlFiles = new HashMap<String,File>();
-		
+
 		File files[] = new File(plugin.getDataFolder(), "worlds" + File.separator).listFiles();
 		for (File item : files) {
 			if (item.isDirectory()) {
-				for (File subItem : item.listFiles()) {
+				for (File subItem : item.listFiles()) { 
 					if (subItem.getName().equals("regions.yml")) {
 						this.regionYamlFiles.put(item.getName(), subItem);
 					}
