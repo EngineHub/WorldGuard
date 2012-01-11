@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.commands;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,6 +65,9 @@ import com.sk89q.worldguard.util.RegionUtil;
 public class RegionCommands {
     private final WorldGuardPlugin plugin;
 
+    private MigratorKey migrateDBRequest;
+    private Date migrateDBRequestDate;
+    
     public RegionCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
@@ -945,6 +949,18 @@ public class RegionCommands {
     		throw new CommandException("No migrator found for that combination and direction.");
     	}
     	
+    	long lastRequest = 10000000;
+    	if (this.migrateDBRequestDate != null) { 
+    		lastRequest = new Date().getTime() - this.migrateDBRequestDate.getTime();
+    	}
+    	if (this.migrateDBRequest == null || lastRequest > 60000) {
+    		this.migrateDBRequest = key;
+    		this.migrateDBRequestDate = new Date();
+    		
+    		throw new CommandException("This command is potentially dangerous.\n" + 
+    				"Please ensure you have made a backup of your data, and then re-enter the command exactly to procede.");
+    	}
+    	
     	Class<? extends AbstractDatabaseMigrator> cls = migrators.get(key);    	
    	
     	try {
@@ -961,5 +977,7 @@ public class RegionCommands {
 			throw new CommandException("Error migrating database: " + e.getMessage());
 		}
     	
+    	sender.sendMessage(ChatColor.YELLOW + "Regions have been migrated successfuly.\n" + 
+    			"If you wish to use the destination format as your new backend, please update your config and reload WorldGuard.");    	
     }
 }
