@@ -80,9 +80,7 @@ public class WorldConfiguration {
     /* Configuration data start */
     public boolean opPermissions;
     public boolean fireSpreadDisableToggle;
-    public boolean enforceOneSession;
     public boolean itemDurability;
-    // public boolean classicWater;
     public boolean simulateSponge;
     public int spongeRadius;
     public boolean disableExpDrops;
@@ -104,11 +102,6 @@ public class WorldConfiguration {
     public boolean blockEnderDragonBlockDamage;
     public boolean blockFireballExplosions;
     public boolean blockFireballBlockDamage;
-    // public int loginProtection;
-    // public int spawnProtection;
-    // public boolean kickOnDeath;
-    // public boolean exactRespawn;
-    // public boolean teleportToHome;
     public boolean disableContactDamage;
     public boolean disableFallDamage;
     public boolean disableLavaDamage;
@@ -285,13 +278,11 @@ public class WorldConfiguration {
 
         opPermissions = getBoolean("op-permissions", true);
 
-        enforceOneSession = getBoolean("protection.enforce-single-session", true);
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
         disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
 
-        // classicWater = getBoolean("simulation.classic-water", false);
         simulateSponge = getBoolean("simulation.sponge.enable", true);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
@@ -320,12 +311,6 @@ public class WorldConfiguration {
         blockFireballBlockDamage = getBoolean("mobs.block-fireball-block-damage", false);
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
         disableEndermanGriefing = getBoolean("mobs.disable-enderman-griefing", false);
-
-        // loginProtection = getInt("spawn.login-protection", 3);
-        // spawnProtection = getInt("spawn.spawn-protection", 0);
-        // kickOnDeath = getBoolean("spawn.kick-on-death", false);
-        // exactRespawn = getBoolean("spawn.exact-respawn", false);
-        // teleportToHome = getBoolean("spawn.teleport-to-home-on-death", false);
 
         disableFallDamage = getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = getBoolean("player-damage.disable-lava-damage", false);
@@ -382,7 +367,7 @@ public class WorldConfiguration {
                 }
             }
         }
-        
+
         // useiConomy = getBoolean("iconomy.enable", false);
         // buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
         // buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
@@ -459,9 +444,6 @@ public class WorldConfiguration {
 
         // Print an overview of settings
         if (getBoolean("summary-on-start", true)) {
-            logger.log(Level.INFO, enforceOneSession
-                    ? "WorldGuard: (" + worldName + ") Single session is enforced."
-                    : "WorldGuard: (" + worldName + ") Single session is NOT ENFORCED.");
             logger.log(Level.INFO, blockTNTExplosions
                     ? "WorldGuard: (" + worldName + ") TNT ignition is blocked."
                     : "WorldGuard: (" + worldName + ") TNT ignition is PERMITTED.");
