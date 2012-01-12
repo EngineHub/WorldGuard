@@ -131,29 +131,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
     }
 
     /**
-     * Called when a player attempts to log in to the server.
-     */
-    /*
-    @Override
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
-
-        if (wcfg.enforceOneSession) {
-            String name = player.getName();
-
-            for (Player pl : plugin.getServer().getOnlinePlayers()) {
-                if (pl.getName().equalsIgnoreCase(name)) {
-                    pl.kickPlayer("Logged in from another location.");
-                }
-            }
-        }
-    }
-    */
-
-    /**
      * Called when a player joins a server.
      */
     @Override

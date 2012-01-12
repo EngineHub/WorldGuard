@@ -153,7 +153,6 @@ public class SignChestProtection implements ChestProtection {
         return isChest(material.getId());
     }
 
-    @Override
     public boolean isChest(int type) {
         return type == BlockID.CHEST
                 || type == BlockID.DISPENSER
