@@ -57,7 +57,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     private Map<String, ProtectedRegion> poly2dRegions;
     private Map<String, ProtectedRegion> globalRegions;
     private Map<ProtectedRegion, String> parentSets;
-
+    
     private ConfigurationManager config;
     
     private Connection conn;
@@ -65,11 +65,11 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     private int worldDbId = -1;	// The database will never have an id of -1;
     
     public MySQLDatabase(ConfigurationManager config, String world) throws ProtectionDatabaseException {
-    	this.config = config;    	
+    	this.config = config;
         this.world = world;
         
         try {
-            conn = DriverManager.getConnection(config.sqlDsn, config.sqlUsername, config.sqlPassword);
+            connect();
             
             PreparedStatement worldStmt = conn.prepareStatement(
             		"SELECT `id` FROM " +
@@ -110,6 +110,12 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             // There was an error initialising the world record, so there is
             // no point continuing
             return;
+    	}
+    }
+    
+    private void connect() throws SQLException {
+    	if (conn == null || conn.isClosed()) {
+    		conn = DriverManager.getConnection(config.sqlDsn, config.sqlUsername, config.sqlPassword);
     	}
     }
     
@@ -410,7 +416,13 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         poly2dRegions = regions;
     }
 
-	public void load() throws ProtectionDatabaseException {		
+	public void load() throws ProtectionDatabaseException {
+		try {
+			connect();
+		} catch (SQLException ex) {
+			throw new ProtectionDatabaseException(ex);
+		}
+		
 		parentSets = new HashMap<ProtectedRegion,String>();
 		
 		// We load the cuboid regions first, as this is likely to be the
@@ -583,6 +595,12 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 	 * @see com.sk89q.worldguard.protection.databases.ProtectionDatabase#save()
 	 */
 	public void save() throws ProtectionDatabaseException {
+		try {
+			connect();
+		} catch (SQLException ex) {
+			throw new ProtectionDatabaseException(ex);
+		}
+		
 		List<String> regionsInDatabase = new ArrayList<String>();
 		
 		try {
@@ -714,10 +732,12 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 		
 		PreparedStatement deleteUsersForRegion = this.conn.prepareStatement(
 				"DELETE FROM `region_players` " +
-				"WHERE `region_id` = ? "
+				"WHERE `region_id` = ? " +
+				"AND `owner` = ?"
 			);
 		
 		deleteUsersForRegion.setString(1, region.getId().toLowerCase());
+		deleteUsersForRegion.setBoolean(2, owners);
 		deleteUsersForRegion.execute();
 		
 		PreparedStatement insertUsersForRegion = this.conn.prepareStatement(
@@ -734,6 +754,16 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 			
 			insertUsersForRegion.execute();
 		}
+		
+		PreparedStatement deleteGroupsForRegion = this.conn.prepareStatement(
+				"DELETE FROM `region_groups` " +
+				"WHERE `region_id` = ? " +
+				"AND `owner` = ?"
+			);
+		
+		deleteGroupsForRegion.setString(1, region.getId().toLowerCase());
+		deleteGroupsForRegion.setBoolean(2, owners);
+		deleteGroupsForRegion.execute();
 		
 		PreparedStatement insertGroupsForRegion = this.conn.prepareStatement(
 				"INSERT INTO `region_groups` " +
