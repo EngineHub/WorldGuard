@@ -42,7 +42,7 @@ CREATE  TABLE IF NOT EXISTS `region` (
   `type` ENUM('cuboid','poly2d','global') NOT NULL ,
   `priority` SMALLINT NOT NULL DEFAULT 0 ,
   `parent` VARCHAR(128) NULL ,
-  PRIMARY KEY (`id`) ,
+  PRIMARY KEY (`id`, `world_id`) ,
   INDEX `parent` (`parent` ASC) ,
   INDEX `fk_region_world` (`world_id` ASC) ,
   CONSTRAINT `parent`
@@ -64,8 +64,8 @@ ENGINE = InnoDB;
 CREATE  TABLE IF NOT EXISTS `region_flag` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `region_id` VARCHAR(128) NOT NULL ,
-  `flag` VARCHAR(45) NOT NULL ,
-  `value` VARCHAR(45) NOT NULL ,
+  `flag` VARCHAR(64) NOT NULL ,
+  `value` VARCHAR(256) NOT NULL ,
   INDEX `fk_flags_region` (`region_id` ASC) ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `fk_flags_region1`
