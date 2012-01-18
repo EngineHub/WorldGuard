@@ -27,8 +27,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
@@ -36,7 +37,6 @@ import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -47,8 +47,6 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.PluginManager;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
@@ -66,10 +64,11 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
  * 
  * @author sk89q
  */
-public class WorldGuardBlockListener extends BlockListener {
+public class WorldGuardBlockListener implements Listener {
     /**
      * Logger for messages.
      */
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     private WorldGuardPlugin plugin;
@@ -87,39 +86,9 @@ public class WorldGuardBlockListener extends BlockListener {
      * Register events.
      */
     public void registerEvents() {
-        registerEvent("BLOCK_DAMAGE", Priority.High);
-        registerEvent("BLOCK_BREAK", Priority.High);
-        registerEvent("BLOCK_FROMTO", Priority.Normal);
-        registerEvent("BLOCK_IGNITE", Priority.High);
-        registerEvent("BLOCK_PHYSICS", Priority.Normal);
-        registerEvent("BLOCK_PLACE", Priority.High);
-        registerEvent("BLOCK_BURN", Priority.High);
-        registerEvent("SIGN_CHANGE", Priority.High);
-        registerEvent("REDSTONE_CHANGE", Priority.High);
-        registerEvent("LEAVES_DECAY", Priority.High);
-        registerEvent("BLOCK_FORM", Priority.High);
-        registerEvent("BLOCK_SPREAD", Priority.High);
-        registerEvent("BLOCK_FADE", Priority.High);
-        registerEvent("BLOCK_PISTON_EXTEND", Priority.High);
-        registerEvent("BLOCK_PISTON_RETRACT", Priority.High);
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    /**
-     * Register an event, but not failing if the event is not implemented.
-     *
-     * @param typeName
-     * @param priority
-     */
-    private void registerEvent(String typeName, Priority priority) {
-        try {
-            Event.Type type = Event.Type.valueOf(typeName);
-            PluginManager pm = plugin.getServer().getPluginManager();
-            pm.registerEvent(type, this, priority, plugin);
-        } catch (IllegalArgumentException e) {
-            logger.info("WorldGuard: Unable to register missing event type " + typeName);
-        }
-    }
-    
     /**
      * Get the world configuration given a world.
      * 
@@ -129,7 +98,7 @@ public class WorldGuardBlockListener extends BlockListener {
     protected WorldConfiguration getWorldConfig(World world) {
         return plugin.getGlobalStateManager().get(world);
     }
-    
+
     /**
      * Get the world configuration given a player.
      * 
@@ -139,11 +108,11 @@ public class WorldGuardBlockListener extends BlockListener {
     protected WorldConfiguration getWorldConfig(Player player) {
         return plugin.getGlobalStateManager().get(player.getWorld());
     }
-    
+
     /**
      * Called when a block is damaged.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockDamage(BlockDamageEvent event) {
         if (event.isCancelled()) {
             return;
@@ -166,7 +135,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a block is broken.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.isCancelled()) {
             return;
@@ -219,7 +188,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when fluids flow.
      */
-    @Override
+    @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
         if (event.isCancelled()) {
             return;
@@ -316,7 +285,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a block gets ignited.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockIgnite(BlockIgniteEvent event) {
         if (event.isCancelled()) {
             return;
@@ -418,7 +387,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a block is destroyed from burning.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockBurn(BlockBurnEvent event) {
 
         if (event.isCancelled()) {
@@ -474,7 +443,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when block physics occurs.
      */
-    @Override
+    @EventHandler
     public void onBlockPhysics(BlockPhysicsEvent event) {
 
         if (event.isCancelled()) {
@@ -510,7 +479,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a player places a block.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockPlace(BlockPlaceEvent event) {
 
         if (event.isCancelled()) {
@@ -565,7 +534,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when redstone changes.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
 
         Block blockTo = event.getBlock();
@@ -601,7 +570,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a sign is changed.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onSignChange(SignChangeEvent event) {
 
         Player player = event.getPlayer();
@@ -668,7 +637,7 @@ public class WorldGuardBlockListener extends BlockListener {
         }
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onLeavesDecay(LeavesDecayEvent event) {
         if (event.isCancelled()) {
             return;
@@ -698,6 +667,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a block is formed based on world conditions.
      */
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockForm(BlockFormEvent event) {
         if (event.isCancelled()) {
             return;
@@ -741,6 +711,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a block spreads based on world conditions.
      */
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockSpread(BlockSpreadEvent event) {
         if (event.isCancelled()) {
             return;
@@ -784,6 +755,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a block fades.
      */
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockFade(BlockFadeEvent event) {
         if (event.isCancelled()) {
             return;
@@ -822,6 +794,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a piston extends
      */
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
         if (event.isCancelled()) {
             return;
@@ -847,6 +820,7 @@ public class WorldGuardBlockListener extends BlockListener {
     /**
      * Called when a piston retracts
      */
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockPistonRetract(BlockPistonRetractEvent event) {
         if (event.isCancelled()) {
             return;

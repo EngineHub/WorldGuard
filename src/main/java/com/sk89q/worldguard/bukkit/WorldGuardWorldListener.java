@@ -9,13 +9,12 @@ import java.util.logging.Logger;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.WorldListener;
 import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.plugin.PluginManager;
 
-public class WorldGuardWorldListener extends WorldListener {
+public class WorldGuardWorldListener implements Listener {
 
     /**
      * Logger for messages.
@@ -37,31 +36,13 @@ public class WorldGuardWorldListener extends WorldListener {
      * Register events.
      */
     public void registerEvents() {
-//        PluginManager pm = plugin.getServer().getPluginManager();
-
-        registerEvent("CHUNK_LOAD", Event.Priority.Normal);
-        registerEvent("WORLD_LOAD", Event.Priority.Normal);
-    }
-
-    /**
-     * Register an event, but not failing if the event is not implemented.
-     *
-     * @param typeName
-     * @param priority
-     */
-    private void registerEvent(String typeName, Event.Priority priority) {
-        try {
-            Event.Type type = Event.Type.valueOf(typeName);
-            PluginManager pm = plugin.getServer().getPluginManager();
-            pm.registerEvent(type, this, priority, plugin);
-        } catch (IllegalArgumentException e) {
-            logger.info("WorldGuard: Unable to register missing event type " + typeName);
-        }
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     /**
      * Called when a chunk is loaded.
      */
+    @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
 
@@ -85,6 +66,7 @@ public class WorldGuardWorldListener extends WorldListener {
     /**
      * Called when a world is loaded.
      */
+    @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         initWorld(event.getWorld());
     }

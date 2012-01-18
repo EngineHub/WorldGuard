@@ -23,24 +23,23 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
-import org.bukkit.event.weather.WeatherListener;
-import org.bukkit.plugin.PluginManager;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
-public class WorldGuardWeatherListener extends WeatherListener {
+public class WorldGuardWeatherListener implements Listener {
 
     /**
      * Logger for messages.
      */
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     /**
@@ -58,30 +57,10 @@ public class WorldGuardWeatherListener extends WeatherListener {
     }
 
     public void registerEvents() {
-//        PluginManager pm = plugin.getServer().getPluginManager();
-
-        registerEvent("LIGHTNING_STRIKE", Priority.High);
-        registerEvent("THUNDER_CHANGE", Priority.High);
-        registerEvent("WEATHER_CHANGE", Priority.High);
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    /**
-     * Register an event, but not failing if the event is not implemented.
-     *
-     * @param typeName
-     * @param priority
-     */
-    private void registerEvent(String typeName, Priority priority) {
-        try {
-            Event.Type type = Event.Type.valueOf(typeName);
-            PluginManager pm = plugin.getServer().getPluginManager();
-            pm.registerEvent(type, this, priority, plugin);
-        } catch (IllegalArgumentException e) {
-            logger.info("WorldGuard: Unable to register missing event type " + typeName);
-        }
-    }
-
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onWeatherChange(WeatherChangeEvent event) {
         if (event.isCancelled()) {
            return;
@@ -100,7 +79,7 @@ public class WorldGuardWeatherListener extends WeatherListener {
         }
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onThunderChange(ThunderChangeEvent event) {
         if (event.isCancelled()) {
            return;
@@ -120,7 +99,7 @@ public class WorldGuardWeatherListener extends WeatherListener {
         }
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onLightningStrike(LightningStrikeEvent event) {
         if (event.isCancelled()) {
            return;

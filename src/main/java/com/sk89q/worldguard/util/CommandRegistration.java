@@ -24,9 +24,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.Plugin;
 
 import java.util.*;
@@ -65,8 +65,7 @@ public class CommandRegistration {
                 Bukkit.getServer().getLogger().warning(plugin.getDescription().getName() +
                         ": Could not retrieve server CommandMap! Please report to http://redmine.sk89q.com");
                 fallbackCommands = commandMap = new SimpleCommandMap(Bukkit.getServer());
-                Bukkit.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS,
-                        new FallbackRegistrationListener(fallbackCommands), Event.Priority.Normal, plugin);
+                Bukkit.getServer().getPluginManager().registerEvents(new FallbackRegistrationListener(fallbackCommands), plugin);
             }
         }
         return commandMap;
@@ -118,7 +117,7 @@ public class CommandRegistration {
         }
     }
 
-    public static class FallbackRegistrationListener extends PlayerListener {
+    public static class FallbackRegistrationListener implements Listener {
 
         private final CommandMap commandRegistration;
 
@@ -126,7 +125,7 @@ public class CommandRegistration {
             this.commandRegistration = commandRegistration;
         }
 
-        @Override
+        @EventHandler
         public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
             if (event.isCancelled()) {
                 return;

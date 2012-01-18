@@ -1,15 +1,15 @@
 package com.sk89q.worldguard.bukkit;
 
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.PluginManager;
 
 /**
  * @author zml2008
  */
-public class WorldGuardServerListener extends ServerListener {
+public class WorldGuardServerListener implements Listener {
 
     private final WorldGuardPlugin plugin;
 
@@ -18,31 +18,16 @@ public class WorldGuardServerListener extends ServerListener {
     }
 
     public void registerEvents() {
-        registerEvent("PLUGIN_ENABLE");
-        registerEvent("PLUGIN_DISABLE");
+        PluginManager pm = plugin.getServer().getPluginManager();
+        pm.registerEvents(this, plugin);
     }
 
-    /**
-     * Register an event, but not failing if the event is not implemented.
-     *
-     * @param typeName
-     */
-    private void registerEvent(String typeName) {
-        try {
-            Event.Type type = Event.Type.valueOf(typeName);
-            PluginManager pm = plugin.getServer().getPluginManager();
-            pm.registerEvent(type, this, Event.Priority.Normal, plugin);
-        } catch (IllegalArgumentException e) {
-            WorldGuardPlugin.logger.info("WorldGuard: Unable to register missing event type " + typeName);
-        }
-    }
-
-    @Override
+    @EventHandler
     public void onPluginEnable(PluginEnableEvent event) {
         plugin.getGlobalStateManager().updateCommandBookGodMode();
     }
 
-    @Override
+    @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
         plugin.getGlobalStateManager().updateCommandBookGodMode();
     }

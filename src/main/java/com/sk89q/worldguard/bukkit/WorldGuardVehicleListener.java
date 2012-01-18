@@ -14,12 +14,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
-import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
-import org.bukkit.plugin.PluginManager;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
@@ -28,11 +26,12 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-public class WorldGuardVehicleListener extends VehicleListener {
+public class WorldGuardVehicleListener implements Listener {
 
     /**
      * Logger for messages.
      */
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     private WorldGuardPlugin plugin;
@@ -50,30 +49,13 @@ public class WorldGuardVehicleListener extends VehicleListener {
      * Register events.
      */
     public void registerEvents() {
-        registerEvent("VEHICLE_MOVE", Event.Priority.Normal);
-        registerEvent("VEHICLE_DESTROY", Event.Priority.Normal);
-    }
-
-    /**
-     * Register an event, but not failing if the event is not implemented.
-     *
-     * @param typeName
-     * @param priority
-     */
-    private void registerEvent(String typeName, Event.Priority priority) {
-        try {
-            Event.Type type = Event.Type.valueOf(typeName);
-            PluginManager pm = plugin.getServer().getPluginManager();
-            pm.registerEvent(type, this, priority, plugin);
-        } catch (IllegalArgumentException e) {
-            logger.info("WorldGuard: Unable to register missing event type " + typeName);
-        }
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     /**
      * Called when a vehicle is destroyed.
      */
-    @Override
+    @EventHandler
     public void onVehicleDestroy(VehicleDestroyEvent event) {
         Vehicle vehicle = event.getVehicle();
         Entity destroyer = event.getAttacker();
@@ -104,7 +86,7 @@ public class WorldGuardVehicleListener extends VehicleListener {
     /**
      * Called when a vehicle moves.
      */
-    @Override
+    @EventHandler
     public void onVehicleMove(VehicleMoveEvent event) {
         Vehicle vehicle = event.getVehicle();
         if (vehicle.getPassenger() == null
