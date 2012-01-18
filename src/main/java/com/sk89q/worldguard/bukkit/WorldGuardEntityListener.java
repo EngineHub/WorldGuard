@@ -42,8 +42,9 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Wolf;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EndermanPickupEvent;
@@ -55,7 +56,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -66,8 +66,6 @@ import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.PluginManager;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
@@ -80,10 +78,11 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
  * 
  * @author sk89q
  */
-public class WorldGuardEntityListener extends EntityListener {
+public class WorldGuardEntityListener implements Listener {
     /**
      * Logger for messages.
      */
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     private WorldGuardPlugin plugin;
@@ -101,45 +100,13 @@ public class WorldGuardEntityListener extends EntityListener {
      * Register events.
      */
     public void registerEvents() {
-//        PluginManager pm = plugin.getServer().getPluginManager();
-
-        registerEvent("ENTITY_DAMAGE", Priority.High);
-        registerEvent("ENTITY_COMBUST", Priority.High);
-        registerEvent("ENTITY_EXPLODE", Priority.High);
-        registerEvent("EXPLOSION_PRIME", Priority.High);
-        registerEvent("CREATURE_SPAWN", Priority.High);
-        registerEvent("ENTITY_INTERACT", Priority.High);
-        registerEvent("CREEPER_POWER", Priority.High);
-        registerEvent("PIG_ZAP", Priority.High);
-        registerEvent("PAINTING_BREAK", Priority.High);
-        registerEvent("PAINTING_PLACE", Priority.High);
-        registerEvent("ENTITY_REGAIN_HEALTH", Priority.High);
-        registerEvent("ENDERMAN_PICKUP", Priority.High);
-        registerEvent("ENDERMAN_PLACE", Priority.High);
-        registerEvent("ENTITY_DEATH", Priority.High);
-        registerEvent("FOOD_LEVEL_CHANGE", Priority.High);
-    }
-
-    /**
-     * Register an event, but not failing if the event is not implemented.
-     *
-     * @param typeName
-     * @param priority
-     */
-    private void registerEvent(String typeName, Priority priority) {
-        try {
-            Event.Type type = Event.Type.valueOf(typeName);
-            PluginManager pm = plugin.getServer().getPluginManager();
-            pm.registerEvent(type, this, priority, plugin);
-        } catch (IllegalArgumentException e) {
-            logger.info("WorldGuard: Unable to register missing event type " + typeName);
-        }
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     /**
      * Called when an entity interacts with another object.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityInteract(EntityInteractEvent event) {
         Entity entity = event.getEntity();
         Block block = event.getBlock();
@@ -157,7 +124,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called when an entity dies.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDeath(EntityDeathEvent event) {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
 
@@ -435,7 +402,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on entity damage.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.isCancelled()) {
             return;
@@ -516,7 +483,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on entity combust.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityCombust(EntityCombustEvent event) {
         if (event.isCancelled()) {
             return;
@@ -540,7 +507,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on entity explode.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityExplode(EntityExplodeEvent event) {
         if (event.isCancelled()) {
             return;
@@ -657,7 +624,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on explosion prime
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onExplosionPrime(ExplosionPrimeEvent event) {
         if (event.isCancelled()) {
             return;
@@ -677,7 +644,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on creature spawn.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         if (event.isCancelled()) {
             return;
@@ -723,7 +690,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on pig zap.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPigZap(PigZapEvent event) {
         if (event.isCancelled()) {
            return;
@@ -740,7 +707,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on creeper power.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onCreeperPower(CreeperPowerEvent event) {
         if (event.isCancelled()) {
            return;
@@ -757,7 +724,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called when a painting is removed.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPaintingBreak(PaintingBreakEvent breakEvent) {
         if (breakEvent.isCancelled()) {
             return;
@@ -800,7 +767,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on painting place.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPaintingPlace(PaintingPlaceEvent event) {
         if (event.isCancelled()) {
             return;
@@ -834,7 +801,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on entity health regain.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
         if (event.isCancelled()) {
             return;
@@ -855,7 +822,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called when an enderman picks a block up.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEndermanPickup(EndermanPickupEvent event) {
         if (event.isCancelled()) {
             return;
@@ -883,7 +850,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called when an enderman places a block.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEndermanPlace(EndermanPlaceEvent event) {
         if (event.isCancelled()) {
             return;
@@ -908,7 +875,7 @@ public class WorldGuardEntityListener extends EntityListener {
         }
     }
 
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
