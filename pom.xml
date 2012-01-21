@@ -26,7 +26,7 @@
     <!-- Repository for Bukkit -->
     <repository>
       <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/artifactory/repo</url>
+      <url>http://repo.bukkit.org/content/groups/public</url>
     </repository>
   </repositories>
 
