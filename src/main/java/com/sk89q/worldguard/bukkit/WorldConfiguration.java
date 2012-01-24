@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.CreatureType;
@@ -167,12 +168,12 @@ public class WorldConfiguration {
 
         this.plugin = plugin;
         this.worldName = worldName;
-        this.parentConfig = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), false);
+        this.parentConfig = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), false, YAMLFormat.EXTENDED);
 
         plugin.createDefaultConfiguration(configFile, "config_world.yml");
         plugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
 
-        config = new YAMLProcessor(this.configFile, true);
+        config = new YAMLProcessor(this.configFile, true, YAMLFormat.EXTENDED);
         loadConfiguration();
 
         logger.info("WorldGuard: Loaded configuration for world '" + worldName + '"');
