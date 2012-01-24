@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.GodComponent;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -73,11 +75,25 @@ public class RegionQueryUtil {
         StateFlag.State regionState = plugin.getGlobalRegionManager().get(world).
                 getApplicableRegions(vec).getFlag(DefaultFlag.INVINCIBILITY);
         if (regionState == StateFlag.State.ALLOW) {
-            return true;
+            return Boolean.TRUE;
         } else if (regionState == StateFlag.State.DENY) {
-            return false;
+            return Boolean.FALSE;
         } else {
             return null;
         }
+    }
+    
+    public static boolean hasGodMode(Player player, WorldGuardPlugin plugin) {
+        try {
+            if (plugin.getServer().getPluginManager().isPluginEnabled("CommandBook")) {
+                GodComponent god = CommandBook.inst().getComponentManager().getComponent(GodComponent.class);
+                if (god != null) {
+                    return god.hasGodMode(player);
+                }
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        return false;
     }
 }

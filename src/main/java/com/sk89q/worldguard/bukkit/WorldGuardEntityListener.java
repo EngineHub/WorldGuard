@@ -202,7 +202,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
             if (wcfg.disableLavaDamage && type == DamageCause.LAVA) {
                 event.setCancelled(true);
-                if (cfg.hasGodMode(player)) player.setFireTicks(0);
+                player.setFireTicks(0);
                 return;
             }
 
@@ -530,7 +530,7 @@ public class WorldGuardEntityListener extends EntityListener {
         if (entity instanceof Player) {
             Player player = (Player) entity;
 
-            if (cfg.hasGodMode(player) || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if ((wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
                 event.setCancelled(true);
                 return;
             }
@@ -914,10 +914,10 @@ public class WorldGuardEntityListener extends EntityListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(player.getWorld());
 
-        boolean god = cfg.hasGodMode(player);
+        boolean god = RegionQueryUtil.hasGodMode(player, plugin);
         if (wcfg.useRegions) {
             Boolean flag = RegionQueryUtil.isAllowedInvinciblity(plugin, player);
-            boolean allowed = flag == null || flag == true;
+            boolean allowed = flag == null || flag == Boolean.TRUE;
             boolean invincible = RegionQueryUtil.isInvincible(plugin, player);
 
             if (allowed) {

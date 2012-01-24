@@ -73,11 +73,6 @@ public class ConfigurationManager {
     private Map<String, WorldConfiguration> worlds;
 
     /**
-     * List of people with god mode.
-     */
-    private Set<String> hasGodMode = new HashSet<String>();
-
-    /**
      * List of people who can breathe underwater.
      */
     private Set<String> hasAmphibious = new HashSet<String>();
@@ -173,37 +168,7 @@ public class ConfigurationManager {
                 bl.forgetPlayer(player);
             }
         }
-
-        hasGodMode.remove(player.getName());
         hasAmphibious.remove(player.getName());
-    }
-
-    /**
-     * Enable god mode for a player.
-     *
-     * @param player
-     */
-    public void enableGodMode(Player player) {
-        hasGodMode.add(player.getName());
-    }
-
-    /**
-     * Disable god mode for a player.
-     *
-     * @param player
-     */
-    public void disableGodMode(Player player) {
-        hasGodMode.remove(player.getName());
-    }
-
-    /**
-     * Check to see if god mode is enabled for a player.
-     *
-     * @param player
-     * @return
-     */
-    public boolean hasGodMode(Player player) {
-        return hasGodMode.contains(player.getName());
     }
 
     /**
