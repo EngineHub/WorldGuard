@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -101,7 +102,7 @@ public class ConfigurationManager {
         plugin.createDefaultConfiguration(
                 new File(plugin.getDataFolder(), "config.yml"), "config.yml");
 
-        YAMLProcessor config = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), true);
+        YAMLProcessor config = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
         try {
             config.load();
         } catch (IOException ignore) {}
@@ -114,6 +115,8 @@ public class ConfigurationManager {
                 "auto-invincible", config.getBoolean("auto-invincible-permission", true));
         usePlayerMove = config.getBoolean(
                 "use-player-move-event", true);
+        
+        config.setWriteDefaults(false);
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
