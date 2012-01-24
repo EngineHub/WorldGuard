@@ -31,10 +31,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sk89q.util.yaml.YAMLProcessor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
-import org.bukkit.util.config.Configuration;
 
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.blacklist.BlacklistLogger;
@@ -69,8 +69,8 @@ public class WorldConfiguration {
     private WorldGuardPlugin plugin;
 
     private String worldName;
-    private Configuration parentConfig;
-    private Configuration config;
+    private YAMLProcessor parentConfig;
+    private YAMLProcessor config;
     private File configFile;
     private File blacklistFile;
 
@@ -167,12 +167,12 @@ public class WorldConfiguration {
 
         this.plugin = plugin;
         this.worldName = worldName;
-        this.parentConfig = plugin.getConfiguration();
+        this.parentConfig = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), false);
 
         plugin.createDefaultConfiguration(configFile, "config_world.yml");
         plugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
 
-        config = new Configuration(this.configFile);
+        config = new YAMLProcessor(this.configFile, true);
         loadConfiguration();
 
         logger.info("WorldGuard: Loaded configuration for world '" + worldName + '"');
@@ -274,7 +274,9 @@ public class WorldConfiguration {
      * Load the configuration.
      */
     private void loadConfiguration() {
-        config.load();
+        try {
+            config.load();
+        } catch (IOException ignore) {}
 
         opPermissions = getBoolean("op-permissions", true);
 
