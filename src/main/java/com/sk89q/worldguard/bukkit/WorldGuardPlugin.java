@@ -50,7 +50,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
-import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
@@ -118,7 +117,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         final CommandRegistration reg = new CommandRegistration(this, commands);
         reg.register(ToggleCommands.class);
         reg.register(ProtectionCommands.class);
-        reg.register(GeneralCommands.class);
 
         // Need to create the plugins/WorldGuard folder
         getDataFolder().mkdirs();
@@ -165,14 +163,6 @@ public class WorldGuardPlugin extends JavaPlugin {
             worldListener.initWorld(world);
         }
         worldListener.registerEvents();
-
-        // Check god mode for existing players, if any
-        for (Player player : getServer().getOnlinePlayers()) {
-            if (inGroup(player, "wg-invincible") ||
-                    (configuration.autoGodMode && hasPermission(player, "worldguard.auto-invincible"))) {
-                configuration.enableGodMode(player);
-            }
-        }
 
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }
