@@ -35,7 +35,7 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>5.1-SNAPSHOT</version>
+      <version>5.1</version>
     </dependency>
     
     <!-- Bukkit -->
@@ -43,6 +43,13 @@
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
       <version>1.0.0-R1-SNAPSHOT</version>
+    </dependency>
+      
+    <!-- CommandBook -->
+    <dependency>
+      <groupId>com.sk89q</groupId>
+      <artifactId>commandbook</artifactId>
+      <version>1.8-SNAPSHOT</version>
     </dependency>
     
     <!-- Additional libraries -->
