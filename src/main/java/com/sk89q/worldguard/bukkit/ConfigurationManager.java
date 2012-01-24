@@ -19,14 +19,15 @@
 package com.sk89q.worldguard.bukkit;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.sk89q.util.yaml.YAMLProcessor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.util.config.Configuration;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
@@ -105,8 +106,10 @@ public class ConfigurationManager {
         plugin.createDefaultConfiguration(
                 new File(plugin.getDataFolder(), "config.yml"), "config.yml");
 
-        Configuration config = plugin.getConfiguration();
-        config.load();
+        YAMLProcessor config = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), true);
+        try {
+            config.load();
+        } catch (IOException ignore) {}
 
         suppressTickSyncWarnings = config.getBoolean(
                 "suppress-tick-sync-warnings", false);
