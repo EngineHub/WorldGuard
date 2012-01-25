@@ -926,16 +926,21 @@ public class WorldGuardPlayerListener extends PlayerListener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         
+		
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
-        
+
         if (event.getItemStack().getTypeId() == ItemID.MILK_BUCKET) {
-        	if (!plugin.getGlobalRegionManager().allows(DefaultFlag.USE, player.getLocation().add(0, 1, 0))) {
+            Vector pt = toVector(player.getLocation().add(0, 1, 0));
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                    && !set.allows(DefaultFlag.USE)
+                    && !set.canBuild(plugin.wrapPlayer(player))) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use this in this area.");
                 event.setCancelled(true);
                 return;
-        	}
-        	
+            }
         } else if (!plugin.getGlobalRegionManager().canBuild(
                 player, event.getBlockClicked().getRelative(event.getBlockFace()))) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
