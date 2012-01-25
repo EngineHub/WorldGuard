@@ -33,6 +33,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Result;
@@ -43,6 +44,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -69,6 +71,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.Material;
 
 /**
  * Handles all events thrown in relation to a player.
@@ -105,6 +108,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
         registerEvent("PLAYER_QUIT", Priority.Normal);
         registerEvent("PLAYER_BUCKET_FILL", Priority.High);
         registerEvent("PLAYER_BUCKET_EMPTY", Priority.High);
+		registerEvent("PLAYER_INTERACT_ENTITY", Priority.High);
         registerEvent("PLAYER_RESPAWN", Priority.Highest);
         registerEvent("PLAYER_ITEM_HELD", Priority.High);
         registerEvent("PLAYER_BED_ENTER", Priority.High);
@@ -986,6 +990,35 @@ public class WorldGuardPlayerListener extends PlayerListener {
         }
     }
     
+	/**
+     * Called when a player right-clicks an entity
+     */
+    @Override
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+        Entity entity = event.getRightClicked();
+        Player player = event.getPlayer();
+
+        if (entity instanceof Sheep && player.getItemInHand() != null && player.getItemInHand().getType() == Material.SHEARS) {
+            
+            World world = player.getWorld();
+
+            Vector pt = toVector(player.getLocation().add(0, 1, 0));
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                    && !set.allows(DefaultFlag.USE)
+                    && !set.canBuild(plugin.wrapPlayer(player))) {
+                player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use this in this area.");
+                event.setCancelled(true);
+                return;
+            }
+
+        }
+    }
+
     /**
      * Called when a player is respawned.
      */
