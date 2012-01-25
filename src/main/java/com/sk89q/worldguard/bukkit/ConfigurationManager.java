@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.GodComponent;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import org.bukkit.World;
@@ -74,9 +76,17 @@ public class ConfigurationManager {
     private Map<String, WorldConfiguration> worlds;
 
     /**
+     * List of people with god mode.
+     */
+    @Deprecated
+    private Set<String> hasGodMode = new HashSet<String>();
+
+    /**
      * List of people who can breathe underwater.
      */
     private Set<String> hasAmphibious = new HashSet<String>();
+    
+    private boolean hasCommandBookGodMode = false;
 
     public boolean suppressTickSyncWarnings;
     public boolean useRegionsScheduler;
@@ -171,7 +181,45 @@ public class ConfigurationManager {
                 bl.forgetPlayer(player);
             }
         }
+
+        hasGodMode.remove(player.getName());
         hasAmphibious.remove(player.getName());
+    }
+
+    /**
+     * Enable god mode for a player.
+     *
+     * @param player
+     */
+    @Deprecated
+    public void enableGodMode(Player player) {
+        hasGodMode.add(player.getName());
+    }
+
+    /**
+     * Disable god mode for a player.
+     *
+     * @param player
+     */
+    @Deprecated
+    public void disableGodMode(Player player) {
+        hasGodMode.remove(player.getName());
+    }
+
+    /**
+     * Check to see if god mode is enabled for a player.
+     *
+     * @param player
+     * @return
+     */
+    public boolean hasGodMode(Player player) {
+        if (hasCommandBookGodMode) {
+            GodComponent god = CommandBook.inst().getComponentManager().getComponent(GodComponent.class);
+            if (god != null) {
+                return god.hasGodMode(player);
+            }
+        }
+        return hasGodMode.contains(player.getName());
     }
 
     /**
@@ -200,5 +248,20 @@ public class ConfigurationManager {
      */
     public boolean hasAmphibiousMode(Player player) {
         return hasAmphibious.contains(player.getName());
+    }
+    
+    public void updateCommandBookGodMode() {
+        try {
+            if (plugin.getServer().getPluginManager().isPluginEnabled("CommandBook")) {
+                Class.forName("com.sk89q.commandbook.GodComponent");
+                hasCommandBookGodMode = true;
+                return;
+            }
+        } catch (ClassNotFoundException ignore) {}
+        hasCommandBookGodMode = false;
+    }
+    
+    public boolean hasCommandBookGodMode() {
+        return hasCommandBookGodMode;
     }
 }
