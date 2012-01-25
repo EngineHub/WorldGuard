@@ -791,7 +791,15 @@ public class WorldGuardPlayerListener extends PlayerListener {
                    event.setCancelled(true);
                    return;
                }
-            }
+            } else if (block.getTypeId() == BlockID.SOIL) {
+				if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                       //&& !set.allows(DefaultFlag.TRAMPLE) // todo: add flag & remove hasBypass?
+                       && !set.canBuild(localPlayer)) {
+                   event.setUseInteractedBlock(Result.DENY);
+                   event.setCancelled(true);
+                   return;
+               }
+			}
         }
     }
 
