@@ -23,8 +23,6 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.GodComponent;
 import com.sk89q.worldedit.blocks.BlockID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -532,7 +530,7 @@ public class WorldGuardEntityListener extends EntityListener {
         if (entity instanceof Player) {
             Player player = (Player) entity;
 
-            if ((wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if (cfg.hasGodMode(player) || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
                 event.setCancelled(true);
                 return;
             }
@@ -916,7 +914,7 @@ public class WorldGuardEntityListener extends EntityListener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(player.getWorld());
 
-        boolean god = RegionQueryUtil.hasGodMode(player, plugin);
+        boolean god = cfg.hasGodMode(player);
         if (wcfg.useRegions) {
             Boolean flag = RegionQueryUtil.isAllowedInvinciblity(plugin, player);
             boolean allowed = flag == null || flag == Boolean.TRUE;

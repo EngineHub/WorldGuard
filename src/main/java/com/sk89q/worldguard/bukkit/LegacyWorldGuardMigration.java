@@ -89,7 +89,7 @@ public class LegacyWorldGuardMigration {
             
             logger.info("WorldGuard: The regions database has changed in 5.x. "
                     + "Your old regions database will be converted to the new format "
-                    + "and set as your primarily world's database.");
+                    + "and set as your primary world's database.");
 
             World w = plugin.getServer().getWorlds().get(0);
             RegionManager mgr = plugin.getGlobalRegionManager().get(w);

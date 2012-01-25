@@ -165,6 +165,11 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     + "Fire spread is currently globally disabled for this world.");
         }
         
+        if (!cfg.hasCommandBookGodMode() && cfg.autoGodMode && (plugin.inGroup(player, "wg-invincible")
+                || plugin.hasPermission(player, "worldguard.auto-invincible"))) {
+            cfg.enableGodMode(player);
+        }
+        
         if (plugin.inGroup(player, "wg-amphibious")) {
             cfg.enableAmphibiousMode(player);
         }

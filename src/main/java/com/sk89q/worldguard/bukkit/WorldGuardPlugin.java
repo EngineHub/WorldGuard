@@ -50,6 +50,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
+import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
@@ -117,6 +118,15 @@ public class WorldGuardPlugin extends JavaPlugin {
         final CommandRegistration reg = new CommandRegistration(this, commands);
         reg.register(ToggleCommands.class);
         reg.register(ProtectionCommands.class);
+        
+        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            @Override
+            public void run() {
+                if (!getGlobalStateManager().hasCommandBookGodMode()) {
+                    reg.register(GeneralCommands.class);
+                }
+            }
+        }, 0L);
 
         // Need to create the plugins/WorldGuard folder
         getDataFolder().mkdirs();
@@ -156,6 +166,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardVehicleListener(this)).registerEvents();
+        (new WorldGuardServerListener(this)).registerEvents();
 
         // handle worlds separately to initialize already loaded worlds
         WorldGuardWorldListener worldListener = (new WorldGuardWorldListener(this));
@@ -163,6 +174,16 @@ public class WorldGuardPlugin extends JavaPlugin {
             worldListener.initWorld(world);
         }
         worldListener.registerEvents();
+
+        if (!configuration.hasCommandBookGodMode()) {
+            // Check god mode for existing players, if any
+            for (Player player : getServer().getOnlinePlayers()) {
+                if (inGroup(player, "wg-invincible") ||
+                        (configuration.autoGodMode && hasPermission(player, "worldguard.auto-invincible"))) {
+                    configuration.enableGodMode(player);
+                }
+            }
+        }
 
         logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }
