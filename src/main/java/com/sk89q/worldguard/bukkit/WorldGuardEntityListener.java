@@ -917,7 +917,7 @@ public class WorldGuardEntityListener extends EntityListener {
         boolean god = cfg.hasGodMode(player);
         if (wcfg.useRegions) {
             Boolean flag = RegionQueryUtil.isAllowedInvinciblity(plugin, player);
-            boolean allowed = flag == null || flag == Boolean.TRUE;
+            boolean allowed = flag == null || flag == true;
             boolean invincible = RegionQueryUtil.isInvincible(plugin, player);
 
             if (allowed) {
