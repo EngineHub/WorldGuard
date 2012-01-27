@@ -57,23 +57,23 @@ public class SignChestProtection implements ChestProtection {
         
         side = searchBlock;
         res = isProtectedSign(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res) return res;
         
         side = searchBlock.getRelative(-1, 0, 0);
         res = isProtectedSignAndChest(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res) return res;
         
         side = searchBlock.getRelative(1, 0, 0);
         res = isProtectedSignAndChest(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res) return res;
         
         side = searchBlock.getRelative(0, 0, -1);
         res = isProtectedSignAndChest(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res) return res;
         
         side = searchBlock.getRelative(0, 0, 1);
         res = isProtectedSignAndChest(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res) return res;
         
         return false;
     }
@@ -115,7 +115,7 @@ public class SignChestProtection implements ChestProtection {
     
     private boolean isProtectedSignAndChestBinary(Block block, Player player) {
         Boolean res = isProtectedSignAndChest(block, player);
-        if (res == null || res == Boolean.FALSE) {
+        if (res == null || !res) {
             return false;
         }
         return true;
@@ -127,23 +127,23 @@ public class SignChestProtection implements ChestProtection {
         
         side = searchBlock;
         res = isProtected(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res == true) return res;
         
         side = searchBlock.getRelative(-1, 0, 0);
         res = isProtected(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res == true) return res;
         
         side = searchBlock.getRelative(1, 0, 0);
         res = isProtected(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res == true) return res;
         
         side = searchBlock.getRelative(0, 0, -1);
         res = isProtected(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res == true) return res;
         
         side = searchBlock.getRelative(0, 0, 1);
         res = isProtected(side, player);
-        if (res != null && res == Boolean.TRUE) return res;
+        if (res != null && res == true) return res;
         
         return false;
     }
