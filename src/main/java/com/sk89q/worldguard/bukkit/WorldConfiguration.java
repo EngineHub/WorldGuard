@@ -168,7 +168,7 @@ public class WorldConfiguration {
 
         this.plugin = plugin;
         this.worldName = worldName;
-        this.parentConfig = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), false, YAMLFormat.EXTENDED);
+        this.parentConfig = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
 
         plugin.createDefaultConfiguration(configFile, "config_world.yml");
         plugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
