@@ -158,17 +158,18 @@ public class WorldConfiguration {
     /**
      * Construct the object.
      *
-     * @param plugin
-     * @param worldName
+     * @param plugin The WorldGuardPlugin instance
+     * @param worldName The world name that this WorldConfiguration is for.
+     * @param parentConfig The parent configuration to read defaults from
      */
-    public WorldConfiguration(WorldGuardPlugin plugin, String worldName) {
+    public WorldConfiguration(WorldGuardPlugin plugin, String worldName, YAMLProcessor parentConfig) {
         File baseFolder = new File(plugin.getDataFolder(), "worlds/" + worldName);
         configFile = new File(baseFolder, "config.yml");
         blacklistFile = new File(baseFolder, "blacklist.txt");
 
         this.plugin = plugin;
         this.worldName = worldName;
-        this.parentConfig = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
+        this.parentConfig = parentConfig;
 
         plugin.createDefaultConfiguration(configFile, "config_world.yml");
         plugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
@@ -277,7 +278,10 @@ public class WorldConfiguration {
     private void loadConfiguration() {
         try {
             config.load();
-        } catch (IOException ignore) {}
+        } catch (IOException e) {
+            WorldGuardPlugin.logger.severe("Error reading configuration for world " + worldName + ": ");
+            e.printStackTrace();
+        }
 
         opPermissions = getBoolean("op-permissions", true);
 
