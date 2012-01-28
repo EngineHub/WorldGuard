@@ -20,6 +20,7 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -69,11 +70,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import java.util.LinkedList;
 
 /**
  * Listener for entity related events.
@@ -559,7 +562,12 @@ public class WorldGuardEntityListener extends EntityListener {
         }
 
         if (ent instanceof Creeper) {
-            if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
+            if (wcfg.blockCreeperBlockDamage) {
+                event.blockList().clear();
+                return;
+            }
+            
+            if (wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
                 return;
             }
@@ -570,7 +578,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
                     for (Block block : event.blockList()) {
                         if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
-                            event.setCancelled(true);
+                            event.blockList().clear();
                             return;
                         }
                     }
@@ -578,7 +586,7 @@ public class WorldGuardEntityListener extends EntityListener {
             }
         } else if (ent instanceof EnderDragon) {
             if (wcfg.blockEnderDragonBlockDamage) {
-                event.setCancelled(true);
+                event.blockList().clear();
                 return;
             }
 
@@ -588,14 +596,19 @@ public class WorldGuardEntityListener extends EntityListener {
 
                     for (Block block : event.blockList()) {
                         if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
-                            event.setCancelled(true);
+                            event.blockList().clear();
                             return;
                         }
                     }
                 }
             }
         } else if (ent instanceof TNTPrimed) {
-            if (wcfg.blockTNTBlockDamage || wcfg.blockTNTExplosions) {
+            if (wcfg.blockTNTBlockDamage) {
+                event.blockList().clear();
+                return;
+            }
+            
+            if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
             }
@@ -605,13 +618,18 @@ public class WorldGuardEntityListener extends EntityListener {
 
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
-                        event.setCancelled(true);
+                        event.blockList().clear();
                         return;
                     }
                 }
             }
         } else if (ent instanceof Fireball) {
-            if (wcfg.blockFireballBlockDamage || wcfg.blockFireballExplosions) {
+            if (wcfg.blockFireballBlockDamage) {
+                event.blockList().clear();
+                return;
+            }
+            
+            if (wcfg.blockFireballExplosions) {
                 event.setCancelled(true);
                 return;
             }
@@ -621,7 +639,7 @@ public class WorldGuardEntityListener extends EntityListener {
 
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
-                        event.setCancelled(true);
+                        event.blockList().clear();
                         return;
                     }
                 }
@@ -631,7 +649,7 @@ public class WorldGuardEntityListener extends EntityListener {
         if (wcfg.signChestProtection) {
             for (Block block : event.blockList()) {
                 if (wcfg.isChestProtected(block)) {
-                    event.setCancelled(true);
+                    event.blockList().clear();
                     return;
                 }
             }
@@ -819,6 +837,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on entity health regain.
      */
+    @Override
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
         if (event.isCancelled()) {
             return;
