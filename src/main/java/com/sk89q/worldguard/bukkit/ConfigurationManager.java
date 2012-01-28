@@ -76,6 +76,11 @@ public class ConfigurationManager {
     private Map<String, WorldConfiguration> worlds;
 
     /**
+     * The global configuration for use when loading worlds
+     */
+    private YAMLProcessor config;
+
+    /**
      * List of people with god mode.
      */
     @Deprecated
@@ -112,10 +117,13 @@ public class ConfigurationManager {
         plugin.createDefaultConfiguration(
                 new File(plugin.getDataFolder(), "config.yml"), "config.yml");
 
-        YAMLProcessor config = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
+        config = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
         try {
             config.load();
-        } catch (IOException ignore) {}
+        } catch (IOException e) {
+            WorldGuardPlugin.logger.severe("Error reading configuration for global config: ");
+            e.printStackTrace();
+        }
 
         suppressTickSyncWarnings = config.getBoolean(
                 "suppress-tick-sync-warnings", false);
@@ -125,8 +133,6 @@ public class ConfigurationManager {
                 "auto-invincible", config.getBoolean("auto-invincible-permission", true));
         usePlayerMove = config.getBoolean(
                 "use-player-move-event", true);
-        
-        config.setWriteDefaults(false);
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
@@ -138,7 +144,9 @@ public class ConfigurationManager {
         } catch (Throwable t) {
         }
 
-        config.save();
+        if (!config.save()) {
+            WorldGuardPlugin.logger.severe("Error saving configuration!");
+        }
     }
 
     /**
@@ -159,7 +167,7 @@ public class ConfigurationManager {
         WorldConfiguration config = worlds.get(worldName);
 
         if (config == null) {
-            config = new WorldConfiguration(plugin, worldName);
+            config = new WorldConfiguration(plugin, worldName, this.config);
             worlds.put(worldName, config);
         }
 
