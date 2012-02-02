@@ -19,9 +19,12 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -53,11 +56,18 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.databases.migrators.AbstractDatabaseMigrator;
+import com.sk89q.worldguard.protection.databases.migrators.MigrationException;
+import com.sk89q.worldguard.protection.databases.migrators.MigratorKey;
 import com.sk89q.worldguard.util.RegionUtil;
 
 public class RegionCommands {
     private final WorldGuardPlugin plugin;
 
+    private MigratorKey migrateDBRequest;
+    private Date migrateDBRequestDate;
+    
     public RegionCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
@@ -118,8 +128,8 @@ public class RegionCommands {
         try {
             mgr.save();
             sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -192,8 +202,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -323,8 +333,8 @@ public class RegionCommands {
         try {
             mgr.save();
             sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -681,8 +691,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -730,8 +740,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -801,8 +811,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -839,8 +849,8 @@ public class RegionCommands {
         
         try {
             mgr.save();
-        } catch (IOException e) {
-            throw new CommandException("Failed to write regions file: "
+        } catch (ProtectionDatabaseException e) {
+            throw new CommandException("Failed to write regions: "
                     + e.getMessage());
         }
     }
@@ -862,8 +872,8 @@ public class RegionCommands {
                 mgr.load();
                 sender.sendMessage(ChatColor.YELLOW
                         + "Regions for '" + world.getName() + "' load.");
-            } catch (IOException e) {
-                throw new CommandException("Failed to read regions file: "
+            } catch (ProtectionDatabaseException e) {
+                throw new CommandException("Failed to read regions: "
                         + e.getMessage());
             }
         } else {
@@ -872,8 +882,8 @@ public class RegionCommands {
                 
                 try {
                     mgr.load();
-                } catch (IOException e) {
-                    throw new CommandException("Failed to read regions file: "
+                } catch (ProtectionDatabaseException e) {
+                    throw new CommandException("Failed to read regions: "
                             + e.getMessage());
                 }
             }
@@ -900,8 +910,8 @@ public class RegionCommands {
                 mgr.save();
                 sender.sendMessage(ChatColor.YELLOW
                         + "Regions for '" + world.getName() + "' saved.");
-            } catch (IOException e) {
-                throw new CommandException("Failed to write regions file: "
+            } catch (ProtectionDatabaseException e) {
+                throw new CommandException("Failed to write regions: "
                         + e.getMessage());
             }
         } else {
@@ -910,8 +920,8 @@ public class RegionCommands {
                 
                 try {
                     mgr.save();
-                } catch (IOException e) {
-                    throw new CommandException("Failed to write regions file: "
+                } catch (ProtectionDatabaseException e) {
+                    throw new CommandException("Failed to write regions: "
                             + e.getMessage());
                 }
             }
@@ -919,5 +929,55 @@ public class RegionCommands {
             sender.sendMessage(ChatColor.YELLOW
                     + "Region databases saved.");
         }
+    }
+    
+    @Command(aliases = {"migratedb"}, usage = "<from> <to>",
+            desc = "Migrate from one Protection Database to another.", min = 1)
+    @CommandPermissions({"worldguard.region.migratedb"})
+    public void migratedb(CommandContext args, CommandSender sender) throws CommandException {
+    	String from = args.getString(0).toLowerCase().trim();
+    	String to = args.getString(1).toLowerCase().trim();
+    	
+    	if (from.equals(to)) {
+    		throw new CommandException("Will not migrate with common source and target.");
+    	}
+    	
+    	Map<MigratorKey, Class<? extends AbstractDatabaseMigrator>> migrators = AbstractDatabaseMigrator.getMigrators();
+    	MigratorKey key = new MigratorKey(from,to);
+    	
+    	if (!migrators.containsKey(key)) {
+    		throw new CommandException("No migrator found for that combination and direction.");
+    	}
+    	
+    	long lastRequest = 10000000;
+    	if (this.migrateDBRequestDate != null) { 
+    		lastRequest = new Date().getTime() - this.migrateDBRequestDate.getTime();
+    	}
+    	if (this.migrateDBRequest == null || lastRequest > 60000) {
+    		this.migrateDBRequest = key;
+    		this.migrateDBRequestDate = new Date();
+    		
+    		throw new CommandException("This command is potentially dangerous.\n" + 
+    				"Please ensure you have made a backup of your data, and then re-enter the command exactly to procede.");
+    	}
+    	
+    	Class<? extends AbstractDatabaseMigrator> cls = migrators.get(key);    	
+   	
+    	try {
+			AbstractDatabaseMigrator migrator = cls.getConstructor(WorldGuardPlugin.class).newInstance(plugin);
+	    	
+	    	migrator.migrate();
+		} catch (IllegalArgumentException e) {
+		} catch (SecurityException e) {
+		} catch (InstantiationException e) {
+		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
+		} catch (NoSuchMethodException e) {
+		} catch (MigrationException e) {
+			throw new CommandException("Error migrating database: " + e.getMessage());
+		}
+    	
+    	sender.sendMessage(ChatColor.YELLOW + "Regions have been migrated successfuly.\n" + 
+    			"If you wish to use the destination format as your new backend, please update your config and reload WorldGuard.");    	
     }
 }

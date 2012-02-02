@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.databases;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,4 +100,34 @@ public class RegionDBUtil {
 
         return domain;
     }
+    
+    /**
+     * Creates a comma separated list of PreparedStatement place holders
+     * 
+     * @param length
+     * @return
+     */
+    public static String preparePlaceHolders(int length) {
+		StringBuilder builder = new StringBuilder();
+	    for (int i = 0; i < length;) {
+	        builder.append("?");
+	        if (++i < length) {
+	            builder.append(",");
+	        }
+	    }
+	    return builder.toString();
+	}
+	
+    /**
+     * Adds all of the parsed values to the PreparedStatement
+     * 
+     * @param preparedStatement
+     * @param values
+     * @throws SQLException
+     */
+    public static void setValues(PreparedStatement preparedStatement, String... values) throws SQLException {
+	    for (int i = 0; i < values.length; i++) {
+	        preparedStatement.setString(i + 1, values[i]);
+	    }
+	}
 }

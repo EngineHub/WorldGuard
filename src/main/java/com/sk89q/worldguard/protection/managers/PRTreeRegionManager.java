@@ -32,6 +32,7 @@ import org.khelekore.prtree.PRTree;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
@@ -58,7 +59,7 @@ public class PRTreeRegionManager extends RegionManager {
      * @param regionloader
      * @throws IOException
      */
-    public PRTreeRegionManager(ProtectionDatabase regionloader) throws IOException {
+    public PRTreeRegionManager(ProtectionDatabase regionloader) throws ProtectionDatabaseException {
         super(regionloader);
         regions = new TreeMap<String, ProtectedRegion>();
         tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);

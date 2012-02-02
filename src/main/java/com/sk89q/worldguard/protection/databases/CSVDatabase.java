@@ -72,22 +72,23 @@ public class CSVDatabase extends AbstractProtectionDatabase {
     /**
      * Saves the database.
      */
-    public void save() throws IOException {
+    public void save() throws ProtectionDatabaseException {
         throw new UnsupportedOperationException("CSV format is no longer implemented");
     }
 
     /**
      * Load the database from file.
      */
-    public void load() throws IOException {
+    public void load() throws ProtectionDatabaseException {
         Map<String,ProtectedRegion> regions =
                 new HashMap<String,ProtectedRegion>();
         Map<ProtectedRegion,String> parentSets =
                 new LinkedHashMap<ProtectedRegion, String>();
 
-        CSVReader reader = new CSVReader(new FileReader(file));
-
+        CSVReader reader = null;
         try {
+        	 reader = new CSVReader(new FileReader(file));
+        	
             String[] line;
 
             while ((line = reader.readNext()) != null) {
@@ -162,6 +163,8 @@ public class CSVDatabase extends AbstractProtectionDatabase {
                     }
                 }
             }
+        } catch (IOException e) {
+        	throw new ProtectionDatabaseException(e);
         } finally {
             try {
                 reader.close();

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.protection.databases;
 
-import java.io.IOException;
 import java.util.Map;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -35,29 +34,29 @@ public interface ProtectionDatabase {
      * Load the list of regions. The method should not modify the list returned
      * by getRegions() unless the load finishes successfully.
      *
-     * @throws IOException
+     * @throws ProtectionDatabaseException
      */
-    public void load() throws IOException;
+    public void load() throws ProtectionDatabaseException;
     /**
      * Save the list of regions.
      *
-     * @throws IOException
+     * @throws ProtectionDatabaseException
      */
-    public void save() throws IOException;
+    public void save() throws ProtectionDatabaseException;
     /**
      * Load the list of regions into a region manager.
      *
      * @param manager
-     * @throws IOException
+     * @throws ProtectionDatabaseException
      */
-    public void load(RegionManager manager) throws IOException;
+    public void load(RegionManager manager) throws ProtectionDatabaseException;
     /**
      * Save the list of regions from a region manager.
      *
      * @param manager
-     * @throws IOException
+     * @throws ProtectionDatabaseException
      */
-    public void save(RegionManager manager) throws IOException;
+    public void save(RegionManager manager) throws ProtectionDatabaseException;
     /**
      * Get a list of regions.
      *

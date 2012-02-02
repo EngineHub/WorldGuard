@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.databases;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -51,18 +52,23 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
     private YAMLProcessor config;
     private Map<String, ProtectedRegion> regions;
     
-    public YAMLDatabase(File file) {
+    public YAMLDatabase(File file) throws ProtectionDatabaseException, FileNotFoundException {
         if (!file.exists()) { // shouldn't be necessary, but check anyways
             try {
                 file.createNewFile();
-            } catch (IOException e) {}
-            // if this is thrown, we can't do anything (caught elsewhere anyway)
+            } catch (IOException e) {
+                throw new FileNotFoundException(file.getAbsolutePath());
+            }
         }
         config = new YAMLProcessor(file, false, YAMLFormat.COMPACT);
     }
 
-    public void load() throws IOException {
-        config.load();
+    public void load() throws ProtectionDatabaseException {
+        try {
+            config.load();
+        } catch (IOException e) {
+            throw new ProtectionDatabaseException(e);
+        }
         
         Map<String, YAMLNode> regionData = config.getNodes("regions");
         
@@ -190,7 +196,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         return domain;
     }
 
-    public void save() throws IOException {
+    public void save() throws ProtectionDatabaseException {
         config.clear();
         
         for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {

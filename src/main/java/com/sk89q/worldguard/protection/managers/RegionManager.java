@@ -26,6 +26,7 @@ import java.util.Map;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -56,7 +57,7 @@ public abstract class RegionManager {
      *
      * @throws IOException thrown on load error
      */
-    public void load() throws IOException {
+    public void load() throws ProtectionDatabaseException {
         loader.load(this);
     }
 
@@ -65,7 +66,7 @@ public abstract class RegionManager {
      *
      * @throws IOException thrown on save eIf checking multiple flags for a single locationror
      */
-    public void save() throws IOException {
+    public void save() throws ProtectionDatabaseException {
         loader.save(this);
     }
 
