@@ -21,6 +21,9 @@ package com.sk89q.worldguard.protection.flags;
 
 import org.bukkit.entity.CreatureType;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  *
  * @author sk89q
@@ -84,23 +87,25 @@ public final class DefaultFlag {
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", new CommandStringFlag(null));
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", new CommandStringFlag(null));
 
-    public static final Flag<?>[] flagsList = new Flag<?>[] {
-        PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
-        TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
-        MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
-        CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
-        GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
-        EXIT, EXIT_PERM, ENTRY, ENTRY_PERM, LIGHTNING,
-        HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
-        FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
-        SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT,
-        MUSHROOMS, LEAF_DECAY, GRASS_SPREAD,
-        FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
-        TELE_LOC, TELE_PERM, SPAWN_LOC, SPAWN_PERM,
-        BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
-    };
+    public static final List<Flag<?>> flagsList;
 
     static {
+        Flag<?>[] flags = new Flag<?>[] {
+                PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
+                TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
+                MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
+                CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
+                GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
+                EXIT, EXIT_PERM, ENTRY, ENTRY_PERM, LIGHTNING,
+                HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
+                FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
+                SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT,
+                MUSHROOMS, LEAF_DECAY, GRASS_SPREAD,
+                FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
+                TELE_LOC, TELE_PERM, SPAWN_LOC, SPAWN_PERM,
+                BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
+        };
+        flagsList = Arrays.asList(flags);
         ENTRY.setGroupFlag(ENTRY_PERM);
         EXIT.setGroupFlag(EXIT_PERM);
     }
@@ -109,7 +114,11 @@ public final class DefaultFlag {
     }
 
     public static Flag<?>[] getFlags() {
-        return flagsList;
+        return flagsList.toArray(new Flag<?>[flagsList.size()]);
+    }
+
+    public static boolean registerFlag(Flag<?> flag) {
+        return flagsList.add(flag);
     }
 
     /**
