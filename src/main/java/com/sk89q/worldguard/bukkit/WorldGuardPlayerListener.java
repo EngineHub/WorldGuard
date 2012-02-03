@@ -524,7 +524,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-            if (item.getTypeId() == wcfg.regionWand && player.hasPermission("worldguard.region.wand")) {
+            if (item.getTypeId() == wcfg.regionWand && plugin.hasPermission(player, "worldguard.region.wand")) {
                 if (set.size() > 0) {
                     player.sendMessage(ChatColor.YELLOW + "Can you build? "
                             + (set.canBuild(localPlayer) ? "Yes" : "No"));
