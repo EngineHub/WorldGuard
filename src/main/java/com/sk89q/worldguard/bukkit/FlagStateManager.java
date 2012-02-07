@@ -89,7 +89,7 @@ public class FlagStateManager implements Runnable {
                     .getApplicableRegions(playerLocation);
             
             if (!RegionQueryUtil.isInvincible(plugin, player, applicable)
-                    && !RegionQueryUtil.hasGodMode(player, plugin)
+                    && !plugin.getGlobalStateManager().hasGodMode(player)
                     && !(player.getGameMode() == GameMode.CREATIVE)) {
                 processHeal(applicable, player, state);
                 processFeed(applicable, player, state);
