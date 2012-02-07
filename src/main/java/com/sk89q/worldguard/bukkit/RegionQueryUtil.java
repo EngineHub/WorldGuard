@@ -82,18 +82,4 @@ public class RegionQueryUtil {
             return null;
         }
     }
-    
-    public static boolean hasGodMode(Player player, WorldGuardPlugin plugin) {
-        try {
-            if (plugin.getServer().getPluginManager().isPluginEnabled("CommandBook")) {
-                GodComponent god = CommandBook.inst().getComponentManager().getComponent(GodComponent.class);
-                if (god != null) {
-                    return god.hasGodMode(player);
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        return false;
-    }
 }
