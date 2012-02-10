@@ -283,7 +283,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
             if (event.getFrom().getBlockX() != event.getTo().getBlockX()
                     || event.getFrom().getBlockY() != event.getTo().getBlockY()
                     || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-		
                 PlayerFlagState state = plugin.getFlagStateManager().getState(player);
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
                 boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
