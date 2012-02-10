@@ -283,8 +283,9 @@ public class WorldGuardPlayerListener extends PlayerListener {
             if (event.getFrom().getBlockX() != event.getTo().getBlockX()
                     || event.getFrom().getBlockY() != event.getTo().getBlockY()
                     || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+		
                 PlayerFlagState state = plugin.getFlagStateManager().getState(player);
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+		LocalPlayer localPlayer = plugin.wrapPlayer(player);
                 boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
 
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -301,6 +302,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     newLoc.setZ(newLoc.getBlockZ() + 0.5);
                     event.setTo(newLoc);
                     return;
+                }
+
+		//Fix for bug #728
+		if (state.lastWorld != null && !state.lastWorld.equals(world)) {
+		    plugin.getFlagStateManager().forget(player);
+		    return;
                 }
 
                 // Have to set this state
@@ -325,7 +332,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
                 Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
                 Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
-                
+              
                 if (state.lastFarewell != null && (farewell == null 
                         || !state.lastFarewell.equals(farewell))) {
                     String replacedFarewell = plugin.replaceMacros(
