@@ -303,6 +303,12 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     return;
                 }
 
+                //Flush states in multiworld scenario
+                if (state.lastWorld != null && !state.lastWorld.equals(world)) {
+                    plugin.getFlagStateManager().forget(player);
+                    return;
+                }
+
                 // Have to set this state
                 if (state.lastExitAllowed == null) {
                     state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))
@@ -325,7 +331,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                 String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
                 Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
                 Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
-                
+              
                 if (state.lastFarewell != null && (farewell == null 
                         || !state.lastFarewell.equals(farewell))) {
                     String replacedFarewell = plugin.replaceMacros(
