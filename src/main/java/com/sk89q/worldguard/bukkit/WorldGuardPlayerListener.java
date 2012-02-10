@@ -285,7 +285,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
 		
                 PlayerFlagState state = plugin.getFlagStateManager().getState(player);
-		LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
                 boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
 
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -304,10 +304,10 @@ public class WorldGuardPlayerListener extends PlayerListener {
                     return;
                 }
 
-		//Fix for bug #728
-		if (state.lastWorld != null && !state.lastWorld.equals(world)) {
-		    plugin.getFlagStateManager().forget(player);
-		    return;
+                //Flush states in multiworld scenario
+                if (state.lastWorld != null && !state.lastWorld.equals(world)) {
+                    plugin.getFlagStateManager().forget(player);
+                    return;
                 }
 
                 // Have to set this state
