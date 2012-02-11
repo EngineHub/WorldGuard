@@ -48,12 +48,12 @@ import com.sk89q.worldguard.util.ArrayReader;
  * @author sk89q
  */
 public class CSVDatabase extends AbstractProtectionDatabase {
-    private static Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+    private final Logger logger;
 
     /**
      * References the CSV file.
      */
-    private File file;
+    private final File file;
     /**
      * Holds the list of regions.
      */
@@ -65,8 +65,9 @@ public class CSVDatabase extends AbstractProtectionDatabase {
      *
      * @param file
      */
-    public CSVDatabase(File file) {
+    public CSVDatabase(File file, Logger logger) {
         this.file = file;
+        this.logger = logger;
     }
 
     /**

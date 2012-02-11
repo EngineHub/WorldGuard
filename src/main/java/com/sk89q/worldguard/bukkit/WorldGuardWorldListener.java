@@ -16,11 +16,6 @@ import org.bukkit.event.world.WorldLoadEvent;
 
 public class WorldGuardWorldListener implements Listener {
 
-    /**
-     * Logger for messages.
-     */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-
     private WorldGuardPlugin plugin;
 
     /**
@@ -57,7 +52,7 @@ public class WorldGuardWorldListener implements Listener {
             }
 
             if (removed > 50) {
-                logger.info("WG Halt-Act: " + removed + " entities (>50) auto-removed from "
+                plugin.getLogger().info("Halt-Act: " + removed + " entities (>50) auto-removed from "
                         + event.getChunk().toString());
             }
         }

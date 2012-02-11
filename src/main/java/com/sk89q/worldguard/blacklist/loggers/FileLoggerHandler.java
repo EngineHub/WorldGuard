@@ -53,10 +53,6 @@ import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
  */
 public class FileLoggerHandler implements BlacklistLoggerHandler {
     /**
-     * Logger.
-     */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-    /**
      * Regex for patterns in the path.
      */
     private static Pattern pattern = Pattern.compile("%.");
@@ -83,6 +79,8 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      */
     private TreeMap<String,FileLoggerWriter> writers =
             new TreeMap<String,FileLoggerWriter>();
+    
+    private final Logger logger;
 
     /**
      * Construct the object.
@@ -90,9 +88,10 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param pathPattern
      * @param worldName
      */
-    public FileLoggerHandler(String pathPattern, String worldName) {
+    public FileLoggerHandler(String pathPattern, String worldName, Logger logger) {
         this.pathPattern = pathPattern;
         this.worldName = worldName;
+        this.logger = logger;
     }
 
     /**
@@ -102,13 +101,14 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param cacheSize
      * @param worldName
      */
-    public FileLoggerHandler(String pathPattern, int cacheSize, String worldName) {
+    public FileLoggerHandler(String pathPattern, int cacheSize, String worldName, Logger logger) {
         if (cacheSize < 1) {
             throw new IllegalArgumentException("Cache size cannot be less than 1");
         }
         this.pathPattern = pathPattern;
         this.cacheSize = cacheSize;
         this.worldName = worldName;
+        this.logger = logger;
     }
 
     /**

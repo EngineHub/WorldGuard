@@ -75,11 +75,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
  */
 public class WorldGuardPlayerListener implements Listener {
 
-    /**
-     * Logger for messages.
-     */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-
     private WorldGuardPlugin plugin;
 
     /**
@@ -252,7 +247,7 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (removed > 10) {
-                logger.info("WG Halt-Act: " + removed + " entities (>10) auto-removed from "
+                plugin.getLogger().info("Halt-Act: " + removed + " entities (>10) auto-removed from "
                         + player.getWorld().toString());
             }
         }

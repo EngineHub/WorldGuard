@@ -48,8 +48,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
 public class MySQLDatabase extends AbstractProtectionDatabase {
-
-    private static Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+    private final Logger logger;
 
     private Map<String, ProtectedRegion> regions;
 
@@ -58,15 +57,16 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     private Map<String, ProtectedRegion> globalRegions;
     private Map<ProtectedRegion, String> parentSets;
 
-    private ConfigurationManager config;
+    private final ConfigurationManager config;
 
     private Connection conn;
     private String world;
     private int worldDbId = -1; // The database will never have an id of -1;
 
-    public MySQLDatabase(ConfigurationManager config, String world) throws ProtectionDatabaseException {
+    public MySQLDatabase(ConfigurationManager config, String world, Logger logger) throws ProtectionDatabaseException {
         this.config = config;
         this.world = world;
+        this.logger = logger;
 
         try {
             connect();
@@ -264,6 +264,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             Throwable t = ex.getCause();
             while (t != null) {
                 logger.warning("\t\tCause: " + t.getMessage());
+                t = t.getCause();
             }
         }
 
@@ -336,6 +337,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             Throwable t = ex.getCause();
             while (t != null) {
                 logger.warning("\t\tCause: " + t.getMessage());
+                t = t.getCause();
             }
         }
 
@@ -409,6 +411,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             Throwable t = ex.getCause();
             while (t != null) {
                 logger.warning("\t\tCause: " + t.getMessage());
+                t = t.getCause();
             }
         }
 
