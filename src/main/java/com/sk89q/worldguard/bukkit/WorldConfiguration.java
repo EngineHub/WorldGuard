@@ -64,9 +64,6 @@ public class WorldConfiguration {
             "# Remove the {} and add your own entries.\r\n" +
             "#\r\n";
 
-    private static final Logger logger = Logger
-            .getLogger("Minecraft.WorldGuard");
-
     private WorldGuardPlugin plugin;
 
     private String worldName;
@@ -177,7 +174,7 @@ public class WorldConfiguration {
         config = new YAMLProcessor(this.configFile, true, YAMLFormat.EXTENDED);
         loadConfiguration();
 
-        logger.info("WorldGuard: Loaded configuration for world '" + worldName + '"');
+        plugin.getLogger().info("Loaded configuration for world '" + worldName + '"');
     }
 
     private boolean getBoolean(String node, boolean def) {
@@ -279,7 +276,7 @@ public class WorldConfiguration {
         try {
             config.load();
         } catch (IOException e) {
-            WorldGuardPlugin.logger.severe("Error reading configuration for world " + worldName + ": ");
+            plugin.getLogger().severe("Error reading configuration for world " + worldName + ": ");
             e.printStackTrace();
         }
 
@@ -384,7 +381,7 @@ public class WorldConfiguration {
             CreatureType creature = CreatureType.fromName(creatureName);
 
             if (creature == null) {
-                logger.warning("WorldGuard: Unknown mob type '" + creatureName + "'");
+                plugin.getLogger().warning("Unknown mob type '" + creatureName + "'");
             } else {
                 blockCreatureSpawn.add(creature);
             }
@@ -424,52 +421,52 @@ public class WorldConfiguration {
                 this.blacklist = null;
             } else {
                 this.blacklist = blist;
-                logger.log(Level.INFO, "WorldGuard: Blacklist loaded.");
+                plugin.getLogger().log(Level.INFO, "Blacklist loaded.");
 
                 BlacklistLogger blacklistLogger = blist.getLogger();
 
                 if (logDatabase) {
-                    blacklistLogger.addHandler(new DatabaseLoggerHandler(dsn, user, pass, table, worldName));
+                    blacklistLogger.addHandler(new DatabaseLoggerHandler(dsn, user, pass, table, worldName, plugin.getLogger()));
                 }
 
                 if (logConsole) {
-                    blacklistLogger.addHandler(new ConsoleLoggerHandler(worldName));
+                    blacklistLogger.addHandler(new ConsoleLoggerHandler(worldName, plugin.getLogger()));
                 }
 
                 if (logFile) {
                     FileLoggerHandler handler =
-                            new FileLoggerHandler(logFilePattern, logFileCacheSize, worldName);
+                            new FileLoggerHandler(logFilePattern, logFileCacheSize, worldName, plugin.getLogger());
                     blacklistLogger.addHandler(handler);
                 }
             }
         } catch (FileNotFoundException e) {
-            logger.log(Level.WARNING, "WorldGuard blacklist does not exist.");
+            plugin.getLogger().log(Level.WARNING, "WorldGuard blacklist does not exist.");
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not load WorldGuard blacklist: "
+            plugin.getLogger().log(Level.WARNING, "Could not load WorldGuard blacklist: "
                     + e.getMessage());
         }
 
         // Print an overview of settings
         if (getBoolean("summary-on-start", true)) {
-            logger.log(Level.INFO, blockTNTExplosions
-                    ? "WorldGuard: (" + worldName + ") TNT ignition is blocked."
-                    : "WorldGuard: (" + worldName + ") TNT ignition is PERMITTED.");
-            logger.log(Level.INFO, blockLighter
-                    ? "WorldGuard: (" + worldName + ") Lighters are blocked."
-                    : "WorldGuard: (" + worldName + ") Lighters are PERMITTED.");
-            logger.log(Level.INFO, preventLavaFire
-                    ? "WorldGuard: (" + worldName + ") Lava fire is blocked."
-                    : "WorldGuard: (" + worldName + ") Lava fire is PERMITTED.");
+            plugin.getLogger().log(Level.INFO, blockTNTExplosions
+                    ? "(" + worldName + ") TNT ignition is blocked."
+                    : "(" + worldName + ") TNT ignition is PERMITTED.");
+            plugin.getLogger().log(Level.INFO, blockLighter
+                    ? "(" + worldName + ") Lighters are blocked."
+                    : "(" + worldName + ") Lighters are PERMITTED.");
+            plugin.getLogger().log(Level.INFO, preventLavaFire
+                    ? "(" + worldName + ") Lava fire is blocked."
+                    : "(" + worldName + ") Lava fire is PERMITTED.");
 
             if (disableFireSpread) {
-                logger.log(Level.INFO, "WorldGuard: (" + worldName + ") All fire spread is disabled.");
+                plugin.getLogger().log(Level.INFO, "(" + worldName + ") All fire spread is disabled.");
             } else {
                 if (disableFireSpreadBlocks.size() > 0) {
-                    logger.log(Level.INFO, "WorldGuard: (" + worldName
+                    plugin.getLogger().log(Level.INFO, "(" + worldName
                             + ") Fire spread is limited to "
                             + disableFireSpreadBlocks.size() + " block types.");
                 } else {
-                    logger.log(Level.INFO, "WorldGuard: (" + worldName
+                    plugin.getLogger().log(Level.INFO, "(" + worldName
                             + ") Fire spread is UNRESTRICTED.");
                 }
             }

@@ -65,11 +65,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
  * @author sk89q
  */
 public class WorldGuardBlockListener implements Listener {
-    /**
-     * Logger for messages.
-     */
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     private WorldGuardPlugin plugin;
 

@@ -28,12 +28,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class WorldGuardVehicleListener implements Listener {
 
-    /**
-     * Logger for messages.
-     */
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-
     private WorldGuardPlugin plugin;
 
     /**

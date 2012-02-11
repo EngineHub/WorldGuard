@@ -37,12 +37,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 public class WorldGuardWeatherListener implements Listener {
 
     /**
-     * Logger for messages.
-     */
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-
-    /**
      * Plugin.
      */
     private WorldGuardPlugin plugin;

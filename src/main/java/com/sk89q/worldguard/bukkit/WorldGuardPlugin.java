@@ -33,9 +33,9 @@ import java.util.logging.Filter;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
+import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.wepif.PermissionsResolverManager;
-import com.sk89q.worldguard.util.CommandRegistration;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -62,10 +62,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
  * @author sk89q
  */
 public class WorldGuardPlugin extends JavaPlugin {
-    /**
-     * Logger for messages.
-     */
-    static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
     /**
      * Manager for commands. This automatically handles nested commands,
@@ -116,7 +112,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         commands.setInjector(new SimpleInjector(this));
 
         // Register command classes
-        final CommandRegistration reg = new CommandRegistration(this, commands);
+        final CommandsManagerRegistration reg = new CommandsManagerRegistration(this, commands);
         reg.register(ToggleCommands.class);
         reg.register(ProtectionCommands.class);
         
@@ -185,8 +181,6 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
             }
         }
-
-        logger.info("WorldGuard " + this.getDescription().getVersion() + " enabled.");
     }
 
     /**
@@ -196,8 +190,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         globalRegionManager.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
-
-        logger.info("WorldGuard " + getDescription().getVersion() + " disabled.");
     }
     
     /**
@@ -693,7 +685,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 if (copy == null) throw new FileNotFoundException();
                 input = file.getInputStream(copy);
             } catch (IOException e) {
-                logger.severe(getDescription().getName() + ": Unable to read default configuration: " + defaultName);
+                getLogger().severe("Unable to read default configuration: " + defaultName);
             }
         
         if (input != null) {
@@ -707,7 +699,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     output.write(buf, 0, length);
                 }
 
-                logger.info("WorldGuard: Default configuration file written: "
+                getLogger().info("Default configuration file written: "
                         + actual.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
