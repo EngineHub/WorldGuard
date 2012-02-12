@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldguard</artifactId>
-  <version>5.5-SNAPSHOT</version>
+  <version>5.5</version>
   <name>WorldGuard</name>
   <description>WorldGuard protects your Minecraft servers</description>
 
@@ -40,14 +40,14 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>5.2-SNAPSHOT</version>
+      <version>5.2</version>
     </dependency>
     
     <!-- Bukkit -->
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.1-R1-SNAPSHOT</version>
+      <version>1.1-R3</version>
     </dependency>
       
     <!-- CommandBook -->
