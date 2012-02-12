@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldguard</artifactId>
-  <version>5.5</version>
+  <version>5.6-SNAPSHOT</version>
   <name>WorldGuard</name>
   <description>WorldGuard protects your Minecraft servers</description>
 
