@@ -323,6 +323,48 @@ public class RegionCommands {
                         "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
                 return;
             }
+            
+            Vector min = region.getMinimumPoint();
+            Vector max = region.getMaximumPoint();
+            
+            int xLength = max.getBlockX() - min.getBlockX() + 1;
+            int yLength = max.getBlockY() - min.getBlockY() + 1;
+            int zLength = max.getBlockZ() - min.getBlockZ() + 1;
+            
+            if (xLength > wcfg.maxClaimXLength) {
+                player.sendMessage(ChatColor.RED + "This region is too large to claim.");
+                player.sendMessage(ChatColor.RED +
+                        "Max. X length: " + wcfg.maxClaimVolume + ", your X length: " + xLength);
+                return;
+            }
+            
+            if (yLength > wcfg.maxClaimYLength) {
+                player.sendMessage(ChatColor.RED + "This region is too large to claim.");
+                player.sendMessage(ChatColor.RED +
+                        "Max. height: " + wcfg.maxClaimVolume + ", your height: " + yLength);
+                return;
+            }
+            
+            if (zLength > wcfg.maxClaimZLength) {
+                player.sendMessage(ChatColor.RED + "This region is too large to claim.");
+                player.sendMessage(ChatColor.RED +
+                        "Max. Z length: " + wcfg.maxClaimVolume + ", your Z length: " + zLength);
+                return;
+            }
+            
+            if ((max.getBlockY() + 1) > wcfg.maxClaimAltitude) {
+                player.sendMessage(ChatColor.RED + "This region is too high to claim.");
+                player.sendMessage(ChatColor.RED +
+                        "Max. altitude: " + wcfg.maxClaimAltitude + ", your highest altitude: " + (max.getBlockY() + 1));
+                return;
+            }
+            
+            if ((min.getBlockY() + 1) < wcfg.minClaimAltitude) {
+                player.sendMessage(ChatColor.RED + "This region is too low to claim.");
+                player.sendMessage(ChatColor.RED +
+                        "Min. altitude: " + wcfg.maxClaimAltitude + ", your lowest altitude: " + (min.getBlockY() + 1));
+                return;
+            }
         }
 
         region.getOwners().addPlayer(player.getName());

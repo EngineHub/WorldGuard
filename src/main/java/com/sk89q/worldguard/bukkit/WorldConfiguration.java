@@ -120,6 +120,11 @@ public class WorldConfiguration {
     // public boolean buyOnClaim;
     // public double buyOnClaimPrice;
     public int maxClaimVolume;
+    public int maxClaimXLength;
+    public int maxClaimYLength;
+    public int maxClaimZLength;
+    public int minClaimAltitude;
+    public int maxClaimAltitude;
     public boolean claimOnlyInsideExistingRegions;
     public int maxRegionCountPerPlayer;
     public boolean antiWolfDumbness;
@@ -357,6 +362,11 @@ public class WorldConfiguration {
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
         regionWand = getInt("regions.wand", 287);
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
+        maxClaimXLength = getInt("regions.max-claim-x-length", 100);
+        maxClaimYLength = getInt("regions.max-claim-y-length", 128);
+        maxClaimZLength = getInt("regions.max-claim-z-length", 100);
+        minClaimAltitude = getInt("regions.min-claim-altitude", 1);
+        maxClaimAltitude = getInt("regions.max-claim-altitude", 128);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
         
         maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player.default", 7);
