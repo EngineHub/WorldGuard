@@ -21,8 +21,6 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Set;
-import java.util.logging.Logger;
-
 import com.sk89q.worldedit.blocks.BlockID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

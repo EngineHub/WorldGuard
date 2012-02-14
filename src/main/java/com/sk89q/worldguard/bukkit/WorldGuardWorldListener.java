@@ -5,8 +5,6 @@
 */
 package com.sk89q.worldguard.bukkit;
 
-import java.util.logging.Logger;
-
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
