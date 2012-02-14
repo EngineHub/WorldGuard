@@ -95,15 +95,15 @@ public class WorldGuardPlayerListener implements Listener {
             pm.registerEvents(new PlayerMoveHandler(), plugin);
         }
     }
-	
-	private class PlayerMoveHandler implements Listener {
-		/**
-		 * Called when a player attempts to move.
-		 *
-		 * @param event
-		 */
-		@EventHandler(priority = EventPriority.HIGH)
-		public void onPlayerMove(PlayerMoveEvent event) {
+
+    class PlayerMoveHandler implements Listener {
+        /**
+         * Called when a player attempts to move.
+         *
+         * @param event
+         */
+        @EventHandler(priority = EventPriority.HIGH)
+        public void onPlayerMove(PlayerMoveEvent event) {
             Player player = event.getPlayer();
             World world = player.getWorld();
 
