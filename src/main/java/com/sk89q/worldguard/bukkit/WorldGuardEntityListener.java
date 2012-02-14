@@ -24,12 +24,14 @@ import java.util.Set;
 import com.sk89q.worldedit.blocks.BlockID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -45,8 +47,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
-import org.bukkit.event.entity.EndermanPickupEvent;
-import org.bukkit.event.entity.EndermanPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -814,57 +815,51 @@ public class WorldGuardEntityListener implements Listener {
     }
 
     /**
-     * Called when an enderman picks a block up.
+     * Called when an enderman picks up or puts down a block and some other cases.
      */
     @EventHandler(priority = EventPriority.HIGH)
-    public void onEndermanPickup(EndermanPickupEvent event) {
+    public void onEndermanPickup(EntityChangeBlockEvent event) {
         if (event.isCancelled()) {
             return;
-         }
+        }
 
         Entity ent = event.getEntity();
         Block block = event.getBlock();
+        Location location = block.getLocation();
 
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(ent.getWorld());
+        if (ent instanceof Enderman) {
+            if (event.getTo() == Material.AIR) {
+                // pickup
+                ConfigurationManager cfg = plugin.getGlobalStateManager();
+                WorldConfiguration wcfg = cfg.get(ent.getWorld());
 
-        if (wcfg.disableEndermanGriefing) {
-            event.setCancelled(true);
-            return;
-        }
+                if (wcfg.disableEndermanGriefing) {
+                    event.setCancelled(true);
+                    return;
+                }
 
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, block.getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
+                if (wcfg.useRegions) {
+                    if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, location)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            } else {
+                // place
+                ConfigurationManager cfg = plugin.getGlobalStateManager();
+                WorldConfiguration wcfg = cfg.get(ent.getWorld());
 
-    /**
-     * Called when an enderman places a block.
-     */
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onEndermanPlace(EndermanPlaceEvent event) {
-        if (event.isCancelled()) {
-            return;
-         }
+                if (wcfg.disableEndermanGriefing) {
+                    event.setCancelled(true);
+                    return;
+                }
 
-        Entity ent = event.getEntity();
-        Location loc = event.getLocation();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(ent.getWorld());
-
-        if (wcfg.disableEndermanGriefing) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, loc)) {
-                event.setCancelled(true);
-                return;
+                if (wcfg.useRegions) {
+                    if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, location)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
         }
     }
