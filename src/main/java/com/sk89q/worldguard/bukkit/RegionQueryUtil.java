@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.GodComponent;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

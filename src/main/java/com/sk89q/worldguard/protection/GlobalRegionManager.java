@@ -22,8 +22,6 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.logging.Logger;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
