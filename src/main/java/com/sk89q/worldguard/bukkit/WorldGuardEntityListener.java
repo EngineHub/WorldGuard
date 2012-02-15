@@ -69,6 +69,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
@@ -258,8 +259,7 @@ public class WorldGuardEntityListener implements Listener {
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
                     if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP) || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP)) {
-                        ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-                        event.setCancelled(true);
+                        tryCancelPVPEvent((Player) attacker, player, event);
                         return;
                     }
                 }
@@ -294,8 +294,7 @@ public class WorldGuardEntityListener implements Listener {
                     if (fireball.getShooter() instanceof Player) {
                         Vector pt2 = toVector(fireball.getShooter().getLocation());
                         if (!set.allows(DefaultFlag.PVP) || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP)) {
-                            ((Player) fireball.getShooter()).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-                            event.setCancelled(true);
+                            tryCancelPVPEvent((Player) fireball.getShooter(), player, event);
                             return;
                         }
                     } else {
@@ -369,8 +368,7 @@ public class WorldGuardEntityListener implements Listener {
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
                     if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP) || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP)) {
-                        ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-                        event.setCancelled(true);
+                        tryCancelPVPEvent((Player) attacker, player, event);
                         return;
                     }
                 }
@@ -392,6 +390,15 @@ public class WorldGuardEntityListener implements Listener {
             }
         }
 
+    }
+    
+    public void tryCancelPVPEvent(final Player attackingPlayer, final Player defendingPlayer, EntityDamageByEntityEvent event) {
+        final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer);
+        plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
+        if (!disallowedPVPEvent.isCancelled()) {
+            attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
+            event.setCancelled(true);
+        }
     }
 
     /**
