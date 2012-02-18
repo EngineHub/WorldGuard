@@ -47,12 +47,12 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritan
 
 public class YAMLDatabase extends AbstractProtectionDatabase {
     
-    private static Logger logger = Logger.getLogger("Minecraft.WorldGuard");
-    
     private YAMLProcessor config;
     private Map<String, ProtectedRegion> regions;
+    private final Logger logger;
     
-    public YAMLDatabase(File file) throws ProtectionDatabaseException, FileNotFoundException {
+    public YAMLDatabase(File file, Logger logger) throws ProtectionDatabaseException, FileNotFoundException {
+        this.logger = logger;
         if (!file.exists()) { // shouldn't be necessary, but check anyways
             try {
                 file.createNewFile();

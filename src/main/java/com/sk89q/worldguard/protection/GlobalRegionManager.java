@@ -22,8 +22,6 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.logging.Logger;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -50,8 +48,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
  * @author Redecouverte
  */
 public class GlobalRegionManager {
-
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     /**
      * Reference to the plugin.
@@ -141,12 +137,12 @@ public class GlobalRegionManager {
         try {
             if (!config.useSqlDatabase) {
                 file = getPath(name);
-                database = new YAMLDatabase(file);
+                database = new YAMLDatabase(file, plugin.getLogger());
 
                 // Store the last modification date so we can track changes
                 lastModified.put(name, file.lastModified());
             } else {
-                database = new MySQLDatabase(config, name);
+                database = new MySQLDatabase(config, name, plugin.getLogger());
             }
 
             // Create a manager
@@ -155,22 +151,22 @@ public class GlobalRegionManager {
             managers.put(name, manager);
             manager.load();
 
-            logger.info("WorldGuard: " + manager.getRegions().size()
+            plugin.getLogger().info(manager.getRegions().size()
                     + " regions loaded for '" + name + "'");
 
             return manager;
         } catch (ProtectionDatabaseException e) {
-            String logStr = "WorldGuard: Failed to load regions from ";
+            String logStr = "Failed to load regions from ";
             if (config.useSqlDatabase) {
                 logStr += "SQL Database <" + config.sqlDsn + "> ";
             } else {
                 logStr += "file \"" + file + "\" ";
             }
 
-            logger.info(logStr + " : " + e.getMessage());
+            plugin.getLogger().info(logStr + " : " + e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
-            logger.info("WorldGuard: Error loading regions for world \""
+            plugin.getLogger().info("Error loading regions for world \""
                     + name + "\": " + e.toString() + "\n\t" + e.getMessage());
             e.printStackTrace();
         }

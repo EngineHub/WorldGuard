@@ -22,8 +22,6 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Logger;
-
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.ItemID;
 import org.bukkit.ChatColor;
@@ -33,9 +31,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Result;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -45,7 +44,6 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -73,12 +71,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 /**
  * Handles all events thrown in relation to a player.
  */
-public class WorldGuardPlayerListener extends PlayerListener {
-
-    /**
-     * Logger for messages.
-     */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+public class WorldGuardPlayerListener implements Listener {
 
     private WorldGuardPlugin plugin;
 
@@ -95,46 +88,142 @@ public class WorldGuardPlayerListener extends PlayerListener {
      * Register events.
      */
     public void registerEvents() {
-//        PluginManager pm = plugin.getServer().getPluginManager();
+        final PluginManager pm = plugin.getServer().getPluginManager();
+        pm.registerEvents(this, plugin);
 
-        registerEvent("PLAYER_INTERACT", Priority.High);
-        registerEvent("PLAYER_DROP_ITEM", Priority.High);
-        registerEvent("PLAYER_PICKUP_ITEM", Priority.High);
-        registerEvent("PLAYER_JOIN", Priority.Normal);
-        registerEvent("PLAYER_LOGIN", Priority.Normal);
-        registerEvent("PLAYER_QUIT", Priority.Normal);
-        registerEvent("PLAYER_BUCKET_FILL", Priority.High);
-        registerEvent("PLAYER_BUCKET_EMPTY", Priority.High);
-        registerEvent("PLAYER_RESPAWN", Priority.Highest);
-        registerEvent("PLAYER_ITEM_HELD", Priority.High);
-        registerEvent("PLAYER_BED_ENTER", Priority.High);
-        registerEvent("PLAYER_COMMAND_PREPROCESS", Priority.Lowest);
         if (plugin.getGlobalStateManager().usePlayerMove) {
-            registerEvent("PLAYER_MOVE", Priority.High);
+            pm.registerEvents(new PlayerMoveHandler(), plugin);
         }
     }
 
-    /**
-     * Register an event, but not failing if the event is not implemented.
-     *
-     * @param typeName
-     * @param priority
-     */
-    private void registerEvent(String typeName, Priority priority) {
-        try {
-            Event.Type type = Event.Type.valueOf(typeName);
-            PluginManager pm = plugin.getServer().getPluginManager();
-            pm.registerEvent(type, this, priority, plugin);
-        } catch (IllegalArgumentException e) {
-            logger.info("WorldGuard: Unable to register missing event type " + typeName);
+    class PlayerMoveHandler implements Listener {
+        /**
+         * Called when a player attempts to move.
+         *
+         * @param event
+         */
+        @EventHandler(priority = EventPriority.HIGH)
+        public void onPlayerMove(PlayerMoveEvent event) {
+            Player player = event.getPlayer();
+            World world = player.getWorld();
+
+            ConfigurationManager cfg = plugin.getGlobalStateManager();
+            WorldConfiguration wcfg = cfg.get(world);
+
+            if (player.getVehicle() != null) return; // handled in vehicle listener
+            if (wcfg.useRegions) {
+                // Did we move a block?
+                if (event.getFrom().getBlockX() != event.getTo().getBlockX()
+                        || event.getFrom().getBlockY() != event.getTo().getBlockY()
+                        || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+                    PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+
+                    //Flush states in multiworld scenario
+                    if (state.lastWorld != null && !state.lastWorld.equals(world)) {
+                        plugin.getFlagStateManager().forget(player);
+                        state = plugin.getFlagStateManager().getState(player);
+                    }
+                    
+                    LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                    boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
+
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                    Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
+                    ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+                    boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
+                    if (!hasBypass && !entryAllowed) {
+                        player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
+
+                        Location newLoc = event.getFrom();
+                        newLoc.setX(newLoc.getBlockX() + 0.5);
+                        newLoc.setY(newLoc.getBlockY());
+                        newLoc.setZ(newLoc.getBlockZ() + 0.5);
+                        event.setTo(newLoc);
+                        return;
+                    }
+
+                    // Have to set this state
+                    if (state.lastExitAllowed == null) {
+                        state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))
+                                .allows(DefaultFlag.EXIT, localPlayer);
+                    }
+
+                    boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
+                    if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
+                        player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
+
+                        Location newLoc = event.getFrom();
+                        newLoc.setX(newLoc.getBlockX() + 0.5);
+                        newLoc.setY(newLoc.getBlockY());
+                        newLoc.setZ(newLoc.getBlockZ() + 0.5);
+                        event.setTo(newLoc);
+                        return;
+                    }
+
+                    String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);
+                    String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
+                    Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
+                    Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
+
+                    if (state.lastFarewell != null && (farewell == null
+                            || !state.lastFarewell.equals(farewell))) {
+                        String replacedFarewell = plugin.replaceMacros(
+                                player, BukkitUtil.replaceColorMacros(state.lastFarewell));
+                        player.sendMessage(ChatColor.AQUA + " ** " + replacedFarewell);
+                    }
+
+                    if (greeting != null && (state.lastGreeting == null
+                            || !state.lastGreeting.equals(greeting))) {
+                        String replacedGreeting = plugin.replaceMacros(
+                                player, BukkitUtil.replaceColorMacros(greeting));
+                        player.sendMessage(ChatColor.AQUA + " ** " + replacedGreeting);
+                    }
+
+                    if ((notifyLeave == null || !notifyLeave)
+                            && state.notifiedForLeave != null && state.notifiedForLeave) {
+                        plugin.broadcastNotification(ChatColor.GRAY + "WG: "
+                                + ChatColor.LIGHT_PURPLE + player.getName()
+                                + ChatColor.GOLD + " left NOTIFY region");
+                    }
+
+                    if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
+                            || !state.notifiedForEnter)) {
+                        StringBuilder regionList = new StringBuilder();
+
+                        for (ProtectedRegion region : set) {
+                            if (regionList.length() != 0) {
+                                regionList.append(", ");
+                            }
+                            regionList.append(region.getId());
+                        }
+
+                        plugin.broadcastNotification(ChatColor.GRAY + "WG: "
+                                + ChatColor.LIGHT_PURPLE + player.getName()
+                                + ChatColor.GOLD + " entered NOTIFY region: "
+                                + ChatColor.WHITE
+                                + regionList);
+                    }
+
+                    state.lastGreeting = greeting;
+                    state.lastFarewell = farewell;
+                    state.notifiedForEnter = notifyEnter;
+                    state.notifiedForLeave = notifyLeave;
+                    state.lastExitAllowed = exitAllowed;
+                    state.lastWorld = event.getTo().getWorld();
+                    state.lastBlockX = event.getTo().getBlockX();
+                    state.lastBlockY = event.getTo().getBlockY();
+                    state.lastBlockZ = event.getTo().getBlockZ();
+                }
+            }
         }
-    }
+	}
 
     /**
      * Called when a player joins a server.
      */
     @SuppressWarnings("deprecation")
-    @Override
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
@@ -156,7 +245,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
             }
 
             if (removed > 10) {
-                logger.info("WG Halt-Act: " + removed + " entities (>10) auto-removed from "
+                plugin.getLogger().info("Halt-Act: " + removed + " entities (>10) auto-removed from "
                         + player.getWorld().toString());
             }
         }
@@ -188,7 +277,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a player leaves a server.
      */
-    @Override
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
@@ -233,7 +322,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a player interacts with an item.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
@@ -260,126 +349,6 @@ public class WorldGuardPlayerListener extends PlayerListener {
             if (heldItem.getAmount() < 0) {
                 player.getInventory().setItem(slot, null);
                 player.sendMessage(ChatColor.RED + "Infinite stack removed.");
-            }
-        }
-    }
-
-    /**
-     * Called when a player attempts to move.
-     *
-     * @param event
-     */
-    @Override
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        World world = player.getWorld();
-        
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        if (player.getVehicle() != null) return; // handled in vehicle listener
-        if (wcfg.useRegions) {
-            // Did we move a block?
-            if (event.getFrom().getBlockX() != event.getTo().getBlockX()
-                    || event.getFrom().getBlockY() != event.getTo().getBlockY()
-                    || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-                PlayerFlagState state = plugin.getFlagStateManager().getState(player);
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-                boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
-
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
-                ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-                boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-                if (!hasBypass && !entryAllowed) {
-                    player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
-
-                    Location newLoc = event.getFrom();
-                    newLoc.setX(newLoc.getBlockX() + 0.5);
-                    newLoc.setY(newLoc.getBlockY());
-                    newLoc.setZ(newLoc.getBlockZ() + 0.5);
-                    event.setTo(newLoc);
-                    return;
-                }
-
-                //Flush states in multiworld scenario
-                if (state.lastWorld != null && !state.lastWorld.equals(world)) {
-                    plugin.getFlagStateManager().forget(player);
-                    return;
-                }
-
-                // Have to set this state
-                if (state.lastExitAllowed == null) {
-                    state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))
-                            .allows(DefaultFlag.EXIT, localPlayer);
-                }
-
-                boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
-                if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
-                    player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
-
-                    Location newLoc = event.getFrom();
-                    newLoc.setX(newLoc.getBlockX() + 0.5);
-                    newLoc.setY(newLoc.getBlockY());
-                    newLoc.setZ(newLoc.getBlockZ() + 0.5);
-                    event.setTo(newLoc);
-                    return;
-                }
-
-                String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);
-                String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
-                Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
-                Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
-              
-                if (state.lastFarewell != null && (farewell == null 
-                        || !state.lastFarewell.equals(farewell))) {
-                    String replacedFarewell = plugin.replaceMacros(
-                            player, BukkitUtil.replaceColorMacros(state.lastFarewell));
-                    player.sendMessage(ChatColor.AQUA + " ** " + replacedFarewell);
-                }
-                
-                if (greeting != null && (state.lastGreeting == null
-                        || !state.lastGreeting.equals(greeting))) {
-                    String replacedGreeting = plugin.replaceMacros(
-                            player, BukkitUtil.replaceColorMacros(greeting));
-                    player.sendMessage(ChatColor.AQUA + " ** " + replacedGreeting);
-                }
-                
-                if ((notifyLeave == null || !notifyLeave)
-                        && state.notifiedForLeave != null && state.notifiedForLeave) {
-                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
-                            + ChatColor.LIGHT_PURPLE + player.getName()
-                            + ChatColor.GOLD + " left NOTIFY region");
-                }
-                
-                if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
-                        || !state.notifiedForEnter)) {
-                    StringBuilder regionList = new StringBuilder();
-                    
-                    for (ProtectedRegion region : set) {
-                        if (regionList.length() != 0) {
-                            regionList.append(", ");
-                        }
-                        regionList.append(region.getId());
-                    }
-                    
-                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
-                            + ChatColor.LIGHT_PURPLE + player.getName()
-                            + ChatColor.GOLD + " entered NOTIFY region: "
-                            + ChatColor.WHITE
-                            + regionList);
-                }
-
-                state.lastGreeting = greeting;
-                state.lastFarewell = farewell;
-                state.notifiedForEnter = notifyEnter;
-                state.notifiedForLeave = notifyLeave;
-                state.lastExitAllowed = exitAllowed;
-                state.lastWorld = event.getTo().getWorld();
-                state.lastBlockX = event.getTo().getBlockX();
-                state.lastBlockY = event.getTo().getBlockY();
-                state.lastBlockZ = event.getTo().getBlockZ();
             }
         }
     }
@@ -872,7 +841,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a player attempts to drop an item.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         if (event.isCancelled()) {
             return;
@@ -896,7 +865,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a player attempts to pickup an item.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
         if (event.isCancelled()) {
             return;
@@ -920,7 +889,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a bucket is filled.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
@@ -955,7 +924,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a bucket is empty.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
@@ -983,7 +952,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a player is respawned.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         Location location = player.getLocation();
@@ -1018,7 +987,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a player changes their held item.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
         
@@ -1039,7 +1008,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called when a player enters a bed.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
         if (event.isCancelled()) {
             return;
@@ -1068,7 +1037,7 @@ public class WorldGuardPlayerListener extends PlayerListener {
     /**
      * Called on command run.
      */
-    @Override
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();

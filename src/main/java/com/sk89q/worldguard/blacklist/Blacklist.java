@@ -41,10 +41,6 @@ import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
  * @author sk89q
  */
 public abstract class Blacklist {
-    /**
-     * Logger.
-     */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     /**
      * List of entries by block ID.
@@ -67,8 +63,11 @@ public abstract class Blacklist {
 
     private boolean useAsWhitelist;
 
-    public Blacklist(Boolean useAsWhitelist) {
+    private final Logger logger;
+
+    public Blacklist(Boolean useAsWhitelist, Logger logger) {
         this.useAsWhitelist = useAsWhitelist;
+        this.logger = logger;
     }
 
     /**
@@ -178,7 +177,7 @@ public abstract class Blacklist {
                         } catch (NumberFormatException e) {
                             id = getItemID(item.trim());
                             if (id == 0) {
-                                logger.log(Level.WARNING, "WorldGuard: Unknown block name: "
+                                logger.log(Level.WARNING, "Unknown block name: "
                                         + item);
                                 break;
                             }

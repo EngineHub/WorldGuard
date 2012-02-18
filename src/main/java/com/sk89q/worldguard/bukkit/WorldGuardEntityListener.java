@@ -21,17 +21,17 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Set;
-import java.util.logging.Logger;
-
 import com.sk89q.worldedit.blocks.BlockID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -42,12 +42,12 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Wolf;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
-import org.bukkit.event.entity.EndermanPickupEvent;
-import org.bukkit.event.entity.EndermanPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -55,7 +55,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -66,8 +65,6 @@ import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.PluginManager;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
@@ -80,11 +77,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
  * 
  * @author sk89q
  */
-public class WorldGuardEntityListener extends EntityListener {
-    /**
-     * Logger for messages.
-     */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
+public class WorldGuardEntityListener implements Listener {
 
     private WorldGuardPlugin plugin;
 
@@ -101,45 +94,13 @@ public class WorldGuardEntityListener extends EntityListener {
      * Register events.
      */
     public void registerEvents() {
-//        PluginManager pm = plugin.getServer().getPluginManager();
-
-        registerEvent("ENTITY_DAMAGE", Priority.High);
-        registerEvent("ENTITY_COMBUST", Priority.High);
-        registerEvent("ENTITY_EXPLODE", Priority.High);
-        registerEvent("EXPLOSION_PRIME", Priority.High);
-        registerEvent("CREATURE_SPAWN", Priority.High);
-        registerEvent("ENTITY_INTERACT", Priority.High);
-        registerEvent("CREEPER_POWER", Priority.High);
-        registerEvent("PIG_ZAP", Priority.High);
-        registerEvent("PAINTING_BREAK", Priority.High);
-        registerEvent("PAINTING_PLACE", Priority.High);
-        registerEvent("ENTITY_REGAIN_HEALTH", Priority.High);
-        registerEvent("ENDERMAN_PICKUP", Priority.High);
-        registerEvent("ENDERMAN_PLACE", Priority.High);
-        registerEvent("ENTITY_DEATH", Priority.High);
-        registerEvent("FOOD_LEVEL_CHANGE", Priority.High);
-    }
-
-    /**
-     * Register an event, but not failing if the event is not implemented.
-     *
-     * @param typeName
-     * @param priority
-     */
-    private void registerEvent(String typeName, Priority priority) {
-        try {
-            Event.Type type = Event.Type.valueOf(typeName);
-            PluginManager pm = plugin.getServer().getPluginManager();
-            pm.registerEvent(type, this, priority, plugin);
-        } catch (IllegalArgumentException e) {
-            logger.info("WorldGuard: Unable to register missing event type " + typeName);
-        }
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     /**
      * Called when an entity interacts with another object.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityInteract(EntityInteractEvent event) {
         Entity entity = event.getEntity();
         Block block = event.getBlock();
@@ -157,7 +118,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called when an entity dies.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDeath(EntityDeathEvent event) {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
 
@@ -404,9 +365,10 @@ public class WorldGuardEntityListener extends EntityListener {
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
+                    Vector pt2 = toVector(attacker.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
-                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP)) {
+                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP) || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP)) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
                         return;
@@ -435,7 +397,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on entity damage.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.isCancelled()) {
             return;
@@ -516,7 +478,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on entity combust.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityCombust(EntityCombustEvent event) {
         if (event.isCancelled()) {
             return;
@@ -540,7 +502,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on entity explode.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityExplode(EntityExplodeEvent event) {
         if (event.isCancelled()) {
             return;
@@ -657,7 +619,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on explosion prime
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onExplosionPrime(ExplosionPrimeEvent event) {
         if (event.isCancelled()) {
             return;
@@ -677,7 +639,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on creature spawn.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         if (event.isCancelled()) {
             return;
@@ -723,7 +685,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on pig zap.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPigZap(PigZapEvent event) {
         if (event.isCancelled()) {
            return;
@@ -740,7 +702,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on creeper power.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onCreeperPower(CreeperPowerEvent event) {
         if (event.isCancelled()) {
            return;
@@ -757,7 +719,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called when a painting is removed.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPaintingBreak(PaintingBreakEvent breakEvent) {
         if (breakEvent.isCancelled()) {
             return;
@@ -800,7 +762,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on painting place.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPaintingPlace(PaintingPlaceEvent event) {
         if (event.isCancelled()) {
             return;
@@ -834,7 +796,7 @@ public class WorldGuardEntityListener extends EntityListener {
     /**
      * Called on entity health regain.
      */
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
         if (event.isCancelled()) {
             return;
@@ -853,62 +815,56 @@ public class WorldGuardEntityListener extends EntityListener {
     }
 
     /**
-     * Called when an enderman picks a block up.
+     * Called when an enderman picks up or puts down a block and some other cases.
      */
-    @Override
-    public void onEndermanPickup(EndermanPickupEvent event) {
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onEndermanPickup(EntityChangeBlockEvent event) {
         if (event.isCancelled()) {
             return;
-         }
+        }
 
         Entity ent = event.getEntity();
         Block block = event.getBlock();
+        Location location = block.getLocation();
 
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(ent.getWorld());
+        if (ent instanceof Enderman) {
+            if (event.getTo() == Material.AIR) {
+                // pickup
+                ConfigurationManager cfg = plugin.getGlobalStateManager();
+                WorldConfiguration wcfg = cfg.get(ent.getWorld());
 
-        if (wcfg.disableEndermanGriefing) {
-            event.setCancelled(true);
-            return;
-        }
+                if (wcfg.disableEndermanGriefing) {
+                    event.setCancelled(true);
+                    return;
+                }
 
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, block.getLocation())) {
-                event.setCancelled(true);
-                return;
+                if (wcfg.useRegions) {
+                    if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, location)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            } else {
+                // place
+                ConfigurationManager cfg = plugin.getGlobalStateManager();
+                WorldConfiguration wcfg = cfg.get(ent.getWorld());
+
+                if (wcfg.disableEndermanGriefing) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (wcfg.useRegions) {
+                    if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, location)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
         }
     }
 
-    /**
-     * Called when an enderman places a block.
-     */
-    @Override
-    public void onEndermanPlace(EndermanPlaceEvent event) {
-        if (event.isCancelled()) {
-            return;
-         }
-
-        Entity ent = event.getEntity();
-        Location loc = event.getLocation();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(ent.getWorld());
-
-        if (wcfg.disableEndermanGriefing) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, loc)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
-
-    @Override
+    @EventHandler(priority = EventPriority.HIGH)
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();

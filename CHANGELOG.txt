@@ -1,3 +1,28 @@
+5.5:
+- Removed WorldEdit.jar from the classpath to stop conflicts with Bukkit's plugin loader
+- Now using Bukkit's tagged logging
+- Updated to new event system
+- Flush player flag state cache on world change
+- Improved compatibility with versions of CommandBook without GodComponent and updated pom dep for 2.0
+- Added MySQL region storage method.
+- Made explosions display their animations even when the event was blocked.
+- Added fallback support for those who don't have a version of CommandBook with GodComponent
+- Added LIGHTNING flag to DefaultFlag's flagsList Fixes #1026
+- Removed /god, /heal, /locate, and /stack from WorldGuard to CommandBook. CommandBook is now checked to see whether a player is godded.
+- Removed remaining usages of org.bukkit.util.config.Configuration
+- Removed some unused configuration options
+- Added permission worldguard.region.wand to the region wand
+- Fixed ProtectedRegion.compareTo.
+- Fixed FlatRegionManager.getApplicableRegions to return parent regions as well.
+- Added exp-drops flag to disable experience drops per-region.
+- Fixed some warnings.
+- Updated dependency version for WorldGuard from 5.0 to 5.1-SNAPSHOT.
+- Added support for fireballs shot by players being blocked by the PVP flag.
+- Now using dynamic command registration
+- Split off ender dragon block damage from creeper block damage.
+
+Contributions thanks to: narthollis, DarkArc, Wolvereness, and skeight
+
 5.4:
 - Fixed configuration generation on Windows
 - Fixed intersection calculation for regions

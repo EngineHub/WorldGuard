@@ -26,8 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Logger;
-
 import org.bukkit.World;
 
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
@@ -40,10 +38,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
  * @author sk89q
  */
 public class LegacyWorldGuardMigration {
-    /**
-     * Logger for messages.
-     */
-    protected static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
     
     /**
      * Port over the blacklist.
@@ -59,7 +53,7 @@ public class LegacyWorldGuardMigration {
         File newFile = new File(plugin.getDataFolder(), newPath);
         
         if (!newFile.exists() && oldFile.exists()) {
-            logger.warning("WorldGuard: WorldGuard will now update your blacklist "
+            plugin.getLogger().warning("WorldGuard will now update your blacklist "
                     + "from an older version of WorldGuard.");
             
             // Need to make root directories
@@ -69,9 +63,9 @@ public class LegacyWorldGuardMigration {
                 oldFile.renameTo(new File(plugin.getDataFolder(),
                         "blacklist.txt.old"));
             } else {
-                logger.warning("WorldGuard: blacklist.txt has been converted " +
+                plugin.getLogger().warning("blacklist.txt has been converted " +
                         "for the main world at " + newPath + "");
-                logger.warning("WorldGuard: Your other worlds currently have no " +
+                plugin.getLogger().warning("Your other worlds currently have no " +
                 		"blacklist defined!");
             }
             
@@ -88,7 +82,7 @@ public class LegacyWorldGuardMigration {
             File oldDatabase = new File(plugin.getDataFolder(), "regions.txt");
             if (!oldDatabase.exists()) return;
             
-            logger.info("WorldGuard: The regions database has changed in 5.x. "
+            plugin.getLogger().info("The regions database has changed in 5.x. "
                     + "Your old regions database will be converted to the new format "
                     + "and set as your primary world's database.");
 
@@ -96,7 +90,7 @@ public class LegacyWorldGuardMigration {
             RegionManager mgr = plugin.getGlobalRegionManager().get(w);
 
             // First load up the old database using the CSV loader
-            CSVDatabase db = new CSVDatabase(oldDatabase);
+            CSVDatabase db = new CSVDatabase(oldDatabase, plugin.getLogger());
             db.load();
             
             // Then save the new database
@@ -105,9 +99,9 @@ public class LegacyWorldGuardMigration {
             
             oldDatabase.renameTo(new File(plugin.getDataFolder(), "regions.txt.old"));
 
-            logger.info("WorldGuard: Regions database converted!");
+            plugin.getLogger().info("Regions database converted!");
         } catch (ProtectionDatabaseException e) {
-            logger.warning("WorldGuard: Failed to load regions: "
+            plugin.getLogger().warning("Failed to load regions: "
                     + e.getMessage());
         }
     }

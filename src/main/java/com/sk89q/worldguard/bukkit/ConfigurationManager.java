@@ -129,7 +129,7 @@ public class ConfigurationManager {
         try {
             config.load();
         } catch (IOException e) {
-            WorldGuardPlugin.logger.severe("Error reading configuration for global config: ");
+            plugin.getLogger().severe("Error reading configuration for global config: ");
             e.printStackTrace();
         }
 
@@ -160,7 +160,7 @@ public class ConfigurationManager {
         }
 
         if (!config.save()) {
-            WorldGuardPlugin.logger.severe("Error saving configuration!");
+            plugin.getLogger().severe("Error saving configuration!");
         }
     }
 

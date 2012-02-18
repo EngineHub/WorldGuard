@@ -42,35 +42,33 @@ import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
  * @author sk89q
  */
 public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
-    /**
-     * Logger.
-     */
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldGuard");
 
     /**
      * DSN.
      */
-    private String dsn;
+    private final String dsn;
     /**
      * Username.
      */
-    private String user;
+    private final String user;
     /**
      * Password.
      */
-    private String pass;
+    private final String pass;
     /**
      * Table.
      */
-    private String table;
+    private final String table;
     /**
      * World name.
      */
-    private String worldName;
+    private final String worldName;
     /**
      * Database connection.
      */
     private Connection conn;
+    
+    private final Logger logger;
 
     /**
      * Construct the object.
@@ -81,12 +79,13 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * @param table
      * @param worldName
      */
-    public DatabaseLoggerHandler(String dsn, String user, String pass, String table, String worldName) {
+    public DatabaseLoggerHandler(String dsn, String user, String pass, String table, String worldName, Logger logger) {
         this.dsn = dsn;
         this.user = user;
         this.pass = pass;
         this.table = table;
         this.worldName = worldName;
+        this.logger = logger;
     }
 
     /**
@@ -106,10 +105,8 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
      * Log an event to the database.
      *
      * @param event
-     * @param name
-     * @param x
-     * @param y
-     * @param z
+     * @param player
+     * @param pos
      * @param item
      * @param comment
      */

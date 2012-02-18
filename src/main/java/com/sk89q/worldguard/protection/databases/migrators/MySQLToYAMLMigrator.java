@@ -72,7 +72,7 @@ public class MySQLToYAMLMigrator extends AbstractDatabaseMigrator {
     protected Map<String, ProtectedRegion> getRegionsForWorldFromOld(String world) throws MigrationException {
         ProtectionDatabase oldDatabase;
         try {
-            oldDatabase = new MySQLDatabase(plugin.getGlobalStateManager(), world);
+            oldDatabase = new MySQLDatabase(plugin.getGlobalStateManager(), world, plugin.getLogger());
             oldDatabase.load();
         } catch (ProtectionDatabaseException e) {
             throw new MigrationException((Exception) e);
@@ -87,7 +87,7 @@ public class MySQLToYAMLMigrator extends AbstractDatabaseMigrator {
             File file = new File(plugin.getDataFolder(),
                     "worlds" + File.separator + world + File.separator + "regions.yml");
 
-            return new YAMLDatabase(file);
+            return new YAMLDatabase(file, plugin.getLogger());
         } catch (FileNotFoundException e) {
             throw new MigrationException((Exception) e);
         } catch (ProtectionDatabaseException e) {

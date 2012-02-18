@@ -136,13 +136,13 @@ public final class DefaultFlag {
      * or an other custom flag.</p>
      * <p>true if the flag was added successfully</p>
      */
-    public static boolean addCustomFlag(Flag<?> flag) {
+    public static boolean addCustomFlag(Flag<?> flag) throws DuplicateFlagException {
         if (customFlagsList.containsKey(flag.getName())) {
-            return false;
+            throw new DuplicateFlagException();
         }
         for (Flag<?> fl : flagsList) {
             if (fl.getName().equalsIgnoreCase(flag.getName())) {
-                return false;
+                throw new DuplicateFlagException();
             }
         }
         customFlagsList.put(flag.getName(), flag);
