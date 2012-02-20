@@ -725,6 +725,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 player.sendMessage(msg);
             }
         }
+        getLogger().info(msg);
     }
     
     /**

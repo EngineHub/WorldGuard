@@ -59,7 +59,7 @@ public class RegionQueryUtil {
                 set = mgr.getApplicableRegions(vec);
             }
 
-            state.wasInvincible = set.allows(DefaultFlag.INVINCIBILITY);
+            state.wasInvincible = set.allows(DefaultFlag.INVINCIBILITY, plugin.wrapPlayer(player));
         }
 
         return state.wasInvincible;
@@ -71,7 +71,7 @@ public class RegionQueryUtil {
         Vector vec = new Vector(state.lastInvincibleX, state.lastInvincibleY, state.lastInvincibleZ);
 
         StateFlag.State regionState = plugin.getGlobalRegionManager().get(world).
-                getApplicableRegions(vec).getFlag(DefaultFlag.INVINCIBILITY);
+                getApplicableRegions(vec).getFlag(DefaultFlag.INVINCIBILITY, plugin.wrapPlayer(player));
         if (regionState == StateFlag.State.ALLOW) {
             return Boolean.TRUE;
         } else if (regionState == StateFlag.State.DENY) {

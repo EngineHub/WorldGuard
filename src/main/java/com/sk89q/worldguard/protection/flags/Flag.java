@@ -30,24 +30,26 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 public abstract class Flag<T> {
 
     private String name;
-    private Character legacyCode;
-
-    public Flag(String name, char legacyCode) {
+    private RegionGroupFlag regionGroup;
+    
+    public Flag(String name, RegionGroup defaultGroup) {
         this.name = name;
-        this.legacyCode = legacyCode;
+
+        if (defaultGroup != null) {
+            this.regionGroup = new RegionGroupFlag(name + "-group", defaultGroup);
+        }
     }
 
     public Flag(String name) {
-        this.name = name;
-        this.legacyCode = null;
+        this(name, RegionGroup.NON_MEMBERS);
     }
 
     public String getName() {
         return name;
     }
-
-    public Character getLegacyCode() {
-        return legacyCode;
+    
+    public RegionGroupFlag getRegionGroupFlag() {
+        return regionGroup;
     }
 
     public abstract T parseInput(WorldGuardPlugin plugin, CommandSender sender,

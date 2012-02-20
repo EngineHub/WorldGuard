@@ -294,6 +294,10 @@ public class GlobalRegionManager {
         return true;
     }
 
+    public boolean allows(StateFlag flag, Location loc) {
+        return allows(flag, loc, null);
+    }
+
     /**
      * Checks to see whether a flag is allowed.
      *
@@ -301,7 +305,7 @@ public class GlobalRegionManager {
      * @param loc
      * @return
      */
-    public boolean allows(StateFlag flag, Location loc) {
+    public boolean allows(StateFlag flag, Location loc, LocalPlayer player) {
         World world = loc.getWorld();
         WorldConfiguration worldConfig = config.get(world);
 
@@ -310,6 +314,6 @@ public class GlobalRegionManager {
         }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-        return mgr.getApplicableRegions(toVector(loc)).allows(flag);
+        return mgr.getApplicableRegions(toVector(loc)).allows(flag, player);
     }
 }

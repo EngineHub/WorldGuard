@@ -28,8 +28,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  */
 public class StringFlag extends Flag<String> {
 
-    public StringFlag(String name, char legacyCode) {
-        super(name, legacyCode);
+    public StringFlag(String name, RegionGroup defaultGroup) {
+        super(name, defaultGroup);
     }
 
     public StringFlag(String name) {

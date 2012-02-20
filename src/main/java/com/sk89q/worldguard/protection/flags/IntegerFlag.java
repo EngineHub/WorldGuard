@@ -28,8 +28,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  */
 public class IntegerFlag extends Flag<Integer> {
 
-    public IntegerFlag(String name, char legacyCode) {
-        super(name, legacyCode);
+    public IntegerFlag(String name, RegionGroup defaultGroup) {
+        super(name, defaultGroup);
     }
 
     public IntegerFlag(String name) {

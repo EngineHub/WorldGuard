@@ -48,6 +48,21 @@ import com.sk89q.worldguard.util.ArrayReader;
  * @author sk89q
  */
 public class CSVDatabase extends AbstractProtectionDatabase {
+    
+    private static final Map<String, StateFlag> legacyFlagCodes = new HashMap<String, StateFlag>();
+    static {
+        legacyFlagCodes.put("z", DefaultFlag.PASSTHROUGH);
+        legacyFlagCodes.put("b", DefaultFlag.BUILD);
+        legacyFlagCodes.put("p", DefaultFlag.PVP);
+        legacyFlagCodes.put("m", DefaultFlag.MOB_DAMAGE);
+        legacyFlagCodes.put("c", DefaultFlag.CREEPER_EXPLOSION);
+        legacyFlagCodes.put("t", DefaultFlag.TNT);
+        legacyFlagCodes.put("l", DefaultFlag.LIGHTER);
+        legacyFlagCodes.put("f", DefaultFlag.FIRE_SPREAD);
+        legacyFlagCodes.put("F", DefaultFlag.LAVA_FIRE);
+        legacyFlagCodes.put("C", DefaultFlag.CHEST_ACCESS);
+    }
+
     private final Logger logger;
 
     /**
@@ -267,7 +282,7 @@ public class CSVDatabase extends AbstractProtectionDatabase {
                     flagStr = String.valueOf(k);
                 }
 
-                StateFlag flag = DefaultFlag.getLegacyFlag(flagStr);
+                StateFlag flag = legacyFlagCodes.get(flagStr);
                 if (flag != null) {
                     region.setFlag(flag, curState);
                 } else {

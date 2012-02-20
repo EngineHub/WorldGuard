@@ -28,8 +28,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  */
 public class DoubleFlag extends Flag<Double> {
 
-    public DoubleFlag(String name, char legacyCode) {
-        super(name, legacyCode);
+    public DoubleFlag(String name, RegionGroup defaultGroup) {
+        super(name, defaultGroup);
     }
 
     public DoubleFlag(String name) {

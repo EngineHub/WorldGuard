@@ -33,9 +33,9 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author sk89q
  */
 public class VectorFlag extends Flag<Vector> {
-
-    public VectorFlag(String name, char legacyCode) {
-        super(name, legacyCode);
+    
+    public VectorFlag(String name, RegionGroup defaultGroup) {
+        super(name, defaultGroup);
     }
 
     public VectorFlag(String name) {

@@ -22,6 +22,7 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Set;
 import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldguard.LocalPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -226,6 +227,7 @@ public class WorldGuardEntityListener implements Listener {
 
         if (defender instanceof Player) {
             Player player = (Player) defender;
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
@@ -257,7 +259,8 @@ public class WorldGuardEntityListener implements Listener {
                     Vector pt2 = toVector(attacker.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
-                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP) || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP)) {
+                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer) 
+                            || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
                         return;
@@ -274,7 +277,7 @@ public class WorldGuardEntityListener implements Listener {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                    if (!set.allows(DefaultFlag.TNT)) {
+                    if (!set.allows(DefaultFlag.TNT, localPlayer)) {
                         event.setCancelled(true);
                         return;
                     }
@@ -293,13 +296,14 @@ public class WorldGuardEntityListener implements Listener {
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
                     if (fireball.getShooter() instanceof Player) {
                         Vector pt2 = toVector(fireball.getShooter().getLocation());
-                        if (!set.allows(DefaultFlag.PVP) || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP)) {
+                        if (!set.allows(DefaultFlag.PVP, localPlayer)
+                                || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) fireball.getShooter()))) {
                             ((Player) fireball.getShooter()).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                             event.setCancelled(true);
                             return;
                         }
                     } else {
-                        if (!set.allows(DefaultFlag.GHAST_FIREBALL)) {
+                        if (!set.allows(DefaultFlag.GHAST_FIREBALL, localPlayer)) {
                             event.setCancelled(true);
                             return;
                         }
@@ -325,13 +329,13 @@ public class WorldGuardEntityListener implements Listener {
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-                    if (!set.allows(DefaultFlag.MOB_DAMAGE)) {
+                    if (!set.allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
                         event.setCancelled(true);
                         return;
                     }
 
                     if (attacker instanceof Creeper) {
-                        if (!set.allows(DefaultFlag.CREEPER_EXPLOSION)) {
+                        if (!set.allows(DefaultFlag.CREEPER_EXPLOSION, localPlayer)) {
                             event.setCancelled(true);
                             return;
                         }
@@ -353,6 +357,7 @@ public class WorldGuardEntityListener implements Listener {
 
         if (defender instanceof Player) {
             Player player = (Player) defender;
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
@@ -368,7 +373,8 @@ public class WorldGuardEntityListener implements Listener {
                     Vector pt2 = toVector(attacker.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
-                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP) || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP)) {
+                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer) 
+                            || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
                         return;
@@ -384,7 +390,7 @@ public class WorldGuardEntityListener implements Listener {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
-                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.MOB_DAMAGE)) {
+                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
                         event.setCancelled(true);
                         return;
                     }

@@ -27,8 +27,8 @@ import org.bukkit.entity.CreatureType;
  */
 public class CreatureTypeFlag extends EnumFlag<CreatureType> {
 
-    public CreatureTypeFlag(String name, char legacyCode) {
-        super(name, legacyCode, CreatureType.class);
+    public CreatureTypeFlag(String name, RegionGroup defaultGroup) {
+        super(name, CreatureType.class, defaultGroup);
     }
 
     public CreatureTypeFlag(String name) {

@@ -27,9 +27,9 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author sk89q
  */
 public class CommandStringFlag extends Flag<String> {
-    
-    public CommandStringFlag(String name, char legacyCode) {
-        super(name, legacyCode);
+
+    public CommandStringFlag(String name, RegionGroup defaultGroup) {
+        super(name, defaultGroup);
     }
 
     public CommandStringFlag(String name) {
