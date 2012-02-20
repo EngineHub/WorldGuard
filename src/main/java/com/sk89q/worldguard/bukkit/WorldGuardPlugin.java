@@ -49,7 +49,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.TickSyncDelayLoggerFilter;
 import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
@@ -145,16 +144,6 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         if (configuration.useRegionsScheduler) {
             getServer().getScheduler().scheduleAsyncRepeatingTask(this, flagStateManager, FlagStateManager.RUN_DELAY, FlagStateManager.RUN_DELAY);
-        }
-
-        if (configuration.suppressTickSyncWarnings) {
-            Logger.getLogger("Minecraft").setFilter(
-                    new TickSyncDelayLoggerFilter());
-        } else {
-            Filter filter = Logger.getLogger("Minecraft").getFilter();
-            if (filter != null && filter instanceof TickSyncDelayLoggerFilter) {
-                Logger.getLogger("Minecraft").setFilter(null);
-            }
         }
 
         // Register events
