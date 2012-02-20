@@ -31,9 +31,9 @@ public interface ChestProtection {
     /**
      * Returns whether a block is protected.
      * 
-     * @param block
-     * @param player
-     * @return
+     * @param block The block to check
+     * @param player The player to check
+     * @return Whether the block is protected for player
      */
     public boolean isProtected(Block block, Player player);
 
@@ -41,26 +41,27 @@ public interface ChestProtection {
      * Returns whether a location where a chest block is trying to be created 
      * is protected. 
      * 
-     * @param block
-     * @param player
-     * @return
+     * @param block The block to check
+     * @param player The player to check
+     * @return Whether {@code player} can place a block at the specified block
      */
     public boolean isProtectedPlacement(Block block, Player player);
 
     /**
      * Returns whether an adjacent chest is protected.
      * 
-     * @param searchBlock
-     * @param player
-     * @return
+     * @param searchBlock The block to check
+     * @param player The player to check
+     * @return Whether {@code searchBlock} is protected from access by {@code player}
      */
     public boolean isAdjacentChestProtected(Block searchBlock, Player player);
 
     /**
      * Returns whether a material is a chest.
-     * 
-     * @param material
-     * @return
+     *
+     * @param material The material to check
+     * @deprecated see {@link #isChest(int)}
+     * @return {@link #isChest(int)}
      */
     @Deprecated
     public boolean isChest(Material material);
@@ -68,8 +69,8 @@ public interface ChestProtection {
     /**
      * Returns whether a material is a chest.
      *
-     * @param type
-     * @return
+     * @param type The type to check
+     * @return Whether type is a 'chest' (block that can be protected)
      */
     public boolean isChest(int type);
 

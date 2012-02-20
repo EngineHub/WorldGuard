@@ -53,8 +53,8 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Construct the object.
      * 
-     * @param applicable
-     * @param globalRegion 
+     * @param applicable The regions contained in this set
+     * @param globalRegion The global region, set aside for special handling.
      */
     public ApplicableRegionSet(Collection<ProtectedRegion> applicable,
             ProtectedRegion globalRegion) {
@@ -65,7 +65,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Checks if a player can build in an area.
      * 
-     * @param player
+     * @param player The player to chec
      * @return build ability
      */
     public boolean canBuild(LocalPlayer player) {
@@ -75,7 +75,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Checks if a player can use buttons and such in an area.
      * 
-     * @param player
+     * @param player The player to check
      * @return able to use items
      */
     public boolean canUse(LocalPlayer player) {
@@ -151,7 +151,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param flag flag to check
      * @param player null to not check owners and members
      * @param groupPlayer player to use for the group flag check
-     * @return
+     * @return the allow/deny state for the flag
      */
     private boolean internalGetState(StateFlag flag, LocalPlayer player,
                                      LocalPlayer groupPlayer) {
@@ -275,16 +275,16 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             found = true;
         }
 
-        return found == false ? def :
+        return !found ? def :
                 (allowed || (player != null && needsClear.size() == 0));
     }
 
     /**
      * Clear a region's parents for isFlagAllowed().
      * 
-     * @param needsClear
-     * @param hasCleared
-     * @param region
+     * @param needsClear The regions that should be cleared
+     * @param hasCleared The regions already cleared
+     * @param region The region to start from
      */
     private void clearParents(Set<ProtectedRegion> needsClear,
             Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
@@ -299,6 +299,11 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         }
     }
 
+    /**
+     * @see #getFlag(com.sk89q.worldguard.protection.flags.Flag, com.sk89q.worldguard.LocalPlayer)
+     * @param flag flag to check
+     * @return value of the flag
+     */
     public <T extends Flag<V>, V> V getFlag(T flag) {
         return getFlag(flag, null);
     }
@@ -308,6 +313,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * (use {@link #allows(StateFlag, LocalPlayer)} for that).
      * 
      * @param flag flag to check
+     * @param groupPlayer player to check {@link RegionGroup}s against
      * @return value of the flag
      * @throws IllegalArgumentException if a StateFlag is given
      */
@@ -372,9 +378,9 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Clear a region's parents for getFlag().
      * 
-     * @param needsClear
-     * @param hasCleared
-     * @param region
+     * @param needsClear The regions that should be cleared
+     * @param hasCleared The regions already cleared
+     * @param region The region to start from
      */
     private void clearParents(Map<ProtectedRegion, ?> needsClear,
             Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
@@ -392,7 +398,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Get the number of regions that are included.
      * 
-     * @return
+     * @return the size of this ApplicbleRegionSet
      */
     public int size() {
         return applicable.size();
@@ -400,8 +406,6 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     
     /**
      * Get an iterator of affected regions.
-     * 
-     * @return
      */
     public Iterator<ProtectedRegion> iterator() {
         return applicable.iterator();

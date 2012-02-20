@@ -78,7 +78,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Construct a new instance of this region.
      *
-     * @param id
+     * @param id The id (name) of this region.
      */
     public ProtectedRegion(String id) {
         this.id = id;
@@ -87,7 +87,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Sets the minimum and maximum points of the bounding box for a region
      *
-     * @param points
+     * @param points The points to set. Must have at least one element.
      */
     protected void setMinMaxPoints(List<Vector> points) {
         int minX = points.get(0).getBlockX();
@@ -116,6 +116,8 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
+     * Gets the id of this region
+     *
      * @return the id
      */
     public String getId() {
@@ -166,7 +168,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * in circular inheritance.
      *
      * @param parent the curParent to setFlag
-     * @throws CircularInheritanceException
+     * @throws CircularInheritanceException when circular inheritance is detected
      */
     public void setParent(ProtectedRegion parent) throws CircularInheritanceException {
         if (parent == null) {
@@ -303,9 +305,9 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Get a flag's value.
      *
-     * @param <T>
-     * @param <V>
-     * @param flag
+     * @param <T> The flag type
+     * @param <V> The type of the flag's value
+     * @param flag The flag to check
      * @return value or null if isn't defined
      */
     @SuppressWarnings("unchecked")
@@ -323,10 +325,10 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Set a flag's value.
      *
-     * @param <T>
-     * @param <V>
-     * @param flag
-     * @param val
+     * @param <T> The flag type
+     * @param <V> The type of the flag's value
+     * @param flag The flag to check
+     * @param val The value to set
      */
     public <T extends Flag<V>, V> void setFlag(T flag, V val) {
         if (val == null) {
@@ -339,7 +341,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Get the map of flags.
      *
-     * @return
+     * @return The map of flags currently used for this region
      */
     public Map<Flag<?>, Object> getFlags() {
         return flags;
@@ -348,7 +350,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Get the map of flags.
      *
-     * @param flags
+     * @param flags The flags to set
      */
     public void setFlags(Map<Flag<?>, Object> flags) {
         this.flags = flags;
@@ -357,30 +359,30 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Gets the 2D points for this region
      *
-     * @return
+     * @return The points for this region as (x, z) coordinates
      */
     public abstract List<BlockVector2D> getPoints();
 
     /**
      * Get the number of blocks in this region
      *
-     * @return
+     * @return the volume of this region in blocks
      */
     public abstract int volume();
 
     /**
      * Check to see if a point is inside this region.
      *
-     * @param pt
-     * @return
+     * @param pt The point to check
+     * @return Whether {@code pt} is in this region
      */
     public abstract boolean contains(Vector pt);
 
     /**
      * Check to see if a point is inside this region.
      *
-     * @param pt
-     * @return
+     * @param pt The point to check
+     * @return Whether {@code pt} is in this region
      */
     public boolean contains(BlockVector2D pt) {
         return contains(new Vector(pt.getBlockX(), min.getBlockY(), pt.getBlockZ()));
@@ -389,10 +391,10 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Check to see if a point is inside this region.
      *
-     * @param x
-     * @param y
-     * @param z
-     * @return
+     * @param x The x coordinate to check
+     * @param y The y coordinate to check
+     * @param z The z coordinate to check
+     * @return Whether this region contains the points at the given coordinate
      */
     public boolean contains(int x, int y, int z) {
         return contains(new Vector(x, y, z));
@@ -419,8 +421,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * Orders primarily by the priority, descending<br>
      * Orders secondarily by the id, ascending
      *
-     * @param other
-     * @return
+     * @param other The region to compare to
      */
     public int compareTo(ProtectedRegion other) {
         if (priority > other.priority) {
@@ -442,9 +443,9 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Get a list of intersecting regions.
      *
-     * @param regions
-     * @return
-     * @throws UnsupportedIntersectionException
+     * @param regions The list of regions to source from
+     * @return The elements of {@code regions} that intersect with this region
+     * @throws UnsupportedIntersectionException if an invalid intersection is detected
      */
     public abstract List<ProtectedRegion> getIntersectingRegions(
             List<ProtectedRegion> regions)
@@ -454,7 +455,8 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * Checks if the bounding box of a region intersects with with the bounding
      * box of this region
      *
-     * @param region
+     * @param region The region to check
+     * @return whether the given region intersects
      */
     protected boolean intersectsBoundingBox(ProtectedRegion region) {
         BlockVector rMaxPoint = region.getMaximumPoint();
@@ -477,8 +479,8 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Compares all edges of two regions to see if any of them intersect
      *
-     * @param region
-     * @return
+     * @param region The region to check
+     * @return whether any edges of a region intersect
      */
     protected boolean intersectsEdges(ProtectedRegion region) {
         List<BlockVector2D> pts1 = getPoints();
@@ -511,16 +513,14 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Checks to see if the given ID is accurate.
      *
-     * @param id
-     * @return
+     * @param id The id to check
+     * @see #idPattern
+     * @return Whether the region id given is valid
      */
     public static boolean isValidId(String id) {
         return idPattern.matcher(id).matches();
     }
 
-    /**
-     * Returns the hash code.
-     */
     @Override
     public int hashCode(){
         return id.hashCode();
@@ -542,7 +542,6 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Thrown when setting a curParent would create a circular inheritance
      * situation.
-     *
      */
     public static class CircularInheritanceException extends Exception {
         private static final long serialVersionUID = 7479613488496776022L;

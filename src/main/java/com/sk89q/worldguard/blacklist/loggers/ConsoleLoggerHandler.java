@@ -48,11 +48,6 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
 	    this.logger = logger;
     }
 
-    /**
-     * Log an event.
-     *
-     * @param event
-     */
     public void logEvent(BlacklistEvent event, String comment) {
         // Block break
         if (event instanceof BlockBreakBlacklistEvent) {
@@ -113,14 +108,15 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Get an item's friendly name with its ID.
      *
-     * @param id
+     * @param id The item id
+     * @return The friendly name of the item
      */
     private static String getFriendlyItemName(int id) {
         ItemType type = ItemType.fromID(id);
         if (type != null) {
             return type.getName() + " (#" + id + ")";
         } else {
-            return "#" + id + "";
+            return "#" + id;
         }
     }
 

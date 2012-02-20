@@ -26,12 +26,7 @@ public class BlockInteractBlacklistEvent extends BlockBlacklistEvent {
     public BlockInteractBlacklistEvent(LocalPlayer player, Vector pos, int type) {
         super(player, pos, type);
     }
-    
-    /**
-     * Get a short description such as "break" or "destroy with."
-     * 
-     * @return
-     */
+
     @Override
     public String getDescription() {
         return "interact with";

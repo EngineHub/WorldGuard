@@ -32,8 +32,8 @@ public class BlacklistTrackedEvent {
     /**
      * Construct the object.
      *
-     * @param event
-     * @param time
+     * @param event The event tracked
+     * @param time The time at which the event occurred
      */
     public BlacklistTrackedEvent(BlacklistEvent event, long time) {
         this.event = event;

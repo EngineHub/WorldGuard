@@ -127,7 +127,7 @@ public class ReportWriter {
                 configLog.put(field.getName(), val);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException ignore) {
             }
         }
         
@@ -274,7 +274,7 @@ public class ReportWriter {
                     configLog.put(field.getName(), String.valueOf(val));
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
-                } catch (IllegalAccessException e) {
+                } catch (IllegalAccessException ignore) {
                 }
             }
             
@@ -324,7 +324,7 @@ public class ReportWriter {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
             }
         }

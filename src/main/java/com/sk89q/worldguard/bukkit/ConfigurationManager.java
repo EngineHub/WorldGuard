@@ -109,7 +109,7 @@ public class ConfigurationManager {
     /**
      * Construct the object.
      *
-     * @param plugin
+     * @param plugin The plugin instance
      */
     public ConfigurationManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -152,10 +152,7 @@ public class ConfigurationManager {
             get(world);
         }
 
-        try {
-            config.setHeader(CONFIG_HEADER);
-        } catch (Throwable t) {
-        }
+        config.setHeader(CONFIG_HEADER);
 
         if (!config.save()) {
             plugin.getLogger().severe("Error saving configuration!");
@@ -172,8 +169,8 @@ public class ConfigurationManager {
     /**
      * Get the configuration for a world.
      *
-     * @param world
-     * @return
+     * @param world The world to get the configuration for
+     * @return {@code world}'s configuration
      */
     public WorldConfiguration get(World world) {
         String worldName = world.getName();
@@ -190,7 +187,7 @@ public class ConfigurationManager {
     /**
      * Forget a player.
      *
-     * @param player
+     * @param player The player to forget about
      */
     public void forgetPlayer(LocalPlayer player) {
         for (Map.Entry<String, WorldConfiguration> entry
@@ -210,7 +207,7 @@ public class ConfigurationManager {
     /**
      * Enable god mode for a player.
      *
-     * @param player
+     * @param player The player to enable god mode for.
      */
     @Deprecated
     public void enableGodMode(Player player) {
@@ -220,7 +217,7 @@ public class ConfigurationManager {
     /**
      * Disable god mode for a player.
      *
-     * @param player
+     * @param player The player to disable godmode for
      */
     @Deprecated
     public void disableGodMode(Player player) {
@@ -230,8 +227,8 @@ public class ConfigurationManager {
     /**
      * Check to see if god mode is enabled for a player.
      *
-     * @param player
-     * @return
+     * @param player The player to check
+     * @return Whether the player has godmode through WorldGuard or CommandBook
      */
     public boolean hasGodMode(Player player) {
         if (hasCommandBookGodMode) {
@@ -246,7 +243,7 @@ public class ConfigurationManager {
     /**
      * Enable amphibious mode for a player.
      *
-     * @param player
+     * @param player The player to enable amphibious mode for
      */
     public void enableAmphibiousMode(Player player) {
         hasAmphibious.add(player.getName());
@@ -255,17 +252,17 @@ public class ConfigurationManager {
     /**
      * Disable amphibious mode  for a player.
      *
-     * @param player
+     * @param player The player to disable amphibious mode for
      */
     public void disableAmphibiousMode(Player player) {
         hasAmphibious.remove(player.getName());
     }
 
     /**
-     * Check to see if amphibious mode  is enabled for a player.
+     * Check to see if amphibious mode is enabled for a player.
      *
-     * @param player
-     * @return
+     * @param player The player to check
+     * @return Whether {@code player} has amphibious mode
      */
     public boolean hasAmphibiousMode(Player player) {
         return hasAmphibious.contains(player.getName());

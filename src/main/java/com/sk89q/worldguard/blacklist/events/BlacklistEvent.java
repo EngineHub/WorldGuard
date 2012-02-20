@@ -39,9 +39,9 @@ public abstract class BlacklistEvent {
     /**
      * Construct the object.
      * 
-     * @param player
-     * @param pos
-     * @param type
+     * @param player The player associated with this event
+     * @param pos The position the event occurred at
+     * @param type The type of item used
      */
     public BlacklistEvent(LocalPlayer player, Vector pos, int type) {
         this.player = player;
@@ -51,8 +51,8 @@ public abstract class BlacklistEvent {
     
     /**
      * Get the player.
-     * 
-     * @return
+     *
+     * @return The player associated with this event
      */
     public LocalPlayer getPlayer() {
         return player;
@@ -61,16 +61,16 @@ public abstract class BlacklistEvent {
     /**
      * Get the position.
      * 
-     * @return
+     * @return The position of this event
      */
     public Vector getPosition() {
         return pos;
     }
     
     /**
-     * Get the type.
+     * Get the item type.
      * 
-     * @return
+     * @return The type associated with this event
      */
     public int getType() {
         return type;
@@ -79,7 +79,7 @@ public abstract class BlacklistEvent {
     /**
      * Get a short description such as "break" or "destroy with."
      * 
-     * @return
+     * @return The event description
      */
     public abstract String getDescription();
 }

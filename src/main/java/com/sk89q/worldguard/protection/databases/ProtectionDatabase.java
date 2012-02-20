@@ -34,39 +34,39 @@ public interface ProtectionDatabase {
      * Load the list of regions. The method should not modify the list returned
      * by getRegions() unless the load finishes successfully.
      *
-     * @throws ProtectionDatabaseException
+     * @throws ProtectionDatabaseException when an error occurs
      */
     public void load() throws ProtectionDatabaseException;
     /**
      * Save the list of regions.
      *
-     * @throws ProtectionDatabaseException
+     * @throws ProtectionDatabaseException when an error occurs
      */
     public void save() throws ProtectionDatabaseException;
     /**
      * Load the list of regions into a region manager.
      *
-     * @param manager
-     * @throws ProtectionDatabaseException
+     * @param manager The manager to load regions into
+     * @throws ProtectionDatabaseException when an error occurs
      */
     public void load(RegionManager manager) throws ProtectionDatabaseException;
     /**
      * Save the list of regions from a region manager.
      *
-     * @param manager
-     * @throws ProtectionDatabaseException
+     * @param manager The manager to load regions into
+     * @throws ProtectionDatabaseException when an error occurs
      */
     public void save(RegionManager manager) throws ProtectionDatabaseException;
     /**
      * Get a list of regions.
      *
-     * @return
+     * @return the regions loaded by this ProtectionDatabase
      */
     public Map<String,ProtectedRegion> getRegions();
     /**
      * Set the list of regions.
      *
-     * @param regions
+     * @param regions The regions to be applied to this ProtectionDatabase
      */
     public void setRegions(Map<String,ProtectedRegion> regions);
 }

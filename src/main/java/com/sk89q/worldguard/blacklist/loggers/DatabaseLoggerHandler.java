@@ -73,11 +73,12 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Construct the object.
      *
-     * @param dsn
-     * @param user
-     * @param pass
-     * @param table
-     * @param worldName
+     * @param dsn The DSN for the connection
+     * @param user The username to connect with
+     * @param pass The password to connect with
+     * @param table The table to log to
+     * @param worldName The name of the world to log
+     * @param logger The logger to log errors to
      */
     public DatabaseLoggerHandler(String dsn, String user, String pass, String table, String worldName, Logger logger) {
         this.dsn = dsn;
@@ -91,8 +92,8 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Gets the database connection.
      *
-     * @return
-     * @throws SQLException
+     * @return The database connection
+     * @throws SQLException when the connection cannot be created
      */
     private Connection getConnection() throws SQLException {
         if (conn == null || conn.isClosed()) {
@@ -104,11 +105,11 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Log an event to the database.
      *
-     * @param event
-     * @param player
-     * @param pos
-     * @param item
-     * @param comment
+     * @param event The event to log
+     * @param player The player associated with the event
+     * @param pos The location of the event
+     * @param item The item used
+     * @param comment The comment associated with the event
      */
     private void logEvent(String event, LocalPlayer player, Vector pos, int item,
             String comment) {
@@ -137,7 +138,7 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Log an event.
      *
-     * @param event
+     * @param event The event to log
      */
     public void logEvent(BlacklistEvent event, String comment) {
         // Block break
@@ -197,7 +198,7 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
             if (conn != null && !conn.isClosed()) {
                 conn.close();
             }
-        } catch (SQLException e) {
+        } catch (SQLException ignore) {
 
         }
     }

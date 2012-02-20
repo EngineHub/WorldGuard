@@ -19,7 +19,7 @@ public class WorldGuardWorldListener implements Listener {
     /**
      * Construct the object;
      *
-     * @param plugin
+     * @param plugin The plugin instance
      */
     public WorldGuardWorldListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -32,9 +32,6 @@ public class WorldGuardWorldListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    /**
-     * Called when a chunk is loaded.
-     */
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
@@ -56,14 +53,19 @@ public class WorldGuardWorldListener implements Listener {
         }
     }
 
-    /**
-     * Called when a world is loaded.
-     */
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         initWorld(event.getWorld());
     }
 
+    /**
+     * Initialize the settings for the specified world
+     * @see WorldConfiguration#alwaysRaining
+     * @see WorldConfiguration#disableWeather
+     * @see WorldConfiguration#alwaysThundering
+     * @see WorldConfiguration#disableThunder
+     * @param world The specified world
+     */
     public void initWorld(World world) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);

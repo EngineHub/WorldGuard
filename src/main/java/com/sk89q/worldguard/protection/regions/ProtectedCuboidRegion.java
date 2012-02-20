@@ -36,9 +36,9 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     /**
      * Construct a new instance of this cuboid region.
      *
-     * @param id
-     * @param pt1
-     * @param pt2
+     * @param id The region id
+     * @param pt1 The first point of this region
+     * @param pt2 The second point of this region
      */
     public ProtectedCuboidRegion(String id, BlockVector pt1, BlockVector pt2) {
         super(id);
@@ -48,8 +48,8 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     /**
      * Given any two points, sets the minimum and maximum points
      *
-     * @param pt1
-     * @param pt2
+     * @param pt1 The first point of this region
+     * @param pt2 The second point of this region
      */
     private void setMinMaxPoints(BlockVector pt1, BlockVector pt2) {
         List<Vector> points = new ArrayList<Vector>();
@@ -61,7 +61,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     /**
      * Set the lower point of the cuboid.
      *
-     * @param pt
+     * @param pt The point to set as the minimum point
      */
     public void setMinimumPoint(BlockVector pt) {
         setMinMaxPoints(pt, max);
@@ -70,7 +70,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     /**
      * Set the upper point of the cuboid.
      *
-     * @param pt
+     * @param pt The point to set as the maximum point
      */
     public void setMaximumPoint(BlockVector pt) {
         setMinMaxPoints(min, pt);
@@ -91,9 +91,6 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         return pts;
     }
 
-    /**
-     * Checks to see if a point is inside this region.
-     */
     @Override
     public boolean contains(Vector pt) {
         final double x = pt.getX();
@@ -157,29 +154,17 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         return intersectingRegions;
     }
 
-
-    /**
-     * Return the type of region as a user-friendly name.
-     *
-     * @return type of region
-     */
     @Override
     public String getTypeName() {
         return "cuboid";
     }
 
-    /**
-     * Get the number of Blocks in this region
-     *
-     * @return
-     */
     @Override
     public int volume() {
         int xLength = max.getBlockX() - min.getBlockX() + 1;
         int yLength = max.getBlockY() - min.getBlockY() + 1;
         int zLength = max.getBlockZ() - min.getBlockZ() + 1;
 
-        int volume = xLength * yLength * zLength;
-        return volume;
+        return xLength * yLength * zLength;
     }
 }

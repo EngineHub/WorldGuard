@@ -28,12 +28,12 @@ public class SpongeUtil {
 
     /**
      * Remove water around a sponge.
-     * 
-     * @param plugin 
-     * @param world
-     * @param ox
-     * @param oy
-     * @param oz
+     *
+     * @param plugin The plugin instace
+     * @param world The world the sponge isin
+     * @param ox The x coordinate of the 'sponge' block
+     * @param oy The y coordinate of the 'sponge' block
+     * @param oz The z coordinate of the 'sponge' block
      */
     public static void clearSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
@@ -53,11 +53,11 @@ public class SpongeUtil {
     /**
      * Add water around a sponge.
      * 
-     * @param plugin 
-     * @param world
-     * @param ox
-     * @param oy
-     * @param oz
+     * @param plugin The plugin instance
+     * @param world The world the sponge is located in
+     * @param ox The x coordinate of the 'sponge' block
+     * @param oy The y coordinate of the 'sponge' block
+     * @param oz The z coordinate of the 'sponge' block
      */
     public static void addSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();

@@ -49,46 +49,28 @@ public class FlatRegionManager extends RegionManager {
     /**
      * Construct the manager.
      *
-     * @param regionloader
+     * @param regionLoader The loader for regions
      */
-    public FlatRegionManager(ProtectionDatabase regionloader) {
-        super(regionloader);
+    public FlatRegionManager(ProtectionDatabase regionLoader) {
+        super(regionLoader);
         regions = new TreeMap<String, ProtectedRegion>();
     }
 
-    /**
-     * Get a list of protected regions.
-     *
-     * @return
-     */
     @Override
     public Map<String, ProtectedRegion> getRegions() {
         return regions;
     }
 
-    /**
-     * Set a list of protected regions.
-     */
     @Override
     public void setRegions(Map<String, ProtectedRegion> regions) {
         this.regions = new TreeMap<String, ProtectedRegion>(regions);
     }
 
-    /**
-     * Adds a region.
-     *
-     * @param region
-     */
     @Override
     public void addRegion(ProtectedRegion region) {
         regions.put(region.getId().toLowerCase(), region);
     }
 
-    /**
-     * Removes a region and its children.
-     *
-     * @param id
-     */
     @Override
     public void removeRegion(String id) {
         ProtectedRegion region = regions.get(id.toLowerCase());
@@ -110,33 +92,16 @@ public class FlatRegionManager extends RegionManager {
         }
     }
 
-    /**
-     * Return whether a region exists by an ID.
-     *
-     * @param id
-     * @return
-     */
     @Override
     public boolean hasRegion(String id) {
         return regions.containsKey(id.toLowerCase());
     }
 
-    /**
-     * Get a region by its ID.
-     *
-     * @param id
-     */
     @Override
     public ProtectedRegion getRegion(String id) {
         return regions.get(id.toLowerCase());
     }
 
-    /**
-     * Get an object for a point for rules to be applied with.
-     *
-     * @param pt
-     * @return
-     */
     @Override
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
         TreeSet<ProtectedRegion> appRegions =
@@ -182,12 +147,6 @@ public class FlatRegionManager extends RegionManager {
         return new ApplicableRegionSet(intersectRegions, regions.get("__global__"));
     }*/
 
-    /**
-     * Get a list of region IDs that contain a point.
-     *
-     * @param pt
-     * @return
-     */
     @Override
     public List<String> getApplicableRegionsIDs(Vector pt) {
         List<String> applicable = new ArrayList<String>();
@@ -201,11 +160,6 @@ public class FlatRegionManager extends RegionManager {
         return applicable;
     }
 
-    /**
-     * Get an object for a region for rules to be applied with.
-     *
-     * @return
-     */
     @Override
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
 
@@ -223,13 +177,6 @@ public class FlatRegionManager extends RegionManager {
         return new ApplicableRegionSet(intersectRegions, regions.get("__global__"));
     }
 
-    /**
-     * Returns true if the provided region overlaps with any other region that
-     * is not owned by the player.
-     *
-     * @param player
-     * @return
-     */
     @Override
     public boolean overlapsUnownedRegion(ProtectedRegion checkRegion, LocalPlayer player) {
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
@@ -252,11 +199,6 @@ public class FlatRegionManager extends RegionManager {
         return intersectRegions.size() > 0;
     }
 
-    /**
-     * Get the number of regions.
-     *
-     * @return
-     */
     @Override
     public int size() {
         return regions.size();

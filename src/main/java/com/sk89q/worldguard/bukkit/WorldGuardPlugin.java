@@ -29,8 +29,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.jar.JarFile;
-import java.util.logging.Filter;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
@@ -43,6 +41,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -217,16 +216,16 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Get the GlobalRegionManager.
      * 
-     * @return
+     * @return The plugin's global region manager
      */
     public GlobalRegionManager getGlobalRegionManager() {
         return globalRegionManager;
     }
 
     /**
-     * Get the WorldGuardConfiguraton.
+     * Get the WorldGuard Configuration.
      *
-     * @return
+     * @return ConfigurationManager
      * @deprecated Use {@link #getGlobalStateManager()} instead
      */
     @Deprecated
@@ -237,27 +236,28 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Gets the flag state manager.
      * 
-     * @return
+     * @return The flag state manager
      */
     public FlagStateManager getFlagStateManager() {
         return flagStateManager;
     }
 
     /**
-     * Get the WorldGuardConfiguraton.
-     *
-     * @return
+     * Get the global ConfigurationManager.
+     * USe this to access global configuration values and per-world configuration values.
+     * @return The global ConfigurationManager
      */
     public ConfigurationManager getGlobalStateManager() {
         return configuration;
     }
 
     /**
-     * Check whether a player is in a group.
+     * Check whether a player is in a group. 
+     * This calls the corresponding method in PermissionsResolverManager
      * 
-     * @param player
-     * @param group
-     * @return
+     * @param player The player to check
+     * @param group The group
+     * @return whether {@code player} is in {@code group}
      */
     public boolean inGroup(Player player, String group) {
         try {
@@ -270,9 +270,9 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     /**
      * Get the groups of a player.
-     * 
-     * @param player
-     * @return
+     * This calls the corresponding method in PermissionsResolverManager.
+     * @param player The player to check
+     * @return The names of each group the playe is in.
      */
     public String[] getGroups(Player player) {
         try {
@@ -287,37 +287,39 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Gets the name of a command sender. This is a unique name and this
      * method should never return a "display name".
      * 
-     * @param sender
-     * @return
+     * @param sender The sender to get the name of
+     * @return The unique name of the sender.
      */
     public String toUniqueName(CommandSender sender) {
-        if (sender instanceof Player) {
-            return ((Player) sender).getName();
-        } else {
+        if (sender instanceof ConsoleCommandSender) {
             return "*Console*";
+        } else {
+            return sender.getName();
         }
     }
     
     /**
      * Gets the name of a command sender. This play be a display name.
      * 
-     * @param sender
-     * @return
+     * @param sender The CommandSender to get the name of.
+     * @return The name of the given sender
      */
     public String toName(CommandSender sender) {
-        if (sender instanceof Player) {
-            return ((Player) sender).getName();
-        } else {
+        if (sender instanceof ConsoleCommandSender) {
             return "*Console*";
+        } else if (sender instanceof Player) {
+            return ((Player) sender).getDisplayName();
+        } else {
+            return sender.getName();
         }
     }
     
     /**
      * Checks permissions.
      * 
-     * @param sender
-     * @param perm
-     * @return 
+     * @param sender The sender to check the permission on.
+     * @param perm The permission to check the permission on.
+     * @return whether {@code sender} has {@code perm}
      */
     public boolean hasPermission(CommandSender sender, String perm) {
         if (sender.isOp()) {
@@ -343,9 +345,9 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Checks permissions and throws an exception if permission is not met.
      * 
-     * @param sender
-     * @param perm
-     * @throws CommandPermissionsException 
+     * @param sender The sender to check the permission on.
+     * @param perm The permission to check the permission on.
+     * @throws CommandPermissionsException if {@code sender} doesn't have {@code perm}
      */
     public void checkPermission(CommandSender sender, String perm)
             throws CommandPermissionsException {
@@ -357,9 +359,9 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Checks to see if the sender is a player, otherwise throw an exception.
      * 
-     * @param sender
-     * @return 
-     * @throws CommandException 
+     * @param sender The {@link CommandSender} to check
+     * @return {@code sender} casted to a player
+     * @throws CommandException if {@code sender} isn't a {@link Player}
      */
     public Player checkPlayer(CommandSender sender)
             throws CommandException {
@@ -373,8 +375,13 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Match player names.
      * 
-     * @param filter
-     * @return
+     * The filter string uses the following format:
+     * @[name] looks up all players with the exact {@code name}
+     * *[name] matches any player whose name contains {@code name}
+     * [name] matches any player whose name starts with {@code name}
+     * 
+     * @param filter The filter string to check.
+     * @return A {@link List} of players who match {@code filter}
      */
     public List<Player> matchPlayerNames(String filter) {
         Player[] players = getServer().getOnlinePlayers();
@@ -426,9 +433,9 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Checks if the given list of players is greater than size 0, otherwise
      * throw an exception.
      * 
-     * @param players
-     * @return 
-     * @throws CommandException
+     * @param players The {@link List} to check
+     * @return {@code players} as an {@link Iterable}
+     * @throws CommandException If {@code players} is empty
      */
     protected Iterable<Player> checkPlayerMatch(List<Player> players)
             throws CommandException {
@@ -441,12 +448,19 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
     
     /**
-     * Checks permissions and throws an exception if permission is not met.
-     * 
-     * @param source 
-     * @param filter
+     * Matches players based on the specified filter string
+     *
+     * The filter string format is as follows:
+     * * returns all the players currently online
+     * If {@code sender} is a {@link Player}:
+     * #world returns all players in the world that {@code sender} is in
+     * #near reaturns all players within 30 blocks of {@code sender}'s location
+     * Otherwise, the format is as specified in {@link #matchPlayerNames(String)}
+     *
+     * @param source The CommandSender who is trying to find a player
+     * @param filter The filter string for players
      * @return iterator for players
-     * @throws CommandException no matches found
+     * @throws CommandException if no matches are found
      */
     public Iterable<Player> matchPlayers(CommandSender source, String filter)
             throws CommandException {
@@ -507,10 +521,11 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Match only a single player.
      * 
-     * @param sender
-     * @param filter
-     * @return
-     * @throws CommandException
+     * @param sender The {@link CommandSender} who is requesting a player match
+     * @param filter The filter string.
+     * @see #matchPlayers(org.bukkit.entity.Player) for filter string syntax
+     * @return The single player
+     * @throws CommandException If more than one player match was found
      */
     public Player matchSinglePlayer(CommandSender sender, String filter)
             throws CommandException {
@@ -532,11 +547,14 @@ public class WorldGuardPlugin extends JavaPlugin {
     
     /**
      * Match only a single player or console.
-     * 
-     * @param sender
-     * @param filter
-     * @return
-     * @throws CommandException
+     *
+     * The filter string syntax is as follows:
+     * #console, *console, or ! return the server console
+     * All syntax from {@link #matchSinglePlayer(org.bukkit.command.CommandSender, String)}
+     * @param sender The sender trying to match a CommandSender
+     * @param filter The filter string
+     * @return The resulting CommandSender
+     * @throws CommandException if either zero or more than one player matched.
      */
     public CommandSender matchPlayerOrConsole(CommandSender sender, String filter)
             throws CommandException {
@@ -554,20 +572,27 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Get a single player as an iterator for players.
      * 
-     * @param player
-     * @return iterator for players
+     * @param player The player to return in an Iterable
+     * @return iterator for player
      */
     public Iterable<Player> matchPlayers(Player player) {
-        return Arrays.asList(new Player[] {player});
+        return Arrays.asList(player);
     }
     
     /**
      * Match a world.
-     * @param sender 
-     * 
-     * @param filter
-     * @return
-     * @throws CommandException 
+     *
+     * The filter string syntax is as follows:
+     * #main returns the main world
+     * #normal returns the first world with a normal environment
+     * #nether return the first world with a nether environment
+     * #player:[name] returns the world that a player named {@code name} is located in, if the player is online.
+     * [name] A world with the name {@code name}
+     *
+     * @param sender The sender requesting a match
+     * @param filter The filter string
+     * @return The resulting world
+     * @throws CommandException if no world matches
      */
     public World matchWorld(CommandSender sender, String filter) throws CommandException {
         List<World> worlds = getServer().getWorlds();
@@ -625,8 +650,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Gets a copy of the WorldEdit plugin.
      * 
-     * @return
-     * @throws CommandException
+     * @return The WorldEditPlugin instance
+     * @throws CommandException If there is no WorldEditPlugin available
      */
     public WorldEditPlugin getWorldEdit() throws CommandException {
         Plugin worldEdit = getServer().getPluginManager().getPlugin("WorldEdit");
@@ -644,8 +669,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Wrap a player as a LocalPlayer.
      * 
-     * @param player
-     * @return
+     * @param player The player to wrap
+     * @return The wrapped player
      */
     public LocalPlayer wrapPlayer(Player player) {
         return new BukkitPlayer(this, player);
@@ -654,8 +679,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Create a default configuration file from the .jar.
      * 
-     * @param actual 
-     * @param defaultName 
+     * @param actual The destination file
+     * @param defaultName The name of the file inside the jar's defaults folder
      */
     public void createDefaultConfiguration(File actual,
             String defaultName) {
@@ -701,14 +726,14 @@ public class WorldGuardPlugin extends JavaPlugin {
                     if (input != null) {
                         input.close();
                     }
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
 
                 try {
                     if (output != null) {
                         output.close();
                     }
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
             }
         }
@@ -716,12 +741,16 @@ public class WorldGuardPlugin extends JavaPlugin {
     
     /**
      * Notifies all with the notify permission.
-     * 
-     * @param msg
+     * This will check both superperms and WEPIF,
+     * but makes sure WEPIF checks don't result in duplicate notifications
+     *
+     * @param msg The notification to broadcast
      */
     public void broadcastNotification(String msg) {
+        getServer().broadcast(msg, "worldguard.notify");
         for (Player player : getServer().getOnlinePlayers()) {
-            if (hasPermission(player, "worldguard.notify")) {
+            if (hasPermission(player, "worldguard.notify") &&
+                    !player.hasPermission("worldguard.notify")) { // Make sure the player wasn't already broadcasted to.
                 player.sendMessage(msg);
             }
         }
@@ -731,7 +760,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Forgets a player.
      * 
-     * @param player
+     * @param player The player to remove state information for
      */
     public void forgetPlayer(Player player) {
         flagStateManager.forget(player);
@@ -741,9 +770,10 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Checks to see if a player can build at a location. This will return
      * true if region protection is disabled.
      * 
-     * @param player
-     * @param loc
-     * @return
+     * @param player The player to check.
+     * @param loc The location to check at.
+     * @see GlobalRegionManager#canBuild(org.bukkit.entity.Player, org.bukkit.Location)
+     * @return whether {@code player} can build at {@code loc}
      */
     public boolean canBuild(Player player, Location loc) {
         return getGlobalRegionManager().canBuild(player, loc);
@@ -753,9 +783,10 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Checks to see if a player can build at a location. This will return
      * true if region protection is disabled.
      * 
-     * @param player
-     * @param block
-     * @return
+     * @param player The player to check
+     * @param block The block to check at.
+     * @see GlobalRegionManager#canBuild(org.bukkit.entity.Player, org.bukkit.block.Block)
+     * @return whether {@code player} can build at {@code block}'s location
      */
     public boolean canBuild(Player player, Block block) {
         return getGlobalRegionManager().canBuild(player, block);
@@ -778,9 +809,17 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Replace macros in the text.
      *
-     * @param sender
-     * @param message
-     * @return
+     * The macros replaced are as follows:
+     * %name%: The name of {@code sender}. See {@link #toName(org.bukkit.command.CommandSender)}
+     * %id%: The unique name of the sender. See {@link #toUniqueName(org.bukkit.command.CommandSender)}
+     * %online%: The number of players currently online on the server
+     * If {@code sender} is a Player:
+     * %world%: The name of the world {@code sender} is located in
+     * %health%: The health of {@code sender}. See {@link org.bukkit.entity.Player#getHealth()}
+     *
+     * @param sender The sender to check
+     * @param message The message to replace macros in
+     * @return The message with macros replaced
      */
     public String replaceMacros(CommandSender sender, String message) {
         Player[] online = getServer().getOnlinePlayers();

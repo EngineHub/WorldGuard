@@ -58,7 +58,7 @@ import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.migrators.AbstractDatabaseMigrator;
 import com.sk89q.worldguard.protection.databases.migrators.MigrationException;
 import com.sk89q.worldguard.protection.databases.migrators.MigratorKey;
-import com.sk89q.worldguard.util.RegionUtil;
+import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 
 public class RegionCommands {
     private final WorldGuardPlugin plugin;
@@ -118,7 +118,7 @@ public class RegionCommands {
 
         // Get the list of region owners
         if (args.argsLength() > 1) {
-            region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
+            region.setOwners(RegionDBUtil.parseDomainString(args.getSlice(1), 1));
         }
         
         mgr.addRegion(region);
@@ -191,7 +191,7 @@ public class RegionCommands {
         region.setPriority(existing.getPriority());
         try {
             region.setParent(existing.getParent());
-        } catch (CircularInheritanceException e) {
+        } catch (CircularInheritanceException ignore) {
         }
         
         mgr.addRegion(region);
@@ -256,7 +256,7 @@ public class RegionCommands {
 
         // Get the list of region owners
         if (args.argsLength() > 1) {
-            region.setOwners(RegionUtil.parseDomainString(args.getSlice(1), 1));
+            region.setOwners(RegionDBUtil.parseDomainString(args.getSlice(1), 1));
         }
 
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
@@ -494,8 +494,8 @@ public class RegionCommands {
         if (!own)
             plugin.checkPermission(sender, "worldguard.region.list");
         
-        if (args.argsLength() > 0 + argl) {
-            page = Math.max(0, args.getInteger(0 + argl) - 1);
+        if (args.argsLength() > argl) {
+            page = Math.max(0, args.getInteger(argl) - 1);
         }
         
         if (args.argsLength() > 1 + argl) {
@@ -513,8 +513,8 @@ public class RegionCommands {
 
         String[] regionIDList = new String[size];
         int index = 0;
-        boolean show = false;
-        String prefix = "";
+        boolean show;
+        String prefix;
         for (String id : regions.keySet()) {
             show = false;
             prefix = "";
@@ -780,7 +780,7 @@ public class RegionCommands {
         if (args.argsLength() == 1) {
             try {
                 region.setParent(null);
-            } catch (CircularInheritanceException e) {
+            } catch (CircularInheritanceException ignore) {
             }
     
             sender.sendMessage(ChatColor.YELLOW
@@ -982,17 +982,17 @@ public class RegionCommands {
             AbstractDatabaseMigrator migrator = cls.getConstructor(WorldGuardPlugin.class).newInstance(plugin);
 
             migrator.migrate();
-        } catch (IllegalArgumentException e) {
-        } catch (SecurityException e) {
-        } catch (InstantiationException e) {
-        } catch (IllegalAccessException e) {
-        } catch (InvocationTargetException e) {
-        } catch (NoSuchMethodException e) {
+        } catch (IllegalArgumentException ignore) {
+        } catch (SecurityException ignore) {
+        } catch (InstantiationException ignore) {
+        } catch (IllegalAccessException ignore) {
+        } catch (InvocationTargetException ignore) {
+        } catch (NoSuchMethodException ignore) {
         } catch (MigrationException e) {
             throw new CommandException("Error migrating database: " + e.getMessage());
         }
 
-        sender.sendMessage(ChatColor.YELLOW + "Regions have been migrated successfuly.\n" + 
+        sender.sendMessage(ChatColor.YELLOW + "Regions have been migrated successfully.\n" +
                 "If you wish to use the destination format as your new backend, please update your config and reload WorldGuard.");
     }
 }

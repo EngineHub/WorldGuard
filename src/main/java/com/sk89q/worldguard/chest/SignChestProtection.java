@@ -127,23 +127,23 @@ public class SignChestProtection implements ChestProtection {
         
         side = searchBlock;
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res) return res;
         
         side = searchBlock.getRelative(-1, 0, 0);
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res) return res;
         
         side = searchBlock.getRelative(1, 0, 0);
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res) return res;
         
         side = searchBlock.getRelative(0, 0, -1);
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res) return res;
         
         side = searchBlock.getRelative(0, 0, 1);
         res = isProtected(side, player);
-        if (res != null && res == true) return res;
+        if (res != null && res) return res;
         
         return false;
     }

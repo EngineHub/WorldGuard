@@ -19,83 +19,58 @@
 
 package com.sk89q.worldguard.util;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 
 /**
  * Various utility functions for regions.
  * 
  * @author sk89q
  */
+@Deprecated
 public class RegionUtil {
-    private static Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
     
     private RegionUtil() {
-        
     }
 
     /**
      * Parse a group/player DefaultDomain specification for areas.
      * 
-     * @param domain
-     * @param split
-     * @param startIndex
+     * @param domain The domain
+     * @param split The arguments
+     * @param startIndex The index to start at
+     * @deprecated see {@link RegionDBUtil#addToDomain(com.sk89q.worldguard.domains.DefaultDomain, String[], int)}
      */
+    @Deprecated
     public static void addToDomain(DefaultDomain domain, String[] split,
             int startIndex) {
-        for (int i = startIndex; i < split.length; i++) {
-            String s = split[i];
-            Matcher m = groupPattern.matcher(s);
-            if (m.matches()) {
-                domain.addGroup(m.group(1));
-            } else {
-                domain.addPlayer(s);
-            }
-        }
+        RegionDBUtil.addToDomain(domain, split, startIndex);
     }
 
     /**
      * Parse a group/player DefaultDomain specification for areas.
      * 
-     * @param domain
-     * @param split
-     * @param startIndex
+     * @param domain The domain to add to
+     * @param split The arguments
+     * @param startIndex The index to start at
+     * @deprecated see {@link RegionDBUtil#removeFromDomain(com.sk89q.worldguard.domains.DefaultDomain, String[], int)}
      */
+    @Deprecated
     public static void removeFromDomain(DefaultDomain domain, String[] split,
             int startIndex) {
-        for (int i = startIndex; i < split.length; i++) {
-            String s = split[i];
-            Matcher m = groupPattern.matcher(s);
-            if (m.matches()) {
-                domain.removeGroup(m.group(1));
-            } else {
-                domain.removePlayer(s);
-            }
-        }
+        RegionDBUtil.removeFromDomain(domain, split, startIndex);
     }
 
     /**
      * Parse a group/player DefaultDomain specification for areas.
-     * 
-     * @param split
-     * @param startIndex
-     * @return
+     *
+     * @param split The arguments
+     * @param startIndex The index to start at
+     * @deprecated see {@link RegionDBUtil#parseDomainString(String[], int)}
+     * @return the parsed domain
      */
+    @Deprecated
     public static DefaultDomain parseDomainString(String[] split, int startIndex) {
-        DefaultDomain domain = new DefaultDomain();
-
-        for (int i = startIndex; i < split.length; i++) {
-            String s = split[i];
-            Matcher m = groupPattern.matcher(s);
-            if (m.matches()) {
-                domain.addGroup(m.group(1));
-            } else {
-                domain.addPlayer(s);
-            }
-        }
-
-        return domain;
+        return RegionDBUtil.parseDomainString(split, startIndex);
     }
 }

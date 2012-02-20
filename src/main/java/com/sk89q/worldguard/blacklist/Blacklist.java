@@ -73,7 +73,7 @@ public abstract class Blacklist {
     /**
      * Returns whether the list is empty.
      *
-     * @return
+     * @return whether the blacklist is empty
      */
     public boolean isEmpty() {
         return blacklist.isEmpty();
@@ -82,8 +82,8 @@ public abstract class Blacklist {
     /**
      * Get the entries for an item or list.
      *
-     * @param id
-     * @return
+     * @param id The item id to get blacklist information for
+     * @return The blacklist entries for {@code id}
      */
     public List<BlacklistEntry> getEntries(int id) {
         return blacklist.get(id);
@@ -92,7 +92,7 @@ public abstract class Blacklist {
     /**
      * Get the number of individual items that have blacklist entries.
      *
-     * @return
+     * @return The number of items in the blacklist
      */
     public int getItemCount() {
         return blacklist.size();
@@ -101,7 +101,7 @@ public abstract class Blacklist {
     /**
      * Returns whether the blacklist is used as a whitelist.
      *
-     * @return
+     * @return whether the blacklist is be used as a whitelist
      */
     public boolean isWhitelist() {
         return useAsWhitelist;
@@ -110,7 +110,7 @@ public abstract class Blacklist {
     /**
      * Get the logger.
      *
-     * @return
+     * @return The logger used in this blacklist
      */
     public BlacklistLogger getLogger() {
         return blacklistLogger;
@@ -119,10 +119,10 @@ public abstract class Blacklist {
     /**
      * Method to handle the event.
      *
-     * @param event
-     * @param forceRepeat
-     * @param silent
-     * @return
+     * @param event The event to check
+     * @param forceRepeat Whether to force quickly repeating notifications
+     * @param silent Whether to force-deny notifications
+     * @return Whether the event is allowed
      */
     public boolean check(BlacklistEvent event, boolean forceRepeat, boolean silent) {
         List<BlacklistEntry> entries = getEntries(event.getType());
@@ -141,8 +141,8 @@ public abstract class Blacklist {
     /**
      * Load the blacklist.
      *
-     * @param file
-     * @throws IOException
+     * @param file The file to load from
+     * @throws IOException if an error occurred reading from the file
      */
     public void load(File file) throws IOException {
         FileReader input = null;
@@ -170,7 +170,7 @@ public abstract class Blacklist {
                     currentEntries = new ArrayList<BlacklistEntry>();
 
                     for (String item : items) {
-                        int id = 0;
+                        int id;
 
                         try {
                             id = Integer.parseInt(item.trim());
@@ -248,7 +248,7 @@ public abstract class Blacklist {
                 if (input != null) {
                     input.close();
                 }
-            } catch (IOException e2) {
+            } catch (IOException ignore) {
             }
         }
     }
@@ -256,7 +256,7 @@ public abstract class Blacklist {
     /**
      * Get the last event.
      *
-     * @return
+     * @return The last event
      */
     public BlacklistEvent getLastEvent() {
         return lastEvent;
@@ -265,8 +265,8 @@ public abstract class Blacklist {
     /**
      * Notify administrators.
      *
-     * @param event
-     * @param comment
+     * @param event The event to notify about
+     * @param comment The comment to notify with
      */
     public void notify(BlacklistEvent event, String comment) {
         lastEvent = event;
@@ -282,14 +282,14 @@ public abstract class Blacklist {
     /**
      * Sends a notification to all subscribing users.
      *
-     * @param msg
+     * @param msg The message to broadcast
      */
     public abstract void broadcastNotification(String msg);
 
     /**
      * Forget a player.
      *
-     * @param player
+     * @param player The player to forget
      */
     public void forgetPlayer(LocalPlayer player) {
         lastAffected.remove(player.getName());
@@ -305,7 +305,8 @@ public abstract class Blacklist {
     /**
      * Get an item's ID from its name.
      *
-     * @param name
+     * @param name the name of the item to look up
+     * @return the id for name if contained in ItemId, else -1
      */
     private static int getItemID(String name) {
         ItemType type = ItemType.lookup(name);
@@ -319,7 +320,8 @@ public abstract class Blacklist {
     /**
      * Get an item's friendly name with its ID.
      *
-     * @param id
+     * @param id The id to look up
+     * @return The item's friendly name
      */
     private static String getFriendlyItemName(int id) {
         ItemType type = ItemType.fromID(id);

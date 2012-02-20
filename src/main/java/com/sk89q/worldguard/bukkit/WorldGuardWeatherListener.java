@@ -42,7 +42,7 @@ public class WorldGuardWeatherListener implements Listener {
     /**
      * Construct the object;
      *
-     * @param plugin
+     * @param plugin The plugin instance
      */
     public WorldGuardWeatherListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;

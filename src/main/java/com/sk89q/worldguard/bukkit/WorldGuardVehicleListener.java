@@ -44,9 +44,6 @@ public class WorldGuardVehicleListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    /**
-     * Called when a vehicle is destroyed.
-     */
     @EventHandler
     public void onVehicleDestroy(VehicleDestroyEvent event) {
         Vehicle vehicle = event.getVehicle();
@@ -74,9 +71,6 @@ public class WorldGuardVehicleListener implements Listener {
         }
     }
 
-    /**
-     * Called when a vehicle moves.
-     */
     @EventHandler
     public void onVehicleMove(VehicleMoveEvent event) {
         Vehicle vehicle = event.getVehicle();

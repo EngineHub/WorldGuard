@@ -42,8 +42,8 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
     /**
      * Construct the object.
      *
-     * @param path
-     * @param writer
+     * @param path The path to write to
+     * @param writer The writer for the file
      */
     public FileLoggerWriter(String path, BufferedWriter writer) {
         this.path = path;
@@ -54,14 +54,14 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
     /**
      * File path.
      *
-     * @return
+     * @return The path the logger is logging to
      */
     public String getPath() {
         return path;
     }
 
     /**
-     * @return the writer
+     * @return the writer being logged to
      */
     public BufferedWriter getWriter() {
         return writer;
@@ -81,12 +81,6 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
         lastUse = System.currentTimeMillis();
     }
 
-    /**
-     * Comparison function.
-     *
-     * @param other
-     * @return
-     */
     public int compareTo(FileLoggerWriter other) {
         if (lastUse > other.lastUse) {
             return 1;

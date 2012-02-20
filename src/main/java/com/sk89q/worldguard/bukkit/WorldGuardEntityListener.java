@@ -85,7 +85,7 @@ public class WorldGuardEntityListener implements Listener {
     /**
      * Construct the object;
      * 
-     * @param plugin
+     * @param plugin The plugin instance
      */
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -98,9 +98,6 @@ public class WorldGuardEntityListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    /**
-     * Called when an entity interacts with another object.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityInteract(EntityInteractEvent event) {
         Entity entity = event.getEntity();
@@ -116,9 +113,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
-     * Called when an entity dies.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDeath(EntityDeathEvent event) {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
@@ -128,20 +122,11 @@ public class WorldGuardEntityListener implements Listener {
             event.setDroppedExp(0);
         }
 
-        try {
-            if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
-                ((PlayerDeathEvent) event).setDeathMessage("");
-            }
-        } catch (Throwable t) {
-            // old CraftBukkit, eat it
+        if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
+            ((PlayerDeathEvent) event).setDeathMessage("");
         }
     }
 
-    /**
-     * Called on entity damage by a block.
-     * 
-     * @param event
-     */
     private void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
@@ -191,11 +176,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
-     * Called on entity damage by an entity.
-     * 
-     * @param event
-     */
     private void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if (event.getCause() == DamageCause.PROJECTILE) {
             onEntityDamageByProjectile(event);
@@ -346,11 +326,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
-     * Called on entity damage by a projectile.
-     * 
-     * @param event
-     */
     private void onEntityDamageByProjectile(EntityDamageByEntityEvent event) {
         Entity defender = event.getEntity();
         Entity attacker = ((Projectile) event.getDamager()).getShooter();
@@ -400,9 +375,6 @@ public class WorldGuardEntityListener implements Listener {
 
     }
 
-    /**
-     * Called on entity damage.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.isCancelled()) {
@@ -481,9 +453,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
-     * Called on entity combust.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityCombust(EntityCombustEvent event) {
         if (event.isCancelled()) {
@@ -505,7 +474,7 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called on entity explode.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -622,7 +591,7 @@ public class WorldGuardEntityListener implements Listener {
 
     }
 
-    /**
+    /*
      * Called on explosion prime
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -642,9 +611,6 @@ public class WorldGuardEntityListener implements Listener {
 
     }
 
-    /**
-     * Called on creature spawn.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         if (event.isCancelled()) {
@@ -688,9 +654,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
-     * Called on pig zap.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onPigZap(PigZapEvent event) {
         if (event.isCancelled()) {
@@ -705,9 +668,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
-     * Called on creeper power.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onCreeperPower(CreeperPowerEvent event) {
         if (event.isCancelled()) {
@@ -722,9 +682,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
-     * Called when a painting is removed.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onPaintingBreak(PaintingBreakEvent breakEvent) {
         if (breakEvent.isCancelled()) {
@@ -765,9 +722,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
-     * Called on painting place.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onPaintingPlace(PaintingPlaceEvent event) {
         if (event.isCancelled()) {
@@ -799,9 +753,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    /**
-     * Called on entity health regain.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
         if (event.isCancelled()) {
@@ -822,6 +773,8 @@ public class WorldGuardEntityListener implements Listener {
 
     /**
      * Called when an enderman picks up or puts down a block and some other cases.
+     *
+     * @param event Relevant event details
      */
     @EventHandler(priority = EventPriority.HIGH)
     public void onEndermanPickup(EntityChangeBlockEvent event) {
@@ -885,8 +838,8 @@ public class WorldGuardEntityListener implements Listener {
      * the region denies invincibility, the player must have an extra permission
      * to override it. (worldguard.god.override-regions)
      * 
-     * @param player
-     * @return
+     * @param player The player to check
+     * @return Whether {@code player} is invincible
      */
     private boolean isInvincible(Player player) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
@@ -895,7 +848,7 @@ public class WorldGuardEntityListener implements Listener {
         boolean god = cfg.hasGodMode(player);
         if (wcfg.useRegions) {
             Boolean flag = RegionQueryUtil.isAllowedInvinciblity(plugin, player);
-            boolean allowed = flag == null || flag == true;
+            boolean allowed = flag == null || flag;
             boolean invincible = RegionQueryUtil.isInvincible(plugin, player);
 
             if (allowed) {
