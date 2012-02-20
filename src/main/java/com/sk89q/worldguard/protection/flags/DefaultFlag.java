@@ -21,6 +21,9 @@ package com.sk89q.worldguard.protection.flags;
 
 import org.bukkit.entity.CreatureType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author sk89q
@@ -100,6 +103,8 @@ public final class DefaultFlag {
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
     };
 
+    public static final Map<String, Flag<?>> customFlagsList = new HashMap<String, Flag<?>>();
+
     static {
         ENTRY.setGroupFlag(ENTRY_PERM);
         EXIT.setGroupFlag(EXIT_PERM);
@@ -109,7 +114,39 @@ public final class DefaultFlag {
     }
 
     public static Flag<?>[] getFlags() {
-        return flagsList;
+        // check if we need to merge custom flags
+        if (!(customFlagsList.size() > 0)) {
+            return flagsList;
+        }
+        int size = customFlagsList.size() + flagsList.length;
+        // merge the custom flags and default flags
+        Flag<?>[] flags = customFlagsList.values().toArray(new Flag<?>[size]);
+        int k = 0;
+        for (int i = customFlagsList.size(); i < size; i++) {
+            flags[i] = flagsList[k];
+            k++;
+        }
+        return flags;
+    }
+
+    /**
+     * <p>Adds a custom Flag<?> to the Default.getFlags() list.</p>
+     * @param flag to add
+     * @return <p>false if the flag name is already taken by the default flags
+     * or an other custom flag.</p>
+     * <p>true if the flag was added successfully</p>
+     */
+    public static boolean addCustomFlag(Flag<?> flag) throws DuplicateFlagException {
+        if (customFlagsList.containsKey(flag.getName())) {
+            throw new DuplicateFlagException();
+        }
+        for (Flag<?> fl : flagsList) {
+            if (fl.getName().equalsIgnoreCase(flag.getName())) {
+                throw new DuplicateFlagException();
+            }
+        }
+        customFlagsList.put(flag.getName(), flag);
+        return true;
     }
 
     /**
@@ -126,5 +163,12 @@ public final class DefaultFlag {
         }
 
         return null;
+    }
+
+    public static class DuplicateFlagException extends Exception {
+
+        public DuplicateFlagException() {
+            super("There is already a flag with that name. Cannot add the custom flag!");
+        }
     }
 }
