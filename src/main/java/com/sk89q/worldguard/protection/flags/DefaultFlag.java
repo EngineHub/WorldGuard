@@ -45,6 +45,7 @@ public final class DefaultFlag {
     public static final StateFlag WATER_FLOW = new StateFlag("water-flow", true);
     public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
     public static final StateFlag USE = new StateFlag("use", true);
+    public static final RegionGroupFlag USE_PERM = new RegionGroupFlag("use-group", RegionGroupFlag.RegionGroup.NON_MEMBERS);
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
     public static final StateFlag DESTROY_VEHICLE = new StateFlag("vehicle-destroy", false);
     public static final StateFlag PISTONS = new StateFlag("pistons", true);
@@ -86,7 +87,7 @@ public final class DefaultFlag {
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
-        TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
+        TNT, LIGHTER, USE, USE_PERM, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
         CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
@@ -103,6 +104,7 @@ public final class DefaultFlag {
     static {
         ENTRY.setGroupFlag(ENTRY_PERM);
         EXIT.setGroupFlag(EXIT_PERM);
+        USE.setGroupFlag(USE_PERM);
     }
 
     private DefaultFlag() {

@@ -312,4 +312,23 @@ public class GlobalRegionManager {
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         return mgr.getApplicableRegions(toVector(loc)).allows(flag);
     }
+    
+    /**
+     * Checks to see whether a flag is allowed.
+     *
+     * @param flag
+     * @param loc
+     * @return
+     */
+    public boolean allows(StateFlag flag, Location loc, LocalPlayer player) {
+        World world = loc.getWorld();
+        WorldConfiguration worldConfig = config.get(world);
+
+        if (!worldConfig.useRegions) {
+            return true;
+        }
+
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        return mgr.getApplicableRegions(toVector(loc)).allows(flag, player);
+    }
 }

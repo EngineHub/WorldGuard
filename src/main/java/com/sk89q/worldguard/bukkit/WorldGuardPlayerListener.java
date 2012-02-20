@@ -391,8 +391,7 @@ public class WorldGuardPlayerListener implements Listener {
                   || type == BlockID.TRAP_DOOR
                   || type == BlockID.NOTE_BLOCK) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.allows(DefaultFlag.USE)
-                        && !set.canBuild(localPlayer)) {
+                        && !set.allows(DefaultFlag.USE, localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
@@ -587,7 +586,7 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.CAULDRON
                     || type == BlockID.DRAGON_EGG) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.allows(DefaultFlag.USE)
+                        && !set.allows(DefaultFlag.USE, localPlayer)
                         && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
                     event.setUseInteractedBlock(Result.DENY);
@@ -761,7 +760,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (type == BlockID.STONE_PRESSURE_PLATE || type == BlockID.WOODEN_PRESSURE_PLATE) {
                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                       && !set.allows(DefaultFlag.USE)
+                       && !set.allows(DefaultFlag.USE, localPlayer)
                        && !set.canBuild(localPlayer)) {
                    event.setUseInteractedBlock(Result.DENY);
                    event.setCancelled(true);
@@ -896,9 +895,9 @@ public class WorldGuardPlayerListener implements Listener {
         
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
-        
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
         if (event.getItemStack().getTypeId() == ItemID.MILK_BUCKET) {
-        	if (!plugin.getGlobalRegionManager().allows(DefaultFlag.USE, player.getLocation().add(0, 1, 0))) {
+        	if (!plugin.getGlobalRegionManager().allows(DefaultFlag.USE, player.getLocation().add(0, 1, 0), localPlayer)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use this in this area.");
                 event.setCancelled(true);
                 return;
