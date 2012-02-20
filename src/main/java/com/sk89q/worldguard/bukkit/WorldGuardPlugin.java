@@ -153,6 +153,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardVehicleListener(this)).registerEvents();
         (new WorldGuardServerListener(this)).registerEvents();
+        
+        if (getServer().getPluginManager().isPluginEnabled("CommandBook")) {
+            getServer().getPluginManager().registerEvents(new WorldGuardCommandBookListener(this), this);
+        }
 
         // handle worlds separately to initialize already loaded worlds
         WorldGuardWorldListener worldListener = (new WorldGuardWorldListener(this));
