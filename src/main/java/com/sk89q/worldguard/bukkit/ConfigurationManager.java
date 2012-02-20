@@ -93,7 +93,6 @@ public class ConfigurationManager {
     
     private boolean hasCommandBookGodMode = false;
 
-    public boolean suppressTickSyncWarnings;
     public boolean useRegionsScheduler;
     public boolean activityHaltToggle = false;
     public boolean autoGodMode;
@@ -132,9 +131,8 @@ public class ConfigurationManager {
             plugin.getLogger().severe("Error reading configuration for global config: ");
             e.printStackTrace();
         }
-
-        suppressTickSyncWarnings = config.getBoolean(
-                "suppress-tick-sync-warnings", false);
+        
+        config.removeProperty("suppress-tick-sync-warnings");
         useRegionsScheduler = config.getBoolean(
                 "regions.use-scheduler", true);
         autoGodMode = config.getBoolean(
