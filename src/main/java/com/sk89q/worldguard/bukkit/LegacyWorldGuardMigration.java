@@ -42,7 +42,7 @@ public class LegacyWorldGuardMigration {
     /**
      * Port over the blacklist.
      * 
-     * @param plugin
+     * @param plugin The plugin instance
      */
     public static void migrateBlacklist(WorldGuardPlugin plugin) {
         World mainWorld = plugin.getServer().getWorlds().get(0);
@@ -75,7 +75,7 @@ public class LegacyWorldGuardMigration {
     /**
      * Migrate region settings.
      * 
-     * @param plugin
+     * @param plugin The plugin instance
      */
     public static void migrateRegions(WorldGuardPlugin plugin) {
         try {
@@ -109,8 +109,8 @@ public class LegacyWorldGuardMigration {
     /**
      * Copies a file.
      * 
-     * @param from
-     * @param to
+     * @param from The source file
+     * @param to The destination file
      * @return true if successful
      */
     private static boolean copyFile(File from, File to) {
@@ -131,20 +131,20 @@ public class LegacyWorldGuardMigration {
             out.close();
             
             return true;
-        } catch (FileNotFoundException ex) {
-        } catch (IOException e) {
+        } catch (FileNotFoundException ignore) {
+        } catch (IOException ignore) {
         } finally {
             if (in != null) {
                 try {
                     in.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
             }
             
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                 }
             }
         }

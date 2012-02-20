@@ -57,6 +57,7 @@ public class BukkitPlayer extends LocalPlayer {
 
     @Override
     public void ban(String msg) {
+        player.setBanned(true);
         player.kickPlayer(msg);
     }
 

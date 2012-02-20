@@ -78,7 +78,8 @@ public class CSVDatabase extends AbstractProtectionDatabase {
      * Construct the database with a path to a file. No file is read or
      * written at this time.
      *
-     * @param file
+     * @param file The file in CSV format containing the region database
+     * @param logger The logger to log errors to
      */
     public CSVDatabase(File file, Logger logger) {
         this.file = file;
@@ -92,9 +93,6 @@ public class CSVDatabase extends AbstractProtectionDatabase {
         throw new UnsupportedOperationException("CSV format is no longer implemented");
     }
 
-    /**
-     * Load the database from file.
-     */
     public void load() throws ProtectionDatabaseException {
         Map<String,ProtectedRegion> regions =
                 new HashMap<String,ProtectedRegion>();
@@ -208,8 +206,8 @@ public class CSVDatabase extends AbstractProtectionDatabase {
     /**
      * Used to parse the specified domain in the CSV file.
      *
-     * @param data
-     * @return
+     * @param data The domain data as a string
+     * @return The domain data as a DefaultDomain
      */
     private DefaultDomain parseDomains(String data) {
         if (data == null) {
@@ -251,7 +249,7 @@ public class CSVDatabase extends AbstractProtectionDatabase {
     /**
      * Used to parse the list of flags.
      *
-     * @param data
+     * @param data The flag data in string format
      */
     private void parseFlags(ProtectedRegion region, String data) {
         if (data == null) {
@@ -336,8 +334,8 @@ public class CSVDatabase extends AbstractProtectionDatabase {
     /**
      * Returns a null if a string is null or empty.
      *
-     * @param str
-     * @return
+     * @param str The string to format
+     * @return null if the string is empty or null, otherwise the provided string
      */
     protected String nullEmptyString(String str) {
         if (str == null) {
@@ -349,18 +347,10 @@ public class CSVDatabase extends AbstractProtectionDatabase {
         }
     }
 
-    /**
-     * Get a list of protected regions.
-     *
-     * @return
-     */
     public Map<String,ProtectedRegion> getRegions() {
         return regions;
     }
 
-    /**
-     * Get a list of protected regions.
-     */
     public void setRegions(Map<String,ProtectedRegion> regions) {
         this.regions = regions;
     }

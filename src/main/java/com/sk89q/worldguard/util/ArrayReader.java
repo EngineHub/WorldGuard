@@ -25,17 +25,24 @@ public class ArrayReader<T> {
     public ArrayReader(T[] arr) {
         this.arr = arr;
     }
-    
+
+    /**
+     * Gets an element from the array
+     * @param index The index to get an element at
+     * @return The element at {@code index} if the index is within bounds, otherwise null
+     */
     public T get(int index) {
-        if (arr.length > index) {
-            return arr[index];
-        } else {
-            return null;
-        }
+        return get(index, null);
     }
-    
+
+    /**
+     * Gets an element from the array
+     * @param index The index to get an element at
+     * @param def the default value, used when the given index is out of bounds
+     * @return The element at {@code index} if the index is within bounds, otherwise the default value
+     */
     public T get(int index, T def) {
-        if (arr.length > index) {
+        if (index >= 0 && arr.length > index) {
             return arr[index];
         } else {
             return def;

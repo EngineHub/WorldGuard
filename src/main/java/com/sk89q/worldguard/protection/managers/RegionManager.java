@@ -45,7 +45,7 @@ public abstract class RegionManager {
     /**
      * Construct the object.
      *
-     * @param loader
+     * @param loader The loader for this region
      */
     public RegionManager(ProtectionDatabase loader) {
         this.loader = loader;
@@ -55,7 +55,7 @@ public abstract class RegionManager {
      * Load the list of regions. If the regions do not load properly, then
      * the existing list should be used (as stored previously).
      *
-     * @throws IOException thrown on load error
+     * @throws ProtectionDatabaseException when an error occurs
      */
     public void load() throws ProtectionDatabaseException {
         loader.load(this);
@@ -64,7 +64,7 @@ public abstract class RegionManager {
     /**
      * Save the list of regions.
      *
-     * @throws IOException thrown on save eIf checking multiple flags for a single locationror
+     * @throws ProtectionDatabaseException when an error occurs while saving
      */
     public void save() throws ProtectionDatabaseException {
         loader.save(this);

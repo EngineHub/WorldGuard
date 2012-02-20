@@ -67,7 +67,6 @@ public class WorldConfiguration {
     private String worldName;
     private YAMLProcessor parentConfig;
     private YAMLProcessor config;
-    private File configFile;
     private File blacklistFile;
 
     private Blacklist blacklist;
@@ -159,7 +158,7 @@ public class WorldConfiguration {
      */
     public WorldConfiguration(WorldGuardPlugin plugin, String worldName, YAMLProcessor parentConfig) {
         File baseFolder = new File(plugin.getDataFolder(), "worlds/" + worldName);
-        configFile = new File(baseFolder, "config.yml");
+        File configFile = new File(baseFolder, "config.yml");
         blacklistFile = new File(baseFolder, "blacklist.txt");
 
         this.plugin = plugin;
@@ -169,7 +168,7 @@ public class WorldConfiguration {
         plugin.createDefaultConfiguration(configFile, "config_world.yml");
         plugin.createDefaultConfiguration(blacklistFile, "blacklist.txt");
 
-        config = new YAMLProcessor(this.configFile, true, YAMLFormat.EXTENDED);
+        config = new YAMLProcessor(configFile, true, YAMLFormat.EXTENDED);
         loadConfiguration();
 
         plugin.getLogger().info("Loaded configuration for world '" + worldName + '"');
@@ -470,10 +469,7 @@ public class WorldConfiguration {
             }
         }
 
-        try {
-            config.setHeader(CONFIG_HEADER);
-        } catch (Throwable t) {
-        }
+        config.setHeader(CONFIG_HEADER);
 
         config.save();
     }

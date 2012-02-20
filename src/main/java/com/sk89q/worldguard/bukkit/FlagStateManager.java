@@ -49,7 +49,7 @@ public class FlagStateManager implements Runnable {
     /**
      * Construct the object.
      * 
-     * @param plugin
+     * @param plugin The plugin instance
      */
     public FlagStateManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -99,10 +99,10 @@ public class FlagStateManager implements Runnable {
     
     /**
      * Process healing for a player.
-     * 
-     * @param applicable
-     * @param player
-     * @param state
+     *
+     * @param applicable The set of applicable regions
+     * @param player The player to process healing flags on
+     * @param state The player's state
      */
     private void processHeal(ApplicableRegionSet applicable, Player player,
             PlayerFlagState state) {
@@ -141,9 +141,9 @@ public class FlagStateManager implements Runnable {
     /**
      * Process restoring hunger for a player.
      * 
-     * @param applicable
-     * @param player
-     * @param state
+     * @param applicable The set of applicable regions
+     * @param player The player to process hunger flags on
+     * @param state The player's state
      */
     private void processFeed(ApplicableRegionSet applicable, Player player,
             PlayerFlagState state) {
@@ -178,7 +178,7 @@ public class FlagStateManager implements Runnable {
     /**
      * Forget a player.
      * 
-     * @param player
+     * @param player The player to forget
      */
     public synchronized void forget(Player player) {
         states.remove(player.getName());
@@ -192,10 +192,11 @@ public class FlagStateManager implements Runnable {
     }
 
     /**
-     * Get a player's flag state.
+     * Get a player's flag state. A new state will be created if there is no existing
+     * state for the player.
      * 
-     * @param player
-     * @return
+     * @param player The player to get a state for
+     * @return The {@code player}'s state
      */
     public synchronized PlayerFlagState getState(Player player) {
         PlayerFlagState state = states.get(player.getName());

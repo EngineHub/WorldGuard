@@ -18,10 +18,8 @@
  */
 package com.sk89q.worldguard.protection.managers;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -56,29 +54,21 @@ public class PRTreeRegionManager extends RegionManager {
     /**
      * Construct the manager.
      *
-     * @param regionloader
-     * @throws IOException
+     * @param regionLoader The region loader to use
+     * @throws ProtectionDatabaseException when an error occurs while loading
      */
-    public PRTreeRegionManager(ProtectionDatabase regionloader) throws ProtectionDatabaseException {
-        super(regionloader);
+    public PRTreeRegionManager(ProtectionDatabase regionLoader) throws ProtectionDatabaseException {
+        super(regionLoader);
         regions = new TreeMap<String, ProtectedRegion>();
         tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
         this.load();
     }
 
-    /**
-     * Get a list of protected regions.
-     *
-     * @return
-     */
     @Override
     public Map<String, ProtectedRegion> getRegions() {
         return regions;
     }
 
-    /**
-     * Set a list of protected regions.
-     */
     @Override
     public void setRegions(Map<String, ProtectedRegion> regions) {
         this.regions = new TreeMap<String, ProtectedRegion>(regions);
@@ -86,11 +76,6 @@ public class PRTreeRegionManager extends RegionManager {
         tree.load(regions.values());
     }
 
-    /**
-     * Adds a region.
-     *
-     * @param region
-     */
     @Override
     public void addRegion(ProtectedRegion region) {
         regions.put(region.getId().toLowerCase(), region);
@@ -98,32 +83,16 @@ public class PRTreeRegionManager extends RegionManager {
         tree.load(regions.values());
     }
 
-    /**
-     * Return whether a region exists by an ID.
-     *
-     * @param id
-     * @return
-     */
     @Override
     public boolean hasRegion(String id) {
         return regions.containsKey(id.toLowerCase());
     }
 
-    /**
-     * Get a region by its ID.
-     *
-     * @param id
-     */
     @Override
     public ProtectedRegion getRegion(String id) {
         return regions.get(id.toLowerCase());
     }
 
-    /**
-     * Removes a region and its children.
-     *
-     * @param id
-     */
     @Override
     public void removeRegion(String id) {
         ProtectedRegion region = regions.get(id.toLowerCase());
@@ -132,9 +101,7 @@ public class PRTreeRegionManager extends RegionManager {
 
         if (region != null) {
             List<String> removeRegions = new ArrayList<String>();
-            Iterator<ProtectedRegion> iter = regions.values().iterator();
-            while (iter.hasNext()) {
-                ProtectedRegion curRegion = iter.next();
+            for (ProtectedRegion curRegion : regions.values()) {
                 if (curRegion.getParent() == region) {
                     removeRegions.add(curRegion.getId().toLowerCase());
                 }
@@ -149,12 +116,6 @@ public class PRTreeRegionManager extends RegionManager {
         tree.load(regions.values());
     }
 
-    /**
-     * Get an object for a point for rules to be applied with.
-     *
-     * @param pt
-     * @return
-     */
     @Override
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
         List<ProtectedRegion> appRegions =
@@ -189,12 +150,6 @@ public class PRTreeRegionManager extends RegionManager {
         return new ApplicableRegionSet(intersectRegions, regions.get("__global__"));
     }
 
-    /**
-     * Get a list of region IDs that contain a point.
-     *
-     * @param pt
-     * @return
-     */
     @Override
     public List<String> getApplicableRegionsIDs(Vector pt) {
         List<String> applicable = new ArrayList<String>();
@@ -211,13 +166,6 @@ public class PRTreeRegionManager extends RegionManager {
         return applicable;
     }
 
-    /**
-     * Returns true if the provided region overlaps with any other region that
-     * is not owned by the player.
-     *
-     * @param player
-     * @return
-     */
     @Override
     public boolean overlapsUnownedRegion(ProtectedRegion checkRegion, LocalPlayer player) {
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
@@ -240,11 +188,6 @@ public class PRTreeRegionManager extends RegionManager {
         return intersectRegions.size() > 0;
     }
 
-    /**
-     * Get the number of regions.
-     *
-     * @return
-     */
     @Override
     public int size() {
         return regions.size();

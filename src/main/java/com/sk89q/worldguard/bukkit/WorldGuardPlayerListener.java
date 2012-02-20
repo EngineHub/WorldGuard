@@ -96,11 +96,6 @@ public class WorldGuardPlayerListener implements Listener {
     }
 
     class PlayerMoveHandler implements Listener {
-        /**
-         * Called when a player attempts to move.
-         *
-         * @param event
-         */
         @EventHandler(priority = EventPriority.HIGH)
         public void onPlayerMove(PlayerMoveEvent event) {
             Player player = event.getPlayer();
@@ -218,10 +213,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
 	}
 
-    /**
-     * Called when a player joins a server.
-     */
-    @SuppressWarnings("deprecation")
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -273,9 +264,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    /**
-     * Called when a player leaves a server.
-     */
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
@@ -318,9 +306,6 @@ public class WorldGuardPlayerListener implements Listener {
         plugin.forgetPlayer(player);
     }
 
-    /**
-     * Called when a player interacts with an item.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -355,7 +340,7 @@ public class WorldGuardPlayerListener implements Listener {
     /**
      * Called when a player left clicks air.
      *
-     * @param event
+     * @param event Thrown event
      */
     private void handleAirLeftClick(PlayerInteractEvent event) {
          // I don't think we have to do anything here yet.
@@ -365,7 +350,7 @@ public class WorldGuardPlayerListener implements Listener {
     /**
      * Called when a player left clicks a block.
      *
-     * @param event
+     * @param event Thrown event
      */
     private void handleBlockLeftClick(PlayerInteractEvent event) {
         if (event.isCancelled()) return;
@@ -428,7 +413,7 @@ public class WorldGuardPlayerListener implements Listener {
     /**
      * Called when a player right clicks air.
      * 
-     * @param event 
+     * @param event Thrown event
      */
     private void handleAirRightClick(PlayerInteractEvent event) {
         if (event.isCancelled()) {
@@ -457,7 +442,7 @@ public class WorldGuardPlayerListener implements Listener {
     /**
      * Called when a player right clicks a block.
      * 
-     * @param event 
+     * @param event Thrown event
      */
     private void handleBlockRightClick(PlayerInteractEvent event) {
         if (event.isCancelled()) {
@@ -730,7 +715,7 @@ public class WorldGuardPlayerListener implements Listener {
     /**
      * Called when a player steps on a pressure plate or tramples crops.
      *
-     * @param event
+     * @param event Thrown event
      */
     private void handlePhysicalInteract(PlayerInteractEvent event) {
         if (event.isCancelled()) return;
@@ -832,9 +817,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }*/
 
-    /**
-     * Called when a player attempts to drop an item.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         if (event.isCancelled()) {
@@ -856,9 +838,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    /**
-     * Called when a player attempts to pickup an item.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
         if (event.isCancelled()) {
@@ -880,9 +859,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    /**
-     * Called when a bucket is filled.
-     */
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
         Player player = event.getPlayer();
@@ -916,9 +893,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    /**
-     * Called when a bucket is empty.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         Player player = event.getPlayer();
@@ -943,10 +917,7 @@ public class WorldGuardPlayerListener implements Listener {
             }
         }
     }
-    
-    /**
-     * Called when a player is respawned.
-     */
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
@@ -969,9 +940,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    /**
-     * Called when a player changes their held item.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
@@ -990,9 +958,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    /**
-     * Called when a player enters a bed.
-     */
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
         if (event.isCancelled()) {
@@ -1019,9 +984,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    /**
-     * Called on command run.
-     */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();

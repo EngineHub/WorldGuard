@@ -85,8 +85,9 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Construct the object.
      *
-     * @param pathPattern
-     * @param worldName
+     * @param pathPattern The pattern for the logflie path
+     * @param worldName The name of the world
+     * @param logger The logger used to log errors
      */
     public FileLoggerHandler(String pathPattern, String worldName, Logger logger) {
         this.pathPattern = pathPattern;
@@ -97,9 +98,10 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Construct the object.
      *
-     * @param pathPattern
-     * @param cacheSize
-     * @param worldName
+     * @param pathPattern The pattern for logfile paths
+     * @param cacheSize The size of the file cache
+     * @param worldName The name of the associated world
+     * @param logger The logger to log errors with
      */
     public FileLoggerHandler(String pathPattern, int cacheSize, String worldName, Logger logger) {
         if (cacheSize < 1) {
@@ -114,7 +116,8 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Build the path.
      *
-     * @return
+     * @param playerName The name of the playername
+     * @return The path for the logfile
      */
     private String buildPath(String playerName) {
         GregorianCalendar calendar = new GregorianCalendar();
@@ -171,8 +174,9 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Log a message.
      *
-     * @param player
-     * @param message
+     * @param player The player to log
+     * @param message The message to log
+     * @param comment The comment associated with the logged event
      */
     private void log(LocalPlayer player, String message, String comment) {
         String path = buildPath(player.getName());
@@ -220,7 +224,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
                     Map.Entry<String,FileLoggerWriter> entry = it.next();
                     try {
                         entry.getValue().getWriter().close();
-                    } catch (IOException e) {
+                    } catch (IOException ignore) {
                     }
                     it.remove();
 
@@ -240,8 +244,8 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Gets the coordinates in text form for the log.
      *
-     * @param pos
-     * @return
+     * @param pos The position to get coordinates for
+     * @return The position's coordinates in human-readable form
      */
     private String getCoordinates(Vector pos) {
         return "@" + pos.getBlockX() + "," + pos.getBlockY() + "," + pos.getBlockZ();
@@ -255,55 +259,17 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Log an event.
      *
-     * @param event
+     * @param event The event to log
      */
     public void logEvent(BlacklistEvent event, String comment) {
-        // Block break
-        if (event instanceof BlockBreakBlacklistEvent) {
-            BlockBreakBlacklistEvent evt = (BlockBreakBlacklistEvent)event;
-            logEvent(event, "break", evt.getType(), evt.getPosition(), comment);
-
-        // Block place
-        } else if (event instanceof BlockPlaceBlacklistEvent) {
-            BlockPlaceBlacklistEvent evt = (BlockPlaceBlacklistEvent)event;
-            logEvent(event, "place", evt.getType(), evt.getPosition(), comment);
-
-        // Block interact
-        } else if (event instanceof BlockInteractBlacklistEvent) {
-            BlockInteractBlacklistEvent evt = (BlockInteractBlacklistEvent)event;
-            logEvent(event, "interact with", evt.getType(), evt.getPosition(), comment);
-
-        // Destroy with
-        } else if (event instanceof DestroyWithBlacklistEvent) {
-            DestroyWithBlacklistEvent evt = (DestroyWithBlacklistEvent)event;
-            logEvent(event, "destroy with", evt.getType(), evt.getPosition(), comment);
-
-        // Acquire
-        } else if (event instanceof ItemAcquireBlacklistEvent) {
-            ItemAcquireBlacklistEvent evt = (ItemAcquireBlacklistEvent)event;
-            logEvent(event, "acquire", evt.getType(), evt.getPosition(), comment);
-
-        // Drop
-        } else if (event instanceof ItemDropBlacklistEvent) {
-            ItemDropBlacklistEvent evt = (ItemDropBlacklistEvent)event;
-            logEvent(event, "drop", evt.getType(), evt.getPosition(), comment);
-
-        // Use
-        } else if (event instanceof ItemUseBlacklistEvent) {
-            ItemUseBlacklistEvent evt = (ItemUseBlacklistEvent)event;
-            logEvent(event, "use", evt.getType(), evt.getPosition(), comment);
-
-        // Unknown
-        } else {
-            log(event.getPlayer(), "Unknown event: "
-                    + event.getClass().getCanonicalName(), comment);
-        }
+        logEvent(event, event.getDescription(), event.getType(), event.getPosition(), comment);
     }
 
     /**
      * Get an item's friendly name with its ID.
      *
-     * @param id
+     * @param id The id to get a friendly name for
+     * @return The friendly name
      */
     private static String getFriendlyItemName(int id) {
         ItemType type = ItemType.fromID(id);
@@ -321,7 +287,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
         for (Map.Entry<String,FileLoggerWriter> entry : writers.entrySet()) {
             try {
                 entry.getValue().getWriter().close();
-            } catch (IOException e) {
+            } catch (IOException ignore) {
             }
         }
 

@@ -32,18 +32,18 @@ import com.sk89q.worldguard.domains.DefaultDomain;
  * @author sk89q
  */
 public class RegionDBUtil {
-    private static Pattern groupPattern = Pattern.compile("^[gG]:(.+)$");
+    private static Pattern groupPattern = Pattern.compile("(?i)^[G]:(.+)$");
     
     private RegionDBUtil() {
         
     }
 
     /**
-     * Parse a group/player DefaultDomain specification for areas.
+     * Add the given names to {@code domain}
      * 
-     * @param domain
-     * @param split
-     * @param startIndex
+     * @param domain The domain to add to
+     * @param split The {@link String[]} containing names to add to {@code domain}
+     * @param startIndex The beginning index in the array
      */
     public static void addToDomain(DefaultDomain domain, String[] split,
             int startIndex) {
@@ -59,11 +59,11 @@ public class RegionDBUtil {
     }
 
     /**
-     * Parse a group/player DefaultDomain specification for areas.
-     * 
-     * @param domain
-     * @param split
-     * @param startIndex
+     * Remove the given names from {@code domain}
+     *
+     * @param domain The domain to remove from
+     * @param split The {@link String[]} containing names to remove from {@code domain}
+     * @param startIndex The beginning index in the array
      */
     public static void removeFromDomain(DefaultDomain domain, String[] split,
             int startIndex) {
@@ -81,9 +81,9 @@ public class RegionDBUtil {
     /**
      * Parse a group/player DefaultDomain specification for areas.
      * 
-     * @param split
-     * @param startIndex
-     * @return
+     * @param split The array of names to add
+     * @param startIndex The beginning index in the array
+     * @return The resulting DefaultDomain
      */
     public static DefaultDomain parseDomainString(String[] split, int startIndex) {
         DefaultDomain domain = new DefaultDomain();
@@ -104,8 +104,8 @@ public class RegionDBUtil {
     /**
      * Creates a comma separated list of PreparedStatement place holders
      * 
-     * @param length
-     * @return
+     * @param length The number of wildcards to create
+     * @return A string with {@code length} wildcards for usage in a PreparedStatement
      */
     public static String preparePlaceHolders(int length) {
         StringBuilder builder = new StringBuilder();
@@ -121,9 +121,9 @@ public class RegionDBUtil {
     /**
      * Adds all of the parsed values to the PreparedStatement
      * 
-     * @param preparedStatement
-     * @param values
-     * @throws SQLException
+     * @param preparedStatement The preparedStanement to add to
+     * @param values The values to set
+     * @throws SQLException see {@link PreparedStatement#setString(int, String)}
      */
     public static void setValues(PreparedStatement preparedStatement, String... values) throws SQLException {
         for (int i = 0; i < values.length; i++) {

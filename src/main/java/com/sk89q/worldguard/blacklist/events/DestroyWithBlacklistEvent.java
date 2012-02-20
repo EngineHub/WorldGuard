@@ -26,12 +26,7 @@ public class DestroyWithBlacklistEvent extends BlacklistEvent {
     public DestroyWithBlacklistEvent(LocalPlayer player, Vector pos, int type) {
         super(player, pos, type);
     }
-    
-    /**
-     * Get a short description such as "break" or "destroy with."
-     * 
-     * @return
-     */
+
     @Override
     public String getDescription() {
         return "destroy with";

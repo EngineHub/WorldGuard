@@ -39,16 +39,16 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
     /**
      * Add a handler.
      *
-     * @param handler
+     * @param handler The handler to add
      */
     public void addHandler(BlacklistLoggerHandler handler) {
         handlers.add(handler);
     }
 
     /**
-     * Add a handler.
+     * Remove a handler.
      *
-     * @param handler
+     * @param handler The handler to remove
      */
     public void removeHandler(BlacklistLoggerHandler handler) {
         handlers.remove(handler);
@@ -64,7 +64,7 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
     /**
      * Log an event.
      *
-     * @param event
+     * @param event The event to log
      */
     public void logEvent(BlacklistEvent event, String comment) {
         for (BlacklistLoggerHandler handler : handlers) {

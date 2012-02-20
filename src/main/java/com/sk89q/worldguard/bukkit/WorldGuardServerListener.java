@@ -24,11 +24,15 @@ public class WorldGuardServerListener implements Listener {
 
     @EventHandler
     public void onPluginEnable(PluginEnableEvent event) {
-        plugin.getGlobalStateManager().updateCommandBookGodMode();
+        if (event.getPlugin().getDescription().getName().equalsIgnoreCase("CommandBook")) {
+            plugin.getGlobalStateManager().updateCommandBookGodMode();
+        }
     }
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
-        plugin.getGlobalStateManager().updateCommandBookGodMode();
+        if (event.getPlugin().getDescription().getName().equalsIgnoreCase("CommandBook")) {
+            plugin.getGlobalStateManager().updateCommandBookGodMode();
+        }
     }
 }

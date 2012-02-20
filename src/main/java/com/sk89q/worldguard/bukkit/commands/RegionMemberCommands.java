@@ -34,7 +34,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.util.RegionUtil;
+import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 
 // @TODO: A lot of code duplication here! Need to fix.
 
@@ -70,7 +70,7 @@ public class RegionMemberCommands {
             plugin.checkPermission(sender, "worldguard.region.addmember." + id.toLowerCase());
         }
 
-        RegionUtil.addToDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
+        RegionDBUtil.addToDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Region '" + id + "' updated.");
@@ -102,7 +102,7 @@ public class RegionMemberCommands {
 
         Boolean flag = region.getFlag(DefaultFlag.BUYABLE);
         DefaultDomain owners = region.getOwners();
-        if (flag != null && flag == true && owners != null && owners.size() == 0) {
+        if (flag != null && flag && owners != null && owners.size() == 0) {
             if (!plugin.hasPermission(player, "worldguard.region.unlimited")) {
                 int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
                 if (maxRegionCount >= 0 && mgr.getRegionCountOfPlayer(localPlayer)
@@ -121,7 +121,7 @@ public class RegionMemberCommands {
             }
         }
 
-        RegionUtil.addToDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
+        RegionDBUtil.addToDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Region '" + id + "' updated.");
@@ -159,7 +159,7 @@ public class RegionMemberCommands {
             plugin.checkPermission(sender, "worldguard.region.removemember." + id.toLowerCase());
         }
 
-        RegionUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
+        RegionDBUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Region '" + id + "' updated.");
@@ -198,7 +198,7 @@ public class RegionMemberCommands {
             plugin.checkPermission(sender, "worldguard.region.removeowner." + id.toLowerCase());
         }
 
-        RegionUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
+        RegionDBUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Region '" + id + "' updated.");

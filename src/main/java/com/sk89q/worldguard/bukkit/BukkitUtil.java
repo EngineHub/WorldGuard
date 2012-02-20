@@ -50,8 +50,8 @@ public class BukkitUtil {
     /**
      * Converts the location of a Bukkit block to a WorldEdit vector.
      * 
-     * @param block
-     * @return
+     * @param block The block to convert
+     * @return The block's location as a BlockVector
      */
     public static BlockVector toVector(Block block) {
         return new BlockVector(block.getX(), block.getY(), block.getZ());
@@ -60,8 +60,8 @@ public class BukkitUtil {
     /**
      * Converts a Bukkit location to a WorldEdit vector.
      * 
-     * @param loc
-     * @return
+     * @param loc A Bukkit Location
+     * @return A Vector with the location's x, y, and z values
      */
     public static Vector toVector(Location loc) {
         return new Vector(loc.getX(), loc.getY(), loc.getZ());
@@ -70,8 +70,8 @@ public class BukkitUtil {
     /**
      * Converts a Bukkit vector to a WorldEdit vector.
      * 
-     * @param vector
-     * @return
+     * @param vector The Bukkit vector
+     * @return A WorldEdit vector with the same values as the Bukkit vector.
      */
     public static Vector toVector(org.bukkit.util.Vector vector) {
         return new Vector(vector.getX(), vector.getY(), vector.getZ());
@@ -80,9 +80,9 @@ public class BukkitUtil {
     /**
      * Converts a WorldEdit vector to a Bukkit location.
      * 
-     * @param world
-     * @param vec 
-     * @return
+     * @param world The World to create the new Location with
+     * @param vec The vector to use for coordinates
+     * @return The Vector as a location with a World of world
      */
     public static Location toLocation(World world, Vector vec) {
         return new Location(world, vec.getX(), vec.getY(), vec.getZ());
@@ -91,10 +91,12 @@ public class BukkitUtil {
     /**
      * Matches one player based on name.
      * 
-     * @param server
-     * @param name
-     * @return
+     * @param server The server to check
+     * @param name The name to attempt to match
+     * @deprecated see {@link WorldGuardPlugin#matchSinglePlayer(org.bukkit.command.CommandSender, String)}
+     * @return The matched player if any, otherwise null
      */
+    @Deprecated
     public static Player matchSinglePlayer(Server server, String name) {
         List<Player> players = server.matchPlayer(name);
         if (players.size() == 0) {
@@ -106,8 +108,10 @@ public class BukkitUtil {
     /**
      * Drops a sign item and removes a sign.
      * 
-     * @param block
+     * @param block The block
+     * @deprecated see {@link org.bukkit.block.Block#breakNaturally()}
      */
+    @Deprecated
     public static void dropSign(Block block) {
         block.setTypeId(0);
         block.getWorld().dropItemNaturally(block.getLocation(),

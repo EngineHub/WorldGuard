@@ -42,9 +42,9 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     /**
      * Sets the min and max points from all the 2d points and the min/max Y values
      *
-     * @param points2D
-     * @param minY
-     * @param maxY
+     * @param points2D A {@link List} of points that this region should contain
+     * @param minY The minimum y coordinate
+     * @param maxY The maximum y coordinate
      */
     private void setMinMaxPoints(List<BlockVector2D> points2D, int minY, int maxY) {
         List<Vector> points = new ArrayList<Vector>();
@@ -156,11 +156,6 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         return "polygon";
     }
 
-    /**
-     * Get the number of Blocks in this region
-     *
-     * @return
-     */
     @Override
     public int volume() {
         int volume = 0;

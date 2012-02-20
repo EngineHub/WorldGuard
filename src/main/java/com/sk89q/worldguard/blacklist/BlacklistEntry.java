@@ -69,7 +69,7 @@ public class BlacklistEntry {
     /**
      * Construct the object.
      *
-     * @param blacklist
+     * @param blacklist The blacklist that contains this entry
      */
     public BlacklistEntry(Blacklist blacklist) {
         this.blacklist = blacklist;
@@ -112,98 +112,98 @@ public class BlacklistEntry {
     }
 
     /**
-     * @return
+     * @return The actions that occur when breaking
      */
     public String[] getBreakActions() {
         return breakActions;
     }
 
     /**
-     * @param actions
+     * @param actions The actions to occur when breaking
      */
     public void setBreakActions(String[] actions) {
         this.breakActions = actions;
     }
 
     /**
-     * @return
+     * @return The actions that occur when destroying with a specific item
      */
     public String[] getDestroyWithActions() {
         return destroyWithActions;
     }
 
     /**
-     * @param actions
+     * @param actions The actions to occur when destroying with an item
      */
     public void setDestroyWithActions(String[] actions) {
         this.destroyWithActions = actions;
     }
 
     /**
-     * @return
+     * @return The actions that will occur when placing
      */
     public String[] getPlaceActions() {
         return placeActions;
     }
 
     /**
-     * @param actions
+     * @param actions The actions to occur when placing
      */
     public void setPlaceActions(String[] actions) {
         this.placeActions = actions;
     }
 
     /**
-     * @return
+     * @return The actions that will occur when interacting
      */
     public String[] getInteractActions() {
         return interactActions;
     }
 
     /**
-     * @param actions
+     * @param actions The actions to occur when interacting
      */
     public void setInteractActions(String[] actions) {
         this.interactActions = actions;
     }
 
     /**
-     * @return
+     * @return The actions that will occur when using
      */
     public String[] getUseActions() {
         return useActions;
     }
 
     /**
-     * @param actions
+     * @param actions The actions to occur when using
      */
     public void setUseActions(String[] actions) {
         this.useActions = actions;
     }
 
     /**
-     * @return
+     * @return The actions that will occur when dropping
      */
     public String[] getDropActions() {
         return dropActions;
     }
 
     /**
-     * @param actions
+     * @param actions The actions to occur when dropping
      */
     public void setDropActions(String[] actions) {
         this.dropActions = actions;
     }
 
     /**
-     * @return
+     * @return The actions that will occur when acquiring
      */
     public String[] getAcquireActions() {
         return acquireActions;
     }
 
     /**
-     * @param actions
+     * @param actions The actions to occur when acquiring
      */
     public void setAcquireActions(String[] actions) {
         this.acquireActions = actions;
@@ -240,8 +240,8 @@ public class BlacklistEntry {
     /**
      * Returns true if this player should be ignored.
      *
-     * @param player
-     * @return
+     * @param player The player to check
+     * @return whether this player should be ignored for blacklist blocking
      */
     public boolean shouldIgnore(LocalPlayer player) {
         if (ignoreGroups != null) {
@@ -266,8 +266,8 @@ public class BlacklistEntry {
     /**
      * Get the associated actions with an event.
      *
-     * @param event
-     * @return
+     * @param event The event to check
+     * @return The actions for the given event
      */
     private String[] getActions(BlacklistEvent event) {
         if (event instanceof BlockBreakBlacklistEvent) {
@@ -299,11 +299,11 @@ public class BlacklistEntry {
     /**
      * Method to handle the event.
      *
-     * @param useAsWhitelist
-     * @param event
-     * @param forceRepeat
-     * @param silent
-     * @return
+     * @param useAsWhitelist Whether this entry is buing used in a whitelist
+     * @param event The event to check
+     * @param forceRepeat Whether to force repeating notifications even within the delay limit
+     * @param silent Whether to prevent notifications from happening
+     * @return Whether the action was allowed
      */
     public boolean check(boolean useAsWhitelist, BlacklistEvent event, boolean forceRepeat, boolean silent) {
         LocalPlayer player = event.getPlayer();
@@ -329,11 +329,11 @@ public class BlacklistEntry {
         String actions[] = getActions(event);
 
 
-        boolean ret = useAsWhitelist ? false : true;
+        boolean ret = !useAsWhitelist;
 
         // Nothing to do
         if (actions == null) {
-            return useAsWhitelist ? false : true;
+            return ret;
         }
 
         for (String action : actions) {
@@ -412,7 +412,7 @@ public class BlacklistEntry {
     /**
      * Get an item's friendly name with its ID.
      *
-     * @param id
+     * @param id The id to get a name for
      */
     private static String getFriendlyItemName(int id) {
         ItemType type = ItemType.fromID(id);

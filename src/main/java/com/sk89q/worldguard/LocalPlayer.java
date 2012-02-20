@@ -25,58 +25,58 @@ public abstract class LocalPlayer {
     /**
      * Get a player's name.
      * 
-     * @return
+     * @return The player's name
      */
     public abstract String getName();
     
     /**
      * Returns true if the player is inside a group.
      * 
-     * @param group
-     * @return
+     * @param group The group to check
+     * @return Whether this player is in {@code group}
      */
     public abstract boolean hasGroup(String group);
     
     /**
      * Get the player's position.
      * 
-     * @return
+     * @return The player's position
      */
     public abstract Vector getPosition();
     
     /**
      * Kick the player.
      * 
-     * @param msg
+     * @param msg The message to kick the player with
      */
     public abstract void kick(String msg);
     
     /**
      * Ban the player.
      * 
-     * @param msg
+     * @param msg The message to ban the player with
      */
     public abstract void ban(String msg);
     
     /**
      * Send the player a message;
      * 
-     * @param msg
+     * @param msg The message to send to the player
      */
     public abstract void printRaw(String msg);
     
     /**
      * Get the player's list of groups.
      * 
-     * @return
+     * @return The groups this player is in
      */
     public abstract String[] getGroups();
     
     /**
      * Returns whether a player has permission.
      * 
-     * @param perm 
-     * @return 
+     * @param perm The permission to check
+     * @return Whether this player has {@code perm}
      */
     public abstract boolean hasPermission(String perm);
     

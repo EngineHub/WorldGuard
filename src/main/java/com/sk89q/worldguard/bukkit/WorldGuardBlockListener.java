@@ -18,7 +18,6 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.dropSign;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import org.bukkit.ChatColor;
@@ -69,7 +68,7 @@ public class WorldGuardBlockListener implements Listener {
     /**
      * Construct the object.
      * 
-     * @param plugin
+     * @param plugin The plugin instance
      */
     public WorldGuardBlockListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -85,8 +84,8 @@ public class WorldGuardBlockListener implements Listener {
     /**
      * Get the world configuration given a world.
      * 
-     * @param world
-     * @return
+     * @param world The world to get the configuration for.
+     * @return The configuration for {@code world}
      */
     protected WorldConfiguration getWorldConfig(World world) {
         return plugin.getGlobalStateManager().get(world);
@@ -95,14 +94,14 @@ public class WorldGuardBlockListener implements Listener {
     /**
      * Get the world configuration given a player.
      * 
-     * @param player
-     * @return
+     * @param player The player to get the wold from
+     * @return The {@link WorldConfiguration} for the player's world
      */
     protected WorldConfiguration getWorldConfig(Player player) {
-        return plugin.getGlobalStateManager().get(player.getWorld());
+        return getWorldConfig(player.getWorld());
     }
 
-    /**
+    /*
      * Called when a block is damaged.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -125,7 +124,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
     
-    /**
+    /*
      * Called when a block is broken.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -178,7 +177,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when fluids flow.
      */
     @EventHandler
@@ -275,7 +274,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when a block gets ignited.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -377,7 +376,7 @@ public class WorldGuardBlockListener implements Listener {
 
     }
 
-    /**
+    /*
      * Called when a block is destroyed from burning.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -433,7 +432,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when block physics occurs.
      */
     @EventHandler
@@ -469,7 +468,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when a player places a block.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -524,7 +523,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when redstone changes.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -560,7 +559,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when a sign is changed.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -573,7 +572,7 @@ public class WorldGuardBlockListener implements Listener {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 if (wcfg.isChestProtectedPlacement(event.getBlock(), player)) {
                     player.sendMessage(ChatColor.DARK_RED + "You do not own the adjacent chest.");
-                    dropSign(event.getBlock());
+                    event.getBlock().breakNaturally();
                     event.setCancelled(true);
                     return;
                 }
@@ -582,7 +581,7 @@ public class WorldGuardBlockListener implements Listener {
                     player.sendMessage(ChatColor.RED
                             + "The [Lock] sign must be a sign post, not a wall sign.");
 
-                    dropSign(event.getBlock());
+                    event.getBlock().breakNaturally();
                     event.setCancelled(true);
                     return;
                 }
@@ -591,7 +590,7 @@ public class WorldGuardBlockListener implements Listener {
                     player.sendMessage(ChatColor.RED
                             + "The first owner line must be your name.");
 
-                    dropSign(event.getBlock());
+                    event.getBlock().breakNaturally();
                     event.setCancelled(true);
                     return;
                 }
@@ -603,7 +602,7 @@ public class WorldGuardBlockListener implements Listener {
                     player.sendMessage(ChatColor.RED
                             + "That is not a safe block that you're putting this sign on.");
 
-                    dropSign(event.getBlock());
+                    event.getBlock().breakNaturally();
                     event.setCancelled(true);
                     return;
                 }
@@ -616,8 +615,8 @@ public class WorldGuardBlockListener implements Listener {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 player.sendMessage(ChatColor.RED
                         + "WorldGuard's sign chest protection is disabled.");
-                
-                dropSign(event.getBlock());
+
+                event.getBlock().breakNaturally();
                 event.setCancelled(true);
                 return;
             }
@@ -657,7 +656,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when a block is formed based on world conditions.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -701,7 +700,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when a block spreads based on world conditions.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -745,7 +744,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when a block fades.
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -784,7 +783,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when a piston extends
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -810,7 +809,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /**
+    /*
      * Called when a piston retracts
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -826,6 +825,7 @@ public class WorldGuardBlockListener implements Listener {
             if (!(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getRetractLocation()))
                     || !(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation()))) {
                 event.setCancelled(true);
+                return;
             }
         }
     }
