@@ -569,7 +569,7 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"flag", "f"}, usage = "<id> <flag> [value]",
+    @Command(aliases = {"flag", "f"}, usage = "<id> <flag> [-g group] [value]", flags = "g:",
             desc = "Set flags", min = 2)
     public void flag(CommandContext args, CommandSender sender) throws CommandException {
         
@@ -668,23 +668,40 @@ public class RegionCommands {
         } else {
             plugin.checkPermission(sender, "worldguard.region.flag.flags."
                     + foundFlag.getName() + "." + id.toLowerCase());
-        } 
-        
-        if (value != null) {
+        }
+
+        if (args.hasFlag('g')) {
+            String group = args.getFlag('g');
+            if (foundFlag.getRegionGroupFlag() == null) {
+                throw new CommandException("Region flag '" + foundFlag.getName()
+                        + "' does not have a group flag!");
+            }
+
             try {
-                setFlag(region, foundFlag, sender, value);
+                setFlag(region, foundFlag.getRegionGroupFlag(), sender, group);
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }
 
             sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag '" + foundFlag.getName() + "' set.");
+                    + "Region group flag for '" + foundFlag.getName() + "' set.");
         } else {
-            // Clear the flag
-            region.setFlag(foundFlag, null);
+            if (value != null) {
+                try {
+                    setFlag(region, foundFlag, sender, value);
+                } catch (InvalidFlagFormat e) {
+                    throw new CommandException(e.getMessage());
+                }
 
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag '" + foundFlag.getName() + "' cleared.");
+                sender.sendMessage(ChatColor.YELLOW
+                        + "Region flag '" + foundFlag.getName() + "' set.");
+            } else {
+                // Clear the flag
+                region.setFlag(foundFlag, null);
+
+                sender.sendMessage(ChatColor.YELLOW
+                        + "Region flag '" + foundFlag.getName() + "' cleared.");
+            }
         }
         
         try {

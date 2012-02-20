@@ -27,21 +27,21 @@ import org.bukkit.entity.CreatureType;
  */
 public final class DefaultFlag {
 
-    public static final StateFlag PASSTHROUGH = new StateFlag("passthrough", 'z', false);
-    public static final StateFlag BUILD = new StateFlag("build", 'b', true);
-    public static final StateFlag PVP = new StateFlag("pvp", 'p', true);
-    public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", 'm', true);
+    public static final StateFlag PASSTHROUGH = new StateFlag("passthrough", false, RegionGroup.ALL);
+    public static final StateFlag BUILD = new StateFlag("build", true, RegionGroup.NON_MEMBERS);
+    public static final StateFlag PVP = new StateFlag("pvp", true, RegionGroup.ALL);
+    public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", true, RegionGroup.ALL);
     public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true);
-    public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", 'c', true);
+    public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", true, RegionGroup.ALL);
     public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = new StateFlag("enderdragon-block-damage", true);
-    public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true);
+    public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true, RegionGroup.ALL);
     public static final StateFlag SLEEP = new StateFlag("sleep", true);
-    public static final StateFlag TNT = new StateFlag("tnt", 't', true);
-    public static final StateFlag LIGHTER = new StateFlag("lighter", 'l', true);
-    public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", 'f', true);
-    public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", 'F', true);
+    public static final StateFlag TNT = new StateFlag("tnt", true);
+    public static final StateFlag LIGHTER = new StateFlag("lighter", true);
+    public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", true);
+    public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", true);
     public static final StateFlag LIGHTNING = new StateFlag("lightning", true);
-    public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", 'C', false);
+    public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", false);
     public static final StateFlag WATER_FLOW = new StateFlag("water-flow", true);
     public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
     public static final StateFlag USE = new StateFlag("use", true);
@@ -56,16 +56,14 @@ public final class DefaultFlag {
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
     public static final StateFlag GRASS_SPREAD = new StateFlag("grass-growth", true);
     public static final StateFlag ENDER_BUILD = new StateFlag("enderman-grief", true);
-    public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false);
+    public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false, RegionGroup.ALL);
     public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true);
-    public static final StateFlag ENTRY = new StateFlag("entry", true);
-    public static final RegionGroupFlag ENTRY_PERM = new RegionGroupFlag("entry-group", RegionGroupFlag.RegionGroup.NON_MEMBERS);
-    public static final StateFlag EXIT = new StateFlag("exit", true);
-    public static final RegionGroupFlag EXIT_PERM = new RegionGroupFlag("exit-group", RegionGroupFlag.RegionGroup.NON_MEMBERS);
-    public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
-    public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
-    public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
-    public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave");
+    public static final StateFlag ENTRY = new StateFlag("entry", true, RegionGroup.NON_MEMBERS);
+    public static final StateFlag EXIT = new StateFlag("exit", true, RegionGroup.NON_MEMBERS);
+    public static final StringFlag GREET_MESSAGE = new StringFlag("greeting", RegionGroup.ALL);
+    public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell", RegionGroup.ALL);
+    public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
+    public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave", RegionGroup.ALL);
     public static final SetFlag<CreatureType> DENY_SPAWN = new SetFlag<CreatureType>("deny-spawn", new CreatureTypeFlag(null));
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay");
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount");
@@ -75,14 +73,12 @@ public final class DefaultFlag {
     public static final IntegerFlag FEED_AMOUNT = new IntegerFlag("feed-amount");
     public static final IntegerFlag MIN_FOOD = new IntegerFlag("feed-min-hunger");
     public static final IntegerFlag MAX_FOOD = new IntegerFlag("feed-max-hunger");
-    public static final VectorFlag TELE_LOC = new VectorFlag("teleport");
-    public static final RegionGroupFlag TELE_PERM = new RegionGroupFlag("teleport-group", RegionGroupFlag.RegionGroup.MEMBERS);
-    public static final VectorFlag SPAWN_LOC = new VectorFlag("spawn");
-    public static final RegionGroupFlag SPAWN_PERM = new RegionGroupFlag("spawn-group", RegionGroupFlag.RegionGroup.MEMBERS);
+    public static final VectorFlag TELE_LOC = new VectorFlag("teleport", RegionGroup.MEMBERS);
+    public static final VectorFlag SPAWN_LOC = new VectorFlag("spawn", RegionGroup.MEMBERS);
     public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
     public static final DoubleFlag PRICE = new DoubleFlag("price");
-    public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", new CommandStringFlag(null));
-    public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", new CommandStringFlag(null));
+    public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
+    public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
@@ -90,41 +86,21 @@ public final class DefaultFlag {
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
         CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
-        EXIT, EXIT_PERM, ENTRY, ENTRY_PERM, LIGHTNING,
+        EXIT, ENTRY, LIGHTNING,
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
         SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT,
         MUSHROOMS, LEAF_DECAY, GRASS_SPREAD,
         FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
-        TELE_LOC, TELE_PERM, SPAWN_LOC, SPAWN_PERM,
+        TELE_LOC, SPAWN_LOC,
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
     };
 
-    static {
-        ENTRY.setGroupFlag(ENTRY_PERM);
-        EXIT.setGroupFlag(EXIT_PERM);
-    }
 
     private DefaultFlag() {
     }
 
     public static Flag<?>[] getFlags() {
         return flagsList;
-    }
-
-    /**
-     * Get the legacy flag.
-     *
-     * @param flagString
-     * @return null if not found
-     */
-    public static StateFlag getLegacyFlag(String flagString) {
-        for (Flag<?> flag : flagsList) {
-            if (flag instanceof StateFlag && flagString.equals(String.valueOf(flag.getLegacyCode()))) {
-                return (StateFlag) flag;
-            }
-        }
-
-        return null;
     }
 }

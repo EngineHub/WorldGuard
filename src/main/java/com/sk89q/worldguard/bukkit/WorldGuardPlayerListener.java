@@ -64,7 +64,6 @@ import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag.RegionGroup;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -161,10 +160,10 @@ public class WorldGuardPlayerListener implements Listener {
                         return;
                     }
 
-                    String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);
-                    String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
-                    Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
-                    Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
+                    String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE, localPlayer);
+                    String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE, localPlayer);
+                    Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER, localPlayer);
+                    Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE, localPlayer);
 
                     if (state.lastFarewell != null && (farewell == null
                             || !state.lastFarewell.equals(farewell))) {
@@ -391,7 +390,7 @@ public class WorldGuardPlayerListener implements Listener {
                   || type == BlockID.TRAP_DOOR
                   || type == BlockID.NOTE_BLOCK) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.allows(DefaultFlag.USE)
+                        && !set.allows(DefaultFlag.USE, localPlayer)
                         && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
                     event.setUseInteractedBlock(Result.DENY);
@@ -526,7 +525,7 @@ public class WorldGuardPlayerListener implements Listener {
                 Block placedOn = block.getRelative(event.getBlockFace());
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !plugin.getGlobalRegionManager().allows(
-                        DefaultFlag.TNT, placedOn.getLocation())) {
+                        DefaultFlag.TNT, placedOn.getLocation(), localPlayer)) {
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                 }
@@ -545,7 +544,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (type == BlockID.BED) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.allows(DefaultFlag.SLEEP)) {
+                        && !set.allows(DefaultFlag.SLEEP, localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You're not allowed to use that bed.");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
@@ -560,8 +559,7 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.BURNING_FURNACE
                     || type == BlockID.BREWING_STAND) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.allows(DefaultFlag.CHEST_ACCESS)
-                        && !set.canBuild(localPlayer)) {
+                        && !set.allows(DefaultFlag.CHEST_ACCESS, localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to open that in this area.");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
@@ -587,8 +585,7 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.CAULDRON
                     || type == BlockID.DRAGON_EGG) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.allows(DefaultFlag.USE)
-                        && !set.canBuild(localPlayer)) {
+                        && !set.allows(DefaultFlag.USE, localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
@@ -608,8 +605,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (BlockType.isRailBlock(type) && item.getTypeId() == ItemID.MINECART) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.canBuild(localPlayer)
-                        && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
+                        && !set.allows(DefaultFlag.PLACE_VEHICLE, localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to place vehicles here.");
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
@@ -619,8 +615,7 @@ public class WorldGuardPlayerListener implements Listener {
             
             if (item.getTypeId() == ItemID.WOOD_BOAT) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.canBuild(localPlayer)
-                        && !set.allows(DefaultFlag.PLACE_VEHICLE)) {
+                        && !set.allows(DefaultFlag.PLACE_VEHICLE, localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to place vehicles here.");
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
@@ -761,8 +756,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (type == BlockID.STONE_PRESSURE_PLATE || type == BlockID.WOODEN_PRESSURE_PLATE) {
                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                       && !set.allows(DefaultFlag.USE)
-                       && !set.canBuild(localPlayer)) {
+                       && !set.allows(DefaultFlag.USE, localPlayer)) {
                    event.setUseInteractedBlock(Result.DENY);
                    event.setCancelled(true);
                    return;
@@ -896,9 +890,10 @@ public class WorldGuardPlayerListener implements Listener {
         
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         if (event.getItemStack().getTypeId() == ItemID.MILK_BUCKET) {
-        	if (!plugin.getGlobalRegionManager().allows(DefaultFlag.USE, player.getLocation().add(0, 1, 0))) {
+        	if (!plugin.getGlobalRegionManager().allows(DefaultFlag.USE, player.getLocation().add(0, 1, 0), localPlayer)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use this in this area.");
                 event.setCancelled(true);
                 return;
@@ -964,22 +959,12 @@ public class WorldGuardPlayerListener implements Listener {
             Vector pt = toVector(location);
             RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-    
-            Vector spawn = set.getFlag(DefaultFlag.SPAWN_LOC);
+
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+            Vector spawn = set.getFlag(DefaultFlag.SPAWN_LOC, localPlayer);
     
             if (spawn != null) {
-                RegionGroup group = set.getFlag(DefaultFlag.SPAWN_PERM);
-                Location spawnLoc = BukkitUtil.toLocation(player.getWorld(), spawn);
-                
-                if (group != null) {
-                    LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-                    if (RegionGroupFlag.isMember(set, group, localPlayer)) {
-                        event.setRespawnLocation(spawnLoc);
-                    }
-                } else {
-                    event.setRespawnLocation(spawnLoc);
-                }
+                event.setRespawnLocation(BukkitUtil.toLocation(player.getWorld(), spawn));
             }
         }
     }
@@ -1026,7 +1011,7 @@ public class WorldGuardPlayerListener implements Listener {
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             if (!plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())
-                && !set.allows(DefaultFlag.SLEEP)) {
+                && !set.allows(DefaultFlag.SLEEP, plugin.wrapPlayer(player))) {
                     event.setCancelled(true);
                     player.sendMessage("This bed doesn't belong to you!");
                     return;
@@ -1040,6 +1025,7 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
         World world = player.getWorld();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
@@ -1052,7 +1038,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             String[] parts = event.getMessage().split(" ");
 
-            Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS);
+            Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS, localPlayer);
             if (allowedCommands == null && globalRegion != null) {
                 allowedCommands = globalRegion.getFlag(DefaultFlag.ALLOWED_CMDS);
             }
@@ -1063,7 +1049,7 @@ public class WorldGuardPlayerListener implements Listener {
                 return;
             }
 
-            Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS);
+            Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS, localPlayer);
             if (blockedCommands == null && globalRegion != null) {
                 blockedCommands = globalRegion.getFlag(DefaultFlag.BLOCKED_CMDS);
             }

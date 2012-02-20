@@ -354,7 +354,7 @@ public class WorldGuardBlockListener implements Listener {
                         event.setCancelled(true);
                         return;
                     }
-                    if (!set.allows(DefaultFlag.LIGHTER)
+                    if (!set.allows(DefaultFlag.LIGHTER, localPlayer)
                             && !plugin.hasPermission(player, "worldguard.override.lighter")) {
                         event.setCancelled(true);
                         return;

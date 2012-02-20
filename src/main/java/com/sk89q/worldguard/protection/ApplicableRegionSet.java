@@ -29,6 +29,7 @@ import java.util.Set;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
@@ -68,7 +69,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return build ability
      */
     public boolean canBuild(LocalPlayer player) {
-        return internalGetState(DefaultFlag.BUILD, player, null, null);
+        return internalGetState(DefaultFlag.BUILD, player, null);
     }
     
     /**
@@ -93,7 +94,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         if (flag == DefaultFlag.BUILD) {
             throw new IllegalArgumentException("Can't use build flag with allows()");
         }
-        return internalGetState(flag, null, null, null);
+        return internalGetState(flag, null, null);
     }
     
     /**
@@ -108,7 +109,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         if (flag == DefaultFlag.BUILD) {
             throw new IllegalArgumentException("Can't use build flag with allows()");
         }
-        return internalGetState(flag, null, flag.getGroupFlag(), player);
+        return internalGetState(flag, null, player);
     }
     
     /**
@@ -149,12 +150,10 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * 
      * @param flag flag to check
      * @param player null to not check owners and members
-     * @param groupFlag group flag to check
      * @param groupPlayer player to use for the group flag check
      * @return
      */
     private boolean internalGetState(StateFlag flag, LocalPlayer player,
-                                     RegionGroupFlag groupFlag,
                                      LocalPlayer groupPlayer) {
         boolean found = false;
         boolean hasFlagDefined = false;
@@ -229,10 +228,10 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             }
 
             // Check group permissions
-            if (groupPlayer != null && groupFlag != null) {
-                RegionGroupFlag.RegionGroup group = region.getFlag(groupFlag);
+            if (groupPlayer != null && flag.getRegionGroupFlag() != null) {
+                RegionGroup group = region.getFlag(flag.getRegionGroupFlag());
                 if (group == null) {
-                    group = groupFlag.getDefault();
+                    group = flag.getRegionGroupFlag().getDefault();
                 }
                 if (!RegionGroupFlag.isMember(region, group, groupPlayer)) {
                     continue;
@@ -300,6 +299,10 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         }
     }
 
+    public <T extends Flag<V>, V> V getFlag(T flag) {
+        return getFlag(flag, null);
+    }
+
     /**
      * Gets the value of a flag. Do not use this for state flags
      * (use {@link #allows(StateFlag, LocalPlayer)} for that).
@@ -308,7 +311,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return value of the flag
      * @throws IllegalArgumentException if a StateFlag is given
      */
-    public <T extends Flag<V>, V> V getFlag(T flag) {
+    public <T extends Flag<V>, V> V getFlag(T flag, LocalPlayer groupPlayer) {
         /*
         if (flag instanceof StateFlag) {
             throw new IllegalArgumentException("Cannot use StateFlag with getFlag()");
@@ -329,6 +332,17 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             // Ignore lower priority regions
             if (found && region.getPriority() < lastPriority) {
                 break;
+            }
+
+            // Check group permissions
+            if (groupPlayer != null && flag.getRegionGroupFlag() != null) {
+                RegionGroup group = region.getFlag(flag.getRegionGroupFlag());
+                if (group == null) {
+                    group = flag.getRegionGroupFlag().getDefault();
+                }
+                if (!RegionGroupFlag.isMember(region, group, groupPlayer)) {
+                    continue;
+                }
             }
 
             if (hasCleared.contains(region)) {

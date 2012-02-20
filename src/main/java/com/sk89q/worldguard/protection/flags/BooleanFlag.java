@@ -27,9 +27,9 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author sk89q
  */
 public class BooleanFlag extends Flag<Boolean> {
-    
-    public BooleanFlag(String name, char legacyCode) {
-        super(name, legacyCode);
+
+    public BooleanFlag(String name, RegionGroup defaultGroup) {
+        super(name, defaultGroup);
     }
 
     public BooleanFlag(String name) {

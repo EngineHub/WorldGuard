@@ -29,9 +29,9 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 public class EnumFlag<T extends Enum<T>> extends Flag<T> {
 
     private Class<T> enumClass;
-    
-    public EnumFlag(String name, char legacyCode, Class<T> enumClass) {
-        super(name, legacyCode);
+
+    public EnumFlag(String name, Class<T> enumClass, RegionGroup defaultGroup) {
+        super(name, defaultGroup);
         this.enumClass = enumClass;
     }
 

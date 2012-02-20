@@ -66,8 +66,7 @@ public class WorldGuardVehicleListener implements Listener {
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
             if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                    && !set.canBuild(localPlayer)
-                    && !set.allows(DefaultFlag.DESTROY_VEHICLE)) {
+                    && !set.allows(DefaultFlag.DESTROY_VEHICLE, localPlayer)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission to destroy vehicles here.");
                 event.setCancelled(true);
                 return;
@@ -125,10 +124,10 @@ public class WorldGuardVehicleListener implements Listener {
                     return;
                 }
 
-                String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);
-                String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
-                Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
-                Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
+                String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE, localPlayer);
+                String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE, localPlayer);
+                Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER, localPlayer);
+                Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE, localPlayer);
                 
                 if (state.lastFarewell != null && (farewell == null 
                         || !state.lastFarewell.equals(farewell))) {

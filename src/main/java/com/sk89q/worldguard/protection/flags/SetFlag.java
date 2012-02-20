@@ -36,9 +36,9 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 public class SetFlag<T> extends Flag<Set<T>> {
 
     private Flag<T> subFlag;
-    
-    public SetFlag(String name, char legacyCode, Flag<T> subFlag) {
-        super(name, legacyCode);
+
+    public SetFlag(String name, RegionGroup defaultGroup, Flag<T> subFlag) {
+        super(name, defaultGroup);
         this.subFlag = subFlag;
     }
 
