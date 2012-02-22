@@ -396,6 +396,15 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     }
     
     /**
+     * Get the Collection of applicable ProtectedRegions for this RegionSet
+     * 
+     * @return applicable
+     */
+    public Collection<ProtectedRegion> getApplicable() {
+        return applicable;
+    }
+
+    /**
      * Get the number of regions that are included.
      * 
      * @return the size of this ApplicbleRegionSet

@@ -90,13 +90,28 @@ public class PRTreeRegionManager extends RegionManager {
 
     @Override
     public ProtectedRegion getRegion(String id) {
-        return regions.get(id.toLowerCase());
+        if (regions.containsKey(id.toLowerCase()))
+            return getRegion(id.toLowerCase());
+        
+        for (RegionManager rm : subManagers) {
+            if (rm.getRegions().containsKey(id.toLowerCase())) {
+                return rm.getRegion(id.toLowerCase());
+            }
+        }
+        return null;
     }
 
     @Override
     public void removeRegion(String id) {
         ProtectedRegion region = regions.get(id.toLowerCase());
-
+        // if the region is not contained in this RegionManager then attempt to remove 
+        // the region from any SubRegionManager
+        if (region == null) {
+            for (RegionManager rm : subManagers) {
+                rm.removeRegion(id);
+            }
+            return;
+        }
         regions.remove(id.toLowerCase());
 
         if (region != null) {
@@ -112,7 +127,7 @@ public class PRTreeRegionManager extends RegionManager {
             }
         }
 
-    tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+        tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
         tree.load(regions.values());
     }
 
@@ -130,6 +145,11 @@ public class PRTreeRegionManager extends RegionManager {
             }
         }
 
+        // Get all applicable regions from the sub-region managers
+        for (RegionManager rm : subManagers) {
+            appRegions.addAll(rm.getApplicableRegions(pt).getApplicable());
+        }
+        
         Collections.sort(appRegions);
 
         return new ApplicableRegionSet(appRegions, regions.get("__global__"));
@@ -146,7 +166,12 @@ public class PRTreeRegionManager extends RegionManager {
         } catch (Exception e) {
             intersectRegions = new ArrayList<ProtectedRegion>();
         }
-
+        
+        // Get all applicable regions from the sub-region managers
+        for (RegionManager rm : subManagers) {
+            intersectRegions.addAll(rm.getApplicableRegions(checkRegion).getApplicable());
+        }
+        
         return new ApplicableRegionSet(intersectRegions, regions.get("__global__"));
     }
 
@@ -162,7 +187,12 @@ public class PRTreeRegionManager extends RegionManager {
                 applicable.add(region.getId());
             }
         }
-
+        
+        // Get all IDs of applicable regions in SubManagers
+        for (RegionManager rm : subManagers) {
+            applicable.addAll(rm.getApplicableRegionsIDs(pt));
+        }
+        
         return applicable;
     }
 
@@ -177,15 +207,24 @@ public class PRTreeRegionManager extends RegionManager {
 
             appRegions.add(other);
         }
-
+        
         List<ProtectedRegion> intersectRegions;
         try {
             intersectRegions = checkRegion.getIntersectingRegions(appRegions);
         } catch (Exception e) {
             intersectRegions = new ArrayList<ProtectedRegion>();
         }
-
-        return intersectRegions.size() > 0;
+        
+        if (intersectRegions.size() > 0)  return true;
+        
+        // Check if the Region overlaps one of the regions in a subRegionManager
+        for (RegionManager rm : subManagers) {
+            if (rm.overlapsUnownedRegion(checkRegion, player)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     @Override
