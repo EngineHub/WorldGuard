@@ -212,6 +212,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
 	}
 
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -866,7 +867,6 @@ public class WorldGuardPlayerListener implements Listener {
         
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
         
         if (!plugin.getGlobalRegionManager().canBuild(
                 player, event.getBlockClicked().getRelative(event.getBlockFace()))) {
