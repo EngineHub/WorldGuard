@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.protection.managers;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
