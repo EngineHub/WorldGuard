@@ -39,13 +39,6 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 
 /**
  *
