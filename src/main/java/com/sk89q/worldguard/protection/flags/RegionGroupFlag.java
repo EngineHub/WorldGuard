@@ -43,8 +43,7 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
     }
 
     @Override
-    public RegionGroup parseInput(WorldGuardPlugin plugin, CommandSender sender,
-            String input) throws InvalidFlagFormat {
+    public RegionGroup detectValue(String input) {
         input = input.trim();
 
         if (input.equalsIgnoreCase("members") || input.equalsIgnoreCase("member")) {
@@ -58,7 +57,7 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
         } else if (input.equalsIgnoreCase("everyone") || input.equalsIgnoreCase("anyone") || input.equalsIgnoreCase("all")) {
             return RegionGroup.ALL;
         } else {
-            throw new InvalidFlagFormat("Expected [non]member/[non]owner/anyone but got '" + input + "'");
+            return null;
         }
     }
 
