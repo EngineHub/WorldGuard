@@ -611,7 +611,7 @@ public class WorldGuardBlockListener implements Listener {
                 player.sendMessage(ChatColor.YELLOW
                         + "A chest or double chest above is now protected.");
             }
-        } else {
+        } else if (!wcfg.disableSignChestProtectionCheck) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 player.sendMessage(ChatColor.RED
                         + "WorldGuard's sign chest protection is disabled.");
