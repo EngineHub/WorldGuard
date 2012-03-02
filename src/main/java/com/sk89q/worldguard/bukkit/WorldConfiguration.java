@@ -32,7 +32,7 @@ import java.util.logging.Level;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import org.bukkit.block.Block;
-import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldguard.blacklist.Blacklist;
@@ -112,7 +112,7 @@ public class WorldConfiguration {
     public boolean useRegions;
     public boolean highFreqFlags;
     public int regionWand = 287;
-    public Set<CreatureType> blockCreatureSpawn;
+    public Set<EntityType> blockCreatureSpawn;
     // public boolean useiConomy;
     // public boolean buyOnClaim;
     // public double buyOnClaimPrice;
@@ -375,12 +375,14 @@ public class WorldConfiguration {
         // buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
         // buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
 
-        blockCreatureSpawn = new HashSet<CreatureType>();
+        blockCreatureSpawn = new HashSet<EntityType>();
         for (String creatureName : getStringList("mobs.block-creature-spawn", null)) {
-            CreatureType creature = CreatureType.fromName(creatureName);
+            EntityType creature = EntityType.fromName(creatureName);
 
             if (creature == null) {
                 plugin.getLogger().warning("Unknown mob type '" + creatureName + "'");
+            } else if (!creature.isAlive()) {
+                plugin.getLogger().warning("Entity type '" + creatureName + "' is not a creature");
             } else {
                 blockCreatureSpawn.add(creature);
             }

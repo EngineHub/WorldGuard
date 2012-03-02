@@ -29,11 +29,11 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
-import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Painting;
@@ -628,9 +628,9 @@ public class WorldGuardEntityListener implements Listener {
         }
 
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
-        CreatureType creaType = event.getCreatureType();
+        EntityType entityType = event.getEntityType();
 
-        if (wcfg.blockCreatureSpawn.contains(creaType)) {
+        if (wcfg.blockCreatureSpawn.contains(entityType)) {
             event.setCancelled(true);
             return;
         }
@@ -649,8 +649,8 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
 
-            Set<CreatureType> creatureTypes = set.getFlag(DefaultFlag.DENY_SPAWN);
-            if (creatureTypes != null && creatureTypes.contains(creaType)) {
+            Set<EntityType> entityTypes = set.getFlag(DefaultFlag.DENY_SPAWN);
+            if (entityTypes != null && entityTypes.contains(entityType)) {
                 event.setCancelled(true);
                 return;
             }
