@@ -136,7 +136,7 @@ public class ConfigurationManager {
         useRegionsScheduler = config.getBoolean(
                 "regions.use-scheduler", true);
         autoGodMode = config.getBoolean(
-                "auto-invincible", config.getBoolean("auto-invincible-permission", true));
+                "auto-invincible", config.getBoolean("auto-invincible-permission", false));
         usePlayerMove = config.getBoolean(
                 "use-player-move-event", true);
 
