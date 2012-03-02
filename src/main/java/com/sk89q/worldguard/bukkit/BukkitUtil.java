@@ -44,32 +44,32 @@ import com.sk89q.worldedit.blocks.BlockType;
 public class BukkitUtil {
 
     private BukkitUtil()  {
-    	
+
     }
-    
+
     /**
      * Converts the location of a Bukkit block to a WorldEdit vector.
-     * 
+     *
      * @param block The block to convert
      * @return The block's location as a BlockVector
      */
     public static BlockVector toVector(Block block) {
         return new BlockVector(block.getX(), block.getY(), block.getZ());
     }
-    
+
     /**
      * Converts a Bukkit location to a WorldEdit vector.
-     * 
+     *
      * @param loc A Bukkit Location
      * @return A Vector with the location's x, y, and z values
      */
     public static Vector toVector(Location loc) {
         return new Vector(loc.getX(), loc.getY(), loc.getZ());
     }
-    
+
     /**
      * Converts a Bukkit vector to a WorldEdit vector.
-     * 
+     *
      * @param vector The Bukkit vector
      * @return A WorldEdit vector with the same values as the Bukkit vector.
      */
@@ -79,7 +79,7 @@ public class BukkitUtil {
 
     /**
      * Converts a WorldEdit vector to a Bukkit location.
-     * 
+     *
      * @param world The World to create the new Location with
      * @param vec The vector to use for coordinates
      * @return The Vector as a location with a World of world
@@ -87,10 +87,10 @@ public class BukkitUtil {
     public static Location toLocation(World world, Vector vec) {
         return new Location(world, vec.getX(), vec.getY(), vec.getZ());
     }
-    
+
     /**
      * Matches one player based on name.
-     * 
+     *
      * @param server The server to check
      * @param name The name to attempt to match
      * @deprecated see {@link WorldGuardPlugin#matchSinglePlayer(org.bukkit.command.CommandSender, String)}
@@ -104,10 +104,10 @@ public class BukkitUtil {
         }
         return players.get(0);
     }
-    
+
     /**
      * Drops a sign item and removes a sign.
-     * 
+     *
      * @param block The block
      * @deprecated see {@link org.bukkit.block.Block#breakNaturally()}
      */
@@ -121,7 +121,7 @@ public class BukkitUtil {
     /**
      * Sets the given block to fluid water.
      * Used by addSpongeWater()
-     * 
+     *
      * @param world
      * @param ox
      * @param oy
@@ -137,12 +137,12 @@ public class BukkitUtil {
 
     /**
      * Checks if the given block is water
-     * 
+     *
      * @param world
      * @param ox
      * @param oy
      * @param oz
-     * @return 
+     * @return
      */
     public static boolean isBlockWater(World world, int ox, int oy, int oz) {
         Block block = world.getBlockAt(ox, oy, oz);
@@ -172,7 +172,7 @@ public class BukkitUtil {
 
         byte free = 0;
 
-        while (y <= 129) {
+        while (y <= world.getMaxHeight() + 1) {
             if (BlockType.canPassThrough(world.getBlockTypeIdAt(x, y, z))) {
                 free++;
             } else {
