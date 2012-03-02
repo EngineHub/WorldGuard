@@ -62,7 +62,7 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
     }
 
     public static boolean isMember(ProtectedRegion region, RegionGroup group, LocalPlayer player) {
-        if (group == null) {
+        if (group == null || group == RegionGroup.ALL) {
             return true;
         } else if (group == RegionGroup.OWNERS) {
             if (region.isOwner(player)) {
@@ -87,7 +87,7 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
 
     public static boolean isMember(ApplicableRegionSet set,
                                    RegionGroup group, LocalPlayer player) {
-        if (group == RegionGroup.ALL) {
+        if (group == null || group == RegionGroup.ALL) {
             return true;
         } else if (group == RegionGroup.OWNERS) {
             if (set.isOwnerOfAll(player)) {
