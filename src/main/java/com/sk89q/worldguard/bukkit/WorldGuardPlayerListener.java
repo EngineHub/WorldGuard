@@ -330,7 +330,7 @@ public class WorldGuardPlayerListener implements Listener {
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
             int slot = player.getInventory().getHeldItemSlot();
             ItemStack heldItem = player.getInventory().getItem(slot);
-            if (heldItem.getAmount() < 0) {
+            if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(slot, null);
                 player.sendMessage(ChatColor.RED + "Infinite stack removed.");
             }
