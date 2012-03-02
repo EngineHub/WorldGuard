@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldguard</artifactId>
-  <version>5.6-SNAPSHOT</version>
+  <version>5.5.2-SNAPSHOT</version>
   <name>WorldGuard</name>
   <description>WorldGuard protects your Minecraft servers</description>
 
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>5.3-SNAPSHOT</version>
+      <version>5.2</version>
     </dependency>
     
     <!-- Bukkit -->
@@ -160,7 +160,7 @@
       <!-- Assembly -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2.1</version>
+        <version>2.2-beta-2</version>
         <configuration>
           <descriptor>${basedir}/src/main/assembly/default.xml</descriptor>
         </configuration>

@@ -1,3 +1,11 @@
+5.5.1:
+- Fixed attacking with arrows from non-PVP to PVP areas
+- Compatibility with Bukkit 1.1-R5
+- Removed broken suppress-tick-sync-warnings config option. See bukkit.yml's setings.warn-on-overload option instead.
+- Add region and 'can build' information to CommandBook's /whois
+
+Contributions thanks to: NolanSyKinsley
+
 5.5:
 - Removed WorldEdit.jar from the classpath to stop conflicts with Bukkit's plugin loader
 - Now using Bukkit's tagged logging
