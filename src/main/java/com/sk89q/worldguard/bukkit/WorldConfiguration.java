@@ -121,6 +121,7 @@ public class WorldConfiguration {
     public int maxRegionCountPerPlayer;
     public boolean antiWolfDumbness;
     public boolean signChestProtection;
+    public boolean disableSignChestProtectionCheck;
     public boolean removeInfiniteStacks;
     public boolean disableCreatureCropTrampling;
     public boolean disablePlayerCropTrampling;
@@ -328,6 +329,7 @@ public class WorldConfiguration {
         disableDeathMessages = getBoolean("player-damage.disable-death-messages", false);
 
         signChestProtection = getBoolean("chest-protection.enable", false);
+        disableSignChestProtectionCheck = getBoolean("chest-protection.disable-off-check", false);
 
         disableCreatureCropTrampling = getBoolean("crops.disable-creature-trampling", false);
         disablePlayerCropTrampling = getBoolean("crops.disable-player-trampling", false);
