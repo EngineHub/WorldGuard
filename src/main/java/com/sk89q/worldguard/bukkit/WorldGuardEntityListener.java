@@ -414,10 +414,13 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
+            
+            ItemStack helmet = player.getInventory().getHelmet();
 
             if (type == DamageCause.DROWNING && wcfg.pumpkinScuba
-                    && (player.getInventory().getHelmet().getTypeId() == BlockID.PUMPKIN
-                    || player.getInventory().getHelmet().getTypeId() == BlockID.JACKOLANTERN)) {
+                    && helmet != null
+                    && (helmet.getTypeId() == BlockID.PUMPKIN
+                    || helmet.getTypeId() == BlockID.JACKOLANTERN)) {
                 player.setRemainingAir(player.getMaximumAir());
                 event.setCancelled(true);
                 return;
