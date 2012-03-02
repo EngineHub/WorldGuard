@@ -117,7 +117,7 @@ public class WorldGuardPlayerListener implements Listener {
                         state = plugin.getFlagStateManager().getState(player);
                     }
 
-                    LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                    //LocalPlayer localPlayer = plugin.wrapPlayer(player);
                     boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
 
                     RegionManager mgr = plugin.getGlobalRegionManager().get(world);
