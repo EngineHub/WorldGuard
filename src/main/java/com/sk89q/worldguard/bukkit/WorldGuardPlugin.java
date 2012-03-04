@@ -55,6 +55,7 @@ import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
@@ -133,9 +134,14 @@ public class WorldGuardPlugin extends JavaPlugin {
         // This must be done before configuration is loaded
         LegacyWorldGuardMigration.migrateBlacklist(this);
 
-        // Load the configuration
-        configuration.load();
-        globalRegionManager.preload();
+        try {
+        	// Load the configuration
+        	configuration.load();
+        	globalRegionManager.preload();
+        } catch (FatalConfigurationLoadingException e) {
+        	e.printStackTrace();
+        	getServer().shutdown();
+        }
 
         // Migrate regions after the regions were loaded because
         // the migration code reuses the loaded region managers
