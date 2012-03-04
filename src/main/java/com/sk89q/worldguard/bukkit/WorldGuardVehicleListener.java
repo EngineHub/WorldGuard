@@ -63,6 +63,7 @@ public class WorldGuardVehicleListener implements Listener {
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
             if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                    && !set.canBuild(localPlayer)
                     && !set.allows(DefaultFlag.DESTROY_VEHICLE, localPlayer)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission to destroy vehicles here.");
                 event.setCancelled(true);
@@ -122,40 +123,40 @@ public class WorldGuardVehicleListener implements Listener {
                 String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE, localPlayer);
                 Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER, localPlayer);
                 Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE, localPlayer);
-                
-                if (state.lastFarewell != null && (farewell == null 
+
+                if (state.lastFarewell != null && (farewell == null
                         || !state.lastFarewell.equals(farewell))) {
                     String replacedFarewell = plugin.replaceMacros(
                             player, BukkitUtil.replaceColorMacros(state.lastFarewell));
                     player.sendMessage(ChatColor.AQUA + " ** " + replacedFarewell);
                 }
-                
+
                 if (greeting != null && (state.lastGreeting == null
                         || !state.lastGreeting.equals(greeting))) {
                     String replacedGreeting = plugin.replaceMacros(
                             player, BukkitUtil.replaceColorMacros(greeting));
                     player.sendMessage(ChatColor.AQUA + " ** " + replacedGreeting);
                 }
-                
+
                 if ((notifyLeave == null || !notifyLeave)
                         && state.notifiedForLeave != null && state.notifiedForLeave) {
-                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
+                    plugin.broadcastNotification(ChatColor.GRAY + "WG: "
                             + ChatColor.LIGHT_PURPLE + player.getName()
                             + ChatColor.GOLD + " left NOTIFY region");
                 }
-                
+
                 if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
                         || !state.notifiedForEnter)) {
                     StringBuilder regionList = new StringBuilder();
-                    
+
                     for (ProtectedRegion region : set) {
                         if (regionList.length() != 0) {
                             regionList.append(", ");
                         }
                         regionList.append(region.getId());
                     }
-                    
-                    plugin.broadcastNotification(ChatColor.GRAY + "WG: " 
+
+                    plugin.broadcastNotification(ChatColor.GRAY + "WG: "
                             + ChatColor.LIGHT_PURPLE + player.getName()
                             + ChatColor.GOLD + " entered NOTIFY region: "
                             + ChatColor.WHITE
