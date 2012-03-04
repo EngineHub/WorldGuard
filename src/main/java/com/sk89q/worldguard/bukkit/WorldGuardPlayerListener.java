@@ -117,14 +117,14 @@ public class WorldGuardPlayerListener implements Listener {
                         state = plugin.getFlagStateManager().getState(player);
                     }
 
-                    //LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                    LocalPlayer localPlayer = plugin.wrapPlayer(player);
                     boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
 
                     RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                     Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-                    boolean entryAllowed = set.allows(DefaultFlag.ENTRY);//, localPlayer);
+                    boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
                     if (!hasBypass && !entryAllowed) {
                         player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
 
@@ -139,10 +139,10 @@ public class WorldGuardPlayerListener implements Listener {
                     // Have to set this state
                     if (state.lastExitAllowed == null) {
                         state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))
-                                .allows(DefaultFlag.EXIT);//, localPlayer);
+                                .allows(DefaultFlag.EXIT, localPlayer);
                     }
 
-                    boolean exitAllowed = set.allows(DefaultFlag.EXIT);//, localPlayer);
+                    boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
                     if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
                         player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
 
