@@ -35,6 +35,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
+import org.bukkit.entity.FallingSand;
+
 import org.bukkit.inventory.ItemStack;
 
 import com.sk89q.worldedit.BlockVector;
@@ -246,8 +248,9 @@ public class BukkitUtil {
         return entity instanceof Item
                 || entity instanceof TNTPrimed
                 || entity instanceof ExperienceOrb
+                || entity instanceof FallingSand
                 || (entity instanceof LivingEntity
-                && !(entity instanceof Tameable)
-                && !(entity instanceof Player));
+                    && !(entity instanceof Tameable)
+                    && !(entity instanceof Player));
     }
 }
