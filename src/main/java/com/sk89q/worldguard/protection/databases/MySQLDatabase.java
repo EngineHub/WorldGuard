@@ -70,6 +70,18 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
         try {
             connect();
+            
+            try {
+            	// Test if the database is up to date, if not throw a critical error
+            	PreparedStatement verTest = this.conn.prepareStatement(
+            			"SELECT `world_id` FROM `region_cuboid` LIMIT 0,1;"
+            		);
+            	verTest.execute();
+            } catch (SQLException ex) {
+            	throw new InvalidTableFormatException(
+            			"region_storage_update_20110325.sql"
+            		);
+            }
 
             PreparedStatement worldStmt = conn.prepareStatement(
                     "SELECT `id` FROM " +
@@ -113,6 +125,20 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     }
 
     private void connect() throws SQLException {
+    	if (conn != null) {
+    		// Make a dummy query to check the connnection is alive.
+    		try {
+    			conn.prepareStatement("SELECT 1;").execute();
+    		} catch (SQLException ex) {
+                // Test if the dummy query failed because the connection is dead,
+                // and if it is mark the connection as closed (the MySQL Driver
+                // does not ensure that the connection is marked as closed unless 
+                // the close() method has been called.
+    			if ("08S01".equals(ex.getSQLState())) {
+    				conn.close();
+    			}
+    		}
+    	}
         if (conn == null || conn.isClosed()) {
             conn = DriverManager.getConnection(config.sqlDsn, config.sqlUsername, config.sqlPassword);
         }
@@ -126,7 +152,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "`region_flag`.`flag`, " +
                     "`region_flag`.`value` " +
                     "FROM `region_flag` " +
-                    "WHERE `region_flag`.`region_id` = ? "
+                    "WHERE `region_flag`.`region_id` = ? " +
+                    "AND `region_flag`.`world_id` = " + this.worldDbId
             );
 
             flagsStatement.setString(1, region.getId().toLowerCase());
@@ -178,7 +205,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "LEFT JOIN `user` ON ( " +
                     "`region_players`.`user_id` = " +
                     "`user`.`id`) " +
-                    "WHERE `region_players`.`region_id` = ? "
+                    "WHERE `region_players`.`region_id` = ? " +
+                    "AND `region_players`.`world_id` = " + this.worldDbId
             );
 
             usersStatement.setString(1, region.getId().toLowerCase());
@@ -203,7 +231,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "LEFT JOIN `group` ON ( " +
                     "`region_groups`.`group_id` = " +
                     "`group`.`id`) " +
-                    "WHERE `region_groups`.`region_id` = ? "
+                    "WHERE `region_groups`.`region_id` = ? " +
+                    "AND `region_groups`.`world_id` = " + this.worldDbId
             );
 
             groupsStatement.setString(1, region.getId().toLowerCase());
@@ -235,7 +264,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "`parent`.`id` AS `parent` " +
                     "FROM `region` " +
                     "LEFT JOIN `region` AS `parent` " +
-                    "ON (`region`.`parent` = `parent`.`id`) " +
+                    "ON (`region`.`parent` = `parent`.`id` " +
+                    "AND `region`.`world_id` = `parent`.`world_id`) " +
                     "WHERE `region`.`type` = 'global' " +
                     "AND `region`.`world_id` = ? "
             );
@@ -289,9 +319,11 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "`parent`.`id` AS `parent` " +
                     "FROM `region_cuboid` " +
                     "LEFT JOIN `region` " +
-                    "ON (`region_cuboid`.`region_id` = `region`.`id`) " +
+                    "ON (`region_cuboid`.`region_id` = `region`.`id` " +
+                    "AND `region_cuboid`.`world_id` = `region`.`world_id`) " +
                     "LEFT JOIN `region` AS `parent` " +
-                    "ON (`region`.`parent` = `parent`.`id`) " +
+                    "ON (`region`.`parent` = `parent`.`id` " +
+                    "AND `region`.`world_id` = `parent`.`world_id`) " +
                     "WHERE `region`.`world_id` = ? "
             );
 
@@ -358,9 +390,11 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "`parent`.`id` AS `parent` " +
                     "FROM `region_poly2d` " +
                     "LEFT JOIN `region` " +
-                    "ON (`region_poly2d`.`region_id` = `region`.`id`) " +
+                    "ON (`region_poly2d`.`region_id` = `region`.`id` " +
+                    "AND `region_poly2d`.`world_id` = `region`.`world_id`) " +
                     "LEFT JOIN `region` AS `parent` " +
-                    "ON (`region`.`parent` = `parent`.`id`) " +
+                    "ON (`region`.`parent` = `parent`.`id` " +
+                    "AND `region`.`world_id` = `parent`.`world_id`) " +
                     "WHERE `region`.`world_id` = ? "
             );
 
@@ -372,7 +406,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "`region_poly2d_point`.`x`, " +
                     "`region_poly2d_point`.`z` " +
                     "FROM `region_poly2d_point` " +
-                    "WHERE `region_poly2d_point`.`region_id` = ? "
+                    "WHERE `region_poly2d_point`.`region_id` = ? " +
+                    "AND `region_poly2d_point`.`world_id` = " + this.worldDbId
             );
 
             while (poly2dResultSet.next()) {
@@ -663,7 +698,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 PreparedStatement setParentStatement = this.conn.prepareStatement(
                         "UPDATE `region` SET " +
                         "`parent` = ? " +
-                        "WHERE `id` = ? "
+                        "WHERE `id` = ? AND `world_id` = " + this.worldDbId
                 );
 
                 setParentStatement.setString(1, entry.getValue().getParent().getId().toLowerCase());
@@ -694,7 +729,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     private void updateFlags(ProtectedRegion region) throws SQLException {
         PreparedStatement clearCurrentFlagStatement = this.conn.prepareStatement(
                 "DELETE FROM `region_flag` " +
-                "WHERE `region_id` = ? "
+                "WHERE `region_id` = ? " +
+                "AND `world_id` = " + this.worldDbId
         );
 
         clearCurrentFlagStatement.setString(1, region.getId().toLowerCase());
@@ -709,9 +745,10 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "INSERT INTO `region_flag` ( " +
                     "`id`, " +
                     "`region_id`, " +
+                    "`world_id`, " +
                     "`flag`, " +
                     "`value` " +
-                    ") VALUES (null, ?, ?, ?)"
+                    ") VALUES (null, ?, " + this.worldDbId + ", ?, ?)"
             );
 
             insertFlagStatement.setString(1, region.getId().toLowerCase());
@@ -734,6 +771,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         PreparedStatement deleteUsersForRegion = this.conn.prepareStatement(
                 "DELETE FROM `region_players` " +
                 "WHERE `region_id` = ? " +
+                "AND `world_id` = " + this.worldDbId + " " +
                 "AND `owner` = ?"
         );
 
@@ -743,7 +781,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
         PreparedStatement insertUsersForRegion = this.conn.prepareStatement(
                 "INSERT INTO `region_players` " +
-                "(`region_id`, `user_id`, `owner`) VALUES (?, ?, ?)"
+                "(`region_id`, `world_id`, `user_id`, `owner`) " +
+                "VALUES (?, " + this.worldDbId + ",  ?, ?)"
         );
 
         Map<String,Integer> players = getUserIds(domain.getPlayers().toArray(new String[0]));
@@ -759,6 +798,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         PreparedStatement deleteGroupsForRegion = this.conn.prepareStatement(
                 "DELETE FROM `region_groups` " +
                 "WHERE `region_id` = ? " +
+                "AND `world_id` = " + this.worldDbId + " " +
                 "AND `owner` = ?"
         );
 
@@ -768,7 +808,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
         PreparedStatement insertGroupsForRegion = this.conn.prepareStatement(
                 "INSERT INTO `region_groups` " +
-                "(`region_id`, `group_id`, `owner`) VALUES (?, ?, ?)"
+                "(`region_id`, `world_id`, `group_id`, `owner`) " +
+                "VALUES (?, " + this.worldDbId + ",  ?, ?)"
         );
 
         Map<String,Integer> groups = getGroupIds(domain.getGroups().toArray(new String[0]));
@@ -795,12 +836,13 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 "`type`, " +
                 "`priority`, " +
                 "`parent` " +
-                ") VALUES (?, " + this.worldDbId  + ", ?, ?, null)"
+                ") VALUES (?, ?, ?, ?, null)"
         );
 
         insertRegionStatement.setString(1, region.getId().toLowerCase());
-        insertRegionStatement.setString(2, type);
-        insertRegionStatement.setInt(3, region.getPriority());
+        insertRegionStatement.setInt(2, this.worldDbId);
+        insertRegionStatement.setString(3, type);
+        insertRegionStatement.setInt(4, region.getPriority());
 
         insertRegionStatement.execute();
 
@@ -816,13 +858,14 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         PreparedStatement insertCuboidRegionStatement = this.conn.prepareStatement(
                 "INSERT INTO `region_cuboid` (" +
                 "`region_id`, " +
+                "`world_id`, " +
                 "`min_z`, " +
                 "`min_y`, " +
                 "`min_x`, " +
                 "`max_z`, " +
                 "`max_y`, " +
                 "`max_x` " +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?)"
+                ") VALUES (?, " + this.worldDbId + ", ?, ?, ?, ?, ?, ?)"
         );
 
         BlockVector min = region.getMinimumPoint();
@@ -845,9 +888,10 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         PreparedStatement insertPoly2dRegionStatement = this.conn.prepareStatement(
                 "INSERT INTO `region_poly2d` (" +
                 "`region_id`, " +
+                "`world_id`, " +
                 "`max_y`, " +
                 "`min_y` " +
-                ") VALUES (?, ?, ?)"
+                ") VALUES (?, " + this.worldDbId + ", ?, ?)"
         );
 
         insertPoly2dRegionStatement.setString(1, region.getId().toLowerCase());
@@ -862,7 +906,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     private void updatePoly2dPoints(ProtectedPolygonalRegion region) throws SQLException {
         PreparedStatement clearPoly2dPointsForRegionStatement = this.conn.prepareStatement(
                 "DELETE FROM `region_poly2d_point` " +
-                "WHERE `region_id` = ? "
+                "WHERE `region_id` = ? " +
+                "AND `world_id` = " + this.worldDbId
         );
 
         clearPoly2dPointsForRegionStatement.setString(1, region.getId().toLowerCase());
@@ -873,9 +918,10 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 "INSERT INTO `region_poly2d_point` (" +
                 "`id`, " +
                 "`region_id`, " +
+                "`world_id`, " +
                 "`z`, " +
                 "`x` " +
-                ") VALUES (null, ?, ?, ?)"
+                ") VALUES (null, ?, " + this.worldDbId + ", ?, ?)"
         );
 
         for (BlockVector2D point : region.getPoints()) {
@@ -894,7 +940,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     private void updateRegion(ProtectedRegion region, String type) throws SQLException  {
         PreparedStatement updateRegionStatement = this.conn.prepareStatement(
                 "UPDATE `region` SET " +
-                "`priority` = ? WHERE `id` = ? "
+                "`priority` = ? WHERE `id` = ? AND `world_id` = " + this.worldDbId
         );
 
         updateRegionStatement.setInt(1, region.getPriority());
@@ -919,7 +965,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 "`max_z` = ?, " +
                 "`max_y` = ?, " +
                 "`max_x` = ? " +
-                "WHERE `region_id` = ? "
+                "WHERE `region_id` = ? " +
+                "AND `world_id` = " + this.worldDbId
         );
 
         BlockVector min = region.getMinimumPoint();
@@ -943,7 +990,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 "UPDATE `region_poly2d` SET " +
                 "`max_y` = ?, " +
                 "`min_y` = ? " +
-                "WHERE `region_id` = ? "
+                "WHERE `region_id` = ? " +
+                "AND `world_id` = " + this.worldDbId
         );
 
         updatePoly2dRegionStatement.setInt(1, region.getMaximumPoint().getBlockY());
