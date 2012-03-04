@@ -118,6 +118,10 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     		try {
     			conn.prepareStatement("SELECT 1;").execute();
     		} catch (SQLException ex) {
+                // Test if the dummy query failed because the connection is dead,
+                // and if it is mark the connection as closed (the MySQL Driver
+                // does not ensure that the connection is marked as closed unless 
+                // the close() method has been called.
     			if ("08S01".equals(ex.getSQLState())) {
     				conn.close();
     			}
