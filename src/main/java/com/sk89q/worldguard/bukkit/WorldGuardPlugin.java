@@ -115,7 +115,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         reg.register(ProtectionCommands.class);
         
         getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
             public void run() {
                 if (!getGlobalStateManager().hasCommandBookGodMode()) {
                     reg.register(GeneralCommands.class);
