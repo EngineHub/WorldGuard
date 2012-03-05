@@ -165,7 +165,7 @@ CREATE TABLE `region_poly2d_point` (
 DROP TABLE IF EXISTS `region_users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `region_users` (
+CREATE TABLE `region_players` (
   `region_id` varchar(128) COLLATE utf8_bin NOT NULL,
   `world_id` int(10) unsigned NOT NULL,
   `user_id` int(10) unsigned NOT NULL,

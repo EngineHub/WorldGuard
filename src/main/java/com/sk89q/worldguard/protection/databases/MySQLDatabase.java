@@ -194,7 +194,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "`region_players`.`user_id` = " +
                     "`user`.`id`) " +
                     "WHERE `region_players`.`region_id` = ? " +
-                    "AND `region_users`.`world_id` = " + this.worldDbId
+                    "AND `region_players`.`world_id` = " + this.worldDbId
             );
 
             usersStatement.setString(1, region.getId().toLowerCase());
@@ -685,7 +685,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
                 PreparedStatement setParentStatement = this.conn.prepareStatement(
                         "UPDATE `region` SET " +
-                        "`parent_region_id` = ? " +
+                        "`parent_region_id` = ?, " +
                         "`parent_world_id` = " + this.worldDbId + " " +
                         "WHERE `id` = ? AND `world_id` = " + this.worldDbId
                 );
@@ -825,7 +825,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 "`type`, " +
                 "`priority`, " +
                 "`parent_region_id`, " +
-                "`parent_region_id` " +
+                "`parent_world_id` " +
                 ") VALUES (?, " + this.worldDbId  + ", ?, ?, null, null)"
         );
 
