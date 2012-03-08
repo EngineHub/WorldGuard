@@ -29,6 +29,7 @@ public final class DefaultFlag {
 
     public static final StateFlag PASSTHROUGH = new StateFlag("passthrough", false, RegionGroup.ALL);
     public static final StateFlag BUILD = new StateFlag("build", true, RegionGroup.NON_MEMBERS);
+    public static final RegionGroupFlag CONSTRUCT = new RegionGroupFlag("construct", RegionGroup.MEMBERS);
     public static final StateFlag PVP = new StateFlag("pvp", true, RegionGroup.ALL);
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", true, RegionGroup.ALL);
     public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true, RegionGroup.ALL);
@@ -81,7 +82,7 @@ public final class DefaultFlag {
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
-        PASSTHROUGH, BUILD, PVP, CHEST_ACCESS, PISTONS,
+        PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
         CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
