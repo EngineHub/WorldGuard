@@ -172,7 +172,7 @@ public class WorldConfiguration {
         config = new YAMLProcessor(configFile, true, YAMLFormat.EXTENDED);
         loadConfiguration();
 
-        plugin.getLogger().info("Loaded configuration for world '" + worldName + '"');
+        plugin.getLogger().info("Loaded configuration for world '" + worldName + "'");
     }
 
     private boolean getBoolean(String node, boolean def) {
