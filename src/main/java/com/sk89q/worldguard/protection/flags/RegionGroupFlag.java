@@ -53,6 +53,8 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
             return RegionGroup.NON_MEMBERS;
         } else if (input.equalsIgnoreCase("everyone") || input.equalsIgnoreCase("anyone") || input.equalsIgnoreCase("all")) {
             return RegionGroup.ALL;
+        } else if (input.equalsIgnoreCase("none") || input.equalsIgnoreCase("noone") || input.equalsIgnoreCase("deny")) {
+            return RegionGroup.NONE;
         } else {
             return null;
         }
