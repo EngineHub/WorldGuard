@@ -26,5 +26,6 @@ public enum RegionGroup {
     OWNERS,
     NON_MEMBERS,
     NON_OWNERS,
-    ALL
+    ALL,
+    NONE
 }
