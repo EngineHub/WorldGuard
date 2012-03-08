@@ -71,13 +71,20 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     public boolean canBuild(LocalPlayer player) {
         return internalGetState(DefaultFlag.BUILD, player, null);
     }
-    
+
+    public boolean canConstruct(LocalPlayer player) {
+        final RegionGroup flag = getFlag(DefaultFlag.CONSTRUCT, player);
+        return RegionGroupFlag.isMember(this, flag, player);
+    }
+
     /**
      * Checks if a player can use buttons and such in an area.
      * 
      * @param player The player to check
      * @return able to use items
+     * @deprecated This method seems to be the opposite of its name
      */
+    @Deprecated
     public boolean canUse(LocalPlayer player) {
         return !allows(DefaultFlag.USE, player)
                 && !canBuild(player);

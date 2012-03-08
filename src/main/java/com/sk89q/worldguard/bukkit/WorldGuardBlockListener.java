@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -146,7 +147,8 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())) {
+        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
+         || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
@@ -486,7 +488,9 @@ public class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().canBuild(player, blockPlaced.getLocation())) {
+            final Location location = blockPlaced.getLocation();
+            if (!plugin.getGlobalRegionManager().canBuild(player, location)
+             || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
