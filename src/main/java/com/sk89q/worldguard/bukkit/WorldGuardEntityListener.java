@@ -75,7 +75,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
  * Listener for entity related events.
- * 
+ *
  * @author sk89q
  */
 public class WorldGuardEntityListener implements Listener {
@@ -84,7 +84,7 @@ public class WorldGuardEntityListener implements Listener {
 
     /**
      * Construct the object;
-     * 
+     *
      * @param plugin The plugin instance
      */
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
@@ -98,7 +98,7 @@ public class WorldGuardEntityListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
         Entity entity = event.getEntity();
         Block block = event.getBlock();
@@ -184,7 +184,7 @@ public class WorldGuardEntityListener implements Listener {
 
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
-        
+
         if (attacker instanceof Player) {
             Player player = (Player) attacker;
 
@@ -192,7 +192,7 @@ public class WorldGuardEntityListener implements Listener {
             WorldConfiguration wcfg = cfg.get(player.getWorld());
 
             ItemStack held = player.getInventory().getItemInHand();
-            
+
             if (held != null) {
                 if (wcfg.getBlacklist() != null) {
                     if (!wcfg.getBlacklist().check(
@@ -239,7 +239,7 @@ public class WorldGuardEntityListener implements Listener {
                     Vector pt2 = toVector(attacker.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
-                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer) 
+                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer)
                             || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
@@ -336,7 +336,7 @@ public class WorldGuardEntityListener implements Listener {
 
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
-            
+
             if (isInvincible(player)) {
                 event.setCancelled(true);
                 return;
@@ -348,7 +348,7 @@ public class WorldGuardEntityListener implements Listener {
                     Vector pt2 = toVector(attacker.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
-                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer) 
+                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer)
                             || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
                         ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
                         event.setCancelled(true);
@@ -375,11 +375,8 @@ public class WorldGuardEntityListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
 
         if (event instanceof EntityDamageByEntityEvent) {
             this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
@@ -414,7 +411,7 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             ItemStack helmet = player.getInventory().getHelmet();
 
             if (type == DamageCause.DROWNING && wcfg.pumpkinScuba
@@ -456,12 +453,8 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityCombust(EntityCombustEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         Entity entity = event.getEntity();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
@@ -480,12 +473,8 @@ public class WorldGuardEntityListener implements Listener {
     /*
      * Called on entity explode.
      */
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         Location l = event.getLocation();
         World world = l.getWorld();
@@ -503,7 +492,7 @@ public class WorldGuardEntityListener implements Listener {
                 event.blockList().clear();
                 return;
             }
-            
+
             if (wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
                 return;
@@ -544,7 +533,7 @@ public class WorldGuardEntityListener implements Listener {
                 event.blockList().clear();
                 return;
             }
-            
+
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
@@ -565,7 +554,7 @@ public class WorldGuardEntityListener implements Listener {
                 event.blockList().clear();
                 return;
             }
-            
+
             if (wcfg.blockFireballExplosions) {
                 event.setCancelled(true);
                 return;
@@ -597,12 +586,8 @@ public class WorldGuardEntityListener implements Listener {
     /*
      * Called on explosion prime
      */
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onExplosionPrime(ExplosionPrimeEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         Entity ent = event.getEntity();
 
@@ -614,12 +599,8 @@ public class WorldGuardEntityListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
 
         if (cfg.activityHaltToggle) {
@@ -634,9 +615,9 @@ public class WorldGuardEntityListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        
+
         Location eventLoc = event.getLocation();
-        
+
         if (wcfg.useRegions) {
             Vector pt = toVector(eventLoc);
             RegionManager mgr = plugin.getGlobalRegionManager().get(eventLoc.getWorld());
@@ -657,12 +638,8 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPigZap(PigZapEvent event) {
-        if (event.isCancelled()) {
-           return;
-        }
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
@@ -671,12 +648,8 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreeperPower(CreeperPowerEvent event) {
-        if (event.isCancelled()) {
-           return;
-        }
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
@@ -685,21 +658,17 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPaintingBreak(PaintingBreakEvent breakEvent) {
-        if (breakEvent.isCancelled()) {
-            return;
-        }
-
         if (!(breakEvent instanceof PaintingBreakByEntityEvent)) {
             return;
         }
-        
+
         PaintingBreakByEntityEvent event = (PaintingBreakByEntityEvent) breakEvent;
         if (!(event.getRemover() instanceof Player)) {
             return;
         }
-        
+
         Painting painting= event.getPainting();
         Player player = (Player) event.getRemover();
         World world = painting.getWorld();
@@ -725,12 +694,8 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPaintingPlace(PaintingPlaceEvent event) {
-        if (event.isCancelled()) {
-            return;
-         }
-
         Block placedOn = event.getBlock();
         Player player = event.getPlayer();
         World world = placedOn.getWorld();
@@ -756,11 +721,8 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-        if (event.isCancelled()) {
-            return;
-         }
 
         Entity ent = event.getEntity();
         World world = ent.getWorld();
@@ -779,12 +741,8 @@ public class WorldGuardEntityListener implements Listener {
      *
      * @param event Relevant event details
      */
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEndermanPickup(EntityChangeBlockEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         Entity ent = event.getEntity();
         Block block = event.getBlock();
         Location location = block.getLocation();
@@ -826,7 +784,7 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
@@ -840,7 +798,7 @@ public class WorldGuardEntityListener implements Listener {
      * Check if a player is invincible, via either god mode or region flag. If
      * the region denies invincibility, the player must have an extra permission
      * to override it. (worldguard.god.override-regions)
-     * 
+     *
      * @param player The player to check
      * @return Whether {@code player} is invincible
      */
