@@ -24,6 +24,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -59,7 +60,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
  * The listener for block events.
- * 
+ *
  * @author sk89q
  */
 public class WorldGuardBlockListener implements Listener {
@@ -68,7 +69,7 @@ public class WorldGuardBlockListener implements Listener {
 
     /**
      * Construct the object.
-     * 
+     *
      * @param plugin The plugin instance
      */
     public WorldGuardBlockListener(WorldGuardPlugin plugin) {
@@ -84,7 +85,7 @@ public class WorldGuardBlockListener implements Listener {
 
     /**
      * Get the world configuration given a world.
-     * 
+     *
      * @param world The world to get the configuration for.
      * @return The configuration for {@code world}
      */
@@ -94,7 +95,7 @@ public class WorldGuardBlockListener implements Listener {
 
     /**
      * Get the world configuration given a player.
-     * 
+     *
      * @param player The player to get the wold from
      * @return The {@link WorldConfiguration} for the player's world
      */
@@ -124,7 +125,7 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
     }
-    
+
     /*
      * Called when a block is broken.
      */
@@ -171,7 +172,7 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
         }
-        
+
         if (wcfg.isChestProtected(event.getBlock(), player)) {
             player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
             event.setCancelled(true);
@@ -238,7 +239,7 @@ public class WorldGuardBlockListener implements Listener {
         // If so and the target block is protected, cancel the event
         if (wcfg.preventWaterDamage.size() > 0) {
             int targetId = blockTo.getTypeId();
-            
+
             if ((isAir || isWater) &&
                     wcfg.preventWaterDamage.contains(targetId)) {
                 event.setCancelled(true);
@@ -248,7 +249,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.allowedLavaSpreadOver.size() > 0 && isLava) {
             int targetId = blockTo.getRelative(0, -1, 0).getTypeId();
-            
+
             if (!wcfg.allowedLavaSpreadOver.contains(targetId)) {
                 event.setCancelled(true);
                 return;
@@ -296,7 +297,6 @@ public class WorldGuardBlockListener implements Listener {
             event.setCancelled(true);
             return;
         }
-
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
         if (wcfg.preventLightningFire && cause == IgniteCause.LIGHTNING) {
@@ -402,7 +402,9 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.fireSpreadDisableToggle) {
+            Block block = event.getBlock();
             event.setCancelled(true);
+            checkAndDestroyAround(block.getWorld(), block.getX(), block.getY(), block.getZ(), BlockID.FIRE);
             return;
         }
 
@@ -411,6 +413,7 @@ public class WorldGuardBlockListener implements Listener {
 
             if (wcfg.disableFireSpreadBlocks.contains(block.getTypeId())) {
                 event.setCancelled(true);
+                checkAndDestroyAround(block.getWorld(), block.getX(), block.getY(), block.getZ(), BlockID.FIRE);
                 return;
             }
         }
@@ -419,18 +422,37 @@ public class WorldGuardBlockListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        
+
         if (wcfg.useRegions) {
             Block block = event.getBlock();
+            int x = block.getX();
+            int y = block.getY();
+            int z = block.getZ();
             Vector pt = toVector(block);
             RegionManager mgr = plugin.getGlobalRegionManager().get(block.getWorld());
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             if (!set.allows(DefaultFlag.FIRE_SPREAD)) {
+                checkAndDestroyAround(block.getWorld(), x, y, z, BlockID.FIRE);
                 event.setCancelled(true);
                 return;
             }
 
+        }
+    }
+
+    private void checkAndDestroyAround(World world, int x, int y, int z, int required) {
+        checkAndDestroy(world, x, y, z + 1, required);
+        checkAndDestroy(world, x, y, z - 1, required);
+        checkAndDestroy(world, x, y + 1, z, required);
+        checkAndDestroy(world, x, y - 1, z, required);
+        checkAndDestroy(world, x + 1, y, z, required);
+        checkAndDestroy(world, x - 1, y, z, required);
+    }
+
+    private void checkAndDestroy(World world, int x, int y, int z, int required) {
+        if (world.getBlockTypeIdAt(x, y, z) == required) {
+            world.getBlockAt(x, y, z).setTypeId(BlockID.AIR);
         }
     }
 
@@ -505,7 +527,7 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
         }
-        
+
         if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getTypeId())) {
             if (wcfg.isAdjacentChestProtected(event.getBlock(), player)) {
                 player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
@@ -571,7 +593,7 @@ public class WorldGuardBlockListener implements Listener {
 
         Player player = event.getPlayer();
         WorldConfiguration wcfg = getWorldConfig(player);
-        
+
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 if (wcfg.isChestProtectedPlacement(event.getBlock(), player)) {
@@ -580,7 +602,7 @@ public class WorldGuardBlockListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                
+
                 if (event.getBlock().getTypeId() != BlockID.SIGN_POST) {
                     player.sendMessage(ChatColor.RED
                             + "The [Lock] sign must be a sign post, not a wall sign.");
@@ -598,7 +620,7 @@ public class WorldGuardBlockListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                
+
                 int below = event.getBlock().getRelative(0, -1, 0).getTypeId();
 
                 if (below == BlockID.TNT || below == BlockID.SAND
@@ -610,7 +632,7 @@ public class WorldGuardBlockListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                
+
                 event.setLine(0, "[Lock]");
                 player.sendMessage(ChatColor.YELLOW
                         + "A chest or double chest above is now protected.");
