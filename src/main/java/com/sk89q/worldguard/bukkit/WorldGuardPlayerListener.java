@@ -212,7 +212,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
 	}
 
-    @SuppressWarnings("deprecation")
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -822,12 +821,8 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }*/
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
 
@@ -843,12 +838,8 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
 
@@ -865,7 +856,7 @@ public class WorldGuardPlayerListener implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
@@ -890,7 +881,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
@@ -955,12 +946,8 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         Player player = event.getPlayer();
         Location location = player.getLocation();
 
@@ -981,7 +968,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
