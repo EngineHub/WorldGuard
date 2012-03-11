@@ -36,6 +36,7 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
@@ -1037,5 +1038,32 @@ public class RegionCommands {
 
         sender.sendMessage(ChatColor.YELLOW + "Regions have been migrated successfully.\n" +
                 "If you wish to use the destination format as your new backend, please update your config and reload WorldGuard.");
+    }
+
+    @Command(aliases = {"teleport", "tp"}, usage = "<id>",
+            desc = "Teleports you to the location associated with the region.", min = 1, max = 1)
+    @CommandPermissions({"worldguard.region.teleport"})
+    public void teleport(CommandContext args, CommandSender sender) throws CommandException {
+        final Player player = plugin.checkPlayer(sender);
+
+        final RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
+        final String id = args.getString(0);
+
+        final ProtectedRegion region = mgr.getRegion(id);
+        if (region == null) {
+            if (!ProtectedRegion.isValidId(id)) {
+                throw new CommandException("Invalid region ID specified!");
+            }
+            throw new CommandException("A region with ID '" + id + "' doesn't exist.");
+        }
+
+        final Vector teleportLocation = region.getFlag(DefaultFlag.TELE_LOC);
+        if (teleportLocation == null) {
+            throw new CommandException("The region has no teleport point associated.");
+        }
+
+        player.teleport(BukkitUtil.toLocation(player.getWorld(), teleportLocation));
+        
+        sender.sendMessage("Teleported you to the region '" + id + "'.");
     }
 }
