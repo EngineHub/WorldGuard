@@ -357,8 +357,12 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        }
 
+            if (cause == IgniteCause.LIGHTNING && !set.allows(DefaultFlag.LIGHTNING)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     /*
