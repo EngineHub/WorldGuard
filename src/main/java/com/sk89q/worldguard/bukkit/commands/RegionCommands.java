@@ -41,6 +41,7 @@ import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -383,28 +384,49 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"info", "i"}, usage = "[world] <id>",
-            desc = "Get information about a region", min = 1, max = 2)
+    @Command(aliases = {"info", "i"}, usage = "[world] [id]",
+            desc = "Get information about a region", min = 0, max = 2)
     public void info(CommandContext args, CommandSender sender) throws CommandException {
 
-        Player player = null;
-        LocalPlayer localPlayer = null;
-        World world;
-        String id;
-        
+        final Player player;
+        final LocalPlayer localPlayer;
+        final World world;
+        final String id;
+
         // Get different values based on provided arguments
-        if (args.argsLength() == 1) {
+        switch (args.argsLength()) {
+        case 0:
+            player = plugin.checkPlayer(sender);
+            localPlayer = plugin.wrapPlayer(player);
+            world = player.getWorld();
+
+            Vector pt = BukkitUtil.toVector(player.getLocation());
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            if (set.size() == 0) {
+                throw new CommandException("No region ID specified and no region found at current location!");
+            }
+
+            id = set.iterator().next().getId();
+            break;
+
+        case 1:
             player = plugin.checkPlayer(sender);
             localPlayer = plugin.wrapPlayer(player);
             world = player.getWorld();
             id = args.getString(0).toLowerCase();
-        } else {
+            break;
+
+        default:
+            player = null;
+            localPlayer = null;
             world = plugin.matchWorld(sender, args.getString(0));
             id = args.getString(1).toLowerCase();
+            break;
         }
-        
+
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-        
+
         if (!mgr.hasRegion(id)) {
             if (!ProtectedRegion.isValidId(id)) {
                 throw new CommandException("Invalid region ID specified!");
