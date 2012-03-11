@@ -41,7 +41,6 @@ import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -388,21 +387,32 @@ public class RegionCommands {
             desc = "Get information about a region", min = 0, max = 2)
     public void info(CommandContext args, CommandSender sender) throws CommandException {
 
-        final Player player;
         final LocalPlayer localPlayer;
         final World world;
+        if (sender instanceof Player) {
+            final Player player = (Player) sender;
+            localPlayer = plugin.wrapPlayer(player);
+            world = player.getWorld();
+        } else if (args.argsLength() < 2) {
+            throw new CommandException("A player is expected.");
+        } else {
+            localPlayer = null;
+            world = plugin.matchWorld(sender, args.getString(0));
+        }
+
+        final RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
         final String id;
 
         // Get different values based on provided arguments
         switch (args.argsLength()) {
         case 0:
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
+            if (localPlayer == null) {
+                throw new CommandException("A player is expected.");
+            }
 
-            Vector pt = BukkitUtil.toVector(player.getLocation());
-            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            final Vector pt = localPlayer.getPosition();
+            final ApplicableRegionSet set = mgr.getApplicableRegions(pt);
             if (set.size() == 0) {
                 throw new CommandException("No region ID specified and no region found at current location!");
             }
@@ -411,82 +421,80 @@ public class RegionCommands {
             break;
 
         case 1:
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
             id = args.getString(0).toLowerCase();
             break;
 
         default:
-            player = null;
-            localPlayer = null;
-            world = plugin.matchWorld(sender, args.getString(0));
             id = args.getString(1).toLowerCase();
-            break;
         }
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        final ProtectedRegion region = mgr.getRegion(id);
 
-        if (!mgr.hasRegion(id)) {
+        if (region == null) {
             if (!ProtectedRegion.isValidId(id)) {
                 throw new CommandException("Invalid region ID specified!");
             }
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");
         }
 
-        ProtectedRegion region = mgr.getRegion(id);
+        displayRegion(sender, localPlayer, region);
+    }
 
-        if (player != null) {
-            if (region.isOwner(localPlayer)) {
-                plugin.checkPermission(sender, "worldguard.region.info.own");
-            } else if (region.isMember(localPlayer)) {
-                plugin.checkPermission(sender, "worldguard.region.info.member");
-            } else {
-                plugin.checkPermission(sender, "worldguard.region.info");
-            }
+    public void displayRegion(CommandSender sender, final LocalPlayer localPlayer, ProtectedRegion region) throws CommandPermissionsException {
+        if (localPlayer == null) {
+            plugin.checkPermission(sender, "worldguard.region.info");
+        } else if (region.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.info.own");
+        } else if (region.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.info.member");
         } else {
             plugin.checkPermission(sender, "worldguard.region.info");
         }
 
-        DefaultDomain owners = region.getOwners();
-        DefaultDomain members = region.getMembers();
+        final String id = region.getId();
 
-        sender.sendMessage(ChatColor.YELLOW + "Region: " + id
-                + ChatColor.GRAY + " (type: " + region.getTypeName() + ")");
-        if (!ProtectedRegion.isValidId(id)) {
-            sender.sendMessage(ChatColor.RED + "This region has an invalid ID. "
-                    + "Please ask the owner to delete it and recreate it.");
-        }
-        sender.sendMessage(ChatColor.BLUE + "Priority: " + region.getPriority());
+        sender.sendMessage(ChatColor.YELLOW + "Region: " + id + ChatColor.GRAY + ", type: " + region.getTypeName() + ", " + ChatColor.BLUE + "Priority: " + region.getPriority());
 
-        StringBuilder s = new StringBuilder();
-
+        boolean hasFlags = false;
+        final StringBuilder s = new StringBuilder(ChatColor.BLUE + "Flags: ");
         for (Flag<?> flag : DefaultFlag.getFlags()) {
             Object val = region.getFlag(flag);
-            
+
             if (val == null) {
                 continue;
             }
-            
+
             if (s.length() > 0) {
                 s.append(", ");
             }
 
             s.append(flag.getName() + ": " + String.valueOf(val));
+            hasFlags = true;
+        }
+        if (hasFlags) {
+            sender.sendMessage(s.toString());
         }
 
-        sender.sendMessage(ChatColor.BLUE + "Flags: " + s.toString());
-        sender.sendMessage(ChatColor.BLUE + "Parent: "
-                + (region.getParent() == null ? "(none)" : region.getParent().getId()));
-        sender.sendMessage(ChatColor.LIGHT_PURPLE + "Owners: "
-                + owners.toUserFriendlyString());
-        sender.sendMessage(ChatColor.LIGHT_PURPLE + "Members: "
-                + members.toUserFriendlyString());
-        BlockVector min = region.getMinimumPoint();
-        BlockVector max = region.getMaximumPoint();
-        String c = "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")";
-        c += " (" +max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")";
-        sender.sendMessage(ChatColor.LIGHT_PURPLE + "Bounds: " + c);
+        if (region.getParent() != null) {
+            sender.sendMessage(ChatColor.BLUE + "Parent: " + region.getParent().getId());
+        }
+
+        final DefaultDomain owners = region.getOwners();
+        if (owners.size() != 0) {
+            sender.sendMessage(ChatColor.LIGHT_PURPLE + "Owners: " + owners.toUserFriendlyString());
+        }
+
+        final DefaultDomain members = region.getMembers();
+        if (members.size() != 0) {
+            sender.sendMessage(ChatColor.LIGHT_PURPLE + "Members: " + members.toUserFriendlyString());
+        }
+
+        final BlockVector min = region.getMinimumPoint();
+        final BlockVector max = region.getMaximumPoint();
+        sender.sendMessage(ChatColor.LIGHT_PURPLE + "Bounds:"
+                + " (" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")"
+                + " (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")"
+        );
     }
     
     @Command(aliases = {"list"}, usage = "[.player] [page] [world]",
