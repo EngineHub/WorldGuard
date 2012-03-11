@@ -337,24 +337,37 @@ public class RegionCommands {
         }
     }
     
-    @Command(aliases = {"select", "sel", "s"}, usage = "<id>",
-            desc = "Load a region as a WorldEdit selection", min = 1, max = 1)
+    @Command(aliases = {"select", "sel", "s"}, usage = "[id]",
+            desc = "Load a region as a WorldEdit selection", min = 0, max = 1)
     public void select(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
-        String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+        final String id;
+        if (args.argsLength() == 0) {
+            final Vector pt = localPlayer.getPosition();
+            final ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            if (set.size() == 0) {
+                throw new CommandException("No region ID specified and no region found at current location!");
+            }
+
+            id = set.iterator().next().getId();
+        }
+        else {
+            id = args.getString(0);
+        }
+
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
-        
+
         if (region.isOwner(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.select.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
