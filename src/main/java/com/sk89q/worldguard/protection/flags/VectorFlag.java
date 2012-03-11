@@ -43,14 +43,29 @@ public class VectorFlag extends Flag<Vector> {
     }
 
     @Override
-    public Vector parseInput(WorldGuardPlugin plugin, CommandSender sender,
-            String input) throws InvalidFlagFormat {
+    public Vector parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
         input = input.trim();
 
-        try {
-            return BukkitUtil.toVector(plugin.checkPlayer(sender).getLocation());
-        } catch (CommandException e) {
-            throw new InvalidFlagFormat(e.getMessage());
+        if ("here".equalsIgnoreCase(input)) {
+            try {
+                return BukkitUtil.toVector(plugin.checkPlayer(sender).getLocation());
+            } catch (CommandException e) {
+                throw new InvalidFlagFormat(e.getMessage());
+            }
+        } else {
+            String[] split = input.split(",");
+            if (split.length == 3) {
+                try {
+                    return new Vector(
+                            Double.parseDouble(split[0]),
+                            Double.parseDouble(split[1]),
+                            Double.parseDouble(split[2])
+                    );
+                } catch (NumberFormatException e) {
+                }
+            }
+
+            throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
         }
     }
 
