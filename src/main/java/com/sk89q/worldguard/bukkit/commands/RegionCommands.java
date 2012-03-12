@@ -867,11 +867,11 @@ public class RegionCommands {
             } 
             
             if (parent.isOwner(localPlayer)) {
-                plugin.checkPermission(sender, "worldguard.region.setparent.own." + id.toLowerCase());
+                plugin.checkPermission(sender, "worldguard.region.setparent.own." + parentId.toLowerCase());
             } else if (parent.isMember(localPlayer)) {
-                plugin.checkPermission(sender, "worldguard.region.setparent.member." + id.toLowerCase());
+                plugin.checkPermission(sender, "worldguard.region.setparent.member." + parentId.toLowerCase());
             } else {
-                plugin.checkPermission(sender, "worldguard.region.setparent." + id.toLowerCase());
+                plugin.checkPermission(sender, "worldguard.region.setparent." + parentId.toLowerCase());
             }
             
             try {
