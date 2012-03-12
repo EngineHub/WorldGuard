@@ -89,11 +89,6 @@ public class PRTreeRegionManager extends RegionManager {
     }
 
     @Override
-    public ProtectedRegion getRegion(String id) {
-        return regions.get(id.toLowerCase());
-    }
-
-    @Override
     public void removeRegion(String id) {
         ProtectedRegion region = regions.get(id.toLowerCase());
 

@@ -61,7 +61,9 @@ public class RegionMemberCommands {
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
-        
+
+        id = region.getId();
+
         if (region.isOwner(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.addmember.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
@@ -99,6 +101,8 @@ public class RegionMemberCommands {
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
+
+        id = region.getId();
 
         Boolean flag = region.getFlag(DefaultFlag.BUYABLE);
         DefaultDomain owners = region.getOwners();
@@ -150,7 +154,9 @@ public class RegionMemberCommands {
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
-        
+
+        id = region.getId();
+
         if (region.isOwner(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.removemember.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
@@ -189,7 +195,9 @@ public class RegionMemberCommands {
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
-        
+
+        id = region.getId();
+
         if (region.isOwner(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.removeowner.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {

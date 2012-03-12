@@ -98,11 +98,6 @@ public class FlatRegionManager extends RegionManager {
     }
 
     @Override
-    public ProtectedRegion getRegion(String id) {
-        return regions.get(id.toLowerCase());
-    }
-
-    @Override
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
         TreeSet<ProtectedRegion> appRegions =
                 new TreeSet<ProtectedRegion>();
