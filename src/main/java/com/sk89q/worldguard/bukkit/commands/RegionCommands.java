@@ -835,7 +835,10 @@ public class RegionCommands {
         
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
-        
+        if (region == null) {
+            throw new CommandException("Could not find a target region by that ID.");
+        }
+
         if (args.argsLength() == 1) {
             try {
                 region.setParent(null);
@@ -847,10 +850,6 @@ public class RegionCommands {
         } else {
             String parentId = args.getString(1);
             ProtectedRegion parent = mgr.getRegion(parentId);
-    
-            if (region == null) {
-                throw new CommandException("Could not find a target region by that ID.");
-            }
     
             if (parent == null) {
                 throw new CommandException("Could not find the parent region by that ID.");
