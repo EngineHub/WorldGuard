@@ -102,12 +102,40 @@ public abstract class RegionManager {
     public abstract boolean hasRegion(String id);
 
     /**
+     * Get a region by its ID. Includes symbolic names like #&lt;index&gt;
+     *
+     * @param id id of the region, can be mixed-case
+     * @return region or null if it doesn't exist
+     */
+    public ProtectedRegion getRegion(String id) {
+        if (id.startsWith("#")) {
+            int index;
+            try {
+                index = Integer.parseInt(id.substring(1)) - 1;
+            } catch (NumberFormatException e) {
+                return null;
+            }
+            for (ProtectedRegion region : getRegions().values()) {
+                if (index == 0) {
+                    return region;
+                }
+                --index;
+            }
+            return null;
+        }
+
+        return getRegionExact(id);
+    }
+
+    /**
      * Get a region by its ID.
      *
      * @param id id of the region, can be mixed-case
      * @return region or null if it doesn't exist
      */
-    public abstract ProtectedRegion getRegion(String id);
+    public ProtectedRegion getRegionExact(String id) {
+        return getRegions().get(id.toLowerCase());
+    }
 
     /**
      * Removes a region, including inheriting children.

@@ -149,12 +149,12 @@ public class RegionCommands {
         }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion existing = mgr.getRegion(id);
+        ProtectedRegion existing = mgr.getRegionExact(id);
 
         if (existing == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
-        
+
         if (existing.isOwner(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.redefine.own");
         } else if (existing.isMember(localPlayer)) {
@@ -272,7 +272,7 @@ public class RegionCommands {
             }
         }
 
-        ProtectedRegion existing = mgr.getRegion(id);
+        ProtectedRegion existing = mgr.getRegionExact(id);
 
         // Check for an existing region
         if (existing != null) {
@@ -793,11 +793,12 @@ public class RegionCommands {
         
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
-
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
-        
+
+        id = region.getId();
+
         if (region.isOwner(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.setpriority.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
@@ -838,6 +839,8 @@ public class RegionCommands {
         if (region == null) {
             throw new CommandException("Could not find a target region by that ID.");
         }
+
+        id = region.getId();
 
         if (args.argsLength() == 1) {
             try {
@@ -901,7 +904,7 @@ public class RegionCommands {
         String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        ProtectedRegion region = mgr.getRegionExact(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -1061,7 +1064,7 @@ public class RegionCommands {
         final Player player = plugin.checkPlayer(sender);
 
         final RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
-        final String id = args.getString(0);
+        String id = args.getString(0);
 
         final ProtectedRegion region = mgr.getRegion(id);
         if (region == null) {
@@ -1070,6 +1073,8 @@ public class RegionCommands {
             }
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");
         }
+
+        id = region.getId();
 
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         if (region.isOwner(localPlayer)) {
