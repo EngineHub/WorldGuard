@@ -920,10 +920,10 @@ public class WorldGuardPlayerListener implements Listener {
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
-            Vector spawn = set.getFlag(DefaultFlag.SPAWN_LOC, localPlayer);
+            com.sk89q.worldedit.Location spawn = set.getFlag(DefaultFlag.SPAWN_LOC, localPlayer);
 
             if (spawn != null) {
-                event.setRespawnLocation(BukkitUtil.toLocation(player.getWorld(), spawn));
+                event.setRespawnLocation(com.sk89q.worldedit.bukkit.BukkitUtil.toLocation(spawn));
             }
         }
     }

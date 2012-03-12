@@ -35,6 +35,7 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.Location;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -1071,13 +1072,13 @@ public class RegionCommands {
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");
         }
 
-        final Vector teleportLocation = region.getFlag(DefaultFlag.TELE_LOC);
+        final Location teleportLocation = region.getFlag(DefaultFlag.TELE_LOC);
         if (teleportLocation == null) {
             throw new CommandException("The region has no teleport point associated.");
         }
 
-        player.teleport(BukkitUtil.toLocation(player.getWorld(), teleportLocation));
-        
+        player.teleport(BukkitUtil.toLocation(teleportLocation));
+
         sender.sendMessage("Teleported you to the region '" + id + "'.");
     }
 }

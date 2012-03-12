@@ -74,8 +74,8 @@ public final class DefaultFlag {
     public static final IntegerFlag FEED_AMOUNT = new IntegerFlag("feed-amount", RegionGroup.ALL);
     public static final IntegerFlag MIN_FOOD = new IntegerFlag("feed-min-hunger", RegionGroup.ALL);
     public static final IntegerFlag MAX_FOOD = new IntegerFlag("feed-max-hunger", RegionGroup.ALL);
-    public static final VectorFlag TELE_LOC = new VectorFlag("teleport", RegionGroup.MEMBERS);
-    public static final VectorFlag SPAWN_LOC = new VectorFlag("spawn", RegionGroup.MEMBERS);
+    public static final LocationFlag TELE_LOC = new LocationFlag("teleport", RegionGroup.MEMBERS);
+    public static final LocationFlag SPAWN_LOC = new LocationFlag("spawn", RegionGroup.MEMBERS);
     public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
     public static final DoubleFlag PRICE = new DoubleFlag("price");
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
