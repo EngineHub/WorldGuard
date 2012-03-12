@@ -1055,7 +1055,7 @@ public class RegionCommands {
                 "If you wish to use the destination format as your new backend, please update your config and reload WorldGuard.");
     }
 
-    @Command(aliases = {"teleport", "tp"}, usage = "<id>",
+    @Command(aliases = {"teleport", "tp"}, usage = "<id>", flags = "s",
             desc = "Teleports you to the location associated with the region.", min = 1, max = 1)
     @CommandPermissions({"worldguard.region.teleport"})
     public void teleport(CommandContext args, CommandSender sender) throws CommandException {
@@ -1081,9 +1081,17 @@ public class RegionCommands {
             plugin.checkPermission(sender, "worldguard.region.teleport." + id.toLowerCase());
         }
 
-        final Location teleportLocation = region.getFlag(DefaultFlag.TELE_LOC);
-        if (teleportLocation == null) {
-            throw new CommandException("The region has no teleport point associated.");
+        final Location teleportLocation;
+        if (args.hasFlag('s')) {
+            teleportLocation = region.getFlag(DefaultFlag.SPAWN_LOC);
+            if (teleportLocation == null) {
+                throw new CommandException("The region has no spawn point associated.");
+            }
+        } else {
+            teleportLocation = region.getFlag(DefaultFlag.TELE_LOC);
+            if (teleportLocation == null) {
+                throw new CommandException("The region has no teleport point associated.");
+            }
         }
 
         player.teleport(BukkitUtil.toLocation(teleportLocation));
