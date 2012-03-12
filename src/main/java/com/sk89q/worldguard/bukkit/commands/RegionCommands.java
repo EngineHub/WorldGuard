@@ -1072,6 +1072,15 @@ public class RegionCommands {
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");
         }
 
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        if (region.isOwner(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.teleport.own." + id.toLowerCase());
+        } else if (region.isMember(localPlayer)) {
+            plugin.checkPermission(sender, "worldguard.region.teleport.member." + id.toLowerCase());
+        } else {
+            plugin.checkPermission(sender, "worldguard.region.teleport." + id.toLowerCase());
+        }
+
         final Location teleportLocation = region.getFlag(DefaultFlag.TELE_LOC);
         if (teleportLocation == null) {
             throw new CommandException("The region has no teleport point associated.");
