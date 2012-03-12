@@ -671,7 +671,6 @@ public class RegionCommands {
         if (!hasPerm) throw new CommandPermissionsException();
         
         Flag<?> foundFlag = null;
-        
         // Now time to find the flag!
         for (Flag<?> flag : DefaultFlag.getFlags()) {
             // Try to detect the flag
@@ -746,6 +745,7 @@ public class RegionCommands {
                     + "Region group flag for '" + foundFlag.getName() + "' set.");
         } else {
             if (value != null) {
+		Object val;
                 try {
                     setFlag(region, foundFlag, sender, value);
                 } catch (InvalidFlagFormat e) {
