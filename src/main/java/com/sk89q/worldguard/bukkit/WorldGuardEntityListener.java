@@ -70,6 +70,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
@@ -241,8 +242,7 @@ public class WorldGuardEntityListener implements Listener {
 
                     if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer)
                             || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
-                        ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-                        event.setCancelled(true);
+                        tryCancelPVPEvent((Player) attacker, player, event);
                         return;
                     }
                 }
@@ -278,8 +278,7 @@ public class WorldGuardEntityListener implements Listener {
                         Vector pt2 = toVector(fireball.getShooter().getLocation());
                         if (!set.allows(DefaultFlag.PVP, localPlayer)
                                 || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) fireball.getShooter()))) {
-                            ((Player) fireball.getShooter()).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-                            event.setCancelled(true);
+                            tryCancelPVPEvent((Player) fireball.getShooter(), player, event);
                             return;
                         }
                     } else {
@@ -350,8 +349,7 @@ public class WorldGuardEntityListener implements Listener {
 
                     if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer)
                             || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
-                        ((Player) attacker).sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-                        event.setCancelled(true);
+                        tryCancelPVPEvent((Player) attacker, player, event);
                         return;
                     }
                 }
@@ -820,6 +818,25 @@ public class WorldGuardEntityListener implements Listener {
             }
         } else {
             return god;
+        }
+    }
+
+    /**
+     * Using a DisallowedPVPEvent, notifies other plugins that WorldGuard
+     * wants to cancel a PvP damage event.<br />
+     * If this event is not cancelled, the attacking player is notified that
+     * PvP is disabled and WorldGuard cancels the damage event.
+     *
+     * @param attackingPlayer The attacker
+     * @param defendingPlayer The defender
+     * @param event The event that caused WorldGuard to act
+     */
+    public void tryCancelPVPEvent(final Player attackingPlayer, final Player defendingPlayer, EntityDamageByEntityEvent event) {
+        final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
+        plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
+        if (!disallowedPVPEvent.isCancelled()) {
+            attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
+            event.setCancelled(true);
         }
     }
 }
