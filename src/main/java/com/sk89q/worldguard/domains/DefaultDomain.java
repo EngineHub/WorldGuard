@@ -70,20 +70,26 @@ public class DefaultDomain implements Domain {
         return players;
     }
 
+    @Override
     public boolean contains(LocalPlayer player) {
-        if (players.contains(player.getName().toLowerCase())) {
+        if (contains(player.getName())) {
             return true;
         }
-        
+
         for (String group : groups) {
             if (player.hasGroup(group)) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
+    @Override
+    public boolean contains(String playerName) {
+        return players.contains(playerName.toLowerCase());
+    }
+
     public int size() {
         return groups.size() + players.size();
     }
