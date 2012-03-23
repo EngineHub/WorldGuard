@@ -220,6 +220,7 @@ public class FlagStateManager implements Runnable {
         public Boolean lastExitAllowed = null;
         public Boolean notifiedForLeave = false;
         public Boolean notifiedForEnter = false;
+        public Boolean lastAllowFlight = null;
         public World lastWorld;
         public int lastBlockX;
         public int lastBlockY;
