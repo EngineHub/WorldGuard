@@ -20,8 +20,10 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.ChatColor;
@@ -525,109 +527,129 @@ public class RegionCommands {
                 + " (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")"
         );
     }
-    
+
+    public class RegionEntry implements Comparable<RegionEntry>{
+        private final String id;
+        private final int index;
+        private boolean isOwner;
+        private boolean isMember;
+
+        public RegionEntry(String id, int index) {
+            this.id = id;
+            this.index = index;
+        }
+
+        @Override
+        public int compareTo(RegionEntry o) {
+            if (isOwner != o.isOwner) {
+                return isOwner ? 1 : -1;
+            }
+            if (isMember != o.isMember) {
+                return isMember ? 1 : -1;
+            }
+            return id.compareTo(o.id);
+        }
+
+        @Override
+        public String toString() {
+            if (isOwner) {
+                return (index + 1) + ". +" + id;
+            } else if (isMember) {
+                return (index + 1) + ". -" + id;
+            } else {
+                return (index + 1) + ". " + id;
+            }
+        }
+    }
+
     @Command(aliases = {"list"}, usage = "[.player] [page] [world]",
             desc = "Get a list of regions", max = 3)
-//    @CommandPermissions({"worldguard.region.list"})
+    //@CommandPermissions({"worldguard.region.list"})
     public void list(CommandContext args, CommandSender sender) throws CommandException {
 
         World world;
         int page = 0;
-        int argl = 0;
+        int argOffset = 0;
         String name = "";
         boolean own = false;
         LocalPlayer localPlayer = null;
-        
+
+        final String senderName = sender.getName().toLowerCase();
         if (args.argsLength() > 0 && args.getString(0).startsWith(".")) {
             name = args.getString(0).substring(1).toLowerCase();
-            argl = 1;
-            
-            if (name.equals("me") || name.isEmpty() ||
-                    name.equals(plugin.checkPlayer(sender).getDisplayName().toLowerCase())) {
-                plugin.checkPermission(sender, "worldguard.region.list.own");
-                name = plugin.checkPlayer(sender).getDisplayName().toLowerCase();
-                localPlayer = plugin.wrapPlayer(plugin.checkPlayer(sender));
+            argOffset = 1;
+
+            if (name.equals("me") || name.isEmpty() || name.equals(senderName)) {
                 own = true;
             }
         }
-        if (!own)
-            plugin.checkPermission(sender, "worldguard.region.list");
-        
-        if (args.argsLength() > argl) {
-            page = Math.max(0, args.getInteger(argl) - 1);
+
+        // Make /rg list default to "own" mode if the "worldguard.region.list" permission is not given
+        if (!own && !plugin.hasPermission(sender, "worldguard.region.list")) {
+            own = true;
         }
-        
-        if (args.argsLength() > 1 + argl) {
-            world = plugin.matchWorld(sender, args.getString(1 + argl));
+
+        if (own) {
+            plugin.checkPermission(sender, "worldguard.region.list.own");
+            name = senderName;
+            localPlayer = plugin.wrapPlayer(plugin.checkPlayer(sender));
+        }
+
+        if (args.argsLength() > argOffset) {
+            page = Math.max(0, args.getInteger(argOffset) - 1);
+        }
+
+        if (args.argsLength() > 1 + argOffset) {
+            world = plugin.matchWorld(sender, args.getString(1 + argOffset));
         } else {
             world = plugin.checkPlayer(sender).getWorld();
         }
-        
-        int listSize = 10;
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-        Map<String, ProtectedRegion> regions = mgr.getRegions();
+        final RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        final Map<String, ProtectedRegion> regions = mgr.getRegions();
 
-        int size = regions.size();
-
-        String[] regionIDList = new String[size];
+        List<RegionEntry> regionEntries = new ArrayList<RegionEntry>();
         int index = 0;
-        boolean show;
-        String prefix;
         for (String id : regions.keySet()) {
-            show = false;
-            prefix = "";
-            if (name.isEmpty()) {
-                show = true;
-            }
-            else {
+            RegionEntry entry = new RegionEntry(id, index++);
+            if (!name.isEmpty()) {
                 if (own) {
-                    if (regions.get(id).isOwner(localPlayer)) {
-                        show = true;
-                        prefix += "+";
-                    }
-                    else if (regions.get(id).isMember(localPlayer)) {
-                        show = true;
-                        prefix += "-";
-                    }
+                    entry.isOwner = regions.get(id).isOwner(localPlayer);
+                    entry.isMember = regions.get(id).isMember(localPlayer);
                 }
                 else {
-                    if (regions.get(id).getOwners().getPlayers().contains(name)) {
-                        show = true;
-                        prefix += "+";
-                    }
-                    if (regions.get(id).getMembers().getPlayers().contains(name)) {
-                        show = true;
-                        prefix += "-";
-                    }
+                    entry.isOwner = regions.get(id).isOwner(name);
+                    entry.isMember = regions.get(id).isMember(name);
+                }
+
+                if (!entry.isOwner && !entry.isMember) {
+                    continue;
                 }
             }
-            if (show) {
-                regionIDList[index] = prefix + " " + id;
-                index++;
-            }
+
+            regionEntries.add(entry);
         }
-        if (!name.isEmpty())
-            regionIDList = Arrays.copyOf(regionIDList, index);
-        Arrays.sort(regionIDList);
-        size = index;
-        int pages = (int) Math.ceil(size / (float) listSize);
+
+        Collections.sort(regionEntries);
+
+        final int totalSize = regionEntries.size();
+        final int pageSize = 10;
+        final int pages = (int) Math.ceil(totalSize / (float) pageSize);
 
         sender.sendMessage(ChatColor.RED
                 + (name.equals("") ? "Regions (page " : "Regions for " + name + " (page ")
                 + (page + 1) + " of " + pages + "):");
 
         if (page < pages) {
-            for (int i = page * listSize; i < page * listSize + listSize; i++) {
-                if (i >= size) {
+            for (int i = page * pageSize; i < page * pageSize + pageSize; i++) {
+                if (i >= totalSize) {
                     break;
                 }
-                sender.sendMessage(ChatColor.YELLOW.toString() + (i + 1) +
-                        "." + regionIDList[i]);
+                sender.sendMessage(ChatColor.YELLOW.toString() + regionEntries.get(i));
             }
         }
     }
-    
+
     @Command(aliases = {"flag", "f"}, usage = "<id> <flag> [-g group] [value]", flags = "g:",
             desc = "Set flags", min = 2)
     public void flag(CommandContext args, CommandSender sender) throws CommandException {
