@@ -254,6 +254,29 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
+     * Checks whether a player is an owner of region or any of its parents.
+     *
+     * @param playerName player name to check
+     * @return whether an owner
+     */
+    public boolean isOwner(String playerName) {
+        if (owners.contains(playerName)) {
+            return true;
+        }
+
+        ProtectedRegion curParent = getParent();
+        while (curParent != null) {
+            if (curParent.getOwners().contains(playerName)) {
+                return true;
+            }
+
+            curParent = curParent.getParent();
+        }
+
+        return false;
+    }
+
+    /**
      * Checks whether a player is a member OR OWNER of the region
      * or any of its parents.
      *
@@ -261,14 +284,45 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @return whether an owner or member
      */
     public boolean isMember(LocalPlayer player) {
-        if (owners.contains(player) || members.contains(player)) {
+        if (isOwner(player)) {
+            return true;
+        }
+
+        if (members.contains(player)) {
             return true;
         }
 
         ProtectedRegion curParent = getParent();
         while (curParent != null) {
-            if (curParent.getOwners().contains(player)
-                    || curParent.getMembers().contains(player)) {
+            if (curParent.getMembers().contains(player)) {
+                return true;
+            }
+
+            curParent = curParent.getParent();
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether a player is a member OR OWNER of the region
+     * or any of its parents.
+     *
+     * @param playerName player name to check
+     * @return whether an owner or member
+     */
+    public boolean isMember(String playerName) {
+        if (isOwner(playerName)) {
+            return true;
+        }
+
+        if (members.contains(playerName)) {
+            return true;
+        }
+
+        ProtectedRegion curParent = getParent();
+        while (curParent != null) {
+            if (curParent.getMembers().contains(playerName)) {
                 return true;
             }
 
