@@ -26,29 +26,33 @@ import com.sk89q.worldguard.LocalPlayer;
 
 public class PlayerDomain implements Domain {
     private Set<String> players;
-    
+
     public PlayerDomain() {
         this.players = new HashSet<String>();
     }
-    
+
     public PlayerDomain(String[] players) {
         this.players = new HashSet<String>();
-        
+
         for (String name : players) {
             this.players.add(name.toLowerCase());
         }
     }
-    
+
     public void addPlayer(String name) {
         players.add(name.toLowerCase());
     }
-    
+
     public boolean contains(LocalPlayer player) {
-        return players.contains(player.getName().toLowerCase());
+        return contains(player.getName());
     }
-    
+
+    @Override
+    public boolean contains(String playerName) {
+        return players.contains(playerName.toLowerCase());
+    }
+
     public int size() {
         return players.size();
     }
-
 }

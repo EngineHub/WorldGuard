@@ -27,15 +27,15 @@ import com.sk89q.worldguard.LocalPlayer;
 
 public class GroupDomain implements Domain {
     private Set<String> groups;
-    
+
     public GroupDomain() {
         this.groups = new LinkedHashSet<String>();
     }
-    
+
     public GroupDomain(String[] groups) {
         this.groups = new LinkedHashSet<String>(Arrays.asList(groups));
     }
-    
+
     public void addGroup(String name) {
         groups.add(name);
     }
@@ -46,12 +46,16 @@ public class GroupDomain implements Domain {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
+    @Override
+    public boolean contains(String playerName) {
+        return false; // GroupDomains can't contain player names.
+    }
+
     public int size() {
         return groups.size();
     }
-
 }

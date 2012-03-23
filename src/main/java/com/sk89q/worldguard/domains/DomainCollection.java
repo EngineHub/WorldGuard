@@ -26,31 +26,42 @@ import com.sk89q.worldguard.LocalPlayer;
 
 public class DomainCollection implements Domain {
     private Set<Domain> domains;
-    
+
     public DomainCollection() {
         domains = new LinkedHashSet<Domain>();
     }
-    
+
     public void add(Domain domain) {
         domains.add(domain);
     }
-    
+
     public void remove(Domain domain) {
         domains.remove(domain);
     }
-    
+
     public int size() {
         return domains.size();
     }
 
+    @Override
     public boolean contains(LocalPlayer player) {
         for (Domain domain : domains) {
             if (domain.contains(player)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
+    @Override
+    public boolean contains(String playerName) {
+        for (Domain domain : domains) {
+            if (domain.contains(playerName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
