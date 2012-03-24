@@ -123,7 +123,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     reg.register(GeneralCommands.class);
                 }
             }
-        }, 0L);
+        }, 1L);
 
         // Need to create the plugins/WorldGuard folder
         getDataFolder().mkdirs();
@@ -153,7 +153,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardEntityListener(this)).registerEvents();
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardVehicleListener(this)).registerEvents();
-        (new WorldGuardServerListener(this)).registerEvents();
 
         if (getServer().getPluginManager().isPluginEnabled("CommandBook")) {
             getServer().getPluginManager().registerEvents(new WorldGuardCommandBookListener(this), this);
@@ -165,16 +164,6 @@ public class WorldGuardPlugin extends JavaPlugin {
             worldListener.initWorld(world);
         }
         worldListener.registerEvents();
-
-        if (!configuration.hasCommandBookGodMode()) {
-            // Check god mode for existing players, if any
-            for (Player player : getServer().getOnlinePlayers()) {
-                if (inGroup(player, "wg-invincible") ||
-                        (configuration.autoGodMode && hasPermission(player, "worldguard.auto-invincible"))) {
-                    configuration.enableGodMode(player);
-                }
-            }
-        }
     }
 
     /**

@@ -22,11 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.GodComponent;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import org.bukkit.World;
@@ -34,6 +33,8 @@ import org.bukkit.entity.Player;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
 /**
  * Represents the global configuration and also delegates configuration
@@ -43,6 +44,8 @@ import com.sk89q.worldguard.blacklist.Blacklist;
  * @author Michael
  */
 public class ConfigurationManager {
+
+    public static final String GOD_METADATA_KEY = "god";
 
     private static final String CONFIG_HEADER = "#\r\n" +
             "# WorldGuard's main configuration file\r\n" +
@@ -81,23 +84,15 @@ public class ConfigurationManager {
     private YAMLProcessor config;
 
     /**
-     * List of people with god mode.
-     */
-    @Deprecated
-    private Set<String> hasGodMode = new HashSet<String>();
-
-    /**
      * List of people who can breathe underwater.
      */
     private Set<String> hasAmphibious = new HashSet<String>();
-    
-    private boolean hasCommandBookGodMode = false;
 
     public boolean useRegionsScheduler;
     public boolean activityHaltToggle = false;
-    public boolean autoGodMode;
+    @Deprecated public boolean autoGodMode = false;
     public boolean usePlayerMove;
-    
+
     /**
      * Region Storage Configuration method, and config values
      */
@@ -131,14 +126,10 @@ public class ConfigurationManager {
             plugin.getLogger().severe("Error reading configuration for global config: ");
             e.printStackTrace();
         }
-        
+
         config.removeProperty("suppress-tick-sync-warnings");
-        useRegionsScheduler = config.getBoolean(
-                "regions.use-scheduler", true);
-        autoGodMode = config.getBoolean(
-                "auto-invincible", config.getBoolean("auto-invincible-permission", false));
-        usePlayerMove = config.getBoolean(
-                "use-player-move-event", true);
+        useRegionsScheduler = config.getBoolean("regions.use-scheduler", true);
+        usePlayerMove = config.getBoolean("use-player-move-event", true);
 
         useSqlDatabase = config.getBoolean(
                 "regions.sql.use", false);
@@ -199,8 +190,6 @@ public class ConfigurationManager {
                 bl.forgetPlayer(player);
             }
         }
-
-        hasGodMode.remove(player.getName());
         hasAmphibious.remove(player.getName());
     }
 
@@ -211,7 +200,9 @@ public class ConfigurationManager {
      */
     @Deprecated
     public void enableGodMode(Player player) {
-        hasGodMode.add(player.getName());
+        if (!hasGodMode(player)) {
+            player.setMetadata(GOD_METADATA_KEY, new FixedMetadataValue(plugin, true));
+        }
     }
 
     /**
@@ -221,7 +212,7 @@ public class ConfigurationManager {
      */
     @Deprecated
     public void disableGodMode(Player player) {
-        hasGodMode.remove(player.getName());
+        player.removeMetadata(GOD_METADATA_KEY, plugin);
     }
 
     /**
@@ -231,13 +222,20 @@ public class ConfigurationManager {
      * @return Whether the player has godmode through WorldGuard or CommandBook
      */
     public boolean hasGodMode(Player player) {
-        if (hasCommandBookGodMode) {
-            GodComponent god = CommandBook.inst().getComponentManager().getComponent(GodComponent.class);
-            if (god != null) {
-                return god.hasGodMode(player);
-            }
+        List<MetadataValue> values = player.getMetadata(GOD_METADATA_KEY);
+        switch (values.size()) {
+            case 0:
+                return false;
+            case 1:
+                return values.get(0).asBoolean();
+            default:
+                for (MetadataValue val : values) {
+                    if (val.asBoolean()) {
+                        return true;
+                    }
+                }
+                return false;
         }
-        return hasGodMode.contains(player.getName());
     }
 
     /**
@@ -267,19 +265,13 @@ public class ConfigurationManager {
     public boolean hasAmphibiousMode(Player player) {
         return hasAmphibious.contains(player.getName());
     }
-    
-    public void updateCommandBookGodMode() {
-        try {
-            if (plugin.getServer().getPluginManager().isPluginEnabled("CommandBook")) {
-                Class.forName("com.sk89q.commandbook.GodComponent");
-                hasCommandBookGodMode = true;
-                return;
-            }
-        } catch (ClassNotFoundException ignore) {}
-        hasCommandBookGodMode = false;
-    }
-    
+
     public boolean hasCommandBookGodMode() {
-        return hasCommandBookGodMode;
+        try {
+            Class.forName("com.sk89q.commandbook.GodComponent");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 }

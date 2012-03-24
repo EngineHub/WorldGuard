@@ -38,25 +38,25 @@ public class GeneralCommands {
     public GeneralCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     @SuppressWarnings("deprecation")
     @Command(aliases = {"god"}, usage = "[player]",
             desc = "Enable godmode on a player", flags = "s", max = 1)
     public void god(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
-        
+
         Iterable<Player> targets = null;
         boolean included = false;
-        
+
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god");
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god.other");
         }
@@ -64,87 +64,87 @@ public class GeneralCommands {
         for (Player player : targets) {
             config.enableGodMode(player);
             player.setFireTicks(0);
-            
+
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "God mode enabled! Use /ungod to disable.");
-                
+
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "God enabled by "
                         + plugin.toName(sender) + ".");
-                
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players now have god mode.");
         }
     }
-    
+
     @SuppressWarnings("deprecation")
     @Command(aliases = {"ungod"}, usage = "[player]",
             desc = "Disable godmode on a player", flags = "s", max = 1)
     public void ungod(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
-        
+
         Iterable<Player> targets = null;
         boolean included = false;
-        
+
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god");
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god.other");
         }
 
         for (Player player : targets) {
             config.disableGodMode(player);
-            
+
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "God mode disabled!");
-                
+
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "God disabled by "
                         + plugin.toName(sender) + ".");
-                
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players no longer have god mode.");
         }
     }
-    
+
     @Command(aliases = {"heal"}, usage = "[player]", desc = "Heal a player", flags = "s", max = 1)
     public void heal(CommandContext args,CommandSender sender) throws CommandException {
-        
+
         Iterable<Player> targets = null;
         boolean included = false;
-        
+
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.heal");
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.heal.other");
         }
@@ -152,100 +152,100 @@ public class GeneralCommands {
         for (Player player : targets) {
             player.setHealth(20);
             player.setFoodLevel(20);
-            
+
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "Healed!");
-                
+
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Healed by "
                         + plugin.toName(sender) + ".");
-                
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
         }
     }
-    
+
     @Command(aliases = {"slay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
     public void slay(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Iterable<Player> targets = null;
         boolean included = false;
-        
+
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.slay");
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.slay.other");
         }
 
         for (Player player : targets) {
             player.setHealth(0);
-            
+
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(ChatColor.YELLOW + "Slain!");
-                
+
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(ChatColor.YELLOW + "Slain by "
                         + plugin.toName(sender) + ".");
-                
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
         }
     }
-    
+
     @Command(aliases = {"locate"}, usage = "[player]", desc = "Locate a player", max = 1)
     @CommandPermissions({"worldguard.locate"})
     public void locate(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
-        
+
         if (args.argsLength() == 0) {
             player.setCompassTarget(player.getWorld().getSpawnLocation());
-            
+
             sender.sendMessage(ChatColor.YELLOW.toString() + "Compass reset to spawn.");
         } else {
             Player target = plugin.matchSinglePlayer(sender, args.getString(0));
             player.setCompassTarget(target.getLocation());
-            
+
             sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");
         }
     }
-    
+
     @Command(aliases = {"stack", ";"}, usage = "", desc = "Stack items", max = 0)
     @CommandPermissions({"worldguard.stack"})
     public void stack(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         boolean ignoreMax = plugin.hasPermission(player, "worldguard.stack.illegitimate");
         boolean ignoreDamaged = plugin.hasPermission(player, "worldguard.stack.damaged");
-        
+
         ItemStack[] items = player.getInventory().getContents();
         int len = items.length;
 
         int affected = 0;
-        
+
         for (int i = 0; i < len; i++) {
             ItemStack item = items[i];
 
