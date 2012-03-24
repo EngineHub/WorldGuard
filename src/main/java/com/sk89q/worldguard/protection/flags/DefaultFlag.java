@@ -80,6 +80,7 @@ public final class DefaultFlag {
     public static final DoubleFlag PRICE = new DoubleFlag("price");
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
+    public static final BooleanFlag ALLOW_FLIGHT = new BooleanFlag("allow-flight", RegionGroup.ALL);
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
@@ -94,7 +95,7 @@ public final class DefaultFlag {
         MUSHROOMS, LEAF_DECAY, GRASS_SPREAD,
         FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
         TELE_LOC, SPAWN_LOC,
-        BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
+        BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ALLOW_FLIGHT,
     };
 
 
