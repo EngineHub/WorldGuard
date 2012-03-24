@@ -1,3 +1,27 @@
+5.5.2:
+ - A cancellable event is now fired if WorldGuard disallows PvP. (for developers!)
+ - Made /region setparent check worldguard.region.setparent.own/member.<parent> instead of worldguard.region.setparent.own/member.<child>.
+ - Allowed passing #<index> in place of a region ID, where <index> is the index as displayed by /region list.
+ - Fixed an error that occured when clearing a non-existant region's parent.
+ - Added a -s flag to /region teleport, which sends you to the spawn point instead of the teleport point of a region.
+ - Added region/role-based permissions to /region teleport.
+ - BREAKING CHANGE: Added a LocationFlag class and made the teleport and spawn flags use it.
+ - /region info -s now selects the region being queried.
+ - Added /region teleport <id>.
+ - Vector flags can now be set to the current location with the value "here" and to a specific position with x,y,z.
+ - Made /region info show the region you're in if you don't specify an id explicitly.
+ - Prevent block ignition from lightning strikes if lightning is blocked in region. Fixes #1175
+ - Correctly check both WEPIF and superperms in WorldGurdPlugin.broadcastNotification()
+ - Destroy fire blocks when fire-spread is disallowed
+ - Added a construct flag that can be used to restrict block placing/destroying in zones to certain roles.
+ - Added FallingSand to list of intensive entities to be removed with /halt-activiy.
+ - Replaced all usage of CreatureType by EntityType.
+ - Updated to support Bukkit 1.2-R0.3 and newer
+ - Made auto-god-mode disabled by default again.
+ - Added sign protection check disable.
+ - Cleaned up javadoc, deprecated duplicate methods, other cleanup
+ - Added a RegionGroupFlag to evey region flag Using the /region flag command with -g, the region group that the region flag applies to can be set.
+
 5.5.1:
 - Fixed attacking with arrows from non-PVP to PVP areas
 - Compatibility with Bukkit 1.1-R5
