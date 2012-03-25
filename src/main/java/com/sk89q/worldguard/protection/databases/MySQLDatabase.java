@@ -19,13 +19,16 @@
 
 package com.sk89q.worldguard.protection.databases;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -49,7 +52,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritan
 
 public class MySQLDatabase extends AbstractProtectionDatabase {
     private final Logger logger;
-
+    private boolean isNewMysqlFormat;
     private Map<String, ProtectedRegion> regions;
 
     private Map<String, ProtectedRegion> cuboidRegions;
@@ -97,6 +100,11 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     this.worldDbId = generatedKeys.getInt(1);
                 }
             }
+            Statement testStmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet testRS = testStmt.executeQuery("SELECT * FROM region_flag");
+            if(testRS.getMetaData().getColumnType(testRS.getMetaData().getColumnCount()) != -4)
+                convertTables();
+
         } catch (SQLException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             // We havn't connected to the databases, or there was an error
@@ -111,6 +119,59 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             return;
         }
     }
+
+    private void convertTables() {
+        if(!isNewMysqlFormat) {
+        String regionID = "";
+        String tmpData = "";
+        Object data = null;
+        String flagName = "";
+            try {
+                Statement stmt = conn.createStatement();
+                stmt.executeUpdate("RENAME TABLE region_flag TO legacy_flag");
+                stmt.executeUpdate("CREATE TABLE `region_flag` (`id` INT UNSIGNED NOT NULL AUTO_INCREMENT , `region_id` VARCHAR(128) NOT NULL , `flag` VARCHAR(64) NOT NULL , `value` MEDIUMBLOB NOT NULL , INDEX `fk_flags_region` (`region_id` ASC) , PRIMARY KEY (`id`) ) ENGINE = InnoDB");
+                stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+                ResultSet rs = stmt.executeQuery("SELECT * FROM legacy_flag");
+                while(rs.next()) {
+                    Map<String,String> regionFlags = new HashMap<String,String>();
+                    tmpData = rs.getString("value");
+                    flagName = rs.getString("flag");
+                    regionID = rs.getString("region_id");
+                    regionFlags.put(flagName,tmpData);
+                    for(Flag<?> flag : DefaultFlag.getFlags()) {
+                        Object o = regionFlags.get(flag.getName());
+                        if(o != null) {
+                           System.out.println(o);
+                           String className = flag.getClass().getName();
+                           if(className.contains("DoubleFlag"))
+                              data = Double.parseDouble(tmpData);
+                           else if(className.contains("IntegerFlag"))
+                              data = Integer.parseInt(tmpData);
+                           else
+                              data = tmpData;
+                           ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                           ObjectOutputStream out = new ObjectOutputStream(buf);
+                           out.writeUnshared(data);
+                           Object toDbData = buf.toByteArray();
+                           PreparedStatement pstmt = conn.prepareStatement("INSERT INTO `region_flag` ( `id`, `region_id`, `flag`, `value`) VALUES (null, ?, ?, ?)");
+                           pstmt.setString(1, regionID.toLowerCase());
+                           pstmt.setString(2, flag.getName());
+                           pstmt.setObject(3, toDbData);
+                           pstmt.execute();
+                        }
+
+                    }
+                }
+
+
+            } catch (Exception e) {
+                System.out.println("There was a problem converting your MySQL table.");
+                System.out.println(e);
+            }
+        }
+    }
+
+
 
     private void connect() throws SQLException {
         if (conn == null || conn.isClosed()) {
@@ -134,9 +195,25 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
             Map<String,Object> regionFlags = new HashMap<String,Object>();
             while (flagsResultSet.next()) {
+                 String flagName = flagsResultSet.getString("flag");
+                 Object flagValue = null;
+                 if(flagsResultSet.getMetaData().getColumnType(flagsResultSet.getMetaData().getColumnCount()) == -4) {
+                     isNewMysqlFormat = true;;
+                          java.sql.Blob blob = flagsResultSet.getBlob("value");
+                     try{
+                          java.io.ObjectInputStream obIn = new java.io.ObjectInputStream(blob.getBinaryStream());
+                          flagValue = obIn.readUnshared();
+                     } catch (Exception e) {
+                          System.out.println(e);
+                          continue;
+                     }
+                 } else {
+                     flagValue = flagsResultSet.getObject("value");
+                     flagName = flagsResultSet.getString("flag");
+                }
                 regionFlags.put(
-                        flagsResultSet.getString("flag"),
-                        flagsResultSet.getObject("value")
+                    flagName,
+                    flagValue
                 );
             }
 
@@ -590,10 +667,10 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
      *   b) If the region is not in the database, we insert it
      *  3) We iterate over what remains of the in-database list and remove
      *     them from the database
-     *     
+     *
      * TODO: Look at adding/removing/updating the database when the in
      *       memory region is created/remove/updated
-     *        
+     *
      * @see com.sk89q.worldguard.protection.databases.ProtectionDatabase#save()
      */
     public void save() throws ProtectionDatabaseException {
@@ -702,8 +779,22 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
         for (Map.Entry<Flag<?>, Object> entry : region.getFlags().entrySet()) {
             if (entry.getValue() == null) continue;
-
-            Object flag = marshalFlag(entry.getKey(), entry.getValue());
+            Object flag;
+            if (isNewMysqlFormat) {
+                flag = new byte[0];
+                Object flag2 = marshalFlag(entry.getKey(), entry.getValue());
+                try{
+                    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                    ObjectOutputStream out = new ObjectOutputStream(buf);
+                    out.writeUnshared(flag2);
+                    flag = buf.toByteArray();
+                } catch(Exception e) {
+                    System.out.println(e);
+                    continue;
+                }
+            } else {
+                flag = marshalFlag(entry.getKey(), entry.getValue());
+            }
 
             PreparedStatement insertFlagStatement = this.conn.prepareStatement(
                     "INSERT INTO `region_flag` ( " +

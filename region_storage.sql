@@ -65,7 +65,7 @@ CREATE  TABLE IF NOT EXISTS `region_flag` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `region_id` VARCHAR(128) NOT NULL ,
   `flag` VARCHAR(64) NOT NULL ,
-  `value` VARCHAR(256) NOT NULL ,
+  `value` MEDIUMBLOB NOT NULL ,
   INDEX `fk_flags_region` (`region_id` ASC) ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `fk_flags_region1`
