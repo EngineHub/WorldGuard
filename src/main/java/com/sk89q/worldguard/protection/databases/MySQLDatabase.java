@@ -63,13 +63,25 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     private String world;
     private int worldDbId = -1; // The database will never have an id of -1;
 
-    public MySQLDatabase(ConfigurationManager config, String world, Logger logger) throws ProtectionDatabaseException {
+    public MySQLDatabase(ConfigurationManager config, String world, Logger logger) throws ProtectionDatabaseException, ProtectionDatabaseUpdateRequired {
         this.config = config;
         this.world = world;
         this.logger = logger;
 
         try {
             connect();
+            
+            try {
+            	// Test if the database is up to date, if not throw a critical error
+            	PreparedStatement verTest = this.conn.prepareStatement(
+            			"SELECT `world_id` FROM `region_cuboid` LIMIT 0,1;"
+            		);
+            	verTest.execute();
+            } catch (SQLException ex) {
+            	throw new ProtectionDatabaseUpdateRequired(
+            			"region_storage_update_20110325.sql"
+            		);
+            }
 
             PreparedStatement worldStmt = conn.prepareStatement(
                     "SELECT `id` FROM " +
@@ -252,8 +264,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "`parent`.`id` AS `parent` " +
                     "FROM `region` " +
                     "LEFT JOIN `region` AS `parent` " +
-                    "ON (`region`.`parent_region_id` = `parent`.`id` " +
-                    "AND `region`.`parent_world_id` = `parent`.`world_id`) " +
+                    "ON (`region`.`parent` = `parent`.`id` " +
+                    "AND `region`.`world_id` = `parent`.`world_id`) " +
                     "WHERE `region`.`type` = 'global' " +
                     "AND `region`.`world_id` = ? "
             );
@@ -310,8 +322,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "ON (`region_cuboid`.`region_id` = `region`.`id` " +
                     "AND `region_cuboid`.`world_id` = `region`.`world_id`) " +
                     "LEFT JOIN `region` AS `parent` " +
-                    "ON (`region`.`parent_region_id` = `parent`.`id` " +
-                    "AND `region`.`parent_world_id` = `parent`.`world_id`) " +
+                    "ON (`region`.`parent` = `parent`.`id` " +
+                    "AND `region`.`world_id` = `parent`.`world_id`) " +
                     "WHERE `region`.`world_id` = ? "
             );
 
@@ -381,8 +393,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "ON (`region_poly2d`.`region_id` = `region`.`id` " +
                     "AND `region_poly2d`.`world_id` = `region`.`world_id`) " +
                     "LEFT JOIN `region` AS `parent` " +
-                    "ON (`region`.`parent_region_id` = `parent`.`id` " +
-                    "AND `region`.`parent_world_id` = `parent`.`world_id`) " +
+                    "ON (`region`.`parent` = `parent`.`id` " +
+                    "AND `region`.`world_id` = `parent`.`world_id`) " +
                     "WHERE `region`.`world_id` = ? "
             );
 
@@ -685,8 +697,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
                 PreparedStatement setParentStatement = this.conn.prepareStatement(
                         "UPDATE `region` SET " +
-                        "`parent_region_id` = ?, " +
-                        "`parent_world_id` = " + this.worldDbId + " " +
+                        "`parent` = ? " +
                         "WHERE `id` = ? AND `world_id` = " + this.worldDbId
                 );
 
@@ -824,14 +835,14 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 "`world_id`, " +
                 "`type`, " +
                 "`priority`, " +
-                "`parent_region_id`, " +
-                "`parent_world_id` " +
-                ") VALUES (?, " + this.worldDbId  + ", ?, ?, null, null)"
+                "`parent` " +
+                ") VALUES (?, ?, ?, ?, null)"
         );
 
         insertRegionStatement.setString(1, region.getId().toLowerCase());
-        insertRegionStatement.setString(2, type);
-        insertRegionStatement.setInt(3, region.getPriority());
+        insertRegionStatement.setInt(2, this.worldDbId);
+        insertRegionStatement.setString(3, type);
+        insertRegionStatement.setInt(4, region.getPriority());
 
         insertRegionStatement.execute();
 
