@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -166,7 +167,7 @@ public class GlobalRegionManager {
 
             plugin.getLogger().log(Level.SEVERE, logStr + " : " + e.getMessage());
             e.printStackTrace();
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
             plugin.getLogger().log(Level.SEVERE, "Error loading regions for world \""
                     + name + "\": " + e.toString() + "\n\t" + e.getMessage());
             e.printStackTrace();
