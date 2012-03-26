@@ -22,6 +22,8 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -162,10 +164,10 @@ public class GlobalRegionManager {
                 logStr += "file \"" + file + "\" ";
             }
 
-            plugin.getLogger().info(logStr + " : " + e.getMessage());
+            plugin.getLogger().log(Level.SEVERE, logStr + " : " + e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
-            plugin.getLogger().info("Error loading regions for world \""
+            plugin.getLogger().log(Level.SEVERE, "Error loading regions for world \""
                     + name + "\": " + e.toString() + "\n\t" + e.getMessage());
             e.printStackTrace();
         }
