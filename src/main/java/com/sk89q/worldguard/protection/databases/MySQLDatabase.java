@@ -63,7 +63,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     private String world;
     private int worldDbId = -1; // The database will never have an id of -1;
 
-    public MySQLDatabase(ConfigurationManager config, String world, Logger logger) throws ProtectionDatabaseException, ProtectionDatabaseUpdateRequired {
+    public MySQLDatabase(ConfigurationManager config, String world, Logger logger) throws ProtectionDatabaseException {
         this.config = config;
         this.world = world;
         this.logger = logger;
@@ -78,7 +78,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             		);
             	verTest.execute();
             } catch (SQLException ex) {
-            	throw new ProtectionDatabaseUpdateRequired(
+            	throw new InvalidTableFormatException(
             			"region_storage_update_20110325.sql"
             		);
             }
