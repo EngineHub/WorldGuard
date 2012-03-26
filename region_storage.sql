@@ -2,11 +2,10 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-
 -- -----------------------------------------------------
--- Table `worldguard`.`group`
+-- Table `group`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`group` (
+CREATE  TABLE IF NOT EXISTS `group` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(64) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   PRIMARY KEY (`id`) ,
@@ -18,9 +17,9 @@ COLLATE = utf8_bin;
 
 
 -- -----------------------------------------------------
--- Table `worldguard`.`world`
+-- Table `world`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`world` (
+CREATE  TABLE IF NOT EXISTS `world` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   PRIMARY KEY (`id`) ,
@@ -32,26 +31,25 @@ COLLATE = utf8_bin;
 
 
 -- -----------------------------------------------------
--- Table `worldguard`.`region`
+-- Table `region`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`region` (
+CREATE  TABLE IF NOT EXISTS `region` (
   `id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
   `type` ENUM('cuboid','poly2d','global') CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `priority` SMALLINT(6) NOT NULL DEFAULT '0' ,
-  `parent_region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL DEFAULT NULL ,
-  `parent_world_id` INT(10) UNSIGNED NULL DEFAULT NULL ,
+  `parent` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL DEFAULT NULL ,
   PRIMARY KEY (`id`, `world_id`) ,
   INDEX `fk_region_world` (`world_id` ASC) ,
-  INDEX `parent` (`parent_region_id` ASC, `parent_world_id` ASC) ,
+  INDEX `parent` (`parent` ASC) ,
   CONSTRAINT `fk_region_world1`
     FOREIGN KEY (`world_id` )
-    REFERENCES `worldguard`.`world` (`id` )
+    REFERENCES `world` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `parent`
-    FOREIGN KEY (`parent_region_id` , `parent_world_id` )
-    REFERENCES `worldguard`.`region` (`id` , `world_id` )
+    FOREIGN KEY (`parent` )
+    REFERENCES `region` (`id` )
     ON DELETE SET NULL
     ON UPDATE CASCADE)
 ENGINE = InnoDB
@@ -60,22 +58,28 @@ COLLATE = utf8_bin;
 
 
 -- -----------------------------------------------------
--- Table `worldguard`.`region_cuboid`
+-- Table `region_cuboid`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`region_cuboid` (
+CREATE  TABLE IF NOT EXISTS `region_cuboid` (
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
+<<<<<<< ./region_storage.sql.LOCAL.16678.sql
   `min_z` BIGINT(20) NOT NULL ,
   `min_y` BIGINT(20) NOT NULL ,
+||||||| ./region_storage.sql.BASE.16678.sql
+=======
+>>>>>>> ./region_storage.sql.REMOTE.16678.sql
   `min_x` BIGINT(20) NOT NULL ,
-  `max_z` BIGINT(20) NOT NULL ,
-  `max_y` BIGINT(20) NOT NULL ,
+  `min_y` BIGINT(20) NOT NULL ,
+  `min_z` BIGINT(20) NOT NULL ,
   `max_x` BIGINT(20) NOT NULL ,
+  `max_y` BIGINT(20) NOT NULL ,
+  `max_z` BIGINT(20) NOT NULL ,
   PRIMARY KEY (`region_id`, `world_id`) ,
   INDEX `fk_region_cuboid_region` (`region_id` ASC) ,
   CONSTRAINT `fk_region_cuboid_region`
     FOREIGN KEY (`region_id` , `world_id` )
-    REFERENCES `worldguard`.`region` (`id` , `world_id` )
+    REFERENCES `region` (`id` , `world_id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
@@ -84,9 +88,9 @@ COLLATE = utf8_bin;
 
 
 -- -----------------------------------------------------
--- Table `worldguard`.`region_flag`
+-- Table `region_flag`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`region_flag` (
+CREATE  TABLE IF NOT EXISTS `region_flag` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
@@ -96,7 +100,7 @@ CREATE  TABLE IF NOT EXISTS `worldguard`.`region_flag` (
   INDEX `fk_flags_region` (`region_id` ASC, `world_id` ASC) ,
   CONSTRAINT `fk_flags_region`
     FOREIGN KEY (`region_id` , `world_id` )
-    REFERENCES `worldguard`.`region` (`id` , `world_id` )
+    REFERENCES `region` (`id` , `world_id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
@@ -106,9 +110,9 @@ COLLATE = utf8_bin;
 
 
 -- -----------------------------------------------------
--- Table `worldguard`.`region_groups`
+-- Table `region_groups`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`region_groups` (
+CREATE  TABLE IF NOT EXISTS `region_groups` (
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
   `group_id` INT(10) UNSIGNED NOT NULL ,
@@ -118,12 +122,12 @@ CREATE  TABLE IF NOT EXISTS `worldguard`.`region_groups` (
   INDEX `fk_region_groups_group` (`group_id` ASC) ,
   CONSTRAINT `fk_region_groups_group`
     FOREIGN KEY (`group_id` )
-    REFERENCES `worldguard`.`group` (`id` )
+    REFERENCES `group` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `fk_region_groups_region`
     FOREIGN KEY (`region_id` , `world_id` )
-    REFERENCES `worldguard`.`region` (`id` , `world_id` )
+    REFERENCES `region` (`id` , `world_id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
@@ -132,9 +136,9 @@ COLLATE = utf8_bin;
 
 
 -- -----------------------------------------------------
--- Table `worldguard`.`user`
+-- Table `user`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`user` (
+CREATE  TABLE IF NOT EXISTS `user` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(64) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   PRIMARY KEY (`id`) ,
@@ -146,9 +150,9 @@ COLLATE = utf8_bin;
 
 
 -- -----------------------------------------------------
--- Table `worldguard`.`region_players`
+-- Table `region_players`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`region_players` (
+CREATE  TABLE IF NOT EXISTS `region_players` (
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
   `user_id` INT(10) UNSIGNED NOT NULL ,
@@ -158,12 +162,12 @@ CREATE  TABLE IF NOT EXISTS `worldguard`.`region_players` (
   INDEX `fk_region_users_user` (`user_id` ASC) ,
   CONSTRAINT `fk_region_users_region`
     FOREIGN KEY (`region_id` , `world_id` )
-    REFERENCES `worldguard`.`region` (`id` , `world_id` )
+    REFERENCES `region` (`id` , `world_id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `fk_region_users_user`
     FOREIGN KEY (`user_id` )
-    REFERENCES `worldguard`.`user` (`id` )
+    REFERENCES `user` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
@@ -172,18 +176,23 @@ COLLATE = utf8_bin;
 
 
 -- -----------------------------------------------------
--- Table `worldguard`.`region_poly2d`
+-- Table `region_poly2d`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`region_poly2d` (
+CREATE  TABLE IF NOT EXISTS `region_poly2d` (
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
+<<<<<<< ./region_storage.sql.LOCAL.16678.sql
   `max_y` INT(11) NOT NULL ,
+||||||| ./region_storage.sql.BASE.16678.sql
+=======
+>>>>>>> ./region_storage.sql.REMOTE.16678.sql
   `min_y` INT(11) NOT NULL ,
+  `max_y` INT(11) NOT NULL ,
   PRIMARY KEY (`region_id`, `world_id`) ,
   INDEX `fk_region_poly2d_region` (`region_id` ASC) ,
   CONSTRAINT `fk_region_poly2d_region`
     FOREIGN KEY (`region_id` , `world_id` )
-    REFERENCES `worldguard`.`region` (`id` , `world_id` )
+    REFERENCES `region` (`id` , `world_id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
@@ -192,19 +201,24 @@ COLLATE = utf8_bin;
 
 
 -- -----------------------------------------------------
--- Table `worldguard`.`region_poly2d_point`
+-- Table `region_poly2d_point`
 -- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `worldguard`.`region_poly2d_point` (
+CREATE  TABLE IF NOT EXISTS `region_poly2d_point` (
   `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
+<<<<<<< ./region_storage.sql.LOCAL.16678.sql
   `z` BIGINT(20) NOT NULL ,
+||||||| ./region_storage.sql.BASE.16678.sql
+=======
+>>>>>>> ./region_storage.sql.REMOTE.16678.sql
   `x` BIGINT(20) NOT NULL ,
+  `z` BIGINT(20) NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_region_poly2d_point_region_poly2d` (`region_id` ASC, `world_id` ASC) ,
   CONSTRAINT `fk_region_poly2d_point_region_poly2d`
     FOREIGN KEY (`region_id` , `world_id` )
-    REFERENCES `worldguard`.`region_poly2d` (`region_id` , `world_id` )
+    REFERENCES `region_poly2d` (`region_id` , `world_id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
