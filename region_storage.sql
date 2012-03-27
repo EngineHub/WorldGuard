@@ -63,12 +63,6 @@ COLLATE = utf8_bin;
 CREATE  TABLE IF NOT EXISTS `region_cuboid` (
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
-<<<<<<< ./region_storage.sql.LOCAL.16678.sql
-  `min_z` BIGINT(20) NOT NULL ,
-  `min_y` BIGINT(20) NOT NULL ,
-||||||| ./region_storage.sql.BASE.16678.sql
-=======
->>>>>>> ./region_storage.sql.REMOTE.16678.sql
   `min_x` BIGINT(20) NOT NULL ,
   `min_y` BIGINT(20) NOT NULL ,
   `min_z` BIGINT(20) NOT NULL ,
@@ -181,11 +175,6 @@ COLLATE = utf8_bin;
 CREATE  TABLE IF NOT EXISTS `region_poly2d` (
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
-<<<<<<< ./region_storage.sql.LOCAL.16678.sql
-  `max_y` INT(11) NOT NULL ,
-||||||| ./region_storage.sql.BASE.16678.sql
-=======
->>>>>>> ./region_storage.sql.REMOTE.16678.sql
   `min_y` INT(11) NOT NULL ,
   `max_y` INT(11) NOT NULL ,
   PRIMARY KEY (`region_id`, `world_id`) ,
@@ -207,11 +196,6 @@ CREATE  TABLE IF NOT EXISTS `region_poly2d_point` (
   `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
-<<<<<<< ./region_storage.sql.LOCAL.16678.sql
-  `z` BIGINT(20) NOT NULL ,
-||||||| ./region_storage.sql.BASE.16678.sql
-=======
->>>>>>> ./region_storage.sql.REMOTE.16678.sql
   `x` BIGINT(20) NOT NULL ,
   `z` BIGINT(20) NOT NULL ,
   PRIMARY KEY (`id`) ,
