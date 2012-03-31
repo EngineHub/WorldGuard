@@ -65,7 +65,6 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.GameMode;
 
 /**
  * Handles all events thrown in relation to a player.
@@ -159,7 +158,6 @@ public class WorldGuardPlayerListener implements Listener {
                     String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);//, localPlayer);
                     Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);//, localPlayer);
                     Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);//, localPlayer);
-                    Boolean allowFlight = set.getFlag(DefaultFlag.ALLOW_FLIGHT);//, localPlayer);
 
                     if (state.lastFarewell != null && (farewell == null
                             || !state.lastFarewell.equals(farewell))) {
@@ -198,24 +196,6 @@ public class WorldGuardPlayerListener implements Listener {
                                 + ChatColor.GOLD + " entered NOTIFY region: "
                                 + ChatColor.WHITE
                                 + regionList);
-                    }
-                    
-                    if (allowFlight == null) {
-                        if ((plugin.getServer().getDefaultGameMode() == GameMode.CREATIVE
-                                && player.getGameMode() == GameMode.CREATIVE)
-                                || player.getGameMode() == GameMode.CREATIVE) {
-                            allowFlight = true;
-                        } else {
-                            allowFlight = false;
-                        }
-                    }
-                    
-                    if (player.getAllowFlight() && !allowFlight) {
-                        player.setAllowFlight(false);
-                        state.lastAllowFlight = true;
-                    } else if (!player.getAllowFlight() && allowFlight) {
-                        player.setAllowFlight(true);
-                        state.lastAllowFlight = false;
                     }
 
                     state.lastGreeting = greeting;
