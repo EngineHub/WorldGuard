@@ -1,6 +1,4 @@
 5.5.2:
- - Added 'allow-flight' flag, which allows or disallows flight per-region
- - Restructured /region list
  - A cancellable event is now fired if WorldGuard disallows PvP. (for developers!)
  - Made /region setparent check worldguard.region.setparent.own/member.<parent> instead of worldguard.region.setparent.own/member.<child>.
  - Allowed passing #<index> in place of a region ID, where <index> is the index as displayed by /region list.
