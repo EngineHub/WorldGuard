@@ -59,6 +59,8 @@ public final class DefaultFlag {
     public static final StateFlag ENDER_BUILD = new StateFlag("enderman-grief", true);
     public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false, RegionGroup.ALL);
     public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true, RegionGroup.ALL);
+    public static final StateFlag SEND_CHAT = new StateFlag("send-chat", true);
+    public static final StateFlag RECEIVE_CHAT = new StateFlag("receive-chat", true);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
     public static final StateFlag EXIT = new StateFlag("exit", true);
     public static final StateFlag ENTITY_PAINTING_DESTROY = new StateFlag("entity-painting-destroy", true);
@@ -93,7 +95,7 @@ public final class DefaultFlag {
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
         SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT,
-        MUSHROOMS, LEAF_DECAY, GRASS_SPREAD,
+        MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, SEND_CHAT, RECEIVE_CHAT,
         FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
         TELE_LOC, SPAWN_LOC, POTION_SPLASH,
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,

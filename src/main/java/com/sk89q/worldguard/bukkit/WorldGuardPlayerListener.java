@@ -39,6 +39,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -260,6 +261,28 @@ public class WorldGuardPlayerListener implements Listener {
             state.lastBlockX = loc.getBlockX();
             state.lastBlockY = loc.getBlockY();
             state.lastBlockZ = loc.getBlockZ();
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerChat(PlayerChatEvent event) {
+        Player player = event.getPlayer();
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
+        if (wcfg.useRegions) {
+            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SEND_CHAT, player.getLocation())) {
+                player.sendMessage(ChatColor.RED + "You don't have permission to chat in this region!");
+                event.setCancelled(true);
+                return;
+            }
+
+            for (Iterator<Player> i = event.getRecipients().iterator(); i.hasNext();) {
+                if (!plugin.getGlobalRegionManager().allows(DefaultFlag.RECEIVE_CHAT, i.next().getLocation())) {
+                    i.remove();
+                }
+            }
+            if (event.getRecipients().size() == 0) {
+                event.setCancelled(true);
+            }
         }
     }
 
