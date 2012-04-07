@@ -61,6 +61,7 @@ public final class DefaultFlag {
     public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true, RegionGroup.ALL);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
     public static final StateFlag EXIT = new StateFlag("exit", true);
+    public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting", RegionGroup.ALL);
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
@@ -93,7 +94,7 @@ public final class DefaultFlag {
         SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT,
         MUSHROOMS, LEAF_DECAY, GRASS_SPREAD,
         FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
-        TELE_LOC, SPAWN_LOC,
+        TELE_LOC, SPAWN_LOC, POTION_SPLASH,
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
     };
 
