@@ -160,6 +160,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardVehicleListener(this)).registerEvents();
         (new WorldGuardServerListener(this)).registerEvents();
+        configuration.updateCommandBookGodMode();
 
         if (getServer().getPluginManager().isPluginEnabled("CommandBook")) {
             getServer().getPluginManager().registerEvents(new WorldGuardCommandBookListener(this), this);
