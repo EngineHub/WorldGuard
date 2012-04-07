@@ -90,14 +90,14 @@ public class ConfigurationManager {
      * List of people who can breathe underwater.
      */
     private Set<String> hasAmphibious = new HashSet<String>();
-    
+
     private boolean hasCommandBookGodMode = false;
 
     public boolean useRegionsScheduler;
     public boolean activityHaltToggle = false;
     public boolean autoGodMode;
     public boolean usePlayerMove;
-    
+
     /**
      * Region Storage Configuration method, and config values
      */
@@ -131,12 +131,13 @@ public class ConfigurationManager {
             plugin.getLogger().severe("Error reading configuration for global config: ");
             e.printStackTrace();
         }
-        
+
         config.removeProperty("suppress-tick-sync-warnings");
         useRegionsScheduler = config.getBoolean(
                 "regions.use-scheduler", true);
         autoGodMode = config.getBoolean(
                 "auto-invincible", config.getBoolean("auto-invincible-permission", false));
+        config.removeProperty("auto-invincible-permission");
         usePlayerMove = config.getBoolean(
                 "use-player-move-event", true);
 
@@ -211,6 +212,7 @@ public class ConfigurationManager {
      */
     @Deprecated
     public void enableGodMode(Player player) {
+
         hasGodMode.add(player.getName());
     }
 
@@ -267,7 +269,7 @@ public class ConfigurationManager {
     public boolean hasAmphibiousMode(Player player) {
         return hasAmphibious.contains(player.getName());
     }
-    
+
     public void updateCommandBookGodMode() {
         try {
             if (plugin.getServer().getPluginManager().isPluginEnabled("CommandBook")) {
@@ -278,7 +280,7 @@ public class ConfigurationManager {
         } catch (ClassNotFoundException ignore) {}
         hasCommandBookGodMode = false;
     }
-    
+
     public boolean hasCommandBookGodMode() {
         return hasCommandBookGodMode;
     }
