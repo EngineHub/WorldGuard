@@ -1,6 +1,6 @@
 <!--
   Maven build file for WorldGuard
-  Copyright (c) 2011 sk89q <http://www.sk89q.com> 
+  Copyright (c) 2011 sk89q <http://www.sk89q.com>
   WorldGuard is available under the GNU General Public License v3
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -40,23 +40,23 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>5.3-SNAPSHOT</version>
+      <version>5.3</version>
     </dependency>
-    
+
     <!-- Bukkit -->
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.1-R6</version>
+      <version>1.2.5-R1.0</version>
     </dependency>
-      
+
     <!-- CommandBook -->
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>commandbook</artifactId>
       <version>2.0</version>
     </dependency>
-    
+
     <!-- Additional libraries -->
     <dependency>
       <groupId>com.nijikokun</groupId>
@@ -192,7 +192,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <reporting>
     <plugins>
       <!-- Javadocs -->
