@@ -23,6 +23,7 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.util.Set;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.protection.GlobalRegionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -62,6 +63,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
@@ -789,6 +791,21 @@ public class WorldGuardEntityListener implements Listener {
             if (event.getFoodLevel() < player.getFoodLevel() && isInvincible(player)) {
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPotionSplash(PotionSplashEvent event) {
+        GlobalRegionManager global = plugin.getGlobalRegionManager();
+        int blockedEntities = 0;
+        for (LivingEntity e : event.getAffectedEntities()) {
+            if (!global.allows(DefaultFlag.POTION_SPLASH, e.getLocation(), e instanceof Player ? plugin.wrapPlayer((Player) e) : null)) {
+                event.setIntensity(e, 0);
+                ++blockedEntities;
+            }
+        }
+        if (blockedEntities == event.getAffectedEntities().size()) {
+            event.setCancelled(true);
         }
     }
 
