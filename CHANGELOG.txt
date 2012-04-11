@@ -1,4 +1,8 @@
 5.5.2:
+ - Added potion-splash flag to block splash potions
+ - Add entity-painting-destroy which can be used to prevent entities from destroying paintings (skeletons firing arrows)
+ - Added send-chat and receive-chat flags
+ - Fixed having regions in multiple worlds with the same name not working with MySQL
  - A cancellable event is now fired if WorldGuard disallows PvP. (for developers!)
  - Made /region setparent check worldguard.region.setparent.own/member.<parent> instead of worldguard.region.setparent.own/member.<child>.
  - Allowed passing #<index> in place of a region ID, where <index> is the index as displayed by /region list.
