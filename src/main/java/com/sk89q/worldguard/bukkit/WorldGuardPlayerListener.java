@@ -1003,27 +1003,22 @@ public class WorldGuardPlayerListener implements Listener {
             Vector pt = toVector(player.getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-            ProtectedRegion globalRegion = mgr.getRegion("__global__");
 
             String[] parts = event.getMessage().split(" ");
+            String lowerCommand = parts[0].toLowerCase();
 
             Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS, localPlayer);
-            if (allowedCommands == null && globalRegion != null) {
-                allowedCommands = globalRegion.getFlag(DefaultFlag.ALLOWED_CMDS);
-            }
-            if (allowedCommands != null && !allowedCommands.contains(parts[0].toLowerCase())) {
+            Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS, localPlayer);
 
-                player.sendMessage(ChatColor.RED + parts[0].toLowerCase() + " is not allowed in this area.");
+            if (allowedCommands != null && !allowedCommands.contains(lowerCommand) && (blockedCommands == null || blockedCommands.contains(lowerCommand))) {
+                player.sendMessage(ChatColor.RED + lowerCommand + " is not allowed in this area.");
                 event.setCancelled(true);
                 return;
             }
 
-            Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS, localPlayer);
-            if (blockedCommands == null && globalRegion != null) {
-                blockedCommands = globalRegion.getFlag(DefaultFlag.BLOCKED_CMDS);
-            }
-            if (blockedCommands != null && blockedCommands.contains(parts[0].toLowerCase())) {
-                player.sendMessage(ChatColor.RED + parts[0].toLowerCase() + " is blocked in this area.");
+            if (blockedCommands != null && blockedCommands.contains(lowerCommand)
+                    && (allowedCommands == null || !allowedCommands.contains(lowerCommand))) {
+                player.sendMessage(ChatColor.RED + lowerCommand + " is blocked in this area.");
                 event.setCancelled(true);
                 return;
             }

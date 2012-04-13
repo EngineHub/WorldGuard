@@ -38,7 +38,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author sk89q
  */
 public class LocationFlag extends Flag<Location> {
-    
+
     public LocationFlag(String name, RegionGroup defaultGroup) {
         super(name, defaultGroup);
     }
@@ -139,16 +139,11 @@ public class LocationFlag extends Flag<Location> {
     }
 
     private double toNumber(Object o) {
-        if (o instanceof Integer) {
-            return (Integer) o;
-        } else if (o instanceof Long) {
-            return (Long) o;
-        } else if (o instanceof Float) {
-            return (Float) o;
-        } else if (o instanceof Double) {
-            return (Double) o;
+        if (o instanceof Number) {
+            return ((Number) o).doubleValue();
         } else {
             return 0;
         }
+
     }
 }
