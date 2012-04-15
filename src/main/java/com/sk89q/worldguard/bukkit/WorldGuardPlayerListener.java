@@ -167,14 +167,18 @@ public class WorldGuardPlayerListener implements Listener {
                             || !state.lastFarewell.equals(farewell))) {
                         String replacedFarewell = plugin.replaceMacros(
                                 player, BukkitUtil.replaceColorMacros(state.lastFarewell));
-                        player.sendMessage(ChatColor.AQUA + " ** " + replacedFarewell);
+                        for (String line : replacedFarewell.split("\n")) {
+                            player.sendMessage(ChatColor.AQUA + " ** " + line);
+                        }
                     }
 
                     if (greeting != null && (state.lastGreeting == null
                             || !state.lastGreeting.equals(greeting))) {
                         String replacedGreeting = plugin.replaceMacros(
                                 player, BukkitUtil.replaceColorMacros(greeting));
-                        player.sendMessage(ChatColor.AQUA + " ** " + replacedGreeting);
+                        for (String line : replacedGreeting.split("\n")) {
+                            player.sendMessage(ChatColor.AQUA + " ** " + line);
+                        }
                     }
 
                     if ((notifyLeave == null || !notifyLeave)
@@ -202,12 +206,16 @@ public class WorldGuardPlayerListener implements Listener {
                                 + regionList);
                     }
 
-                    if (gameMode != null && player.getGameMode() != gameMode) {
-                        player.setGameMode(gameMode);
+                    if (gameMode != null) {
+                        if (player.getGameMode() != gameMode) {
+                            state.lastGameMode = player.getGameMode();
+                            player.setGameMode(gameMode);
+                        }
                     } else {
                         if (state.lastGameMode != null) {
-                            player.setGameMode(state.lastGameMode);
+                            GameMode mode = state.lastGameMode;
                             state.lastGameMode = null;
+                            player.setGameMode(mode);
                         }
                     }
 
@@ -232,7 +240,8 @@ public class WorldGuardPlayerListener implements Listener {
         if (wcfg.useRegions) {
             GameMode gameMode = plugin.getGlobalRegionManager().get(player.getWorld())
                     .getApplicableRegions(player.getLocation()).getFlag(DefaultFlag.GAME_MODE);
-            if (gameMode != null && event.getNewGameMode() != gameMode) {
+            if (plugin.getFlagStateManager().getState(player).lastGameMode != null
+                    && gameMode != null && event.getNewGameMode() != gameMode) {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.RED + "Your game mode is locked to "
                         + gameMode + "in this region!");
@@ -1037,7 +1046,8 @@ public class WorldGuardPlayerListener implements Listener {
             Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS, localPlayer);
             Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS, localPlayer);
 
-            if (allowedCommands != null && !allowedCommands.contains(lowerCommand) && (blockedCommands == null || blockedCommands.contains(lowerCommand))) {
+            if (allowedCommands != null && !allowedCommands.contains(lowerCommand)
+                    && (blockedCommands == null || blockedCommands.contains(lowerCommand))) {
                 player.sendMessage(ChatColor.RED + lowerCommand + " is not allowed in this area.");
                 event.setCancelled(true);
                 return;
