@@ -41,6 +41,10 @@ public class EnumFlag<T extends Enum<T>> extends Flag<T> {
     }
 
     private T findValue(String input) throws IllegalArgumentException {
+        if (input != null) {
+            input = input.toUpperCase();
+        }
+
         try {
             return Enum.valueOf(enumClass, input);
         } catch (IllegalArgumentException e) {
@@ -88,5 +92,5 @@ public class EnumFlag<T extends Enum<T>> extends Flag<T> {
     public Object marshal(T o) {
         return o.name();
     }
-    
+
 }
