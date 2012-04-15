@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 
 /**
@@ -70,6 +71,7 @@ public final class DefaultFlag {
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave", RegionGroup.ALL);
     public static final SetFlag<EntityType> DENY_SPAWN = new SetFlag<EntityType>("deny-spawn", RegionGroup.ALL, new EntityTypeFlag(null));
+    public static final EnumFlag<GameMode> GAME_MODE = new EnumFlag<GameMode>("game-mode", GameMode.class, RegionGroup.ALL);
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay", RegionGroup.ALL);
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount", RegionGroup.ALL);
     public static final IntegerFlag MIN_HEAL = new IntegerFlag("heal-min-health", RegionGroup.ALL);
@@ -94,7 +96,7 @@ public final class DefaultFlag {
         EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY,
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
-        SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT,
+        SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, GAME_MODE,
         MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, SEND_CHAT, RECEIVE_CHAT,
         FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
         TELE_LOC, SPAWN_LOC, POTION_SPLASH,

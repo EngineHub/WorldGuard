@@ -36,24 +36,24 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 /**
  * This processes per-player state information and is also meant to be used
  * as a scheduled task.
- * 
+ *
  * @author sk89q
  */
 public class FlagStateManager implements Runnable {
-    
+
     public static final int RUN_DELAY = 20;
-    
+
     private WorldGuardPlugin plugin;
     private Map<String, PlayerFlagState> states;
-    
+
     /**
      * Construct the object.
-     * 
+     *
      * @param plugin The plugin instance
      */
     public FlagStateManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-        
+
         states = new HashMap<String, PlayerFlagState>();
     }
 
@@ -66,16 +66,16 @@ public class FlagStateManager implements Runnable {
 
         for (Player player : players) {
             WorldConfiguration worldConfig = config.get(player.getWorld());
-            
+
             if (!worldConfig.useRegions) {
                 continue;
             }
-            
+
             PlayerFlagState state;
-            
+
             synchronized (this) {
                 state = states.get(player.getName());
-                
+
                 if (state == null) {
                     state = new PlayerFlagState();
                     states.put(player.getName(), state);
@@ -87,7 +87,7 @@ public class FlagStateManager implements Runnable {
                     .get(player.getWorld());
             ApplicableRegionSet applicable = regionManager
                     .getApplicableRegions(playerLocation);
-            
+
             if (!RegionQueryUtil.isInvincible(plugin, player, applicable)
                     && !plugin.getGlobalStateManager().hasGodMode(player)
                     && !(player.getGameMode() == GameMode.CREATIVE)) {
@@ -96,7 +96,7 @@ public class FlagStateManager implements Runnable {
             }
         }
     }
-    
+
     /**
      * Process healing for a player.
      *
@@ -106,18 +106,18 @@ public class FlagStateManager implements Runnable {
      */
     private void processHeal(ApplicableRegionSet applicable, Player player,
             PlayerFlagState state) {
-        
+
         if (player.getHealth() <= 0) {
             return;
         }
-        
+
         long now = System.currentTimeMillis();
 
         Integer healAmount = applicable.getFlag(DefaultFlag.HEAL_AMOUNT);
         Integer healDelay = applicable.getFlag(DefaultFlag.HEAL_DELAY);
         Integer minHealth = applicable.getFlag(DefaultFlag.MIN_HEAL);
         Integer maxHealth = applicable.getFlag(DefaultFlag.MAX_HEAL);
-        
+
         if (healAmount == null || healDelay == null || healAmount == 0 || healDelay < 0) {
             return;
         }
@@ -127,7 +127,7 @@ public class FlagStateManager implements Runnable {
         if (player.getHealth() >= maxHealth && healAmount > 0) {
             return;
         }
-        
+
         if (healDelay <= 0) {
             player.setHealth(healAmount > 0 ? maxHealth : minHealth); // this will insta-kill if the flag is unset
             state.lastHeal = now;
@@ -137,10 +137,10 @@ public class FlagStateManager implements Runnable {
             state.lastHeal = now;
         }
     }
-    
+
     /**
      * Process restoring hunger for a player.
-     * 
+     *
      * @param applicable The set of applicable regions
      * @param player The player to process hunger flags on
      * @param state The player's state
@@ -154,7 +154,7 @@ public class FlagStateManager implements Runnable {
         Integer feedDelay = applicable.getFlag(DefaultFlag.FEED_DELAY);
         Integer minHunger = applicable.getFlag(DefaultFlag.MIN_FOOD);
         Integer maxHunger = applicable.getFlag(DefaultFlag.MAX_FOOD);
-        
+
         if (feedAmount == null || feedDelay == null || feedAmount == 0 || feedDelay < 0) {
             return;
         }
@@ -177,7 +177,7 @@ public class FlagStateManager implements Runnable {
 
     /**
      * Forget a player.
-     * 
+     *
      * @param player The player to forget
      */
     public synchronized void forget(Player player) {
@@ -194,21 +194,21 @@ public class FlagStateManager implements Runnable {
     /**
      * Get a player's flag state. A new state will be created if there is no existing
      * state for the player.
-     * 
+     *
      * @param player The player to get a state for
      * @return The {@code player}'s state
      */
     public synchronized PlayerFlagState getState(Player player) {
         PlayerFlagState state = states.get(player.getName());
-        
+
         if (state == null) {
             state = new PlayerFlagState();
             states.put(player.getName(), state);
         }
-        
+
         return state;
     }
-    
+
     /**
      * Keeps state per player.
      */
@@ -220,6 +220,7 @@ public class FlagStateManager implements Runnable {
         public Boolean lastExitAllowed = null;
         public Boolean notifiedForLeave = false;
         public Boolean notifiedForEnter = false;
+        public GameMode lastGameMode;
         public World lastWorld;
         public int lastBlockX;
         public int lastBlockY;

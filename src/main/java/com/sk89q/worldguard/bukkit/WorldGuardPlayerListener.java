@@ -25,6 +25,7 @@ import java.util.Set;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.ItemID;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -42,6 +43,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -159,6 +161,7 @@ public class WorldGuardPlayerListener implements Listener {
                     String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);//, localPlayer);
                     Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);//, localPlayer);
                     Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);//, localPlayer);
+                    GameMode gameMode = set.getFlag(DefaultFlag.GAME_MODE);
 
                     if (state.lastFarewell != null && (farewell == null
                             || !state.lastFarewell.equals(farewell))) {
@@ -199,6 +202,15 @@ public class WorldGuardPlayerListener implements Listener {
                                 + regionList);
                     }
 
+                    if (gameMode != null && player.getGameMode() != gameMode) {
+                        player.setGameMode(gameMode);
+                    } else {
+                        if (state.lastGameMode != null) {
+                            player.setGameMode(state.lastGameMode);
+                            state.lastGameMode = null;
+                        }
+                    }
+
                     state.lastGreeting = greeting;
                     state.lastFarewell = farewell;
                     state.notifiedForEnter = notifyEnter;
@@ -212,6 +224,21 @@ public class WorldGuardPlayerListener implements Listener {
             }
         }
 	}
+
+    @EventHandler
+    public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+        Player player = event.getPlayer();
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
+        if (wcfg.useRegions) {
+            GameMode gameMode = plugin.getGlobalRegionManager().get(player.getWorld())
+                    .getApplicableRegions(player.getLocation()).getFlag(DefaultFlag.GAME_MODE);
+            if (gameMode != null && event.getNewGameMode() != gameMode) {
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "Your game mode is locked to "
+                        + gameMode + "in this region!");
+            }
+        }
+    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
