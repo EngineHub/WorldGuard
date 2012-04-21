@@ -206,10 +206,12 @@ public class WorldGuardPlayerListener implements Listener {
                                 + regionList);
                     }
 
-                    if (gameMode != null) {
+                    if (!hasBypass && gameMode != null) {
                         if (player.getGameMode() != gameMode) {
                             state.lastGameMode = player.getGameMode();
                             player.setGameMode(gameMode);
+                        } else if (state.lastGameMode == null) {
+                            state.lastGameMode = player.getServer().getDefaultGameMode();
                         }
                     } else {
                         if (state.lastGameMode != null) {
@@ -237,7 +239,7 @@ public class WorldGuardPlayerListener implements Listener {
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
-        if (wcfg.useRegions) {
+        if (wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())) {
             GameMode gameMode = plugin.getGlobalRegionManager().get(player.getWorld())
                     .getApplicableRegions(player.getLocation()).getFlag(DefaultFlag.GAME_MODE);
             if (plugin.getFlagStateManager().getState(player).lastGameMode != null
