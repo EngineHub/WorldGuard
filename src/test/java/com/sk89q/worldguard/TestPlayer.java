@@ -24,6 +24,7 @@ import java.util.HashSet;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 
+@org.junit.Ignore
 public class TestPlayer extends LocalPlayer {
     private String name;
     private Set<String> groups = new HashSet<String>();
