@@ -518,14 +518,12 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (wcfg.useRegions) {
-                if (wcfg.useRegions) {
-                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
-                    for (Block block : event.blockList()) {
-                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
-                            event.blockList().clear();
-                            return;
-                        }
+                for (Block block : event.blockList()) {
+                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
+                        event.blockList().clear();
+                        return;
                     }
                 }
             }
