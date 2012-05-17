@@ -181,7 +181,7 @@ public class WorldGuardEntityListener implements Listener {
     }
 
     private void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (event.getCause() == DamageCause.PROJECTILE) {
+        if (event.getDamager() instanceof Projectile) {
             onEntityDamageByProjectile(event);
             return;
         }
