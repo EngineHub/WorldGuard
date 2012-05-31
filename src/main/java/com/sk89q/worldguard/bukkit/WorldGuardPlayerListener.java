@@ -515,6 +515,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
+        String[] ProtectedBlocks=cfg.PBlocks.split(",");
 
         // Infinite stack removal
         if ((type == BlockID.CHEST
@@ -595,19 +596,16 @@ public class WorldGuardPlayerListener implements Listener {
                 }
             }
 
-            if (type == BlockID.CHEST
-                    || type == BlockID.JUKEBOX //stores the (arguably) most valuable item
-                    || type == BlockID.DISPENSER
-                    || type == BlockID.FURNACE
-                    || type == BlockID.BURNING_FURNACE
-                    || type == BlockID.BREWING_STAND) {
-                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.canBuild(localPlayer)
-                        && !set.allows(DefaultFlag.CHEST_ACCESS, localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to open that in this area.");
-                    event.setUseInteractedBlock(Result.DENY);
-                    event.setCancelled(true);
-                    return;
+            for(int x=0;x<ProtectedBlocks.length;x++){
+                if (type==Integer.parseInt(ProtectedBlocks[x])){
+                    if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                         && !set.canBuild(localPlayer)
+                         && !set.allows(DefaultFlag.CHEST_ACCESS, localPlayer)) {
+                         player.sendMessage(ChatColor.DARK_RED + "You don't have permission to open that in this area.");
+                         event.setUseInteractedBlock(Result.DENY);
+                         event.setCancelled(true);
+                         return;
+                    }     
                 }
             }
 
