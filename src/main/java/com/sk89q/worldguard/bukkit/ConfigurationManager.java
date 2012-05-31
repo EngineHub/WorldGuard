@@ -105,6 +105,8 @@ public class ConfigurationManager {
     public String sqlDsn;
     public String sqlUsername;
     public String sqlPassword;
+    
+    public String PBlocks;
 
     /**
      * Construct the object.
@@ -147,6 +149,8 @@ public class ConfigurationManager {
         sqlDsn = config.getString("regions.sql.dsn", "jdbc:mysql://localhost/worldguard");
         sqlUsername = config.getString("regions.sql.username", "worldguard");
         sqlPassword = config.getString("regions.sql.password", "worldguard");
+        
+        PBlocks = config.getString("regions.PBlocks","23,25,54,61,62,84,116,379");
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
