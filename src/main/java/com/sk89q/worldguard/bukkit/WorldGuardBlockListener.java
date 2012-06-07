@@ -297,7 +297,7 @@ public class WorldGuardBlockListener implements Listener {
             return;
         }
 
-        if (wcfg.blockLighter && cause == IgniteCause.FLINT_AND_STEEL
+        if (wcfg.blockLighter && (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL)
                 && event.getPlayer() != null
                 && !plugin.hasPermission(event.getPlayer(), "worldguard.override.lighter")) {
             event.setCancelled(true);
