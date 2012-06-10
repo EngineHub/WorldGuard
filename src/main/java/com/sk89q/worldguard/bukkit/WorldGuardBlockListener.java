@@ -34,6 +34,7 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
@@ -264,6 +265,28 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
+    /*
+     * Called when a block grows.
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockGrow(BlockGrowEvent event) {
+	    Block block = event.getBlock();
+	    World world = block.getWorld();
+	    
+	    ConfigurationManager cfg = plugin.getGlobalStateManager();
+	    WorldConfiguration wcfg = cfg.get(world);
+	    
+	    // TODO: Add an global configuration option here.
+	    
+	    if (wcfg.useRegions) {
+		    Vector pt = toVector(block);
+		    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+	            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+	            
+	            if (block.getTypeId() == BlockID.VINE && !set.allows(DefaultFlag.VINES)) event.setCancelled(true);
+	    }
+    }
+    
     /*
      * Called when a block gets ignited.
      */
