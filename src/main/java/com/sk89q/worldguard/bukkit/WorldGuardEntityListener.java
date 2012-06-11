@@ -310,12 +310,12 @@ public class WorldGuardEntityListener implements Listener {
                 }
                 
                 if (!global.allows(DefaultFlag.MONSTER_ATTACK, defender.getLocation()) && attacker instanceof Creature) {
-                	event.setCancelled(true);
-                	
-                	// reset target
-                	Creature creature = (Creature) attacker;
-                	creature.setTarget(null); // FIXME: We should reset the target onEntityMove. But there's currently no event like that.
-                	return;
+                    event.setCancelled(true);
+                    
+                    // reset target
+                    Creature creature = (Creature) attacker;
+                    creature.setTarget(null); // FIXME: We should reset the target onEntityMove. But there's currently no event like that.
+                    return;
                 }
 
                 if (wcfg.useRegions) {
@@ -843,8 +843,8 @@ public class WorldGuardEntityListener implements Listener {
     
     @EventHandler(ignoreCancelled = true)
     public void onEntityTargetLivingEntity(EntityTargetLivingEntityEvent event) {
-	    GlobalRegionManager global = plugin.getGlobalRegionManager();
-	    if (!global.allows(DefaultFlag.MONSTER_ATTACK, event.getTarget().getLocation())) event.setCancelled(true);
+        GlobalRegionManager global = plugin.getGlobalRegionManager();
+        if (!global.allows(DefaultFlag.MONSTER_ATTACK, event.getTarget().getLocation())) event.setCancelled(true);
     }
 
     /**
