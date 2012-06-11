@@ -491,7 +491,7 @@ public class WorldGuardBlockListener implements Listener {
                 	if (vineBlock.getTypeId() == BlockID.VINE) break;
                 }
                 
-                if (vineBlock != null && !blockPlaceWorkaroundList.contains(vineBlock.getLocation())) {
+                if (vineBlock != null && vineBlock.getTypeId() == BlockID.VINE && !blockPlaceWorkaroundList.contains(vineBlock.getLocation())) {
                     vineBlock.setType(Material.AIR); // FIXME: This seems to be not the best way!
                 } else if (vineBlock != null && blockPlaceWorkaroundList.contains(vineBlock.getLocation())) {
                     final Block tempVineBlock = vineBlock; // We've to use a final copy if we're using an external thread.
