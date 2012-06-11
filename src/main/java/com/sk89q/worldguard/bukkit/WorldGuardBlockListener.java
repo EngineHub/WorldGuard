@@ -75,6 +75,11 @@ public class WorldGuardBlockListener implements Listener {
      * @FIXME This is just a workaround to allow players to place vines in regions with vines-growth set to DENY.
      */
     private List<Location> blockPlaceWorkaroundList = new java.util.Vector<Location>();
+    
+    /**
+     * Used to determinate which directions should be checked for vines-growth flag.
+     */
+    private static final BlockFace[] VINES_GROW_CHECK_DIRECTIONS = new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 
     /**
      * Construct the object.
@@ -480,15 +485,15 @@ public class WorldGuardBlockListener implements Listener {
         
         if (wcfg.useRegions) {
             if (id == BlockID.VINE && !plugin.getGlobalRegionManager().allows(DefaultFlag.VINES_GROWTH, event.getBlock().getLocation())) { // FIXME: Currently this seems to be the only way to prevent vines from growing. Check this again later!
-                // FIXME: This is absolute not the best way to check this! This method could generate some problems (Such as destroying the wrong vine block)
-                Block vineBlock = event.getBlock().getRelative(BlockFace.NORTH);
-                if (vineBlock.getTypeId() != BlockID.VINE) vineBlock = event.getBlock().getRelative(BlockFace.SOUTH);
-                if (vineBlock.getTypeId() != BlockID.VINE) vineBlock = event.getBlock().getRelative(BlockFace.EAST);
-                if (vineBlock.getTypeId() != BlockID.VINE) vineBlock = event.getBlock().getRelative(BlockFace.WEST);
+                Block vineBlock = null;
+                for(BlockFace face : VINES_GROW_CHECK_DIRECTIONS) {
+                	vineBlock = event.getBlock().getRelative(face);
+                	if (vineBlock.getTypeId() == BlockID.VINE) break;
+                }
                 
-                if (vineBlock.getTypeId() == BlockID.VINE && !blockPlaceWorkaroundList.contains(vineBlock.getLocation())) {
+                if (vineBlock != null && !blockPlaceWorkaroundList.contains(vineBlock.getLocation())) {
                     vineBlock.setType(Material.AIR); // FIXME: This seems to be not the best way!
-                } else if (blockPlaceWorkaroundList.contains(vineBlock.getLocation())) {
+                } else if (vineBlock != null && blockPlaceWorkaroundList.contains(vineBlock.getLocation())) {
                     final Block tempVineBlock = vineBlock; // We've to use a final copy if we're using an external thread.
                     
                     // FIXME: This is very dirty! This could cause some lags on very busy servers. Maybe we should add vine-growth to high-freq-flags!
