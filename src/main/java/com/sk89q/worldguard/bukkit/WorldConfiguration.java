@@ -98,6 +98,7 @@ public class WorldConfiguration {
     public boolean blockFireballExplosions;
     public boolean blockFireballBlockDamage;
     public boolean blockEntityPaintingDestroy;
+    public boolean blockPluginSpawning;
     public boolean disableContactDamage;
     public boolean disableFallDamage;
     public boolean disableLavaDamage;
@@ -315,6 +316,7 @@ public class WorldConfiguration {
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
         disableEndermanGriefing = getBoolean("mobs.disable-enderman-griefing", false);
         blockEntityPaintingDestroy = getBoolean("mobs.block-painting-destroy", false);
+        blockPluginSpawning = getBoolean("mobs.block-plugin-spawning", true);
 
         disableFallDamage = getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = getBoolean("player-damage.disable-lava-damage", false);
