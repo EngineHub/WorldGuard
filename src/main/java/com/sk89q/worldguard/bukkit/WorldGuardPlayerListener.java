@@ -47,6 +47,7 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -320,6 +321,30 @@ public class WorldGuardPlayerListener implements Listener {
             }
             if (event.getRecipients().size() == 0) {
                 event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        
+        String hostKey = cfg.hostKeys.get(player.getName().toLowerCase());
+        if (hostKey != null) {
+            String hostname = event.getHostname();
+            int colonIndex = hostname.indexOf(':');
+            if (colonIndex != -1) {
+                hostname = hostname.substring(0, colonIndex);
+            }
+            
+            if (!hostname.equals(hostKey)) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
+                        "You did not join with the valid host key!");
+                plugin.getLogger().warning("WorldGuard host key check: " +
+                        player.getName() + " joined with '" + hostname +
+                        "' but '" + hostKey + "' was expected. Kicked!");
+                return;
             }
         }
     }

@@ -97,6 +97,7 @@ public class ConfigurationManager {
     public boolean activityHaltToggle = false;
     public boolean autoGodMode;
     public boolean usePlayerMove;
+    public Map<String, String> hostKeys = new HashMap<String, String>();
 
     /**
      * Region Storage Configuration method, and config values
@@ -119,6 +120,7 @@ public class ConfigurationManager {
     /**
      * Load the configuration.
      */
+    @SuppressWarnings("unchecked")
     public void load() {
         // Create the default configuration file
         plugin.createDefaultConfiguration(
@@ -140,6 +142,18 @@ public class ConfigurationManager {
         config.removeProperty("auto-invincible-permission");
         usePlayerMove = config.getBoolean(
                 "use-player-move-event", true);
+        
+        hostKeys = new HashMap<String, String>();
+        Object hostKeysRaw = config.getProperty("host-keys");
+        if (hostKeysRaw == null || !(hostKeysRaw instanceof Map)) {
+            config.setProperty("host-keys", new HashMap<String, String>());
+        } else {
+            for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) hostKeysRaw).entrySet()) {
+                String key = String.valueOf(entry.getKey());
+                String value = String.valueOf(entry.getValue());
+                hostKeys.put(key.toLowerCase(), value);
+            }
+        }
 
         useSqlDatabase = config.getBoolean(
                 "regions.sql.use", false);
