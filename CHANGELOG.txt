@@ -1,3 +1,13 @@
+5.5.3:
+- Added game mode flag.
+- Added item drop pickup flag to regions.
+- Added support for fireball item blocking (385).
+- Added configuration option to allow creature spawns from plugins.
+- Added host key check.
+- Added a new line split feature to region greetings.
+- Prevented commands in the allow commands list from being blocked and
+    vice versa.
+
 5.5.2:
  - Added potion-splash flag to block splash potions
  - Add entity-painting-destroy which can be used to prevent entities from destroying paintings (skeletons firing arrows)
