@@ -278,14 +278,14 @@ public class GeneralCommands {
                             item.getEnchantments().equals(item2.getEnchantments())) {
                         // This stack won't fit in the parent stack
                         if (item2.getAmount() > needed) {
-                            item.setAmount(64);
+                            item.setAmount(max);
                             item2.setAmount(item2.getAmount() - needed);
                             break;
                         // This stack will
                         } else {
                             items[j] = null;
                             item.setAmount(item.getAmount() + item2.getAmount());
-                            needed = 64 - item.getAmount();
+                            needed = max - item.getAmount();
                         }
 
                         affected++;
