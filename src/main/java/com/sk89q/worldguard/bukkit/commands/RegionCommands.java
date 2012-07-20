@@ -1081,7 +1081,7 @@ public class RegionCommands {
 
     @Command(aliases = {"teleport", "tp"}, usage = "<id>", flags = "s",
             desc = "Teleports you to the location associated with the region.", min = 1, max = 1)
-    @CommandPermissions({"worldguard.region.teleport"})
+    @CommandPermissions({"worldguard.region.teleport","worldguard.region.teleport.own.*","worldguard.region.teleport.member.*"})
     public void teleport(CommandContext args, CommandSender sender) throws CommandException {
         final Player player = plugin.checkPlayer(sender);
 
@@ -1097,12 +1097,12 @@ public class RegionCommands {
         }
 
         id = region.getId();
-
+        
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.teleport.own." + id.toLowerCase());
+        	plugin.checkPermission(sender, "worldguard.region.teleport.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.teleport.member." + id.toLowerCase());
+        	plugin.checkPermission(sender, "worldguard.region.teleport.member." + id.toLowerCase());
         } else {
             plugin.checkPermission(sender, "worldguard.region.teleport." + id.toLowerCase());
         }
