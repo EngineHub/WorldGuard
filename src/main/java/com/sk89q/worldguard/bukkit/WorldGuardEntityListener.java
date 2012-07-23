@@ -624,7 +624,7 @@ public class WorldGuardEntityListener implements Listener {
 
         Location eventLoc = event.getLocation();
 
-        if (wcfg.useRegions) {
+        if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
             Vector pt = toVector(eventLoc);
             RegionManager mgr = plugin.getGlobalRegionManager().get(eventLoc.getWorld());
             // @TODO get victims' stacktraces and find out why it's null anyway

@@ -94,6 +94,7 @@ public class ConfigurationManager {
     private boolean hasCommandBookGodMode = false;
 
     public boolean useRegionsScheduler;
+    public boolean useRegionsCreatureSpawnEvent;
     public boolean activityHaltToggle = false;
     public boolean autoGodMode;
     public boolean usePlayerMove;
@@ -137,6 +138,8 @@ public class ConfigurationManager {
         config.removeProperty("suppress-tick-sync-warnings");
         useRegionsScheduler = config.getBoolean(
                 "regions.use-scheduler", true);
+        useRegionsCreatureSpawnEvent = config.getBoolean(
+                "regions.use-creature-spawn-event", true);
         autoGodMode = config.getBoolean(
                 "auto-invincible", config.getBoolean("auto-invincible-permission", false));
         config.removeProperty("auto-invincible-permission");
