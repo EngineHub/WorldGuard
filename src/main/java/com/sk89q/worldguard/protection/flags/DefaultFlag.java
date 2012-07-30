@@ -71,6 +71,7 @@ public final class DefaultFlag {
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave", RegionGroup.ALL);
+    public static final BooleanFlag ALLOW_FLIGHT = new BooleanFlag("allow-flight", RegionGroup.ALL);
     public static final SetFlag<EntityType> DENY_SPAWN = new SetFlag<EntityType>("deny-spawn", RegionGroup.ALL, new EntityTypeFlag(null));
     public static final EnumFlag<GameMode> GAME_MODE = new EnumFlag<GameMode>("game-mode", GameMode.class, RegionGroup.ALL);
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay", RegionGroup.ALL);
@@ -87,7 +88,6 @@ public final class DefaultFlag {
     public static final DoubleFlag PRICE = new DoubleFlag("price");
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
-	public static final BooleanFlag ALLOW_FLIGHT = new BooleanFlag("allow-flight", RegionGroup.ALL);
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
