@@ -713,6 +713,15 @@ public class WorldGuardPlayerListener implements Listener {
                     return;
                 }
             }
+            
+            if (type == BlockID.REDSTONE_REPEATER_OFF || type == BlockID.REDSTONE_REPEATER_ON) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world) && !set.canBuild(localPlayer)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to alter repeaters here.");
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         }
 
         if (wcfg.getBlacklist() != null) {
