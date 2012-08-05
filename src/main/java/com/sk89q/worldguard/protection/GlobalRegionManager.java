@@ -23,6 +23,7 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
@@ -65,7 +66,7 @@ public class GlobalRegionManager {
     /**
      * Map of managers per-world.
      */
-    private HashMap<String, RegionManager> managers;
+    private ConcurrentHashMap<String, RegionManager> managers;
 
     /**
      * Stores the list of modification dates for the world files. This allows
@@ -81,7 +82,7 @@ public class GlobalRegionManager {
     public GlobalRegionManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
         config = plugin.getGlobalStateManager();
-        managers = new HashMap<String, RegionManager>();
+        managers = new ConcurrentHashMap<String, RegionManager>();
         lastModified = new HashMap<String, Long>();
     }
 
@@ -125,19 +126,27 @@ public class GlobalRegionManager {
         lastModified.clear();
     }
 
+    public RegionManager load(World world) {
+        RegionManager manager = create(world);
+        managers.put(world.getName(), manager);
+        return manager;
+    }
+
     /**
      * Load region information for a world.
      *
      * @param world The world to load a RegionManager for
      * @return the loaded RegionManager
      */
-    public RegionManager load(World world) {
+    public RegionManager create(World world) {
         String name = world.getName();
+        boolean sql = config.useSqlDatabase;
+        String sqlDsn = config.sqlDsn;
         ProtectionDatabase database;
         File file = null;
-        
+
         try {
-            if (!config.useSqlDatabase) {
+            if (!sql) {
                 file = getPath(name);
                 database = new YAMLDatabase(file, plugin.getLogger());
 
@@ -149,8 +158,6 @@ public class GlobalRegionManager {
 
             // Create a manager
             RegionManager manager = new FlatRegionManager(database);
-
-            managers.put(name, manager);
             manager.load();
 
             plugin.getLogger().info(manager.getRegions().size()
@@ -159,7 +166,7 @@ public class GlobalRegionManager {
             return manager;
         } catch (ProtectionDatabaseException e) {
             String logStr = "Failed to load regions from ";
-            if (config.useSqlDatabase) {
+            if (sql) {
                 logStr += "SQL Database <" + config.sqlDsn + "> ";
             } else {
                 logStr += "file \"" + file + "\" ";
@@ -224,9 +231,14 @@ public class GlobalRegionManager {
      */
     public RegionManager get(World world) {
         RegionManager manager = managers.get(world.getName());
+        RegionManager newManager = null;
 
-        if (manager == null) {
-            manager = load(world);
+        while (manager == null) {
+            if (newManager == null) {
+                newManager = create(world);
+            }
+            managers.putIfAbsent(world.getName(), newManager);
+            manager = managers.get(world.getName());
         }
 
         return manager;
@@ -353,7 +365,7 @@ public class GlobalRegionManager {
             return true;
         }
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionManager mgr = get(world);
         return mgr.getApplicableRegions(toVector(loc)).allows(flag, player);
     }
 }

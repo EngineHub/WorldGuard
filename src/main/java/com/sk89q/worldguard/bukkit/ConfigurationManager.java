@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.GodComponent;
@@ -73,7 +75,7 @@ public class ConfigurationManager {
     /**
      * Holds configurations for different worlds.
      */
-    private Map<String, WorldConfiguration> worlds;
+    private ConcurrentMap<String, WorldConfiguration> worlds;
 
     /**
      * The global configuration for use when loading worlds
@@ -115,7 +117,7 @@ public class ConfigurationManager {
      */
     public ConfigurationManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-        this.worlds = new HashMap<String, WorldConfiguration>();
+        this.worlds = new ConcurrentHashMap<String, WorldConfiguration>();
     }
 
     /**
@@ -145,7 +147,7 @@ public class ConfigurationManager {
         config.removeProperty("auto-invincible-permission");
         usePlayerMove = config.getBoolean(
                 "use-player-move-event", true);
-        
+
         hostKeys = new HashMap<String, String>();
         Object hostKeysRaw = config.getProperty("host-keys");
         if (hostKeysRaw == null || !(hostKeysRaw instanceof Map)) {
@@ -193,10 +195,14 @@ public class ConfigurationManager {
     public WorldConfiguration get(World world) {
         String worldName = world.getName();
         WorldConfiguration config = worlds.get(worldName);
+        WorldConfiguration newConfig = null;
 
-        if (config == null) {
-            config = new WorldConfiguration(plugin, worldName, this.config);
-            worlds.put(worldName, config);
+        while (config == null) {
+            if (newConfig == null) {
+                newConfig = new WorldConfiguration(plugin, worldName, this.config);
+            }
+            worlds.putIfAbsent(world.getName(), newConfig);
+            config = worlds.get(world.getName());
         }
 
         return config;

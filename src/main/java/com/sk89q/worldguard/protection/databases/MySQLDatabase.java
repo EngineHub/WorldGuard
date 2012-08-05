@@ -70,7 +70,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
         try {
             connect();
-            
+
             try {
             	// Test if the database is up to date, if not throw a critical error
             	PreparedStatement verTest = this.conn.prepareStatement(
@@ -132,7 +132,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     		} catch (SQLException ex) {
                 // Test if the dummy query failed because the connection is dead,
                 // and if it is mark the connection as closed (the MySQL Driver
-                // does not ensure that the connection is marked as closed unless 
+                // does not ensure that the connection is marked as closed unless
                 // the close() method has been called.
     			if ("08S01".equals(ex.getSQLState())) {
     				conn.close();
@@ -148,7 +148,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         // @TODO: Iterate _ONCE_
         try {
             PreparedStatement flagsStatement = this.conn.prepareStatement(
-                    "SELECT " + 
+                    "SELECT " +
                     "`region_flag`.`flag`, " +
                     "`region_flag`.`value` " +
                     "FROM `region_flag` " +
@@ -463,7 +463,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         parentSets = new HashMap<ProtectedRegion,String>();
 
         // We load the cuboid regions first, as this is likely to be the
-        // largest dataset. This should save time in regards to the putAll()s 
+        // largest dataset. This should save time in regards to the putAll()s
         this.loadCuboid();
         Map<String,ProtectedRegion> regions = this.cuboidRegions;
         this.cuboidRegions = null;
@@ -625,10 +625,10 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
      *   b) If the region is not in the database, we insert it
      *  3) We iterate over what remains of the in-database list and remove
      *     them from the database
-     *     
+     *
      * TODO: Look at adding/removing/updating the database when the in
      *       memory region is created/remove/updated
-     *        
+     *
      * @see com.sk89q.worldguard.protection.databases.ProtectionDatabase#save()
      */
     public void save() throws ProtectionDatabaseException {
