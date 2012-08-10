@@ -667,7 +667,8 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (type == BlockID.CAKE_BLOCK) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.canBuild(localPlayer)) {
+                        && !set.canBuild(localPlayer)
+                        && !set.allows(DefaultFlag.USE, localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
