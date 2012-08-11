@@ -141,7 +141,6 @@ public class GlobalRegionManager {
     public RegionManager create(World world) {
         String name = world.getName();
         boolean sql = config.useSqlDatabase;
-        String sqlDsn = config.sqlDsn;
         ProtectionDatabase database;
         File file = null;
 
