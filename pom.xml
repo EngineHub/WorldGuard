@@ -15,10 +15,10 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:git://github.com/sk89q/worldedit.git</connection>
-    <url>https://github.com/sk89q/worldedit</url>
+    <connection>scm:git:git://github.com/sk89q/worldguard.git</connection>
+    <url>https://github.com/sk89q/worldguard</url>
     <tag>master</tag>
-    <developerConnection>scm:git:git@github.com:sk89q/worldedit.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:sk89q/worldguard.git</developerConnection>
   </scm>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -84,7 +84,7 @@
   <distributionManagement>
     <site>
       <id>sk89q-docs-upload</id>
-      <url>ftp://sk89q-maven-deploy/worldedit/</url>
+      <url>ftp://sk89q-maven-deploy/worldguard/</url>
     </site>
   </distributionManagement>
   <build>
