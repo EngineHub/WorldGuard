@@ -166,7 +166,7 @@ public class ReportWriter {
     }
     
     private void appendPluginInformation(Plugin[] plugins) {
-        appendHeader("Plugins");
+        appendHeader("Plugins (" + plugins.length + ")");
         
         LogListBlock log = new LogListBlock();
         
