@@ -22,19 +22,35 @@ package com.sk89q.worldguard.protection.regions;
 import org.khelekore.prtree.MBRConverter;
 
 public class ProtectedRegionMBRConverter implements MBRConverter<ProtectedRegion> {
-    public double getMinX(ProtectedRegion t) {
-        return t.getMinimumPoint().getBlockX();
+
+    @Override
+    public int getDimensions() {
+        return 3;
     }
 
-    public double getMinY(ProtectedRegion t) {
-        return t.getMinimumPoint().getBlockZ();
+    @Override
+    public double getMax(int dimension, ProtectedRegion region) {
+        switch (dimension) {
+            case 0:
+                return region.getMaximumPoint().getBlockX();
+            case 1:
+                return region.getMaximumPoint().getBlockY();
+            case 2:
+                return region.getMaximumPoint().getBlockZ();
+        }
+        return 0;
     }
 
-    public double getMaxX(ProtectedRegion t) {
-        return t.getMaximumPoint().getBlockX();
-    }
-
-    public double getMaxY(ProtectedRegion t) {
-        return t.getMaximumPoint().getBlockZ();
+    @Override
+    public double getMin(int dimension, ProtectedRegion region) {
+        switch (dimension) {
+            case 0:
+                return region.getMinimumPoint().getBlockX();
+            case 1:
+                return region.getMinimumPoint().getBlockY();
+            case 2:
+                return region.getMinimumPoint().getBlockZ();
+        }
+        return 0;
     }
 }
