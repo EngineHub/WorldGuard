@@ -175,6 +175,7 @@
               <artifactSet>
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
+                  <include>org.khelekore:prtree</include>
                 </includes>
               </artifactSet>
             </configuration>
