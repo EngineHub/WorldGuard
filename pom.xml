@@ -165,9 +165,10 @@
             </goals>
             <configuration>
               <artifactSet>
-                <!-- We want to bundle in the modified CSV library -->
+                <!-- We want to bundle in the modified CSV library and the PRTree library -->
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
+                  <include>org.khelekore:prtree</include>
                 </includes>
               </artifactSet>
             </configuration>
