@@ -333,7 +333,7 @@ public class WorldGuardBlockListener implements Listener {
             if (player != null && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-                if (cause == IgniteCause.FLINT_AND_STEEL) {
+                if (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL) {
                     if (!set.canBuild(localPlayer)) {
                         event.setCancelled(true);
                         return;
