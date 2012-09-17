@@ -71,6 +71,7 @@ public final class DefaultFlag {
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave", RegionGroup.ALL);
+    public static final BooleanFlag ALLOW_FLIGHT = new BooleanFlag("allow-flight", RegionGroup.ALL);
     public static final SetFlag<EntityType> DENY_SPAWN = new SetFlag<EntityType>("deny-spawn", RegionGroup.ALL, new EntityTypeFlag(null));
     public static final EnumFlag<GameMode> GAME_MODE = new EnumFlag<GameMode>("game-mode", GameMode.class, RegionGroup.ALL);
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay", RegionGroup.ALL);
@@ -101,7 +102,7 @@ public final class DefaultFlag {
         MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, SEND_CHAT, RECEIVE_CHAT,
         FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
         TELE_LOC, SPAWN_LOC, POTION_SPLASH,
-        BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
+        BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ALLOW_FLIGHT,
     };
 
 

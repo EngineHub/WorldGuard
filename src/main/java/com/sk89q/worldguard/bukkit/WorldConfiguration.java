@@ -136,6 +136,7 @@ public class WorldConfiguration {
     public boolean disablePigZap;
     public boolean disableCreeperPower;
     public boolean disableHealthRegain;
+    public boolean noFly;
     public boolean disableMushroomSpread;
     public boolean disableIceMelting;
     public boolean disableSnowMelting;
@@ -293,7 +294,7 @@ public class WorldConfiguration {
 
         pumpkinScuba = getBoolean("default.pumpkin-scuba", false);
         disableHealthRegain = getBoolean("default.disable-health-regain", false);
-
+        noFly = getBoolean("default.modify-flight", false);
         noPhysicsGravel = getBoolean("physics.no-physics-gravel", false);
         noPhysicsSand = getBoolean("physics.no-physics-sand", false);
         allowPortalAnywhere = getBoolean("physics.allow-portal-anywhere", false);

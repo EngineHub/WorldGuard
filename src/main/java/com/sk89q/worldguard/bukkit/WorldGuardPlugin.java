@@ -135,12 +135,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         LegacyWorldGuardMigration.migrateBlacklist(this);
 
         try {
-        	// Load the configuration
-        	configuration.load();
-        	globalRegionManager.preload();
+            // Load the configuration
+            configuration.load();
+            globalRegionManager.preload();
         } catch (FatalConfigurationLoadingException e) {
-        	e.printStackTrace();
-        	getServer().shutdown();
+            e.printStackTrace();
+            getServer().shutdown();
         }
 
         // Migrate regions after the regions were loaded because

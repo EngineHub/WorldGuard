@@ -162,6 +162,7 @@ public class WorldGuardPlayerListener implements Listener {
                     String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);//, localPlayer);
                     Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);//, localPlayer);
                     Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);//, localPlayer);
+                    Boolean allowFlight = set.getFlag(DefaultFlag.ALLOW_FLIGHT);//, localPlayer);
                     GameMode gameMode = set.getFlag(DefaultFlag.GAME_MODE);
 
                     if (state.lastFarewell != null && (farewell == null
@@ -206,6 +207,22 @@ public class WorldGuardPlayerListener implements Listener {
                                 + ChatColor.WHITE
                                 + regionList);
                     }
+                    
+                    if (allowFlight == null) {
+                        if ((plugin.getServer().getDefaultGameMode() == GameMode.CREATIVE && player.getGameMode() == GameMode.CREATIVE) || player.getGameMode() == GameMode.CREATIVE) {
+                            allowFlight = true;
+                        } else {
+                            allowFlight = false;
+                        }
+                    }
+                    
+                    if (player.getAllowFlight() && !allowFlight && !hasBypass && wcfg.noFly == true) {
+                        player.setAllowFlight(false);
+                        state.lastAllowFlight = true;
+                    } else if (!player.getAllowFlight() && allowFlight) {
+                        player.setAllowFlight(true);
+                        state.lastAllowFlight = false;
+                    }
 
                     if (!hasBypass && gameMode != null) {
                         if (player.getGameMode() != gameMode) {
@@ -234,7 +251,7 @@ public class WorldGuardPlayerListener implements Listener {
                 }
             }
         }
-	}
+    }
 
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
@@ -693,6 +710,15 @@ public class WorldGuardPlayerListener implements Listener {
                         && !set.allows(DefaultFlag.PLACE_VEHICLE, localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to place vehicles here.");
                     event.setUseItemInHand(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+            
+            if (type == BlockID.REDSTONE_REPEATER_OFF || type == BlockID.REDSTONE_REPEATER_ON) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world) && !set.canBuild(localPlayer)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to alter repeaters here.");
+                    event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
                 }
