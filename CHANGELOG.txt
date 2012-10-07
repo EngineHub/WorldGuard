@@ -1,3 +1,13 @@
+5.5.4:
+- Minecraft 1.3 support.
+- Fixed /stack dupe bugs.
+- Added regions.use-creature-spawn-event.
+- Update for Async chat issue.
+- Add use flag to cakes.
+- Report number of plugins loaded in report writer.
+- Updated fireblal item blocking.
+- Fixed permissions for /region reload.
+
 5.5.3:
 - Added game mode flag.
 - Added item drop pickup flag to regions.
