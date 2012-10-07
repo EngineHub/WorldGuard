@@ -955,6 +955,7 @@ public class RegionCommands {
     
     @Command(aliases = {"load", "reload"}, usage = "[world]",
             desc = "Reload regions from file", max = 1)
+    @CommandPermissions({"worldguard.region.load"})
     public void load(CommandContext args, CommandSender sender) throws CommandException {
         
         World world = null;
@@ -993,6 +994,7 @@ public class RegionCommands {
     
     @Command(aliases = {"save", "write"}, usage = "[world]",
             desc = "Re-save regions to file", max = 1)
+    @CommandPermissions({"worldguard.region.save"})
     public void save(CommandContext args, CommandSender sender) throws CommandException {
         
         World world = null;
