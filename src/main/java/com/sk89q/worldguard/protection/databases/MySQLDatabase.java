@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.databases;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
@@ -125,20 +128,20 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     }
 
     private void connect() throws SQLException {
-    	if (conn != null) {
-    		// Make a dummy query to check the connnection is alive.
-    		try {
-    			conn.prepareStatement("SELECT 1;").execute();
-    		} catch (SQLException ex) {
+        if (conn != null) {
+            // Make a dummy query to check the connnection is alive.
+            try {
+                conn.prepareStatement("SELECT 1;").execute();
+            } catch (SQLException ex) {
                 // Test if the dummy query failed because the connection is dead,
                 // and if it is mark the connection as closed (the MySQL Driver
                 // does not ensure that the connection is marked as closed unless
                 // the close() method has been called.
-    			if ("08S01".equals(ex.getSQLState())) {
-    				conn.close();
-    			}
-    		}
-    	}
+                if ("08S01".equals(ex.getSQLState())) {
+                    conn.close();
+                }
+            }
+        }
         if (conn == null || conn.isClosed()) {
             conn = DriverManager.getConnection(config.sqlDsn, config.sqlUsername, config.sqlPassword);
         }
@@ -161,9 +164,18 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
             Map<String,Object> regionFlags = new HashMap<String,Object>();
             while (flagsResultSet.next()) {
+                Object value = flagsResultSet.getObject("value");
+                // check if its a string list and convert back
+                if(value instanceof String) {
+                    String str = (String) value;
+                    String[] valueArr = StringUtils.split(str, ";");
+                if(valueArr.length > 1)
+                        value = new ArrayList<String>(Arrays.asList(valueArr));
+                }
+                
                 regionFlags.put(
                         flagsResultSet.getString("flag"),
-                        flagsResultSet.getObject("value")
+                        value
                 );
             }
 
@@ -719,6 +731,19 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
                 removeRegion.setString(1, name);
                 removeRegion.execute();
+
+                PreparedStatement removeRegionCuboid = this.conn.prepareStatement(
+                        "DELETE FROM `region_cuboid` WHERE `region_id` = ? "
+                );
+                removeRegionCuboid.setString(1, name);
+                removeRegionCuboid.execute();
+
+                PreparedStatement removeRegionPlayers = this.conn.prepareStatement(
+                        "DELETE FROM `region_players` WHERE `region_id` = ? "
+                );
+                removeRegionPlayers.setString(1, name);
+                removeRegionPlayers.execute();
+
             } catch (SQLException ex) {
                 logger.warning("Could not remove region from database " + name + ": " + ex.getMessage());
             }
@@ -753,8 +778,14 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
             insertFlagStatement.setString(1, region.getId().toLowerCase());
             insertFlagStatement.setString(2, entry.getKey().getName());
-            insertFlagStatement.setObject(3, flag);
-
+            // if its a list, build a string list
+            if(flag instanceof ArrayList<?>) {
+                @SuppressWarnings("unchecked")
+                ArrayList<String> listFlag = (ArrayList<String>) flag;
+                insertFlagStatement.setObject(3, StringUtils.join(listFlag.toArray(), ";"));
+            } else {
+                insertFlagStatement.setObject(3, flag);
+            }
             insertFlagStatement.execute();
         }
     }
