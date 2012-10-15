@@ -57,6 +57,12 @@ import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 
+// These imports from CraftBukkit/Minecraft are a workaround for implementing
+// the "texture-pack" region flag. Once Bukkit supports a proper API, these can
+// be removed.
+import net.minecraft.server.Packet250CustomPayload;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+
 /**
  * The main class for WorldGuard as a Bukkit plugin.
  *
@@ -847,5 +853,21 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         return message;
+    }
+
+    /**
+     * Switch texture packs on the client.
+     *
+     * Sends a texture pack URL to the client using the builtin "MC|TPack"
+     * plugin channel. The client will then download the texture pack and
+     * automatically switch to it.
+     *
+     * @param player Switch texture pack in this player's client.
+     * @param url URL from which to download the texture pack. Must use
+     * only US-ASCII characters.
+     */
+    public void switchTexturePack(Player player, String url) {
+        byte[] message = (url + "\0" + "16").getBytes();
+        ((CraftPlayer)player).getHandle().netServerHandler.sendPacket(new Packet250CustomPayload("MC|TPack", message));
     }
 }

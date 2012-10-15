@@ -50,6 +50,13 @@
       <version>1.3.2-R1.0</version>
     </dependency>
 
+    <!-- CraftBukkit (workaround for texture-pack flag until Bukkit adds proper API) -->
+    <dependency>
+      <groupId>org.bukkit</groupId>
+      <artifactId>craftbukkit</artifactId>
+      <version>1.3.2-R1.0</version>
+    </dependency>
+
     <!-- CommandBook -->
     <dependency>
       <groupId>com.sk89q</groupId>

@@ -69,6 +69,7 @@ public final class DefaultFlag {
     public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting", RegionGroup.ALL);
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell", RegionGroup.ALL);
+    public static final StringFlag TEXTURE_PACK = new StringFlag("texture-pack", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave", RegionGroup.ALL);
     public static final SetFlag<EntityType> DENY_SPAWN = new SetFlag<EntityType>("deny-spawn", RegionGroup.ALL, new EntityTypeFlag(null));
@@ -93,7 +94,7 @@ public final class DefaultFlag {
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
         CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
-        GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
+        GREET_MESSAGE, FAREWELL_MESSAGE, TEXTURE_PACK, NOTIFY_ENTER, NOTIFY_LEAVE,
         EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ITEM_DROP,
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
