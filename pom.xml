@@ -1,9 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldguard</artifactId>
   <version>5.5.5-SNAPSHOT</version>
   <name>WorldGuard</name>
+  <packaging>jar</packaging>
   <description>WorldGuard protects your Minecraft servers.</description>
   <licenses>
     <license>
@@ -24,12 +27,12 @@
   </properties>
   <repositories>
     <repository>
-      <id>zml-repo</id>
-      <url>http://files.zachsthings.com/repo</url>
-    </repository>
-    <repository>
       <id>sk89q-repo</id>
       <url>http://maven.sk89q.com/repo/</url>
+    </repository>
+    <repository>
+      <id>zml-repo</id>
+      <url>http://files.zachsthings.com/repo</url>
     </repository>
     <repository>
       <id>bukkit-repo</id>
@@ -41,37 +44,47 @@
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
       <version>5.4</version>
+      <scope>compile</scope>
     </dependency>
-
-    <!-- Bukkit -->
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
       <version>1.3.2-R1.0</version>
+      <scope>compile</scope>
     </dependency>
-
-    <!-- CommandBook -->
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>commandbook</artifactId>
-      <version>2.0</version>
+      <version>2.1</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.zachsthings.libcomponents</groupId>
+          <artifactId>libcomponents-bukkit</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.spout</groupId>
+          <artifactId>spoutapi</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-
-    <!-- Additional libraries -->
     <dependency>
       <groupId>com.nijikokun</groupId>
       <artifactId>iconomy</artifactId>
       <version>5.0</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.khelekore</groupId>
       <artifactId>prtree</artifactId>
       <version>1.5</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>net.sf.opencsv</groupId>
       <artifactId>opencsv</artifactId>
       <version>2.0</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -87,6 +100,7 @@
     </site>
   </distributionManagement>
   <build>
+    <defaultGoal>install</defaultGoal>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
     
     <extensions>
@@ -97,7 +111,6 @@
       </extension>
     </extensions>
 
-    <!-- Resources -->
     <resources>
       <resource>
         <targetPath>.</targetPath>
@@ -120,7 +133,6 @@
     </resources>
 
     <plugins>
-      <!-- Compile plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -130,8 +142,7 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-
-      <!-- JAR creation plugin -->
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -149,9 +160,7 @@
           </archive>
         </configuration>
       </plugin>
-
-      <!-- Shade -->
-      <!-- We want to bundle in some dependencies -->
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -164,7 +173,6 @@
             </goals>
             <configuration>
               <artifactSet>
-                <!-- We want to bundle in the modified CSV library and the PRTree library -->
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
                   <include>org.khelekore:prtree</include>
@@ -174,8 +182,7 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- Assembly -->
+      
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.2-beta-2</version>
@@ -192,8 +199,7 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- Release -->
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
@@ -205,7 +211,6 @@
         </configuration>
       </plugin>
       
-      <!-- Site generation -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
