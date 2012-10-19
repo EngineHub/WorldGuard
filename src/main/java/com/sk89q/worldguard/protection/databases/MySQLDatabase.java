@@ -20,6 +20,12 @@
 package com.sk89q.worldguard.protection.databases;
 
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,12 +33,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.representer.Representer;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
@@ -49,6 +55,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritan
 
 public class MySQLDatabase extends AbstractProtectionDatabase {
     private final Logger logger;
+
+    private Yaml yaml;
 
     private Map<String, ProtectedRegion> regions;
 
@@ -122,6 +130,15 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             // no point continuing
             return;
         }
+
+        DumperOptions options = new DumperOptions();
+        options.setIndent(2);
+        options.setDefaultFlowStyle(FlowStyle.FLOW);
+        Representer representer = new Representer();
+        representer.setDefaultFlowStyle(FlowStyle.FLOW);
+
+        // We have to use this in order to properly save non-string values
+        yaml = new Yaml(new SafeConstructor(), new Representer(), options);
     }
 
     private void connect() throws SQLException {
@@ -163,8 +180,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             while (flagsResultSet.next()) {
                 regionFlags.put(
                         flagsResultSet.getString("flag"),
-                        flagsResultSet.getObject("value")
-                );
+                        sqlUnmarshal(flagsResultSet.getString("value"))
+                        );
             }
 
             // @TODO: Make this better
@@ -453,6 +470,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         poly2dRegions = regions;
     }
 
+    @Override
     public void load() throws ProtectionDatabaseException {
         try {
             connect();
@@ -631,6 +649,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
      *
      * @see com.sk89q.worldguard.protection.databases.ProtectionDatabase#save()
      */
+    @Override
     public void save() throws ProtectionDatabaseException {
         try {
             connect();
@@ -739,7 +758,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         for (Map.Entry<Flag<?>, Object> entry : region.getFlags().entrySet()) {
             if (entry.getValue() == null) continue;
 
-            Object flag = marshalFlag(entry.getKey(), entry.getValue());
+            Object flag = sqlMarshal(marshalFlag(entry.getKey(), entry.getValue()));
 
             PreparedStatement insertFlagStatement = this.conn.prepareStatement(
                     "INSERT INTO `region_flag` ( " +
@@ -1007,11 +1026,25 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         updateRegion(region, "global");
     }
 
+    @Override
     public Map<String, ProtectedRegion> getRegions() {
         return regions;
     }
 
+    @Override
     public void setRegions(Map<String, ProtectedRegion> regions) {
         this.regions = regions;
+    }
+    
+    protected Object sqlUnmarshal(String rawValue) {
+        try {
+            return yaml.load(rawValue);
+        } catch (YAMLException e) {
+            return String.valueOf(rawValue);
+        }
+    }
+    
+    protected String sqlMarshal(Object rawObject) {
+        return yaml.dump(rawObject);
     }
 }
