@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -126,7 +129,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
     private void connect() throws SQLException {
     	if (conn != null) {
-    		// Make a dummy query to check the connnection is alive.
+    		// Make a dummy query to check the connection is alive.
     		try {
     			conn.prepareStatement("SELECT 1;").execute();
     		} catch (SQLException ex) {
@@ -144,41 +147,53 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         }
     }
 
-    private void loadFlags(ProtectedRegion region) {
+    private void loadFlags(ProtectedRegion region)
+    {
         // @TODO: Iterate _ONCE_
-        try {
+        try
+        {
             PreparedStatement flagsStatement = this.conn.prepareStatement(
                     "SELECT " +
                     "`region_flag`.`flag`, " +
-                    "`region_flag`.`value` " +
+                    "`region_flag`.`value` " + 
                     "FROM `region_flag` " +
                     "WHERE `region_flag`.`region_id` = ? " +
-                    "AND `region_flag`.`world_id` = " + this.worldDbId
+                    "AND `region_flag`.`world_id` = " +
+                    this.worldDbId
             );
 
             flagsStatement.setString(1, region.getId().toLowerCase());
             ResultSet flagsResultSet = flagsStatement.executeQuery();
 
-            Map<String,Object> regionFlags = new HashMap<String,Object>();
-            while (flagsResultSet.next()) {
-                regionFlags.put(
-                        flagsResultSet.getString("flag"),
-                        flagsResultSet.getObject("value")
-                );
-            }
+            Map<String, Object> regionFlags = new HashMap<String, Object>();
 
-            // @TODO: Make this better
-            for (Flag<?> flag : DefaultFlag.getFlags()) {
-                Object o = regionFlags.get(flag.getName());
-                if (o != null) {
-                    setFlag(region, flag, o);
+            while (flagsResultSet.next())
+            {
+                InputStream is = flagsResultSet.getBlob("value").getBinaryStream();
+                ObjectInputStream ois = new ObjectInputStream(is);
+                Object value = ois.readObject();
+
+                regionFlags.put(flagsResultSet.getString("flag"), value);
+
+                // @TODO: Make this better
+                for (Flag<?> flag : DefaultFlag.getFlags())
+                {
+                	Object o = regionFlags.get(flag.getName());
+                	if (o != null)
+                	{
+                		setFlag(region, flag, o);
+                	}
                 }
             }
-        } catch (SQLException ex) {
-            logger.warning(
-                    "Unable to load flags for region "
-                    + region.getId().toLowerCase() + ": " + ex.getMessage()
-            );
+        } catch (SQLException ex)
+        {
+            logger.warning("SQL Error: Unable to load flags for region " + region.getId().toLowerCase() + ": " + ex.getMessage());
+        } catch (IOException ex)
+        {
+            logger.warning("Stream Error: Unable to load flags for region "	+ region.getId().toLowerCase() + ": " + ex.getMessage());
+        } catch (ClassNotFoundException ex)
+        {
+            logger.warning("Object Error: Unable to load flags for region "	+ region.getId().toLowerCase() + ": " + ex.getMessage());
         }
     }
 
