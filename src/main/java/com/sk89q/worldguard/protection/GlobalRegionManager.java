@@ -42,6 +42,7 @@ import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.databases.MySQLDatabase;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.FlatRegionManager;
+import com.sk89q.worldguard.protection.managers.PRTreeRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
@@ -156,7 +157,7 @@ public class GlobalRegionManager {
             }
 
             // Create a manager
-            RegionManager manager = new FlatRegionManager(database);
+            RegionManager manager = new PRTreeRegionManager(database);
             manager.load();
 
             plugin.getLogger().info(manager.getRegions().size()
