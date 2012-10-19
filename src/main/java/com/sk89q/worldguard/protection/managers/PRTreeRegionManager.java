@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.khelekore.prtree.MBR;
 import org.khelekore.prtree.MBRConverter;
 import org.khelekore.prtree.PRTree;
+import org.khelekore.prtree.SimpleMBR;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
@@ -115,11 +117,9 @@ public class PRTreeRegionManager extends RegionManager {
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
         List<ProtectedRegion> appRegions =
                 new ArrayList<ProtectedRegion>();
+        MBR pointMBR = new SimpleMBR(pt.getX(), pt.getX(), pt.getY(), pt.getY(), pt.getZ(), pt.getZ());
 
-        int x = pt.getBlockX();
-        int z = pt.getBlockZ();
-
-        for (ProtectedRegion region : tree.find(x, z, x, z)) {
+        for (ProtectedRegion region : tree.find(pointMBR)) {
             if (region.contains(pt)) {
                 appRegions.add(region);
             }
@@ -148,11 +148,9 @@ public class PRTreeRegionManager extends RegionManager {
     @Override
     public List<String> getApplicableRegionsIDs(Vector pt) {
         List<String> applicable = new ArrayList<String>();
+        MBR pointMBR = new SimpleMBR(pt.getX(), pt.getX(), pt.getY(), pt.getY(), pt.getZ(), pt.getZ());
 
-        int x = pt.getBlockX();
-        int z = pt.getBlockZ();
-
-        for (ProtectedRegion region : tree.find(x, z, x, z)) {
+        for (ProtectedRegion region : tree.find(pointMBR)) {
             if (region.contains(pt)) {
                 applicable.add(region.getId());
             }
