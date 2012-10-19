@@ -217,6 +217,7 @@ public class FlagStateManager implements Runnable {
         public long lastFeed;
         public String lastGreeting;
         public String lastFarewell;
+        public String lastTexture;
         public Boolean lastExitAllowed = null;
         public Boolean notifiedForLeave = false;
         public Boolean notifiedForEnter = false;
