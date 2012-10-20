@@ -9,7 +9,7 @@ WorldGuard is a toolbox of various functions, useful for multiplayer servers, th
 * Assign ownership to areas so only selected individuals can build.
 * Use a number of useful commands.
 
-WorldGuard is open source and is available under the GNU General Public License.
+WorldGuard is open source and is available under the GNU General Public License v3.
 
 Compiling
 ---------

@@ -132,15 +132,15 @@ h2 + * {
         <h3>I or others don't have permission to build.</h3>
         <p>
             Unless you copied configuration files from an older installation of 
-            WorldGuard, your problem is either caused by another plugin, or by not
+            ${project.name}, your problem is either caused by another plugin, or by not
             disabling the built-in spawn protection of the Minecraft server.
         </p>
         
-        <h3>WorldGuard doesn't seem to work.</h3>
+        <h3>${project.name} doesn't seem to work.</h3>
         <p>
             Two common mistakes include forgetting to install WorldEdit
-            (WorldGuard needs it), or making
-            a syntax error in one of WorldGuard's configuration files (this is very
+            (${project.name} needs it), or making
+            a syntax error in one of ${project.name}'s configuration files (this is very
             fatal unfortunately, and can be caused by a single character typed in the wrong place). Try 
             <a href="http://wiki.sk89q.com/wiki/${project.name}/Support">asking in IRC</a>
             to see whether anyone can help you.
@@ -156,14 +156,14 @@ h2 + * {
                 no one can modify the things inside the region.</li>
             <li>That you added the player as an owner or member of the region. If you are using
                 a group (g:groupName), you may have to give the group the permission of
-                group.groupName for WorldGuard to recognize it.</li>
+                group.groupName for ${project.name} to recognize it.</li>
             <li>That you disabled spawn protection. The Minecraft server has an automatic
                 spawn protection feature where only 'ops' can build in a definable
                 radius around spawn (by default, it is 16 blocks). Modify bukkit.yml in order
                 to change the spawn radius to 0.</li>
-            <li>That it's not another plugin causing you trouble. The error messages of WorldGuard are of
+            <li>That it's not another plugin causing you trouble. The error messages of ${project.name} are of
                 a dark red shade. If the color of the "no permission" message is not
-                that color, it is not WorldGuard.</li>
+                that color, it is not ${project.name}.</li>
         </ul>
         
         <h3>Everyone can build in a region I made!</h3>
