@@ -8,65 +8,46 @@ body {
   padding: 20px;
   background: #efefef;
   color: #333;
+  line-height: 1.5;
 }
 #wrapper {
-  margin: 20px auto 20px auto;
+  margin: 1em auto 1em auto;
   width: 600px;
   background: #fff;
-  padding: 40px;
-  border: 1px solid #fff;
-  border-radius: 10px;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
-  box-shadow: 0 0 2px #999;
-  -webkit-box-shadow: 0 0 3px #999;
-}
-a img {
-  border: 0;
+  padding: 3em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;
+  border: 1px solid #ccc;
+  box-shadow: 0 0.3em 0.6em rgba(0, 0, 0, 0.1);
+  line-height: 1.4;
 }
 body, th, td, input {
-  font: 13px/17px "Lucida Grande", "Lucida Sans Unicode", Arial, Verdana, sans-serif;
+  font: 0.8em sans-serif;
 }
 a:link, a:visited {
-  color: #00688f;
-  text-decoration: underline;
+  color: #0004b2;   
+  text-decoration: none;
 }
-a:hover, a:active {
-  color: #000;
-  border: 0;
+a:hover {
+  color: #ac0000;
+  text-decoration: none;
+  border-bottom: 1px solid #999;
 }
 h1 {
-  font: 170% "Trebuchet MS", Georgia, serif;
-  font-weight: bold;
-  color: #b90000;
-  margin: 15px 0 5px 0;
+  font: 2.2em 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  color: #6a45ac;
+  margin: 0 0;
+  padding: 0 0 0.2em 0;
+  font-weight: normal;
 }
 h2 {
-  font: 130% "Trebuchet MS", Georgia, serif;
+  font: 1.4em 'Trebuchet MS', Helvetica, Arial, sans-serif;
+  color: #555;
+  margin: 1.6em 0 1em 0;
+  padding: 0 0 0.2em 0;
+  border-bottom: 1px solid #CCC;
   font-weight: bold;
-  color: #6a45ac;
-  margin: 50px 0 5px 0;
-  padding: 0 0 3px 0;
-  border-bottom: 1px solid #ccc;
-}
-.warning {
-  background: #fffedf;
-  padding: 8px;
-  border: 1px dashed #ccc;
-  border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  font-size: 90%;
-}
-.subtle {
-  color: #999;
-}
-.optional {
-  background: none repeat scroll 0 0 #FFE081;
-  border-radius: 3px 3px 3px 3px;
-  font-size: 80%;
-	font-weight: normal;
-  padding: 1px 4px;
 }
 </style>
 </head>
@@ -75,42 +56,28 @@ h2 {
 <div id="wrapper">
 
 <h1>WorldGuard ${version}</h1>
-<p>Thanks for choosing WorldGuard!</p>
-<h2>Getting Started</h2>
-
-<p>Now, to begin, you want to:</p>
-<ol>
-  <li><strong>Install the plugin:</strong> Copy WorldGuard.jar into your Bukkit server's &quot;plugins&quot; directory.</li>
-  <li><strong>Change the configuration:</strong> Run your server once (with WorldGuard) to generate the default configuration files. There are <em>two</em> types of configuration files:
-    <ul>
-      <li>The main config.yml file  inside &quot;plugins/WorldGuard&quot; is the main configuration. </li>
-      <li>Each world has a configuration file in &quot;plugins/WorldGuard/worlds&quot; that you can use to override any setting in the main configuration file for that specific world.</li>
-    </ul>
-  </li>
-  Use <em>/wg reload</em> in the console to reload the configuration.
-  <li><strong>Learn how to use WorldGuard:</strong> Check <a href="http://wiki.sk89q.com/wiki/WorldGuard">out the wiki</a> to learn how to disable things like fire and to protect regions.</li>
-</ol>
-<p class="warning"><strong>Note:</strong> <a href="http://www.sk89q.com/projects/worldedit/">WorldEdit</a> must be installed, but if you do not want it,  put WorldEdit.jar into your Bukkit root folder (outside of plugins/). Note that region protection  requires WorldEdit in plugins/.</p>
-<p>Be sure to:</p>
+<p>Thanks for choosing WorldGuard! WorldGuard protects your multiplayer server and provides additional features.</p>
+<h2>Relevant links</h2>
+<p>You can find information on how to install, configure, and use WorldGuard on our wiki.</p>
 <ul>
-  <li>Subscribe to <a href="http://minecraftnews.sk89q.com/">SK's Minecraft blog</a> for news about WorldGuard</li>
-  <li>Idle with us in IRC at <a href="http://skq.me/irc/irc.esper.net/worldguard">irc.esper.net in #worldguard</a></li>
+  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard/Installation">Installation</a></li>
+  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard/Upgrading">Upgrading</a></li>
+  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard/Changelog">Changelog</a></li>
+  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard#Usage">Documentation</a></li>
 </ul>
-<h2>Getting Help</h2>
-<p>If you need help, the best two ways to ask are:</p>
+<h2>Getting help</h2>
+<p>Need help? Check out our <a href="http://wiki.sk89q.com/wiki/WorldGuard/Support">support information page</a>.</p>
+<p>There, you can learn how to:</p>
 <ul>
-  <li><a href="http://forum.sk89q.com/">Visit the WorldGuard forum</a></li>
-  <li>Ask in IRC chat on <a href="http://skq.me/irc/irc.esper.net/worldguard">irc.esper.net in #worldguard</a> (idle with us!)</li>
-  <li>Submit bug reports and suggestions to the <a href="http://redmine.sk89q.com/projects/worldguard/issues">issue tracker</a></li>
+  <li>How to join IRC chat and ask questions</li>
+  <li>Where to report bugs and request features</li>
 </ul>
 <h2>Contributing</h2>
 <p>WorldGuard is entirely open source! You can download all of the plugin code to learn from it, modify it for your own self, or even contribute back!</p>
 <ul>
-  <li><a href="https://github.com/sk89q/worldguard">Download WorldGuard code from GitHub</a></li>
-  <li>You can also <a href="http://www.sk89q.com/donate/">donate</a></li>
-  </ul>
-<p>The code is covered under the GNU General Public License v3.</p>
-<p class="subtle">Maven information: ${groupId}/${artifactId}/${version}</p>
+  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard/Development">More information</a></li>
+</ul>
+<p><small>Maven information: ${groupId}/${artifactId}/${version}</small></p>
 </div>
 </body>
 </html>
