@@ -21,7 +21,9 @@ Dependencies are automatically handled by Maven.
 Contributing
 ------------
 
-We happily accept contributions, especially through pull requests on GitHub.
+We happily accept contributions, especially through pull requests on GitHub. Submissions 
+must be licensed under the GNU General Public License v3,
+which is outlined inside LICENSE.txt.
 
 Please see [the wiki for further information about contributing](http://wiki.sk89q.com/wiki/WorldGuard/Development#Contributing).
 
