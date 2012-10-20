@@ -28,8 +28,9 @@
         <include>LICENSE.txt</include>
         <include>NOTICE.txt</include>
         <include>CHANGELOG.txt</include>
-        <include>blacklist_table.sql</include>
-        <include>region_storage.sql</include>
+        <include>contrib/blacklist_table.sql</include>
+        <include>contrib/region_storage.sql</include>
+        <include>contrib/region_storage_update_20110325.sql</include>
       </includes>
     </fileSet>
   </fileSets>
