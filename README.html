@@ -1,83 +1,201 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>WorldGuard ${version}</title>
+<title>${project.name} ${version}</title>
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Ropa+Sans" rel="stylesheet" type="text/css">
 <style>
 body {
-  margin: 0;
-  padding: 20px;
-  background: #efefef;
-  color: #333;
-  line-height: 1.5;
+    margin: 0;
+    padding: 3em 1em;
+    background: #efefef;
+    color: #333;
+    line-height: 1.5;
 }
 #wrapper {
-  margin: 1em auto 1em auto;
-  width: 600px;
-  background: #fff;
-  padding: 3em;
-  -moz-border-radius: 0.5em;
-  -webkit-border-radius: 0.5em;
-  border-radius: 0.5em;
-  border: 1px solid #ccc;
-  box-shadow: 0 0.3em 0.6em rgba(0, 0, 0, 0.1);
-  line-height: 1.4;
+    width: 600px;
+    margin: auto;
 }
 body, th, td, input {
-  font: 0.8em sans-serif;
+    font: 14px 'Source Sans Pro', Arial, sans-serifsans-serif;
+}
+.section {
+	background: #fff;
+	position: relative;
+	padding: 2em 2.4em;
+	margin: 3em auto 4em auto;
+    width: 80%;
+    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+.section:before, .section:after {
+	content: "";
+	position: absolute;
+	z-index: -2;
+}
+.section {
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+.section:before, .section:after {
+	bottom: 15px;
+	left: 10px;
+	width: 50%;
+	height: 20%;
+	max-width: 300px;
+	max-height: 100px;
+    -webkit-box-shadow: 0 15px 10px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0 15px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 15px 10px rgba(0, 0, 0, 0.5);
+    -webkit-transform: rotate(-1deg);
+    -moz-transform: rotate(-1deg);
+    -ms-transform: rotate(-1deg);
+    -o-transform: rotate(-1deg);
+    transform: rotate(-1deg);
+}
+.section:after {
+    right: 10px;
+    left: auto;
+    -webkit-transform: rotate(1deg);
+    -moz-transform: rotate(1deg);
+    -ms-transform: rotate(1deg);
+    -o-transform: rotate(1deg);
+    transform: rotate(1deg);
 }
 a:link, a:visited {
-  color: #0004b2;   
-  text-decoration: none;
+    color: #0004b2;   
+    text-decoration: none;
 }
 a:hover {
-  color: #ac0000;
-  text-decoration: none;
-  border-bottom: 1px solid #999;
+    color: #ac0000;
+    text-decoration: none;
+    border-bottom: 1px solid #999;
 }
 h1 {
-  font: 2.2em 'Trebuchet MS', Helvetica, Arial, sans-serif;
-  color: #6a45ac;
-  margin: 0 0;
-  padding: 0 0 0.2em 0;
-  font-weight: normal;
+    font: 2.7em 'Ropa Sans', 'Trebuchet MS', Helvetica, Arial, sans-serif;
+    color: #000;
+    margin: 0 0;
+    padding: 0 0 0.2em 0;
+    font-weight: normal;
+    text-align: center;
+    text-shadow: 2px 2px #FFF;
 }
 h2 {
-  font: 1.4em 'Trebuchet MS', Helvetica, Arial, sans-serif;
-  color: #555;
-  margin: 1.6em 0 1em 0;
-  padding: 0 0 0.2em 0;
-  border-bottom: 1px solid #CCC;
-  font-weight: bold;
+    font-size: 1.3em;
+    color: #444;
+    margin: -2.5em 0 0.8em 0;
+    float: left;
+    background: #FECA13;
+    padding: 0.4em 0.8em;
+    border-radius: 0.2em;
+    font-weight: normal;
+    text-align: center; 
+}
+h3 {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+h2 + * {
+    clear: both;
+}
+@media (max-width: 650px) {
+    #wrapper {
+        width: 100%;
+    }
 }
 </style>
 </head>
 <body>
 
 <div id="wrapper">
-
-<h1>WorldGuard ${version}</h1>
-<p>Thanks for choosing WorldGuard! WorldGuard protects your multiplayer server and provides additional features.</p>
-<h2>Relevant links</h2>
-<p>You can find information on how to install, configure, and use WorldGuard on our wiki.</p>
-<ul>
-  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard/Installation">Installation</a></li>
-  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard/Upgrading">Upgrading</a></li>
-  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard/Changelog">Changelog</a></li>
-  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard#Usage">Documentation</a></li>
-</ul>
-<h2>Getting help</h2>
-<p>Need help? Check out our <a href="http://wiki.sk89q.com/wiki/WorldGuard/Support">support information page</a>.</p>
-<p>There, you can learn how to:</p>
-<ul>
-  <li>How to join IRC chat and ask questions</li>
-  <li>Where to report bugs and request features</li>
-</ul>
-<h2>Contributing</h2>
-<p>WorldGuard is entirely open source! You can download all of the plugin code to learn from it, modify it for your own self, or even contribute back!</p>
-<ul>
-  <li><a href="http://wiki.sk89q.com/wiki/WorldGuard/Development">More information</a></li>
-</ul>
-<p><small>Maven information: ${groupId}/${artifactId}/${version}</small></p>
+    <h1>${project.name} ${version}</h1>
+    <div class="section">
+        <h2>Getting Started</h2>
+        <p>
+            Thanks for choosing ${project.name}! When you first install ${project.name},
+            nothing will be enabled, so you will need to switch on the features
+            that you need to use, whenever it is convenient for you.
+        </p>
+        <ul>
+            <li><a href="http://wiki.sk89q.com/wiki/${project.name}/Installation">How do I install ${project.name}?</a></li>
+            <li><a href="http://wiki.sk89q.com/wiki/${project.name}/Upgrading">How do I update ${project.name}?</a></li>
+            <li><a href="http://wiki.sk89q.com/wiki/${project.name}#Usage">How do I use ${project.name}?</a></li>
+        </ul>
+        <p>
+            Need help?
+            <a href="http://wiki.sk89q.com/wiki/${project.name}/Support">See the ways that you can get assistance</a>.
+        </p>
+    </div>
+    <div class="section">
+        <h2>Common Issues</h2>
+        
+        <h3>I or others don't have permission to build.</h3>
+        <p>
+            Unless you copied configuration files from an older installation of 
+            WorldGuard, your problem is either caused by another plugin, or by not
+            disabling the built-in spawn protection of the Minecraft server.
+        </p>
+        
+        <h3>WorldGuard doesn't seem to work.</h3>
+        <p>
+            Two common mistakes include forgetting to install WorldEdit
+            (WorldGuard needs it), or making
+            a syntax error in one of WorldGuard's configuration files (this is very
+            fatal unfortunately, and can be caused by a single character typed in the wrong place). Try 
+            <a href="http://wiki.sk89q.com/wiki/${project.name}/Support">asking in IRC</a>
+            to see whether anyone can help you.
+        </p>
+        
+        <h3>No one can build in a region I made!</h3>
+        <p>
+            Make sure that:
+        </p>
+        <ul>
+            <li>You didn't change the 'build' flag, because protection is on by default
+                when a new region is made. Setting the build flag to 'deny' means that
+                no one can modify the things inside the region.</li>
+            <li>That you added the player as an owner or member of the region. If you are using
+                a group (g:groupName), you may have to give the group the permission of
+                group.groupName for WorldGuard to recognize it.</li>
+            <li>That you disabled spawn protection. The Minecraft server has an automatic
+                spawn protection feature where only 'ops' can build in a definable
+                radius around spawn (by default, it is 16 blocks). Modify bukkit.yml in order
+                to change the spawn radius to 0.</li>
+            <li>That it's not another plugin causing you trouble. The error messages of WorldGuard are of
+                a dark red shade. If the color of the "no permission" message is not
+                that color, it is not WorldGuard.</li>
+        </ul>
+        
+        <h3>Everyone can build in a region I made!</h3>
+        <p>
+            Make sure that:
+        </p>
+        <ul>
+            <li>You didn't change the 'build' flag, because protection is on by default
+                when a new region is made. Setting the build flag to 'allow' means that
+                anyone can modify the things inside the region.</li>
+            <li>That it's not caused by another plugin. If players are getting a dark red
+                permission denied message, but they can still build, another plugin
+                is likely causing the conflict.</li>
+        </ul>
+        
+        <p>
+            Still need help?
+            <a href="http://wiki.sk89q.com/wiki/${project.name}/Support">See the ways that you can get assistance</a>.
+        </p>
+    </div>
+    <div class="section">
+        <h2>Contributing</h2>
+        <p>
+            Did you know that ${project.name} is open source? That means that you can
+            read the code and learn from it, as well as modify it and submit back
+            changes to help the community!
+        </p>
+        <ul>
+            <li><a href="https://github.com/sk89q/worldguard">View the source code</a></li>
+            <li><a href="http://wiki.sk89q.com/wiki/${project.name}/Development">More information</a></li>
+        </ul>
+    </div>
 </div>
 </body>
 </html>
