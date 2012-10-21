@@ -122,6 +122,16 @@ public class PRTreeRegionManager extends RegionManager {
         for (ProtectedRegion region : tree.find(pointMBR)) {
             if (region.contains(pt)) {
                 appRegions.add(region);
+
+                ProtectedRegion parent = region.getParent();
+
+                while (parent != null) {
+                    if (!appRegions.contains(parent)) {
+                        appRegions.add(parent);
+                    }
+
+                    parent = parent.getParent();
+                }
             }
         }
 
