@@ -63,6 +63,7 @@ import com.sk89q.worldguard.protection.databases.migrators.AbstractDatabaseMigra
 import com.sk89q.worldguard.protection.databases.migrators.MigrationException;
 import com.sk89q.worldguard.protection.databases.migrators.MigratorKey;
 import com.sk89q.worldguard.protection.databases.RegionDBUtil;
+import org.json.*;
 
 public class RegionCommands {
     private final WorldGuardPlugin plugin;
@@ -499,7 +500,14 @@ public class RegionCommands {
                 s.append(", ");
             }
 
-            s.append(flag.getName() + ": " + String.valueOf(val));
+            if (val instanceof Location)
+            {
+            	Vector pos = (Vector) ((Location) val).getPosition();
+            	s.append(flag.getName() + ": " + pos.ceil().toString());
+            } 
+            else
+            	s.append(flag.getName() + ": " + String.valueOf(val));
+
             hasFlags = true;
         }
         if (hasFlags) {
