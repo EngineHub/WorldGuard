@@ -499,7 +499,14 @@ public class RegionCommands {
                 s.append(", ");
             }
 
-            s.append(flag.getName() + ": " + String.valueOf(val));
+            if (val instanceof Location)
+            {
+            	Vector pos = (Vector) ((Location) val).getPosition();
+            	s.append(flag.getName() + ": " + pos.ceil().toString());
+            } 
+            else
+            	s.append(flag.getName() + ": " + String.valueOf(val));
+
             hasFlags = true;
         }
         if (hasFlags) {
