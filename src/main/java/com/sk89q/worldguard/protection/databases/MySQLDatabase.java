@@ -52,6 +52,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import org.json.*;
 
 public class MySQLDatabase extends AbstractProtectionDatabase {
     private final Logger logger;
@@ -200,8 +201,39 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     }
 
     private <T> void setFlag(ProtectedRegion region, Flag<T> flag, Object rawValue) {
-        T val = flag.unmarshal(rawValue);
-        if (val == null) {
+        T val = null;
+    	Boolean inJSON = false;
+		
+    	// check for JSONArray
+    	try
+    	{
+    		JSONArray jarr = new JSONArray(rawValue.toString().intern());
+    		ArrayList tmpVal = new ArrayList();
+    		for (int i = 0; i < jarr.length(); i++)
+    		{
+    			tmpVal.add(jarr.get(i));
+    		}
+    		val = flag.unmarshal(tmpVal.clone());
+    		inJSON = true;
+    	} catch (JSONException e) { }
+    	
+    	// check for JSONObject
+    	try
+    	{
+    		HashMap hm = new HashMap();
+    		JSONObject jobj = new JSONObject(rawValue.toString().intern());
+    		JSONArray keys = jobj.names();
+    		for (int i=0; i < keys.length(); i++)
+    		{
+    			hm.put(keys.get(i), jobj.get(keys.getString(i)));
+    		}
+    		val = flag.unmarshal(hm);
+    		inJSON = true;
+    	} catch (JSONException e) { }
+        
+    	if (!inJSON) val = flag.unmarshal(rawValue);
+    	
+    	if (val == null) {
             logger.warning("Failed to parse flag '" + flag.getName()
                     + "' with value '" + rawValue.toString() + "'");
             return;
@@ -772,7 +804,24 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
             insertFlagStatement.setString(1, region.getId().toLowerCase());
             insertFlagStatement.setString(2, entry.getKey().getName());
-            insertFlagStatement.setObject(3, flag);
+            
+            if (flag instanceof ArrayList)
+            {
+                JSONArray jarr = new JSONArray();
+            	for (int i=0; i < (Integer)((ArrayList) flag).size(); i++)
+            	{
+            		try
+            		{
+            			jarr.put((String)((ArrayList) flag).get(i));
+            		} catch (Exception e) { } 
+            	}
+            	insertFlagStatement.setObject(3, jarr.toString());
+            } else if (flag instanceof HashMap)
+            {
+            	JSONObject jobj = new JSONObject((HashMap) ((HashMap) flag));
+            	insertFlagStatement.setObject(3, jobj.toString());
+            } else
+            	insertFlagStatement.setObject(3, flag);
 
             insertFlagStatement.execute();
         }
