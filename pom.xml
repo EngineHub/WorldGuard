@@ -76,7 +76,7 @@
     <dependency>
       <groupId>org.khelekore</groupId>
       <artifactId>prtree</artifactId>
-      <version>1.5</version>
+      <version>1.5.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
