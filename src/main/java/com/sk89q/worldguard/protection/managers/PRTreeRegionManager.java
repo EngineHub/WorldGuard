@@ -18,24 +18,19 @@
  */
 package com.sk89q.worldguard.protection.managers;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
 import org.khelekore.prtree.MBR;
 import org.khelekore.prtree.MBRConverter;
 import org.khelekore.prtree.PRTree;
 import org.khelekore.prtree.SimpleMBR;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
+import java.util.*;
 
 public class PRTreeRegionManager extends RegionManager {
 
@@ -117,7 +112,7 @@ public class PRTreeRegionManager extends RegionManager {
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
         List<ProtectedRegion> appRegions =
                 new ArrayList<ProtectedRegion>();
-        MBR pointMBR = new SimpleMBR(pt.getX(), pt.getX(), pt.getY(), pt.getY(), pt.getZ(), pt.getZ());
+        MBR pointMBR = new SimpleMBR(pt.getX() - 1, pt.getX(), pt.getY() - 1, pt.getY(), pt.getZ() - 1, pt.getZ());
 
         for (ProtectedRegion region : tree.find(pointMBR)) {
             if (region.contains(pt)) {
@@ -158,7 +153,7 @@ public class PRTreeRegionManager extends RegionManager {
     @Override
     public List<String> getApplicableRegionsIDs(Vector pt) {
         List<String> applicable = new ArrayList<String>();
-        MBR pointMBR = new SimpleMBR(pt.getX(), pt.getX(), pt.getY(), pt.getY(), pt.getZ(), pt.getZ());
+        MBR pointMBR = new SimpleMBR(pt.getX() - 1, pt.getX(), pt.getY() - 1, pt.getY(), pt.getZ() - 1, pt.getZ());
 
         for (ProtectedRegion region : tree.find(pointMBR)) {
             if (region.contains(pt)) {
