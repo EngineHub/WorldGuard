@@ -34,7 +34,7 @@ import com.sk89q.worldguard.protection.regions.*;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class RegionPriorityTest {
+public abstract class RegionPriorityTest {
     static String COURTYARD_ID = "courtyard";
     static String FOUNTAIN_ID = "fountain";
     static String NO_FIRE_ID = "nofire";
@@ -50,12 +50,14 @@ public class RegionPriorityTest {
     ProtectedRegion fountain;
     TestPlayer player1;
     TestPlayer player2;
+    
+    protected abstract RegionManager createRegionManager() throws Exception;
 
     @Before
     public void setUp() throws Exception {
         setUpGlobalRegion();
         
-        manager = new FlatRegionManager(null);
+        manager = createRegionManager();
 
         setUpPlayers();
         setUpCourtyardRegion();
