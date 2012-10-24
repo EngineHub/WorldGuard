@@ -673,6 +673,7 @@ public class RegionCommands {
         String id = args.getString(0);
         String flagName = args.getString(1);
         String value = null;
+        RegionGroup groupValue = null;
 
         if (args.argsLength() >= 3) {
             value = args.getJoinedStrings(2);
@@ -771,41 +772,51 @@ public class RegionCommands {
                         + "' does not have a group flag!");
             }
 
+            // Parse the [-g group] separately so entire command can abort if parsing
+            // the [value] part throws an error.
             try {
-                // If group set to default value then clear the group flag
-                RegionGroup groupValue = groupFlag.parseInput(plugin, sender, group);
-                if (groupValue == groupFlag.getDefault()) {
-                    region.setFlag(groupFlag, null);
-                    sender.sendMessage(ChatColor.YELLOW
-                            + "Region group flag for '" + foundFlag.getName() + "' reset to default.");
-                } else {
-                    region.setFlag(groupFlag, groupValue);
-                    sender.sendMessage(ChatColor.YELLOW
-                            + "Region group flag for '" + foundFlag.getName() + "' set.");
-                }
+                groupValue = groupFlag.parseInput(plugin, sender, group);
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }
 
-        } else {
-            if (value != null) {
-                try {
-                    setFlag(region, foundFlag, sender, value);
-                } catch (InvalidFlagFormat e) {
-                    throw new CommandException(e.getMessage());
-                }
+        }
 
+        if (value != null) {
+            // Set the flag if [value] was given even if [-g group] was given as well
+            try {
+                setFlag(region, foundFlag, sender, value);
+            } catch (InvalidFlagFormat e) {
+                throw new CommandException(e.getMessage());
+            }
+
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Region flag '" + foundFlag.getName() + "' set.");
+        }
+
+        if (value == null && !args.hasFlag('g')) {
+            // Clear the flag only if neither [value] nor [-g group] was given
+            region.setFlag(foundFlag, null);
+
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Region flag '" + foundFlag.getName() + "' cleared.");
+        }
+
+        if (groupValue != null) {
+            RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
+
+            // If group set to the default, then clear the group flag
+            if (groupValue == groupFlag.getDefault()) {
+                region.setFlag(groupFlag, null);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region flag '" + foundFlag.getName() + "' set.");
+                        + "Region group flag for '" + foundFlag.getName() + "' reset to default.");
             } else {
-                // Clear the flag
-                region.setFlag(foundFlag, null);
-
+                region.setFlag(groupFlag, groupValue);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region flag '" + foundFlag.getName() + "' cleared.");
+                        + "Region group flag for '" + foundFlag.getName() + "' set.");
             }
         }
-        
+
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
