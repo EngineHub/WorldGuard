@@ -52,6 +52,8 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -489,7 +491,7 @@ public class RegionCommands {
         boolean hasFlags = false;
         final StringBuilder s = new StringBuilder(ChatColor.BLUE + "Flags: ");
         for (Flag<?> flag : DefaultFlag.getFlags()) {
-            Object val = region.getFlag(flag);
+            Object val = region.getFlag(flag), group = null;
 
             if (val == null) {
                 continue;
@@ -499,7 +501,17 @@ public class RegionCommands {
                 s.append(", ");
             }
 
-            s.append(flag.getName() + ": " + String.valueOf(val));
+            RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
+            if (groupFlag != null) {
+                group = region.getFlag(groupFlag);
+            }
+
+            if(group == null) {
+                s.append(flag.getName() + ": " + String.valueOf(val));
+            } else {
+                s.append(flag.getName() + " -g " + String.valueOf(group) + ": " + String.valueOf(val));
+            }
+
             hasFlags = true;
         }
         if (hasFlags) {
