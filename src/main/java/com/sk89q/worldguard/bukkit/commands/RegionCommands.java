@@ -765,19 +765,28 @@ public class RegionCommands {
 
         if (args.hasFlag('g')) {
             String group = args.getFlag('g');
-            if (foundFlag.getRegionGroupFlag() == null) {
+            RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
+            if (groupFlag == null) {
                 throw new CommandException("Region flag '" + foundFlag.getName()
                         + "' does not have a group flag!");
             }
 
             try {
-                setFlag(region, foundFlag.getRegionGroupFlag(), sender, group);
+                // If group set to default value then clear the group flag
+                RegionGroup groupValue = groupFlag.parseInput(plugin, sender, group);
+                if (groupValue == groupFlag.getDefault()) {
+                    region.setFlag(groupFlag, null);
+                    sender.sendMessage(ChatColor.YELLOW
+                            + "Region group flag for '" + foundFlag.getName() + "' reset to default.");
+                } else {
+                    region.setFlag(groupFlag, groupValue);
+                    sender.sendMessage(ChatColor.YELLOW
+                            + "Region group flag for '" + foundFlag.getName() + "' set.");
+                }
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }
 
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Region group flag for '" + foundFlag.getName() + "' set.");
         } else {
             if (value != null) {
                 try {
