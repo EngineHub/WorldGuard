@@ -798,6 +798,12 @@ public class RegionCommands {
             // Clear the flag only if neither [value] nor [-g group] was given
             region.setFlag(foundFlag, null);
 
+            // Also clear the associated group flag if one exists
+            RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
+            if (groupFlag != null) {
+                region.setFlag(groupFlag, null);
+            }
+
             sender.sendMessage(ChatColor.YELLOW
                     + "Region flag '" + foundFlag.getName() + "' cleared.");
         }
