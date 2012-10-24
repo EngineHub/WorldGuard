@@ -52,13 +52,11 @@ public class PRTreeRegionManager extends RegionManager {
      * Construct the manager.
      *
      * @param regionLoader The region loader to use
-     * @throws ProtectionDatabaseException when an error occurs while loading
      */
-    public PRTreeRegionManager(ProtectionDatabase regionLoader) throws ProtectionDatabaseException {
+    public PRTreeRegionManager(ProtectionDatabase regionLoader) {
         super(regionLoader);
         regions = new TreeMap<String, ProtectedRegion>();
         tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
-        this.load();
     }
 
     @Override
