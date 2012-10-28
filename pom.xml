@@ -6,7 +6,6 @@
   <artifactId>worldguard</artifactId>
   <version>5.5.5-SNAPSHOT</version>
   <name>WorldGuard</name>
-  <packaging>jar</packaging>
   <description>WorldGuard protects your Minecraft servers.</description>
   <licenses>
     <license>
