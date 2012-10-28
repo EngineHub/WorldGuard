@@ -22,10 +22,9 @@ Contributing
 ------------
 
 We happily accept contributions, especially through pull requests on GitHub. Submissions 
-must be licensed under the GNU General Public License v3,
-which is outlined inside LICENSE.txt.
+must be licensed under the GNU General Public License v3.
 
-Please see [the wiki for further information about contributing](http://wiki.sk89q.com/wiki/WorldGuard/Development#Contributing).
+Please read CONTRIBUTING.md for important guidelines to follow.
 
 Links
 -----
