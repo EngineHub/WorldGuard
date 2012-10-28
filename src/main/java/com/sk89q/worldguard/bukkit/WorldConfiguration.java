@@ -115,7 +115,7 @@ public class WorldConfiguration {
     public boolean disableMobDamage;
     public boolean useRegions;
     public boolean highFreqFlags;
-    public int regionWand = 287;
+    public int regionWand;
     public Set<EntityType> blockCreatureSpawn;
     // public boolean useiConomy;
     // public boolean buyOnClaim;
@@ -361,7 +361,7 @@ public class WorldConfiguration {
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
-        regionWand = getInt("regions.wand", 287);
+        regionWand = getInt("regions.wand", 334);
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
 
