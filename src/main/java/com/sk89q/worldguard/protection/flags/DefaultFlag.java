@@ -22,6 +22,10 @@ package com.sk89q.worldguard.protection.flags;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  *
  * @author sk89q
@@ -88,27 +92,35 @@ public final class DefaultFlag {
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
 
-    public static final Flag<?>[] flagsList = new Flag<?>[] {
-        PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
-        TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
-        MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
-        CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
-        GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
-        EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ITEM_DROP,
-        HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
-        FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
-        SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, GAME_MODE,
-        MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, SEND_CHAT, RECEIVE_CHAT,
-        FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
-        TELE_LOC, SPAWN_LOC, POTION_SPLASH,
-        BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
-    };
+    private static final List<Flag<?>> flagsList;
 
+    static {
+        Flag<?>[] flags = new Flag<?>[] {
+                PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
+                TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
+                MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
+                CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
+                GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
+                EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ITEM_DROP,
+                HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
+                FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
+                SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, GAME_MODE,
+                MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, SEND_CHAT, RECEIVE_CHAT,
+                FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
+                TELE_LOC, SPAWN_LOC, POTION_SPLASH,
+                BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
+        };
+        flagsList = new LinkedList<Flag<?>>(Arrays.asList(flags));
+    }
 
     private DefaultFlag() {
     }
 
     public static Flag<?>[] getFlags() {
-        return flagsList;
+        return flagsList.toArray(new Flag<?>[flagsList.size()]);
+    }
+
+    public static boolean registerFlag(Flag<?> flag) {
+        return flagsList.add(flag);
     }
 }
