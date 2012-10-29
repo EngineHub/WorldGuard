@@ -42,6 +42,7 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -496,6 +497,23 @@ public class WorldGuardEntityListener implements Listener {
                 event.blockList().clear();
                 return;
             }
+
+            if (wcfg.blockWitherExplosions) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if (ent instanceof WitherSkull) {
+            if (wcfg.blockWitherSkullBlockDamage) {
+                event.blockList().clear();
+                return;
+            }
+
+            if (wcfg.blockWitherSkullExplosions) {
+                event.setCancelled(true);
+                return;
+            }
         }
 
         if (ent instanceof Creeper) {
@@ -608,12 +626,35 @@ public class WorldGuardEntityListener implements Listener {
         }
         
         if (event.getEntityType() == EntityType.WITHER) {
-            if (wcfg.blockWitherBlockDamage) {
+            if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
                 return;
             }
         }
-
+        else if (event.getEntityType() == EntityType.WITHER_SKULL) {
+            if (wcfg.blockWitherSkullExplosions) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        else if (event.getEntityType() == EntityType.LARGE_FIREBALL) {
+            if (wcfg.blockFireballExplosions) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        else if (event.getEntityType() == EntityType.CREEPER) {
+            if (wcfg.blockCreeperExplosions) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+        else if (event.getEntityType() == EntityType.PRIMED_TNT) {
+            if (wcfg.blockTNTExplosions) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
