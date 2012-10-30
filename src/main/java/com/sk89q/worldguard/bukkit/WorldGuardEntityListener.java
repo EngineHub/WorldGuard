@@ -89,6 +89,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 public class WorldGuardEntityListener implements Listener {
 
     private WorldGuardPlugin plugin;
+    private EntityType fireballEntityType;
 
     /**
      * Construct the object;
@@ -97,6 +98,12 @@ public class WorldGuardEntityListener implements Listener {
      */
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
+        
+        try {
+            fireballEntityType = EntityType.valueOf("LARGE_FIREBALL");
+        } catch (IllegalArgumentException e) {
+            fireballEntityType = EntityType.valueOf("FIREBALL");
+        }
     }
 
     /**
@@ -637,7 +644,7 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
         }
-        else if (event.getEntityType() == EntityType.LARGE_FIREBALL) {
+        else if (event.getEntityType() == fireballEntityType) {
             if (wcfg.blockFireballExplosions) {
                 event.setCancelled(true);
                 return;
