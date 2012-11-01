@@ -253,4 +253,18 @@ public class BukkitUtil {
                     && !(entity instanceof Tameable)
                     && !(entity instanceof Player));
     }
+
+    /**
+     * Returns whether our running CraftBukkit already supports
+     * the HangingEvent instead of the PaintingEvent
+     *
+     * @return
+     */
+    public static boolean hasHangingEvent() {
+        Class<?> tmp = null;
+        try {
+            tmp = Class.forName("org.bukkit.event.hanging.HangingEvent");
+        } catch (ClassNotFoundException ex) { }
+        return (tmp != null);
+    }
 }
