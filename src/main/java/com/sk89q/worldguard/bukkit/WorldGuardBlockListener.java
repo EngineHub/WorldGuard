@@ -20,10 +20,14 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -65,6 +69,17 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 public class WorldGuardBlockListener implements Listener {
 
     private WorldGuardPlugin plugin;
+    
+    /**
+     * Used for detecting player interactions. As example this is needed to detect user placed vines.
+     * @FIXME This is just a workaround to allow players to place vines in regions with vines-growth set to DENY.
+     */
+    private List<Location> blockPlaceWorkaroundList = new java.util.Vector<Location>();
+    
+    /**
+     * Used to determinate which directions should be checked for vines-growth flag.
+     */
+    private static final BlockFace[] VINES_GROW_CHECK_DIRECTIONS = new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 
     /**
      * Construct the object.
@@ -467,6 +482,30 @@ public class WorldGuardBlockListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        
+        if (wcfg.useRegions) {
+            if (id == BlockID.VINE && !plugin.getGlobalRegionManager().allows(DefaultFlag.VINES_GROWTH, event.getBlock().getLocation())) { // FIXME: Currently this seems to be the only way to prevent vines from growing. Check this again later!
+                Block vineBlock = null;
+                for(BlockFace face : VINES_GROW_CHECK_DIRECTIONS) {
+                	vineBlock = event.getBlock().getRelative(face);
+                	if (vineBlock.getTypeId() == BlockID.VINE) break;
+                }
+                
+                if (vineBlock != null && vineBlock.getTypeId() == BlockID.VINE && !blockPlaceWorkaroundList.contains(vineBlock.getLocation())) {
+                    vineBlock.setType(Material.AIR); // FIXME: This seems to be not the best way!
+                } else if (vineBlock != null && blockPlaceWorkaroundList.contains(vineBlock.getLocation())) {
+                    final Block tempVineBlock = vineBlock; // We've to use a final copy if we're using an external thread.
+                    
+                    // FIXME: This is very dirty! This could cause some lags on very busy servers. Maybe we should add vine-growth to high-freq-flags!
+                    // FIXME: This will run at least two times due to the second physics update. This should be fixed. I'm to lazy to do this now. It just works.
+                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                        public void run() {
+                            blockPlaceWorkaroundList.remove(tempVineBlock.getLocation());
+                        }
+                    }, 10); // We're using 10 ticks (This could produce problems if the server has a lot of lag)
+                }
+            }
+        }
     }
 
     /*
@@ -518,6 +557,12 @@ public class WorldGuardBlockListener implements Listener {
             int oz = blockPlaced.getZ();
 
             SpongeUtil.clearSpongeWater(plugin, world, ox, oy, oz);
+        }
+        
+        if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(DefaultFlag.VINES_GROWTH, blockPlaced.getLocation())) {
+            if (blockPlaced.getTypeId() == BlockID.VINE) {
+                blockPlaceWorkaroundList.add(blockPlaced.getLocation());
+            }
         }
     }
 
