@@ -58,6 +58,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
@@ -191,6 +192,8 @@ public class WorldGuardEntityListener implements Listener {
             return;
         }
 
+        GlobalRegionManager global = plugin.getGlobalRegionManager();
+        
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
 
@@ -308,6 +311,15 @@ public class WorldGuardEntityListener implements Listener {
 
                 if (wcfg.disableMobDamage) {
                     event.setCancelled(true);
+                    return;
+                }
+                
+                if (!global.allows(DefaultFlag.MONSTER_ATTACK, defender.getLocation()) && attacker instanceof Creature) {
+                    event.setCancelled(true);
+                    
+                    // reset target
+                    Creature creature = (Creature) attacker;
+                    creature.setTarget(null); // FIXME: We should reset the target onEntityMove. But there's currently no event like that.
                     return;
                 }
 
@@ -808,6 +820,12 @@ public class WorldGuardEntityListener implements Listener {
         if (blockedEntities == event.getAffectedEntities().size()) {
             event.setCancelled(true);
         }
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityTargetLivingEntity(EntityTargetLivingEntityEvent event) {
+        GlobalRegionManager global = plugin.getGlobalRegionManager();
+        if (!global.allows(DefaultFlag.MONSTER_ATTACK, event.getTarget().getLocation())) event.setCancelled(true);
     }
 
     /**
