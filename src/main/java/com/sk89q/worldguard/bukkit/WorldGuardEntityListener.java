@@ -219,10 +219,10 @@ public class WorldGuardEntityListener implements Listener {
                     Vector pt2 = toVector(attacker.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
-                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer)
-                            || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
-                        tryCancelPVPEvent((Player) attacker, player, event);
-                        return;
+                    if (!mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
+                        tryCancelPVPEvent((Player) attacker, player, event, true);
+                    } else if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP ,localPlayer)) {
+                        tryCancelPVPEvent((Player) attacker, player, event, false);
                     }
                 }
             }
@@ -255,10 +255,10 @@ public class WorldGuardEntityListener implements Listener {
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
                     if (fireball.getShooter() instanceof Player) {
                         Vector pt2 = toVector(fireball.getShooter().getLocation());
-                        if (!set.allows(DefaultFlag.PVP, localPlayer)
-                                || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) fireball.getShooter()))) {
-                            tryCancelPVPEvent((Player) fireball.getShooter(), player, event);
-                            return;
+                        if (!mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) fireball.getShooter()))) {
+                            tryCancelPVPEvent((Player) fireball.getShooter(), player, event, true);
+                        } else if (!set.allows(DefaultFlag.PVP, localPlayer)) {
+                            tryCancelPVPEvent((Player) fireball.getShooter(), player, event, false);
                         }
                     } else {
                         if (!set.allows(DefaultFlag.GHAST_FIREBALL, localPlayer)) {
@@ -346,9 +346,10 @@ public class WorldGuardEntityListener implements Listener {
                     Vector pt2 = toVector(attacker.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
 
-                    if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer)
-                            || !mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
-                        tryCancelPVPEvent((Player) attacker, player, event);
+                    if (!mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
+                        tryCancelPVPEvent((Player) attacker, player, event, true);
+                    } else if (!mgr.getApplicableRegions(pt).allows(DefaultFlag.PVP, localPlayer)) {
+                        tryCancelPVPEvent((Player) attacker, player, event, false);
                     }
                 }
             }
@@ -832,11 +833,12 @@ public class WorldGuardEntityListener implements Listener {
      * @param defendingPlayer The defender
      * @param event The event that caused WorldGuard to act
      */
-    public void tryCancelPVPEvent(final Player attackingPlayer, final Player defendingPlayer, EntityDamageByEntityEvent event) {
+    public void tryCancelPVPEvent(final Player attackingPlayer, final Player defendingPlayer, EntityDamageByEntityEvent event, boolean aggressorTriggered) {
         final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
         plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
         if (!disallowedPVPEvent.isCancelled()) {
-            attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
+            if (aggressorTriggered) attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
+            else attackingPlayer.sendMessage(ChatColor.DARK_RED + "That player is in a no-PvP area.");
             event.setCancelled(true);
         }
     }
