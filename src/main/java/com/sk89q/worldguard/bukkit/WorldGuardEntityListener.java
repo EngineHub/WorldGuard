@@ -782,6 +782,14 @@ public class WorldGuardEntityListener implements Listener {
                     }
                 }
             }
+        } else if (ent instanceof Wither) {
+            ConfigurationManager cfg = plugin.getGlobalStateManager();
+            WorldConfiguration wcfg = cfg.get(ent.getWorld());
+            
+            if (wcfg.blockWitherBlockDamage || wcfg.blockWitherExplosions) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
