@@ -943,8 +943,9 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 ") VALUES (null, ?, " + this.worldDbId + ", ?, ?)"
         );
 
+        String lowerId = region.getId();
         for (BlockVector2D point : region.getPoints()) {
-            insertPoly2dPointStatement.setString(1, region.getId().toLowerCase());
+            insertPoly2dPointStatement.setString(1, lowerId);
             insertPoly2dPointStatement.setInt(2, point.getBlockZ());
             insertPoly2dPointStatement.setInt(3, point.getBlockX());
 
