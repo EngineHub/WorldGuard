@@ -409,6 +409,52 @@ public class RegionCommands {
             throw new CommandException("Unknown region type: " + region.getClass().getCanonicalName());
         }
     }
+    
+    @Command(aliases = {"consoleselect", "consel", "cs"}, usage = "[world] [id]",
+			desc = "Load a region as a WorldEdit selection from the console", min = 2, max = 2)
+	public void consoleselect(CommandContext args, CommandSender sender) throws CommandException {
+		if (args.argsLength() < 2) {
+			throw new CommandException("Not enough args");
+		}
+
+		final World world = plugin.matchWorld(sender, args.getString(0));
+		final RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+		final String id = args.getString(1);
+
+		final ProtectedRegion region = mgr.getRegion(id);
+
+		if (region == null) {
+			throw new CommandException("Could not find a region by that ID.");
+		}
+
+		consoleSelectRegion(sender, world, region);
+	} 
+
+	public void consoleSelectRegion(CommandSender sender, World world, ProtectedRegion region) throws CommandException, CommandPermissionsException {
+		final WorldEditPlugin worldEdit = plugin.getWorldEdit();
+		final String id = region.getId();
+
+		if (region instanceof ProtectedCuboidRegion) {
+			final ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
+			final Vector pt1 = cuboid.getMinimumPoint();
+			final Vector pt2 = cuboid.getMaximumPoint();
+			final CuboidSelection selection = new CuboidSelection(world, pt1, pt2);
+			worldEdit.setConsoleSelection(sender, world, selection);
+		} else if (region instanceof ProtectedPolygonalRegion) {
+			final ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
+			final Polygonal2DSelection selection = new Polygonal2DSelection(
+					world, poly2d.getPoints(),
+					poly2d.getMinimumPoint().getBlockY(),
+					poly2d.getMaximumPoint().getBlockY()
+					);
+			worldEdit.setConsoleSelection(sender, world, selection);
+		} else if (region instanceof GlobalProtectedRegion) {
+			throw new CommandException("Can't select global regions.");
+		} else {
+			throw new CommandException("Unknown region type: " + region.getClass().getCanonicalName());
+		}
+	}
 
     @Command(aliases = {"info", "i"}, usage = "[world] [id]", flags = "s",
             desc = "Get information about a region", min = 0, max = 2)
