@@ -25,6 +25,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
@@ -35,6 +36,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 import com.sk89q.worldedit.blocks.ItemID;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
@@ -161,6 +163,33 @@ public class WorldGuardHangingListener implements Listener {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityInteract(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        Entity entity = event.getRightClicked();
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(entity.getWorld());
+
+        if (wcfg.useRegions && (entity instanceof ItemFrame || entity instanceof Painting)) {
+            if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
+                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (entity instanceof ItemFrame
+                    && ((!plugin.getGlobalRegionManager().allows(
+                            DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, entity.getLocation())))) {
+                event.setCancelled(true);
+            } else if (entity instanceof Painting
+                    && ((!plugin.getGlobalRegionManager().allows(
+                            DefaultFlag.ENTITY_PAINTING_DESTROY, entity.getLocation())))) {
+                event.setCancelled(true);
             }
         }
     }

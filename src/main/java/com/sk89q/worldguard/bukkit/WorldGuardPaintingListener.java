@@ -22,9 +22,11 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Warning;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,12 +35,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 import com.sk89q.worldedit.blocks.ItemID;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import org.bukkit.Warning;
 
 /**
  * Listener for painting related events.
@@ -143,6 +145,29 @@ public class WorldGuardPaintingListener implements Listener {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityInteract(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        Entity entity = event.getRightClicked();
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(entity.getWorld());
+
+        if (wcfg.useRegions && entity instanceof Painting) {
+            if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
+                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (entity instanceof Painting
+                    && ((!plugin.getGlobalRegionManager().allows(
+                            DefaultFlag.ENTITY_PAINTING_DESTROY, entity.getLocation())))) {
+                event.setCancelled(true);
             }
         }
     }
