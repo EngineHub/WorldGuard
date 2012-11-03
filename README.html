@@ -129,20 +129,18 @@ h2 + * {
     <div class="section">
         <h2>Common Issues</h2>
         
-        <h3>Where do I report bugs or suggest ideas?</h3>
+        <h3>What are the other files that come with the download?</h3>
         <p>
-            Make sure you are using the latest version of WorldGuard, try asking in
-            IRC first (see "Need help?" above) if it's a problem, and if you think you've
-            found a bug or have a great suggestion to provide, please
-            report it to <a href="http://youtrack.sk89q.com/issues/WORLDGUARD">our issue tracker</a>.
+            Inside the folder "contrib" of the download are the following files:
         </p>
-        
-        <h3>I or others don't have permission to build.</h3>
-        <p>
-            Unless you copied configuration files from an older installation of 
-            ${project.name}, your problem is either caused by another plugin, or by not
-            disabling the built-in spawn protection of the Minecraft server.
-        </p>
+        <ul>
+            <li>blacklist_table.sql is for using a database with the 
+              <a href="http://wiki.sk89q.com/wiki/${project.name}/Blacklist">blacklist feature</a>.</li>
+            <li>region_storage.sql is for using a database with the
+                <a href="http://wiki.sk89q.com/wiki/${project.name}/Regions">region protection feature</a>.</li>
+            <li>region_storage_update_20110325.sql is for updating your region protection
+                database (if you're using it) if your database was made before March 25, 2011.</li>
+        </ul>
         
         <h3>${project.name} doesn't seem to work.</h3>
         <p>
@@ -152,6 +150,22 @@ h2 + * {
             fatal unfortunately, and can be caused by a single character typed in the wrong place). Try 
             <a href="http://wiki.sk89q.com/wiki/${project.name}/Support">asking in IRC</a>
             to see whether anyone can help you.
+        </p>
+        
+        <h3>How do I protect my spawn, or another area?</h3>
+        <p>
+            Read the <a href="http://wiki.sk89q.com/wiki/${project.name}/Regions/Tutorial">area protection tutorial</a>
+            on our wiki. For more detailed information, be sure to read about
+            <a href="http://wiki.sk89q.com/wiki/WorldGuard/Regions">region protection on the wiki</a>. Note
+            that if you can't build in spawn, don't forget that Minecraft comes with its own
+            limited spawn protection that you have to disable (see below).
+        </p>
+        
+        <h3>I or others don't have permission to build.</h3>
+        <p>
+            Unless you copied configuration files from an older installation of 
+            ${project.name}, your problem is either caused by another plugin, or by not
+            disabling the built-in spawn protection of the Minecraft server.
         </p>
         
         <h3>No one can build in a region I made!</h3>
@@ -167,8 +181,9 @@ h2 + * {
                 group.groupName for ${project.name} to recognize it.</li>
             <li>That you disabled spawn protection. The Minecraft server has an automatic
                 spawn protection feature where only 'ops' can build in a definable
-                radius around spawn (by default, it is 16 blocks). Modify bukkit.yml in order
-                to change the spawn radius to 0.</li>
+                radius around spawn (by default, it is 16 blocks). If you are on Minecraft
+                1.4 or newer, edit "spawn-protection" in server.properties; otherwise, modify bukkit.yml
+                and change the spawn-radius setting.</li>
             <li>That it's not another plugin causing you trouble. The error messages of ${project.name} are of
                 a dark red shade. If the color of the "no permission" message is not
                 that color, it is not ${project.name}.</li>
@@ -186,6 +201,14 @@ h2 + * {
                 permission denied message, but they can still build, another plugin
                 is likely causing the conflict.</li>
         </ul>
+        
+        <h3>Where do I report bugs or suggest ideas?</h3>
+        <p>
+            Make sure you are using the latest version of ${project.name}, try asking in
+            IRC first (see "Need help?" above) if it's a problem, and if you think you've
+            found a bug or have a great suggestion to provide, please
+            report it to <a href="http://youtrack.sk89q.com/issues/WORLDGUARD">our issue tracker</a>.
+        </p>
         
         <p>
             Still need help?
