@@ -269,8 +269,7 @@ public class WorldGuardEntityListener implements Listener {
                 }
             }
 
-            if (attacker != null && attacker instanceof LivingEntity
-                    && !(attacker instanceof Player)) {
+            if (attacker != null && attacker instanceof LivingEntity && !(attacker instanceof Player)) {
                 if (attacker instanceof Creeper && wcfg.blockCreeperExplosions) {
                     event.setCancelled(true);
                     return;
@@ -321,7 +320,7 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             // Check Mob
-            if (attacker != null && attacker instanceof Skeleton) {
+            if (attacker != null && attacker instanceof LivingEntity && !(attacker instanceof Player)) {
                 if (wcfg.disableMobDamage) {
                     event.setCancelled(true);
                     return;
