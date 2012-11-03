@@ -1,3 +1,39 @@
+5.6:
+- Added official support for Minecraft 1.4. Support for 1.3.2 (and below) is still
+    provided in this release.
+- Added support for new and existing explosion types.
+- Added support for blocking withers with the following settings:
+    mobs:
+        block-wither-explosions: false
+        block-wither-block-damage: false
+        block-wither-skull-explosions: false
+        block-wither-skull-block-damage: true
+- Added support for blocking item frames (and their use) in protected regions.
+- Added item frame destruction region flags (if you wish to disable item frame 
+    destruction completely).
+- (Re-)added support for priority R-tree region indexes. This means quicker region lookup,
+    and better support for servers with thousands of regions.
+- Improved /region info output for -g group flags.
+- Allowed removing of -g group flags with /region flag.
+- Allowed /region flag to set group and value at once.
+- Deleting a region flag now also deletes group flag.
+- Fixed detection of attack by projectiles to be more accurate.
+- Fixed support for saving non-string flags in the MySQL region support.
+- Fixed spurious comma in "Flags:" /region info output.
+- Fixed players who are not in god mode not receiving damage in PVP areas from
+    enderpearls.
+- Players will now be told that they are in a no-PvP area if they are in one and
+    attempting to attack someone, or that the player they are attacking is in a
+    no-PvP area, if that is the case instead.
+- Fixed an issue where region.getId() was lowercase'd each pass of a for loop in
+    MySQLDatabase.updatePoly2dPoints().
+- Fixed mob damage from projectiles not being properly blocked in regions where
+    applicable.
+- Changed default region wand to leather (#334).
+
+Thank you to the following individuals for their contribution:
+thvortex, Rutr, Glitchfinder, and DarthAndroid.
+
 5.5.4:
 - Minecraft 1.3 support.
 - Fixed /stack dupe bugs.
@@ -19,32 +55,41 @@
     vice versa.
 
 5.5.2:
- - Added potion-splash flag to block splash potions
- - Add entity-painting-destroy which can be used to prevent entities from destroying paintings (skeletons firing arrows)
- - Added send-chat and receive-chat flags
- - Fixed having regions in multiple worlds with the same name not working with MySQL
- - A cancellable event is now fired if WorldGuard disallows PvP. (for developers!)
- - Made /region setparent check worldguard.region.setparent.own/member.<parent> instead of worldguard.region.setparent.own/member.<child>.
- - Allowed passing #<index> in place of a region ID, where <index> is the index as displayed by /region list.
- - Fixed an error that occured when clearing a non-existant region's parent.
- - Added a -s flag to /region teleport, which sends you to the spawn point instead of the teleport point of a region.
- - Added region/role-based permissions to /region teleport.
- - BREAKING CHANGE: Added a LocationFlag class and made the teleport and spawn flags use it.
- - /region info -s now selects the region being queried.
- - Added /region teleport <id>.
- - Vector flags can now be set to the current location with the value "here" and to a specific position with x,y,z.
- - Made /region info show the region you're in if you don't specify an id explicitly.
- - Prevent block ignition from lightning strikes if lightning is blocked in region. Fixes #1175
- - Correctly check both WEPIF and superperms in WorldGurdPlugin.broadcastNotification()
- - Destroy fire blocks when fire-spread is disallowed
- - Added a construct flag that can be used to restrict block placing/destroying in zones to certain roles.
- - Added FallingSand to list of intensive entities to be removed with /halt-activiy.
- - Replaced all usage of CreatureType by EntityType.
- - Updated to support Bukkit 1.2-R0.3 and newer
- - Made auto-god-mode disabled by default again.
- - Added sign protection check disable.
- - Cleaned up javadoc, deprecated duplicate methods, other cleanup
- - Added a RegionGroupFlag to evey region flag Using the /region flag command with -g, the region group that the region flag applies to can be set.
+- Added potion-splash flag to block splash potions
+- Add entity-painting-destroy which can be used to prevent entities from destroying
+    paintings (skeletons firing arrows)
+- Added send-chat and receive-chat flags
+- Fixed having regions in multiple worlds with the same name not working with MySQL
+- A cancellable event is now fired if WorldGuard disallows PvP. (for developers!)
+- Made /region setparent check worldguard.region.setparent.own/member.<parent> instead
+    of worldguard.region.setparent.own/member.<child>.
+- Allowed passing #<index> in place of a region ID, where <index> is the index as
+    displayed by /region list.
+- Fixed an error that occured when clearing a non-existant region's parent.
+- Added a -s flag to /region teleport, which sends you to the spawn point instead of the
+    teleport point of a region.
+- Added region/role-based permissions to /region teleport.
+- BREAKING CHANGE: Added a LocationFlag class and made the teleport and spawn flags
+    use it.
+- /region info -s now selects the region being queried.
+- Added /region teleport <id>.
+- Vector flags can now be set to the current location with the value "here" and to a
+    specific position with x,y,z.
+- Made /region info show the region you're in if you don't specify an id explicitly.
+- Prevent block ignition from lightning strikes if lightning is blocked in region. Fixes
+    #1175
+- Correctly check both WEPIF and superperms in WorldGurdPlugin.broadcastNotification()
+- Destroy fire blocks when fire-spread is disallowed
+- Added a construct flag that can be used to restrict block placing/destroying in zones
+    to certain roles.
+- Added FallingSand to list of intensive entities to be removed with /halt-activiy.
+- Replaced all usage of CreatureType by EntityType.
+- Updated to support Bukkit 1.2-R0.3 and newer
+- Made auto-god-mode disabled by default again.
+- Added sign protection check disable.
+- Cleaned up javadoc, deprecated duplicate methods, other cleanup
+- Added a RegionGroupFlag to evey region flag Using the /region flag command with -g,
+    the region group that the region flag applies to can be set.
 
 5.5.1:
 - Fixed attacking with arrows from non-PVP to PVP areas
