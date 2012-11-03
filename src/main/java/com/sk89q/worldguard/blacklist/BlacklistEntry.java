@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.blacklist;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -105,9 +106,7 @@ public class BlacklistEntry {
      */
     public void setIgnorePermissions(String[] ignorePermissions) {
         Set<String> ignorePermissionsSet = new HashSet<String>();
-        for (String perm : ignorePermissions) {
-            ignorePermissionsSet.add(perm);
-        }
+        Collections.addAll(ignorePermissionsSet, ignorePermissions);
         this.ignorePermissions = ignorePermissionsSet;
     }
 

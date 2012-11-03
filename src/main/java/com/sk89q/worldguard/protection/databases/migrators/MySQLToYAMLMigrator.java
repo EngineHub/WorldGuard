@@ -19,6 +19,14 @@
 
 package com.sk89q.worldguard.protection.databases.migrators;
 
+import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.databases.MySQLDatabase;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.databases.YAMLDatabase;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
@@ -28,14 +36,6 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.databases.MySQLDatabase;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.YAMLDatabase;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class MySQLToYAMLMigrator extends AbstractDatabaseMigrator {
 
@@ -59,7 +59,7 @@ public class MySQLToYAMLMigrator extends AbstractDatabaseMigrator {
 
             conn.close();
         } catch (SQLException e) {
-            throw new MigrationException((Exception) e);
+            throw new MigrationException(e);
         }
     }
 
@@ -75,7 +75,7 @@ public class MySQLToYAMLMigrator extends AbstractDatabaseMigrator {
             oldDatabase = new MySQLDatabase(plugin.getGlobalStateManager(), world, plugin.getLogger());
             oldDatabase.load();
         } catch (ProtectionDatabaseException e) {
-            throw new MigrationException((Exception) e);
+            throw new MigrationException(e);
         }
 
         return oldDatabase.getRegions();
@@ -89,9 +89,9 @@ public class MySQLToYAMLMigrator extends AbstractDatabaseMigrator {
 
             return new YAMLDatabase(file, plugin.getLogger());
         } catch (FileNotFoundException e) {
-            throw new MigrationException((Exception) e);
+            throw new MigrationException(e);
         } catch (ProtectionDatabaseException e) {
-            throw new MigrationException((Exception) e);
+            throw new MigrationException(e);
         }
     }
 }

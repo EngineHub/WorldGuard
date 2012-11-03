@@ -61,7 +61,7 @@ public class VectorFlag extends Flag<Vector> {
                             Double.parseDouble(split[1]),
                             Double.parseDouble(split[2])
                     );
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ignored) {
                 }
             }
 

@@ -82,7 +82,7 @@ public class LocationFlag extends Flag<Location> {
                             ),
                             yaw, pitch
                     );
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ignored) {
                 }
             }
 

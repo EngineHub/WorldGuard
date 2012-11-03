@@ -19,12 +19,6 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import java.awt.geom.Line2D;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
@@ -32,6 +26,12 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.flags.Flag;
+
+import java.awt.geom.Line2D;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Represents a region of any shape and size that can be protected.
@@ -541,25 +541,25 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         List<BlockVector2D> pts2 = region.getPoints();
         BlockVector2D lastPt1 = pts1.get(pts1.size() - 1);
         BlockVector2D lastPt2 = pts2.get(pts2.size() - 1);
-        for (int i = 0; i < pts1.size(); i++ ) {
-            for (int j = 0; j < pts2.size(); j++) {
+        for (BlockVector2D aPts1 : pts1) {
+            for (BlockVector2D aPts2 : pts2) {
 
                 Line2D line1 = new Line2D.Double(
                         lastPt1.getBlockX(),
                         lastPt1.getBlockZ(),
-                        pts1.get(i).getBlockX(),
-                        pts1.get(i).getBlockZ());
+                        aPts1.getBlockX(),
+                        aPts1.getBlockZ());
 
                 if (line1.intersectsLine(
-                                lastPt2.getBlockX(),
-                                lastPt2.getBlockZ(),
-                                pts2.get(j).getBlockX(),
-                                pts2.get(j).getBlockZ())) {
+                        lastPt2.getBlockX(),
+                        lastPt2.getBlockZ(),
+                        aPts2.getBlockX(),
+                        aPts2.getBlockZ())) {
                     return true;
                 }
-                lastPt2 = pts2.get(j);
+                lastPt2 = aPts2;
             }
-            lastPt1 = pts1.get(i);
+            lastPt1 = aPts1;
         }
         return false;
     }
