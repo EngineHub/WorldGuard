@@ -30,6 +30,6 @@ Links
 -----
 
 * [IRC channel](http://skq.me/irc/irc.esper.net/sk89q/) (#sk89q on irc.esper.net)
-* [Issue tracker](http://redmine.sk89q.com)
+* [Issue tracker](http://youtrack.sk89q.com/issues/WORLDGUARD)
 * [Continuous integration](http://build.sk89q.com) [![Build Status](https://secure.travis-ci.org/sk89q/worldguard.png)](http://travis-ci.org/sk89q/worldguard)
 * [End-user documentation](http://wiki.sk89q.com/wiki/WorldGuard)
