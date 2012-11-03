@@ -18,19 +18,14 @@
  */
 package com.sk89q.worldguard.protection.managers;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+import java.util.*;
 
 /**
  * A very simple implementation of the region manager that uses a flat list
@@ -78,9 +73,7 @@ public class FlatRegionManager extends RegionManager {
 
         if (region != null) {
             List<String> removeRegions = new ArrayList<String>();
-            Iterator<ProtectedRegion> iter = regions.values().iterator();
-            while (iter.hasNext()) {
-                ProtectedRegion curRegion = iter.next();
+            for (ProtectedRegion curRegion : regions.values()) {
                 if (curRegion.getParent() == region) {
                     removeRegions.add(curRegion.getId().toLowerCase());
                 }

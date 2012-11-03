@@ -84,7 +84,7 @@ public class PastebinPoster {
                     in = conn.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     String line;
-                    StringBuffer response = new StringBuffer(); 
+                    StringBuilder response = new StringBuilder();
                     while ((line = reader.readLine()) != null) {
                         response.append(line);
                         response.append("\r\n");
@@ -114,13 +114,13 @@ public class PastebinPoster {
                 if (in != null) {
                     try {
                         in.close();
-                    } catch (IOException e) {
+                    } catch (IOException ignored) {
                     }
                 }
                 if (out != null) {
                     try {
                         out.close();
-                    } catch (IOException e) {
+                    } catch (IOException ignored) {
                     }
                 }
             }

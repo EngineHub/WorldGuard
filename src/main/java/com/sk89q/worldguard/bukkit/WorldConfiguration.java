@@ -19,21 +19,6 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-
-import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldguard.blacklist.Blacklist;
@@ -43,6 +28,15 @@ import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
 import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
 import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.chest.SignChestProtection;
+import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Holds the configuration for individual worlds.
@@ -513,10 +507,8 @@ public class WorldConfiguration {
     }
 
     public boolean isChestProtected(Block block) {
-        if (!signChestProtection) {
-            return false;
-        }
-        return chestProtection.isProtected(block, null);
+
+        return signChestProtection && chestProtection.isProtected(block, null);
     }
 
     public boolean isChestProtectedPlacement(Block block, Player player) {

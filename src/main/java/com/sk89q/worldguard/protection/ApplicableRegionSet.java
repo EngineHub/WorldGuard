@@ -18,22 +18,12 @@
  */
 package com.sk89q.worldguard.protection;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.RegionGroup;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+import java.util.*;
 
 /**
  * Represents a set of regions for a particular point or area and the rules
@@ -216,16 +206,12 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
         Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
 
-        Iterator<ProtectedRegion> it = applicable.iterator();
-        
-        while (it.hasNext()) {
-            ProtectedRegion region = it.next();
-
+        for (ProtectedRegion region : applicable) {
             // Ignore lower priority regions
             if (hasFlagDefined && region.getPriority() < lastPriority) {
                 break;
             }
-            
+
             lastPriority = region.getPriority();
 
             // Ignore non-build regions
@@ -244,7 +230,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
                     continue;
                 }
             }
-            
+
             State v = region.getFlag(flag);
 
             // Allow DENY to override everything
@@ -337,11 +323,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         Map<ProtectedRegion, V> needsClear = new HashMap<ProtectedRegion, V>();
         Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
 
-        Iterator<ProtectedRegion> it = applicable.iterator();
-
-        while (it.hasNext()) {
-            ProtectedRegion region = it.next();
-
+        for (ProtectedRegion region : applicable) {
             // Ignore lower priority regions
             if (found && region.getPriority() < lastPriority) {
                 break;
@@ -360,11 +342,11 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
 
             if (hasCleared.contains(region)) {
                 // Already cleared, so do nothing
-            } else if (region.getFlag(flag) != null){
+            } else if (region.getFlag(flag) != null) {
                 clearParents(needsClear, hasCleared, region);
-                
+
                 needsClear.put(region, region.getFlag(flag));
-                
+
                 found = true;
             }
 

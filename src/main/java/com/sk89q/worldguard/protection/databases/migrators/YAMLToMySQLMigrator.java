@@ -19,18 +19,18 @@
 
 package com.sk89q.worldguard.protection.databases.migrators;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.databases.MySQLDatabase;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class YAMLToMySQLMigrator extends AbstractDatabaseMigrator {
 
@@ -66,9 +66,9 @@ public class YAMLToMySQLMigrator extends AbstractDatabaseMigrator {
             oldDatabase = new YAMLDatabase(this.regionYamlFiles.get(world), plugin.getLogger());
             oldDatabase.load();
         } catch (FileNotFoundException e) {
-            throw new MigrationException((Exception) e);
+            throw new MigrationException(e);
         } catch (ProtectionDatabaseException e) {
-            throw new MigrationException((Exception) e);
+            throw new MigrationException(e);
         }
 
         return oldDatabase.getRegions();
@@ -79,7 +79,7 @@ public class YAMLToMySQLMigrator extends AbstractDatabaseMigrator {
         try {
             return new MySQLDatabase(plugin.getGlobalStateManager(), world, plugin.getLogger());
         } catch (ProtectionDatabaseException e) {
-            throw new MigrationException((Exception) e);
+            throw new MigrationException(e);
         }
     }
 

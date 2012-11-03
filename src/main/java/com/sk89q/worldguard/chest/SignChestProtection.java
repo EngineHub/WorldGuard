@@ -115,10 +115,7 @@ public class SignChestProtection implements ChestProtection {
     
     private boolean isProtectedSignAndChestBinary(Block block, Player player) {
         Boolean res = isProtectedSignAndChest(block, player);
-        if (res == null || !res) {
-            return false;
-        }
-        return true;
+        return !(res == null || !res);
     }
 
     public boolean isAdjacentChestProtected(Block searchBlock, Player player) {

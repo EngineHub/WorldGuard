@@ -82,11 +82,9 @@ public abstract class LocalPlayer {
     
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof LocalPlayer)) {
-            return false;
-        }
-        
-        return ((LocalPlayer)obj).getName().equals(getName());
+
+        return obj instanceof LocalPlayer && ((LocalPlayer) obj).getName().equals(getName());
+
     }
     
     @Override

@@ -19,29 +19,20 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import java.util.List;
-
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.FallingSand;
-
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockType;
+import java.util.List;
 
 public class BukkitUtil {
 
@@ -149,11 +140,7 @@ public class BukkitUtil {
     public static boolean isBlockWater(World world, int ox, int oy, int oz) {
         Block block = world.getBlockAt(ox, oy, oz);
         int id = block.getTypeId();
-        if (id == 8 || id == 9) {
-            return true;
-        } else {
-            return false;
-        }
+        return id == 8 || id == 9;
     }
 
     /**
@@ -264,7 +251,7 @@ public class BukkitUtil {
         Class<?> tmp = null;
         try {
             tmp = Class.forName("org.bukkit.event.hanging.HangingEvent");
-        } catch (ClassNotFoundException ex) { }
+        } catch (ClassNotFoundException ignored) { }
         return (tmp != null);
     }
 }
