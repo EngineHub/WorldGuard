@@ -131,11 +131,11 @@ public class BukkitUtil {
     /**
      * Checks if the given block is water
      *
-     * @param world
-     * @param ox
-     * @param oy
-     * @param oz
-     * @return
+     * @param world the world
+     * @param ox x
+     * @param oy y
+     * @param oz z
+     * @return true if it's water
      */
     public static boolean isBlockWater(World world, int ox, int oy, int oz) {
         Block block = world.getBlockAt(ox, oy, oz);
@@ -229,7 +229,7 @@ public class BukkitUtil {
      * Returns whether an entity should be removed for the halt activity mode.
      *
      * @param entity
-     * @return
+     * @return true if it's to be removed
      */
     public static boolean isIntensiveEntity(Entity entity) {
         return entity instanceof Item
@@ -245,7 +245,7 @@ public class BukkitUtil {
      * Returns whether our running CraftBukkit already supports
      * the HangingEvent instead of the PaintingEvent
      *
-     * @return
+     * @return true if the hanging event is supported
      */
     public static boolean hasHangingEvent() {
         Class<?> tmp = null;
@@ -253,5 +253,24 @@ public class BukkitUtil {
             tmp = Class.forName("org.bukkit.event.hanging.HangingEvent");
         } catch (ClassNotFoundException ignored) { }
         return (tmp != null);
+    }
+
+    /**
+     * Search an enum for a value, and return the first one found. Return null if the
+     * enum entry is not found.
+     *
+     * @param enumType enum class
+     * @param values values to test
+     * @return a value in the enum or null
+     */
+    public static <T extends Enum<T>> T tryEnum(Class<T> enumType, String ... values) {
+        for (String val : values) {
+            try {
+                return Enum.valueOf(enumType, val);
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
+        return null;
     }
 }
