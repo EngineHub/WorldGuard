@@ -57,6 +57,7 @@ public final class DefaultFlag {
     public static final StateFlag MUSHROOMS = new StateFlag("mushroom-growth", true);
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
     public static final StateFlag GRASS_SPREAD = new StateFlag("grass-growth", true);
+    public static final StateFlag MYCELIUM_SPREAD = new StateFlag("mycelium-spread", true);
     public static final StateFlag ENDER_BUILD = new StateFlag("enderman-grief", true);
     public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false, RegionGroup.ALL);
     public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true, RegionGroup.ALL);
@@ -100,8 +101,8 @@ public final class DefaultFlag {
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
         SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, GAME_MODE,
-        MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, SEND_CHAT, RECEIVE_CHAT,
-        FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
+        MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, SEND_CHAT,
+        RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
         TELE_LOC, SPAWN_LOC, POTION_SPLASH,
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
     };
