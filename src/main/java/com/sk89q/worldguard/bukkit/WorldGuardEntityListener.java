@@ -18,6 +18,51 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+
+import java.util.Set;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.EnderPearl;
+import org.bukkit.entity.Enderman;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Tameable;
+import org.bukkit.entity.Wolf;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreeperPowerEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PigZapEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.inventory.ItemStack;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
@@ -27,22 +72,6 @@ import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.*;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Set;
-
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * Listener for entity related events.
@@ -52,7 +81,9 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 public class WorldGuardEntityListener implements Listener {
 
     private WorldGuardPlugin plugin;
-    private EntityType fireballEntityType;
+    private EntityType fireballType;
+    private EntityType witherType;
+    private EntityType witherSkullType;
 
     /**
      * Construct the object;
@@ -61,12 +92,10 @@ public class WorldGuardEntityListener implements Listener {
      */
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-        
-        try {
-            fireballEntityType = EntityType.valueOf("LARGE_FIREBALL");
-        } catch (IllegalArgumentException e) {
-            fireballEntityType = EntityType.valueOf("FIREBALL");
-        }
+
+        fireballType = BukkitUtil.tryEnum(EntityType.class, "LARGE_FIREBALL", "FIREBALL");
+        witherType = BukkitUtil.tryEnum(EntityType.class, "WITHER");
+        witherSkullType = BukkitUtil.tryEnum(EntityType.class, "WITHER_SKULL");
     }
 
     /**
@@ -467,7 +496,7 @@ public class WorldGuardEntityListener implements Listener {
             return;
         }
 
-        if (ent instanceof Wither) {
+        if (ent.getType() == witherType) {
             if (wcfg.blockWitherBlockDamage) {
                 event.blockList().clear();
                 return;
@@ -479,7 +508,7 @@ public class WorldGuardEntityListener implements Listener {
             }
         }
 
-        if (ent instanceof WitherSkull) {
+        if (ent.getType() == witherSkullType) {
             if (wcfg.blockWitherSkullBlockDamage) {
                 event.blockList().clear();
                 return;
@@ -600,19 +629,19 @@ public class WorldGuardEntityListener implements Listener {
             return;
         }
         
-        if (event.getEntityType() == EntityType.WITHER) {
+        if (event.getEntityType() == witherType) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
                 return;
             }
         }
-        else if (event.getEntityType() == EntityType.WITHER_SKULL) {
+        else if (event.getEntityType() == witherSkullType) {
             if (wcfg.blockWitherSkullExplosions) {
                 event.setCancelled(true);
                 return;
             }
         }
-        else if (event.getEntityType() == fireballEntityType) {
+        else if (event.getEntityType() == fireballType) {
             if (wcfg.blockFireballExplosions) {
                 event.setCancelled(true);
                 return;
@@ -756,7 +785,7 @@ public class WorldGuardEntityListener implements Listener {
                     }
                 }
             }
-        } else if (ent instanceof Wither) {
+        } else if (ent.getType() == witherType) {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(ent.getWorld());
             
