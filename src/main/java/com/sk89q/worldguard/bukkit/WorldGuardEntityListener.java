@@ -496,108 +496,111 @@ public class WorldGuardEntityListener implements Listener {
             return;
         }
 
-        if (ent.getType() == witherType) {
-            if (wcfg.blockWitherBlockDamage) {
-                event.blockList().clear();
-                return;
+        // Not all explosions come from an entity
+        if (ent != null) {
+            if (ent.getType() == witherType) {
+                if (wcfg.blockWitherBlockDamage) {
+                    event.blockList().clear();
+                    return;
+                }
+
+                if (wcfg.blockWitherExplosions) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
 
-            if (wcfg.blockWitherExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-        }
+            if (ent.getType() == witherSkullType) {
+                if (wcfg.blockWitherSkullBlockDamage) {
+                    event.blockList().clear();
+                    return;
+                }
 
-        if (ent.getType() == witherSkullType) {
-            if (wcfg.blockWitherSkullBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
-
-            if (wcfg.blockWitherSkullExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (ent instanceof Creeper) {
-            if (wcfg.blockCreeperBlockDamage) {
-                event.blockList().clear();
-                return;
+                if (wcfg.blockWitherSkullExplosions) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
 
-            if (wcfg.blockCreeperExplosions) {
-                event.setCancelled(true);
-                return;
-            }
+            if (ent instanceof Creeper) {
+                if (wcfg.blockCreeperBlockDamage) {
+                    event.blockList().clear();
+                    return;
+                }
 
-            if (wcfg.useRegions) {
+                if (wcfg.blockCreeperExplosions) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (wcfg.useRegions) {
+                    if (wcfg.useRegions) {
+                        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                        for (Block block : event.blockList()) {
+                            if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
+                                event.blockList().clear();
+                                return;
+                            }
+                        }
+                    }
+                }
+            } else if (ent instanceof EnderDragon) {
+                if (wcfg.blockEnderDragonBlockDamage) {
+                    event.blockList().clear();
+                    return;
+                }
+
                 if (wcfg.useRegions) {
                     RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
                     for (Block block : event.blockList()) {
-                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
+                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
                             event.blockList().clear();
                             return;
                         }
                     }
                 }
-            }
-        } else if (ent instanceof EnderDragon) {
-            if (wcfg.blockEnderDragonBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
+            } else if (ent instanceof TNTPrimed) {
+                if (wcfg.blockTNTBlockDamage) {
+                    event.blockList().clear();
+                    return;
+                }
 
-            if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                if (wcfg.blockTNTExplosions) {
+                    event.setCancelled(true);
+                    return;
+                }
 
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
-                        event.blockList().clear();
-                        return;
+                if (wcfg.useRegions) {
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                    for (Block block : event.blockList()) {
+                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
+                            event.blockList().clear();
+                            return;
+                        }
                     }
                 }
-            }
-        } else if (ent instanceof TNTPrimed) {
-            if (wcfg.blockTNTBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
-
-            if (wcfg.blockTNTExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
-                        event.blockList().clear();
-                        return;
-                    }
+            } else if (ent instanceof Fireball) {
+                if (wcfg.blockFireballBlockDamage) {
+                    event.blockList().clear();
+                    return;
                 }
-            }
-        } else if (ent instanceof Fireball) {
-            if (wcfg.blockFireballBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
 
-            if (wcfg.blockFireballExplosions) {
-                event.setCancelled(true);
-                return;
-            }
+                if (wcfg.blockFireballExplosions) {
+                    event.setCancelled(true);
+                    return;
+                }
 
-            if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                if (wcfg.useRegions) {
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
-                        event.blockList().clear();
-                        return;
+                    for (Block block : event.blockList()) {
+                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
+                            event.blockList().clear();
+                            return;
+                        }
                     }
                 }
             }
@@ -628,7 +631,7 @@ public class WorldGuardEntityListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        
+
         if (event.getEntityType() == witherType) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
@@ -788,7 +791,7 @@ public class WorldGuardEntityListener implements Listener {
         } else if (ent.getType() == witherType) {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(ent.getWorld());
-            
+
             if (wcfg.blockWitherBlockDamage || wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
                 return;
