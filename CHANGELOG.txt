@@ -1,3 +1,13 @@
+5.6.1:
+- Added a mycelium-spread region flag.
+- Added a dynamics.disable-mycelium-spread configuration setting.
+- Added new gameplay.block-potions option. For example:
+    gameplay:
+        block-potions: [invisibility, speed]
+- Fixed a bug in the entity explosion event handler that caused a NullPointerException.
+
+Thank you for gabizou for his contribution in this release.
+
 5.6:
 - Added official support for Minecraft 1.4. Support for 1.3.2 (and below) is still
     provided in this release.
