@@ -76,6 +76,7 @@ public class WorldConfiguration {
     public int spongeRadius;
     public boolean disableExpDrops;
     public Set<PotionEffectType> blockPotions;
+    public boolean blockPotionsAlways;
     public boolean pumpkinScuba;
     public boolean redstoneSponges;
     public boolean noPhysicsGravel;
@@ -300,6 +301,7 @@ public class WorldConfiguration {
                 blockPotions.add(effect);
             }
         }
+        blockPotionsAlways = getBoolean("gameplay.block-potions-overly-reliably", false);
 
         simulateSponge = getBoolean("simulation.sponge.enable", true);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;

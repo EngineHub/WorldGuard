@@ -40,6 +40,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -62,6 +63,7 @@ import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
@@ -811,14 +813,39 @@ public class WorldGuardEntityListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPotionSplash(PotionSplashEvent event) {
-        GlobalRegionManager global = plugin.getGlobalRegionManager();
+        Entity entity = event.getEntity();
+        ThrownPotion potion = event.getPotion();
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(entity.getWorld());
+
+        if (wcfg.blockPotionsAlways && wcfg.blockPotions.size() > 0) {
+            boolean blocked = false;
+
+            for (PotionEffect effect : potion.getEffects()) {
+                if (wcfg.blockPotions.contains(effect.getType())) {
+                    blocked = true;
+                    break;
+                }
+            }
+
+            if (blocked) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        GlobalRegionManager regionMan = plugin.getGlobalRegionManager();
+
         int blockedEntities = 0;
         for (LivingEntity e : event.getAffectedEntities()) {
-            if (!global.allows(DefaultFlag.POTION_SPLASH, e.getLocation(), e instanceof Player ? plugin.wrapPlayer((Player) e) : null)) {
+            if (!regionMan.allows(DefaultFlag.POTION_SPLASH, e.getLocation(),
+                    e instanceof Player ? plugin.wrapPlayer((Player) e) : null)) {
                 event.setIntensity(e, 0);
                 ++blockedEntities;
             }
         }
+
         if (blockedEntities == event.getAffectedEntities().size()) {
             event.setCancelled(true);
         }
