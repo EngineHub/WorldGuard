@@ -38,6 +38,8 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
+import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.RuleSet;
 import com.sk89q.worldedit.blocks.ItemID;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
@@ -108,10 +110,6 @@ public class WorldGuardHangingListener implements Listener {
             }
         } else {
             if (event.getRemover() instanceof Creeper) {
-                if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
                 if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(DefaultFlag.CREEPER_EXPLOSION, hanging.getLocation())) {
                     event.setCancelled(true);
                     return;
@@ -119,16 +117,25 @@ public class WorldGuardHangingListener implements Listener {
             }
 
             if (hanging instanceof Painting
-                    && (wcfg.blockEntityPaintingDestroy
-                    || (wcfg.useRegions
-                    && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_PAINTING_DESTROY, hanging.getLocation())))) {
+                    && ((wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                            DefaultFlag.ENTITY_PAINTING_DESTROY, hanging.getLocation())))) {
                 event.setCancelled(true);
             } else if (hanging instanceof ItemFrame
-                    && (wcfg.blockEntityItemFrameDestroy
-                    || (wcfg.useRegions
-                    && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, hanging.getLocation())))) {
+                    && ((wcfg.useRegions && !plugin.getGlobalRegionManager()
+                            .allows(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY,
+                                    hanging.getLocation())))) {
                 event.setCancelled(true);
             }
+        }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+        BukkitContext context = new BukkitContext(event);
+        context.setSourceEntity(event.getRemover());
+        context.setTargetEntity(event.getEntity());
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
         }
     }
 
@@ -165,6 +172,16 @@ public class WorldGuardHangingListener implements Listener {
                 return;
             }
         }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
+        BukkitContext context = new BukkitContext(event);
+        context.setSourceEntity(event.getPlayer());
+        context.setTargetEntity(event.getEntity());
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -181,16 +198,28 @@ public class WorldGuardHangingListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (entity instanceof ItemFrame
                     && ((!plugin.getGlobalRegionManager().allows(
                             DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, entity.getLocation())))) {
                 event.setCancelled(true);
+                return;
             } else if (entity instanceof Painting
                     && ((!plugin.getGlobalRegionManager().allows(
                             DefaultFlag.ENTITY_PAINTING_DESTROY, entity.getLocation())))) {
                 event.setCancelled(true);
+                return;
             }
+        }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_INTERACT);
+        BukkitContext context = new BukkitContext(event);
+        context.setSourceEntity(player);
+        context.setTargetEntity(entity);
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
         }
     }
 }

@@ -27,23 +27,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
+
+import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.RuleSet;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
+/**
+ * Listener for weather events.
+ */
 public class WorldGuardWeatherListener implements Listener {
 
-    /**
-     * Plugin.
-     */
     private WorldGuardPlugin plugin;
 
-    /**
-     * Construct the object;
-     *
-     * @param plugin The plugin instance
-     */
     public WorldGuardWeatherListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
@@ -57,14 +55,12 @@ public class WorldGuardWeatherListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getWorld());
 
-        if (event.toWeatherState()) {
-            if (wcfg.disableWeather) {
-                event.setCancelled(true);
-            }
-        } else {
-            if (!wcfg.disableWeather && wcfg.alwaysRaining) {
-                event.setCancelled(true);
-            }
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_TRANSITION);
+        BukkitContext context = new BukkitContext(event);
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
         }
     }
 
@@ -73,30 +69,23 @@ public class WorldGuardWeatherListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getWorld());
 
-        if (event.toThunderState()) {
-            if (wcfg.disableThunder) {
-                event.setCancelled(true);
-            }
-        } else {
-            if (!wcfg.disableWeather && wcfg.alwaysThundering) {
-                event.setCancelled(true);
-            }
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_TRANSITION);
+        BukkitContext context = new BukkitContext(event);
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLightningStrike(LightningStrikeEvent event) {
+        Location loc = event.getLightning().getLocation();
+
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getWorld());
 
-        if (wcfg.disallowedLightningBlocks.size() > 0) {
-            int targetId = event.getLightning().getLocation().getBlock().getTypeId();
-            if (wcfg.disallowedLightningBlocks.contains(targetId)) {
-                event.setCancelled(true);
-            }
-        }
-
-        Location loc = event.getLightning().getLocation();
+        // Regions
         if (wcfg.useRegions) {
             Vector pt = toVector(loc);
             RegionManager mgr = plugin.getGlobalRegionManager().get(loc.getWorld());
@@ -105,6 +94,15 @@ public class WorldGuardWeatherListener implements Listener {
             if (!set.allows(DefaultFlag.LIGHTNING)) {
                 event.setCancelled(true);
             }
+        }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_PHENOMENON);
+        BukkitContext context = new BukkitContext(event);
+        context.setTargetBlock(loc.getBlock().getState());
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
         }
     }
 }

@@ -37,6 +37,8 @@ import org.bukkit.event.painting.PaintingBreakEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
+import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.RuleSet;
 import com.sk89q.worldedit.blocks.ItemID;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
@@ -103,22 +105,24 @@ public class WorldGuardPaintingListener implements Listener {
             }
         } else {
             if (event.getRemover() instanceof Creeper) {
-                if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
                 if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(DefaultFlag.CREEPER_EXPLOSION, painting.getLocation())) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if (wcfg.blockEntityPaintingDestroy
-                    || (wcfg.useRegions
-                    && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_PAINTING_DESTROY, painting.getLocation()))) {
+            if ((wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.ENTITY_PAINTING_DESTROY, painting.getLocation()))) {
                 event.setCancelled(true);
             }
         }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+        BukkitContext context = new BukkitContext(event);
+        context.setSourceEntity(event.getRemover());
+        context.setTargetEntity(event.getPainting());
+        rules.process(context);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -147,6 +151,16 @@ public class WorldGuardPaintingListener implements Listener {
                 return;
             }
         }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
+        BukkitContext context = new BukkitContext(event);
+        context.setSourceEntity(event.getPlayer());
+        context.setTargetEntity(event.getPainting());
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -163,12 +177,23 @@ public class WorldGuardPaintingListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (entity instanceof Painting
                     && ((!plugin.getGlobalRegionManager().allows(
                             DefaultFlag.ENTITY_PAINTING_DESTROY, entity.getLocation())))) {
                 event.setCancelled(true);
+                return;
             }
+        }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_INTERACT);
+        BukkitContext context = new BukkitContext(event);
+        context.setSourceEntity(player);
+        context.setTargetEntity(entity);
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
         }
     }
 }

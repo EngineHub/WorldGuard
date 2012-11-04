@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
@@ -24,22 +25,17 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+/**
+ * Listener for vehicle events.
+ */
 public class WorldGuardVehicleListener implements Listener {
 
     private WorldGuardPlugin plugin;
 
-    /**
-     * Construct the object;
-     *
-     * @param plugin
-     */
     public WorldGuardVehicleListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
 
-    /**
-     * Register events.
-     */
     public void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -50,12 +46,14 @@ public class WorldGuardVehicleListener implements Listener {
         Entity destroyer = event.getAttacker();
 
         if (!(destroyer instanceof Player)) return; // don't care
+        
         Player player = (Player) destroyer;
         World world = vehicle.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
+        // Regions
         if (wcfg.useRegions) {
             Vector pt = toVector(vehicle.getLocation());
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -82,6 +80,7 @@ public class WorldGuardVehicleListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
+        // Regions
         // unfortunate code duplication
         if (wcfg.useRegions) {
             // Did we move a block?

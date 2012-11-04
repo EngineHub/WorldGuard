@@ -22,15 +22,11 @@ package com.sk89q.worldguard.bukkit.commands;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.LagStopMode;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
@@ -45,15 +41,15 @@ public class ToggleCommands {
             desc = "Disables all fire spread temporarily", max = 1)
     @CommandPermissions({"worldguard.fire-toggle.stop"})
     public void stopFire(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         World world;
-        
+
         if (args.argsLength() == 0) {
             world = plugin.checkPlayer(sender).getWorld();
         } else {
             world = plugin.matchWorld(sender, args.getString(0));
         }
-        
+
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(world);
 
         if (!wcfg.fireSpreadDisableToggle) {
@@ -74,15 +70,14 @@ public class ToggleCommands {
             desc = "Allows all fire spread temporarily", max = 1)
     @CommandPermissions({"worldguard.fire-toggle.stop"})
     public void allowFire(CommandContext args, CommandSender sender) throws CommandException {
-        
         World world;
-        
+
         if (args.argsLength() == 0) {
             world = plugin.checkPlayer(sender).getWorld();
         } else {
             world = plugin.matchWorld(sender, args.getString(0));
         }
-        
+
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
@@ -98,48 +93,20 @@ public class ToggleCommands {
     }
 
     @Command(aliases = {"halt-activity", "stoplag", "haltactivity"},
-            desc = "Attempts to cease as much activity in order to stop lag", flags = "c", max = 0)
+            desc = "Attempts to cease as much activity in order to stop lag", flags = "cag", max = 0)
     @CommandPermissions({"worldguard.halt-activity"})
     public void stopLag(CommandContext args, CommandSender sender) throws CommandException {
+        LagStopMode lagStopper = plugin.getLagStopMode();
 
-        ConfigurationManager configManager = plugin.getGlobalStateManager();
+        lagStopper.setRemoveAnimals(!args.hasFlag('c'));
 
-        configManager.activityHaltToggle = !args.hasFlag('c');
-
-        if (configManager.activityHaltToggle) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.YELLOW
-                        + "ALL intensive server activity halted.");
-            }
-
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "ALL intensive server activity halted by "
-                    + plugin.toName(sender) + ".");
-
-            for (World world : plugin.getServer().getWorlds()) {
-                int removed = 0;
-
-                for (Entity entity : world.getEntities()) {
-                    if (BukkitUtil.isIntensiveEntity(entity)) {
-                        entity.remove();
-                        removed++;
-                    }
-                }
-
-                if (removed > 10) {
-                    sender.sendMessage("" + removed + " entities (>10) auto-removed from "
-                            + world.toString());
-                }
-            }
-
+        if (!args.hasFlag('c')) {
+            sender.sendMessage(ChatColor.YELLOW + "Enabling lag stop mode...");
+            lagStopper.enable(!args.hasFlag('g'));
         } else {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.YELLOW
-                        + "ALL intensive server activity no longer halted.");
-            }
-
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "ALL intensive server activity is now allowed.");
+            sender.sendMessage(ChatColor.YELLOW + "Disabling lag stop mode...");
+            lagStopper.disable();
         }
+
     }
 }

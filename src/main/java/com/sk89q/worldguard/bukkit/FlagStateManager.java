@@ -60,6 +60,7 @@ public class FlagStateManager implements Runnable {
     /**
      * Run the task.
      */
+    @Override
     public void run() {
         Player[] players = plugin.getServer().getOnlinePlayers();
         ConfigurationManager config = plugin.getGlobalStateManager();

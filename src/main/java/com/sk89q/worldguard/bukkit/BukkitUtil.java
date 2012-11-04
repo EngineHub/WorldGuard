@@ -226,22 +226,6 @@ public class BukkitUtil {
     }
 
     /**
-     * Returns whether an entity should be removed for the halt activity mode.
-     *
-     * @param entity
-     * @return true if it's to be removed
-     */
-    public static boolean isIntensiveEntity(Entity entity) {
-        return entity instanceof Item
-                || entity instanceof TNTPrimed
-                || entity instanceof ExperienceOrb
-                || entity instanceof FallingSand
-                || (entity instanceof LivingEntity
-                    && !(entity instanceof Tameable)
-                    && !(entity instanceof Player));
-    }
-
-    /**
      * Returns whether our running CraftBukkit already supports
      * the HangingEvent instead of the PaintingEvent
      *

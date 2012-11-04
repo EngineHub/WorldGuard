@@ -5,79 +5,63 @@
 */
 package com.sk89q.worldguard.bukkit;
 
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldSaveEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
+import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.RuleSet;
+
+/**
+ * Listener for world events.
+ */
 public class WorldGuardWorldListener implements Listener {
 
     private WorldGuardPlugin plugin;
 
-    /**
-     * Construct the object;
-     *
-     * @param plugin The plugin instance
-     */
     public WorldGuardWorldListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
 
-    /**
-     * Register events.
-     */
     public void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
-    public void onChunkLoad(ChunkLoadEvent event) {
+    public void onWorldLoad(WorldLoadEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getWorld());
 
-        if (cfg.activityHaltToggle) {
-            int removed = 0;
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_LOAD);
+        BukkitContext context = new BukkitContext(event);
+        rules.process(context);
+    }
 
-            for (Entity entity : event.getChunk().getEntities()) {
-                if (BukkitUtil.isIntensiveEntity(entity)) {
-                    entity.remove();
-                    removed++;
-                }
-            }
+    @EventHandler
+    public void onWorldLoad(WorldUnloadEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getWorld());
 
-            if (removed > 50) {
-                plugin.getLogger().info("Halt-Act: " + removed + " entities (>50) auto-removed from "
-                        + event.getChunk().toString());
-            }
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_UNLOAD);
+        BukkitContext context = new BukkitContext(event);
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
         }
     }
 
     @EventHandler
-    public void onWorldLoad(WorldLoadEvent event) {
-        initWorld(event.getWorld());
-    }
-
-    /**
-     * Initialize the settings for the specified world
-     * @see WorldConfiguration#alwaysRaining
-     * @see WorldConfiguration#disableWeather
-     * @see WorldConfiguration#alwaysThundering
-     * @see WorldConfiguration#disableThunder
-     * @param world The specified world
-     */
-    public void initWorld(World world) {
+    public void onWorldSave(WorldSaveEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-        if (wcfg.alwaysRaining && !wcfg.disableWeather) {
-            world.setStorm(true);
-        } else if (wcfg.disableWeather && !wcfg.alwaysRaining) {
-            world.setStorm(false);
-        }
-        if (wcfg.alwaysThundering && !wcfg.disableThunder) {
-            world.setThundering(true);
-        } else if (wcfg.disableThunder && !wcfg.alwaysThundering) {
-            world.setStorm(false);
-        }
+        WorldConfiguration wcfg = cfg.get(event.getWorld());
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_SAVE);
+        BukkitContext context = new BukkitContext(event);
+        rules.process(context);
     }
 }

@@ -1,0 +1,687 @@
+- setting: [auto-invincible, auto-invincible-permission]
+  rules:
+    - when: player-spawn
+      if:
+        - ?has-permission: worldguard.auto-invincible
+      then:
+        - ?: update-entity
+          set-invincible: true
+          
+# ----------------------------------------------
+# protection.*
+# ----------------------------------------------
+
+- setting: protection.item-durability
+  negate: true
+  rules:
+    - when: block-break
+      if:
+        - ?: match-item
+          has-data: true
+      then:
+        - ?: update-item
+          set-data: 0
+- setting: protection.disable-xp-orb-drops
+  rules:
+    - when: player-death
+      then:
+        - ?: set-drop
+          set-xp: 0
+- setting: protection.disable-obsidian-generators
+  rules:
+    - when: block-spread
+      if:
+        - ?: match-block
+          material: [lava, moving_lava, air]
+          block: source
+        - ?: match-block
+          material: redstone_block
+          block: target
+      then:
+        - ?: set-block
+          block: target
+          material: air
+
+# ----------------------------------------------
+# default.*
+# ----------------------------------------------
+
+- setting: default.pumpkin-scuba
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-entity: [player]
+          entity: target
+        - ?match-damage: drowning
+        - ?: match-item
+          material: pumpkin
+          item: helmet
+          entity: target
+      then:
+        - ?: update-entity
+          entity: target
+          set-air: 320
+        - ?: cancel
+
+# ----------------------------------------------
+# physics.*
+# ----------------------------------------------
+        
+- setting: physics.no-physics-gravel
+  rules:
+    - when: block-physics
+      if:
+        - ?match-block: gravel
+      then:
+        - ?: cancel
+- setting: physics.no-physics-sand
+  rules:
+    - when: block-physics
+      if:
+        - ?match-block: sand
+      then:
+        - ?: cancel
+- setting: physics.no-physics-portal
+  rules:
+    - when: block-physics
+      if:
+        - ?match-block: portal
+      then:
+        - ?: cancel
+- setting: physics.disable-water-damage-blocks
+  type: list
+  parameters:
+    target: "rules[0].if[1].?match-block"
+  rules:
+    - when: block-spread
+      if:
+        - ?match-block: [water, water_moving]
+          block: source
+        - ?match-block: VARIABLE
+          block: target
+      then:
+        - ?: cancel
+- setting: physics.block-tnt
+  rules:
+    - when: entity-explode
+      if:
+        - ?match-entity: primed_tnt
+          entity: target
+      then:
+        - ?: cancel
+    - when: entity-damage
+      if:
+        - ?match-entity: primed_tnt
+          entity: source
+      then:
+        - ?: cancel
+- setting: physics.block-tnt-damage
+  rules:
+    - when: block-break
+      if:
+        - ?match-entity: primed_tnt
+          entity: source
+      then:
+        - ?: cancel
+
+# ----------------------------------------------
+# ignition.*
+# ----------------------------------------------
+        
+- setting: ignition.lighter
+  rules:
+    - when: item-use
+      if:
+        - ?match-block: fire
+          block: placed
+        - ?match-entity: [player]
+          entity: source
+        - ?match-item: lighter
+          slot: held
+        - ?has-permission: worldguard.override.lighter
+          negate: true
+      then:
+        - ?: cancel
+
+# ----------------------------------------------
+# fire.*
+# ----------------------------------------------
+        
+- setting: fire.disable-lava-fire-spread
+  rules:
+    - when: block-spread
+      if:
+        - ?match-block: fire
+          block: placed
+        - ?match-block: [lava, moving_lava]
+          block: source
+      then:
+        - ?: cancel
+- setting: fire.disable-all-fire-spread
+  rules:
+    - when: block-spread
+      if:
+        - ?match-block: fire
+          block: placed
+      then:
+        - ?: cancel
+    - when: block-break
+      if:
+        - ?match-block: fire
+          block: source
+      then:
+        - ?: cancel
+- setting: fire.disable-fire-spread-blocks
+  type: list
+  parameters:
+    target: ["rules[0].if[0].?match-block",
+             "rules[1].if[0].?match-block"]
+  rules:
+    - when: block-spread
+      if:
+        - ?match-block: VARIABLE
+          block: target
+          relative: around
+        - ?match-block: fire
+          block: placed
+      then:
+        - ?: cancel
+    - when: block-break
+      if:
+        - ?match-block: VARIABLE
+          block: target
+        - ?match-block: fire
+          block: source
+      then:
+        - ?: cancel
+- setting: fire.lava-spread-blocks
+  type: list
+  parameters:
+    target: "rules[0].if[1].?match-block"
+  rules:
+    - when: block-spread
+      if:
+        - ?match-block: [lava, moving_lava]
+          block: source
+        - ?match-block: VARIABLE
+          block: target
+          relative: below
+          negate: true
+      then:
+        - ?: cancel
+- setting: [fire.disable-lightning-strike-fire, weather.disable-lightning-strike-fire]
+  rules:
+    - when: block-place
+      if:
+        - ?match-block: fire
+          block: placed
+        - ?match-entity: lightning
+          entity: source
+      then:
+        - ?: cancel
+
+# ----------------------------------------------
+# mobs.*
+# ----------------------------------------------
+
+- setting: mobs.block-enderdragon-block-damage
+  rules:
+    - when: block-break
+      if:
+        - ?match-entity: enderdragon
+          entity: source
+      then:
+        - ?: cancel
+- setting: mobs.block-fireball-explosions
+  rules:
+    - when: entity-explode
+      if:
+        - ?match-entity: fireball
+          entity: target
+      then:
+        - ?: cancel
+- setting: mobs.block-fireball-block-damage
+  rules:
+    - when: block-break
+      if:
+        - ?match-entity: fireball
+          entity: source
+      then:
+        - ?: cancel
+- setting: mobs.disable-enderman-griefing
+  rules:
+    - when: [block-place, block-break]
+      if:
+        - ?match-entity: enderman
+          entity: source
+      then:
+        - ?: cancel
+
+# Creepers
+- setting: mobs.block-creeper-explosions
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-entity: creeper # Why is this needed?
+          entity: source
+      then:
+        - ?: cancel
+    - when: entity-explode
+      if:
+        - ?match-entity: creeper
+          entity: target
+      then:
+        - ?: cancel
+- setting: mobs.block-creeper-block-damage
+  rules:
+    - when: block-break
+      if:
+        - ?match-entity: creeper
+          entity: source
+      then:
+        - ?: cancel
+
+# Make pets very low-maintenance
+- setting: [mobs.wolves-practically-invincible, mobs.anti-wolf-dumbness]
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-entity: wolf
+          entity: target
+      then:
+        - ?: cancel
+- setting: mobs.ocelots-practically-invincible
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-entity: ocelot
+          entity: target
+      then:
+        - ?: cancel
+        
+# Mobs breaking things that they shouldn't
+- setting: mobs.block-painting-destroy
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-entity: painting
+          entity: target
+        - ?match-entity: player
+          negate: true
+          entity: source
+      then:
+        - ?: cancel
+- setting: mobs.block-item-frame-destroy
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-entity: item_frame
+          entity: target
+        - ?match-entity: player
+          negate: true
+          entity: source
+      then:
+        - ?: cancel
+
+# Spawning
+- setting: mobs.block-creature-spawn
+  type: list
+  parameters:
+    target: "rules[0].if[0].?match-entity"
+  rules:
+    - when: entity-spawn
+      if:
+        - ?match-entity: PLACEHOLDER
+          entity: target
+      then:
+        - ?: cancel
+- setting: mobs.block-plugin-spawning
+  rules:
+    - when: entity-spawn
+      if:
+        - ?match-spawn: plugin
+          entity: target
+      then:
+        - ?: cancel
+        
+# Withers
+- setting: mobs.block-wither-explosions
+  rules:
+    - when: entity-damage # Why is this needed?
+      if:
+        - ?match-entity: wither
+          entity: source
+      then:
+        - ?: cancel
+    - when: entity-explode
+      if:
+        - ?match-entity: wither
+          entity: target
+      then:
+        - ?: cancel
+- setting: mobs.block-wither-block-damage
+  rules:
+    - when: block-break
+      if:
+        - ?match-entity: wither
+          entity: source
+      then:
+        - ?: cancel
+
+# Wither skulls
+- setting: mobs.block-wither-skull-explosions
+  rules:
+    - when: entity-damage # Why is this needed?
+      if:
+        - ?match-entity: wither_skull
+          entity: source
+      then:
+        - ?: cancel
+    - when: entity-explode
+      if:
+        - ?match-entity: wither_skull
+          entity: target
+      then:
+        - ?: cancel
+- setting: mobs.block-wither-skull-block-damage
+  rules:
+    - when: block-break
+      if:
+        - ?match-entity: wither_skull
+          entity: source
+      then:
+        - ?: cancel
+
+# ----------------------------------------------
+# player-damage.*
+# ----------------------------------------------
+        
+- setting: player-damage.teleport-on-suffocation
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: suffocation
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: update-entity
+          entity: target
+          teleport-safely: true
+        - ?: cancel
+- setting: player-damage.teleport-on-void-falling
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: void
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: update-entity
+          entity: target
+          teleport-safely: true
+        - ?: cancel
+- setting: player-damage.disable-death-messages
+  rules:
+    - when: entity-death
+      if:
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?set-message: ""
+- setting: player-damage.disable-fall-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: fall
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+- setting: player-damage.disable-lava-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: lava
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+- setting: player-damage.disable-fire-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: [fire, fire_tick]
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+- setting: player-damage.disable-lightning-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: lightning
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+- setting: player-damage.disable-drowning-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: drowning
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+- setting: player-damage.disable-suffocation-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: suffocation
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+- setting: player-damage.disable-contact-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: contact
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+- setting: player-damage.disable-void-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: void
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+- setting: player-damage.disable-explosion-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: [entity_explosion, block_explosion]
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+- setting: player-damage.disable-mob-damage
+  rules:
+    - when: entity-damage
+      if:
+        - ?match-damage: entity_attack
+        - ?match-entity: player
+          entity: target
+      then:
+        - ?: cancel
+
+# ----------------------------------------------
+# crops.*
+# ----------------------------------------------
+        
+- setting: crops.disable-creature-trampling
+  rules:
+    - when: block-interact
+      if:
+        - ?match-block: soil
+        - ?: match-entity
+          is-living: true
+          entity: source
+      then:
+        - ?: cancel
+- setting: crops.disable-player-trampling
+  rules:
+    - when: block-interact
+      if:
+        - ?match-block: soil
+        - ?match-entity: player
+          entity: source
+      then:
+        - ?: cancel
+
+# ----------------------------------------------
+# weather.*
+# ----------------------------------------------
+        
+- setting: weather.prevent-lightning-strike-blocks
+  type: list
+  parameters:
+    target: "rules[0].if[1].?match-block"
+  rules:
+    - when: weather-phenomenon
+      if:
+        - ?match-phenomenon: lightning
+        - ?match-block: VARIABLE
+          block: target
+          negate: true
+      then:
+        - ?: cancel
+- setting: weather.disable-thunderstorm
+  rules:
+    - when: weather-transition
+      if:
+        - ?match-weather: thunderstorm
+          is-starting: true
+      then:
+        - ?: cancel
+    - when: world-load
+      then:
+        - ?: update-world
+          set-thunderstorm: false
+- setting: weather.disable-weather
+  rules:
+    - when: weather-transition
+      if:
+        - ?match-weather: storm
+          is-starting: true
+      then:
+        - ?: cancel
+    - when: world-load
+      then:
+        - ?: update-world
+          set-storm: false
+- setting: weather.disable-pig-zombification
+  rules:
+    - when: entity-strike
+      if:
+        - ?match-entity: pig
+          entity: target
+      then:
+        - ?: cancel
+- setting: weather.disable-powered-creepers
+  rules:
+    - when: entity-strike
+      if:
+        - ?match-entity: creeper
+          entity: target
+      then:
+        - ?: cancel
+- setting: weather.always-thundering
+  rules:
+    - when: weather-transition
+      if:
+        - ?match-weather: thunderstorm
+          is-starting: false
+      then:
+        - ?: cancel
+    - when: world-load
+      then:
+        - ?: update-world
+          set-thunderstorm: true
+- setting: weather.always-raining
+  rules:
+    - when: weather-transition
+      if:
+        - ?match-weather: storm
+          is-starting: false
+      then:
+        - ?: cancel
+    - when: world-load
+      then:
+        - ?: update-world
+          set-storm: true
+
+# ----------------------------------------------
+# dynamics.*
+# ----------------------------------------------
+          
+- setting: dynamics.disable-mushroom-spread
+  rules:
+    - when: block-spread
+      if:
+        - ?match-block: [red_mushroom, brown_mushroom]
+          block: placed
+      then:
+        - ?: cancel
+- setting: dynamics.disable-ice-melting
+  rules:
+    - when: block-fade
+      if:
+        - ?match-block: ice
+          block: target
+      then:
+        - ?: cancel
+- setting: dynamics.disable-snow-melting
+  rules:
+    - when: block-fade
+      if:
+        - ?match-block: snow
+          block: target
+      then:
+        - ?: cancel
+- setting: dynamics.disable-snow-formation
+  rules:
+    - when: block-form
+      if:
+        - ?match-block: snow
+          block: placed
+      then:
+        - ?: cancel
+- setting: dynamics.disable-ice-formation
+  rules:
+    - when: block-form
+      if:
+        - ?match-block: ice
+          block: placed
+      then:
+        - ?: cancel
+- setting: dynamics.disable-leaf-decay
+  rules:
+    - when: block-fade
+      if:
+        - ?match-block: leaves
+          block: target
+      then:
+        - ?: cancel
+- setting: dynamics.disable-grass-growth
+  rules:
+    - when: block-spread
+      if:
+        - ?match-block: grass
+          block: placed
+      then:
+        - ?: cancel

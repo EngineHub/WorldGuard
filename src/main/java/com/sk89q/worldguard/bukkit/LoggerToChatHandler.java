@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit;
 
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import org.bukkit.ChatColor;
@@ -27,8 +28,6 @@ import org.bukkit.command.CommandSender;
 
 /**
  * Sends all logger messages to a player.
- *
- * @author sk89q
  */
 public class LoggerToChatHandler extends Handler {
     /**
@@ -64,7 +63,12 @@ public class LoggerToChatHandler extends Handler {
      */
     @Override
     public void publish(LogRecord record) {
-        player.sendMessage(ChatColor.GRAY + record.getLevel().getName() + ": "
-                + ChatColor.WHITE + record.getMessage());
+        if (record.getLevel().intValue() >= Level.WARNING.intValue()) {
+            player.sendMessage(ChatColor.RED + record.getLevel().getName() + ": "
+                    + ChatColor.YELLOW + record.getMessage());
+        } else {
+            player.sendMessage(ChatColor.GRAY + record.getLevel().getName() + ": "
+                    + ChatColor.WHITE + record.getMessage());
+        }
     }
 }

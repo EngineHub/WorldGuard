@@ -20,6 +20,7 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
@@ -27,7 +28,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Creature;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EnderPearl;
@@ -40,7 +41,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -51,20 +51,20 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.RuleSet;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -74,117 +74,144 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
- * Listener for entity related events.
- *
- * @author sk89q
+ * The listener for entity events.
  */
 public class WorldGuardEntityListener implements Listener {
 
     private WorldGuardPlugin plugin;
-    private EntityType fireballType;
-    private EntityType witherType;
-    private EntityType witherSkullType;
 
-    /**
-     * Construct the object;
-     *
-     * @param plugin The plugin instance
-     */
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-
-        fireballType = BukkitUtil.tryEnum(EntityType.class, "LARGE_FIREBALL", "FIREBALL");
-        witherType = BukkitUtil.tryEnum(EntityType.class, "WITHER");
-        witherSkullType = BukkitUtil.tryEnum(EntityType.class, "WITHER_SKULL");
     }
 
-    /**
-     * Register events.
-     */
     public void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
-        Entity entity = event.getEntity();
-        Block block = event.getBlock();
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(entity.getWorld());
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
-        if (block.getTypeId() == BlockID.SOIL) {
-            if (entity instanceof Creature && wcfg.disableCreatureCropTrampling) {
-                event.setCancelled(true);
-            }
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_INTERACT);
+        BukkitContext context = new BukkitContext(event);
+        context.setSourceEntity(event.getEntity());
+        context.setTargetBlock(event.getBlock().getState());
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDeath(EntityDeathEvent event) {
-        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
-
-        if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
-                event.getEntity().getLocation())) {
-            event.setDroppedExp(0);
-        }
-
-        if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
-            ((PlayerDeathEvent) event).setDeathMessage("");
-        }
-    }
-
-    private void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
-        Entity defender = event.getEntity();
-        DamageCause type = event.getCause();
-
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(defender.getWorld());
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
-        if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
-            if (wcfg.antiWolfDumbness && !(type == DamageCause.VOID)) {
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DEATH);
+        BukkitContext context = new BukkitContext(event);
+        context.setTargetEntity(event.getEntity());
+
+        // Set a message if it's a death from a player
+        if (event instanceof PlayerDeathEvent) {
+            context.setMessage(((PlayerDeathEvent) event).getDeathMessage());
+        }
+
+        rules.process(context);
+
+        // Set the message back
+        if (event instanceof PlayerDeathEvent) {
+            ((PlayerDeathEvent) event).setDeathMessage(context.getMessage());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityDamage(EntityDamageEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
+
+        // Redirect damage done by an entity
+        if (event instanceof EntityDamageByEntityEvent) {
+            this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
+
+            // RuleLists
+            RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+            BukkitContext context = new BukkitContext(event);
+            context.setSourceEntity(((EntityDamageByEntityEvent) event).getDamager());
+            context.setTargetEntity(event.getEntity());
+            if (rules.process(context)) {
                 event.setCancelled(true);
                 return;
             }
-        } else if (defender instanceof Player) {
-            Player player = (Player) defender;
 
-            if (isInvincible(player)) {
+        // Redirect damage done by blocks
+        } else if (event instanceof EntityDamageByBlockEvent) {
+            Entity defender = event.getEntity();
+
+            // God-mode/amphibious mode
+            if (defender instanceof Player) {
+                Player player = (Player) defender;
+
+                if (isInvincible(player)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            // RuleLists
+            RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+            BukkitContext context = new BukkitContext(event);
+            Block damager = ((EntityDamageByBlockEvent) event).getDamager();
+            if (damager != null) { // Should NOT be null!
+                context.setSourceBlock(damager.getState());
+            }
+            context.setTargetEntity(event.getEntity());
+            if (rules.process(context)) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (wcfg.disableLavaDamage && type == DamageCause.LAVA) {
-                event.setCancelled(true);
-                player.setFireTicks(0);
-                return;
+        // Other damage
+        } else {
+            Entity defender = event.getEntity();
+            DamageCause type = event.getCause();
+
+            // God-mode/amphibious mode
+            if (defender instanceof Player) {
+                Player player = (Player) defender;
+
+                if (isInvincible(player)) {
+                    event.setCancelled(true);
+                    player.setFireTicks(0);
+                    return;
+                }
+
+                if (type == DamageCause.DROWNING && cfg.hasAmphibiousMode(player)) {
+                    player.setRemainingAir(player.getMaximumAir());
+                    event.setCancelled(true);
+                    return;
+                }
             }
 
-            if (wcfg.disableContactDamage && type == DamageCause.CONTACT) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.teleportOnVoid && type == DamageCause.VOID) {
-                BukkitUtil.findFreePosition(player);
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableVoidDamage && type == DamageCause.VOID) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableExplosionDamage && type == DamageCause.BLOCK_EXPLOSION) {
+            // RuleLists
+            RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+            BukkitContext context = new BukkitContext(event);
+            context.setTargetEntity(event.getEntity());
+            if (rules.process(context)) {
                 event.setCancelled(true);
                 return;
             }
         }
     }
 
+    /**
+     * Handle a damage by entity event.
+     *
+     * @param event event
+     */
     private void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-
         if (event.getDamager() instanceof Projectile) {
             onEntityDamageByProjectile(event);
             return;
@@ -231,16 +258,6 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
 
-            if (wcfg.disableLightningDamage && event.getCause() == DamageCause.LIGHTNING) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableExplosionDamage && event.getCause() == DamageCause.ENTITY_EXPLOSION) {
-                event.setCancelled(true);
-                return;
-            }
-
             if (attacker != null && attacker instanceof Player) {
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
@@ -256,10 +273,6 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (attacker != null && attacker instanceof TNTPrimed) {
-                if (wcfg.blockTNTExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
@@ -272,10 +285,6 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (attacker != null && attacker instanceof Fireball) {
-                if (wcfg.blockFireballExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
                 if (wcfg.useRegions) {
                     Fireball fireball = (Fireball) attacker;
                     Vector pt = toVector(defender.getLocation());
@@ -299,16 +308,6 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (attacker != null && attacker instanceof LivingEntity && !(attacker instanceof Player)) {
-                if (attacker instanceof Creeper && wcfg.blockCreeperExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (wcfg.disableMobDamage) {
-                    event.setCancelled(true);
-                    return;
-                }
-
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
@@ -350,10 +349,6 @@ public class WorldGuardEntityListener implements Listener {
 
             // Check Mob
             if (attacker != null && attacker instanceof LivingEntity && !(attacker instanceof Player)) {
-                if (wcfg.disableMobDamage) {
-                    event.setCancelled(true);
-                    return;
-                }
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
@@ -385,90 +380,13 @@ public class WorldGuardEntityListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEntityDamage(EntityDamageEvent event) {
-
-        if (event instanceof EntityDamageByEntityEvent) {
-            this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
-            return;
-        } else if (event instanceof EntityDamageByBlockEvent) {
-            this.onEntityDamageByBlock((EntityDamageByBlockEvent) event);
-            return;
-        }
-
-        Entity defender = event.getEntity();
-        DamageCause type = event.getCause();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(defender.getWorld());
-
-        if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
-            if (wcfg.antiWolfDumbness) {
-                event.setCancelled(true);
-                return;
-            }
-        } else if (defender instanceof Player) {
-            Player player = (Player) defender;
-
-            if (isInvincible(player)) {
-                event.setCancelled(true);
-                player.setFireTicks(0);
-                return;
-            }
-
-            if (type == DamageCause.DROWNING && cfg.hasAmphibiousMode(player)) {
-                player.setRemainingAir(player.getMaximumAir());
-                event.setCancelled(true);
-                return;
-            }
-
-            ItemStack helmet = player.getInventory().getHelmet();
-
-            if (type == DamageCause.DROWNING && wcfg.pumpkinScuba
-                    && helmet != null
-                    && (helmet.getTypeId() == BlockID.PUMPKIN
-                    || helmet.getTypeId() == BlockID.JACKOLANTERN)) {
-                player.setRemainingAir(player.getMaximumAir());
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableFallDamage && type == DamageCause.FALL) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableFireDamage && (type == DamageCause.FIRE
-                    || type == DamageCause.FIRE_TICK)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableDrowningDamage && type == DamageCause.DROWNING) {
-                player.setRemainingAir(player.getMaximumAir());
-                event.setCancelled(true);
-                return;
-            }
-
-           if (wcfg.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
-                BukkitUtil.findFreePosition(player);
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityCombust(EntityCombustEvent event) {
         Entity entity = event.getEntity();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(entity.getWorld());
 
+        // God mode and regions
         if (entity instanceof Player) {
             Player player = (Player) entity;
 
@@ -477,11 +395,17 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
         }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_IGNITE);
+        BukkitContext context = new BukkitContext(event);
+        context.setTargetEntity(entity);
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
+        }
     }
 
-    /*
-     * Called on entity explode.
-     */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
@@ -490,47 +414,19 @@ public class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
         Entity ent = event.getEntity();
 
-        if (cfg.activityHaltToggle) {
-            ent.remove();
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_EXPLODE);
+        BukkitContext context = new BukkitContext(event);
+        context.setTargetEntity(event.getEntity());
+        if (rules.process(context)) {
             event.setCancelled(true);
             return;
         }
 
-        if (ent.getType() == witherType) {
-            if (wcfg.blockWitherBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
+        /* --- No short-circuit returns below this line --- */
 
-            if (wcfg.blockWitherExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (ent.getType() == witherSkullType) {
-            if (wcfg.blockWitherSkullBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
-
-            if (wcfg.blockWitherSkullExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
+        // Regions
         if (ent instanceof Creeper) {
-            if (wcfg.blockCreeperBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
-
-            if (wcfg.blockCreeperExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-
             if (wcfg.useRegions) {
                 if (wcfg.useRegions) {
                     RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -544,11 +440,6 @@ public class WorldGuardEntityListener implements Listener {
                 }
             }
         } else if (ent instanceof EnderDragon) {
-            if (wcfg.blockEnderDragonBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
-
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
@@ -560,16 +451,6 @@ public class WorldGuardEntityListener implements Listener {
                 }
             }
         } else if (ent instanceof TNTPrimed) {
-            if (wcfg.blockTNTBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
-
-            if (wcfg.blockTNTExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
@@ -581,16 +462,6 @@ public class WorldGuardEntityListener implements Listener {
                 }
             }
         } else if (ent instanceof Fireball) {
-            if (wcfg.blockFireballBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
-
-            if (wcfg.blockFireballExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
@@ -612,79 +483,46 @@ public class WorldGuardEntityListener implements Listener {
             }
         }
 
+        // Now apply RuleLists for each block
+        Iterator<Block> iter = event.blockList().iterator();
+        while (iter.hasNext()) {
+            Block block = iter.next();
+
+            rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_BREAK);
+            context = new BukkitContext(event);
+            context.setSourceEntity(event.getEntity());
+            context.setTargetBlock(block.getState());
+            rules.process(context);
+            if (context.isCancelled()) {
+                iter.remove();
+            }
+        }
     }
 
-    /*
-     * Called on explosion prime
-     */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onExplosionPrime(ExplosionPrimeEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
-        Entity ent = event.getEntity();
 
-        if (cfg.activityHaltToggle) {
-            ent.remove();
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_EXPLODE);
+        BukkitContext context = new BukkitContext(event);
+        context.setTargetEntity(event.getEntity());
+        if (rules.process(context)) {
             event.setCancelled(true);
             return;
-        }
-        
-        if (event.getEntityType() == witherType) {
-            if (wcfg.blockWitherExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-        else if (event.getEntityType() == witherSkullType) {
-            if (wcfg.blockWitherSkullExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-        else if (event.getEntityType() == fireballType) {
-            if (wcfg.blockFireballExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-        else if (event.getEntityType() == EntityType.CREEPER) {
-            if (wcfg.blockCreeperExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-        else if (event.getEntityType() == EntityType.PRIMED_TNT) {
-            if (wcfg.blockTNTExplosions) {
-                event.setCancelled(true);
-                return;
-            }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
-            return;
-        }
-
-        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
-
-        // allow spawning of creatures from plugins
-        if (!wcfg.blockPluginSpawning && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM)
-            return;
-
         EntityType entityType = event.getEntityType();
-
-        if (wcfg.blockCreatureSpawn.contains(entityType)) {
-            event.setCancelled(true);
-            return;
-        }
-
         Location eventLoc = event.getLocation();
 
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
+
+        // Regions
         if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
             Vector pt = toVector(eventLoc);
             RegionManager mgr = plugin.getGlobalRegionManager().get(eventLoc.getWorld());
@@ -703,6 +541,15 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
         }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
+        BukkitContext context = new BukkitContext(event);
+        context.setTargetEntity(event.getEntity());
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -710,9 +557,11 @@ public class WorldGuardEntityListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
-        if (wcfg.disablePigZap) {
-            event.setCancelled(true);
-        }
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_STRIKE);
+        BukkitContext context = new BukkitContext(event);
+        context.setTargetEntity(event.getEntity());
+        rules.process(context);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -720,64 +569,37 @@ public class WorldGuardEntityListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
-        if (wcfg.disableCreeperPower) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-
-        Entity ent = event.getEntity();
-        World world = ent.getWorld();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        if (wcfg.disableHealthRegain) {
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_STRIKE);
+        BukkitContext context = new BukkitContext(event);
+        context.setTargetEntity(event.getEntity());
+        if (rules.process(context)) {
             event.setCancelled(true);
             return;
         }
     }
 
-    /**
-     * Called when an enderman picks up or puts down a block and some other cases.
-     *
-     * @param event Relevant event details
-     */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEndermanPickup(EntityChangeBlockEvent event) {
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         Entity ent = event.getEntity();
         Block block = event.getBlock();
         Location location = block.getLocation();
 
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(ent.getWorld());
+
         if (ent instanceof Enderman) {
-            if (event.getTo() == Material.AIR) {
-                // pickup
-                ConfigurationManager cfg = plugin.getGlobalStateManager();
-                WorldConfiguration wcfg = cfg.get(ent.getWorld());
-
-                if (wcfg.disableEndermanGriefing) {
-                    event.setCancelled(true);
-                    return;
-                }
-
+            if (event.getTo() == Material.AIR) { // Pickup
+                // Blacklist
                 if (wcfg.useRegions) {
                     if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, location)) {
                         event.setCancelled(true);
                         return;
                     }
                 }
+
+            // Place
             } else {
-                // place
-                ConfigurationManager cfg = plugin.getGlobalStateManager();
-                WorldConfiguration wcfg = cfg.get(ent.getWorld());
-
-                if (wcfg.disableEndermanGriefing) {
-                    event.setCancelled(true);
-                    return;
-                }
-
                 if (wcfg.useRegions) {
                     if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, location)) {
                         event.setCancelled(true);
@@ -785,14 +607,20 @@ public class WorldGuardEntityListener implements Listener {
                     }
                 }
             }
-        } else if (ent.getType() == witherType) {
-            ConfigurationManager cfg = plugin.getGlobalStateManager();
-            WorldConfiguration wcfg = cfg.get(ent.getWorld());
-            
-            if (wcfg.blockWitherBlockDamage || wcfg.blockWitherExplosions) {
-                event.setCancelled(true);
-                return;
-            }
+        }
+
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(event.getTo() == Material.AIR ?
+                KnownAttachment.BLOCK_BREAK : KnownAttachment.BLOCK_PLACE);
+        BukkitContext context = new BukkitContext(event);
+        context.setSourceEntity(ent);
+        BlockState newState = event.getBlock().getState(); // This event is lame
+        newState.setType(event.getTo()); // Need to construct our own BlockState
+        context.setTargetBlock(event.getBlock().getState());
+        context.setPlacedBlock(newState);
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
         }
     }
 
@@ -802,6 +630,7 @@ public class WorldGuardEntityListener implements Listener {
             Player player = (Player) event.getEntity();
             if (event.getFoodLevel() < player.getFoodLevel() && isInvincible(player)) {
                 event.setCancelled(true);
+                return;
             }
         }
     }
@@ -810,12 +639,15 @@ public class WorldGuardEntityListener implements Listener {
     public void onPotionSplash(PotionSplashEvent event) {
         GlobalRegionManager global = plugin.getGlobalRegionManager();
         int blockedEntities = 0;
+
         for (LivingEntity e : event.getAffectedEntities()) {
-            if (!global.allows(DefaultFlag.POTION_SPLASH, e.getLocation(), e instanceof Player ? plugin.wrapPlayer((Player) e) : null)) {
+            if (!global.allows(DefaultFlag.POTION_SPLASH, e.getLocation(),
+                    e instanceof Player ? plugin.wrapPlayer((Player) e) : null)) {
                 event.setIntensity(e, 0);
                 ++blockedEntities;
             }
         }
+
         if (blockedEntities == event.getAffectedEntities().size()) {
             event.setCancelled(true);
         }
@@ -852,20 +684,28 @@ public class WorldGuardEntityListener implements Listener {
 
     /**
      * Using a DisallowedPVPEvent, notifies other plugins that WorldGuard
-     * wants to cancel a PvP damage event.<br />
-     * If this event is not cancelled, the attacking player is notified that
+     * wants to cancel a PvP damage event.
+     *
+     * <p>If this event is not cancelled, the attacking player is notified that
      * PvP is disabled and WorldGuard cancels the damage event.
      *
      * @param attackingPlayer The attacker
      * @param defendingPlayer The defender
      * @param event The event that caused WorldGuard to act
+     * @param aggressorTriggered whether the aggressor triggered the incident.
      */
     public void tryCancelPVPEvent(final Player attackingPlayer, final Player defendingPlayer, EntityDamageByEntityEvent event, boolean aggressorTriggered) {
         final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
         plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
+
         if (!disallowedPVPEvent.isCancelled()) {
-            if (aggressorTriggered) attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-            else attackingPlayer.sendMessage(ChatColor.DARK_RED + "That player is in a no-PvP area.");
+            if (aggressorTriggered) {
+                attackingPlayer.sendMessage(ChatColor.DARK_RED
+                        + "You are in a no-PvP area.");
+            } else {
+                attackingPlayer.sendMessage(ChatColor.DARK_RED
+                        + "That player is in a no-PvP area.");
+            }
             event.setCancelled(true);
         }
     }

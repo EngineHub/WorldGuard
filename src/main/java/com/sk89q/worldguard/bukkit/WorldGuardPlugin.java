@@ -22,7 +22,6 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.hasHangingEvent;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,12 +30,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
+import java.util.logging.Level;
 
-import com.sk89q.bukkit.util.CommandsManagerRegistration;
-import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.wepif.PermissionsResolverManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -46,55 +41,86 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sk89q.bukkit.util.CommandsManagerRegistration;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.minecraft.util.commands.CommandUsageException;
+import com.sk89q.minecraft.util.commands.CommandsManager;
+import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
+import com.sk89q.minecraft.util.commands.SimpleInjector;
+import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import com.sk89q.rebar.bukkit.VirtualRebarPlugin;
+import com.sk89q.rebar.config.ConfigurationException;
+import com.sk89q.rebar.config.YamlConfiguration;
+import com.sk89q.rebar.config.YamlConfigurationResource;
+import com.sk89q.rulelists.Action;
+import com.sk89q.rulelists.Criteria;
+import com.sk89q.rulelists.DefinitionManager;
+import com.sk89q.rulelists.ResolverManager;
+import com.sk89q.rulelists.RuleListsManager;
+import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
+import com.sk89q.worldguard.bukkit.definitions.BlockCriteriaLoader;
+import com.sk89q.worldguard.bukkit.definitions.CancelActionLoader;
+import com.sk89q.worldguard.bukkit.definitions.DamageCriteriaLoader;
+import com.sk89q.worldguard.bukkit.definitions.EntityCriteriaLoader;
+import com.sk89q.worldguard.bukkit.definitions.ItemCriteriaLoader;
+import com.sk89q.worldguard.bukkit.definitions.PermissionCriteriaLoader;
+import com.sk89q.worldguard.bukkit.definitions.PhenomenonCriteriaLoader;
+import com.sk89q.worldguard.bukkit.definitions.SetBlockActionLoader;
+import com.sk89q.worldguard.bukkit.definitions.SetDropActionLoader;
+import com.sk89q.worldguard.bukkit.definitions.SpawnCriteriaLoader;
+import com.sk89q.worldguard.bukkit.definitions.TellActionLoader;
+import com.sk89q.worldguard.bukkit.definitions.UpdateEntityActionLoader;
+import com.sk89q.worldguard.bukkit.definitions.UpdateItemActionLoader;
+import com.sk89q.worldguard.bukkit.definitions.SetMessageActionLoader;
+import com.sk89q.worldguard.bukkit.definitions.UpdateWorldActionLoader;
+import com.sk89q.worldguard.bukkit.definitions.WeatherCriteriaLoader;
+import com.sk89q.worldguard.bukkit.resolvers.BlockResolver;
+import com.sk89q.worldguard.bukkit.resolvers.EntityResolver;
+import com.sk89q.worldguard.bukkit.resolvers.ItemStackSlotResolver;
+import com.sk89q.worldguard.bukkit.resolvers.PlacedBlockResolver;
+import com.sk89q.worldguard.bukkit.resolvers.PlayerItemStackSlotResolver;
+import com.sk89q.worldguard.bukkit.resolvers.PlayerItemStackSlotResolver.Slot;
+import com.sk89q.worldguard.bukkit.resolvers.SourceBlockResolver;
+import com.sk89q.worldguard.bukkit.resolvers.SourceEntityResolver;
+import com.sk89q.worldguard.bukkit.resolvers.TargetBlockResolver;
+import com.sk89q.worldguard.bukkit.resolvers.TargetEntityResolver;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
- *
- * @author sk89q
  */
 public class WorldGuardPlugin extends JavaPlugin {
 
-    /**
-     * Manager for commands. This automatically handles nested commands,
-     * permissions checking, and a number of other fancy command things.
-     * We just set it up and register commands against it.
-     */
     private final CommandsManager<CommandSender> commands;
-
-    /**
-     * Handles the region databases for all worlds.
-     */
     private final GlobalRegionManager globalRegionManager;
-
-    /**
-     * Handles all configuration.
-     */
     private final ConfigurationManager configuration;
-
-    /**
-     * Used for scheduling flags.
-     */
     private FlagStateManager flagStateManager;
+    private RuleListsManager ruleListsManager;
+    private final LagStopMode lagStopper;
+
+    private WorldGuardWorldListener worldListener;
 
     /**
-     * Construct objects. Actual loading occurs when the plugin is enabled, so
-     * this merely instantiates the objects.
+     * Do initial loading of WorldGuard. Only called once. {@link #onEnable()} will be
+     * called when WorldGuard is enabled.
      */
     public WorldGuardPlugin() {
         configuration = new ConfigurationManager(this);
         globalRegionManager = new GlobalRegionManager(this);
+        lagStopper = new LagStopMode(this);
 
         final WorldGuardPlugin plugin = this;
         commands = new CommandsManager<CommandSender>() {
@@ -105,11 +131,15 @@ public class WorldGuardPlugin extends JavaPlugin {
         };
     }
 
-    /**
-     * Called on plugin enable.
-     */
     @SuppressWarnings("deprecation")
+    @Override
     public void onEnable() {
+        // We don't require Rebar yet
+        VirtualRebarPlugin.setup(this);
+
+        // Set up RuleLists
+        ruleListsManager = new RuleListsManager();
+        registerRuleList();
 
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(this));
@@ -141,7 +171,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         	configuration.load();
         	globalRegionManager.preload();
         } catch (FatalConfigurationLoadingException e) {
-        	e.printStackTrace();
+            getLogger().log(Level.SEVERE, "Fatal error encountered", e);
         	getServer().shutdown();
         }
 
@@ -162,6 +192,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardVehicleListener(this)).registerEvents();
         (new WorldGuardServerListener(this)).registerEvents();
+        (worldListener = new WorldGuardWorldListener(this)).registerEvents();
+        lagStopper.registerEvents();
+
+        // Initialization
+        simulateWorldLoad();
+
         if (hasHangingEvent()) {
             (new WorldGuardHangingListener(this)).registerEvents();
         } else {
@@ -172,37 +208,15 @@ public class WorldGuardPlugin extends JavaPlugin {
         if (getServer().getPluginManager().isPluginEnabled("CommandBook")) {
             getServer().getPluginManager().registerEvents(new WorldGuardCommandBookListener(this), this);
         }
-
-        // handle worlds separately to initialize already loaded worlds
-        WorldGuardWorldListener worldListener = (new WorldGuardWorldListener(this));
-        for (World world : getServer().getWorlds()) {
-            worldListener.initWorld(world);
-        }
-        worldListener.registerEvents();
-
-        if (!configuration.hasCommandBookGodMode()) {
-            // Check god mode for existing players, if any
-            for (Player player : getServer().getOnlinePlayers()) {
-                if (inGroup(player, "wg-invincible") ||
-                        (configuration.autoGodMode && hasPermission(player, "worldguard.auto-invincible"))) {
-                    configuration.enableGodMode(player);
-                }
-            }
-        }
     }
 
-    /**
-     * Called on plugin disable.
-     */
+    @Override
     public void onDisable() {
         globalRegionManager.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
     }
 
-    /**
-     * Handle a command.
-     */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label,
             String[] args) {
@@ -227,6 +241,16 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         return true;
+    }
+
+    /**
+     * Dispatch {@link WorldLoadEvent}s to the world listener.
+     */
+    public void simulateWorldLoad() {
+        for (World world : getServer().getWorlds()) {
+            WorldLoadEvent event = new WorldLoadEvent(world);
+            worldListener.onWorldLoad(event);
+        }
     }
 
     /**
@@ -265,6 +289,74 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public ConfigurationManager getGlobalStateManager() {
         return configuration;
+    }
+
+    /**
+     * Get the rules list manager.
+     *
+     * @return rule lists manager
+     */
+    public RuleListsManager getRulesListManager() {
+        return ruleListsManager;
+    }
+
+    /**
+     * Get the built-in rules.
+     *
+     * @return built-in rules
+     * @throws ConfigurationException
+     *             on config error
+     * @throws IOException
+     *             on I/O exception
+     */
+    public YamlConfiguration getBuiltInRules() throws IOException, ConfigurationException {
+        YamlConfiguration rules = new YamlConfigurationResource(getClass(),
+                "/defaults/builtin_rules.yml");
+        rules.load();
+        return rules;
+    }
+
+    /**
+     * Register RuleList resolvers, criterion, and actions.
+     */
+    private void registerRuleList() {
+        // Subject resolvers
+        ResolverManager resolvers = ruleListsManager.getResolvers();
+
+        resolvers.register(BlockResolver.class, "source", new SourceBlockResolver());
+        resolvers.register(BlockResolver.class, "target", new TargetBlockResolver());
+        resolvers.register(BlockResolver.class, "placed", new PlacedBlockResolver());
+
+        resolvers.register(EntityResolver.class, "source", new SourceEntityResolver());
+        resolvers.register(EntityResolver.class, "target", new TargetEntityResolver());
+
+        resolvers.register(ItemStackSlotResolver.class, "held", new PlayerItemStackSlotResolver(Slot.HELD));
+        resolvers.register(ItemStackSlotResolver.class, "helmet", new PlayerItemStackSlotResolver(Slot.HELMET));
+        resolvers.register(ItemStackSlotResolver.class, "chestplate", new PlayerItemStackSlotResolver(Slot.CHESTPLATE));
+        resolvers.register(ItemStackSlotResolver.class, "leggings", new PlayerItemStackSlotResolver(Slot.LEGGINGS));
+        resolvers.register(ItemStackSlotResolver.class, "boots", new PlayerItemStackSlotResolver(Slot.BOOTS));
+
+        // Criterion
+        DefinitionManager<Criteria<?>> criterion = ruleListsManager.getCriterion();
+        criterion.register("match-block", new BlockCriteriaLoader(ruleListsManager));
+        criterion.register("match-item", new ItemCriteriaLoader(ruleListsManager));
+        criterion.register("match-entity", new EntityCriteriaLoader(ruleListsManager));
+        criterion.register("match-damage", new DamageCriteriaLoader());
+        criterion.register("match-spawn", new SpawnCriteriaLoader());
+        criterion.register("match-phenomenon", new PhenomenonCriteriaLoader());
+        criterion.register("match-weather", new WeatherCriteriaLoader());
+        criterion.register("has-permission", new PermissionCriteriaLoader(this, ruleListsManager));
+
+        // Actions
+        DefinitionManager<Action<?>> actions = ruleListsManager.getActions();
+        actions.register("cancel", new CancelActionLoader());
+        actions.register("tell", new TellActionLoader(ruleListsManager));
+        actions.register("update-item", new UpdateItemActionLoader(ruleListsManager));
+        actions.register("update-world", new UpdateWorldActionLoader());
+        actions.register("update-entity", new UpdateEntityActionLoader(this, ruleListsManager));
+        actions.register("set-message", new SetMessageActionLoader(ruleListsManager));
+        actions.register("set-drop", new SetDropActionLoader());
+        actions.register("set-block", new SetBlockActionLoader(ruleListsManager));
     }
 
     /**
@@ -698,9 +790,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param actual The destination file
      * @param defaultName The name of the file inside the jar's defaults folder
      */
-    public void createDefaultConfiguration(File actual,
-            String defaultName) {
-
+    public void createDefaultConfiguration(File actual, String defaultName) {
         // Make parent directories
         File parent = actual.getParentFile();
         if (!parent.exists()) {
@@ -711,16 +801,10 @@ public class WorldGuardPlugin extends JavaPlugin {
             return;
         }
 
-        InputStream input =
-                    null;
-            try {
-                JarFile file = new JarFile(getFile());
-                ZipEntry copy = file.getEntry("defaults/" + defaultName);
-                if (copy == null) throw new FileNotFoundException();
-                input = file.getInputStream(copy);
-            } catch (IOException e) {
-                getLogger().severe("Unable to read default configuration: " + defaultName);
-            }
+        InputStream input = WorldGuardPlugin.class.getResourceAsStream("/defaults/" + defaultName);
+        if (input == null) {
+            getLogger().severe("Unable to read default configuration: " + defaultName);
+        }
 
         if (input != null) {
             FileOutputStream output = null;
@@ -821,6 +905,15 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         return getGlobalRegionManager().get(world);
+    }
+
+    /**
+     * Get the "lag stop mode" controller.
+     *
+     * @return the lag stop mode
+     */
+    public LagStopMode getLagStopMode() {
+        return lagStopper;
     }
 
     /**

@@ -44,6 +44,12 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>com.sk89q</groupId>
+      <artifactId>rebar</artifactId>
+      <version>4.1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
       <version>1.4.2-R0.2-SNAPSHOT</version>
@@ -122,9 +128,9 @@
         <filtering>true</filtering>
         <directory>${basedir}/src/main/resources/</directory>
         <includes>
-          <include>config.yml</include>
-          <include>config_world.yml</include>
           <include>blacklist.txt</include>
+          <include>builtin_rules.yml</include>
+          <include>rulelist.yml</include>
         </includes>
       </resource>
     </resources>
@@ -173,6 +179,7 @@
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
                   <include>org.khelekore:prtree</include>
+                  <include>com.sk89q:rebar</include>
                 </includes>
               </artifactSet>
             </configuration>

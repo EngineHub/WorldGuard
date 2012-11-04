@@ -26,94 +26,70 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.GodComponent;
-import com.sk89q.util.yaml.YAMLFormat;
-import com.sk89q.util.yaml.YAMLProcessor;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
+import com.sk89q.rebar.config.ConfigurationException;
+import com.sk89q.rebar.config.PairedKeyValueLoaderBuilder;
+import com.sk89q.rebar.config.YamlConfigurationFile;
+import com.sk89q.rebar.config.YamlStyle;
+import com.sk89q.rebar.config.types.LowercaseStringLoaderBuilder;
+import com.sk89q.rebar.config.types.StringLoaderBuilder;
+import com.sk89q.rebar.util.LoggerUtils;
+import com.sk89q.rulelists.RuleEntryLoader;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
 
 /**
  * Represents the global configuration and also delegates configuration
  * for individual worlds.
- *
- * @author sk89q
- * @author Michael
  */
 public class ConfigurationManager {
 
-    private static final String CONFIG_HEADER = "#\r\n" +
-            "# WorldGuard's main configuration file\r\n" +
-            "#\r\n" +
-            "# This is the global configuration file. Anything placed into here will\r\n" +
-            "# be applied to all worlds. However, each world has its own configuration\r\n" +
-            "# file to allow you to replace most settings in here for that world only.\r\n" +
-            "#\r\n" +
-            "# About editing this file:\r\n" +
-            "# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If\r\n" +
-            "#   you use an editor like Notepad++ (recommended for Windows users), you\r\n" +
-            "#   must configure it to \"replace tabs with spaces.\" In Notepad++, this can\r\n" +
-            "#   be changed in Settings > Preferences > Language Menu.\r\n" +
-            "# - Don't get rid of the indents. They are indented so some entries are\r\n" +
-            "#   in categories (like \"enforce-single-session\" is in the \"protection\"\r\n" +
-            "#   category.\r\n" +
-            "# - If you want to check the format of this file before putting it\r\n" +
-            "#   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/\r\n" +
-            "#   and see if it gives \"ERROR:\".\r\n" +
-            "# - Lines starting with # are comments and so they are ignored.\r\n" +
-            "#\r\n";
+    private static Logger logger = LoggerUtils.getLogger(RuleEntryLoader.class, "[WorldGuard] ");
 
-    /**
-     * Reference to the plugin.
-     */
+    private static final String DEFAULT_RULELIST_PATH = "rulelist.yml";
+    private static final String DEFAULT_BLACKLIST_PATH = "worlds/%world%/blacklist.txt";
+    private static final String DEFAULT_WORLD_CONFIG_PATH = "worlds/%world%/config.yml";
+
+    static final YamlStyle YAML_STYLE = new YamlStyle(FlowStyle.BLOCK);
+
     private WorldGuardPlugin plugin;
-
-    /**
-     * Holds configurations for different worlds.
-     */
     private ConcurrentMap<String, WorldConfiguration> worlds;
+    private YamlConfigurationFile config;
 
-    /**
-     * The global configuration for use when loading worlds
-     */
-    private YAMLProcessor config;
+    private Map<String, String> ruleLists = new HashMap<String, String>();
+    private Map<String, String> blacklists = new HashMap<String, String>();
+    private Map<String, String> worldConfigs = new HashMap<String, String>();
 
-    /**
-     * List of people with god mode.
-     */
     @Deprecated
     private Set<String> hasGodMode = new HashSet<String>();
-
-    /**
-     * List of people who can breathe underwater.
-     */
     private Set<String> hasAmphibious = new HashSet<String>();
 
     private boolean hasCommandBookGodMode = false;
 
+    /* Configuration data start */
     public boolean useRegionsScheduler;
     public boolean useRegionsCreatureSpawnEvent;
-    public boolean activityHaltToggle = false;
-    public boolean autoGodMode;
     public boolean usePlayerMove;
     public Map<String, String> hostKeys = new HashMap<String, String>();
 
-    /**
-     * Region Storage Configuration method, and config values
-     */
     public boolean useSqlDatabase = false;
     public String sqlDsn;
     public String sqlUsername;
     public String sqlPassword;
+    /* Configuration data end */
 
     /**
      * Construct the object.
      *
-     * @param plugin The plugin instance
+     * @param plugin the plugin instance
      */
     public ConfigurationManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -123,60 +99,66 @@ public class ConfigurationManager {
     /**
      * Load the configuration.
      */
-    @SuppressWarnings("unchecked")
     public void load() {
-        // Create the default configuration file
-        plugin.createDefaultConfiguration(
-                new File(plugin.getDataFolder(), "config.yml"), "config.yml");
+        loadConfig();
 
-        config = new YAMLProcessor(new File(plugin.getDataFolder(), "config.yml"), true, YAMLFormat.EXTENDED);
-        try {
-            config.load();
-        } catch (IOException e) {
-            plugin.getLogger().severe("Error reading configuration for global config: ");
-            e.printStackTrace();
-        }
+        // Regions settings
+        useRegionsScheduler = config.getBoolean("regions.use-scheduler", true);
+        useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
 
-        config.removeProperty("suppress-tick-sync-warnings");
-        useRegionsScheduler = config.getBoolean(
-                "regions.use-scheduler", true);
-        useRegionsCreatureSpawnEvent = config.getBoolean(
-                "regions.use-creature-spawn-event", true);
-        autoGodMode = config.getBoolean(
-                "auto-invincible", config.getBoolean("auto-invincible-permission", false));
-        config.removeProperty("auto-invincible-permission");
-        usePlayerMove = config.getBoolean(
-                "use-player-move-event", true);
-
-        hostKeys = new HashMap<String, String>();
-        Object hostKeysRaw = config.getProperty("host-keys");
-        if (hostKeysRaw == null || !(hostKeysRaw instanceof Map)) {
-            config.setProperty("host-keys", new HashMap<String, String>());
-        } else {
-            for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) hostKeysRaw).entrySet()) {
-                String key = String.valueOf(entry.getKey());
-                String value = String.valueOf(entry.getValue());
-                hostKeys.put(key.toLowerCase(), value);
-            }
-        }
-
-        useSqlDatabase = config.getBoolean(
-                "regions.sql.use", false);
-
+        // Regions SQL settings
+        useSqlDatabase = config.getBoolean("regions.sql.use", false);
         sqlDsn = config.getString("regions.sql.dsn", "jdbc:mysql://localhost/worldguard");
         sqlUsername = config.getString("regions.sql.username", "worldguard");
         sqlPassword = config.getString("regions.sql.password", "worldguard");
+
+        // Other settings
+        usePlayerMove = config.getBoolean("use-player-move-event", true);
+
+        // Load host keys
+        hostKeys = config.mapOf("host-keys",
+                PairedKeyValueLoaderBuilder.build(
+                        new LowercaseStringLoaderBuilder(), new StringLoaderBuilder()));
+
+        // Load rule list filenames
+        if (config.contains("rulelists")) {
+            ruleLists = config.mapOf("rulelists",
+                    PairedKeyValueLoaderBuilder.build(
+                            new LowercaseStringLoaderBuilder(), new StringLoaderBuilder()));
+        } else {
+            config.setNode("rulelists").set("__default__", DEFAULT_RULELIST_PATH);
+            ruleLists = new HashMap<String, String>();
+            ruleLists.put("__default__", DEFAULT_RULELIST_PATH);
+        }
+
+        // Load blacklist filenames
+        if (config.contains("blacklists")) {
+            blacklists = config.mapOf("blacklists",
+                    PairedKeyValueLoaderBuilder.build(
+                            new LowercaseStringLoaderBuilder(), new StringLoaderBuilder()));
+        } else {
+            config.setNode("blacklists").set("__default__", DEFAULT_BLACKLIST_PATH);
+            blacklists = new HashMap<String, String>();
+            blacklists.put("__default__", DEFAULT_BLACKLIST_PATH);
+        }
+
+        // Load world config filenames
+        if (config.contains("world-configs")) {
+            worldConfigs = config.mapOf("world-configs",
+                    PairedKeyValueLoaderBuilder.build(
+                            new LowercaseStringLoaderBuilder(), new StringLoaderBuilder()));
+        } else {
+            config.setNode("world-configs").set("__default__", DEFAULT_WORLD_CONFIG_PATH);
+            worldConfigs = new HashMap<String, String>();
+            worldConfigs.put("__default__", DEFAULT_WORLD_CONFIG_PATH);
+        }
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
             get(world);
         }
 
-        config.setHeader(CONFIG_HEADER);
-
-        if (!config.save()) {
-            plugin.getLogger().severe("Error saving configuration!");
-        }
+        saveConfig();
     }
 
     /**
@@ -184,6 +166,41 @@ public class ConfigurationManager {
      */
     public void unload() {
         worlds.clear();
+    }
+
+    /**
+     * Load the configuration from file.
+     */
+    private void loadConfig() {
+        config = new YamlConfigurationFile(new File(plugin.getDataFolder(), "config.yml"), YAML_STYLE);
+
+        try {
+            config.load();
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error reading config.yml for global config", e);
+        } catch (ConfigurationException e) {
+            logger.log(Level.SEVERE, "Error reading config.yml for global config", e);
+        }
+    }
+
+    /**
+     * Save the configuration to file.
+     */
+    private void saveConfig() {
+        config.setHeader(
+                "# GLOBAL CONFIGURATION FILE\r\n" +
+                "#\r\n" +
+                "# Everything in here applies to all worlds. For world-specific settings, edit \r\n" +
+                "# the files in plugins/WorldGuard/worlds/WORLD_NAME_HERE/config.yml\r\n" +
+                "#\r\n" +
+                "# The official format of this file is called YAML. If you've never had to\r\n" +
+                "# edit one before, you should REALLY read http://wiki.sk89q.com/wiki/Editing_YAML\r\n");
+
+        try {
+            config.save();
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to save configuration", e);
+        }
     }
 
     /**
@@ -199,7 +216,7 @@ public class ConfigurationManager {
 
         while (config == null) {
             if (newConfig == null) {
-                newConfig = new WorldConfiguration(plugin, worldName, this.config);
+                newConfig = new WorldConfiguration(plugin, worldName, this, this.config);
             }
             worlds.putIfAbsent(world.getName(), newConfig);
             config = worlds.get(world.getName());
@@ -209,11 +226,90 @@ public class ConfigurationManager {
     }
 
     /**
+     * Get the RuleList file for the given world.
+     *
+     * @param worldName world
+     * @return file (which may or may not exist)
+     */
+    File getRuleListFile(String worldName) {
+        String path = ruleLists.get(worldName.toLowerCase());
+
+        if (path == null) {
+            path = ruleLists.get("__default__");
+        }
+
+        if (path == null) {
+            path = DEFAULT_RULELIST_PATH;
+        }
+
+        path = path.replace("%world%", worldName);
+        File file = new File(plugin.getDataFolder(), path);
+
+        if (!file.exists()) {
+            plugin.createDefaultConfiguration(file, "rulelist.yml");
+        }
+
+        return file;
+    }
+
+    /**
+     * Get the blacklist file for the given world.
+     *
+     * @param worldName world
+     * @return file (which may or may not exist)
+     */
+    File getBlacklistFile(String worldName) {
+        String path = blacklists.get(worldName.toLowerCase());
+        File file;
+
+        if (path == null) {
+            path = blacklists.get("__default__");
+        }
+
+        if (path == null) {
+            path = DEFAULT_BLACKLIST_PATH;
+        }
+
+        path = path.replace("%world%", worldName);
+        file = new File(plugin.getDataFolder(), path);
+
+        if (!file.exists()) {
+            plugin.createDefaultConfiguration(file, "blacklist.txt");
+        }
+
+        return file;
+    }
+
+    /**
+     * Get the world configuration file for the given world.
+     *
+     * @param worldName world
+     * @return file (which may or may not exist)
+     */
+    File getWorldConfigFile(String worldName) {
+        String path = worldConfigs.get(worldName.toLowerCase());
+        File file;
+
+        if (path == null) {
+            path = worldConfigs.get("__default__");
+        }
+
+        if (path == null) {
+            path = DEFAULT_WORLD_CONFIG_PATH;
+        }
+
+        path = path.replace("%world%", worldName);
+        file = new File(plugin.getDataFolder(), path);
+
+        return file;
+    }
+
+    /**
      * Forget a player.
      *
      * @param player The player to forget about
      */
-    public void forgetPlayer(LocalPlayer player) {
+    void forgetPlayer(LocalPlayer player) {
         for (Map.Entry<String, WorldConfiguration> entry
                 : worlds.entrySet()) {
 
@@ -235,7 +331,6 @@ public class ConfigurationManager {
      */
     @Deprecated
     public void enableGodMode(Player player) {
-
         hasGodMode.add(player.getName());
     }
 
@@ -293,7 +388,10 @@ public class ConfigurationManager {
         return hasAmphibious.contains(player.getName());
     }
 
-    public void updateCommandBookGodMode() {
+    /**
+     * Check and store whether CommandBook is installed.
+     */
+    void updateCommandBookGodMode() {
         try {
             if (plugin.getServer().getPluginManager().isPluginEnabled("CommandBook")) {
                 Class.forName("com.sk89q.commandbook.GodComponent");
@@ -304,7 +402,12 @@ public class ConfigurationManager {
         hasCommandBookGodMode = false;
     }
 
-    public boolean hasCommandBookGodMode() {
+    /**
+     * Return whether CommandBook is available for God mode usage.
+     *
+     * @return true if it available
+     */
+    boolean hasCommandBookGodMode() {
         return hasCommandBookGodMode;
     }
 }

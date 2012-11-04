@@ -7,7 +7,7 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.PluginManager;
 
 /**
- * @author zml2008
+ * Listener for server events.
  */
 public class WorldGuardServerListener implements Listener {
 
@@ -24,6 +24,7 @@ public class WorldGuardServerListener implements Listener {
 
     @EventHandler
     public void onPluginEnable(PluginEnableEvent event) {
+        // Legacy god mode
         if (event.getPlugin().getDescription().getName().equalsIgnoreCase("CommandBook")) {
             plugin.getGlobalStateManager().updateCommandBookGodMode();
         }
@@ -31,6 +32,7 @@ public class WorldGuardServerListener implements Listener {
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
+        // Legacy god mode
         if (event.getPlugin().getDescription().getName().equalsIgnoreCase("CommandBook")) {
             plugin.getGlobalStateManager().updateCommandBookGodMode();
         }

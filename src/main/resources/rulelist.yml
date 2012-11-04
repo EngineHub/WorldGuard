@@ -1,0 +1,74 @@
+# RULELIST CONFIGURATION
+#
+# This file allows you to define rules to handle certain events, allowing you to
+# perform actions upon those events.
+#
+# For example, when a player breaks a pumpkin:
+# - event: block break
+# - source entity: the player (s/he caused the event)
+# - target entity: NOTHING
+# - source block: NOTHING (a block didn't break the block)
+# - target block: the pumpkin
+# - placed/new block: air block (NOTE: as of writing, this is NOTHING due to limitations)
+#
+# Let's say you don't want players to ever break pumpkins. You'd want to filter it
+# using the following conditions:
+# - event is block break
+# - source entity is a player
+# - target block is a pumpkin
+#
+# As a RuleList rule, it'd be:
+# ======= EXAMPLE =======
+#- when: block-break
+#  if:
+#    - ?match-entity: player
+#      entity: source
+#    - ?match-block: pumpkin
+#      entity: target
+#  then:
+#    - ?: cancel
+# ======= EXAMPLE =======
+#
+# To learn more, see http://wiki.sk89q.com/wiki/WorldGuard/RuleLists
+
+
+# Here's a rule to block physics events on gravel. This makes gravel not fall
+# (most of the time...):
+#
+# ======= EXAMPLE =======
+#- when: block-physics
+#  if:
+#    - ?match-block: gravel
+#      block: target
+#  then:
+#    - ?: cancel
+# ======= EXAMPLE =======
+
+
+# How about telling players "DENIED." if they try to break iron ore or coal ore?
+#
+# ======= EXAMPLE =======
+#- when: block-break
+#  if:
+#    - ?match-block: [iron_ore, coal_ore]
+#      entity: target
+#  then:
+#    - ?: cancel
+#    - ?tell: DENIED.
+# ======= EXAMPLE =======
+
+
+# How about making ladders not break even if they have nothing behind them, as long
+# as there is a ladder above one?
+#
+# ======= EXAMPLE =======
+#- when: block-physics
+#  if:
+#    - ?match-block: ladder
+#      block: target
+#      relative: above
+#    - ?match-block: ladder
+#      block: target
+#  then:
+#    - ?: cancel
+# ======= EXAMPLE =======
