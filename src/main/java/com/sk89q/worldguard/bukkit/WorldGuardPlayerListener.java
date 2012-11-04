@@ -27,6 +27,7 @@ import com.sk89q.worldedit.blocks.ItemID;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -54,7 +55,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
-
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldguard.LocalPlayer;
@@ -418,6 +420,22 @@ public class WorldGuardPlayerListener implements Listener {
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(slot, null);
                 player.sendMessage(ChatColor.RED + "Infinite stack removed.");
+            }
+        }
+
+        if (wcfg.blockPotions.size() > 0
+                && !plugin.hasPermission(player, "worldguard.override.potions")) {
+            ItemStack item = event.getItem();
+            if (item.getType() == Material.POTION) {
+                Potion potion = Potion.fromItemStack(item);
+                for (PotionEffect effect : potion.getEffects()) {
+                    if (wcfg.blockPotions.contains(effect.getType())) {
+                        player.sendMessage(ChatColor.RED + "Sorry, potions with "
+                                + effect.getType().getName() + " are presently disabled.");
+                        event.setUseItemInHand(Result.DENY);
+                        break;
+                    }
+                }
             }
         }
     }
