@@ -54,7 +54,7 @@ public class EntityCriteriaLoader extends AbstractNodeLoader<EntityCriteria> {
     @Override
     public EntityCriteria read(ConfigurationNode node) throws DefinitionException {
         EntityResolver entityResolver = manager.getResolvers()
-                .get(EntityResolver.class, node.getString("entity", "source"));
+                .get(EntityResolver.class, node.getString("entity", EntityResolver.DEFAULT));
 
         Set<EntityType> types = node.contains(INLINE) ?
                 node.setOf(INLINE, typeLoader) :

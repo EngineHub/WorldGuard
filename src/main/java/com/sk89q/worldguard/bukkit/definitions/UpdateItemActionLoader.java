@@ -38,9 +38,9 @@ public class UpdateItemActionLoader extends AbstractNodeLoader<UpdateItemAction>
     @Override
     public UpdateItemAction read(ConfigurationNode node) throws DefinitionException {
         ItemStackSlotResolver resolver = manager.getResolvers()
-                .get(ItemStackSlotResolver.class, node.getString("item", "held"));
+                .get(ItemStackSlotResolver.class, node.getString("item", ItemStackSlotResolver.DEFAULT));
         EntityResolver entityResolver = manager.getResolvers()
-                .get(EntityResolver.class, node.getString("entity", "source"));
+                .get(EntityResolver.class, node.getString("entity", EntityResolver.DEFAULT));
 
         boolean destroy = node.getBoolean("destroy", false);
         short newData = (short) node.getInt("set-data", -1);

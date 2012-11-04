@@ -42,7 +42,7 @@ public class PermissionCriteriaLoader extends AbstractNodeLoader<PermissionCrite
     @Override
     public PermissionCriteria read(ConfigurationNode node) throws DefinitionException {
         EntityResolver entityResolver = manager.getResolvers()
-                .get(EntityResolver.class, node.getString("entity", "source"));
+                .get(EntityResolver.class, node.getString("entity", EntityResolver.DEFAULT));
 
         String permission = node.contains(INLINE) ?
                 node.getString(INLINE, "") :

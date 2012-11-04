@@ -40,7 +40,7 @@ public class UpdateEntityActionLoader extends AbstractNodeLoader<UpdateEntityAct
     @Override
     public UpdateEntityAction read(ConfigurationNode node) throws DefinitionException {
         EntityResolver entityResolver = manager.getResolvers()
-                .get(EntityResolver.class, node.getString("entity", "source"));
+                .get(EntityResolver.class, node.getString("entity", EntityResolver.DEFAULT));
 
         UpdateEntityAction criteria = new UpdateEntityAction(wg, entityResolver);
 

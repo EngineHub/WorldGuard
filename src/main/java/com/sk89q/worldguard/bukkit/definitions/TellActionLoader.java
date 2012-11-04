@@ -39,7 +39,7 @@ public class TellActionLoader extends AbstractNodeLoader<TellAction> {
     @Override
     public TellAction read(ConfigurationNode node) throws DefinitionException {
         EntityResolver entityResolver = manager.getResolvers()
-                .get(EntityResolver.class, node.getString("entity", "source"));
+                .get(EntityResolver.class, node.getString("entity", EntityResolver.DEFAULT));
 
         String message = node.contains(INLINE) ? node.getString(INLINE) : node.getString("message");
 

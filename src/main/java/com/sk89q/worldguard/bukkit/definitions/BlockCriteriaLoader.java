@@ -49,7 +49,7 @@ public class BlockCriteriaLoader extends AbstractNodeLoader<BlockCriteria> {
     public BlockCriteria read(ConfigurationNode node)
             throws DefinitionException {
         BlockResolver resolver = manager.getResolvers()
-                .get(BlockResolver.class, node.getString("block", "target"));
+                .get(BlockResolver.class, node.getString("block", BlockResolver.DEFAULT));
 
         // Load patterns
         List<MaterialPattern> patterns = node.contains(INLINE) ?

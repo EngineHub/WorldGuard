@@ -43,7 +43,7 @@ public class SetBlockActionLoader extends AbstractNodeLoader<SetBlockAction> {
     @Override
     public SetBlockAction read(ConfigurationNode node) throws DefinitionException {
         BlockResolver resolver = manager.getResolvers()
-                .get(BlockResolver.class, node.getString("block", "target"));
+                .get(BlockResolver.class, node.getString("block", BlockResolver.DEFAULT));
 
         // Load patterns
         MaterialPattern material = node.contains(INLINE) ?
