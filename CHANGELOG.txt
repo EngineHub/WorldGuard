@@ -1,3 +1,6 @@
+5.6.2:
+- Fixed potion blocking not working well for splash potions.
+
 5.6.1:
 - Added a mycelium-spread region flag.
 - Added a dynamics.disable-mycelium-spread configuration setting.
