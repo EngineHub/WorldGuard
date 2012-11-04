@@ -337,6 +337,35 @@ public class GlobalRegionManager {
         return true;
     }
 
+    public boolean canDestroy(Player player, Block block) {
+        return canDestroy(player, block.getLocation());
+    }
+    
+    public boolean canDestroy(Player player, Location loc) {
+        World world = loc.getWorld();
+        WorldConfiguration worldConfig = config.get(world);
+
+        if (!worldConfig.useRegions) {
+            return true;
+        }
+
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+        if (!hasBypass(player, world)) {
+            RegionManager mgr = get(world);
+
+            final ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(BukkitUtil.toVector(loc));
+            if (!applicableRegions.canBuild(localPlayer)) {
+                return false;
+            }
+            if (!applicableRegions.canDestroy(localPlayer)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
     /**
      * Checks to see whether a flag is allowed.
      *
