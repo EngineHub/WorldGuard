@@ -23,7 +23,7 @@
           set-data: 0
 - setting: protection.disable-xp-orb-drops
   rules:
-    - when: player-death
+    - when: entity-death
       then:
         - ?: set-drop
           set-xp: 0

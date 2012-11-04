@@ -37,7 +37,6 @@ public enum KnownAttachment {
     PLAYER_SPAWN("player-spawn"),
     PLAYER_RESPAWN("player-respawn"),
     PLAYER_QUIT("player-quit"),
-    PLAYER_DEATH("player-death"),
     ENTITY_EXPLODE("entity-explode"),
     ENTITY_DAMAGE("entity-damage"),
     ENTITY_DEATH("entity-death"),

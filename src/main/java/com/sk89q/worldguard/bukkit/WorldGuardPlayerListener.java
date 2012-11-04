@@ -848,7 +848,7 @@ public class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(player.getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.PLAYER_DEATH);
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DEATH);
         BukkitContext context = new BukkitContext(event);
         context.setTargetEntity(player);
         rules.process(context);
