@@ -31,6 +31,7 @@ public final class DefaultFlag {
     public static final StateFlag PASSTHROUGH = new StateFlag("passthrough", false, RegionGroup.ALL);
     public static final StateFlag BUILD = new StateFlag("build", true, RegionGroup.NON_MEMBERS);
     public static final RegionGroupFlag CONSTRUCT = new RegionGroupFlag("construct", RegionGroup.MEMBERS);
+    public static final RegionGroupFlag DESTROY = new RegionGroupFlag("destroy", RegionGroup.MEMBERS); 
     public static final StateFlag PVP = new StateFlag("pvp", true, RegionGroup.ALL);
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", true, RegionGroup.ALL);
     public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true, RegionGroup.ALL);
