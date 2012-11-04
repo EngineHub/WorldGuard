@@ -123,6 +123,17 @@
           entity: source
       then:
         - ?: cancel
+- setting: physics.vine-like-rope-ladders
+  rules:
+    - when: block-physics
+      if:
+        - ?match-block: ladder
+          block: target
+          relative: above
+        - ?match-block: ladder
+          block: target
+      then:
+        - ?: cancel
 
 # ----------------------------------------------
 # ignition.*
