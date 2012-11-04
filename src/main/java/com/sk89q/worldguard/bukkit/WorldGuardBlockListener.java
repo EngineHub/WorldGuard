@@ -726,17 +726,19 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
         }
-        
+
         if (fromType == BlockID.MYCELIUM) {
-        	    if (wcfg.disableMyceliumSpread) {
-        	    	    event.setCancelled(true);
-        	    	    return;
-        	    }
-        	    if(wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-        	    		    DefaultFlag.MYCELIUM_SPREAD, event.getBlock().getLocation())) {
-        	    	    event.setCancelled(true);
-        	    	    return;
-        	    }
+            if (wcfg.disableMyceliumSpread) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions
+                    && !plugin.getGlobalRegionManager().allows(
+                            DefaultFlag.MYCELIUM_SPREAD, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
