@@ -5,6 +5,7 @@
         - ?has-permission: worldguard.auto-invincible
       then:
         - ?: update-entity
+          entity: target
           set-invincible: true
           
 # ----------------------------------------------
@@ -17,9 +18,13 @@
     - when: block-break
       if:
         - ?: match-item
+          entity: source
+          item: held
           has-data: true
       then:
         - ?: update-item
+          entity: source
+          item: held
           set-data: 0
 - setting: protection.disable-xp-orb-drops
   rules:
@@ -72,6 +77,7 @@
     - when: block-physics
       if:
         - ?match-block: gravel
+          block: target
       then:
         - ?: cancel
 - setting: physics.no-physics-sand
@@ -79,6 +85,7 @@
     - when: block-physics
       if:
         - ?match-block: sand
+          block: target
       then:
         - ?: cancel
 - setting: physics.no-physics-portal
@@ -86,6 +93,7 @@
     - when: block-physics
       if:
         - ?match-block: portal
+          block: target
       then:
         - ?: cancel
 - setting: physics.disable-water-damage-blocks
@@ -148,7 +156,7 @@
         - ?match-entity: [player]
           entity: source
         - ?match-item: lighter
-          slot: held
+          # context.item
         - ?has-permission: worldguard.override.lighter
           negate: true
       then:
@@ -351,7 +359,6 @@
     - when: entity-spawn
       if:
         - ?match-spawn: plugin
-          entity: target
       then:
         - ?: cancel
         
