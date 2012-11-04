@@ -696,3 +696,11 @@
           block: placed
       then:
         - ?: cancel
+- setting: dynamics.disable-mycelium-spread
+  rules:
+    - when: block-spread
+      if:
+        - ?match-block: mycelium
+          block: placed
+      then:
+        - ?: cancel
