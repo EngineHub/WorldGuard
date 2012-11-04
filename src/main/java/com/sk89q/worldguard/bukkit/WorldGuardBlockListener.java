@@ -22,6 +22,7 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -31,6 +32,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
@@ -45,6 +47,9 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
@@ -813,6 +818,28 @@ public class WorldGuardBlockListener implements Listener {
                     || !(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation()))) {
                 event.setCancelled(true);
                 return;
+            }
+        }
+    }
+
+    /*
+     * Called when a block is damaged.
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockDispense(BlockDispenseEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+
+        if (wcfg.blockPotions.size() > 0) {
+            ItemStack item = event.getItem();
+            if (item.getType() == Material.POTION) {
+                Potion potion = Potion.fromItemStack(item);
+                for (PotionEffect effect : potion.getEffects()) {
+                    if (potion.isSplash() && wcfg.blockPotions.contains(effect.getType())) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
         }
     }
