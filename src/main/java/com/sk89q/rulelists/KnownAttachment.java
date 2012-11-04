@@ -34,7 +34,7 @@ public enum KnownAttachment {
     BLOCK_INTERACT("block-interact"),
     BLOCK_FADE("block-fade"),
     BLOCK_FORM("block-form"),
-    PLAYER_SPAWN("player-spawn"),
+    PLAYER_JOIN("player-join"),
     PLAYER_RESPAWN("player-respawn"),
     PLAYER_QUIT("player-quit"),
     ENTITY_EXPLODE("entity-explode"),

@@ -282,7 +282,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.PLAYER_SPAWN);
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.PLAYER_JOIN);
         BukkitContext context = new BukkitContext(event);
         context.setSourceEntity(player);
         rules.process(context);

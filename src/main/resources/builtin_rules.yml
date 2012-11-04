@@ -1,6 +1,6 @@
 - setting: [auto-invincible, auto-invincible-permission]
   rules:
-    - when: player-spawn
+    - when: player-join
       if:
         - ?has-permission: worldguard.auto-invincible
       then:
