@@ -31,6 +31,7 @@ import com.sk89q.worldguard.chest.SignChestProtection;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -74,6 +75,7 @@ public class WorldConfiguration {
     public boolean simulateSponge;
     public int spongeRadius;
     public boolean disableExpDrops;
+    public Set<PotionEffectType> blockPotions;
     public boolean pumpkinScuba;
     public boolean redstoneSponges;
     public boolean noPhysicsGravel;
@@ -287,6 +289,17 @@ public class WorldConfiguration {
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
         disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
+
+        blockPotions = new HashSet<PotionEffectType>();
+        for (String potionName : getStringList("gameplay.block-potions", null)) {
+            PotionEffectType effect = PotionEffectType.getByName(potionName);
+
+            if (effect == null) {
+                plugin.getLogger().warning("Unknown potion effect type '" + potionName + "'");
+            } else {
+                blockPotions.add(effect);
+            }
+        }
 
         simulateSponge = getBoolean("simulation.sponge.enable", true);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
