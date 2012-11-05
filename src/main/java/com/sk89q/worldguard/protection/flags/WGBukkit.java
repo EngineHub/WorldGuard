@@ -42,7 +42,7 @@ public class WGBukkit {
      *
      * @return the WorldGuard plugin or null
      */
-    public WorldGuardPlugin getPlugin() {
+    public static WorldGuardPlugin getPlugin() {
         return (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
     }
 
@@ -53,7 +53,7 @@ public class WGBukkit {
      * @param world world
      * @return a region manager or null
      */
-    public RegionManager getRegionManager(World world) {
+    public static RegionManager getRegionManager(World world) {
         WorldGuardPlugin plugin = getPlugin();
         if (plugin == null) {
             return null;
