@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
  * Helper class to get a reference to WorldGuard and its components.
  */
 public class WGBukkit {
+    private static WorldGuardPlugin wgbukkit = null;
 
     private WGBukkit() {
     }
@@ -43,7 +44,10 @@ public class WGBukkit {
      * @return the WorldGuard plugin or null
      */
     public static WorldGuardPlugin getPlugin() {
-        return (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+        if (wgbukkit == null) {
+            wgbukkit = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+        }
+        return wgbukkit;
     }
 
     /**
@@ -54,12 +58,10 @@ public class WGBukkit {
      * @return a region manager or null
      */
     public static RegionManager getRegionManager(World world) {
-        WorldGuardPlugin plugin = getPlugin();
-        if (plugin == null) {
+        if (getPlugin() == null) {
             return null;
         }
-
-        return plugin.getRegionManager(world);
+        return wgbukkit.getRegionManager(world);
     }
 
 }
