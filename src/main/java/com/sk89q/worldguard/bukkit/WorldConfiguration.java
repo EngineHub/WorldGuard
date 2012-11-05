@@ -81,6 +81,7 @@ public class WorldConfiguration {
     public boolean redstoneSponges;
     public boolean noPhysicsGravel;
     public boolean noPhysicsSand;
+    public boolean ropeLadders;
     public boolean allowPortalAnywhere;
     public Set<Integer> preventWaterDamage;
     public boolean blockLighter;
@@ -312,6 +313,7 @@ public class WorldConfiguration {
 
         noPhysicsGravel = getBoolean("physics.no-physics-gravel", false);
         noPhysicsSand = getBoolean("physics.no-physics-sand", false);
+        ropeLadders = getBoolean("physics.vine-like-rope-ladders", false);
         allowPortalAnywhere = getBoolean("physics.allow-portal-anywhere", false);
         preventWaterDamage = new HashSet<Integer>(getIntList("physics.disable-water-damage-blocks", null));
 
