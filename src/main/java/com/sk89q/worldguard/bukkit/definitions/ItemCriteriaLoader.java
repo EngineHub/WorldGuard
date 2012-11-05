@@ -45,10 +45,16 @@ public class ItemCriteriaLoader extends AbstractNodeLoader<ItemCriteria> {
 
     @Override
     public ItemCriteria read(ConfigurationNode node) throws DefinitionException {
-        ItemStackSlotResolver resolver = manager.getResolvers()
-                .get(ItemStackSlotResolver.class, node.getString("item", ItemStackSlotResolver.DEFAULT));
-        EntityResolver entityResolver = manager.getResolvers()
-                .get(EntityResolver.class, node.getString("entity", EntityResolver.DEFAULT));
+        String entity = node.getString("entity");
+        EntityResolver entityResolver = null;
+        ItemStackSlotResolver resolver = null;
+
+        if (entity != null) {
+            entityResolver = manager.getResolvers()
+                    .get(EntityResolver.class, entity);
+            resolver = manager.getResolvers()
+                    .get(ItemStackSlotResolver.class, node.getString("item", ItemStackSlotResolver.DEFAULT));
+        }
 
         // has-data
         Boolean hasData = null;
@@ -66,7 +72,6 @@ public class ItemCriteriaLoader extends AbstractNodeLoader<ItemCriteria> {
         ItemCriteria criteria = new ItemCriteria(entityResolver, resolver);
         criteria.setPatterns(patterns);
         criteria.setDataCheck(hasData);
-
 
         RuleListUtils.warnUnknown(node, LoggerUtils.getLogger(getClass()),
                                   "item", "entity", "has-data", "material");

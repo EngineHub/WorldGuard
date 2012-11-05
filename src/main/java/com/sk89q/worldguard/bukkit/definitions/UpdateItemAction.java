@@ -5,11 +5,11 @@
  * Copyright (c) the WorldGuard team and contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software 
+ * terms of the GNU Lesser General Public License as published by the Free Software
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with
@@ -57,15 +57,27 @@ public class UpdateItemAction implements Action<BukkitContext> {
 
     @Override
     public void apply(BukkitContext context) {
-        Entity entity = entityResolver.resolve(context);
-        ItemStackSlot slot = itemResolver.resolve(entity);
-        ItemStack item = slot.get();
+        ItemStackSlot slot = null;
+        ItemStack item;
 
-        boolean updated = false;
+        if (entityResolver == null) {
+            item = context.getItem();
+        } else {
+            Entity entity = entityResolver.resolve(context);
+
+            if (entity == null) {
+                return;
+            }
+
+            slot = itemResolver.resolve(entity);
+            item = slot.get();
+        }
 
         if (item == null) {
             return;
         }
+
+        boolean updated = false;
 
         if (destroy) {
             item = null;
@@ -75,7 +87,7 @@ public class UpdateItemAction implements Action<BukkitContext> {
             updated = true;
         }
 
-        if (updated) {
+        if (updated && slot != null) {
             slot.update(item);
         }
     }
