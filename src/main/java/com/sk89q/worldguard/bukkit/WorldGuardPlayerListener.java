@@ -425,7 +425,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (wcfg.blockPotions.size() > 0) {
             ItemStack item = event.getItem();
-            if (item.getType() == Material.POTION) {
+            if (item != null && item.getType() == Material.POTION) {
                 PotionEffect blockedEffect = null;
 
                 Potion potion = Potion.fromItemStack(item);
