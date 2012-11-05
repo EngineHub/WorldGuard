@@ -473,7 +473,7 @@ public class WorldGuardBlockListener implements Listener {
             return;
         }
 
-        if (id == BlockID.LADDER && wcfg.ropeLadders) {
+        if (wcfg.ropeLadders && event.getBlock().getType() == Material.LADDER) {
             if (event.getBlock().getRelative(0, 1, 0).getType() == Material.LADDER) {
                 event.setCancelled(true);
                 return;
