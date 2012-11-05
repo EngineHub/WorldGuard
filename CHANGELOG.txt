@@ -1,3 +1,13 @@
+5.6.3:
+- Added helper WGBukkit class to get references to WorldGuard from other plugins.
+- Added physics.vine-like-rope-ladders to make ladders work like vines. As long as the
+    top ladder block is present, ladder blocks will hold even if they have no block
+    behind them, like a rope ladder.
+- Fixed NullPointerException in PlayerInteractEvent caused by potion blocking.
+- Fixed mobs.block-{item-frame,painting}-destroy not working.
+
+Thank you to def for testing the above fixes and features.
+
 5.6.2:
 - Fixed potion blocking not working well for splash potions.
 
