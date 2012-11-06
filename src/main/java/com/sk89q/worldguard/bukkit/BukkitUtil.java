@@ -145,16 +145,6 @@ public class BukkitUtil {
         return id == 8 || id == 9;
     }
 
-    /*
-     * Checks if the given potion is a vial of water
-     *
-     * @param potion
-     */
-    public static boolean isWaterPotion(Potion potion) {
-
-        return potion.getType() == PotionType.WATER;
-    }
-
     /**
      * Checks if the given potion is a vial of water
      *
