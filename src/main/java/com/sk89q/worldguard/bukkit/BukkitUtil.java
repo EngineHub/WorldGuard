@@ -156,6 +156,17 @@ public class BukkitUtil {
     }
 
     /**
+     * Checks if the given potion is a vial of water
+     *
+     * @param potion
+     * @return true if it's a water vial
+     */
+    public static boolean isWaterPotion(Potion potion) {
+
+        return potion.getType() == PotionType.WATER;
+    }
+
+    /**
      * Find a position for the player to stand that is not inside a block.
      * Blocks above the player will be iteratively tested until there is
      * a series of two free blocks. The player will be teleported to
