@@ -47,7 +47,7 @@ public class TellActionLoader extends AbstractNodeLoader<TellAction> {
         action.setParser(manager.getParser());
 
         RuleListUtils.warnUnknown(node, LoggerUtils.getLogger(getClass()),
-                                  "message");
+                                  "entity", "message");
 
         return action;
     }
