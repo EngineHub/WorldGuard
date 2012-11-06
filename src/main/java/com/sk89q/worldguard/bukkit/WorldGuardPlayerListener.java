@@ -392,7 +392,7 @@ public class WorldGuardPlayerListener implements Listener {
         plugin.forgetPlayer(player);
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
@@ -412,13 +412,31 @@ public class WorldGuardPlayerListener implements Listener {
         }
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_INTERACT);
-        BukkitContext context = new BukkitContext(event);
-        context.setSourceEntity(player);
-        context.setTargetBlock(event.getClickedBlock().getState());
-        if (rules.process(context)) {
-            event.setCancelled(true);
-            return;
+        RuleSet rules;
+        BukkitContext context;
+
+        // Send one for the block
+        Block block = event.getClickedBlock();
+        if (block != null) {
+            rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_INTERACT);
+            context = new BukkitContext(event);
+            context.setSourceEntity(player);
+            context.setTargetBlock(event.getClickedBlock().getState());
+            if (rules.process(context)) {
+                event.setUseInteractedBlock(Result.DENY);
+            }
+        }
+
+        // Send one for the item in the end
+        ItemStack heldItem = event.getPlayer().getItemInHand();
+        if (heldItem != null) {
+            rules = wcfg.getRuleList().get(KnownAttachment.ITEM_USE);
+            context = new BukkitContext(event);
+            context.setSourceEntity(event.getPlayer());
+            context.setItem(heldItem);
+            if (rules.process(context)) {
+                event.setUseItemInHand(Result.DENY);
+            }
         }
     }
 

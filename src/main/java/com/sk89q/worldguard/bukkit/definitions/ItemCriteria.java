@@ -18,10 +18,16 @@
 
 package com.sk89q.worldguard.bukkit.definitions;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.sk89q.rebar.util.MaterialPattern;
 import com.sk89q.rulelists.Criteria;
@@ -34,6 +40,7 @@ public class ItemCriteria implements Criteria<BukkitContext> {
     private final EntityResolver entityResolver;
     private final ItemStackSlotResolver itemResolver;
     private MaterialPattern[] patterns = new MaterialPattern[0];
+    private Set<PotionEffectType> potionEffects = new HashSet<PotionEffectType>();
     private Boolean hasData = false;
 
     public ItemCriteria(EntityResolver entityResolver, ItemStackSlotResolver itemResolver) {
@@ -63,9 +70,18 @@ public class ItemCriteria implements Criteria<BukkitContext> {
         this.patterns = arr;
     }
 
+    public Set<PotionEffectType> getPotionEffects() {
+        return potionEffects;
+    }
+
+    public void setPotionEffects(Set<PotionEffectType> effects) {
+        this.potionEffects = effects;
+    }
+
     @Override
     public boolean matches(BukkitContext context) {
         ItemStack item;
+        boolean found = false;
 
         if (entityResolver == null) {
             item = context.getItem();
@@ -83,17 +99,34 @@ public class ItemCriteria implements Criteria<BukkitContext> {
             return false;
         }
 
-        if (hasData != null && hasData == (item.getDurability() != 0)) {
-            return true;
+        if (hasData != null) {
+            found = hasData == (item.getDurability() != 0);
+            if (!found) {
+                return false;
+            }
+        }
+
+        if (item.getType() == Material.POTION && potionEffects.size() > 0) {
+            for (PotionEffect effect : Potion.fromItemStack(item).getEffects()) {
+                if (potionEffects.contains(effect.getType())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                return false;
+            }
         }
 
         for (MaterialPattern pattern : patterns) {
             if (pattern.matches(item.getTypeId(), item.getDurability())) {
-                return true;
+                found = true;
+                break;
             }
         }
 
-        return false;
+        return found;
     }
 
 }
