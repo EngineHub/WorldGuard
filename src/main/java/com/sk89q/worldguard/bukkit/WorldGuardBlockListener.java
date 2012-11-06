@@ -18,8 +18,17 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,38 +38,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.event.block.BlockFadeEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.block.LeavesDecayEvent;
-import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockType;
-import com.sk89q.worldedit.blocks.ItemType;
-import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * The listener for block events.
@@ -841,10 +825,12 @@ public class WorldGuardBlockListener implements Listener {
             ItemStack item = event.getItem();
             if (item.getType() == Material.POTION) {
                 Potion potion = Potion.fromItemStack(item);
-                for (PotionEffect effect : potion.getEffects()) {
-                    if (potion.isSplash() && wcfg.blockPotions.contains(effect.getType())) {
-                        event.setCancelled(true);
-                        return;
+                if (!BukkitUtil.isWaterPotion(potion)) {
+                    for (PotionEffect effect : potion.getEffects()) {
+                        if (potion.isSplash() && wcfg.blockPotions.contains(effect.getType())) {
+                            event.setCancelled(true);
+                            return;
+                        }
                     }
                 }
             }
