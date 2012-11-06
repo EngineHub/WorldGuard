@@ -18,7 +18,6 @@
 
 package com.sk89q.worldguard.bukkit.definitions;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,7 +39,7 @@ public class ItemCriteria implements Criteria<BukkitContext> {
     private final EntityResolver entityResolver;
     private final ItemStackSlotResolver itemResolver;
     private MaterialPattern[] patterns = new MaterialPattern[0];
-    private Set<PotionEffectType> potionEffects = new HashSet<PotionEffectType>();
+    private Set<PotionEffectType> potionEffects = null;
     private Boolean hasData = false;
 
     public ItemCriteria(EntityResolver entityResolver, ItemStackSlotResolver itemResolver) {
@@ -81,7 +80,7 @@ public class ItemCriteria implements Criteria<BukkitContext> {
     @Override
     public boolean matches(BukkitContext context) {
         ItemStack item;
-        boolean found = false;
+        boolean matched = false;
 
         if (entityResolver == null) {
             item = context.getItem();
@@ -100,8 +99,8 @@ public class ItemCriteria implements Criteria<BukkitContext> {
         }
 
         if (hasData != null) {
-            found = hasData == (item.getDurability() != 0);
-            if (!found) {
+            matched = hasData == (item.getDurability() != 0);
+            if (!matched) {
                 return false;
             }
         }
@@ -109,24 +108,24 @@ public class ItemCriteria implements Criteria<BukkitContext> {
         if (item.getType() == Material.POTION && potionEffects.size() > 0) {
             for (PotionEffect effect : Potion.fromItemStack(item).getEffects()) {
                 if (potionEffects.contains(effect.getType())) {
-                    found = true;
+                    matched = true;
                     break;
                 }
             }
 
-            if (!found) {
+            if (!matched) {
                 return false;
             }
         }
 
         for (MaterialPattern pattern : patterns) {
             if (pattern.matches(item.getTypeId(), item.getDurability())) {
-                found = true;
+                matched = true;
                 break;
             }
         }
 
-        return found;
+        return matched;
     }
 
 }

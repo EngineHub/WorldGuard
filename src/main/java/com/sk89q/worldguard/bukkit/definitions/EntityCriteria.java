@@ -75,6 +75,7 @@ public class EntityCriteria implements Criteria<BukkitContext> {
     @Override
     public boolean matches(BukkitContext context) {
         Entity entity = entityResolver.resolve(context);
+        boolean matched = false;
 
         // Hack because BlockIgniteEvent doesn't give an entity
         if (context.getEvent() instanceof BlockIgniteEvent && entityResolver instanceof SourceEntityResolver) {
@@ -82,19 +83,19 @@ public class EntityCriteria implements Criteria<BukkitContext> {
 
             if (igniteEvent.getCause() == IgniteCause.FIREBALL) {
                 if (types.contains(fireballType)) {
-                    return true;
+                    matched = true;
                 }
             }
 
             if (igniteEvent.getCause() == IgniteCause.LIGHTNING) {
                 if (types.contains(EntityType.LIGHTNING)) {
-                    return true;
+                    matched = true;
                 }
             }
         }
 
         if (entity == null) {
-            return false;
+            return matched;
         }
 
         if (ofTypes.length != 0) {
@@ -102,18 +103,35 @@ public class EntityCriteria implements Criteria<BukkitContext> {
 
             for (Class<?> type : ofTypes) {
                 if (type.isAssignableFrom(cls)) {
-                    return true;
+                    matched = true;
+                    break;
                 }
+            }
+
+            if (!matched) {
+                return false;
             }
         }
 
         if (isTamed != null) {
             if (entity instanceof Tameable && ((Tameable) entity).isTamed() == isTamed) {
-                return true;
+                matched = true;
+            }
+
+            if (!matched) {
+                return false;
             }
         }
 
-        return types.size() == 0 || types.contains(entity.getType());
+        if (types.size() == 0) {
+            matched = types.contains(entity.getType());
+
+            if (!matched) {
+                return false;
+            }
+        }
+
+        return matched;
     }
 
 }
