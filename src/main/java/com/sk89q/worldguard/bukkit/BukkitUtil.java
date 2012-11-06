@@ -31,6 +31,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionType;
 
 import java.util.List;
 
@@ -141,6 +143,16 @@ public class BukkitUtil {
         Block block = world.getBlockAt(ox, oy, oz);
         int id = block.getTypeId();
         return id == 8 || id == 9;
+    }
+
+    /*
+     * Checks if the given potion is a vial of water
+     *
+     * @param potion
+     */
+    public static boolean isWaterPotion(Potion potion) {
+
+        return potion.getType() == PotionType.WATER;
     }
 
     /**
