@@ -47,6 +47,7 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
@@ -55,6 +56,7 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
  */
 public class WorldGuardPlayerListener implements Listener {
 
+    private Pattern opPattern = Pattern.compile("^/op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
     private WorldGuardPlugin plugin;
 
     /**
@@ -326,6 +328,10 @@ public class WorldGuardPlayerListener implements Listener {
                         "' but '" + hostKey + "' was expected. Kicked!");
                 return;
             }
+        }
+
+        if (cfg.deopOnJoin) {
+            player.setOp(false);
         }
     }
 
@@ -1115,6 +1121,14 @@ public class WorldGuardPlayerListener implements Listener {
             if (blockedCommands != null && blockedCommands.contains(lowerCommand)
                     && (allowedCommands == null || !allowedCommands.contains(lowerCommand))) {
                 player.sendMessage(ChatColor.RED + lowerCommand + " is blocked in this area.");
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if (cfg.blockInGameOp) {
+            if (opPattern.matcher(event.getMessage()).matches()) {
+                player.sendMessage(ChatColor.RED + "/op can only be used in console (as set by a WG setting).");
                 event.setCancelled(true);
                 return;
             }
