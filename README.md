@@ -26,9 +26,12 @@ must be licensed under the GNU General Public License v3.
 
 Please read CONTRIBUTING.md for important guidelines to follow.
 
+We recommend following our [mailing list](https://groups.google.com/d/forum/sk-dev-discuss), especially if you have some big ideas that you want to implement.
+
 Links
 -----
 
+* [Mailing list](https://groups.google.com/d/forum/sk-dev-discuss)
 * [IRC channel](http://skq.me/irc/irc.esper.net/sk89q/) (#sk89q on irc.esper.net)
 * [Issue tracker](http://youtrack.sk89q.com/issues/WORLDGUARD)
 * [Continuous integration](http://build.sk89q.com) [![Build Status](https://secure.travis-ci.org/sk89q/worldguard.png)](http://travis-ci.org/sk89q/worldguard)
