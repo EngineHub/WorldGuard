@@ -16,17 +16,19 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.bukkit;
+package com.sk89q.worldguard.protection.flags;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
  * Helper class to get a reference to WorldGuard and its components.
  */
 public class WGBukkit {
+    private static WorldGuardPlugin cachedPlugin = null;
 
     private WGBukkit() {
     }
@@ -42,7 +44,17 @@ public class WGBukkit {
      * @return the WorldGuard plugin or null
      */
     public static WorldGuardPlugin getPlugin() {
-        return (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+        if (cachedPlugin == null) {
+            cachedPlugin = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+        }
+        return cachedPlugin;
+    }
+
+    /**
+     * Set cache to null for reload WorldGuardPlugin
+     */
+    public static void cleanCache() {
+        cachedPlugin = null;
     }
 
     /**
@@ -53,12 +65,10 @@ public class WGBukkit {
      * @return a region manager or null
      */
     public static RegionManager getRegionManager(World world) {
-        WorldGuardPlugin plugin = getPlugin();
-        if (plugin == null) {
+        if (getPlugin() == null) {
             return null;
         }
-
-        return plugin.getRegionManager(world);
+        return cachedPlugin.getRegionManager(world);
     }
 
 }
