@@ -51,6 +51,13 @@ public class WGBukkit {
     }
 
     /**
+     * Set cache to null for reload WorldGuardPlugin
+     */
+    public static void cleanCache() {
+        cachedPlugin = null;
+    }
+
+    /**
      * Returns the region manager for a given world. May return null if WorldGuard
      * is not loaded or region protection is not enabled for the given world.
      *
