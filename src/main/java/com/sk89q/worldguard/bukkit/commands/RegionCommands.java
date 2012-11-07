@@ -708,9 +708,6 @@ public class RegionCommands {
             
             // Need to build a list
             for (Flag<?> flag : DefaultFlag.getFlags()) {
-                if (list.length() > 0) {
-                    list.append(", ");
-                }
 
                 // @TODO deprecate inconsistant "owner" permission
                 if (region.isOwner(localPlayer)) {
@@ -730,8 +727,11 @@ public class RegionCommands {
                                 + flag.getName() + "." + id.toLowerCase())) {
                         continue;
                     }
-                } 
-                
+                }
+
+                if (list.length() > 0) {
+                    list.append(", ");
+                }
                 list.append(flag.getName());
             }
 
