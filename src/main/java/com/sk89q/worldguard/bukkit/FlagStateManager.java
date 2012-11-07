@@ -19,19 +19,18 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.GameMode;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import org.bukkit.GameMode;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * This processes per-player state information and is also meant to be used
@@ -83,10 +82,8 @@ public class FlagStateManager implements Runnable {
             }
 
             Vector playerLocation = toVector(player.getLocation());
-            RegionManager regionManager = plugin.getGlobalRegionManager()
-                    .get(player.getWorld());
-            ApplicableRegionSet applicable = regionManager
-                    .getApplicableRegions(playerLocation);
+            RegionManager regionManager = plugin.getGlobalRegionManager().get(player.getWorld());
+            ApplicableRegionSet applicable = regionManager.getApplicableRegions(playerLocation);
 
             if (!RegionQueryUtil.isInvincible(plugin, player, applicable)
                     && !plugin.getGlobalStateManager().hasGodMode(player)
