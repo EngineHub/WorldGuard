@@ -1,3 +1,13 @@
+5.6.4:
+- Added mobs.block-above-ground-slimes to block slimes spawning naturally above ground.
+- Added security.deop-everyone-on-join to de-op all players when they join.
+- Added security.block-in-game-op-command to prevent usage of /op from in-game.
+- Fixed a NullPointerException in PlayerInteract involving water potions and
+    potion blocking.
+- Fixed an issue with snowballs being blocked in regions.
+- Changed dragon eggs to be checked like it is a broken block in regions.
+- Moved developer's WGBukkit class to package com.sk89q.worldguard.bukkit.
+
 5.6.3:
 - Added helper WGBukkit class to get references to WorldGuard from other plugins.
 - Added physics.vine-like-rope-ladders to make ladders work like vines. As long as the
