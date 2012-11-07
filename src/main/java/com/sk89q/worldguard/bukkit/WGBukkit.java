@@ -16,12 +16,11 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.protection.flags;
+package com.sk89q.worldguard.bukkit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
