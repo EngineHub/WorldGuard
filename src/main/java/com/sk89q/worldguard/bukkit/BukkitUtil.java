@@ -31,9 +31,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionType;
-
 import java.util.List;
 
 public class BukkitUtil {
@@ -146,14 +143,13 @@ public class BukkitUtil {
     }
 
     /**
-     * Checks if the given potion is a vial of water
+     * Checks if the given potion is a vial of water.
      *
-     * @param potion
+     * @param item the item to check
      * @return true if it's a water vial
      */
-    public static boolean isWaterPotion(Potion potion) {
-
-        return potion.getType() == PotionType.WATER;
+    public static boolean isWaterPotion(ItemStack item) {
+        return (item.getDurability() & 0x3F) == 0;
     }
 
     /**
