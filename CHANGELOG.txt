@@ -1,3 +1,7 @@
+5.6.5:
+- Fixed a regression that caused paintings and item frames to no longer be properly
+    protected.
+
 5.6.4:
 - Added mobs.block-above-ground-slimes to block slimes spawning naturally above ground.
 - Added security.deop-everyone-on-join to de-op all players when they join.
