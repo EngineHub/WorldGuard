@@ -100,6 +100,8 @@ public class ConfigurationManager {
     public boolean activityHaltToggle = false;
     public boolean autoGodMode;
     public boolean usePlayerMove;
+    public boolean deopOnJoin;
+    public boolean blockInGameOp;
     public Map<String, String> hostKeys = new HashMap<String, String>();
 
     /**
@@ -147,6 +149,11 @@ public class ConfigurationManager {
         config.removeProperty("auto-invincible-permission");
         usePlayerMove = config.getBoolean(
                 "use-player-move-event", true);
+
+        deopOnJoin = config.getBoolean(
+                "security.deop-everyone-on-join", false);
+        blockInGameOp = config.getBoolean(
+                "security.block-in-game-op-command", false);
 
         hostKeys = new HashMap<String, String>();
         Object hostKeysRaw = config.getProperty("host-keys");
