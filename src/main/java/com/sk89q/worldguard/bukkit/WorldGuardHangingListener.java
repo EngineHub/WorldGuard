@@ -78,8 +78,10 @@ public class WorldGuardHangingListener implements Listener {
 
         if (event instanceof HangingBreakByEntityEvent) {
             HangingBreakByEntityEvent entityEvent = (HangingBreakByEntityEvent) event;
-            if (entityEvent instanceof Player) {
-                Player player = (Player) entityEvent.getRemover();
+            Entity removerEntity = entityEvent.getRemover();
+
+            if (removerEntity instanceof Player) {
+                Player player = (Player) removerEntity;
 
                 if (wcfg.getBlacklist() != null) {
                     if (hanging instanceof Painting
@@ -105,7 +107,7 @@ public class WorldGuardHangingListener implements Listener {
                     }
                 }
             } else {
-                if (entityEvent.getRemover() instanceof Creeper) {
+                if (removerEntity instanceof Creeper) {
                     if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
                         event.setCancelled(true);
                         return;
