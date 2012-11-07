@@ -652,6 +652,16 @@ public class WorldGuardPlayerListener implements Listener {
                 }
             }
 
+            if (type == BlockID.DRAGON_EGG) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to move dragon eggs here!");
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
             if (type == BlockID.LEVER
                     || type == BlockID.STONE_BUTTON
                     || type == BlockID.NOTE_BLOCK
@@ -667,8 +677,7 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.WORKBENCH
                     || type == BlockID.BREWING_STAND
                     || type == BlockID.ENCHANTMENT_TABLE
-                    || type == BlockID.CAULDRON
-                    || type == BlockID.DRAGON_EGG) {
+                    || type == BlockID.CAULDRON) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.USE, localPlayer)) {
