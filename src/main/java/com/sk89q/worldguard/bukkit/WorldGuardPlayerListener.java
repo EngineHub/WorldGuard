@@ -403,36 +403,34 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (wcfg.blockPotions.size() > 0) {
             ItemStack item = event.getItem();
-            if (item != null && item.getType() == Material.POTION) {
+            if (item != null && item.getType() == Material.POTION && !BukkitUtil.isWaterPotion(item)) {
                 PotionEffect blockedEffect = null;
 
                 Potion potion = Potion.fromItemStack(item);
-                if (!BukkitUtil.isWaterPotion(potion)) {
-                    for (PotionEffect effect : potion.getEffects()) {
-                        if (wcfg.blockPotions.contains(effect.getType())) {
-                            blockedEffect = effect;
-                            break;
-                        }
+                for (PotionEffect effect : potion.getEffects()) {
+                    if (wcfg.blockPotions.contains(effect.getType())) {
+                        blockedEffect = effect;
+                        break;
                     }
+                }
 
-                    if (blockedEffect != null) {
-                        if (plugin.hasPermission(player, "worldguard.override.potions")) {
-                            if (potion.isSplash() && wcfg.blockPotionsAlways) {
-                                player.sendMessage(ChatColor.RED + "Sorry, potions with " +
-                                        blockedEffect.getType().getName() + " can't be thrown, " +
-                                        "even if you have a permission to bypass it, " +
-                                        "due to limitations (and because overly-reliable potion blocking is on).");
-                                event.setUseItemInHand(Result.DENY);
-                                return;
-                            }
-                        } else {
-                            player.sendMessage(ChatColor.RED + "Sorry, potions with "
-                                    + blockedEffect.getType().getName() + " are presently disabled.");
+                if (blockedEffect != null) {
+                    if (plugin.hasPermission(player, "worldguard.override.potions")) {
+                        if (potion.isSplash() && wcfg.blockPotionsAlways) {
+                            player.sendMessage(ChatColor.RED + "Sorry, potions with " +
+                                    blockedEffect.getType().getName() + " can't be thrown, " +
+                                    "even if you have a permission to bypass it, " +
+                                    "due to limitations (and because overly-reliable potion blocking is on).");
                             event.setUseItemInHand(Result.DENY);
                             return;
                         }
-
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Sorry, potions with "
+                                + blockedEffect.getType().getName() + " are presently disabled.");
+                        event.setUseItemInHand(Result.DENY);
+                        return;
                     }
+
                 }
             }
         }
