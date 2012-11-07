@@ -37,6 +37,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -677,6 +678,13 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
+        }
+
+        if (wcfg.blockGroundSlimes && entityType == EntityType.SLIME
+                && eventLoc.getY() >= 60
+                && event.getSpawnReason() == SpawnReason.NATURAL) {
+            event.setCancelled(true);
+            return;
         }
     }
 
