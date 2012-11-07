@@ -1,0 +1,11 @@
+- id: worldguard.build
+  when: block-break
+  if:
+    - ?: region-of
+      block: target
+    - ?: is-member
+      entity: source
+      negate: true
+  then:
+    - ?: cancel
+    - ?tell: Sorry, you don't have permission for this area.
