@@ -44,6 +44,7 @@ public enum KnownAttachment {
     ENTITY_SPAWN("entity-spawn"),
     ENTITY_STRIKE("entity-strike"),
     ENTITY_INTERACT("entity-interact"),
+    CHAT("chat"),
     ITEM_DROP("item-drop"),
     ITEM_PICKUP("item-pickup"),
     ITEM_USE("item-use"),

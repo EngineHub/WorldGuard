@@ -9,15 +9,23 @@ import org.bukkit.plugin.PluginManager;
 /**
  * Listener for server events.
  */
-public class WorldGuardServerListener implements Listener {
+class WorldGuardServerListener implements Listener {
 
     private final WorldGuardPlugin plugin;
 
-    public WorldGuardServerListener(WorldGuardPlugin plugin) {
+    /**
+     * Construct the listener.
+     *
+     * @param plugin WorldGuard plugin
+     */
+    WorldGuardServerListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public void registerEvents() {
+    /**
+     * Register events.
+     */
+    void registerEvents() {
         PluginManager pm = plugin.getServer().getPluginManager();
         pm.registerEvents(this, plugin);
     }

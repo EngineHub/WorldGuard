@@ -21,10 +21,18 @@ public class WorldGuardWorldListener implements Listener {
 
     private WorldGuardPlugin plugin;
 
+    /**
+     * Construct the listener.
+     *
+     * @param plugin WorldGuard plugin
+     */
     public WorldGuardWorldListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * Register the events.
+     */
     public void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -33,6 +41,8 @@ public class WorldGuardWorldListener implements Listener {
     public void onWorldLoad(WorldLoadEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getWorld());
+
+        /* --- No short-circuit returns below this line --- */
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_LOAD);
@@ -58,6 +68,8 @@ public class WorldGuardWorldListener implements Listener {
     public void onWorldSave(WorldSaveEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getWorld());
+
+        /* --- No short-circuit returns below this line --- */
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_SAVE);

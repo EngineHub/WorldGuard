@@ -18,8 +18,6 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,23 +28,27 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 
 import com.sk89q.rulelists.KnownAttachment;
 import com.sk89q.rulelists.RuleSet;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
  * Listener for weather events.
  */
-public class WorldGuardWeatherListener implements Listener {
+class WorldGuardWeatherListener implements Listener {
 
     private WorldGuardPlugin plugin;
 
-    public WorldGuardWeatherListener(WorldGuardPlugin plugin) {
+    /**
+     * Construct the listener.
+     *
+     * @param plugin WorldGuard plugin
+     */
+    WorldGuardWeatherListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public void registerEvents() {
+    /**
+     * Register the events.
+     */
+    void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -84,17 +86,6 @@ public class WorldGuardWeatherListener implements Listener {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getWorld());
-
-        // Regions
-        if (wcfg.useRegions) {
-            Vector pt = toVector(loc);
-            RegionManager mgr = plugin.getGlobalRegionManager().get(loc.getWorld());
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-            if (!set.allows(DefaultFlag.LIGHTNING)) {
-                event.setCancelled(true);
-            }
-        }
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_PHENOMENON);

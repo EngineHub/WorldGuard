@@ -257,4 +257,19 @@ public class BukkitUtil {
 
         return null;
     }
+
+    static void checkAndDestroy(World world, int x, int y, int z, int required) {
+        if (world.getBlockTypeIdAt(x, y, z) == required) {
+            world.getBlockAt(x, y, z).setTypeId(BlockID.AIR);
+        }
+    }
+
+    static void checkAndDestroyAround(World world, int x, int y, int z, int required) {
+        checkAndDestroy(world, x, y, z + 1, required);
+        checkAndDestroy(world, x, y, z - 1, required);
+        checkAndDestroy(world, x, y + 1, z, required);
+        checkAndDestroy(world, x, y - 1, z, required);
+        checkAndDestroy(world, x + 1, y, z, required);
+        checkAndDestroy(world, x - 1, y, z, required);
+    }
 }

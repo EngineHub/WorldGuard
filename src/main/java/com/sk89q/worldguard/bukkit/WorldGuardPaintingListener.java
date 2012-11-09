@@ -19,143 +19,57 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Warning;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Painting;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-
 import com.sk89q.rulelists.KnownAttachment;
 import com.sk89q.rulelists.RuleSet;
-import com.sk89q.worldedit.blocks.ItemID;
-import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 
 /**
- * Listener for painting related events.
- *
- * @author sk89q
- * @deprecated Use {@link com.sk89q.worldguard.bukkit.WorldGuardHangingListener} instead.
+ * Listener for painting related events. This event is deprecated and it is provided for
+ * compatibility with older versions of Bukkit.
  */
 @Deprecated
-@Warning(reason="This listener has been replaced by WorldGuardHangingListener")
 public class WorldGuardPaintingListener implements Listener {
 
     private WorldGuardPlugin plugin;
 
     /**
-     * Construct the object;
+     * Construct the listener.
      *
-     * @param plugin The plugin instance
+     * @param plugin WorldGuard plugin
      */
-    public WorldGuardPaintingListener(WorldGuardPlugin plugin) {
+    WorldGuardPaintingListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
 
     /**
      * Register events.
      */
-    public void registerEvents() {
+    void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPaintingBreak(PaintingBreakEvent breakEvent) {
-        if (!(breakEvent instanceof PaintingBreakByEntityEvent)) {
-            return;
-        }
-
-        PaintingBreakByEntityEvent event = (PaintingBreakByEntityEvent) breakEvent;
+    public void onPaintingBreak(PaintingBreakEvent event) {
         Painting painting = event.getPainting();
         World world = painting.getWorld();
+
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
-
-        if (event.getRemover() instanceof Player) {
-            Player player = (Player) event.getRemover();
-
-            if (wcfg.getBlacklist() != null) {
-                if (!wcfg.getBlacklist().check(
-                            new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
-                                    toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (wcfg.useRegions) {
-                if (!plugin.getGlobalRegionManager().canBuild(player, painting.getLocation())) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        } else {
-            if (event.getRemover() instanceof Creeper) {
-                if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(DefaultFlag.CREEPER_EXPLOSION, painting.getLocation())) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if ((wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    DefaultFlag.ENTITY_PAINTING_DESTROY, painting.getLocation()))) {
-                event.setCancelled(true);
-            }
-        }
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
         BukkitContext context = new BukkitContext(event);
-        context.setSourceEntity(event.getRemover());
-        context.setTargetEntity(event.getPainting());
-        rules.process(context);
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPaintingPlace(PaintingPlaceEvent event) {
-        Block placedOn = event.getBlock();
-        Player player = event.getPlayer();
-        World world = placedOn.getWorld();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        if (wcfg.getBlacklist() != null) {
-
-            if (!wcfg.getBlacklist().check(
-                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                            toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
-                event.setCancelled(true);
-                return;
-            }
+        if (event instanceof PaintingBreakByEntityEvent) {
+            context.setSourceEntity(((PaintingBreakByEntityEvent) event).getRemover());
         }
-
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
-        BukkitContext context = new BukkitContext(event);
-        context.setSourceEntity(event.getPlayer());
         context.setTargetEntity(event.getPainting());
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -164,33 +78,18 @@ public class WorldGuardPaintingListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEntityInteract(PlayerInteractEntityEvent event) {
-        Player player = event.getPlayer();
-        Entity entity = event.getRightClicked();
+    public void onPaintingPlace(PaintingPlaceEvent event) {
+        Block placedOn = event.getBlock();
+        World world = placedOn.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(entity.getWorld());
-
-        if (wcfg.useRegions && entity instanceof Painting) {
-            if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-                event.setCancelled(true);
-                return;
-            }
-
-            if (entity instanceof Painting
-                    && ((!plugin.getGlobalRegionManager().allows(
-                            DefaultFlag.ENTITY_PAINTING_DESTROY, entity.getLocation())))) {
-                event.setCancelled(true);
-                return;
-            }
-        }
+        WorldConfiguration wcfg = cfg.get(world);
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_INTERACT);
+        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
         BukkitContext context = new BukkitContext(event);
-        context.setSourceEntity(player);
-        context.setTargetEntity(entity);
+        context.setSourceEntity(event.getPlayer());
+        context.setTargetEntity(event.getPainting());
         if (rules.process(context)) {
             event.setCancelled(true);
             return;
