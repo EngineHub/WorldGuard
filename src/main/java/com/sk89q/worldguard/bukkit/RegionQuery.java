@@ -22,28 +22,28 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.Event;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.RegionQueryCache;
+import com.sk89q.worldguard.protection.RegionQueryCacheEntry;
 
 /**
- * An implementation of {@link RegionQueryCache} for Bukkit. This implementation is
- * thread-safe.
+ * A class that will cache all region queries. Instances of this class are created
+ * via an instance of {@link RegionQueryCache} and represent a point in time.
  */
-public class BukkitRegionQueryCache extends RegionQueryCache {
+public final class RegionQuery {
 
     private final WorldGuardPlugin plugin;
+    private final RegionQueryCacheEntry entry;
 
     /**
-     * Construct the cache with the given plugin instance.
+     * Construct the instance with the underlying cache entry.
      *
-     * @param plugin plugin instance
+     * @param entry
      */
-    public BukkitRegionQueryCache(WorldGuardPlugin plugin) {
+    RegionQuery(WorldGuardPlugin plugin, RegionQueryCacheEntry entry) {
         this.plugin = plugin;
+        this.entry = entry;
     }
 
     /**
@@ -51,11 +51,10 @@ public class BukkitRegionQueryCache extends RegionQueryCache {
      * temporarily cached for the given event, or null if region protection has
      * been disabled for the the world of the given location.
      *
-     * @param event the event to cache against
      * @param location the location to check
      * @return the set, or null if region protection is disabled for the given location
      */
-    public ApplicableRegionSet lookup(Event event, Location location) {
+    public ApplicableRegionSet lookup(Location location) {
         World world = location.getWorld();
         Vector vector = BukkitUtil.toVector(location);
 
@@ -67,7 +66,7 @@ public class BukkitRegionQueryCache extends RegionQueryCache {
             return null;
         }
 
-        return get(event).lookup(regionManager.get(world), vector);
+        return entry.lookup(regionManager.get(world), vector);
     }
 
     /**
@@ -75,12 +74,11 @@ public class BukkitRegionQueryCache extends RegionQueryCache {
      * temporarily cached for the given event, or null if region protection has
      * been disabled for the the world of the given block.
      *
-     * @param event the event to cache against
      * @param block the block to check
      * @return the set, or null if region protection is disabled for the given block
      */
-    public ApplicableRegionSet lookup(Event event, Block block) {
-        return lookup(event, block.getLocation());
+    public ApplicableRegionSet lookup(Block block) {
+        return lookup(block.getLocation());
     }
 
     /**
@@ -88,12 +86,11 @@ public class BukkitRegionQueryCache extends RegionQueryCache {
      * temporarily cached for the given event, or null if region protection has
      * been disabled for the the world of the given entity.
      *
-     * @param event the event to cache against
      * @param entity the entity to check
      * @return the set, or null if region protection is disabled for the given entity
      */
-    public ApplicableRegionSet lookup(Event event, Entity entity) {
-        return lookup(event, entity.getLocation());
+    public ApplicableRegionSet lookup(Entity entity) {
+        return lookup(entity.getLocation());
     }
 
 }

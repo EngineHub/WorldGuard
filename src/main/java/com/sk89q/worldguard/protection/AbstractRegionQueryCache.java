@@ -35,12 +35,12 @@ import java.util.WeakHashMap;
  * This class is abstract because implementing class should provide methods to check
  * against a standard key object. This cache itself is thread-safe.
  */
-public abstract class RegionQueryCache {
+public abstract class AbstractRegionQueryCache {
 
     private final WeakHashMap<Object, RegionQueryCacheEntry> cache =
             new WeakHashMap<Object, RegionQueryCacheEntry>();
 
-    public RegionQueryCache() {
+    public AbstractRegionQueryCache() {
     }
 
     /**

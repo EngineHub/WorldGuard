@@ -79,7 +79,7 @@ class WorldGuardEntityListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_INTERACT);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getEntity());
         context.setTargetBlock(event.getBlock().getState());
         if (rules.process(context)) {
@@ -97,7 +97,7 @@ class WorldGuardEntityListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DEATH);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
 
         // Set a message if it's a death from a player
@@ -122,7 +122,7 @@ class WorldGuardEntityListener implements Listener {
         if (event instanceof EntityDamageByEntityEvent) {
             // RuleLists
             RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
-            BukkitContext context = new BukkitContext(event);
+            BukkitContext context = new BukkitContext(plugin, event);
             context.setSourceEntity(((EntityDamageByEntityEvent) event).getDamager());
             context.setTargetEntity(event.getEntity());
             if (rules.process(context)) {
@@ -134,7 +134,7 @@ class WorldGuardEntityListener implements Listener {
         } else if (event instanceof EntityDamageByBlockEvent) {
             // RuleLists
             RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
-            BukkitContext context = new BukkitContext(event);
+            BukkitContext context = new BukkitContext(plugin, event);
             Block damager = ((EntityDamageByBlockEvent) event).getDamager();
             if (damager != null) { // Should NOT be null!
                 context.setSourceBlock(damager.getState());
@@ -149,7 +149,7 @@ class WorldGuardEntityListener implements Listener {
         } else {
             // RuleLists
             RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
-            BukkitContext context = new BukkitContext(event);
+            BukkitContext context = new BukkitContext(plugin, event);
             context.setTargetEntity(event.getEntity());
             if (rules.process(context)) {
                 event.setCancelled(true);
@@ -167,7 +167,7 @@ class WorldGuardEntityListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_IGNITE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(entity);
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -184,7 +184,7 @@ class WorldGuardEntityListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_EXPLODE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -199,7 +199,7 @@ class WorldGuardEntityListener implements Listener {
             Block block = iter.next();
 
             rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_BREAK);
-            context = new BukkitContext(event);
+            context = new BukkitContext(plugin, event);
             context.setSourceEntity(event.getEntity());
             context.setTargetBlock(block.getState());
             rules.process(context);
@@ -216,7 +216,7 @@ class WorldGuardEntityListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_EXPLODE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -231,7 +231,7 @@ class WorldGuardEntityListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -246,7 +246,7 @@ class WorldGuardEntityListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_STRIKE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -261,7 +261,7 @@ class WorldGuardEntityListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_STRIKE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -279,7 +279,7 @@ class WorldGuardEntityListener implements Listener {
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(event.getTo() == Material.AIR ?
                 KnownAttachment.BLOCK_BREAK : KnownAttachment.BLOCK_PLACE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(entity);
         BlockState newState = event.getBlock().getState(); // This event is lame
         newState.setType(event.getTo()); // Need to construct our own BlockState

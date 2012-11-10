@@ -46,7 +46,7 @@ public class WorldGuardWorldListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_LOAD);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         rules.process(context);
     }
 
@@ -57,7 +57,7 @@ public class WorldGuardWorldListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_UNLOAD);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         if (rules.process(context)) {
             event.setCancelled(true);
             return;
@@ -73,7 +73,7 @@ public class WorldGuardWorldListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_SAVE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         rules.process(context);
     }
 }

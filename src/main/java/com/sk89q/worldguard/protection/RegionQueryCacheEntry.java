@@ -30,9 +30,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
  * An object to cache a list of {@link ApplicableRegionSet}s. This class is
  * thread-safe.
  *
- * @see RegionQueryCache
+ * @see AbstractRegionQueryCache
  */
-public class RegionQueryCacheEntry {
+public final class RegionQueryCacheEntry {
 
     private final Map<BlockVector, ApplicableRegionSet> cachedPoints =
             new HashMap<BlockVector, ApplicableRegionSet>();

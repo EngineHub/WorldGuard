@@ -109,6 +109,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     private final ConfigurationManager configuration;
     private FlagStateManager flagStateManager;
     private RuleListsManager ruleListsManager;
+    private RegionQueryCache regionCache;
     private final LagStopMode lagStopper;
 
     private WorldGuardWorldListener worldListener;
@@ -140,6 +141,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Set up RuleLists
         ruleListsManager = new RuleListsManager();
         registerRuleList();
+
+        // Setup the cache
+        regionCache = new RegionQueryCache(this);
 
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(this));
@@ -298,6 +302,15 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public RuleListsManager getRulesListManager() {
         return ruleListsManager;
+    }
+
+    /**
+     * Get the region query cache.
+     *
+     * @return region query cache
+     */
+    public RegionQueryCache getRegionCache() {
+        return regionCache;
     }
 
     /**

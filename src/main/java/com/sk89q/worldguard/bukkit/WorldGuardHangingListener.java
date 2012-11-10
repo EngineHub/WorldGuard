@@ -64,7 +64,7 @@ class WorldGuardHangingListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         if (event instanceof HangingBreakByEntityEvent) {
             context.setSourceEntity(((HangingBreakByEntityEvent) event).getRemover());
         }
@@ -85,7 +85,7 @@ class WorldGuardHangingListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getPlayer());
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {

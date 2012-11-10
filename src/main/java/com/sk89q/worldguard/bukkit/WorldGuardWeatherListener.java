@@ -59,7 +59,7 @@ class WorldGuardWeatherListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_TRANSITION);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         if (rules.process(context)) {
             event.setCancelled(true);
             return;
@@ -73,7 +73,7 @@ class WorldGuardWeatherListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_TRANSITION);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         if (rules.process(context)) {
             event.setCancelled(true);
             return;
@@ -89,7 +89,7 @@ class WorldGuardWeatherListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_PHENOMENON);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetBlock(loc.getBlock().getState());
         if (rules.process(context)) {
             event.setCancelled(true);

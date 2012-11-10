@@ -26,13 +26,16 @@ import org.bukkit.inventory.ItemStack;
 import com.sk89q.rulelists.Context;
 
 /**
- * An implementation of a {@link Context} for Bukkit.
+ * An implementation of a {@link Context} for Bukkit. This object is thread-safe, but
+ * the underlying objects returned by this class may not be.
  *
  * @see Context
  */
 public class BukkitContext extends Context {
 
+    private final RegionQueryCache regionCache;
     private final Event event;
+    private RegionQuery regionQuery;
     private String message;
     private Entity sourceEntity;
     private Entity targetEntity;
@@ -44,9 +47,11 @@ public class BukkitContext extends Context {
     /**
      * Construct a context linked to the given event.
      *
+     * @param plugin the WorldGuard plugin
      * @param event the event
      */
-    public BukkitContext(Event event) {
+    BukkitContext(WorldGuardPlugin plugin, Event event) {
+        this.regionCache = plugin.getRegionCache();
         this.event = event;
     }
 
@@ -195,6 +200,18 @@ public class BukkitContext extends Context {
      */
     public Event getEvent() {
         return event;
+    }
+
+    /**
+     * Get the region query object.
+     *
+     * @return region query object
+     */
+    public synchronized RegionQuery getRegionQuery() {
+        if (regionQuery == null) {
+            regionQuery = regionCache.against(event);
+        }
+        return regionQuery;
     }
 
 }

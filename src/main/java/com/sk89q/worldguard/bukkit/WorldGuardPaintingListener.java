@@ -66,7 +66,7 @@ public class WorldGuardPaintingListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         if (event instanceof PaintingBreakByEntityEvent) {
             context.setSourceEntity(((PaintingBreakByEntityEvent) event).getRemover());
         }
@@ -87,7 +87,7 @@ public class WorldGuardPaintingListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getPlayer());
         context.setTargetEntity(event.getPainting());
         if (rules.process(context)) {

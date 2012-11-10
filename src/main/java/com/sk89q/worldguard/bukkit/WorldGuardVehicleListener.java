@@ -46,7 +46,7 @@ class WorldGuardVehicleListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
-        BukkitContext context = new BukkitContext(event);
+        BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(destroyer);
         context.setTargetEntity(vehicle);
         if (rules.process(context)) {
