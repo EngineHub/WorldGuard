@@ -22,6 +22,8 @@ package com.sk89q.worldguard.bukkit;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,10 @@ import org.bukkit.entity.Player;
 
 import com.sk89q.rebar.config.ConfigurationException;
 import com.sk89q.rebar.config.ConfigurationNode;
+import com.sk89q.rebar.config.YamlConfiguration;
 import com.sk89q.rebar.config.YamlConfigurationFile;
+import com.sk89q.rebar.config.YamlConfigurationResource;
+import com.sk89q.rebar.config.YamlStyle;
 import com.sk89q.rebar.util.LoggerUtils;
 import com.sk89q.rulelists.RuleList;
 import com.sk89q.rulelists.RuleEntry;
@@ -112,44 +117,7 @@ public class WorldConfiguration {
         loadBuiltInRules();
         loadUserRules();
         loadBlacklist();
-
-        // Load other rules
-        opPermissions = config.getBoolean("op-permissions", true);
-
-        boolean simulateSponge = config.getBoolean("simulation.sponge.enable", true);
-        int spongeRadius = Math.max(1, config.getInt("simulation.sponge.radius", 3)) - 1;
-        boolean redstoneSponges = config.getBoolean("simulation.sponge.redstone", false);
-        boolean refillArea = config.getBoolean("simulation.sponge.refill-area", false);
-        if (simulateSponge) {
-            spongeApplicator = new SpongeApplicator(spongeRadius, redstoneSponges, refillArea);
-        }
-
-        signChestProtection = config.getBoolean("chest-protection.enable", false);
-        disableSignChestProtectionCheck = config.getBoolean("chest-protection.disable-off-check", false);
-
-        useRegions = config.getBoolean("regions.enable", true);
-        regionInvinciblityRemovesMobs = config.getBoolean("regions.invincibility-removes-mobs", false);
-        highFreqFlags = config.getBoolean("regions.high-frequency-flags", false);
-        regionWand = config.getInt("regions.wand", 287);
-        maxClaimVolume = config.getInt("regions.max-claim-volume", 30000);
-        claimOnlyInsideExistingRegions = config.getBoolean("regions.claim-only-inside-existing-regions", false);
-
-        maxRegionCountPerPlayer = config.getInt("regions.max-region-count-per-player.default", 7);
-        maxRegionCounts = new HashMap<String, Integer>();
-        maxRegionCounts.put(null, maxRegionCountPerPlayer);
-
-        for (String key : config.getKeys("regions.max-region-count-per-player")) {
-            if (!key.equalsIgnoreCase("default")) {
-                Object val = config.get("regions.max-region-count-per-player." + key);
-                if (val != null && val instanceof Number) {
-                    maxRegionCounts.put(key, ((Number) val).intValue());
-                }
-            }
-        }
-
-        // useiConomy = getBoolean("iconomy.enable", false);
-        // buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
-        // buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
+        loadSettings();
 
         saveConfig();
     }
@@ -288,18 +256,116 @@ public class WorldConfiguration {
         }
     }
 
-    public Blacklist getBlacklist() {
+    /**
+     * Load the settings.
+     */
+    private void loadSettings() {
+        opPermissions = config.getBoolean("op-permissions", true);
+
+        boolean simulateSponge = config.getBoolean("simulation.sponge.enable", true);
+        int spongeRadius = Math.max(1, config.getInt("simulation.sponge.radius", 3)) - 1;
+        boolean redstoneSponges = config.getBoolean("simulation.sponge.redstone", false);
+        boolean refillArea = config.getBoolean("simulation.sponge.refill-area", false);
+        if (simulateSponge) {
+            spongeApplicator = new SpongeApplicator(spongeRadius, redstoneSponges, refillArea);
+        }
+
+        signChestProtection = config.getBoolean("chest-protection.enable", false);
+        disableSignChestProtectionCheck = config.getBoolean("chest-protection.disable-off-check", false);
+
+        useRegions = config.getBoolean("regions.enable", true);
+        regionInvinciblityRemovesMobs = config.getBoolean("regions.invincibility-removes-mobs", false);
+        highFreqFlags = config.getBoolean("regions.high-frequency-flags", false);
+        regionWand = config.getInt("regions.wand", 287);
+        maxClaimVolume = config.getInt("regions.max-claim-volume", 30000);
+        claimOnlyInsideExistingRegions = config.getBoolean("regions.claim-only-inside-existing-regions", false);
+
+        maxRegionCountPerPlayer = config.getInt("regions.max-region-count-per-player.default", 7);
+        maxRegionCounts = new HashMap<String, Integer>();
+        maxRegionCounts.put(null, maxRegionCountPerPlayer);
+
+        for (String key : config.getKeys("regions.max-region-count-per-player")) {
+            if (!key.equalsIgnoreCase("default")) {
+                Object val = config.get("regions.max-region-count-per-player." + key);
+                if (val != null && val instanceof Number) {
+                    maxRegionCounts.put(key, ((Number) val).intValue());
+                }
+            }
+        }
+
+        // Very important part for protection!
+        if (useRegions) {
+            loadRegionModels();
+        }
+
+        // useiConomy = getBoolean("iconomy.enable", false);
+        // buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
+        // buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
+    }
+
+    /**
+     * Load region protection model.
+     */
+    private void loadRegionModels() {
+        List<String> filenames;
+        RuleEntryLoader entryLoader = new RuleEntryLoader(plugin.getRulesListManager());
+
+        // Make a default protection model list
+        List<String> defaultProtectionModels = new ArrayList<String>();
+        defaultProtectionModels.add("minimal");
+
+        // Load protection model
+        filenames = config.getStringList("regions.protection-models", defaultProtectionModels);
+        for (YamlConfiguration config : readFiles(filenames, "/models/protection/",
+                new File(plugin.getDataFolder(), "models/protection"))) {
+            for (RuleEntry entry : config.listOf(ConfigurationNode.ROOT, entryLoader)) {
+                ruleList.learn(entry);
+            }
+        }
+    }
+
+    /**
+     * Get the blacklist.
+     *
+     * @return the blacklist
+     */
+    Blacklist getBlacklist() {
         return blacklist;
     }
 
+    /**
+     * Get the RuleList.
+     *
+     * @return the rule list
+     */
+    RuleList getRuleList() {
+        return ruleList;
+    }
+
+    /**
+     * Get the sponge applicator.
+     *
+     * @return sponge applicator
+     */
     SpongeApplicator getSpongeApplicator() {
         return spongeApplicator;
     }
 
+    /**
+     * Get the world name of this configuration.
+     *
+     * @return the world name
+     */
     public String getWorldName() {
         return this.worldName;
     }
 
+    /**
+     * Get the maximum region count for a given player.
+     *
+     * @param player player
+     * @return number of regions
+     */
     public int getMaxRegionCount(Player player) {
         int max = -1;
         for (String group : plugin.getGroups(player)) {
@@ -314,7 +380,55 @@ public class WorldConfiguration {
         return max;
     }
 
-    public RuleList getRuleList() {
-        return ruleList;
+    /**
+     * Read a list of files, either from the .jar (preferred) or from disk.
+     *
+     * @param filenames list of filenames
+     * @param internalDir the base path for the JAR files
+     * @param externalDir the base dir for the disk files
+     * @return a list of {@link YamlConfiguration}s
+     */
+    private static List<YamlConfiguration> readFiles(Collection<String> filenames,
+            String internalDir, File externalDir) {
+        List<YamlConfiguration> configs = new ArrayList<YamlConfiguration>();
+
+        for (String filename : filenames) {
+            YamlConfiguration config;
+
+            // External file path
+            File file = new File(externalDir, filename);
+            file.getParentFile().mkdirs();
+
+            // Try loading from the .jar first
+            String path = internalDir + filename + ".yml";
+            config = new YamlConfigurationResource(WorldGuardPlugin.class, path);
+            try {
+                config.load();
+                configs.add(config);
+                continue; // Found!
+            } catch (FileNotFoundException e) {
+                // Do nothing
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to internal path " + path, e);
+            } catch (ConfigurationException e) {
+                logger.log(Level.SEVERE, "Failed to internal path " + path, e);
+            }
+
+            // Try loading from disk
+            config = new YamlConfigurationFile(file, new YamlStyle(), false);
+            try {
+                config.load();
+                configs.add(config);
+                continue; // Found!
+            } catch (FileNotFoundException e) {
+                logger.log(Level.SEVERE, "Failed to load " + file.getAbsolutePath());
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to load " + file.getAbsolutePath(), e);
+            } catch (ConfigurationException e) {
+                logger.log(Level.SEVERE, "Failed to load " + file.getAbsolutePath(), e);
+            }
+        }
+
+        return configs;
     }
 }
