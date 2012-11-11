@@ -123,7 +123,7 @@ public class EntityCriteria implements Criteria<BukkitContext> {
             }
         }
 
-        if (types.size() == 0) {
+        if (types.size() != 0) {
             matched = types.contains(entity.getType());
 
             if (!matched) {
