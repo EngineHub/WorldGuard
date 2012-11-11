@@ -10,7 +10,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
-import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.DefaultAttachments;
 import com.sk89q.rulelists.RuleSet;
 
 /**
@@ -45,7 +45,7 @@ class WorldGuardVehicleListener implements Listener {
         WorldConfiguration wcfg = cfg.get(vehicle.getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_DAMAGE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(destroyer);
         context.setTargetEntity(vehicle);

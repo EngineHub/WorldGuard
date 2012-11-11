@@ -28,7 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
-import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.DefaultAttachments;
 import com.sk89q.rulelists.RuleSet;
 
 /**
@@ -65,7 +65,7 @@ public class WorldGuardPaintingListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_DAMAGE);
         BukkitContext context = new BukkitContext(plugin, event);
         if (event instanceof PaintingBreakByEntityEvent) {
             context.setSourceEntity(((PaintingBreakByEntityEvent) event).getRemover());
@@ -86,7 +86,7 @@ public class WorldGuardPaintingListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_SPAWN);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getPlayer());
         context.setTargetEntity(event.getPainting());

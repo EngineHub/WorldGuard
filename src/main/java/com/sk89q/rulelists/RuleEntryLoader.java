@@ -18,7 +18,6 @@
 
 package com.sk89q.rulelists;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -34,8 +33,10 @@ import com.sk89q.rebar.util.LoggerUtils;
 public class RuleEntryLoader extends AbstractNodeLoader<RuleEntry> {
 
     public static final String INLINE = "_";
-    private static Logger logger = LoggerUtils.getLogger(RuleEntryLoader.class, "[WorldGuard] RuleList: ");
 
+    private static final Logger logger = LoggerUtils.getLogger(RuleEntryLoader.class);
+
+    private final AttachmentManager attachmentManager;
     private final DefinitionLoader<Criteria<?>> criteriaLoader;
     private final DefinitionLoader<Action<?>> actionLoader;
 
@@ -45,6 +46,7 @@ public class RuleEntryLoader extends AbstractNodeLoader<RuleEntry> {
      * @param ruleListsManager the action lists manager
      */
     public RuleEntryLoader(RuleListsManager ruleListsManager) {
+        attachmentManager = ruleListsManager.getAttachments();
         criteriaLoader = new DefinitionLoader<Criteria<?>>(ruleListsManager.getCriterion(), true);
         actionLoader = new DefinitionLoader<Action<?>>(ruleListsManager.getActions(), false);
     }
@@ -56,7 +58,7 @@ public class RuleEntryLoader extends AbstractNodeLoader<RuleEntry> {
             return null;
         }
 
-        List<String> when = node.getStringList("when", new ArrayList<String>());
+        List<Attachment> when = node.listOf("when", attachmentManager);
 
         // Check to see if the rule has any events defined
         if (when.size() == 0) {
@@ -150,12 +152,12 @@ public class RuleEntryLoader extends AbstractNodeLoader<RuleEntry> {
                 }
 
                 // No class defined!
-                logger.warning("EventListeners: Missing '?' parameter in definition " +
+                logger.warning("RuleList: Missing '?' parameter in definition " +
                 		"(to define what kind of criteria/action it is)");
 
                 return null;
             } catch (DefinitionException e) {
-                logger.warning("EventListeners: Invalid definition " +
+                logger.warning("RuleList: Invalid definition " +
                         "identified by type '" + id + "': " + e.getMessage());
 
                 // Throw an exception in strict mode

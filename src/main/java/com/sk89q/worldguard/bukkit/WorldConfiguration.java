@@ -35,8 +35,7 @@ import com.sk89q.rebar.config.ConfigurationException;
 import com.sk89q.rebar.config.ConfigurationNode;
 import com.sk89q.rebar.config.YamlConfigurationFile;
 import com.sk89q.rebar.util.LoggerUtils;
-import com.sk89q.rulelists.KnownAttachment;
-import com.sk89q.rulelists.KnownAttachmentRules;
+import com.sk89q.rulelists.RuleList;
 import com.sk89q.rulelists.RuleEntry;
 import com.sk89q.rulelists.RuleEntryLoader;
 import com.sk89q.rulelists.RuleTemplateEntryLoader;
@@ -61,7 +60,7 @@ public class WorldConfiguration {
     private final String worldName;
 
     private Blacklist blacklist;
-    private KnownAttachmentRules ruleList = new KnownAttachmentRules();
+    private RuleList ruleList = new RuleList();
     private ChestProtection chestProtection = new SignChestProtection();
     private SpongeApplicator spongeApplicator = null;
 
@@ -113,6 +112,7 @@ public class WorldConfiguration {
         loadConfig();
 
         // Load rule lists
+        ruleList.clear();
         loadBuiltInRules();
         loadUserRules();
         loadBlacklist();
@@ -204,7 +204,7 @@ public class WorldConfiguration {
 
             for (List<RuleEntry> entries : plugin.getBuiltInRules().listOf("", loader)) {
                 for (RuleEntry entry : entries) {
-                    learnRule(entry);
+                    ruleList.learn(entry);
                 }
             }
         } catch (IOException e) {
@@ -227,7 +227,7 @@ public class WorldConfiguration {
             rulesConfig.load();
 
             for (RuleEntry entry : rulesConfig.listOf(ConfigurationNode.ROOT, entryLoader)) {
-                learnRule(entry);
+                ruleList.learn(entry);
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Failed to load " + rulesFile.getAbsolutePath(), e);
@@ -360,23 +360,7 @@ public class WorldConfiguration {
         return max;
     }
 
-    public KnownAttachmentRules getRuleList() {
+    public RuleList getRuleList() {
         return ruleList;
-    }
-
-    /**
-     * Register a rule with this rule list.
-     *
-     * @param entry entry
-     */
-    public void learnRule(RuleEntry entry) {
-        for (String name : entry.getAttachmentNames()) {
-            KnownAttachment attachment = KnownAttachment.fromId(name);
-            if (attachment != null) {
-                ruleList.get(attachment).learn(entry.getRule());
-            } else {
-                logger.warning("Don't know what the RuleList event '" + name + "' is");
-            }
-        }
     }
 }

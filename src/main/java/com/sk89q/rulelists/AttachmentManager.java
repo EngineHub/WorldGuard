@@ -5,11 +5,11 @@
  * Copyright (c) the WorldGuard team and contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software 
+ * terms of the GNU Lesser General Public License as published by the Free Software
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with
@@ -19,44 +19,59 @@
 package com.sk89q.rulelists;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import com.sk89q.rebar.config.Loader;
+import com.sk89q.rebar.config.LoaderBuilderException;
 
 /**
- * Manages known attachment points.
- *
- * @see Attachment
+ * A database of valid attachments.
  */
-public class AttachmentManager {
+public final class AttachmentManager implements Loader<Attachment> {
 
-    private final Map<String, Attachment> attachments = new HashMap<String, Attachment>();
+    private Set<Attachment> attachments = new HashSet<Attachment>();
+    private Map<String, Attachment> aliasMap = new HashMap<String, Attachment>();
 
-    /**
-     * Register an {@link Attachment}.
-     *
-     * @param name name of the attachment (used in a rule's 'when' clause) (case insensitive)
-     * @param attachment attachment
-     */
-    public void register(String name, Attachment attachment) {
-        attachments.put(name.toLowerCase(), attachment);
+    public AttachmentManager() {
     }
 
     /**
-     * Get an attachment.
+     * Register an attachment.
      *
-     * @param name name of the attachment (case insensitive)
-     * @return attachment
+     * @param attachment the attachment
      */
-    public Attachment get(String name) {
-        return attachments.get(name.toLowerCase());
-    }
-
-    /**
-     * Forget all the rules in the registered attachments.
-     */
-    public void forgetRules() {
-        for (Attachment attachment : attachments.values()) {
-            attachment.forgetRules();
+    public synchronized void register(Attachment attachment) {
+        if (attachments.contains(attachment)
+                || aliasMap.containsKey(attachment.getAlias().toLowerCase())) {
+            throw new IllegalArgumentException("Attachment '" + attachment + "' already registered.");
         }
+
+        attachments.add(attachment);
+        aliasMap.put(attachment.getAlias().toLowerCase(), attachment);
+    }
+
+    /**
+     * Get an attachment by its alias.
+     *
+     * @param alias alias, case in-sensitive
+     * @return an attachment or null
+     */
+    public synchronized Attachment lookup(String alias) {
+        return aliasMap.get(alias.toLowerCase());
+    }
+
+    @Override
+    public Attachment read(Object value) throws LoaderBuilderException {
+        String id = String.valueOf(value);
+
+        Attachment attachment = lookup(id);
+        if (attachment == null) {
+            throw new LoaderBuilderException("Unknown RuleList attachment: " + id);
+        }
+
+        return attachment;
     }
 
 }

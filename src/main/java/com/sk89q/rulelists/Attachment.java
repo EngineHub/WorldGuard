@@ -5,11 +5,11 @@
  * Copyright (c) the WorldGuard team and contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software 
+ * terms of the GNU Lesser General Public License as published by the Free Software
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with
@@ -19,22 +19,57 @@
 package com.sk89q.rulelists;
 
 /**
- * An object that can learn rules and possibly implement them. Attachments can be
- * analogous to events that occur in the game. An attachment, for example, would be
- * a block break event.
+ * An attachment is analogous to an event.
  */
-public interface Attachment {
+public final class Attachment {
+
+    private static int NEXT_ID = 0;
+
+    private final int id;
+    private final String alias;
 
     /**
-     * Learn a rule.
+     * Create a new attachment with the given alias. The alias is used in rule list
+     * files.
      *
-     * @param rule rule
+     * @param alias alias name
      */
-    public void learn(Rule<?> rule);
+    public Attachment(String alias) {
+        this.alias = alias;
+
+        // No internal ID
+        id = -1;
+    }
 
     /**
-     * Forget all previously learned rules.
+     * Create a new attachment with the given alias. The alias is used in rule list
+     * files.
+     *
+     * @param alias alias name
+     * @param isInternal true to assign this attachment a standard internal ID
      */
-    public void forgetRules();
+    Attachment(String alias, boolean isInternal) {
+        this.alias = alias;
+
+        id = isInternal ? NEXT_ID++ : -1;
+    }
+
+    /**
+     * Get the internal ID.
+     *
+     * @return ID number, possibly -1 for no internal ID
+     */
+    int getId() {
+        return id;
+    }
+
+    /**
+     * Get the alias used inside rule list files.
+     *
+     * @return alias
+     */
+    public String getAlias() {
+        return alias;
+    }
 
 }

@@ -26,7 +26,7 @@ import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
-import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.DefaultAttachments;
 import com.sk89q.rulelists.RuleSet;
 
 /**
@@ -58,7 +58,7 @@ class WorldGuardWeatherListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_TRANSITION);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.WEATHER_TRANSITION);
         BukkitContext context = new BukkitContext(plugin, event);
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -72,7 +72,7 @@ class WorldGuardWeatherListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_TRANSITION);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.WEATHER_TRANSITION);
         BukkitContext context = new BukkitContext(plugin, event);
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -88,7 +88,7 @@ class WorldGuardWeatherListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WEATHER_PHENOMENON);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.WEATHER_PHENOMENON);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetBlock(loc.getBlock().getState());
         if (rules.process(context)) {

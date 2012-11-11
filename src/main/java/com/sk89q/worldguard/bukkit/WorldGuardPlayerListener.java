@@ -42,7 +42,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
-import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.DefaultAttachments;
 import com.sk89q.rulelists.RuleSet;
 
 /**
@@ -96,7 +96,7 @@ class WorldGuardPlayerListener implements Listener {
         }
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.PLAYER_JOIN);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.PLAYER_JOIN);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(player);
         rules.process(context);
@@ -108,7 +108,7 @@ class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.CHAT);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.CHAT);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getPlayer());
         context.setMessage(event.getMessage());
@@ -159,7 +159,7 @@ class WorldGuardPlayerListener implements Listener {
         /* --- No short-circuit returns below this line --- */
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.PLAYER_QUIT);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.PLAYER_QUIT);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(player);
         rules.process(context);
@@ -185,7 +185,7 @@ class WorldGuardPlayerListener implements Listener {
         // Send one for the block
         Block block = event.getClickedBlock();
         if (block != null) {
-            rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_INTERACT);
+            rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_INTERACT);
             context = new BukkitContext(plugin, event);
             context.setSourceEntity(player);
             context.setTargetBlock(event.getClickedBlock().getState());
@@ -197,7 +197,7 @@ class WorldGuardPlayerListener implements Listener {
         // Send one for the item in the end
         ItemStack heldItem = event.getPlayer().getItemInHand();
         if (heldItem != null) {
-            rules = wcfg.getRuleList().get(KnownAttachment.ITEM_USE);
+            rules = wcfg.getRuleList().get(DefaultAttachments.ITEM_USE);
             context = new BukkitContext(plugin, event);
             context.setSourceEntity(event.getPlayer());
             context.setItem(heldItem);
@@ -214,7 +214,7 @@ class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ITEM_DROP);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ITEM_DROP);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(player);
         context.setItem(event.getItemDrop().getItemStack());
@@ -230,7 +230,7 @@ class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ITEM_PICKUP);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ITEM_PICKUP);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getPlayer());
         context.setItem(event.getItem().getItemStack());
@@ -250,7 +250,7 @@ class WorldGuardPlayerListener implements Listener {
         /* --- No short-circuit returns below this line --- */
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DEATH);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_DEATH);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(player);
         rules.process(context);
@@ -265,7 +265,7 @@ class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ITEM_USE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ITEM_USE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getPlayer());
         context.setItem(event.getItemStack());
@@ -284,7 +284,7 @@ class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ITEM_USE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ITEM_USE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getPlayer());
         context.setItem(event.getItemStack());
@@ -304,7 +304,7 @@ class WorldGuardPlayerListener implements Listener {
         /* --- No short-circuit returns below this line --- */
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.PLAYER_RESPAWN);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.PLAYER_RESPAWN);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getPlayer());
         rules.process(context);
@@ -318,7 +318,7 @@ class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(player.getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_INTERACT);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_INTERACT);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(player);
         context.setTargetBlock(event.getBed().getState());

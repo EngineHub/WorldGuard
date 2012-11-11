@@ -43,7 +43,7 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
-import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.DefaultAttachments;
 import com.sk89q.rulelists.RuleSet;
 import com.sk89q.worldedit.blocks.BlockID;
 
@@ -82,7 +82,7 @@ class WorldGuardBlockListener implements Listener {
         // handle them a bit separately
         if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
             // RuleLists
-            RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_INTERACT);
+            RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_INTERACT);
             BukkitContext context = new BukkitContext(plugin, event);
             context.setSourceEntity(player);
             context.setTargetBlock(event.getBlock().getState());
@@ -102,7 +102,7 @@ class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_BREAK);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_BREAK);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(player);
         context.setTargetBlock(event.getBlock().getState());
@@ -142,7 +142,7 @@ class WorldGuardBlockListener implements Listener {
         }
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_SPREAD);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_SPREAD);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceBlock(event.getBlock().getState());
         context.setTargetBlock(event.getToBlock().getState());
@@ -176,7 +176,7 @@ class WorldGuardBlockListener implements Listener {
         switch (event.getCause()) {
         case FLINT_AND_STEEL:
             // Consider flint and steel as an item use
-            rules = wcfg.getRuleList().get(KnownAttachment.ITEM_USE);
+            rules = wcfg.getRuleList().get(DefaultAttachments.ITEM_USE);
             context = new BukkitContext(plugin, event);
             context.setSourceEntity(event.getPlayer());
             context.setTargetBlock(event.getBlock().getState());
@@ -195,7 +195,7 @@ class WorldGuardBlockListener implements Listener {
         case LAVA:
         case SPREAD:
             // Consider everything else as a block spread
-            rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_SPREAD);
+            rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_SPREAD);
             context = new BukkitContext(plugin, event);
             context.setTargetBlock(event.getBlock().getState());
 
@@ -217,7 +217,7 @@ class WorldGuardBlockListener implements Listener {
         case FIREBALL:
         case LIGHTNING:
             // Consider everything else as a block spread
-            rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_PLACE);
+            rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_PLACE);
             context = new BukkitContext(plugin, event);
             context.setTargetBlock(event.getBlock().getState());
 
@@ -249,7 +249,7 @@ class WorldGuardBlockListener implements Listener {
         }
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_BREAK);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_BREAK);
         BukkitContext context = new BukkitContext(plugin, event);
         BlockState virtualFireState = event.getBlock().getState();
         virtualFireState.setType(Material.FIRE);
@@ -269,7 +269,7 @@ class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_PHYSICS);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_PHYSICS);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetBlock(event.getBlock().getState());
         if (rules.process(context)) {
@@ -305,7 +305,7 @@ class WorldGuardBlockListener implements Listener {
         }
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_PLACE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_PLACE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetBlock(event.getBlock().getState());
         context.setPlacedBlock(event.getBlockReplacedState());
@@ -378,7 +378,7 @@ class WorldGuardBlockListener implements Listener {
         }
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_INTERACT);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_INTERACT);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetBlock(event.getBlock().getState());
         if (rules.process(context)) {
@@ -393,7 +393,7 @@ class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_FADE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_FADE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetBlock(event.getBlock().getState());
         if (rules.process(context)) {
@@ -408,7 +408,7 @@ class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_FORM);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_FORM);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetBlock(event.getBlock().getState());
         context.setPlacedBlock(event.getNewState());
@@ -424,7 +424,7 @@ class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_SPREAD);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_SPREAD);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceBlock(event.getSource().getState());
         context.setTargetBlock(event.getBlock().getState());
@@ -441,7 +441,7 @@ class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_FADE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_FADE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetBlock(event.getBlock().getState());
         context.setPlacedBlock(event.getNewState());
@@ -457,7 +457,7 @@ class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ITEM_DROP);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ITEM_DROP);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceBlock(event.getBlock().getState());
         context.setItem(event.getItem());

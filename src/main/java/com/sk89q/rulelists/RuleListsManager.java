@@ -5,11 +5,11 @@
  * Copyright (c) the WorldGuard team and contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software 
+ * terms of the GNU Lesser General Public License as published by the Free Software
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with
@@ -41,7 +41,7 @@ public class RuleListsManager {
     /**
      * Get the criterion manager.
      *
-     * @return criteron manager
+     * @return criterion manager
      */
     public DefinitionManager<Criteria<?>> getCriterion() {
         return criterion;

@@ -60,6 +60,7 @@ import com.sk89q.rebar.config.YamlConfiguration;
 import com.sk89q.rebar.config.YamlConfigurationResource;
 import com.sk89q.rulelists.Action;
 import com.sk89q.rulelists.Criteria;
+import com.sk89q.rulelists.DefaultAttachments;
 import com.sk89q.rulelists.DefinitionManager;
 import com.sk89q.rulelists.ResolverManager;
 import com.sk89q.rulelists.RuleListsManager;
@@ -317,10 +318,8 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Get the built-in rules.
      *
      * @return built-in rules
-     * @throws ConfigurationException
-     *             on config error
-     * @throws IOException
-     *             on I/O exception
+     * @throws ConfigurationException on config error
+     * @throws IOException on I/O exception
      */
     public YamlConfiguration getBuiltInRules() throws IOException, ConfigurationException {
         YamlConfiguration rules = new YamlConfigurationResource(getClass(),
@@ -333,6 +332,8 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Register RuleList resolvers, criterion, and actions.
      */
     private void registerRuleList() {
+        DefaultAttachments.registerWith(ruleListsManager.getAttachments());
+
         // Subject resolvers
         ResolverManager resolvers = ruleListsManager.getResolvers();
 

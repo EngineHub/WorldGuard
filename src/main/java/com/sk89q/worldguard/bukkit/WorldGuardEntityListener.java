@@ -44,7 +44,7 @@ import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
-import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.DefaultAttachments;
 import com.sk89q.rulelists.RuleSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -78,7 +78,7 @@ class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_INTERACT);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_INTERACT);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(event.getEntity());
         context.setTargetBlock(event.getBlock().getState());
@@ -96,7 +96,7 @@ class WorldGuardEntityListener implements Listener {
         /* --- No short-circuit returns below this line --- */
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DEATH);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_DEATH);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
 
@@ -121,7 +121,7 @@ class WorldGuardEntityListener implements Listener {
         // Redirect damage done by an entity
         if (event instanceof EntityDamageByEntityEvent) {
             // RuleLists
-            RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+            RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_DAMAGE);
             BukkitContext context = new BukkitContext(plugin, event);
             context.setSourceEntity(((EntityDamageByEntityEvent) event).getDamager());
             context.setTargetEntity(event.getEntity());
@@ -133,7 +133,7 @@ class WorldGuardEntityListener implements Listener {
         // Redirect damage done by blocks
         } else if (event instanceof EntityDamageByBlockEvent) {
             // RuleLists
-            RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+            RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_DAMAGE);
             BukkitContext context = new BukkitContext(plugin, event);
             Block damager = ((EntityDamageByBlockEvent) event).getDamager();
             if (damager != null) { // Should NOT be null!
@@ -148,7 +148,7 @@ class WorldGuardEntityListener implements Listener {
         // Other damage
         } else {
             // RuleLists
-            RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_DAMAGE);
+            RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_DAMAGE);
             BukkitContext context = new BukkitContext(plugin, event);
             context.setTargetEntity(event.getEntity());
             if (rules.process(context)) {
@@ -166,7 +166,7 @@ class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(entity.getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_IGNITE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_IGNITE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(entity);
         if (rules.process(context)) {
@@ -183,7 +183,7 @@ class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_EXPLODE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_EXPLODE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
@@ -198,7 +198,7 @@ class WorldGuardEntityListener implements Listener {
         while (iter.hasNext()) {
             Block block = iter.next();
 
-            rules = wcfg.getRuleList().get(KnownAttachment.BLOCK_BREAK);
+            rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_BREAK);
             context = new BukkitContext(plugin, event);
             context.setSourceEntity(event.getEntity());
             context.setTargetBlock(block.getState());
@@ -215,7 +215,7 @@ class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_EXPLODE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_EXPLODE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
@@ -230,7 +230,7 @@ class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_SPAWN);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_SPAWN);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
@@ -245,7 +245,7 @@ class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_STRIKE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_STRIKE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
@@ -260,7 +260,7 @@ class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.ENTITY_STRIKE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.ENTITY_STRIKE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setTargetEntity(event.getEntity());
         if (rules.process(context)) {
@@ -278,7 +278,7 @@ class WorldGuardEntityListener implements Listener {
 
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(event.getTo() == Material.AIR ?
-                KnownAttachment.BLOCK_BREAK : KnownAttachment.BLOCK_PLACE);
+                DefaultAttachments.BLOCK_BREAK : DefaultAttachments.BLOCK_PLACE);
         BukkitContext context = new BukkitContext(plugin, event);
         context.setSourceEntity(entity);
         BlockState newState = event.getBlock().getState(); // This event is lame

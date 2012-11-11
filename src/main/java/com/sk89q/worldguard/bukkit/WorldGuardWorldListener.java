@@ -11,7 +11,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
-import com.sk89q.rulelists.KnownAttachment;
+import com.sk89q.rulelists.DefaultAttachments;
 import com.sk89q.rulelists.RuleSet;
 
 /**
@@ -45,7 +45,7 @@ public class WorldGuardWorldListener implements Listener {
         /* --- No short-circuit returns below this line --- */
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_LOAD);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.WORLD_LOAD);
         BukkitContext context = new BukkitContext(plugin, event);
         rules.process(context);
     }
@@ -56,7 +56,7 @@ public class WorldGuardWorldListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getWorld());
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_UNLOAD);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.WORLD_UNLOAD);
         BukkitContext context = new BukkitContext(plugin, event);
         if (rules.process(context)) {
             event.setCancelled(true);
@@ -72,7 +72,7 @@ public class WorldGuardWorldListener implements Listener {
         /* --- No short-circuit returns below this line --- */
 
         // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(KnownAttachment.WORLD_SAVE);
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.WORLD_SAVE);
         BukkitContext context = new BukkitContext(plugin, event);
         rules.process(context);
     }
