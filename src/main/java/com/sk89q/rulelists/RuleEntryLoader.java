@@ -162,7 +162,8 @@ public class RuleEntryLoader extends AbstractNodeLoader<RuleEntry> {
 
                 // Throw an exception in strict mode
                 if (strict) {
-                    throw new LoaderBuilderException();
+                    throw new LoaderBuilderException("RuleList: Invalid definition " +
+                            "identified by type '" + id + "': " + e.getMessage());
                 }
 
                 return null;
