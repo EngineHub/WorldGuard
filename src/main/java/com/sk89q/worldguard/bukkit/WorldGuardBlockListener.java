@@ -322,16 +322,18 @@ class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(player.getWorld());
 
+        // RuleLists
+        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_INTERACT);
+        BukkitContext context = new BukkitContext(plugin, event);
+        context.setTargetBlock(event.getBlock().getState());
+        if (rules.process(context)) {
+            event.setCancelled(true);
+            return;
+        }
+
         // Chest protection
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
-                if (wcfg.isChestProtectedPlacement(event.getBlock(), player)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You do not own the adjacent chest.");
-                    event.getBlock().breakNaturally();
-                    event.setCancelled(true);
-                    return;
-                }
-
                 if (event.getBlock().getTypeId() != BlockID.SIGN_POST) {
                     player.sendMessage(ChatColor.RED
                             + "The [Lock] sign must be a sign post, not a wall sign.");
@@ -375,15 +377,6 @@ class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        }
-
-        // RuleLists
-        RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_INTERACT);
-        BukkitContext context = new BukkitContext(plugin, event);
-        context.setTargetBlock(event.getBlock().getState());
-        if (rules.process(context)) {
-            event.setCancelled(true);
-            return;
         }
     }
 

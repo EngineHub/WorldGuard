@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.sk89q.rebar.config.ConfigurationException;
@@ -44,8 +43,6 @@ import com.sk89q.worldguard.blacklist.BlacklistLogger;
 import com.sk89q.worldguard.blacklist.loggers.ConsoleLoggerHandler;
 import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
 import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
-import com.sk89q.worldguard.chest.ChestProtection;
-import com.sk89q.worldguard.chest.SignChestProtection;
 
 /**
  * Holds the configuration for individual worlds.
@@ -61,7 +58,6 @@ public class WorldConfiguration {
 
     private Blacklist blacklist;
     private RuleList ruleList = new RuleList();
-    private ChestProtection chestProtection = new SignChestProtection();
     private SpongeApplicator spongeApplicator = null;
 
     /* Configuration data start */
@@ -302,48 +298,6 @@ public class WorldConfiguration {
 
     public String getWorldName() {
         return this.worldName;
-    }
-
-    public boolean isChestProtected(Block block, Player player) {
-        if (!signChestProtection) {
-            return false;
-        }
-        if (plugin.hasPermission(player, "worldguard.chest-protection.override")
-                || plugin.hasPermission(player, "worldguard.override.chest-protection")) {
-            return false;
-        }
-        return chestProtection.isProtected(block, player);
-    }
-
-    public boolean isChestProtected(Block block) {
-
-        return signChestProtection && chestProtection.isProtected(block, null);
-    }
-
-    public boolean isChestProtectedPlacement(Block block, Player player) {
-        if (!signChestProtection) {
-            return false;
-        }
-        if (plugin.hasPermission(player, "worldguard.chest-protection.override")
-                || plugin.hasPermission(player, "worldguard.override.chest-protection")) {
-            return false;
-        }
-        return chestProtection.isProtectedPlacement(block, player);
-    }
-
-    public boolean isAdjacentChestProtected(Block block, Player player) {
-        if (!signChestProtection) {
-            return false;
-        }
-        if (plugin.hasPermission(player, "worldguard.chest-protection.override")
-                || plugin.hasPermission(player, "worldguard.override.chest-protection")) {
-            return false;
-        }
-        return chestProtection.isAdjacentChestProtected(block, player);
-    }
-
-    public ChestProtection getChestProtection() {
-        return chestProtection;
     }
 
     public int getMaxRegionCount(Player player) {
