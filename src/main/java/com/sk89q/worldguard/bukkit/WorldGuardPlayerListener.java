@@ -412,7 +412,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (item != null && item.getType() == Material.POTION && !BukkitUtil.isWaterPotion(item)) {
                 PotionEffect blockedEffect = null;
 
-                Potion potion = Potion.fromItemStack(item);
+                Potion potion = Potion.fromDamage(BukkitUtil.getPotionEffectBits(item));
                 for (PotionEffect effect : potion.getEffects()) {
                     if (wcfg.blockPotions.contains(effect.getType())) {
                         blockedEffect = effect;
