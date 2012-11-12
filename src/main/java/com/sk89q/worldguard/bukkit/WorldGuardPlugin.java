@@ -108,6 +108,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Called on plugin enable.
      */
+    @Override
     @SuppressWarnings("deprecation")
     public void onEnable() {
 
@@ -152,7 +153,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         flagStateManager = new FlagStateManager(this);
 
         if (configuration.useRegionsScheduler) {
-            getServer().getScheduler().scheduleAsyncRepeatingTask(this, flagStateManager, FlagStateManager.RUN_DELAY, FlagStateManager.RUN_DELAY);
+            getServer().getScheduler().scheduleSyncRepeatingTask(this, flagStateManager,
+                    FlagStateManager.RUN_DELAY, FlagStateManager.RUN_DELAY);
         }
 
         // Register events
@@ -194,6 +196,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Called on plugin disable.
      */
+    @Override
     public void onDisable() {
         globalRegionManager.unload();
         configuration.unload();
