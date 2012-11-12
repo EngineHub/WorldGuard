@@ -489,6 +489,16 @@ public class WorldGuardPlayerListener implements Listener {
                 }
             }
 
+            if (type == BlockID.DRAGON_EGG) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to move dragon eggs here!");
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
             if (block.getRelative(event.getBlockFace()).getTypeId() == BlockID.FIRE) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)) {
