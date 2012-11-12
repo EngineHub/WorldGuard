@@ -307,6 +307,7 @@ class WorldGuardBlockListener implements Listener {
         // RuleLists
         RuleSet rules = wcfg.getRuleList().get(DefaultAttachments.BLOCK_PLACE);
         BukkitContext context = new BukkitContext(plugin, event);
+        context.setSourceEntity(event.getPlayer());
         context.setTargetBlock(event.getBlock().getState());
         context.setPlacedBlock(event.getBlockReplacedState());
         if (rules.process(context)) {
