@@ -693,7 +693,8 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.WORKBENCH
                     || type == BlockID.BREWING_STAND
                     || type == BlockID.ENCHANTMENT_TABLE
-                    || type == BlockID.CAULDRON) {
+                    || type == BlockID.CAULDRON
+                    || type == BlockID.COMMAND_BLOCK) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.USE, localPlayer)) {
