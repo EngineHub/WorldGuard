@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.util;
 
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.databases.RegionDBUtil;
+import com.sk89q.worldguard.region.stores.RegionDBUtil;
 
 /**
  * Various utility functions for regions.

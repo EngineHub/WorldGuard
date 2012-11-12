@@ -46,8 +46,8 @@ import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import com.sk89q.rulelists.DefaultAttachments;
 import com.sk89q.rulelists.RuleSet;
-import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.region.RegionManager;
+import com.sk89q.worldguard.region.flags.DefaultFlag;
 
 /**
  * The listener for entity events.
@@ -293,7 +293,7 @@ class WorldGuardEntityListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPotionSplash(PotionSplashEvent event) {
-        GlobalRegionManager global = plugin.getGlobalRegionManager();
+        RegionManager global = plugin.getGlobalRegionManager();
 
         /* --- No short-circuit returns below this line --- */
 

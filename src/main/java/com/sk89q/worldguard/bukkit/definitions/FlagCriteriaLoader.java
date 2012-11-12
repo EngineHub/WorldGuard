@@ -29,8 +29,8 @@ import com.sk89q.rulelists.RuleListsManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.resolvers.BlockResolver;
 import com.sk89q.worldguard.bukkit.resolvers.EntityResolver;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.region.flags.DefaultFlag;
+import com.sk89q.worldguard.region.flags.StateFlag;
 
 public class FlagCriteriaLoader extends AbstractNodeLoader<FlagCriteria> {
 

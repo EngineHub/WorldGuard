@@ -32,19 +32,20 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.RegionDBUtil;
-import com.sk89q.worldguard.protection.databases.migrators.AbstractDatabaseMigrator;
-import com.sk89q.worldguard.protection.databases.migrators.MigrationException;
-import com.sk89q.worldguard.protection.databases.migrators.MigratorKey;
-import com.sk89q.worldguard.protection.flags.*;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.region.ApplicableRegionSet;
+import com.sk89q.worldguard.region.flags.*;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.regions.GlobalProtectedRegion;
+import com.sk89q.worldguard.region.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.region.regions.ProtectedPolygonalRegion;
+import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.region.stores.AbstractDatabaseMigrator;
+import com.sk89q.worldguard.region.stores.MigrationException;
+import com.sk89q.worldguard.region.stores.MigratorKey;
+import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
+import com.sk89q.worldguard.region.stores.RegionDBUtil;
+
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -87,7 +88,7 @@ public class RegionCommands {
             throw new CommandException("Select a region with WorldEdit first.");
         }
         
-        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         if (mgr.hasRegion(id)) {
             throw new CommandException("That region is already defined. Use redefine instead.");
         }
@@ -139,7 +140,7 @@ public class RegionCommands {
             throw new CommandException("The region cannot be named __global__");
         }
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion existing = mgr.getRegionExact(id);
 
         if (existing == null) {
@@ -224,7 +225,7 @@ public class RegionCommands {
             throw new CommandException("Select a region with WorldEdit first.");
         }
         
-        RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
 
         if (mgr.hasRegion(id)) {
             throw new CommandException("That region already exists. Please choose a different name.");
@@ -338,7 +339,7 @@ public class RegionCommands {
         final World world = player.getWorld();
         final LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-        final RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        final RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
 
         final String id;
         if (args.argsLength() == 0) {
@@ -416,7 +417,7 @@ public class RegionCommands {
             world = plugin.matchWorld(sender, args.getString(0));
         }
 
-        final RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        final RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
 
         final String id;
 
@@ -604,7 +605,7 @@ public class RegionCommands {
             world = plugin.checkPlayer(sender).getWorld();
         }
 
-        final RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        final RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         final Map<String, ProtectedRegion> regions = mgr.getRegions();
 
         List<RegionEntry> regionEntries = new ArrayList<RegionEntry>();
@@ -666,7 +667,7 @@ public class RegionCommands {
             value = args.getJoinedStrings(2);
         }
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
@@ -838,7 +839,7 @@ public class RegionCommands {
             throw new CommandException("The region cannot be named __global__");
         }
         
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -881,7 +882,7 @@ public class RegionCommands {
             throw new CommandException("The region cannot be named __global__");
         }
         
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
         if (region == null) {
             throw new CommandException("Could not find a target region by that ID.");
@@ -950,7 +951,7 @@ public class RegionCommands {
         
         String id = args.getString(0);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegionExact(id);
 
         if (region == null) {
@@ -990,7 +991,7 @@ public class RegionCommands {
         }
 
         if (world != null) {
-            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
             
             try {
                 mgr.load();
@@ -1002,7 +1003,7 @@ public class RegionCommands {
             }
         } else {
             for (World w : plugin.getServer().getWorlds()) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(w);
+                RegionIndex mgr = plugin.getGlobalRegionManager().get(w);
                 
                 try {
                     mgr.load();
@@ -1029,7 +1030,7 @@ public class RegionCommands {
         }
 
         if (world != null) {
-            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
             
             try {
                 mgr.save();
@@ -1041,7 +1042,7 @@ public class RegionCommands {
             }
         } else {
             for (World w : plugin.getServer().getWorlds()) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(w);
+                RegionIndex mgr = plugin.getGlobalRegionManager().get(w);
                 
                 try {
                     mgr.save();
@@ -1112,7 +1113,7 @@ public class RegionCommands {
     public void teleport(CommandContext args, CommandSender sender) throws CommandException {
         final Player player = plugin.checkPlayer(sender);
 
-        final RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
+        final RegionIndex mgr = plugin.getGlobalRegionManager().get(player.getWorld());
         String id = args.getString(0);
 
         final ProtectedRegion region = mgr.getRegion(id);

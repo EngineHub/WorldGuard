@@ -24,14 +24,15 @@ import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.PRTreeRegionManager;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.flags.DefaultFlag;
+import com.sk89q.worldguard.region.flags.StateFlag;
+import com.sk89q.worldguard.region.indexes.PriorityRTreeIndex;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.regions.GlobalProtectedRegion;
+import com.sk89q.worldguard.region.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.region.regions.ProtectedPolygonalRegion;
+import com.sk89q.worldguard.region.regions.ProtectedRegion;
+
 import org.junit.Before;
 import org.junit.Test;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class PRTreeRegionManagerTest extends RegionOverlapTest {
-    protected RegionManager createRegionManager() throws Exception {
-        return new PRTreeRegionManager(null);
+    protected RegionIndex createRegionManager() throws Exception {
+        return new PriorityRTreeIndex(null);
     }
 }

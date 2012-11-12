@@ -24,10 +24,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.region.ApplicableRegionSet;
+import com.sk89q.worldguard.region.flags.DefaultFlag;
+import com.sk89q.worldguard.region.flags.StateFlag;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
 
 public class RegionQueryUtil {
 
@@ -55,7 +55,7 @@ public class RegionQueryUtil {
             if (set == null) {
                 Vector vec = new Vector(state.lastInvincibleX,
                         state.lastInvincibleY, state.lastInvincibleZ);
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
                 set = mgr.getApplicableRegions(vec);
             }
 

@@ -98,8 +98,8 @@ import com.sk89q.worldguard.bukkit.resolvers.SourceBlockResolver;
 import com.sk89q.worldguard.bukkit.resolvers.SourceEntityResolver;
 import com.sk89q.worldguard.bukkit.resolvers.TargetBlockResolver;
 import com.sk89q.worldguard.bukkit.resolvers.TargetEntityResolver;
-import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.region.RegionManager;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 
 /**
@@ -108,7 +108,7 @@ import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 public class WorldGuardPlugin extends JavaPlugin {
 
     private final CommandsManager<CommandSender> commands;
-    private final GlobalRegionManager globalRegionManager;
+    private final RegionManager globalRegionManager;
     private final ConfigurationManager configuration;
     private FlagStateManager flagStateManager;
     private RuleListsManager ruleListsManager;
@@ -123,7 +123,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public WorldGuardPlugin() {
         configuration = new ConfigurationManager(this);
-        globalRegionManager = new GlobalRegionManager(this);
+        globalRegionManager = new RegionManager(this);
         lagStopper = new LagStopMode(this);
 
         final WorldGuardPlugin plugin = this;
@@ -265,7 +265,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      *
      * @return The plugin's global region manager
      */
-    public GlobalRegionManager getGlobalRegionManager() {
+    public RegionManager getGlobalRegionManager() {
         return globalRegionManager;
     }
 
@@ -891,7 +891,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      *
      * @param player The player to check.
      * @param loc The location to check at.
-     * @see GlobalRegionManager#canBuild(org.bukkit.entity.Player, org.bukkit.Location)
+     * @see RegionManager#canBuild(org.bukkit.entity.Player, org.bukkit.Location)
      * @return whether {@code player} can build at {@code loc}
      */
     public boolean canBuild(Player player, Location loc) {
@@ -904,7 +904,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      *
      * @param player The player to check
      * @param block The block to check at.
-     * @see GlobalRegionManager#canBuild(org.bukkit.entity.Player, org.bukkit.block.Block)
+     * @see RegionManager#canBuild(org.bukkit.entity.Player, org.bukkit.block.Block)
      * @return whether {@code player} can build at {@code block}'s location
      */
     public boolean canBuild(Player player, Block block) {
@@ -917,7 +917,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param world world to get the region manager for
      * @return the region manager or null if regions are not enabled
      */
-    public RegionManager getRegionManager(World world) {
+    public RegionIndex getRegionManager(World world) {
         if (!getGlobalStateManager().get(world).useRegions) {
             return null;
         }

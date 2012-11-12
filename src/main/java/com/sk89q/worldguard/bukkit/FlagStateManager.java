@@ -29,9 +29,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.region.ApplicableRegionSet;
+import com.sk89q.worldguard.region.flags.DefaultFlag;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
 
 /**
  * This processes per-player state information and is also meant to be used
@@ -84,7 +84,7 @@ public class FlagStateManager implements Runnable {
             }
 
             Vector playerLocation = toVector(player.getLocation());
-            RegionManager regionManager = plugin.getGlobalRegionManager()
+            RegionIndex regionManager = plugin.getGlobalRegionManager()
                     .get(player.getWorld());
             ApplicableRegionSet applicable = regionManager
                     .getApplicableRegions(playerLocation);

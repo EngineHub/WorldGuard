@@ -19,11 +19,11 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.sk89q.worldguard.protection.managers.FlatRegionManager;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.region.indexes.FlatIndex;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
 
 public class FlatRegionPriorityTest extends RegionPriorityTest {
-    protected RegionManager createRegionManager() throws Exception {
-        return new FlatRegionManager(null);
+    protected RegionIndex createRegionManager() throws Exception {
+        return new FlatIndex(null);
     }
 }

@@ -23,9 +23,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.RegionQueryCacheEntry;
+import com.sk89q.worldguard.region.ApplicableRegionSet;
+import com.sk89q.worldguard.region.RegionManager;
+import com.sk89q.worldguard.region.RegionQueryCacheEntry;
 
 /**
  * A class that will cache all region queries. Instances of this class are created
@@ -60,7 +60,7 @@ public final class RegionQuery {
 
         ConfigurationManager config = plugin.getGlobalStateManager();
         WorldConfiguration worldConfig = config.get(world);
-        GlobalRegionManager regionManager = plugin.getGlobalRegionManager();
+        RegionManager regionManager = plugin.getGlobalRegionManager();
 
         if (!worldConfig.useRegions) {
             return null;

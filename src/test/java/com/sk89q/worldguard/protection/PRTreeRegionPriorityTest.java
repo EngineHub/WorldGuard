@@ -19,11 +19,11 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.sk89q.worldguard.protection.managers.PRTreeRegionManager;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.region.indexes.PriorityRTreeIndex;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
 
 public class PRTreeRegionPriorityTest extends RegionPriorityTest {
-    protected RegionManager createRegionManager() throws Exception {
-        return new PRTreeRegionManager(null);
+    protected RegionIndex createRegionManager() throws Exception {
+        return new PriorityRTreeIndex(null);
     }
 }

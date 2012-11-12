@@ -24,7 +24,7 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 
 import com.sk89q.rulelists.Context;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.region.ApplicableRegionSet;
 
 /**
  * An implementation of a {@link Context} for Bukkit. This object is thread-safe, but

@@ -35,12 +35,12 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
-import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.RegionManager;
+import com.sk89q.worldguard.region.flags.DefaultFlag;
+import com.sk89q.worldguard.region.flags.Flag;
+import com.sk89q.worldguard.region.flags.StateFlag;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.LogListBlock;
 
 public class ReportWriter {
@@ -244,7 +244,7 @@ public class ReportWriter {
     }
     
     private void appendWorldConfigurations(WorldGuardPlugin plugin, List<World> worlds,
-            GlobalRegionManager regionMgr, ConfigurationManager mgr) {
+            RegionManager regionMgr, ConfigurationManager mgr) {
         appendHeader("World Configurations");
         
         LogListBlock log = new LogListBlock();
@@ -288,7 +288,7 @@ public class ReportWriter {
                         config.getBlacklist().isWhitelist());
             }
 
-            RegionManager worldRegions = regionMgr.get(world);
+            RegionIndex worldRegions = regionMgr.get(world);
 
             regionsLog.put("Type", worldRegions.getClass().getCanonicalName());
             regionsLog.put("Number of regions", worldRegions.getRegions().size());

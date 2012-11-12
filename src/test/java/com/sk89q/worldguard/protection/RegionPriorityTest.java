@@ -26,11 +26,13 @@ import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.FlatRegionManager;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.*;
+import com.sk89q.worldguard.region.ApplicableRegionSet;
+import com.sk89q.worldguard.region.flags.DefaultFlag;
+import com.sk89q.worldguard.region.flags.StateFlag;
+import com.sk89q.worldguard.region.indexes.FlatIndex;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.regions.*;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -44,14 +46,14 @@ public abstract class RegionPriorityTest {
     Vector inFountain = new Vector(2, 2, 2);
     Vector inCourtyard = new Vector(7, 7, 7);
     Vector outside = new Vector(15, 15, 15);
-    RegionManager manager;
+    RegionIndex manager;
     ProtectedRegion globalRegion;
     ProtectedRegion courtyard;
     ProtectedRegion fountain;
     TestPlayer player1;
     TestPlayer player2;
     
-    protected abstract RegionManager createRegionManager() throws Exception;
+    protected abstract RegionIndex createRegionManager() throws Exception;
 
     @Before
     public void setUp() throws Exception {

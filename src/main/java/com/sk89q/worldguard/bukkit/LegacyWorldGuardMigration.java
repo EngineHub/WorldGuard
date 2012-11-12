@@ -28,9 +28,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import org.bukkit.World;
 
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.CSVDatabase;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.stores.LegacyCsvStore;
+import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 
 /**
  * Utility methods for porting from legacy versions.
@@ -87,10 +87,10 @@ public class LegacyWorldGuardMigration {
                     + "and set as your primary world's database.");
 
             World w = plugin.getServer().getWorlds().get(0);
-            RegionManager mgr = plugin.getGlobalRegionManager().get(w);
+            RegionIndex mgr = plugin.getGlobalRegionManager().get(w);
 
             // First load up the old database using the CSV loader
-            CSVDatabase db = new CSVDatabase(oldDatabase, plugin.getLogger());
+            LegacyCsvStore db = new LegacyCsvStore(oldDatabase, plugin.getLogger());
             db.load();
             
             // Then save the new database

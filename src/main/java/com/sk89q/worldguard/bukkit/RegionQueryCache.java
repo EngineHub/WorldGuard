@@ -20,7 +20,7 @@ package com.sk89q.worldguard.bukkit;
 
 import org.bukkit.event.Event;
 
-import com.sk89q.worldguard.protection.AbstractRegionQueryCache;
+import com.sk89q.worldguard.region.AbstractRegionQueryCache;
 
 /**
  * An implementation of {@link AbstractRegionQueryCache} for Bukkit. This implementation

@@ -30,11 +30,11 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.RegionDBUtil;
+import com.sk89q.worldguard.region.flags.DefaultFlag;
+import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
+import com.sk89q.worldguard.region.stores.RegionDBUtil;
 
 // @TODO: A lot of code duplication here! Need to fix.
 
@@ -55,7 +55,7 @@ public class RegionMemberCommands {
         
         String id = args.getString(0);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
@@ -95,7 +95,7 @@ public class RegionMemberCommands {
         
         String id = args.getString(0);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
@@ -148,7 +148,7 @@ public class RegionMemberCommands {
         
         String id = args.getString(0);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
@@ -189,7 +189,7 @@ public class RegionMemberCommands {
         
         String id = args.getString(0);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
