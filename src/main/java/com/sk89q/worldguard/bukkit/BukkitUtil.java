@@ -153,6 +153,17 @@ public class BukkitUtil {
     }
 
     /**
+     * Get just the potion effect bits. This is to work around bugs with potion
+     * parsing.
+     *
+     * @param item item
+     * @return new bits
+     */
+    public static int getPotionEffectBits(ItemStack item) {
+        return item.getDurability() & 0x3F;
+    }
+
+    /**
      * Find a position for the player to stand that is not inside a block.
      * Blocks above the player will be iteratively tested until there is
      * a series of two free blocks. The player will be teleported to

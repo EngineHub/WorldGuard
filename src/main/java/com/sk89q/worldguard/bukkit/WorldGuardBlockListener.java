@@ -824,7 +824,7 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.blockPotions.size() > 0) {
             ItemStack item = event.getItem();
             if (item.getType() == Material.POTION && !BukkitUtil.isWaterPotion(item)) {
-                Potion potion = Potion.fromItemStack(item);
+                Potion potion = Potion.fromDamage(BukkitUtil.getPotionEffectBits(item));
                 for (PotionEffect effect : potion.getEffects()) {
                     if (potion.isSplash() && wcfg.blockPotions.contains(effect.getType())) {
                         event.setCancelled(true);
