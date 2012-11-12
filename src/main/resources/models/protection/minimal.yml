@@ -3,9 +3,24 @@
   if:
     - ?: region-of
       block: target
-    - ?: is-member
+    - ?: has-flag
+      flag: build
       entity: source
       negate: true
   then:
     - ?: cancel
     - ?tell: Sorry, you don't have permission for this area.
+      entity: source
+- id: worldguard.place
+  when: block-place
+  if:
+    - ?: region-of
+      block: target
+    - ?: has-flag
+      flag: build
+      entity: source
+      negate: true
+  then:
+    - ?: cancel
+    - ?tell: Sorry, you don't have permission for this area.
+      entity: source

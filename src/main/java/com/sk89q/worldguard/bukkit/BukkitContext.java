@@ -24,6 +24,7 @@ import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 
 import com.sk89q.rulelists.Context;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
 /**
  * An implementation of a {@link Context} for Bukkit. This object is thread-safe, but
@@ -43,6 +44,7 @@ public class BukkitContext extends Context {
     private BlockState sourceBlock;
     private BlockState targetBlock;
     private BlockState replacedTargetBlock;
+    private ApplicableRegionSet lastApplRegionSet;
 
     /**
      * Construct a context linked to the given event.
@@ -191,6 +193,25 @@ public class BukkitContext extends Context {
      */
     public void setPlacedBlock(BlockState replacedTargetBlock) {
         this.replacedTargetBlock = replacedTargetBlock;
+    }
+
+    /**
+     * Get the last {@link ApplicableRegionSet}. This can be set by a rule and used
+     * within one, but it cannot be guaranteed to exist across rules.
+     *
+     * @return an {@link ApplicableRegionSet} or null
+     */
+    public ApplicableRegionSet getApplicableRegionSet() {
+        return lastApplRegionSet;
+    }
+
+    /**
+     * Set the last {@link ApplicableRegionSet}.
+     *
+     * @param set an {@link ApplicableRegionSet} or null
+     */
+    public void setApplicableRegionSet(ApplicableRegionSet set) {
+        this.lastApplRegionSet = set;
     }
 
     /**

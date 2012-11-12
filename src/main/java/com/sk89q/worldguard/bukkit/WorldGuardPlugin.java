@@ -74,9 +74,11 @@ import com.sk89q.worldguard.bukkit.definitions.BlockCriteriaLoader;
 import com.sk89q.worldguard.bukkit.definitions.CancelActionLoader;
 import com.sk89q.worldguard.bukkit.definitions.DamageCriteriaLoader;
 import com.sk89q.worldguard.bukkit.definitions.EntityCriteriaLoader;
+import com.sk89q.worldguard.bukkit.definitions.FlagCriteriaLoader;
 import com.sk89q.worldguard.bukkit.definitions.ItemCriteriaLoader;
 import com.sk89q.worldguard.bukkit.definitions.PermissionCriteriaLoader;
 import com.sk89q.worldguard.bukkit.definitions.PhenomenonCriteriaLoader;
+import com.sk89q.worldguard.bukkit.definitions.RegionCriteriaLoader;
 import com.sk89q.worldguard.bukkit.definitions.SetBlockActionLoader;
 import com.sk89q.worldguard.bukkit.definitions.SetDropActionLoader;
 import com.sk89q.worldguard.bukkit.definitions.SpawnCriteriaLoader;
@@ -359,6 +361,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         criterion.register("match-spawn", new SpawnCriteriaLoader());
         criterion.register("match-phenomenon", new PhenomenonCriteriaLoader());
         criterion.register("match-weather", new WeatherCriteriaLoader());
+        criterion.register("region-of", new RegionCriteriaLoader(ruleListsManager));
+        criterion.register("has-flag", new FlagCriteriaLoader(this, ruleListsManager));
         criterion.register("has-permission", new PermissionCriteriaLoader(this, ruleListsManager));
 
         // Actions
