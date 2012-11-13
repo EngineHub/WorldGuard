@@ -103,7 +103,7 @@ public interface RegionIndex {
      *
      * @param region the region to add
      */
-    void add(ProtectedRegion region);
+    void add(ProtectedRegion... region);
 
     /**
      * Remove the region with the given ID from this index. If the region being removed
@@ -112,7 +112,7 @@ public interface RegionIndex {
      *
      * @param id the ID of the region to remove
      */
-    void remove(String id);
+    void remove(String... id);
 
     /**
      * Remove a region from this index having the exact same ID, but possibly no
@@ -121,7 +121,7 @@ public interface RegionIndex {
      *
      * @param region the region with the ID to match against
      */
-    void removeMatching(ProtectedRegion region);
+    void removeMatching(ProtectedRegion... region);
 
     /**
      * Get a region given by the ID.

@@ -51,8 +51,12 @@ public abstract class AbstractRegionIndex implements RegionIndex {
     }
 
     @Override
-    public void removeMatching(ProtectedRegion region) {
-        remove(region.getId());
+    public void removeMatching(ProtectedRegion... region) {
+        String[] ids = new String[region.length];
+        for (int i = 0; i < region.length; i++) {
+            ids[i] = region[i].getId();
+        }
+        remove(ids);
     }
 
     @Override

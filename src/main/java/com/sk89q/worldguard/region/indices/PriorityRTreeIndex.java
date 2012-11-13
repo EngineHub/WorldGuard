@@ -42,17 +42,21 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
     private PRTree<ProtectedRegion> tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
 
     @Override
-    public synchronized void add(ProtectedRegion region) {
+    public synchronized void add(ProtectedRegion... region) {
         Validate.notNull(region, "The region parameter cannot be null");
-        regions.put(normalizeId(region.getId()), region);
+        for (ProtectedRegion r : region) {
+            regions.put(normalizeId(r.getId()), r);
+        }
         tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
         tree.load(regions.values());
     }
 
     @Override
-    public synchronized void remove(String id) {
+    public synchronized void remove(String... id) {
         Validate.notNull(id, "The id parameter cannot be null");
-        regions.remove(normalizeId(id));
+        for (String i : id) {
+            regions.remove(normalizeId(i));
+        }
         tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
         tree.load(regions.values());
     }
