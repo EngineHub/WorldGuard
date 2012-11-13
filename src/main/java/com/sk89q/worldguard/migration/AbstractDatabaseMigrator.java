@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
-import com.sk89q.worldguard.region.stores.MySQLToYAMLMigrator;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionStore;
 
