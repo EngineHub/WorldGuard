@@ -17,10 +17,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region.stores;
+package com.sk89q.worldguard.migration;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.stores.MySQLStore;
+import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
+import com.sk89q.worldguard.region.stores.RegionStore;
+import com.sk89q.worldguard.region.stores.YamlStore;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -17,13 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region.stores;
+package com.sk89q.worldguard.migration;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.stores.MySQLToYAMLMigrator;
+import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
+import com.sk89q.worldguard.region.stores.RegionStore;
 
 public abstract class AbstractDatabaseMigrator implements DatabaseMigrator {
 

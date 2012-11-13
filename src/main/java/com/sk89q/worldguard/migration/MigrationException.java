@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region.stores;
+package com.sk89q.worldguard.migration;
 
 public class MigrationException extends Exception {
     private static final long serialVersionUID = 1L;

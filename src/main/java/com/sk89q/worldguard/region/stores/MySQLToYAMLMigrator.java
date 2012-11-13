@@ -21,6 +21,8 @@ package com.sk89q.worldguard.region.stores;
 
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.migration.AbstractDatabaseMigrator;
+import com.sk89q.worldguard.migration.MigrationException;
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
 
 import java.io.File;
