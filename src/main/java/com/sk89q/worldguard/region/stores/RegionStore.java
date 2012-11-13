@@ -1,79 +1,60 @@
 // $Id$
 /*
- * WorldGuard
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * This file is a part of WorldGuard.
+ * Copyright (c) sk89q <http://www.sk89q.com>
+ * Copyright (c) the WorldGuard team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free Software
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY), without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 package com.sk89q.worldguard.region.stores;
 
-import java.util.Map;
-import java.util.concurrent.Future;
-
 import com.sk89q.worldguard.region.indices.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndexFactory;
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
 
 /**
- * Persists region data by writing it to some persistent storage device,
- * such as to a hard drive.
+ * Persists region data by writing it to some persistent storage device, such as to
+ * a hard drive or a database.
+ * <p>
+ * Implementations must be thread-safe.
+ *
+ * @see RegionStoreFactory
  */
 public interface RegionStore {
 
     /**
-     * Load the list of regions from the data store. The {@link RegionIndex}
-     * should b
+     * Load data from the store and return a new {@link RegionIndex}.
      *
-     * @throws ProtectionDatabaseException when an error occurs
+     * @param factory a factory to create region indices with
+     * @return a region index with the region data loader
      */
-    Future<RegionIndex> load(RegionIndex index) throws ProtectionDatabaseException;
+    RegionIndex load(RegionIndexFactory factory);
 
     /**
-     * Save the list of regions.
+     * Save the entirety of a region index to the store. All existing entries in the
+     * store need to be removed.
      *
-     * @throws ProtectionDatabaseException when an error occurs
+     * @param index the index to replace the store's list of regions with
      */
-    void save() throws ProtectionDatabaseException;
+    void save(RegionIndex index);
 
     /**
-     * Load the list of regions into a region manager.
+     * Save only selected regions to the region store.
      *
-     * @param manager The manager to load regions into
-     * @throws ProtectionDatabaseException when an error occurs
+     * @param added a list of regions that were added
+     * @param updated a list of regions that were updated
+     * @param removed a list of regions that were removed
      */
-    public void load(RegionIndex manager) throws ProtectionDatabaseException;
-
-    /**
-     * Save the list of regions from a region manager.
-     *
-     * @param manager The manager to load regions into
-     * @throws ProtectionDatabaseException when an error occurs
-     */
-    public void save(RegionIndex manager) throws ProtectionDatabaseException;
-
-    /**
-     * Get a list of regions.
-     *
-     * @return the regions loaded by this ProtectionDatabase
-     */
-    public Map<String,ProtectedRegion> getRegions();
-
-    /**
-     * Set the list of regions.
-     *
-     * @param regions The regions to be applied to this ProtectionDatabase
-     */
-    public void setRegions(Map<String,ProtectedRegion> regions);
+    void save(ProtectedRegion added[], ProtectedRegion updated[], ProtectedRegion removed[]);
 
 }
