@@ -34,7 +34,9 @@ import com.sk89q.worldguard.region.regions.ProtectedRegion;
  * the feature). Whether a region should be kept in this special cache is determined
  * using the method {@link ProtectedRegion#shouldCache()}.
  * <p>
- * Implementations should be thread-safe.
+ * Region IDs are case in-sensitive and implementations must be aware of this when
+ * querying by ID. Any casing can be used when looking up an ID. Implementations must
+ * be thread-safe.
  */
 public interface RegionIndex {
 
@@ -47,7 +49,8 @@ public interface RegionIndex {
      * @param preferOnlyCached true to only search cached regions (see class docs)
      * @return a collection of regions matching the criteria
      */
-    Collection<ProtectedRegion> queryContains(Vector location, boolean preferOnlyCached);
+    Collection<ProtectedRegion> queryContains(
+            Vector location, boolean preferOnlyCached);
 
     /**
      * Queries the index for a list of {@link ProtectedRegion}s that overlap with
@@ -60,7 +63,8 @@ public interface RegionIndex {
      * @param preferOnlyCached true to only search cached regions (see class docs)
      * @return a collection of regions matching the criteria
      */
-    Collection<ProtectedRegion> queryOverlapping(ProtectedRegion region, boolean preferOnlyCached);
+    Collection<ProtectedRegion> queryOverlapping(
+            ProtectedRegion region, boolean preferOnlyCached);
 
     /**
      * Queries the index for a list of {@link ProtectedRegion}s that contain the
@@ -94,19 +98,30 @@ public interface RegionIndex {
 
     /**
      * Add the given region to this index. If a region already known by this index is
-     * attempted to be added to this index, nothing will happen.
+     * attempted to be added to this index, nothing will happen. Parents of the
+     * given region will not be added automatically.
      *
      * @param region the region to add
      */
     void add(ProtectedRegion region);
 
     /**
-     * Remove the given region from this index. If a region not yet known by this index
-     * is attempted to be removed to this index, nothing will happen.
+     * Remove the region with the given ID from this index. If the region being removed
+     * has children, they will not be removed automatically. Their parent will also
+     * not be set to null automatically.
      *
-     * @param region the region to add
+     * @param id the ID of the region to remove
      */
-    void remove(ProtectedRegion region);
+    void remove(String id);
+
+    /**
+     * Remove a region from this index having the exact same ID, but possibly no
+     * other equal attribute. If the region being removed as children, they will not be
+     * removed automatically. Their parent will also not be set to null automatically.
+     *
+     * @param region the region with the ID to match against
+     */
+    void removeMatching(ProtectedRegion region);
 
     /**
      * Get a region given by the ID.
@@ -144,5 +159,21 @@ public interface RegionIndex {
      * @return true if this index contains a region by the given ID
      */
     boolean containsMatching(ProtectedRegion region);
+
+    /**
+     * Queries the index to see whether it contains the exact given region object.
+     *
+     * @param region the region to search
+     * @return true if this index contains the given region
+     */
+    boolean containsExact(ProtectedRegion region);
+
+    /**
+     * Get the number of regions stored in the index. This may not be the total
+     * number of regions, as especially with the case of partial store-backed indices.
+     *
+     * @return the number of regions
+     */
+    int size();
 
 }
