@@ -35,11 +35,22 @@ import java.util.*;
  */
 public class PriorityRTreeIndex extends AbstractRegionIndex {
 
-    private static final int BRANCH_FACTOR = 30;
+    private int branchFactor;
+    private Map<String, ProtectedRegion> regions;
+    private MBRConverter<ProtectedRegion> converter;
+    private PRTree<ProtectedRegion> tree;
 
-    private Map<String, ProtectedRegion> regions = new TreeMap<String, ProtectedRegion>();
-    private MBRConverter<ProtectedRegion> converter = new ProtectedRegionMBRConverter();
-    private PRTree<ProtectedRegion> tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+    /**
+     * Construct a new priority R-tree index with a given branch factor.
+     *
+     * @param branchFactor branch factor
+     */
+    public PriorityRTreeIndex(int branchFactor) {
+        this.branchFactor = branchFactor;
+        regions = new TreeMap<String, ProtectedRegion>();
+        converter = new ProtectedRegionMBRConverter();
+        tree = new PRTree<ProtectedRegion>(converter, branchFactor);
+    }
 
     @Override
     public synchronized void add(ProtectedRegion... region) {
@@ -47,7 +58,7 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
         for (ProtectedRegion r : region) {
             regions.put(normalizeId(r.getId()), r);
         }
-        tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+        tree = new PRTree<ProtectedRegion>(converter, branchFactor);
         tree.load(regions.values());
     }
 
@@ -57,7 +68,7 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
         for (String i : id) {
             regions.remove(normalizeId(i));
         }
-        tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+        tree = new PRTree<ProtectedRegion>(converter, branchFactor);
         tree.load(regions.values());
     }
 
