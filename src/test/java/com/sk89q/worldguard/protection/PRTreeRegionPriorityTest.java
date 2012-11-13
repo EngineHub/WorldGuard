@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.sk89q.worldguard.region.indexes.PriorityRTreeIndex;
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.PriorityRTreeIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 
 public class PRTreeRegionPriorityTest extends RegionPriorityTest {
     protected RegionIndex createRegionManager() throws Exception {

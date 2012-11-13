@@ -99,7 +99,7 @@ import com.sk89q.worldguard.bukkit.resolvers.SourceEntityResolver;
 import com.sk89q.worldguard.bukkit.resolvers.TargetBlockResolver;
 import com.sk89q.worldguard.bukkit.resolvers.TargetEntityResolver;
 import com.sk89q.worldguard.region.RegionManager;
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 
 /**

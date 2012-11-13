@@ -31,7 +31,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionDBUtil;

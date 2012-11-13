@@ -23,7 +23,7 @@ import java.util.Map;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
 
 /**

@@ -39,7 +39,7 @@ import com.sk89q.worldguard.region.RegionManager;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.Flag;
 import com.sk89q.worldguard.region.flags.StateFlag;
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.LogListBlock;
 

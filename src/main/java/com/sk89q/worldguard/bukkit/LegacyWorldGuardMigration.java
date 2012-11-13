@@ -28,7 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import org.bukkit.World;
 
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.region.stores.LegacyCsvStore;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 

@@ -22,7 +22,7 @@ package com.sk89q.worldguard.region.stores;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
 
 /**

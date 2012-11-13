@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.region.stores;
 
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 
 public abstract class AbstractProtectionDatabase implements RegionStore {
 

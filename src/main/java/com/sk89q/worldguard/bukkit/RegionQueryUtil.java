@@ -27,7 +27,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.StateFlag;
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 
 public class RegionQueryUtil {
 

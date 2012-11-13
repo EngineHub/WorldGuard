@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.sk89q.worldguard.region.indexes.FlatIndex;
-import com.sk89q.worldguard.region.indexes.RegionIndex;
+import com.sk89q.worldguard.region.indices.FlatIndex;
+import com.sk89q.worldguard.region.indices.RegionIndex;
 
 public class FlatRegionOverlapTest extends RegionOverlapTest {
     protected RegionIndex createRegionManager() throws Exception {

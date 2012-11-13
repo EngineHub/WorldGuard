@@ -16,7 +16,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region.indexes;
+package com.sk89q.worldguard.region.indices;
 
 import java.util.Collection;
 import com.sk89q.worldedit.Vector;
