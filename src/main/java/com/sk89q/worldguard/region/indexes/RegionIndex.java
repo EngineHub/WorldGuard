@@ -1,210 +1,148 @@
 // $Id$
 /*
- * WorldGuard
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * This file is a part of WorldGuard.
+ * Copyright (c) sk89q <http://www.sk89q.com>
+ * Copyright (c) the WorldGuard team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free Software
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY), without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package com.sk89q.worldguard.region.indexes;
 
-import java.util.List;
-import java.util.Map;
-
+import java.util.Collection;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.region.ApplicableRegionSet;
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
-import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
-import com.sk89q.worldguard.region.stores.RegionStore;
 
 /**
- * An abstract class for getting, setting, and looking up regions. The most
- * simple implementation uses a flat list and iterates through the entire list
- * to look for applicable regions, but a more complicated (and more efficient)
- * implementation may use space partitioning techniques.
- *
- * @author sk89q
+ * Indices keep a collection of regions, either partially or fully, in-memory in order
+ * to allow for fast spatial queries. For maximum performance, indices should use
+ * some form of a spatial index in order to quickly satisfy queries.
+ * <p>
+ * A collection of "frequently hit" regions may be kept and used if the
+ * "preferOnlyCached" parameter is true in the spatial query methods. If the parameter
+ * is true, then the implementation may search only between those regions, but it may
+ * choose to search among all regions in the index (for example, if not implementing
+ * the feature). Whether a region should be kept in this special cache is determined
+ * using the method {@link ProtectedRegion#shouldCache()}.
+ * <p>
+ * Implementations should be thread-safe.
  */
-public abstract class RegionIndex {
-
-    protected RegionStore loader;
+public interface RegionIndex {
 
     /**
-     * Construct the object.
+     * Queries the index for a list of {@link ProtectedRegion}s that contain the
+     * given location. Parent regions of regions that match the criteria may NOT
+     * be included in the returned list unless they also match the criteria.
      *
-     * @param loader The loader for this region
+     * @param location the location to use
+     * @param preferOnlyCached true to only search cached regions (see class docs)
+     * @return a collection of regions matching the criteria
      */
-    public RegionIndex(RegionStore loader) {
-        this.loader = loader;
-    }
+    Collection<ProtectedRegion> queryContains(Vector location, boolean preferOnlyCached);
 
     /**
-     * Load the list of regions. If the regions do not load properly, then
-     * the existing list should be used (as stored previously).
+     * Queries the index for a list of {@link ProtectedRegion}s that overlap with
+     * the given region. Parent regions of regions that match the criteria may NOT
+     * be included in the returned list unless they also match the criteria. Regions
+     * in the index do not have to be wholly contained by the provided region
+     * in order to satisfy the criteria.
      *
-     * @throws ProtectionDatabaseException when an error occurs
+     * @param region the area that returned regions must overlap with
+     * @param preferOnlyCached true to only search cached regions (see class docs)
+     * @return a collection of regions matching the criteria
      */
-    public void load() throws ProtectionDatabaseException {
-        loader.load(this);
-    }
+    Collection<ProtectedRegion> queryOverlapping(ProtectedRegion region, boolean preferOnlyCached);
 
     /**
-     * Save the list of regions.
+     * Queries the index for a list of {@link ProtectedRegion}s that contain the
+     * given location. Parent regions of regions that match the criteria may NOT
+     * be included in the returned list unless they also match the criteria.
+     * <p>
+     * Compared to the other method ({@link #queryContains(Vector, boolean)}), you
+     * cannot choose to prefer only cached regions with this method.
      *
-     * @throws ProtectionDatabaseException when an error occurs while saving
+     * @see #queryContains(Vector, boolean)
+     * @param location the location to use
+     * @return a collection of regions matching the criteria
      */
-    public void save() throws ProtectionDatabaseException {
-        loader.save(this);
-    }
+    Collection<ProtectedRegion> queryContains(Vector location);
 
     /**
-     * Get a map of protected regions. Use one of the region manager methods
-     * if possible if working with regions.
+     * Queries the index for a list of {@link ProtectedRegion}s that overlap with
+     * the given region. Parent regions of regions that match the criteria may NOT
+     * be included in the returned list unless they also match the criteria. Regions
+     * in the index do not have to be wholly contained by the provided region
+     * in order to satisfy the criteria.
+     * <p>
+     * Compared to the other method ({@link #queryContains(Vector, boolean)}), you
+     * cannot choose to prefer only cached regions with this method.
      *
-     * @return map of regions, with keys being region IDs (lowercase)
+     * @see #queryOverlapping(ProtectedRegion, boolean)
+     * @param region the area that returned regions must overlap with
+     * @return a collection of regions matching the criteria
      */
-    public abstract Map<String, ProtectedRegion> getRegions();
+    Collection<ProtectedRegion> queryOverlapping(ProtectedRegion region);
 
     /**
-     * Set a list of protected regions. Keys should be lowercase in the given
-     * map fo regions.
+     * Add the given region to this index. If a region already known by this index is
+     * attempted to be added to this index, nothing will happen.
      *
-     * @param regions map of regions
+     * @param region the region to add
      */
-    public abstract void setRegions(Map<String, ProtectedRegion> regions);
+    void add(ProtectedRegion region);
 
     /**
-     * Adds a region. If a region by the given name already exists, then
-     * the existing region will be replaced.
+     * Remove the given region from this index. If a region not yet known by this index
+     * is attempted to be removed to this index, nothing will happen.
      *
-     * @param region region to add
+     * @param region the region to add
      */
-    public abstract void addRegion(ProtectedRegion region);
+    void remove(ProtectedRegion region);
 
     /**
-     * Return whether a region exists by an ID.
+     * Get a region given by the ID.
      *
-     * @param id id of the region, can be mixed-case
-     * @return whether the region exists
+     * @see ProtectedRegion#getId() for details on acceptable IDs
+     * @param id the ID
+     * @return the requested region or null
      */
-    public abstract boolean hasRegion(String id);
+    ProtectedRegion get(String id);
 
     /**
-     * Get a region by its ID. Includes symbolic names like #&lt;index&gt;
+     * Get a region with a matching ID. The returned region may or may not be the
+     * same region as the provided one, as the only feature that has to match is
+     * the region ID.
      *
-     * @param id id of the region, can be mixed-case
-     * @return region or null if it doesn't exist
+     * @param region the region with the ID to match against
+     * @return the requested region or null
      */
-    public ProtectedRegion getRegion(String id) {
-        if (id.startsWith("#")) {
-            int index;
-            try {
-                index = Integer.parseInt(id.substring(1)) - 1;
-            } catch (NumberFormatException e) {
-                return null;
-            }
-            for (ProtectedRegion region : getRegions().values()) {
-                if (index == 0) {
-                    return region;
-                }
-                --index;
-            }
-            return null;
-        }
-
-        return getRegionExact(id);
-    }
+    ProtectedRegion getMatching(ProtectedRegion region);
 
     /**
-     * Get a region by its ID.
+     * Queries the index to see whether it contains a region given by an ID.
      *
-     * @param id id of the region, can be mixed-case
-     * @return region or null if it doesn't exist
+     * @param id the ID
+     * @return true if this index contains a region by the given ID
      */
-    public ProtectedRegion getRegionExact(String id) {
-        return getRegions().get(id.toLowerCase());
-    }
+    boolean contains(String id);
 
     /**
-     * Removes a region, including inheriting children.
+     * Queries the index to see whether it contains a region with an ID the same
+     * as the given ID. The returned region may or may not be the same region as the
+     * provided one, as the only feature that has to match is the region ID.
      *
-     * @param id id of the region, can be mixed-case
+     * @param region the region with the ID to match against
+     * @return true if this index contains a region by the given ID
      */
-    public abstract void removeRegion(String id);
+    boolean containsMatching(ProtectedRegion region);
 
-    /**
-     * Get an object for a point for rules to be applied with. Use this in order
-     * to query for flag data or membership data for a given point.
-     *
-     * @param loc Bukkit location
-     * @return applicable region set
-     */
-    public ApplicableRegionSet getApplicableRegions(org.bukkit.Location loc) {
-        return getApplicableRegions(com.sk89q.worldedit.bukkit.BukkitUtil.toVector(loc));
-    }
-
-    /**
-     * Get an object for a point for rules to be applied with. Use this in order
-     * to query for flag data or membership data for a given point.
-     *
-     * @param pt point
-     * @return applicable region set
-     */
-    public abstract ApplicableRegionSet getApplicableRegions(Vector pt);
-
-    /**
-     * Get an object for a point for rules to be applied with. This gets
-     * a set for the given reason.
-     *
-     * @param region region
-     * @return regino set
-     */
-    public abstract ApplicableRegionSet getApplicableRegions(
-            ProtectedRegion region);
-
-    /**
-     * Get a list of region IDs that contain a point.
-     *
-     * @param pt point
-     * @return list of region Ids
-     */
-    public abstract List<String> getApplicableRegionsIDs(Vector pt);
-
-    /**
-     * Returns true if the provided region overlaps with any other region that
-     * is not owned by the player.
-     *
-     * @param region region to check
-     * @param player player to check against
-     * @return whether there is an overlap
-     */
-    public abstract boolean overlapsUnownedRegion(ProtectedRegion region,
-            LocalPlayer player);
-
-    /**
-     * Get the number of regions.
-     *
-     * @return number of regions
-     */
-    public abstract int size();
-
-    /**
-     * Get the number of regions for a player.
-     *
-     * @param player player
-     * @return name number of regions that a player owns
-     */
-    public abstract int getRegionCountOfPlayer(LocalPlayer player);
 }

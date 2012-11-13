@@ -110,7 +110,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
             if (y > maxY) maxY = y;
             if (z > maxZ) maxZ = z;
         }
-        
+
         min = new BlockVector(minX, minY, minZ);
         max = new BlockVector(maxX, maxY, maxZ);
     }
@@ -477,6 +477,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      *
      * @param other The region to compare to
      */
+    @Override
     public int compareTo(ProtectedRegion other) {
         if (priority > other.priority) {
             return -1;
@@ -561,6 +562,10 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
             }
             lastPt1 = aPts1;
         }
+        return false;
+    }
+
+    public boolean shouldCache() {
         return false;
     }
 

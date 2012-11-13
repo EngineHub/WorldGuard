@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RunnableFuture;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
@@ -37,7 +38,6 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.region.flags.StateFlag;
-import com.sk89q.worldguard.region.indexes.FlatIndex;
 import com.sk89q.worldguard.region.indexes.PriorityRTreeIndex;
 import com.sk89q.worldguard.region.indexes.RegionIndex;
 import com.sk89q.worldguard.region.stores.MySQLStore;
@@ -367,5 +367,9 @@ public class RegionManager {
 
         RegionIndex mgr = get(world);
         return mgr.getApplicableRegions(toVector(loc)).allows(flag, player);
+    }
+
+    public void queue(RunnableFuture<?> future) {
+
     }
 }

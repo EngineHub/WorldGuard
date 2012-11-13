@@ -20,29 +20,32 @@
 package com.sk89q.worldguard.region.stores;
 
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import com.sk89q.worldguard.region.indexes.RegionIndex;
 import com.sk89q.worldguard.region.regions.ProtectedRegion;
 
 /**
- * Represents a database to read and write lists of regions from and to.
- *
- * @author sk89q
+ * Persists region data by writing it to some persistent storage device,
+ * such as to a hard drive.
  */
 public interface RegionStore {
+
     /**
-     * Load the list of regions. The method should not modify the list returned
-     * by getRegions() unless the load finishes successfully.
+     * Load the list of regions from the data store. The {@link RegionIndex}
+     * should b
      *
      * @throws ProtectionDatabaseException when an error occurs
      */
-    public void load() throws ProtectionDatabaseException;
+    Future<RegionIndex> load(RegionIndex index) throws ProtectionDatabaseException;
+
     /**
      * Save the list of regions.
      *
      * @throws ProtectionDatabaseException when an error occurs
      */
-    public void save() throws ProtectionDatabaseException;
+    void save() throws ProtectionDatabaseException;
+
     /**
      * Load the list of regions into a region manager.
      *
@@ -50,6 +53,7 @@ public interface RegionStore {
      * @throws ProtectionDatabaseException when an error occurs
      */
     public void load(RegionIndex manager) throws ProtectionDatabaseException;
+
     /**
      * Save the list of regions from a region manager.
      *
@@ -57,16 +61,19 @@ public interface RegionStore {
      * @throws ProtectionDatabaseException when an error occurs
      */
     public void save(RegionIndex manager) throws ProtectionDatabaseException;
+
     /**
      * Get a list of regions.
      *
      * @return the regions loaded by this ProtectionDatabase
      */
     public Map<String,ProtectedRegion> getRegions();
+
     /**
      * Set the list of regions.
      *
      * @param regions The regions to be applied to this ProtectionDatabase
      */
     public void setRegions(Map<String,ProtectedRegion> regions);
+
 }
