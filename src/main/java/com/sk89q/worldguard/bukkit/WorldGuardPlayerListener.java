@@ -121,7 +121,40 @@ public class WorldGuardPlayerListener implements Listener {
                         event.setTo(newLoc);
                         return;
                     }
-
+                    
+                    // check if region is full
+                    Integer maxPlayers = set.getFlag(DefaultFlag.MAX_PLAYERS);
+                    if(maxPlayers != null) //don't even check if maxPlayers isn't set
+                    {
+                        for(ProtectedRegion region : set)
+                        {
+                            int occupantCount = 0;
+                            for(Player daPlayer : world.getPlayers())
+                            {
+                                // Make sure you're not checking the same player,
+                                // that you're not counting the region owner,
+                                // and that the player doesn't have bypass (they don't count either)
+                                if(!daPlayer.equals(player) && !region.isOwner(daPlayer.getName()) && !plugin.getGlobalRegionManager().hasBypass(daPlayer, world))
+                                    if(region.contains(daPlayer.getLocation().getBlockX(),daPlayer.getLocation().getBlockY(),daPlayer.getLocation().getBlockZ()))
+                                        occupantCount++;                      
+                            }
+                            if (occupantCount >= maxPlayers && !hasBypass) { // setting max_players to 0 does same thing as setting to 1
+                                String message = set.getFlag(DefaultFlag.MAX_PLAYERS_MESSAGE);
+                                if(message!=null)
+                                    player.sendMessage(ChatColor.DARK_RED + message);
+                                else
+                                    player.sendMessage(ChatColor.DARK_RED + "Region is full.");
+        
+                                Location newLoc = event.getFrom();
+                                newLoc.setX(newLoc.getBlockX() + 0.5);
+                                newLoc.setY(newLoc.getBlockY());
+                                newLoc.setZ(newLoc.getBlockZ() + 0.5);
+                                event.setTo(newLoc);
+                                return;
+                            }
+                        }
+                    }
+                    
                     // Have to set this state
                     if (state.lastExitAllowed == null) {
                         state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))

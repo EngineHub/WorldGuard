@@ -71,6 +71,7 @@ public final class DefaultFlag {
     public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting", RegionGroup.ALL);
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell", RegionGroup.ALL);
+    public static final StringFlag MAX_PLAYERS_MESSAGE = new StringFlag("max-players-reject-message", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave", RegionGroup.ALL);
     public static final SetFlag<EntityType> DENY_SPAWN = new SetFlag<EntityType>("deny-spawn", RegionGroup.ALL, new EntityTypeFlag(null));
@@ -83,6 +84,7 @@ public final class DefaultFlag {
     public static final IntegerFlag FEED_AMOUNT = new IntegerFlag("feed-amount", RegionGroup.ALL);
     public static final IntegerFlag MIN_FOOD = new IntegerFlag("feed-min-hunger", RegionGroup.ALL);
     public static final IntegerFlag MAX_FOOD = new IntegerFlag("feed-max-hunger", RegionGroup.ALL);
+    public static final IntegerFlag MAX_PLAYERS = new IntegerFlag("max-players-allowed", RegionGroup.ALL); //added by TopHatHacker
     public static final LocationFlag TELE_LOC = new LocationFlag("teleport", RegionGroup.MEMBERS);
     public static final LocationFlag SPAWN_LOC = new LocationFlag("spawn", RegionGroup.MEMBERS);
     public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
@@ -97,7 +99,7 @@ public final class DefaultFlag {
         CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
         EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY,
-        ENTITY_ITEM_FRAME_DESTROY, ITEM_DROP,
+        ENTITY_ITEM_FRAME_DESTROY, ITEM_DROP, MAX_PLAYERS, MAX_PLAYERS_MESSAGE,
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
         SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, GAME_MODE,
