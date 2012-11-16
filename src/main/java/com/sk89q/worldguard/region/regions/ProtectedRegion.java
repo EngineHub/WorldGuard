@@ -1,122 +1,65 @@
 // $Id$
 /*
- * WorldGuard
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * This file is a part of WorldGuard.
+ * Copyright (c) sk89q <http://www.sk89q.com>
+ * Copyright (c) the WorldGuard team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free Software
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY), without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 package com.sk89q.worldguard.region.regions;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.region.UnsupportedIntersectionException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang.Validate;
+
 import com.sk89q.worldguard.region.flags.Flag;
 
-import java.awt.geom.Line2D;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 /**
- * Represents a region of any shape and size that can be protected.
- *
- * @author sk89q
+ * A region that has an ID, shape, priority, parent, and flags assigned to it. It is
+ * used for defining areas on a world.
+ * <p>
+ * The casing of region IDs are maintained, but they are case insensitive for the
+ * purposes of indexing.
+ * <p>
+ * If changes are made to this region, and it is contained within a region
+ * index, the index must be notified of the change.
  */
 public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
-    protected BlockVector min;
-    protected BlockVector max;
-
-    private static final Pattern idPattern = Pattern.compile("^[A-Za-z0-9_,'\\-\\+/]{1,}$");
-
-    /**
-     * Holds the region's ID.
-     */
-    private String id;
-
-    /**
-     * Priority.
-     */
+    private final String id;
+    private IndexableShape shape;
     private int priority = 0;
-
-    /**
-     * Holds the curParent.
-     */
     private ProtectedRegion parent;
-
-    /**
-     * List of owners.
-     */
-    private DefaultDomain owners = new DefaultDomain();
-
-    /**
-     * List of members.
-     */
-    private DefaultDomain members = new DefaultDomain();
-
-    /**
-     * List of flags.
-     */
     private Map<Flag<?>, Object> flags = new HashMap<Flag<?>, Object>();
 
     /**
      * Construct a new instance of this region.
      *
-     * @param id The id (name) of this region.
+     * @param id the ID of the region
+     * @param shape the shape of the region
      */
-    public ProtectedRegion(String id) {
+    public ProtectedRegion(String id, IndexableShape shape) {
+        Validate.notNull(id, "Region ID cannot be null");
+        Validate.notNull(shape, "Shape parameter cannot be null");
+
         this.id = id;
+        this.shape = shape;
     }
 
     /**
-     * Sets the minimum and maximum points of the bounding box for a region
-     *
-     * @param points The points to set. Must have at least one element.
-     */
-    protected void setMinMaxPoints(List<Vector> points) {
-        int minX = points.get(0).getBlockX();
-        int minY = points.get(0).getBlockY();
-        int minZ = points.get(0).getBlockZ();
-        int maxX = minX;
-        int maxY = minY;
-        int maxZ = minZ;
-
-        for (Vector v : points) {
-            int x = v.getBlockX();
-            int y = v.getBlockY();
-            int z = v.getBlockZ();
-
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
-            if (z < minZ) minZ = z;
-
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-            if (z > maxZ) maxZ = z;
-        }
-
-        min = new BlockVector(minX, minY, minZ);
-        max = new BlockVector(maxX, maxY, maxZ);
-    }
-
-    /**
-     * Gets the id of this region
+     * Gets the ID of this region. IDs maintain casing but are case insensitive
+     * during comparison.
      *
      * @return the id
      */
@@ -125,24 +68,29 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
-     * Get the lower point of the cuboid.
+     * Get the shape defining this region.
      *
-     * @return min point
+     * @return a shape
      */
-    public BlockVector getMinimumPoint() {
-        return min;
+    public IndexableShape getShape() {
+        return shape;
     }
 
     /**
-     * Get the upper point of the cuboid.
+     * Set a shape defining this region.
      *
-     * @return max point
+     * @param shape a shape
      */
-    public BlockVector getMaximumPoint() {
-        return max;
+    public void setShape(IndexableShape shape) {
+        Validate.notNull(shape, "Shape parameter cannot be null");
+        this.shape = shape;
     }
 
     /**
+     * Get the priority of the region. Priorities determine the resolution order of
+     * flags, where greater numbers indicate higher precedence. The default priority
+     * of a newly created region is 0, and negative priorities are also supported.
+     *
      * @return the priority
      */
     public int getPriority() {
@@ -150,222 +98,63 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
-     * @param priority the priority to setFlag
+     * Set the priority of the region.
+     *
+     * @see #getPriority() for an explanation of priorities
+     * @param priority the priority
      */
     public void setPriority(int priority) {
         this.priority = priority;
     }
 
     /**
-     * @return the curParent
+     * Get the parent of the region. Parents can determine how multiple overlapping
+     * regions are handled in regards to some flags, but it is dependent on the flag.
+     *
+     * @return parent region or null
      */
     public ProtectedRegion getParent() {
         return parent;
     }
 
     /**
-     * Set the curParent. This checks to make sure that it will not result
-     * in circular inheritance.
+     * Set the parent of this region.
      *
-     * @param parent the curParent to setFlag
-     * @throws CircularInheritanceException when circular inheritance is detected
+     * @see #getParent() for an explanation of parents
+     * @param parent the new parent, or null
+     * @throws IllegalArgumentException when circular inheritance is detected
      */
-    public void setParent(ProtectedRegion parent) throws CircularInheritanceException {
+    public synchronized void setParent(ProtectedRegion parent) throws IllegalArgumentException {
         if (parent == null) {
             this.parent = null;
-            return;
-        }
-
-        if (parent == this) {
-            throw new CircularInheritanceException();
-        }
-
-        ProtectedRegion p = parent.getParent();
-        while (p != null) {
-            if (p == this) {
-                throw new CircularInheritanceException();
-            }
-            p = p.getParent();
-        }
-
-        this.parent = parent;
-    }
-
-
-    /**
-     * @return the owners
-     */
-    public DefaultDomain getOwners() {
-
-        return owners;
-    }
-
-    /**
-     * @param owners the owners to setFlag
-     */
-    public void setOwners(DefaultDomain owners) {
-        this.owners = owners;
-    }
-
-    /**
-     * @return the members
-     */
-    public DefaultDomain getMembers() {
-        return members;
-    }
-
-    /**
-     * @param members the members to setFlag
-     */
-    public void setMembers(DefaultDomain members) {
-        this.members = members;
-    }
-
-    /**
-     * Checks whether a region has members or owners.
-     *
-     * @return whether there are members or owners
-     */
-    public boolean hasMembersOrOwners() {
-        return owners.size() > 0 || members.size() > 0;
-    }
-
-    /**
-     * Checks whether a player is an owner of region or any of its parents.
-     *
-     * @param player player to check
-     * @return whether an owner
-     */
-    public boolean isOwner(LocalPlayer player) {
-        if (owners.contains(player)) {
-            return true;
-        }
-
-        ProtectedRegion curParent = getParent();
-        while (curParent != null) {
-            if (curParent.getOwners().contains(player)) {
-                return true;
+        } else{
+            if (parent == this) {
+                throw new IllegalArgumentException("Circular region inheritance detected");
             }
 
-            curParent = curParent.getParent();
-        }
+            ProtectedRegion p = parent.getParent();
+            while (p != null) {
+                if (p == this) {
+                    throw new IllegalArgumentException("Circular region inheritance detected");
+                }
 
-        return false;
-    }
-
-    /**
-     * Checks whether a player is an owner of region or any of its parents.
-     *
-     * @param playerName player name to check
-     * @return whether an owner
-     */
-    public boolean isOwner(String playerName) {
-        if (owners.contains(playerName)) {
-            return true;
-        }
-
-        ProtectedRegion curParent = getParent();
-        while (curParent != null) {
-            if (curParent.getOwners().contains(playerName)) {
-                return true;
+                p = p.getParent();
             }
 
-            curParent = curParent.getParent();
+            this.parent = parent;
         }
-
-        return false;
     }
 
     /**
-     * Checks whether a player is a member OR OWNER of the region
-     * or any of its parents.
+     * Get a flag's value. May return null if the flag has been set.
      *
-     * @param player player to check
-     * @return whether an owner or member
-     */
-    public boolean isMember(LocalPlayer player) {
-        if (isOwner(player)) {
-            return true;
-        }
-
-        if (members.contains(player)) {
-            return true;
-        }
-
-        ProtectedRegion curParent = getParent();
-        while (curParent != null) {
-            if (curParent.getMembers().contains(player)) {
-                return true;
-            }
-
-            curParent = curParent.getParent();
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks whether a player is a member OR OWNER of the region
-     * or any of its parents.
-     *
-     * @param playerName player name to check
-     * @return whether an owner or member
-     */
-    public boolean isMember(String playerName) {
-        if (isOwner(playerName)) {
-            return true;
-        }
-
-        if (members.contains(playerName)) {
-            return true;
-        }
-
-        ProtectedRegion curParent = getParent();
-        while (curParent != null) {
-            if (curParent.getMembers().contains(playerName)) {
-                return true;
-            }
-
-            curParent = curParent.getParent();
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks whether a player is a member of the region
-     * or any of its parents.
-     *
-     * @param player player to check
-     * @return whether an member
-     */
-    public boolean isMemberOnly(LocalPlayer player) {
-        if (members.contains(player)) {
-            return true;
-        }
-
-        ProtectedRegion curParent = getParent();
-        while (curParent != null) {
-            if (curParent.getMembers().contains(player)) {
-                return true;
-            }
-
-            curParent = curParent.getParent();
-        }
-
-        return false;
-    }
-
-    /**
-     * Get a flag's value.
-     *
-     * @param <T> The flag type
-     * @param <V> The type of the flag's value
-     * @param flag The flag to check
+     * @param <T> the flag type
+     * @param <V> the type of the flag's value
+     * @param flag the flag to check
      * @return value or null if isn't defined
      */
     @SuppressWarnings("unchecked")
-    public <T extends Flag<V>, V> V getFlag(T flag) {
+    public synchronized <T extends Flag<V>, V> V getFlag(T flag) {
         Object obj = flags.get(flag);
         V val;
         if (obj != null) {
@@ -377,105 +166,61 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     }
 
     /**
-     * Set a flag's value.
+     * Set a flag's value. If the value is null, then the flag is unset. If the flag
+     * has already been set, then the existing value will be replaced with the
+     * new one.
      *
-     * @param <T> The flag type
-     * @param <V> The type of the flag's value
-     * @param flag The flag to check
-     * @param val The value to set
+     * @param <T> the flag type
+     * @param <V> the type of the flag's value
+     * @param flag the flag to set
+     * @param value the value to set, or null to unset
      */
-    public <T extends Flag<V>, V> void setFlag(T flag, V val) {
-        if (val == null) {
+    public synchronized <T extends Flag<V>, V> void setFlag(T flag, V value) {
+        Validate.notNull(flag, "Flag parameter cannot be null");
+        if (value == null) {
             flags.remove(flag);
         } else {
-            flags.put(flag, val);
+            flags.put(flag, value);
         }
     }
 
     /**
-     * Get the map of flags.
+     * Unset a flag. If the flag is not yet set, nothing will happen.
      *
-     * @return The map of flags currently used for this region
+     * @param flag the flag to unset
+     */
+    public void unsetFlag(Flag<?> flag) {
+        setFlag(flag, null);
+    }
+
+    /**
+     * Get the map of all flags. Please avoid using this.
+     *
+     * @return the map of flags currently used for this region
      */
     public Map<Flag<?>, Object> getFlags() {
         return flags;
     }
 
     /**
-     * Get the map of flags.
+     * Get the map of flags. Please avoid using this.
      *
-     * @param flags The flags to set
+     * @param flags the flags to set
      */
     public void setFlags(Map<Flag<?>, Object> flags) {
+        Validate.notNull(flags, "Flags parameter cannot be null");
         this.flags = flags;
     }
 
     /**
-     * Gets the 2D points for this region
+     * Compares to another region.
      *
-     * @return The points for this region as (x, z) coordinates
-     */
-    public abstract List<BlockVector2D> getPoints();
-
-    /**
-     * Get the number of blocks in this region
+     * <ul>
+     * <li>Orders primarily by the priority, descending</li>
+     * Orders secondarily by the id, ascending</li>
+     * </ul>
      *
-     * @return the volume of this region in blocks
-     */
-    public abstract int volume();
-
-    /**
-     * Check to see if a point is inside this region.
-     *
-     * @param pt The point to check
-     * @return Whether {@code pt} is in this region
-     */
-    public abstract boolean contains(Vector pt);
-
-    /**
-     * Check to see if a point is inside this region.
-     *
-     * @param pt The point to check
-     * @return Whether {@code pt} is in this region
-     */
-    public boolean contains(BlockVector2D pt) {
-        return contains(new Vector(pt.getBlockX(), min.getBlockY(), pt.getBlockZ()));
-    }
-
-    /**
-     * Check to see if a point is inside this region.
-     *
-     * @param x The x coordinate to check
-     * @param y The y coordinate to check
-     * @param z The z coordinate to check
-     * @return Whether this region contains the points at the given coordinate
-     */
-    public boolean contains(int x, int y, int z) {
-        return contains(new Vector(x, y, z));
-    }
-
-    /**
-     * Check to see if any of the 2D points are inside this region.
-     *
-     * @param pts
-     * @return
-     */
-    public boolean containsAny(List<BlockVector2D> pts) {
-        for (BlockVector2D pt : pts) {
-            if (contains(pt)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Compares to another region.<br>
-     *<br>
-     * Orders primarily by the priority, descending<br>
-     * Orders secondarily by the id, ascending
-     *
-     * @param other The region to compare to
+     * @param other the region to compare to
      */
     @Override
     public int compareTo(ProtectedRegion other) {
@@ -488,96 +233,8 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         return id.compareTo(other.id);
     }
 
-    /**
-     * Return the type of region as a user-friendly, lowercase name.
-     *
-     * @return type of region
-     */
-    public abstract String getTypeName();
-
-    /**
-     * Get a list of intersecting regions.
-     *
-     * @param regions The list of regions to source from
-     * @return The elements of {@code regions} that intersect with this region
-     * @throws UnsupportedIntersectionException if an invalid intersection is detected
-     */
-    public abstract List<ProtectedRegion> getIntersectingRegions(
-            List<ProtectedRegion> regions)
-            throws UnsupportedIntersectionException;
-
-    /**
-     * Checks if the bounding box of a region intersects with with the bounding
-     * box of this region
-     *
-     * @param region The region to check
-     * @return whether the given region intersects
-     */
-    protected boolean intersectsBoundingBox(ProtectedRegion region) {
-        BlockVector rMaxPoint = region.getMaximumPoint();
-        BlockVector min = getMinimumPoint();
-
-        if (rMaxPoint.getBlockX() < min.getBlockX()) return false;
-        if (rMaxPoint.getBlockY() < min.getBlockY()) return false;
-        if (rMaxPoint.getBlockZ() < min.getBlockZ()) return false;
-
-        BlockVector rMinPoint = region.getMinimumPoint();
-        BlockVector max = getMaximumPoint();
-
-        if (rMinPoint.getBlockX() > max.getBlockX()) return false;
-        if (rMinPoint.getBlockY() > max.getBlockY()) return false;
-        if (rMinPoint.getBlockZ() > max.getBlockZ()) return false;
-
-        return true;
-    }
-
-    /**
-     * Compares all edges of two regions to see if any of them intersect
-     *
-     * @param region The region to check
-     * @return whether any edges of a region intersect
-     */
-    protected boolean intersectsEdges(ProtectedRegion region) {
-        List<BlockVector2D> pts1 = getPoints();
-        List<BlockVector2D> pts2 = region.getPoints();
-        BlockVector2D lastPt1 = pts1.get(pts1.size() - 1);
-        BlockVector2D lastPt2 = pts2.get(pts2.size() - 1);
-        for (BlockVector2D aPts1 : pts1) {
-            for (BlockVector2D aPts2 : pts2) {
-
-                Line2D line1 = new Line2D.Double(
-                        lastPt1.getBlockX(),
-                        lastPt1.getBlockZ(),
-                        aPts1.getBlockX(),
-                        aPts1.getBlockZ());
-
-                if (line1.intersectsLine(
-                        lastPt2.getBlockX(),
-                        lastPt2.getBlockZ(),
-                        aPts2.getBlockX(),
-                        aPts2.getBlockZ())) {
-                    return true;
-                }
-                lastPt2 = aPts2;
-            }
-            lastPt1 = aPts1;
-        }
-        return false;
-    }
-
     public boolean shouldCache() {
         return false;
-    }
-
-    /**
-     * Checks to see if the given ID is accurate.
-     *
-     * @param id The id to check
-     * @see #idPattern
-     * @return Whether the region id given is valid
-     */
-    public static boolean isValidId(String id) {
-        return idPattern.matcher(id).matches();
     }
 
     @Override
@@ -596,13 +253,5 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
         ProtectedRegion other = (ProtectedRegion) obj;
         return other.getId().equals(getId());
-    }
-
-    /**
-     * Thrown when setting a curParent would create a circular inheritance
-     * situation.
-     */
-    public static class CircularInheritanceException extends Exception {
-        private static final long serialVersionUID = 7479613488496776022L;
     }
 }
