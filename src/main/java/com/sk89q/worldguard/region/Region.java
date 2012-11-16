@@ -36,7 +36,7 @@ import com.sk89q.worldguard.region.shapes.IndexableShape;
  * If changes are made to this region, and it is contained within a region
  * index, the index must be notified of the change.
  */
-public abstract class Region implements Comparable<Region> {
+public class Region implements Comparable<Region> {
 
     private final String id;
     private IndexableShape shape;
@@ -169,16 +169,34 @@ public abstract class Region implements Comparable<Region> {
     }
 
     /**
-     * Set a flag's value. If the value is null, then the flag is unset. If the flag
-     * has already been set, then the existing value will be replaced with the
-     * new one.
+     * Set a flag's value with compile-time type checking (via generics).
+     * <p>
+     * If the value is null, then the flag is unset. If the flag has already been set,
+     * then the existing value will be replaced with the new one.
      *
      * @param <T> the flag type
      * @param <V> the type of the flag's value
      * @param flag the flag to set
      * @param value the value to set, or null to unset
+     * @see #setFlagUnsafe(Flag, Object) to set flags in a type-unsafe manner
      */
-    public synchronized <T extends Flag<V>, V> void setFlag(T flag, V value) {
+    public <T extends Flag<V>, V> void setFlag(T flag, V value) {
+        setFlagUnsafe(flag, value);
+    }
+
+    /**
+     * Set a flag's value without compile-time type checking.
+     * <p>
+     * If the value is null, then the flag is unset. If the flag has already been set,
+     * then the existing value will be replaced with the new one. When possible,
+     * use the {@link #setFlag(Flag, Object)} method, as it allows for compile-time
+     * type checking with generics.
+     *
+     * @param flag the flag to set
+     * @param value the value to set, or null to unset
+     * @see #setFlag(Flag, Object) a preferred method for setting flags
+     */
+    public synchronized void setFlagUnsafe(Flag<?> flag, Object value) {
         Validate.notNull(flag, "Flag parameter cannot be null");
         if (value == null) {
             flags.remove(flag);
