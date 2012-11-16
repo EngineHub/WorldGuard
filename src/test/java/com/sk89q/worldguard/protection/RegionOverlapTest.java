@@ -29,10 +29,10 @@ import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.indices.FlatIndex;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.region.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.region.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Cuboid;
+import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
+import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,9 +54,9 @@ public abstract class RegionOverlapTest {
     Vector outside = new Vector(15, 15, 15);
     Vector inNoFire = new Vector(150, 150, 150);
     RegionIndex manager;
-    ProtectedRegion globalRegion;
-    ProtectedRegion courtyard;
-    ProtectedRegion fountain;
+    Region globalRegion;
+    Region courtyard;
+    Region fountain;
     TestPlayer player1;
     TestPlayer player2;
     
@@ -98,7 +98,7 @@ public abstract class RegionOverlapTest {
         points.add(new BlockVector2D(0, 10));
 
         //ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID, new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));
-        ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID, points, 0, 10);
+        Region region = new ExtrudedPolygon(COURTYARD_ID, points, 0, 10);
 
         region.setOwners(domain);
         manager.addRegion(region);
@@ -110,7 +110,7 @@ public abstract class RegionOverlapTest {
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup(MEMBER_GROUP);
 
-        ProtectedRegion region = new ProtectedCuboidRegion(FOUNTAIN_ID,
+        Region region = new Cuboid(FOUNTAIN_ID,
                 new BlockVector(0, 0, 0), new BlockVector(5, 5, 5));
         region.setMembers(domain);
         manager.addRegion(region);
@@ -121,7 +121,7 @@ public abstract class RegionOverlapTest {
     }
 
     void setUpNoFireRegion() throws Exception {
-        ProtectedRegion region = new ProtectedCuboidRegion(NO_FIRE_ID,
+        Region region = new Cuboid(NO_FIRE_ID,
                 new BlockVector(100, 100, 100), new BlockVector(200, 200, 200));
         manager.addRegion(region);
         region.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
@@ -165,7 +165,7 @@ public abstract class RegionOverlapTest {
     public void testPlayer2BuildAccess() {
         ApplicableRegionSet appl;
 
-        HashSet<ProtectedRegion> test = new HashSet<ProtectedRegion>();
+        HashSet<Region> test = new HashSet<Region>();
         test.add(courtyard);
         test.add(fountain);
         System.out.println(test);

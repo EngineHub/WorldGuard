@@ -20,7 +20,8 @@ package com.sk89q.worldguard.region.indices;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.region.UnsupportedIntersectionException;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
+
 import java.util.*;
 
 import org.apache.commons.lang.Validate;
@@ -33,12 +34,12 @@ import org.apache.commons.lang.Validate;
  */
 public class FlatIndex extends AbstractRegionIndex {
 
-    private Map<String, ProtectedRegion> regions = new TreeMap<String, ProtectedRegion>();
+    private Map<String, Region> regions = new TreeMap<String, Region>();
 
     @Override
-    public synchronized void add(ProtectedRegion... region) {
+    public synchronized void add(Region... region) {
         Validate.notNull(region, "The region parameter cannot be null");
-        for (ProtectedRegion r : region) {
+        for (Region r : region) {
             regions.put(normalizeId(r.getId()), r);
         }
     }
@@ -52,7 +53,7 @@ public class FlatIndex extends AbstractRegionIndex {
     }
 
     @Override
-    public synchronized ProtectedRegion get(String id) {
+    public synchronized Region get(String id) {
         Validate.notNull(id, "The id parameter cannot be null");
         return regions.get(id);
     }
@@ -64,13 +65,13 @@ public class FlatIndex extends AbstractRegionIndex {
     }
 
     @Override
-    public synchronized Collection<ProtectedRegion> queryContains(
+    public synchronized Collection<Region> queryContains(
             Vector location, boolean preferOnlyCached) {
         Validate.notNull(location, "The location parameter cannot be null");
 
-        List<ProtectedRegion> result = new ArrayList<ProtectedRegion>();
+        List<Region> result = new ArrayList<Region>();
 
-        for (ProtectedRegion region : regions.values()) {
+        for (Region region : regions.values()) {
             if (region.contains(location)) {
                 result.add(region);
             }
@@ -80,18 +81,18 @@ public class FlatIndex extends AbstractRegionIndex {
     }
 
     @Override
-    public synchronized Collection<ProtectedRegion> queryOverlapping(
-            ProtectedRegion region, boolean preferOnlyCached) {
+    public synchronized Collection<Region> queryOverlapping(
+            Region region, boolean preferOnlyCached) {
         Validate.notNull(region, "The location parameter cannot be null");
 
-        List<ProtectedRegion> testRegions = new ArrayList<ProtectedRegion>();
+        List<Region> testRegions = new ArrayList<Region>();
         testRegions.addAll(regions.values());
-        List<ProtectedRegion> result;
+        List<Region> result;
 
         try {
             result = region.getIntersectingRegions(testRegions);
         } catch (UnsupportedIntersectionException e) { // This is bad!
-            result = new ArrayList<ProtectedRegion>();
+            result = new ArrayList<Region>();
         }
 
         return result;

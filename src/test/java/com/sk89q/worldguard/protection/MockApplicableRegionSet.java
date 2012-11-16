@@ -23,20 +23,20 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
-import com.sk89q.worldguard.region.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Cuboid;
+import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 
 import java.util.TreeSet;
 
 public class MockApplicableRegionSet {
 
-    private TreeSet<ProtectedRegion> regions = new TreeSet<ProtectedRegion>();
-    private ProtectedRegion global;
+    private TreeSet<Region> regions = new TreeSet<Region>();
+    private Region global;
     private int id = 0;
     private int playerIndex = 0;
 
-    public void add(ProtectedRegion region) {
+    public void add(Region region) {
         regions.add(region);
     }
 
@@ -46,22 +46,22 @@ public class MockApplicableRegionSet {
         return player;
     }
 
-    public ProtectedRegion global() {
+    public Region global() {
         global = new GlobalProtectedRegion("__global__");
         return global;
     }
 
-    public ProtectedRegion add(int priority) {
-        ProtectedRegion region = new ProtectedCuboidRegion(getNextId(),
+    public Region add(int priority) {
+        Region region = new Cuboid(getNextId(),
                 new BlockVector(0, 0, 0), new BlockVector(1, 1, 1));
         region.setPriority(priority);
         add(region);
         return region;
     }
 
-    public ProtectedRegion add(int priority, ProtectedRegion parent)
-            throws ProtectedRegion.CircularInheritanceException {
-        ProtectedRegion region = new ProtectedCuboidRegion(getNextId(),
+    public Region add(int priority, Region parent)
+            throws Region.CircularInheritanceException {
+        Region region = new Cuboid(getNextId(),
                 new BlockVector(0, 0, 0), new BlockVector(1, 1, 1));
         region.setPriority(priority);
         region.setParent(parent);

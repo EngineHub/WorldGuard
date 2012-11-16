@@ -39,16 +39,16 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.Flag;
-import com.sk89q.worldguard.region.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.region.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.region.shapes.Cuboid;
+import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
+import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.shapes.Region.CircularInheritanceException;
 
 public class YamlStore extends AbstractProtectionDatabase {
     
     private YAMLProcessor config;
-    private Map<String, ProtectedRegion> regions;
+    private Map<String, Region> regions;
     private final Logger logger;
     
     public YamlStore(File file, Logger logger) throws ProtectionDatabaseException, FileNotFoundException {
@@ -74,21 +74,21 @@ public class YamlStore extends AbstractProtectionDatabase {
         
         // No regions are even configured
         if (regionData == null) {
-            this.regions = new HashMap<String, ProtectedRegion>();
+            this.regions = new HashMap<String, Region>();
             return;
         }
 
-        Map<String,ProtectedRegion> regions =
-            new HashMap<String,ProtectedRegion>();
-        Map<ProtectedRegion,String> parentSets =
-            new LinkedHashMap<ProtectedRegion, String>();
+        Map<String,Region> regions =
+            new HashMap<String,Region>();
+        Map<Region,String> parentSets =
+            new LinkedHashMap<Region, String>();
         
         for (Map.Entry<String, YAMLNode> entry : regionData.entrySet()) {
             String id = entry.getKey().toLowerCase().replace(".", "");
             YAMLNode node = entry.getValue();
             
             String type = node.getString("type");
-            ProtectedRegion region;
+            Region region;
             
             try {
                 if (type == null) {
@@ -99,12 +99,12 @@ public class YamlStore extends AbstractProtectionDatabase {
                     Vector pt2 = checkNonNull(node.getVector("max"));
                     BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
                     BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
-                    region = new ProtectedCuboidRegion(id, min, max);
+                    region = new Cuboid(id, min, max);
                 } else if (type.equals("poly2d")) {
                     Integer minY = checkNonNull(node.getInt("min-y"));
                     Integer maxY = checkNonNull(node.getInt("max-y"));
                     List<BlockVector2D> points = node.getBlockVector2dList("points", null);
-                    region = new ProtectedPolygonalRegion(id, points, minY, maxY);
+                    region = new ExtrudedPolygon(id, points, minY, maxY);
                 } else if (type.equals("global")) {
                     region = new GlobalProtectedRegion(id);
                 } else {
@@ -129,8 +129,8 @@ public class YamlStore extends AbstractProtectionDatabase {
         }
         
         // Relink parents
-        for (Map.Entry<ProtectedRegion, String> entry : parentSets.entrySet()) {
-            ProtectedRegion parent = regions.get(entry.getValue());
+        for (Map.Entry<Region, String> entry : parentSets.entrySet()) {
+            Region parent = regions.get(entry.getValue());
             if (parent != null) {
                 try {
                     entry.getKey().setParent(parent);
@@ -154,7 +154,7 @@ public class YamlStore extends AbstractProtectionDatabase {
         return val;
     }
     
-    private void setFlags(ProtectedRegion region, YAMLNode flagsData) {
+    private void setFlags(Region region, YAMLNode flagsData) {
         if (flagsData == null) {
             return;
         }
@@ -175,7 +175,7 @@ public class YamlStore extends AbstractProtectionDatabase {
         }
     }
     
-    private <T> void setFlag(ProtectedRegion region, Flag<T> flag, Object rawValue) {
+    private <T> void setFlag(Region region, Flag<T> flag, Object rawValue) {
         T val = flag.unmarshal(rawValue);
         if (val == null) {
             logger.warning("Failed to parse flag '" + flag.getName()
@@ -206,20 +206,20 @@ public class YamlStore extends AbstractProtectionDatabase {
     public void save() throws ProtectionDatabaseException {
         config.clear();
         
-        for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
-            ProtectedRegion region = entry.getValue();
+        for (Map.Entry<String, Region> entry : regions.entrySet()) {
+            Region region = entry.getValue();
             YAMLNode node = config.addNode("regions." + entry.getKey());
             
-            if (region instanceof ProtectedCuboidRegion) {
-                ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
+            if (region instanceof Cuboid) {
+                Cuboid cuboid = (Cuboid) region;
                 node.setProperty("type", "cuboid");
-                node.setProperty("min", cuboid.getMinimumPoint());
-                node.setProperty("max", cuboid.getMaximumPoint());
-            } else if (region instanceof ProtectedPolygonalRegion) {
-                ProtectedPolygonalRegion poly = (ProtectedPolygonalRegion) region;
+                node.setProperty("min", cuboid.getAABBMin());
+                node.setProperty("max", cuboid.getAABBMax());
+            } else if (region instanceof ExtrudedPolygon) {
+                ExtrudedPolygon poly = (ExtrudedPolygon) region;
                 node.setProperty("type", "poly2d");
-                node.setProperty("min-y", poly.getMinimumPoint().getBlockY());
-                node.setProperty("max-y", poly.getMaximumPoint().getBlockY());
+                node.setProperty("min-y", poly.getAABBMin().getBlockY());
+                node.setProperty("max-y", poly.getAABBMax().getBlockY());
                 
                 List<Map<String, Object>> points = new ArrayList<Map<String,Object>>();
                 for (BlockVector2D point : poly.getPoints()) {
@@ -240,7 +240,7 @@ public class YamlStore extends AbstractProtectionDatabase {
             node.setProperty("flags", getFlagData(region));
             node.setProperty("owners", getDomainData(region.getOwners()));
             node.setProperty("members", getDomainData(region.getMembers()));
-            ProtectedRegion parent = region.getParent();
+            Region parent = region.getParent();
             if (parent != null) {
                 node.setProperty("parent", parent.getId());
             }
@@ -260,7 +260,7 @@ public class YamlStore extends AbstractProtectionDatabase {
         config.save();
     }
     
-    private Map<String, Object> getFlagData(ProtectedRegion region) {
+    private Map<String, Object> getFlagData(Region region) {
         Map<String, Object> flagData = new HashMap<String, Object>();
         
         for (Map.Entry<Flag<?>, Object> entry : region.getFlags().entrySet()) {
@@ -304,11 +304,11 @@ public class YamlStore extends AbstractProtectionDatabase {
         domainData.put(key, list);
     }
 
-    public Map<String, ProtectedRegion> getRegions() {
+    public Map<String, Region> getRegions() {
         return regions;
     }
 
-    public void setRegions(Map<String, ProtectedRegion> regions) {
+    public void setRegions(Map<String, Region> regions) {
         this.regions = regions;
     }
     

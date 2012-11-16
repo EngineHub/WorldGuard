@@ -27,11 +27,11 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.Flag;
-import com.sk89q.worldguard.region.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.region.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.region.shapes.Cuboid;
+import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
+import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.shapes.Region.CircularInheritanceException;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
@@ -50,12 +50,12 @@ public class MySQLStore extends AbstractProtectionDatabase {
 
     private Yaml yaml;
 
-    private Map<String, ProtectedRegion> regions;
+    private Map<String, Region> regions;
 
-    private Map<String, ProtectedRegion> cuboidRegions;
-    private Map<String, ProtectedRegion> poly2dRegions;
-    private Map<String, ProtectedRegion> globalRegions;
-    private Map<ProtectedRegion, String> parentSets;
+    private Map<String, Region> cuboidRegions;
+    private Map<String, Region> poly2dRegions;
+    private Map<String, Region> globalRegions;
+    private Map<Region, String> parentSets;
 
     private final ConfigurationManager config;
 
@@ -152,7 +152,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         }
     }
 
-    private void loadFlags(ProtectedRegion region) {
+    private void loadFlags(Region region) {
         // @TODO: Iterate _ONCE_
         try {
             PreparedStatement flagsStatement = this.conn.prepareStatement(
@@ -190,7 +190,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         }
     }
 
-    private <T> void setFlag(ProtectedRegion region, Flag<T> flag, Object rawValue) {
+    private <T> void setFlag(Region region, Flag<T> flag, Object rawValue) {
         T val = flag.unmarshal(rawValue);
         if (val == null) {
             logger.warning("Failed to parse flag '" + flag.getName()
@@ -200,7 +200,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         region.setFlag(flag, val);
     }
 
-    private void loadOwnersAndMembers(ProtectedRegion region) {
+    private void loadOwnersAndMembers(Region region) {
         DefaultDomain owners = new DefaultDomain();
         DefaultDomain members = new DefaultDomain();
 
@@ -261,8 +261,8 @@ public class MySQLStore extends AbstractProtectionDatabase {
     }
 
     private void loadGlobal() {
-        Map<String,ProtectedRegion> regions =
-                new HashMap<String,ProtectedRegion>();
+        Map<String,Region> regions =
+                new HashMap<String,Region>();
 
         try {
             PreparedStatement globalRegionStatement = this.conn.prepareStatement(
@@ -282,7 +282,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
             ResultSet globalResultSet = globalRegionStatement.executeQuery();
 
             while (globalResultSet.next()) {
-                ProtectedRegion region = new GlobalProtectedRegion(globalResultSet.getString("id"));
+                Region region = new GlobalProtectedRegion(globalResultSet.getString("id"));
 
                 region.setPriority(globalResultSet.getInt("priority"));
 
@@ -310,8 +310,8 @@ public class MySQLStore extends AbstractProtectionDatabase {
     }
 
     private void loadCuboid() {
-        Map<String,ProtectedRegion> regions =
-                new HashMap<String,ProtectedRegion>();
+        Map<String,Region> regions =
+                new HashMap<String,Region>();
 
         try {
             PreparedStatement cuboidRegionStatement = this.conn.prepareStatement(
@@ -352,7 +352,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
 
                 BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
                 BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
-                ProtectedRegion region = new ProtectedCuboidRegion(
+                Region region = new Cuboid(
                         cuboidResultSet.getString("id"),
                         min,
                         max
@@ -385,8 +385,8 @@ public class MySQLStore extends AbstractProtectionDatabase {
     }
 
     private void loadPoly2d() {
-        Map<String,ProtectedRegion> regions =
-                new HashMap<String,ProtectedRegion>();
+        Map<String,Region> regions =
+                new HashMap<String,Region>();
 
         try {
             PreparedStatement poly2dRegionStatement = this.conn.prepareStatement(
@@ -434,7 +434,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
                             poly2dVectorResultSet.getInt("z")
                     ));
                 }
-                ProtectedRegion region = new ProtectedPolygonalRegion(id, points, minY, maxY);
+                Region region = new ExtrudedPolygon(id, points, minY, maxY);
 
                 region.setPriority(poly2dResultSet.getInt("priority"));
 
@@ -469,12 +469,12 @@ public class MySQLStore extends AbstractProtectionDatabase {
             throw new ProtectionDatabaseException(ex);
         }
 
-        parentSets = new HashMap<ProtectedRegion,String>();
+        parentSets = new HashMap<Region,String>();
 
         // We load the cuboid regions first, as this is likely to be the
         // largest dataset. This should save time in regards to the putAll()s
         this.loadCuboid();
-        Map<String,ProtectedRegion> regions = this.cuboidRegions;
+        Map<String,Region> regions = this.cuboidRegions;
         this.cuboidRegions = null;
 
         this.loadPoly2d();
@@ -486,8 +486,8 @@ public class MySQLStore extends AbstractProtectionDatabase {
         this.globalRegions = null;
 
         // Relink parents // Taken verbatim from YAMLDatabase
-        for (Map.Entry<ProtectedRegion, String> entry : parentSets.entrySet()) {
-            ProtectedRegion parent = regions.get(entry.getValue());
+        for (Map.Entry<Region, String> entry : parentSets.entrySet()) {
+            Region parent = regions.get(entry.getValue());
             if (parent != null) {
                 try {
                     entry.getKey().setParent(parent);
@@ -667,28 +667,28 @@ public class MySQLStore extends AbstractProtectionDatabase {
             logger.warning("Could not get region list for save comparison: " + ex.getMessage());
         }
 
-        for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
+        for (Map.Entry<String, Region> entry : regions.entrySet()) {
             String name = entry.getKey();
-            ProtectedRegion region = entry.getValue();
+            Region region = entry.getValue();
 
             try {
                 if (regionsInDatabase.contains(name)) {
                     regionsInDatabase.remove(name);
 
-                    if (region instanceof ProtectedCuboidRegion) {
-                        updateRegionCuboid( (ProtectedCuboidRegion) region );
-                    } else if (region instanceof ProtectedPolygonalRegion) {
-                        updateRegionPoly2D( (ProtectedPolygonalRegion) region );
+                    if (region instanceof Cuboid) {
+                        updateRegionCuboid( (Cuboid) region );
+                    } else if (region instanceof ExtrudedPolygon) {
+                        updateRegionPoly2D( (ExtrudedPolygon) region );
                     } else if (region instanceof GlobalProtectedRegion) {
                         updateRegionGlobal( (GlobalProtectedRegion) region );
                     } else {
                         this.updateRegion(region, region.getClass().getCanonicalName());
                     }
                 } else {
-                    if (region instanceof ProtectedCuboidRegion) {
-                        insertRegionCuboid( (ProtectedCuboidRegion) region );
-                    } else if (region instanceof ProtectedPolygonalRegion) {
-                        insertRegionPoly2D( (ProtectedPolygonalRegion) region );
+                    if (region instanceof Cuboid) {
+                        insertRegionCuboid( (Cuboid) region );
+                    } else if (region instanceof ExtrudedPolygon) {
+                        insertRegionPoly2D( (ExtrudedPolygon) region );
                     } else if (region instanceof GlobalProtectedRegion) {
                         insertRegionGlobal( (GlobalProtectedRegion) region );
                     } else {
@@ -701,7 +701,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
             }
         }
 
-        for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
+        for (Map.Entry<String, Region> entry : regions.entrySet()) {
             try {
                 if (entry.getValue().getParent() == null) continue;
 
@@ -736,7 +736,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
 
     }
 
-    private void updateFlags(ProtectedRegion region) throws SQLException {
+    private void updateFlags(Region region) throws SQLException {
         PreparedStatement clearCurrentFlagStatement = this.conn.prepareStatement(
                 "DELETE FROM `region_flag` " +
                 "WHERE `region_id` = ? " +
@@ -769,7 +769,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         }
     }
 
-    private void updatePlayerAndGroups(ProtectedRegion region, Boolean owners) throws SQLException {
+    private void updatePlayerAndGroups(Region region, Boolean owners) throws SQLException {
         DefaultDomain domain;
 
         if (owners) {
@@ -837,7 +837,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         return flag.marshal( (V) val );
     }
 
-    private void insertRegion(ProtectedRegion region, String type) throws SQLException {
+    private void insertRegion(Region region, String type) throws SQLException {
         PreparedStatement insertRegionStatement = this.conn.prepareStatement(
                 "INSERT INTO `region` (" +
                 "`id`, " +
@@ -861,7 +861,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         updatePlayerAndGroups(region, true);
     }
 
-    private void insertRegionCuboid(ProtectedCuboidRegion region) throws SQLException {
+    private void insertRegionCuboid(Cuboid region) throws SQLException {
         insertRegion(region, "cuboid");
 
         PreparedStatement insertCuboidRegionStatement = this.conn.prepareStatement(
@@ -877,8 +877,8 @@ public class MySQLStore extends AbstractProtectionDatabase {
                 ") VALUES (?, " + this.worldDbId + ", ?, ?, ?, ?, ?, ?)"
         );
 
-        BlockVector min = region.getMinimumPoint();
-        BlockVector max = region.getMaximumPoint();
+        BlockVector min = region.getAABBMin();
+        BlockVector max = region.getAABBMax();
 
         insertCuboidRegionStatement.setString(1, region.getId().toLowerCase());
         insertCuboidRegionStatement.setInt(2, min.getBlockZ());
@@ -891,7 +891,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         insertCuboidRegionStatement.execute();
     }
 
-    private void insertRegionPoly2D(ProtectedPolygonalRegion region) throws SQLException {
+    private void insertRegionPoly2D(ExtrudedPolygon region) throws SQLException {
         insertRegion(region, "poly2d");
 
         PreparedStatement insertPoly2dRegionStatement = this.conn.prepareStatement(
@@ -904,15 +904,15 @@ public class MySQLStore extends AbstractProtectionDatabase {
         );
 
         insertPoly2dRegionStatement.setString(1, region.getId().toLowerCase());
-        insertPoly2dRegionStatement.setInt(2, region.getMaximumPoint().getBlockY());
-        insertPoly2dRegionStatement.setInt(3, region.getMinimumPoint().getBlockY());
+        insertPoly2dRegionStatement.setInt(2, region.getAABBMax().getBlockY());
+        insertPoly2dRegionStatement.setInt(3, region.getAABBMin().getBlockY());
 
         insertPoly2dRegionStatement.execute();
 
         updatePoly2dPoints(region);
     }
 
-    private void updatePoly2dPoints(ProtectedPolygonalRegion region) throws SQLException {
+    private void updatePoly2dPoints(ExtrudedPolygon region) throws SQLException {
         PreparedStatement clearPoly2dPointsForRegionStatement = this.conn.prepareStatement(
                 "DELETE FROM `region_poly2d_point` " +
                 "WHERE `region_id` = ? " +
@@ -947,7 +947,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         insertRegion(region, "global");
     }
 
-    private void updateRegion(ProtectedRegion region, String type) throws SQLException  {
+    private void updateRegion(Region region, String type) throws SQLException  {
         PreparedStatement updateRegionStatement = this.conn.prepareStatement(
                 "UPDATE `region` SET " +
                 "`priority` = ? WHERE `id` = ? AND `world_id` = " + this.worldDbId
@@ -964,7 +964,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         updatePlayerAndGroups(region, true);
     }
 
-    private void updateRegionCuboid(ProtectedCuboidRegion region) throws SQLException  {
+    private void updateRegionCuboid(Cuboid region) throws SQLException  {
         updateRegion(region, "cuboid");
 
         PreparedStatement updateCuboidRegionStatement = this.conn.prepareStatement(
@@ -979,8 +979,8 @@ public class MySQLStore extends AbstractProtectionDatabase {
                 "AND `world_id` = " + this.worldDbId
         );
 
-        BlockVector min = region.getMinimumPoint();
-        BlockVector max = region.getMaximumPoint();
+        BlockVector min = region.getAABBMin();
+        BlockVector max = region.getAABBMax();
 
         updateCuboidRegionStatement.setInt(1, min.getBlockZ());
         updateCuboidRegionStatement.setInt(2, min.getBlockY());
@@ -993,7 +993,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
         updateCuboidRegionStatement.execute();
     }
 
-    private void updateRegionPoly2D(ProtectedPolygonalRegion region) throws SQLException  {
+    private void updateRegionPoly2D(ExtrudedPolygon region) throws SQLException  {
         updateRegion(region, "poly2d");
 
         PreparedStatement updatePoly2dRegionStatement = this.conn.prepareStatement(
@@ -1004,8 +1004,8 @@ public class MySQLStore extends AbstractProtectionDatabase {
                 "AND `world_id` = " + this.worldDbId
         );
 
-        updatePoly2dRegionStatement.setInt(1, region.getMaximumPoint().getBlockY());
-        updatePoly2dRegionStatement.setInt(2, region.getMinimumPoint().getBlockY());
+        updatePoly2dRegionStatement.setInt(1, region.getAABBMax().getBlockY());
+        updatePoly2dRegionStatement.setInt(2, region.getAABBMin().getBlockY());
         updatePoly2dRegionStatement.setString(3, region.getId().toLowerCase());
 
         updatePoly2dRegionStatement.execute();
@@ -1018,12 +1018,12 @@ public class MySQLStore extends AbstractProtectionDatabase {
     }
 
     @Override
-    public Map<String, ProtectedRegion> getRegions() {
+    public Map<String, Region> getRegions() {
         return regions;
     }
 
     @Override
-    public void setRegions(Map<String, ProtectedRegion> regions) {
+    public void setRegions(Map<String, Region> regions) {
         this.regions = regions;
     }
     

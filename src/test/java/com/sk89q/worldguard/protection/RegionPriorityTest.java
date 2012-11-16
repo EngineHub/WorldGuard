@@ -31,7 +31,7 @@ import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.indices.FlatIndex;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.region.regions.*;
+import com.sk89q.worldguard.region.shapes.*;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -47,9 +47,9 @@ public abstract class RegionPriorityTest {
     Vector inCourtyard = new Vector(7, 7, 7);
     Vector outside = new Vector(15, 15, 15);
     RegionIndex manager;
-    ProtectedRegion globalRegion;
-    ProtectedRegion courtyard;
-    ProtectedRegion fountain;
+    Region globalRegion;
+    Region courtyard;
+    Region fountain;
     TestPlayer player1;
     TestPlayer player2;
     
@@ -90,7 +90,7 @@ public abstract class RegionPriorityTest {
         points.add(new BlockVector2D(0, 10));
         
         //ProtectedRegion region = new ProtectedCuboidRegion(COURTYARD_ID, new BlockVector(0, 0, 0), new BlockVector(10, 10, 10));
-        ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID, points, 0, 10);
+        Region region = new ExtrudedPolygon(COURTYARD_ID, points, 0, 10);
 
         region.setOwners(domain);
         manager.addRegion(region);
@@ -103,7 +103,7 @@ public abstract class RegionPriorityTest {
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup(MEMBER_GROUP);
         
-        ProtectedRegion region = new ProtectedCuboidRegion(FOUNTAIN_ID,
+        Region region = new Cuboid(FOUNTAIN_ID,
                 new BlockVector(0, 0, 0), new BlockVector(5, 5, 5));
         region.setMembers(domain);
         manager.addRegion(region);

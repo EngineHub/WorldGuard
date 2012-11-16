@@ -15,13 +15,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
-package com.sk89q.worldguard.region.regions;
+package com.sk89q.worldguard.region.shapes;
 
 import org.khelekore.prtree.MBRConverter;
 
-public class ProtectedRegionMBRConverter implements MBRConverter<ProtectedRegion> {
+/**
+ * Used to convert a shape to its minimum bounding rectangle for the priority
+ * R-tree library.
+ */
+public class ShapeMBRConverter implements MBRConverter<IndexableShape> {
 
     @Override
     public int getDimensions() {
@@ -29,27 +33,27 @@ public class ProtectedRegionMBRConverter implements MBRConverter<ProtectedRegion
     }
 
     @Override
-    public double getMax(int dimension, ProtectedRegion region) {
+    public double getMax(int dimension, IndexableShape region) {
         switch (dimension) {
-            case 0:
-                return region.getMaximumPoint().getBlockX();
-            case 1:
-                return region.getMaximumPoint().getBlockY();
-            case 2:
-                return region.getMaximumPoint().getBlockZ();
+        case 0:
+            return region.getAABBMax().getBlockX();
+        case 1:
+            return region.getAABBMax().getBlockY();
+        case 2:
+            return region.getAABBMax().getBlockZ();
         }
         return 0;
     }
 
     @Override
-    public double getMin(int dimension, ProtectedRegion region) {
+    public double getMin(int dimension, IndexableShape region) {
         switch (dimension) {
-            case 0:
-                return region.getMinimumPoint().getBlockX();
-            case 1:
-                return region.getMinimumPoint().getBlockY();
-            case 2:
-                return region.getMinimumPoint().getBlockZ();
+        case 0:
+            return region.getAABBMin().getBlockX();
+        case 1:
+            return region.getAABBMin().getBlockY();
+        case 2:
+            return region.getAABBMin().getBlockZ();
         }
         return 0;
     }

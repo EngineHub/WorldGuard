@@ -20,7 +20,7 @@ package com.sk89q.worldguard.region.indices;
 
 import java.util.Collection;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 
 /**
  * Indices keep a collection of regions, either partially or fully, in-memory in order
@@ -32,7 +32,7 @@ import com.sk89q.worldguard.region.regions.ProtectedRegion;
  * is true, then the implementation may search only between those regions, but it may
  * choose to search among all regions in the index (for example, if not implementing
  * the feature). Whether a region should be kept in this special cache is determined
- * using the method {@link ProtectedRegion#shouldCache()}.
+ * using the method {@link Region#shouldCache()}.
  * <p>
  * Region IDs are case in-sensitive and implementations must be aware of this when
  * querying by ID. Any casing can be used when looking up an ID. Implementations must
@@ -41,7 +41,7 @@ import com.sk89q.worldguard.region.regions.ProtectedRegion;
 public interface RegionIndex {
 
     /**
-     * Queries the index for a list of {@link ProtectedRegion}s that contain the
+     * Queries the index for a list of {@link Region}s that contain the
      * given location. Parent regions of regions that match the criteria may NOT
      * be included in the returned list unless they also match the criteria.
      *
@@ -49,11 +49,11 @@ public interface RegionIndex {
      * @param preferOnlyCached true to only search cached regions (see class docs)
      * @return a collection of regions matching the criteria
      */
-    Collection<ProtectedRegion> queryContains(
+    Collection<Region> queryContains(
             Vector location, boolean preferOnlyCached);
 
     /**
-     * Queries the index for a list of {@link ProtectedRegion}s that overlap with
+     * Queries the index for a list of {@link Region}s that overlap with
      * the given region. Parent regions of regions that match the criteria may NOT
      * be included in the returned list unless they also match the criteria. Regions
      * in the index do not have to be wholly contained by the provided region
@@ -63,11 +63,11 @@ public interface RegionIndex {
      * @param preferOnlyCached true to only search cached regions (see class docs)
      * @return a collection of regions matching the criteria
      */
-    Collection<ProtectedRegion> queryOverlapping(
-            ProtectedRegion region, boolean preferOnlyCached);
+    Collection<Region> queryOverlapping(
+            Region region, boolean preferOnlyCached);
 
     /**
-     * Queries the index for a list of {@link ProtectedRegion}s that contain the
+     * Queries the index for a list of {@link Region}s that contain the
      * given location. Parent regions of regions that match the criteria may NOT
      * be included in the returned list unless they also match the criteria.
      * <p>
@@ -78,10 +78,10 @@ public interface RegionIndex {
      * @param location the location to use
      * @return a collection of regions matching the criteria
      */
-    Collection<ProtectedRegion> queryContains(Vector location);
+    Collection<Region> queryContains(Vector location);
 
     /**
-     * Queries the index for a list of {@link ProtectedRegion}s that overlap with
+     * Queries the index for a list of {@link Region}s that overlap with
      * the given region. Parent regions of regions that match the criteria may NOT
      * be included in the returned list unless they also match the criteria. Regions
      * in the index do not have to be wholly contained by the provided region
@@ -90,11 +90,11 @@ public interface RegionIndex {
      * Compared to the other method ({@link #queryContains(Vector, boolean)}), you
      * cannot choose to prefer only cached regions with this method.
      *
-     * @see #queryOverlapping(ProtectedRegion, boolean)
+     * @see #queryOverlapping(Region, boolean)
      * @param region the area that returned regions must overlap with
      * @return a collection of regions matching the criteria
      */
-    Collection<ProtectedRegion> queryOverlapping(ProtectedRegion region);
+    Collection<Region> queryOverlapping(Region region);
 
     /**
      * Add the given region to this index. If a region already known by this index is
@@ -103,7 +103,7 @@ public interface RegionIndex {
      *
      * @param region the region to add
      */
-    void add(ProtectedRegion... region);
+    void add(Region... region);
 
     /**
      * Remove the region with the given ID from this index. If the region being removed
@@ -121,16 +121,16 @@ public interface RegionIndex {
      *
      * @param region the region with the ID to match against
      */
-    void removeMatching(ProtectedRegion... region);
+    void removeMatching(Region... region);
 
     /**
      * Get a region given by the ID.
      *
-     * @see ProtectedRegion#getId() for details on acceptable IDs
+     * @see Region#getId() for details on acceptable IDs
      * @param id the ID
      * @return the requested region or null
      */
-    ProtectedRegion get(String id);
+    Region get(String id);
 
     /**
      * Get a region with a matching ID. The returned region may or may not be the
@@ -140,7 +140,7 @@ public interface RegionIndex {
      * @param region the region with the ID to match against
      * @return the requested region or null
      */
-    ProtectedRegion getMatching(ProtectedRegion region);
+    Region getMatching(Region region);
 
     /**
      * Queries the index to see whether it contains a region given by an ID.
@@ -158,7 +158,7 @@ public interface RegionIndex {
      * @param region the region with the ID to match against
      * @return true if this index contains a region by the given ID
      */
-    boolean containsMatching(ProtectedRegion region);
+    boolean containsMatching(Region region);
 
     /**
      * Queries the index to see whether it contains the exact given region object.
@@ -166,7 +166,7 @@ public interface RegionIndex {
      * @param region the region to search
      * @return true if this index contains the given region
      */
-    boolean containsExact(ProtectedRegion region);
+    boolean containsExact(Region region);
 
     /**
      * Get the number of regions stored in the index. This may not be the total

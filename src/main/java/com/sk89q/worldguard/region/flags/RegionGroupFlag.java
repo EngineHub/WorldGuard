@@ -20,7 +20,7 @@ package com.sk89q.worldguard.region.flags;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 
 /**
  *
@@ -60,7 +60,7 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
         }
     }
 
-    public static boolean isMember(ProtectedRegion region, RegionGroup group, LocalPlayer player) {
+    public static boolean isMember(Region region, RegionGroup group, LocalPlayer player) {
         if (group == null || group == RegionGroup.ALL) {
             return true;
         } else if (group == RegionGroup.OWNERS) {

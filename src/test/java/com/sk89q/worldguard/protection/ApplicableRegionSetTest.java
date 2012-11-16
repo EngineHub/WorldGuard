@@ -24,7 +24,7 @@ import com.sk89q.worldguard.region.ApplicableRegionSet;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.flags.StringFlag;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -34,7 +34,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testStateFlagPriorityFallThrough() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         StateFlag STATE1 = new StateFlag(null, false);
         StateFlag STATE2 = new StateFlag(null, false);
@@ -57,7 +57,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testNonStateFlagPriorityFallThrough() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         StringFlag STRING1 = new StringFlag(null);
         StringFlag STRING2 = new StringFlag(null);
@@ -82,7 +82,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testStateFlagMultiplePriorityFallThrough() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         StringFlag STRING1 = new StringFlag(null);
         StringFlag STRING2 = new StringFlag(null);
@@ -111,7 +111,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testStateGlobalDefault() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         StateFlag STATE1 = new StateFlag(null, false);
         StateFlag STATE2 = new StateFlag(null, false);
@@ -138,7 +138,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testStateGlobalWithRegionsDefault() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         StateFlag STATE1 = new StateFlag(null, false);
         StateFlag STATE2 = new StateFlag(null, false);
@@ -174,7 +174,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testBuildAccess() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -190,7 +190,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testBuildRegionPriorities() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer upperMember = mock.createPlayer();
         LocalPlayer lowerMember = mock.createPlayer();
@@ -211,7 +211,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testBuildDenyFlag() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -228,7 +228,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testBuildAllowFlag() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -245,7 +245,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testHigherPriorityOverrideBuildDenyFlag() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -265,7 +265,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testHigherPriorityUnsetBuildDenyFlag() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -284,7 +284,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testPriorityDisjointBuildDenyFlagAndMembership() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -303,7 +303,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testPriorityDisjointBuildDenyFlagAndRegion() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -321,7 +321,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testPriorityDisjointMembershipAndBuildDenyFlag() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -353,7 +353,7 @@ public class ApplicableRegionSetTest {
     public void testGlobalRegionDefaultBuild() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
         @SuppressWarnings("unused")
-        ProtectedRegion region = mock.global();
+        Region region = mock.global();
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -366,7 +366,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testGlobalRegionBuildFlagAllow() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         region = mock.global();
         region.setFlag(DefaultFlag.BUILD, StateFlag.State.ALLOW);
@@ -382,7 +382,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testGlobalRegionBuildFlagDeny() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         region = mock.global();
         region.setFlag(DefaultFlag.BUILD, StateFlag.State.DENY);
@@ -398,7 +398,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testGlobalRegionBuildFlagAllowWithRegion() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -417,7 +417,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testGlobalRegionBuildFlagDenyWithRegion() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -436,7 +436,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testGlobalRegionHavingOwnershipBuildFlagUnset() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -452,7 +452,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testGlobalRegionHavingOwnershipBuildFlagAllow() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();
@@ -469,7 +469,7 @@ public class ApplicableRegionSetTest {
     @Test
     public void testGlobalRegionHavingOwnershipBuildFlagDeny() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
-        ProtectedRegion region;
+        Region region;
 
         LocalPlayer member = mock.createPlayer();
         LocalPlayer nonMember = mock.createPlayer();

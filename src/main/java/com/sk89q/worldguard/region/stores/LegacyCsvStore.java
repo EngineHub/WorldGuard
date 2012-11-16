@@ -37,9 +37,9 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.flags.StateFlag.State;
-import com.sk89q.worldguard.region.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.region.shapes.Cuboid;
+import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.shapes.Region.CircularInheritanceException;
 import com.sk89q.worldguard.util.ArrayReader;
 
 /**
@@ -72,7 +72,7 @@ public class LegacyCsvStore extends AbstractProtectionDatabase {
     /**
      * Holds the list of regions.
      */
-    private Map<String,ProtectedRegion> regions;
+    private Map<String,Region> regions;
 
     /**
      * Construct the database with a path to a file. No file is read or
@@ -94,10 +94,10 @@ public class LegacyCsvStore extends AbstractProtectionDatabase {
     }
 
     public void load() throws ProtectionDatabaseException {
-        Map<String,ProtectedRegion> regions =
-                new HashMap<String,ProtectedRegion>();
-        Map<ProtectedRegion,String> parentSets =
-                new LinkedHashMap<ProtectedRegion, String>();
+        Map<String,Region> regions =
+                new HashMap<String,Region>();
+        Map<Region,String> parentSets =
+                new LinkedHashMap<Region, String>();
 
         CSVReader reader = null;
         try {
@@ -138,7 +138,7 @@ public class LegacyCsvStore extends AbstractProtectionDatabase {
                     String flagsData = entries.get(10);
                     //String enterMessage = nullEmptyString(entries.get(11));
 
-                    ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
+                    Region region = new Cuboid(id, min, max);
                     region.setPriority(priority);
                     parseFlags(region, flagsData);
                     region.setOwners(this.parseDomains(ownersData));
@@ -164,7 +164,7 @@ public class LegacyCsvStore extends AbstractProtectionDatabase {
                     //String enterMessage = nullEmptyString(entries.get(13));
                     //String leaveMessage = nullEmptyString(entries.get(14));
 
-                    ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
+                    Region region = new Cuboid(id, min, max);
                     region.setPriority(priority);
                     parseFlags(region, flagsData);
                     region.setOwners(this.parseDomains(ownersData));
@@ -186,8 +186,8 @@ public class LegacyCsvStore extends AbstractProtectionDatabase {
             }
         }
 
-        for (Map.Entry<ProtectedRegion, String> entry : parentSets.entrySet()) {
-            ProtectedRegion parent = regions.get(entry.getValue());
+        for (Map.Entry<Region, String> entry : parentSets.entrySet()) {
+            Region parent = regions.get(entry.getValue());
             if (parent != null) {
                 try {
                     entry.getKey().setParent(parent);
@@ -251,7 +251,7 @@ public class LegacyCsvStore extends AbstractProtectionDatabase {
      *
      * @param data The flag data in string format
      */
-    private void parseFlags(ProtectedRegion region, String data) {
+    private void parseFlags(Region region, String data) {
         if (data == null) {
             return;
         }
@@ -347,11 +347,11 @@ public class LegacyCsvStore extends AbstractProtectionDatabase {
         }
     }
 
-    public Map<String,ProtectedRegion> getRegions() {
+    public Map<String,Region> getRegions() {
         return regions;
     }
 
-    public void setRegions(Map<String,ProtectedRegion> regions) {
+    public void setRegions(Map<String,Region> regions) {
         this.regions = regions;
     }
 }

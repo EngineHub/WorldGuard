@@ -21,7 +21,7 @@ package com.sk89q.worldguard.region;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.region.flags.*;
 import com.sk89q.worldguard.region.flags.StateFlag.State;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 
 import java.util.*;
 
@@ -35,10 +35,10 @@ import java.util.*;
  * 
  * @author sk89q
  */
-public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
+public class ApplicableRegionSet implements Iterable<Region> {
 
-    private Collection<ProtectedRegion> applicable;
-    private ProtectedRegion globalRegion;
+    private Collection<Region> applicable;
+    private Region globalRegion;
 
     /**
      * Construct the object.
@@ -46,8 +46,8 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param applicable The regions contained in this set
      * @param globalRegion The global region, set aside for special handling.
      */
-    public ApplicableRegionSet(Collection<ProtectedRegion> applicable,
-            ProtectedRegion globalRegion) {
+    public ApplicableRegionSet(Collection<Region> applicable,
+            Region globalRegion) {
         this.applicable = applicable;
         this.globalRegion = globalRegion;
     }
@@ -116,7 +116,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return whether the player is an owner of all regions
      */
     public boolean isOwnerOfAll(LocalPlayer player) {
-        for (ProtectedRegion region : applicable) {
+        for (Region region : applicable) {
             if (!region.isOwner(player)) {
                 return false;
             }
@@ -133,7 +133,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return whether the player is a member of all regions
      */
     public boolean isMemberOfAll(LocalPlayer player) {
-        for (ProtectedRegion region : applicable) {
+        for (Region region : applicable) {
             if (!region.isMember(player)) {
                 return false;
             }
@@ -203,10 +203,10 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         // and one child does not allow permissions, then it will be placed into
         // needsClear just like as if was a parent.
 
-        Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
-        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
+        Set<Region> needsClear = new HashSet<Region>();
+        Set<Region> hasCleared = new HashSet<Region>();
 
-        for (ProtectedRegion region : applicable) {
+        for (Region region : applicable) {
             // Ignore lower priority regions
             if (hasFlagDefined && region.getPriority() < lastPriority) {
                 break;
@@ -279,9 +279,9 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param hasCleared The regions already cleared
      * @param region The region to start from
      */
-    private void clearParents(Set<ProtectedRegion> needsClear,
-            Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
-        ProtectedRegion parent = region.getParent();
+    private void clearParents(Set<Region> needsClear,
+            Set<Region> hasCleared, Region region) {
+        Region parent = region.getParent();
 
         while (parent != null) {
             if (!needsClear.remove(parent)) {
@@ -320,10 +320,10 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         int lastPriority = 0;
         boolean found = false;
 
-        Map<ProtectedRegion, V> needsClear = new HashMap<ProtectedRegion, V>();
-        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
+        Map<Region, V> needsClear = new HashMap<Region, V>();
+        Set<Region> hasCleared = new HashSet<Region>();
 
-        for (ProtectedRegion region : applicable) {
+        for (Region region : applicable) {
             // Ignore lower priority regions
             if (found && region.getPriority() < lastPriority) {
                 break;
@@ -371,9 +371,9 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param hasCleared The regions already cleared
      * @param region The region to start from
      */
-    private void clearParents(Map<ProtectedRegion, ?> needsClear,
-            Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
-        ProtectedRegion parent = region.getParent();
+    private void clearParents(Map<Region, ?> needsClear,
+            Set<Region> hasCleared, Region region) {
+        Region parent = region.getParent();
 
         while (parent != null) {
             if (needsClear.remove(parent) == null) {
@@ -396,7 +396,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Get an iterator of affected regions.
      */
-    public Iterator<ProtectedRegion> iterator() {
+    public Iterator<Region> iterator() {
         return applicable.iterator();
     }
 }

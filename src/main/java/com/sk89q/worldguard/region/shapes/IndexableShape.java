@@ -16,7 +16,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region.regions;
+package com.sk89q.worldguard.region.shapes;
 
 import java.util.List;
 
@@ -52,9 +52,9 @@ public interface IndexableShape {
      * AABB's vertexes.
      *
      * @return the minimum point
-     * @see #getMaximumPoint() for the maximum point
+     * @see #getAABBMax() for the maximum point
      */
-    BlockVector getMinimumPoint();
+    BlockVector getAABBMin();
 
     /**
      * Get the "maximum" point of the 3-dimensional axis-aligned (AA) minimum
@@ -69,9 +69,9 @@ public interface IndexableShape {
      * AABB's vertexes.
      *
      * @return the maximum point
-     * @see #getMinimumPoint() for the minimum point
+     * @see #getAABBMin() for the minimum point
      */
-    BlockVector getMaximumPoint();
+    BlockVector getAABBMax();
 
     /**
      * Get the vertices corresponding to minimum bounding polygon (MBP) of the projection
@@ -79,7 +79,7 @@ public interface IndexableShape {
      *
      * @return a list of vertices
      */
-    List<BlockVector2D> get2DProjectionVertices();
+    List<BlockVector2D> getProjectedVerts();
 
     /**
      * Get the number of blocks that are contained by this region. Only blocks that
@@ -128,7 +128,7 @@ public interface IndexableShape {
      * one or more locations that are contained by both shapes.
      * <p>
      * The test is performed by comparing whether the edges of each shape's
-     * 2-dimensional projection (see {@link #get2DProjectionVertices()}) overlap with
+     * 2-dimensional projection (see {@link #getProjectedVerts()}) overlap with
      * the other shape. Thus the test has O(n^2) performance for two shapes with
      * the same number of vertices in their 2-dimensional projection. For a faster,
      * but not necessarily accurate, intersect test, consider using

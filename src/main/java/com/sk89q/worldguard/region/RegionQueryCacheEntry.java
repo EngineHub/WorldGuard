@@ -24,7 +24,7 @@ import java.util.Map;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 
 /**
  * An object to cache a list of {@link ApplicableRegionSet}s. This class is
@@ -69,7 +69,7 @@ public final class RegionQueryCacheEntry {
      * @return the applicable region set
      */
     public synchronized ApplicableRegionSet lookup(RegionIndex manager,
-            ProtectedRegion region) {
+            Region region) {
         return manager.getApplicableRegions(region);
     }
 

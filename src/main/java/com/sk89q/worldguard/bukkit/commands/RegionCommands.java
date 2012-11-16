@@ -38,11 +38,11 @@ import com.sk89q.worldguard.migration.MigratorKey;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
 import com.sk89q.worldguard.region.flags.*;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.region.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.region.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.region.shapes.Cuboid;
+import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
+import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.shapes.Region.CircularInheritanceException;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionDBUtil;
 
@@ -73,7 +73,7 @@ public class RegionCommands {
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
         String id = args.getString(0);
         
-        if (!ProtectedRegion.isValidId(id)) {
+        if (!Region.isValidId(id)) {
             throw new CommandException("Invalid region ID specified!");
         }
         
@@ -93,18 +93,18 @@ public class RegionCommands {
             throw new CommandException("That region is already defined. Use redefine instead.");
         }
         
-        ProtectedRegion region;
+        Region region;
 
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
             int minY = polySel.getNativeMinimumPoint().getBlockY();
             int maxY = polySel.getNativeMaximumPoint().getBlockY();
-            region = new ProtectedPolygonalRegion(id, polySel.getNativePoints(), minY, maxY);
+            region = new ExtrudedPolygon(id, polySel.getNativePoints(), minY, maxY);
         } else if (sel instanceof CuboidSelection) {
             BlockVector min = sel.getNativeMinimumPoint().toBlockVector();
             BlockVector max = sel.getNativeMaximumPoint().toBlockVector();
-            region = new ProtectedCuboidRegion(id, min, max);
+            region = new Cuboid(id, min, max);
         } else {
             throw new CommandException(
                     "The type of region selected in WorldEdit is unsupported in WorldGuard!");
@@ -141,7 +141,7 @@ public class RegionCommands {
         }
 
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion existing = mgr.getRegionExact(id);
+        Region existing = mgr.getRegionExact(id);
 
         if (existing == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -162,18 +162,18 @@ public class RegionCommands {
             throw new CommandException("Select a region with WorldEdit first.");
         }
         
-        ProtectedRegion region;
+        Region region;
         
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
             int minY = polySel.getNativeMinimumPoint().getBlockY();
             int maxY = polySel.getNativeMaximumPoint().getBlockY();
-            region = new ProtectedPolygonalRegion(id, polySel.getNativePoints(), minY, maxY);
+            region = new ExtrudedPolygon(id, polySel.getNativePoints(), minY, maxY);
         } else if (sel instanceof CuboidSelection) {
             BlockVector min = sel.getNativeMinimumPoint().toBlockVector();
             BlockVector max = sel.getNativeMaximumPoint().toBlockVector();
-            region = new ProtectedCuboidRegion(id, min, max);
+            region = new Cuboid(id, min, max);
         } else {
             throw new CommandException(
                     "The type of region selected in WorldEdit is unsupported in WorldGuard!");
@@ -210,7 +210,7 @@ public class RegionCommands {
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
         String id = args.getString(0);
         
-        if (!ProtectedRegion.isValidId(id)) {
+        if (!Region.isValidId(id)) {
             throw new CommandException("Invalid region ID specified!");
         }
         
@@ -231,18 +231,18 @@ public class RegionCommands {
             throw new CommandException("That region already exists. Please choose a different name.");
         }
         
-        ProtectedRegion region;
+        Region region;
 
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
             int minY = polySel.getNativeMinimumPoint().getBlockY();
             int maxY = polySel.getNativeMaximumPoint().getBlockY();
-            region = new ProtectedPolygonalRegion(id, polySel.getNativePoints(), minY, maxY);
+            region = new ExtrudedPolygon(id, polySel.getNativePoints(), minY, maxY);
         } else if (sel instanceof CuboidSelection) {
             BlockVector min = sel.getNativeMinimumPoint().toBlockVector();
             BlockVector max = sel.getNativeMaximumPoint().toBlockVector();
-            region = new ProtectedCuboidRegion(id, min, max);
+            region = new Cuboid(id, min, max);
         } else {
             throw new CommandException(
                     "The type of region selected in WorldEdit is unsupported in WorldGuard!");
@@ -264,7 +264,7 @@ public class RegionCommands {
             }
         }
 
-        ProtectedRegion existing = mgr.getRegionExact(id);
+        Region existing = mgr.getRegionExact(id);
 
         // Check for an existing region
         if (existing != null) {
@@ -355,7 +355,7 @@ public class RegionCommands {
             id = args.getString(0);
         }
 
-        final ProtectedRegion region = mgr.getRegion(id);
+        final Region region = mgr.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -364,7 +364,7 @@ public class RegionCommands {
         selectRegion(player, localPlayer, region);
     }
 
-    public void selectRegion(Player player, LocalPlayer localPlayer, ProtectedRegion region) throws CommandException, CommandPermissionsException {
+    public void selectRegion(Player player, LocalPlayer localPlayer, Region region) throws CommandException, CommandPermissionsException {
         final WorldEditPlugin worldEdit = plugin.getWorldEdit();
         final String id = region.getId();
 
@@ -377,19 +377,19 @@ public class RegionCommands {
         }
 
         final World world = player.getWorld();
-        if (region instanceof ProtectedCuboidRegion) {
-            final ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
-            final Vector pt1 = cuboid.getMinimumPoint();
-            final Vector pt2 = cuboid.getMaximumPoint();
+        if (region instanceof Cuboid) {
+            final Cuboid cuboid = (Cuboid) region;
+            final Vector pt1 = cuboid.getAABBMin();
+            final Vector pt2 = cuboid.getAABBMax();
             final CuboidSelection selection = new CuboidSelection(world, pt1, pt2);
             worldEdit.setSelection(player, selection);
             player.sendMessage(ChatColor.YELLOW + "Region selected as a cuboid.");
-        } else if (region instanceof ProtectedPolygonalRegion) {
-            final ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
+        } else if (region instanceof ExtrudedPolygon) {
+            final ExtrudedPolygon poly2d = (ExtrudedPolygon) region;
             final Polygonal2DSelection selection = new Polygonal2DSelection(
                     world, poly2d.getPoints(),
-                    poly2d.getMinimumPoint().getBlockY(),
-                    poly2d.getMaximumPoint().getBlockY()
+                    poly2d.getAABBMin().getBlockY(),
+                    poly2d.getAABBMax().getBlockY()
             );
             worldEdit.setSelection(player, selection);
             player.sendMessage(ChatColor.YELLOW + "Region selected as a polygon.");
@@ -445,10 +445,10 @@ public class RegionCommands {
             id = args.getString(1).toLowerCase();
         }
 
-        final ProtectedRegion region = mgr.getRegion(id);
+        final Region region = mgr.getRegion(id);
 
         if (region == null) {
-            if (!ProtectedRegion.isValidId(id)) {
+            if (!Region.isValidId(id)) {
                 throw new CommandException("Invalid region ID specified!");
             }
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");
@@ -461,7 +461,7 @@ public class RegionCommands {
         }
     }
 
-    public void displayRegionInfo(CommandSender sender, final LocalPlayer localPlayer, ProtectedRegion region) throws CommandPermissionsException {
+    public void displayRegionInfo(CommandSender sender, final LocalPlayer localPlayer, Region region) throws CommandPermissionsException {
         if (localPlayer == null) {
             plugin.checkPermission(sender, "worldguard.region.info");
         } else if (region.isOwner(localPlayer)) {
@@ -520,8 +520,8 @@ public class RegionCommands {
             sender.sendMessage(ChatColor.LIGHT_PURPLE + "Members: " + members.toUserFriendlyString());
         }
 
-        final BlockVector min = region.getMinimumPoint();
-        final BlockVector max = region.getMaximumPoint();
+        final BlockVector min = region.getAABBMin();
+        final BlockVector max = region.getAABBMax();
         sender.sendMessage(ChatColor.LIGHT_PURPLE + "Bounds:"
                 + " (" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")"
                 + " (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")"
@@ -606,7 +606,7 @@ public class RegionCommands {
         }
 
         final RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        final Map<String, ProtectedRegion> regions = mgr.getRegions();
+        final Map<String, Region> regions = mgr.getRegions();
 
         List<RegionEntry> regionEntries = new ArrayList<RegionEntry>();
         int index = 0;
@@ -668,7 +668,7 @@ public class RegionCommands {
         }
 
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        Region region = mgr.getRegion(id);
 
         if (region == null) {
             if (id.equalsIgnoreCase("__global__")) {
@@ -819,7 +819,7 @@ public class RegionCommands {
         }
     }
     
-    public <V> void setFlag(ProtectedRegion region,
+    public <V> void setFlag(Region region,
             Flag<V> flag, CommandSender sender, String value)
                 throws InvalidFlagFormat {
         region.setFlag(flag, flag.parseInput(plugin, sender, value));
@@ -840,7 +840,7 @@ public class RegionCommands {
         }
         
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        Region region = mgr.getRegion(id);
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
@@ -883,7 +883,7 @@ public class RegionCommands {
         }
         
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        Region region = mgr.getRegion(id);
         if (region == null) {
             throw new CommandException("Could not find a target region by that ID.");
         }
@@ -900,7 +900,7 @@ public class RegionCommands {
                     + "Parent of '" + region.getId() + "' cleared.");
         } else {
             String parentId = args.getString(1);
-            ProtectedRegion parent = mgr.getRegion(parentId);
+            Region parent = mgr.getRegion(parentId);
     
             if (parent == null) {
                 throw new CommandException("Could not find the parent region by that ID.");
@@ -952,7 +952,7 @@ public class RegionCommands {
         String id = args.getString(0);
 
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegionExact(id);
+        Region region = mgr.getRegionExact(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -1116,9 +1116,9 @@ public class RegionCommands {
         final RegionIndex mgr = plugin.getGlobalRegionManager().get(player.getWorld());
         String id = args.getString(0);
 
-        final ProtectedRegion region = mgr.getRegion(id);
+        final Region region = mgr.getRegion(id);
         if (region == null) {
-            if (!ProtectedRegion.isValidId(id)) {
+            if (!Region.isValidId(id)) {
                 throw new CommandException("Invalid region ID specified!");
             }
             throw new CommandException("A region with ID '" + id + "' doesn't exist.");

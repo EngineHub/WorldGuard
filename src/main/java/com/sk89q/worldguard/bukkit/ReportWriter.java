@@ -40,7 +40,7 @@ import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.Flag;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 import com.sk89q.worldguard.util.LogListBlock;
 
 public class ReportWriter {
@@ -294,7 +294,7 @@ public class ReportWriter {
             regionsLog.put("Number of regions", worldRegions.getRegions().size());
             LogListBlock globalRegionLog = regionsLog.putChild("Global region");
             
-            ProtectedRegion globalRegion = worldRegions.getRegion("__global__");
+            Region globalRegion = worldRegions.getRegion("__global__");
             if (globalRegion == null) {
                 globalRegionLog.put("Status", "UNDEFINED");
             } else {

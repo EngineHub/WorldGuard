@@ -21,7 +21,7 @@ package com.sk89q.worldguard.migration;
 
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 import com.sk89q.worldguard.region.stores.MySQLStore;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionStore;
@@ -69,7 +69,7 @@ public class MySQLToYAMLMigrator extends AbstractDatabaseMigrator {
     }
 
     @Override
-    protected Map<String, ProtectedRegion> getRegionsForWorldFromOld(String world) throws MigrationException {
+    protected Map<String, Region> getRegionsForWorldFromOld(String world) throws MigrationException {
         RegionStore oldDatabase;
         try {
             oldDatabase = new MySQLStore(plugin.getGlobalStateManager(), world, plugin.getLogger());

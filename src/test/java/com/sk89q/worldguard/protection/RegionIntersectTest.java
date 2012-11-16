@@ -2,9 +2,9 @@ package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldguard.region.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.region.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Cuboid;
+import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
+import com.sk89q.worldguard.region.shapes.Region;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -16,26 +16,26 @@ public class RegionIntersectTest {
 
     @Test
     public void testCuboidGetIntersectingRegions() {
-        ProtectedRegion region = new ProtectedCuboidRegion("square",
+        Region region = new Cuboid("square",
                 new BlockVector(100, 40, 0), new BlockVector(140, 128, 40));
 
-        assertIntersection(region, new ProtectedCuboidRegion("normal",
+        assertIntersection(region, new Cuboid("normal",
                 new BlockVector(80, 40, -20), new BlockVector(120, 128, 20)),
                 true);
 
-        assertIntersection(region, new ProtectedCuboidRegion("small",
+        assertIntersection(region, new Cuboid("small",
                 new BlockVector(98, 45, 20), new BlockVector(103, 50, 25)),
                 true);
 
-        assertIntersection(region, new ProtectedCuboidRegion("large",
+        assertIntersection(region, new Cuboid("large",
                 new BlockVector(-500, 0, -600), new BlockVector(1000, 128, 1000)),
                 true);
 
-        assertIntersection(region, new ProtectedCuboidRegion("short",
+        assertIntersection(region, new Cuboid("short",
                 new BlockVector(50, 40, -1), new BlockVector(150, 128, 2)),
                 true);
 
-        assertIntersection(region, new ProtectedCuboidRegion("long",
+        assertIntersection(region, new Cuboid("long",
                 new BlockVector(0, 40, 5), new BlockVector(1000, 128, 8)),
                 true);
 
@@ -44,7 +44,7 @@ public class RegionIntersectTest {
         triangle_overlap.add(new BlockVector2D(120, -10));
         triangle_overlap.add(new BlockVector2D(90, 20));
 
-        assertIntersection(region, new ProtectedPolygonalRegion("triangle_overlap",
+        assertIntersection(region, new ExtrudedPolygon("triangle_overlap",
                 triangle_overlap, 0, 128),
                 true);
 
@@ -53,7 +53,7 @@ public class RegionIntersectTest {
         triangle_no_overlap.add(new BlockVector2D(105, -10));
         triangle_no_overlap.add(new BlockVector2D(90, 5));
 
-        assertIntersection(region, new ProtectedPolygonalRegion("triangle_no_overlap",
+        assertIntersection(region, new ExtrudedPolygon("triangle_no_overlap",
                 triangle_no_overlap, 0, 128),
                 false);
 
@@ -62,14 +62,14 @@ public class RegionIntersectTest {
         triangle_overlap_no_points.add(new BlockVector2D(120, 50));
         triangle_overlap_no_points.add(new BlockVector2D(140, -20));
 
-        assertIntersection(region, new ProtectedPolygonalRegion("triangle_overlap_no_points",
+        assertIntersection(region, new ExtrudedPolygon("triangle_overlap_no_points",
                 triangle_overlap_no_points, 60, 80),
                 true);
     }
 
-    private void assertIntersection(ProtectedRegion region1, ProtectedRegion region2, boolean expected) {
+    private void assertIntersection(Region region1, Region region2, boolean expected) {
         boolean actual = false;
-        List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
+        List<Region> regions = new ArrayList<Region>();
         regions.add(region2);
 
         try {

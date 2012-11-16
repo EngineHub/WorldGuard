@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionStore;
 
@@ -43,7 +43,7 @@ public abstract class AbstractDatabaseMigrator implements DatabaseMigrator {
 
     protected abstract Set<String> getWorldsFromOld() throws MigrationException;
 
-    protected abstract Map<String, ProtectedRegion> getRegionsForWorldFromOld(String world) throws MigrationException;
+    protected abstract Map<String, Region> getRegionsForWorldFromOld(String world) throws MigrationException;
 
     protected abstract RegionStore getNewWorldStorage(String world) throws MigrationException;
 

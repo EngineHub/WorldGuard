@@ -20,8 +20,9 @@ package com.sk89q.worldguard.region.indices;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.region.UnsupportedIntersectionException;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
-import com.sk89q.worldguard.region.regions.ProtectedRegionMBRConverter;
+import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.shapes.ShapeMBRConverter;
+
 import org.apache.commons.lang.Validate;
 import org.khelekore.prtree.MBR;
 import org.khelekore.prtree.MBRConverter;
@@ -36,9 +37,9 @@ import java.util.*;
 public class PriorityRTreeIndex extends AbstractRegionIndex {
 
     private int branchFactor;
-    private Map<String, ProtectedRegion> regions;
-    private MBRConverter<ProtectedRegion> converter;
-    private PRTree<ProtectedRegion> tree;
+    private Map<String, Region> regions;
+    private MBRConverter<Region> converter;
+    private PRTree<Region> tree;
 
     /**
      * Construct a new priority R-tree index with a given branch factor.
@@ -47,18 +48,18 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
      */
     public PriorityRTreeIndex(int branchFactor) {
         this.branchFactor = branchFactor;
-        regions = new TreeMap<String, ProtectedRegion>();
-        converter = new ProtectedRegionMBRConverter();
-        tree = new PRTree<ProtectedRegion>(converter, branchFactor);
+        regions = new TreeMap<String, Region>();
+        converter = new ShapeMBRConverter();
+        tree = new PRTree<Region>(converter, branchFactor);
     }
 
     @Override
-    public synchronized void add(ProtectedRegion... region) {
+    public synchronized void add(Region... region) {
         Validate.notNull(region, "The region parameter cannot be null");
-        for (ProtectedRegion r : region) {
+        for (Region r : region) {
             regions.put(normalizeId(r.getId()), r);
         }
-        tree = new PRTree<ProtectedRegion>(converter, branchFactor);
+        tree = new PRTree<Region>(converter, branchFactor);
         tree.load(regions.values());
     }
 
@@ -68,7 +69,7 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
         for (String i : id) {
             regions.remove(normalizeId(i));
         }
-        tree = new PRTree<ProtectedRegion>(converter, branchFactor);
+        tree = new PRTree<Region>(converter, branchFactor);
         tree.load(regions.values());
     }
 
@@ -79,24 +80,24 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
     }
 
     @Override
-    public synchronized ProtectedRegion get(String id) {
+    public synchronized Region get(String id) {
         Validate.notNull(id, "The id parameter cannot be null");
         return regions.get(id);
     }
 
     @Override
-    public synchronized Collection<ProtectedRegion> queryContains(
+    public synchronized Collection<Region> queryContains(
             Vector location, boolean preferOnlyCached) {
         Validate.notNull(location, "The location parameter cannot be null");
 
         // Floor the vector to ensure we get accurate points
         location = location.floor();
 
-        List<ProtectedRegion> result = new ArrayList<ProtectedRegion>();
+        List<Region> result = new ArrayList<Region>();
         MBR pointMBR = new SimpleMBR(location.getX(), location.getX(), location.getY(),
                 location.getY(), location.getZ(), location.getZ());
 
-        for (ProtectedRegion region : tree.find(pointMBR)) {
+        for (Region region : tree.find(pointMBR)) {
             if (region.contains(location) && !result.contains(region)) {
                 result.add(region);
             }
@@ -106,18 +107,18 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
     }
 
     @Override
-    public synchronized Collection<ProtectedRegion> queryOverlapping(
-            ProtectedRegion region, boolean preferOnlyCached) {
+    public synchronized Collection<Region> queryOverlapping(
+            Region region, boolean preferOnlyCached) {
         Validate.notNull(region, "The location parameter cannot be null");
 
-        List<ProtectedRegion> testRegions = new ArrayList<ProtectedRegion>();
+        List<Region> testRegions = new ArrayList<Region>();
         testRegions.addAll(regions.values());
-        List<ProtectedRegion> result;
+        List<Region> result;
 
         try {
             result = region.getIntersectingRegions(testRegions);
         } catch (UnsupportedIntersectionException e) { // This is bad!
-            result = new ArrayList<ProtectedRegion>();
+            result = new ArrayList<Region>();
         }
 
         return result;

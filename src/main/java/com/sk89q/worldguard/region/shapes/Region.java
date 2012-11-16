@@ -16,7 +16,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region.regions;
+package com.sk89q.worldguard.region.shapes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,12 +35,12 @@ import com.sk89q.worldguard.region.flags.Flag;
  * If changes are made to this region, and it is contained within a region
  * index, the index must be notified of the change.
  */
-public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
+public abstract class Region implements Comparable<Region> {
 
     private final String id;
     private IndexableShape shape;
     private int priority = 0;
-    private ProtectedRegion parent;
+    private Region parent;
     private Map<Flag<?>, Object> flags = new HashMap<Flag<?>, Object>();
 
     /**
@@ -49,7 +49,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @param id the ID of the region
      * @param shape the shape of the region
      */
-    public ProtectedRegion(String id, IndexableShape shape) {
+    public Region(String id, IndexableShape shape) {
         Validate.notNull(id, "Region ID cannot be null");
         Validate.notNull(shape, "Shape parameter cannot be null");
 
@@ -113,7 +113,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      *
      * @return parent region or null
      */
-    public ProtectedRegion getParent() {
+    public Region getParent() {
         return parent;
     }
 
@@ -124,18 +124,20 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @param parent the new parent, or null
      * @throws IllegalArgumentException when circular inheritance is detected
      */
-    public synchronized void setParent(ProtectedRegion parent) throws IllegalArgumentException {
+    public synchronized void setParent(Region parent) throws IllegalArgumentException {
         if (parent == null) {
             this.parent = null;
-        } else{
+        } else {
             if (parent == this) {
-                throw new IllegalArgumentException("Circular region inheritance detected");
+                throw new IllegalArgumentException(
+                        "Circular region inheritance detected");
             }
 
-            ProtectedRegion p = parent.getParent();
+            Region p = parent.getParent();
             while (p != null) {
                 if (p == this) {
-                    throw new IllegalArgumentException("Circular region inheritance detected");
+                    throw new IllegalArgumentException(
+                            "Circular region inheritance detected");
                 }
 
                 p = p.getParent();
@@ -214,7 +216,6 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
     /**
      * Compares to another region.
-     *
      * <ul>
      * <li>Orders primarily by the priority, descending</li>
      * Orders secondarily by the id, ascending</li>
@@ -223,7 +224,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @param other the region to compare to
      */
     @Override
-    public int compareTo(ProtectedRegion other) {
+    public int compareTo(Region other) {
         if (priority > other.priority) {
             return -1;
         } else if (priority < other.priority) {
@@ -233,13 +234,15 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         return id.compareTo(other.id);
     }
 
+    /**
+     * Returns whether this is a high frequency region that should be placed in a
+     * faster index for frequent access. Indices may or may not adhere to the
+     * return value of this method.
+     *
+     * @return true if this is a high frequency region.
+     */
     public boolean shouldCache() {
         return false;
-    }
-
-    @Override
-    public int hashCode(){
-        return id.hashCode();
     }
 
     /**
@@ -247,11 +250,16 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ProtectedRegion)) {
+        if (!(obj instanceof Region)) {
             return false;
         }
 
-        ProtectedRegion other = (ProtectedRegion) obj;
+        Region other = (Region) obj;
         return other.getId().equals(getId());
+    }
+
+    @Override
+    public int hashCode(){
+        return id.hashCode();
     }
 }

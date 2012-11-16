@@ -16,10 +16,12 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region.regions;
+package com.sk89q.worldguard.region.shapes;
 
 import java.awt.geom.Line2D;
 import java.util.List;
+
+import org.apache.commons.lang.Validate;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
@@ -30,8 +32,8 @@ import com.sk89q.worldedit.Vector;
  */
 public abstract class AbstractIndexableShape implements IndexableShape {
 
-    private final BlockVector min;
-    private final BlockVector max;
+    private BlockVector min;
+    private BlockVector max;
 
     /**
      * Construct this object and build an AABB to store in memory from the provided
@@ -40,6 +42,30 @@ public abstract class AbstractIndexableShape implements IndexableShape {
      * @param vertices list of vertices
      */
     public AbstractIndexableShape(List<Vector> vertices) {
+        updateShape(vertices);
+    }
+
+    /**
+     * Construct this object and build an AABB to store in memory from the provided
+     * list of vertices.
+     *
+     * @param vertices list of vertices
+     */
+    public AbstractIndexableShape(Vector... vertices) {
+        updateShape(vertices);
+    }
+
+    /**
+     * Update this shape with a new bounding box. This method should be called if
+     * an implementing shape gets resized during its lifetime.
+     *
+     * @param vertices list of vertices
+     */
+    protected void updateShape(List<Vector> vertices) {
+        Validate.notNull(vertices, "List of vertices cannot be null");
+        Validate.noNullElements(vertices, "No null entries are allowed in the list of vertices");
+        Validate.isTrue(vertices.size() >= 3, "At least 3 vertices are required to make a valid shape");
+
         int minX = vertices.get(0).getBlockX();
         int minY = vertices.get(0).getBlockY();
         int minZ = vertices.get(0).getBlockZ();
@@ -65,13 +91,49 @@ public abstract class AbstractIndexableShape implements IndexableShape {
         max = new BlockVector(maxX, maxY, maxZ);
     }
 
+    /**
+     * Update this shape with a new bounding box. This method should be called if
+     * an implementing shape gets resized during its lifetime.
+     *
+     * @param vertices list of vertices
+     */
+    protected void updateShape(Vector... vertices) {
+        Validate.notNull(vertices, "List of vertices cannot be null");
+        Validate.noNullElements(vertices, "No null entries are allowed in the list of vertices");
+        Validate.isTrue(vertices.length >= 3, "At least 3 vertices are required to make a valid shape");
+
+        int minX = vertices[0].getBlockX();
+        int minY = vertices[0].getBlockY();
+        int minZ = vertices[0].getBlockZ();
+        int maxX = minX;
+        int maxY = minY;
+        int maxZ = minZ;
+
+        for (Vector v : vertices) {
+            int x = v.getBlockX();
+            int y = v.getBlockY();
+            int z = v.getBlockZ();
+
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (z < minZ) minZ = z;
+
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+            if (z > maxZ) maxZ = z;
+        }
+
+        min = new BlockVector(minX, minY, minZ);
+        max = new BlockVector(maxX, maxY, maxZ);
+    }
+
     @Override
-    public BlockVector getMinimumPoint() {
+    public BlockVector getAABBMin() {
         return min;
     }
 
     @Override
-    public BlockVector getMaximumPoint() {
+    public BlockVector getAABBMax() {
         return max;
     }
 
@@ -82,15 +144,15 @@ public abstract class AbstractIndexableShape implements IndexableShape {
 
     @Override
     public boolean intersectsMbr(IndexableShape other) {
-        BlockVector rMaxPoint = other.getMaximumPoint();
-        BlockVector min = getMinimumPoint();
+        BlockVector rMaxPoint = other.getAABBMax();
+        BlockVector min = getAABBMin();
 
         if (rMaxPoint.getBlockX() < min.getBlockX()) return false;
         if (rMaxPoint.getBlockY() < min.getBlockY()) return false;
         if (rMaxPoint.getBlockZ() < min.getBlockZ()) return false;
 
-        BlockVector rMinPoint = other.getMinimumPoint();
-        BlockVector max = getMaximumPoint();
+        BlockVector rMinPoint = other.getAABBMin();
+        BlockVector max = getAABBMax();
 
         if (rMinPoint.getBlockX() > max.getBlockX()) return false;
         if (rMinPoint.getBlockY() > max.getBlockY()) return false;
@@ -101,8 +163,8 @@ public abstract class AbstractIndexableShape implements IndexableShape {
 
     @Override
     public boolean intersectsEdges(IndexableShape other) {
-        List<BlockVector2D> pts1 = other.get2DProjectionVertices();
-        List<BlockVector2D> pts2 = other.get2DProjectionVertices();
+        List<BlockVector2D> pts1 = other.getProjectedVerts();
+        List<BlockVector2D> pts2 = other.getProjectedVerts();
         BlockVector2D lastPt1 = pts1.get(pts1.size() - 1);
         BlockVector2D lastPt2 = pts2.get(pts2.size() - 1);
 

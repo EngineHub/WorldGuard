@@ -21,7 +21,7 @@ package com.sk89q.worldguard.region.indices;
 import java.util.Collection;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 
 /**
  * An abstract implementation of {@link RegionIndex} to make it easier to implement
@@ -41,17 +41,17 @@ public abstract class AbstractRegionIndex implements RegionIndex {
     }
 
     @Override
-    public Collection<ProtectedRegion> queryContains(Vector location) {
+    public Collection<Region> queryContains(Vector location) {
         return queryContains(location, false);
     }
 
     @Override
-    public Collection<ProtectedRegion> queryOverlapping(ProtectedRegion region) {
+    public Collection<Region> queryOverlapping(Region region) {
         return queryOverlapping(region, false);
     }
 
     @Override
-    public void removeMatching(ProtectedRegion... region) {
+    public void removeMatching(Region... region) {
         String[] ids = new String[region.length];
         for (int i = 0; i < region.length; i++) {
             ids[i] = region[i].getId();
@@ -60,17 +60,17 @@ public abstract class AbstractRegionIndex implements RegionIndex {
     }
 
     @Override
-    public ProtectedRegion getMatching(ProtectedRegion region) {
+    public Region getMatching(Region region) {
         return get(region.getId());
     }
 
     @Override
-    public boolean containsMatching(ProtectedRegion region) {
+    public boolean containsMatching(Region region) {
         return contains(region.getId());
     }
 
     @Override
-    public boolean containsExact(ProtectedRegion region) {
+    public boolean containsExact(Region region) {
         return get(region.getId()) == region;
     }
 

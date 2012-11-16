@@ -32,7 +32,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.region.regions.ProtectedRegion;
+import com.sk89q.worldguard.region.shapes.Region;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionDBUtil;
 
@@ -56,7 +56,7 @@ public class RegionMemberCommands {
         String id = args.getString(0);
 
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        Region region = mgr.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -96,7 +96,7 @@ public class RegionMemberCommands {
         String id = args.getString(0);
 
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        Region region = mgr.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -149,7 +149,7 @@ public class RegionMemberCommands {
         String id = args.getString(0);
 
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        Region region = mgr.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -190,7 +190,7 @@ public class RegionMemberCommands {
         String id = args.getString(0);
 
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        Region region = mgr.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
