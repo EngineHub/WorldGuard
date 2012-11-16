@@ -51,12 +51,8 @@ public abstract class AbstractRegionIndex implements RegionIndex {
     }
 
     @Override
-    public void removeMatching(Region... region) {
-        String[] ids = new String[region.length];
-        for (int i = 0; i < region.length; i++) {
-            ids[i] = region[i].getId();
-        }
-        remove(ids);
+    public boolean removeMatching(Region region) {
+        return remove(region.getId());
     }
 
     @Override
@@ -72,6 +68,98 @@ public abstract class AbstractRegionIndex implements RegionIndex {
     @Override
     public boolean containsExact(Region region) {
         return get(region.getId()) == region;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        if (o instanceof Region) {
+            return containsMatching((Region) o);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        if (o instanceof Region) {
+            return removeMatching((Region) o);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        boolean found = false;
+
+        for (Object o : c) {
+            if (contains(o)) {
+                found = true;
+            } else {
+                return false;
+            }
+        }
+
+        return found;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Region> c) {
+        boolean changed = false;
+
+        for (Region region : c) {
+            if (add(region)) {
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean changed = false;
+
+        for (Object region : c) {
+            if (remove(region)) {
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public Object[] toArray() {
+        Object[] arr = new Object[size()];
+        int i = 0;
+        for (Region region : this) {
+            arr[i++] = region;
+        }
+        return arr;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] arr) {
+        if (arr.length < size()) {
+            arr = (T[]) new Object[size()];
+        }
+        int i = 0;
+        for (Region region : this) {
+            arr[i++] = (T) region;
+        }
+        return arr;
     }
 
 }

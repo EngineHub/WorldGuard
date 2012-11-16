@@ -37,19 +37,15 @@ public class FlatIndex extends AbstractRegionIndex {
     private Map<String, Region> regions = new TreeMap<String, Region>();
 
     @Override
-    public synchronized void add(Region... region) {
+    public synchronized boolean add(Region region) {
         Validate.notNull(region, "The region parameter cannot be null");
-        for (Region r : region) {
-            regions.put(normalizeId(r.getId()), r);
-        }
+        return regions.put(normalizeId(region.getId()), region) != region;
     }
 
     @Override
-    public synchronized void remove(String... id) {
+    public synchronized boolean remove(String id) {
         Validate.notNull(id, "The id parameter cannot be null");
-        for (String i : id) {
-            regions.remove(normalizeId(i));
-        }
+        return regions.remove(normalizeId(id)) != null;
     }
 
     @Override
@@ -72,7 +68,7 @@ public class FlatIndex extends AbstractRegionIndex {
         List<Region> result = new ArrayList<Region>();
 
         for (Region region : regions.values()) {
-            if (region.contains(location)) {
+            if (region.getShape().contains(location)) {
                 result.add(region);
             }
         }
@@ -99,6 +95,11 @@ public class FlatIndex extends AbstractRegionIndex {
     }
 
     @Override
+    public void clear() {
+        regions.clear();
+    }
+
+    @Override
     public synchronized int size() {
         return regions.size();
     }
@@ -111,5 +112,14 @@ public class FlatIndex extends AbstractRegionIndex {
     @Override
     public Iterator<Region> iterator() {
         return regions.values().iterator();
+    }
+
+    /**
+     * Get the internal map of regions.
+     *
+     * @return regions map
+     */
+    protected Map<String, Region> getRegions() {
+        return regions;
     }
 }

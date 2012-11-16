@@ -24,8 +24,7 @@ import com.sk89q.worldguard.region.Region;
 
 /**
  * Indices keep a collection of regions, either partially or fully, in-memory in order
- * to allow for fast spatial queries. For maximum performance, indices should use
- * some form of a spatial index in order to quickly satisfy queries.
+ * to allow for fast spatial queries to be performed upon the index.
  * <p>
  * A collection of "frequently hit" regions may be kept and used if the
  * "preferOnlyCached" parameter is true in the spatial query methods. If the parameter
@@ -38,7 +37,7 @@ import com.sk89q.worldguard.region.Region;
  * querying by ID. Any casing can be used when looking up an ID. Implementations do NOT
  * have to be thread-safe.
  */
-public interface RegionIndex extends Iterable<Region> {
+public interface RegionIndex extends Collection<Region> {
 
     /**
      * Queries the index for a list of {@link Region}s that contain the
@@ -97,7 +96,7 @@ public interface RegionIndex extends Iterable<Region> {
     Collection<Region> queryOverlapping(Region region);
 
     /**
-     * Add the given region to this index. If a region already known by this index is
+     * Add the given region to this index. If a region already in this index is
      * attempted to be added to this index, nothing will happen. Parents of the
      * given region will not be added automatically.
      * <p>
@@ -105,8 +104,10 @@ public interface RegionIndex extends Iterable<Region> {
      * maximum performance and index consistency.
      *
      * @param region the region to add
+     * @return true if this index was changed
      */
-    void add(Region... region);
+    @Override
+    boolean add(Region region);
 
     /**
      * Remove the region with the given ID from this index. If the region being removed
@@ -117,8 +118,9 @@ public interface RegionIndex extends Iterable<Region> {
      * maximum performance and index consistency.
      *
      * @param id the ID of the region to remove
+     * @return true if this index was changed
      */
-    void remove(String... id);
+    boolean remove(String id);
 
     /**
      * Remove a region from this index having the exact same ID, but possibly no
@@ -129,8 +131,34 @@ public interface RegionIndex extends Iterable<Region> {
      * maximum performance and index consistency.
      *
      * @param region the region with the ID to match against
+     * @return true if this index was changed
      */
-    void removeMatching(Region... region);
+    boolean removeMatching(Region region);
+
+    /**
+     * Does the same as {@link #removeMatching(Region)}.
+     * <p>
+     * Non-{@link Region} objects in the collection are ignored.
+     *
+     * @param object object to check
+     * @return true if this index was changed
+     * @see #removeMatching(Region)
+     */
+    @Override
+    @Deprecated
+    boolean remove(Object o);
+
+    /**
+     * Removes every region in the given collection as if they were all passed
+     * to {@link #removeMatching(Region)}.
+     * <p>
+     * Non-{@link Region} objects in the collection are ignored.
+     *
+     * @param c collection of objects to remove
+     * @return true if this index was changed
+     */
+    @Override
+    boolean removeAll(Collection<?> c);
 
     /**
      * Get a region given by the ID.
@@ -160,6 +188,19 @@ public interface RegionIndex extends Iterable<Region> {
     boolean contains(String id);
 
     /**
+     * Does the same as {@link #containsMatching(Region)}.
+     * <p>
+     * Non-{@link Region} objects in the collection are ignored.
+     *
+     * @param object object to check
+     * @return true if this index contains a region by the given ID
+     * @see #containsMatching(Region)
+     */
+    @Override
+    @Deprecated
+    boolean contains(Object object);
+
+    /**
      * Queries the index to see whether it contains a region with an ID the same
      * as the given ID. The returned region may or may not be the same region as the
      * provided one, as the only feature that has to match is the region ID.
@@ -178,11 +219,31 @@ public interface RegionIndex extends Iterable<Region> {
     boolean containsExact(Region region);
 
     /**
+     * Checks to see if this index contains any regions in the given collection
+     * as found by {@link #getMatching(Region)}.
+     * <p>
+     * Non-{@link Region} objects in the collection are ignored.
+     *
+     * @param c collection of objects to test
+     * @return true if this index contains the given region
+     */
+    @Override
+    boolean containsAll(Collection<?> c);
+
+    /**
+     * Not supported.
+     */
+    @Override
+    @Deprecated
+    boolean retainAll(Collection<?> c);
+
+    /**
      * Get the number of regions stored in the index. This may not be the total
      * number of regions, as especially with the case of partial store-backed indices.
      *
      * @return the number of regions
      */
+    @Override
     int size();
 
     /**

@@ -20,8 +20,6 @@ package com.sk89q.worldguard.region.indices;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.region.Region;
-import com.sk89q.worldguard.region.UnsupportedIntersectionException;
-import com.sk89q.worldguard.region.shapes.IndexableShape;
 import com.sk89q.worldguard.region.shapes.ShapeMBRConverter;
 
 import org.apache.commons.lang.Validate;
@@ -35,10 +33,9 @@ import java.util.*;
 /**
  * Indexes regions into a priority R-tree.
  */
-public class PriorityRTreeIndex extends AbstractRegionIndex {
+public class PriorityRTreeIndex extends FlatIndex {
 
     private int branchFactor;
-    private Map<String, Region> regions;
     private MBRConverter<Region> converter;
     private PRTree<Region> tree;
 
@@ -49,37 +46,8 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
      */
     public PriorityRTreeIndex(int branchFactor) {
         this.branchFactor = branchFactor;
-        regions = new TreeMap<String, Region>();
         converter = new ShapeMBRConverter();
         tree = new PRTree<Region>(converter, branchFactor);
-    }
-
-    @Override
-    public synchronized void add(Region... region) {
-        Validate.notNull(region, "The region parameter cannot be null");
-        for (Region r : region) {
-            regions.put(normalizeId(r.getId()), r);
-        }
-    }
-
-    @Override
-    public synchronized void remove(String... id) {
-        Validate.notNull(id, "The id parameter cannot be null");
-        for (String i : id) {
-            regions.remove(normalizeId(i));
-        }
-    }
-
-    @Override
-    public synchronized boolean contains(String id) {
-        Validate.notNull(id, "The id parameter cannot be null");
-        return regions.containsKey(normalizeId(id));
-    }
-
-    @Override
-    public synchronized Region get(String id) {
-        Validate.notNull(id, "The id parameter cannot be null");
-        return regions.get(id);
     }
 
     @Override
@@ -104,37 +72,15 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
     }
 
     @Override
-    public synchronized Collection<Region> queryOverlapping(
-            Region region, boolean preferOnlyCached) {
-        Validate.notNull(region, "The location parameter cannot be null");
-
-        List<Region> testRegions = new ArrayList<Region>();
-        testRegions.addAll(regions.values());
-        List<Region> result;
-
-        try {
-            result = region.getIntersectingRegions(testRegions);
-        } catch (UnsupportedIntersectionException e) { // This is bad!
-            result = new ArrayList<Region>();
-        }
-
-        return result;
-    }
-
-    @Override
-    public synchronized int size() {
-        return regions.size();
-    }
-
-    @Override
     public void reindex() {
         tree = new PRTree<Region>(converter, branchFactor);
-        tree.load(regions.values());
+        tree.load(getRegions().values());
     }
 
     @Override
-    public Iterator<Region> iterator() {
-        return regions.values().iterator();
+    public void clear() {
+        super.clear();
+        tree = new PRTree<Region>(converter, branchFactor);
     }
 
 }
