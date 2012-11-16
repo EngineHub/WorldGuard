@@ -21,10 +21,10 @@ package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.flags.StringFlag;
-import com.sk89q.worldguard.region.shapes.Region;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

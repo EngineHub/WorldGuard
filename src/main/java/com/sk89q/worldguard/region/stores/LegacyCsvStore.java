@@ -34,12 +34,12 @@ import au.com.bytecode.opencsv.CSVReader;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.region.Region;
+import com.sk89q.worldguard.region.Region.CircularInheritanceException;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.flags.StateFlag.State;
 import com.sk89q.worldguard.region.shapes.Cuboid;
-import com.sk89q.worldguard.region.shapes.Region;
-import com.sk89q.worldguard.region.shapes.Region.CircularInheritanceException;
 import com.sk89q.worldguard.util.ArrayReader;
 
 /**

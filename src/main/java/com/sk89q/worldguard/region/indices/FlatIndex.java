@@ -19,8 +19,8 @@
 package com.sk89q.worldguard.region.indices;
 
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.UnsupportedIntersectionException;
-import com.sk89q.worldguard.region.shapes.Region;
 
 import java.util.*;
 

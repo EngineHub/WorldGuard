@@ -16,7 +16,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region.shapes;
+package com.sk89q.worldguard.region;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 
 import com.sk89q.worldguard.region.flags.Flag;
+import com.sk89q.worldguard.region.shapes.IndexableShape;
 
 /**
  * A region that has an ID, shape, priority, parent, and flags assigned to it. It is

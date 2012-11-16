@@ -27,6 +27,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.indices.FlatIndex;

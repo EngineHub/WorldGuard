@@ -23,9 +23,9 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.shapes.Cuboid;
 import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
-import com.sk89q.worldguard.region.shapes.Region;
 
 import java.util.TreeSet;
 

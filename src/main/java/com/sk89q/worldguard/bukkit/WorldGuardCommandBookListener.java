@@ -21,7 +21,7 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.commandbook.InfoComponent;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
-import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.Region;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

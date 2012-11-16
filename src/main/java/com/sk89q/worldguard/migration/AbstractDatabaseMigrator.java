@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionStore;
 

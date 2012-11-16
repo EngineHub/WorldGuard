@@ -21,7 +21,6 @@ package com.sk89q.worldguard.region;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.region.flags.*;
 import com.sk89q.worldguard.region.flags.StateFlag.State;
-import com.sk89q.worldguard.region.shapes.Region;
 
 import java.util.*;
 

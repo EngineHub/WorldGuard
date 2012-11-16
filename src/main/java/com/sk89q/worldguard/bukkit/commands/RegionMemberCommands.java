@@ -30,9 +30,9 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.region.shapes.Region;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionDBUtil;
 

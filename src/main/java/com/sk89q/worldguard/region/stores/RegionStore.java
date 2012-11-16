@@ -18,9 +18,9 @@
 
 package com.sk89q.worldguard.region.stores;
 
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.region.indices.RegionIndexFactory;
-import com.sk89q.worldguard.region.shapes.Region;
 
 /**
  * Persists region data by writing it to some persistent storage device, such as to

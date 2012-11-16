@@ -20,7 +20,7 @@ package com.sk89q.worldguard.region.flags;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
-import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.Region;
 
 /**
  *

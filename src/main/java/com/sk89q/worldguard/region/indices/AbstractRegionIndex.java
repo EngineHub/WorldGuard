@@ -21,7 +21,7 @@ package com.sk89q.worldguard.region.indices;
 import java.util.Collection;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.Region;
 
 /**
  * An abstract implementation of {@link RegionIndex} to make it easier to implement

@@ -2,9 +2,9 @@ package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.shapes.Cuboid;
 import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
-import com.sk89q.worldguard.region.shapes.Region;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

@@ -35,12 +35,12 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.RegionManager;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.Flag;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.region.shapes.Region;
 import com.sk89q.worldguard.util.LogListBlock;
 
 public class ReportWriter {

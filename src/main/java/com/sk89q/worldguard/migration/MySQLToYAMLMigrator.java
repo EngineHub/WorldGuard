@@ -21,7 +21,7 @@ package com.sk89q.worldguard.migration;
 
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.stores.MySQLStore;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionStore;

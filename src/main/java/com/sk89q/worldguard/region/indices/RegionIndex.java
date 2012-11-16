@@ -20,7 +20,7 @@ package com.sk89q.worldguard.region.indices;
 
 import java.util.Collection;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.region.shapes.Region;
+import com.sk89q.worldguard.region.Region;
 
 /**
  * Indices keep a collection of regions, either partially or fully, in-memory in order

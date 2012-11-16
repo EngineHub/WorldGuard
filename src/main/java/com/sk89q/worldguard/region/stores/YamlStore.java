@@ -37,13 +37,13 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.region.Region;
+import com.sk89q.worldguard.region.Region.CircularInheritanceException;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.Flag;
 import com.sk89q.worldguard.region.shapes.Cuboid;
 import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
 import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
-import com.sk89q.worldguard.region.shapes.Region;
-import com.sk89q.worldguard.region.shapes.Region.CircularInheritanceException;
 
 public class YamlStore extends AbstractProtectionDatabase {
     
