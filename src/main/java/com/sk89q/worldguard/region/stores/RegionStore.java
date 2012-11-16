@@ -59,6 +59,6 @@ public interface RegionStore {
      * @param updated a list of regions that were updated
      * @param removed a list of regions that were removed
      */
-    void save(Region added[], Region updated[], Region removed[]);
+    void save(Region added[], Region updated[], Region removed[]) throws IOException;
 
 }
