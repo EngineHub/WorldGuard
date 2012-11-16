@@ -35,8 +35,8 @@ import com.sk89q.worldguard.region.Region;
  * using the method {@link Region#shouldCache()}.
  * <p>
  * Region IDs are case in-sensitive and implementations must be aware of this when
- * querying by ID. Any casing can be used when looking up an ID. Implementations must
- * be thread-safe.
+ * querying by ID. Any casing can be used when looking up an ID. Implementations do NOT
+ * have to be thread-safe.
  */
 public interface RegionIndex {
 
@@ -100,6 +100,9 @@ public interface RegionIndex {
      * Add the given region to this index. If a region already known by this index is
      * attempted to be added to this index, nothing will happen. Parents of the
      * given region will not be added automatically.
+     * <p>
+     * After making changes, {@link #reindex()} MUST be called in order to ensure
+     * maximum performance and index consistency.
      *
      * @param region the region to add
      */
@@ -109,6 +112,9 @@ public interface RegionIndex {
      * Remove the region with the given ID from this index. If the region being removed
      * has children, they will not be removed automatically. Their parent will also
      * not be set to null automatically.
+     * <p>
+     * After making changes, {@link #reindex()} MUST be called in order to ensure
+     * maximum performance and index consistency.
      *
      * @param id the ID of the region to remove
      */
@@ -118,6 +124,9 @@ public interface RegionIndex {
      * Remove a region from this index having the exact same ID, but possibly no
      * other equal attribute. If the region being removed as children, they will not be
      * removed automatically. Their parent will also not be set to null automatically.
+     * <p>
+     * After making changes, {@link #reindex()} MUST be called in order to ensure
+     * maximum performance and index consistency.
      *
      * @param region the region with the ID to match against
      */
@@ -175,5 +184,11 @@ public interface RegionIndex {
      * @return the number of regions
      */
     int size();
+
+    /**
+     * After making a series of changes, this method should be called in order to
+     * perform any re-indexing activities.
+     */
+    void reindex();
 
 }

@@ -102,4 +102,9 @@ public class FlatIndex extends AbstractRegionIndex {
     public synchronized int size() {
         return regions.size();
     }
+
+    @Override
+    public void reindex() {
+        // Whoo, nothing to do, because this index is so simple
+    }
 }

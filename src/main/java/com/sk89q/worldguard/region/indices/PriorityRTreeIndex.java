@@ -21,6 +21,7 @@ package com.sk89q.worldguard.region.indices;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.UnsupportedIntersectionException;
+import com.sk89q.worldguard.region.shapes.IndexableShape;
 import com.sk89q.worldguard.region.shapes.ShapeMBRConverter;
 
 import org.apache.commons.lang.Validate;
@@ -59,8 +60,6 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
         for (Region r : region) {
             regions.put(normalizeId(r.getId()), r);
         }
-        tree = new PRTree<Region>(converter, branchFactor);
-        tree.load(regions.values());
     }
 
     @Override
@@ -69,8 +68,6 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
         for (String i : id) {
             regions.remove(normalizeId(i));
         }
-        tree = new PRTree<Region>(converter, branchFactor);
-        tree.load(regions.values());
     }
 
     @Override
@@ -98,7 +95,7 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
                 location.getY(), location.getZ(), location.getZ());
 
         for (Region region : tree.find(pointMBR)) {
-            if (region.contains(location) && !result.contains(region)) {
+            if (region.getShape().contains(location) && !result.contains(region)) {
                 result.add(region);
             }
         }
@@ -127,6 +124,12 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
     @Override
     public synchronized int size() {
         return regions.size();
+    }
+
+    @Override
+    public void reindex() {
+        tree = new PRTree<Region>(converter, branchFactor);
+        tree.load(regions.values());
     }
 
 }
