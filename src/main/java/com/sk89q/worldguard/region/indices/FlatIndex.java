@@ -107,4 +107,9 @@ public class FlatIndex extends AbstractRegionIndex {
     public void reindex() {
         // Whoo, nothing to do, because this index is so simple
     }
+
+    @Override
+    public Iterator<Region> iterator() {
+        return regions.values().iterator();
+    }
 }

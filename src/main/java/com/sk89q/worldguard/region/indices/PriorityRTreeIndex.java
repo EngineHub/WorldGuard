@@ -132,4 +132,9 @@ public class PriorityRTreeIndex extends AbstractRegionIndex {
         tree.load(regions.values());
     }
 
+    @Override
+    public Iterator<Region> iterator() {
+        return regions.values().iterator();
+    }
+
 }

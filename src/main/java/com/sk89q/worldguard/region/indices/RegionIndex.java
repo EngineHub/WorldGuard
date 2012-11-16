@@ -38,7 +38,7 @@ import com.sk89q.worldguard.region.Region;
  * querying by ID. Any casing can be used when looking up an ID. Implementations do NOT
  * have to be thread-safe.
  */
-public interface RegionIndex {
+public interface RegionIndex extends Iterable<Region> {
 
     /**
      * Queries the index for a list of {@link Region}s that contain the
