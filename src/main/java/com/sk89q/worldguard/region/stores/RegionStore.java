@@ -18,6 +18,8 @@
 
 package com.sk89q.worldguard.region.stores;
 
+import java.io.IOException;
+
 import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.region.indices.RegionIndexFactory;
@@ -37,16 +39,18 @@ public interface RegionStore {
      *
      * @param factory a factory to create region indices with
      * @return a region index with the region data loader
+     * @throws IOException on I/O error
      */
-    RegionIndex load(RegionIndexFactory factory);
+    RegionIndex load(RegionIndexFactory factory) throws IOException;
 
     /**
      * Save the entirety of a region index to the store. All existing entries in the
      * store need to be removed.
      *
      * @param index the index to replace the store's list of regions with
+     * @throws IOException on I/O error
      */
-    void save(RegionIndex index);
+    void save(RegionIndex index) throws IOException;
 
     /**
      * Save only selected regions to the region store.
