@@ -19,6 +19,7 @@
 package com.sk89q.worldguard.region.stores;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.indices.RegionIndex;
@@ -44,21 +45,17 @@ public interface RegionStore {
     RegionIndex load(RegionIndexFactory factory) throws IOException;
 
     /**
-     * Save the entirety of a region index to the store. All existing entries in the
-     * store need to be removed.
+     * Save the entirety of a region collection to the store.
+     * <p>
+     * It must be assumed that the given list of regions is the complete list of all
+     * regions. With the case of partial stores, this also means that the given list
+     * is to be assumed as non-partial. It is therefore recommended that use of
+     * this method is limited to only special cases, such as creation of brand new
+     * region indexes.
      *
-     * @param index the index to replace the store's list of regions with
+     * @param regions the collection of regions to store in its entirety
      * @throws IOException on I/O error
      */
-    void save(RegionIndex index) throws IOException;
-
-    /**
-     * Save only selected regions to the region store.
-     *
-     * @param added a list of regions that were added
-     * @param updated a list of regions that were updated
-     * @param removed a list of regions that were removed
-     */
-    void save(Region added[], Region updated[], Region removed[]) throws IOException;
+    void save(Collection<Region> regions) throws IOException;
 
 }
