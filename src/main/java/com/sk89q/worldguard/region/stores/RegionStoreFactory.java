@@ -18,16 +18,24 @@
 
 package com.sk89q.worldguard.region.stores;
 
+import java.io.Closeable;
+
 /**
  * Used to create instances of {@link RegionStore} to access collections of regions
  * grouped by a given ID.
+ * <p>
+ * When unloading, the {@link #close()} method needs to be called to ensure that all
+ * handles and what not are taken care of.
  *
  * @see RegionStore
  */
-public interface RegionStoreFactory {
+public interface RegionStoreFactory extends Closeable {
 
     /**
      * Returns a store for the collection of regions identified by the given ID.
+     * <p>
+     * The store returned should be cached and a new store should not be created
+     * until necessary.
      *
      * @param id the ID
      * @return a store

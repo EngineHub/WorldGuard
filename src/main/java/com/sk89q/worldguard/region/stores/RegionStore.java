@@ -18,6 +18,7 @@
 
 package com.sk89q.worldguard.region.stores;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -29,11 +30,12 @@ import com.sk89q.worldguard.region.indices.RegionIndexFactory;
  * Persists region data by writing it to some persistent storage device, such as to
  * a hard drive or a database.
  * <p>
- * Implementations must be thread-safe.
+ * When unloading, the {@link #close()} method needs to be called to ensure that all
+ * handles and what not are taken care of. Implementations do not need be thread-safe.
  *
  * @see RegionStoreFactory
  */
-public interface RegionStore {
+public interface RegionStore extends Closeable {
 
     /**
      * Load data from the store and return a new {@link RegionIndex}.
