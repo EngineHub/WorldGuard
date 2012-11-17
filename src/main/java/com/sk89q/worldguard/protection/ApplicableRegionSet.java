@@ -66,7 +66,12 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         final RegionGroup flag = getFlag(DefaultFlag.CONSTRUCT, player);
         return RegionGroupFlag.isMember(this, flag, player);
     }
-
+    
+    public boolean canDestroy(LocalPlayer player) {
+        final RegionGroup flag = getFlag(DefaultFlag.DESTROY, player);
+        return RegionGroupFlag.isMember(this, flag, player);
+    }
+    
     /**
      * Checks if a player can use buttons and such in an area.
      * 
