@@ -40,7 +40,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.region.flags.StateFlag;
 import com.sk89q.worldguard.region.indices.PriorityRTreeIndex;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.region.stores.MySQLStore;
+import com.sk89q.worldguard.region.stores.LegacyMySqlStore;
 import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
 import com.sk89q.worldguard.region.stores.RegionStore;
 import com.sk89q.worldguard.region.stores.YamlStore;
@@ -153,7 +153,7 @@ public class RegionManager {
                 // Store the last modification date so we can track changes
                 lastModified.put(name, file.lastModified());
             } else {
-                database = new MySQLStore(config, name, plugin.getLogger());
+                database = new LegacyMySqlStore(config, name, plugin.getLogger());
             }
 
             // Create a manager

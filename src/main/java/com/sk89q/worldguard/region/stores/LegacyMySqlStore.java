@@ -24,15 +24,11 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.region.Region;
-import com.sk89q.worldguard.region.Region.CircularInheritanceException;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.Flag;
 import com.sk89q.worldguard.region.shapes.Cuboid;
 import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
-import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
-
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.Yaml;
@@ -45,7 +41,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MySQLStore extends AbstractProtectionDatabase {
+public class LegacyMySqlStore implements RegionStore {
     private final Logger logger;
 
     private Yaml yaml;
@@ -62,7 +58,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
     private Connection conn;
     private int worldDbId = -1; // The database will never have an id of -1;
 
-    public MySQLStore(ConfigurationManager config, String world, Logger logger) throws ProtectionDatabaseException {
+    public LegacyMySqlStore(ConfigurationManager config, String world, Logger logger) throws ProtectionDatabaseException {
         this.config = config;
         String world1 = world;
         this.logger = logger;
@@ -1026,7 +1022,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
     public void setRegions(Map<String, Region> regions) {
         this.regions = regions;
     }
-    
+
     protected Object sqlUnmarshal(String rawValue) {
         try {
             return yaml.load(rawValue);
@@ -1034,7 +1030,7 @@ public class MySQLStore extends AbstractProtectionDatabase {
             return String.valueOf(rawValue);
         }
     }
-    
+
     protected String sqlMarshal(Object rawObject) {
         return yaml.dump(rawObject);
     }
