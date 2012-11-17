@@ -21,120 +21,170 @@ package com.sk89q.worldguard.region.stores;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import com.sk89q.util.yaml.YAMLFormat;
-import com.sk89q.util.yaml.YAMLNode;
-import com.sk89q.util.yaml.YAMLProcessor;
-import com.sk89q.worldedit.BlockVector;
+import org.apache.commons.lang.Validate;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+
+import com.sk89q.rebar.config.ConfigurationException;
+import com.sk89q.rebar.config.ConfigurationNode;
+import com.sk89q.rebar.config.YamlConfiguration;
+import com.sk89q.rebar.config.YamlConfigurationFile;
+import com.sk89q.rebar.config.YamlStyle;
+import com.sk89q.rebar.config.types.BlockVector2dLoaderBuilder;
+import com.sk89q.rebar.config.types.ListBuilder;
+import com.sk89q.rebar.config.types.VectorLoaderBuilder;
+import com.sk89q.rebar.util.LoggerUtils;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.region.Region;
-import com.sk89q.worldguard.region.Region.CircularInheritanceException;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.Flag;
+import com.sk89q.worldguard.region.indices.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndexFactory;
 import com.sk89q.worldguard.region.shapes.Cuboid;
+import com.sk89q.worldguard.region.shapes.Everywhere;
 import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
-import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
+import com.sk89q.worldguard.region.shapes.IndexableShape;
 
-public class YamlStore extends AbstractProtectionDatabase {
-    
-    private YAMLProcessor config;
-    private Map<String, Region> regions;
-    private final Logger logger;
-    
-    public YamlStore(File file, Logger logger) throws ProtectionDatabaseException, FileNotFoundException {
-        this.logger = logger;
-        if (!file.exists()) { // shouldn't be necessary, but check anyways
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new FileNotFoundException(file.getAbsolutePath());
-            }
-        }
-        config = new YAMLProcessor(file, false, YAMLFormat.COMPACT);
+/**
+ * A YAML-based region store that uses {@link YamlConfiguration} in order to store
+ * region data.
+ * <p>
+ * The main advantage of this format is that output files can easily be edited by
+ * hand, but the disadvantage is that it's not fast as a format that writes more
+ * native data types. In addition, while YAML is not nearly verbose as XML, being a
+ * text-based format making heavy use of indentation, the size of data files written
+ * by this format can be quite large.
+ * <p>
+ * To mitigate some of the impacts of this format, this store uses only an indentation
+ * size of two spaces to reduce disk space usage.
+ */
+public class YamlStore implements RegionStore {
+
+    private static final Logger defaultLogger = LoggerUtils.getLogger(YamlStore.class);
+    private static final YamlStyle style = new YamlStyle(FlowStyle.FLOW, 2);
+    private static final VectorLoaderBuilder vectorLB = new VectorLoaderBuilder();
+    private static final BlockVector2dLoaderBuilder blockVec2dLB = new BlockVector2dLoaderBuilder();
+
+    private Logger logger = defaultLogger;
+    private final File file;
+
+    /**
+     * Create a new YAML-based store that uses the provided file for storing data.
+     * <p>
+     * The file does not yet have to exist, but it does need to be readable and
+     * writable in order for regions to be loaded or saved.
+     *
+     * @param file file to store data in
+     */
+    public YamlStore(File file) {
+        this.file = file;
     }
 
-    public void load() throws ProtectionDatabaseException {
+    /**
+     * Get the logger assigned to this store.
+     * <p>
+     * Messages will be relayed through the logger set on this store if possible.
+     *
+     * @return logger, or null
+     */
+    public Logger getLogger() {
+        return logger;
+    }
+
+    /**
+     * Set the logger assigned to this store.
+     * <p>
+     * Messages will be relayed through the logger set on this store if possible.
+     *
+     * @param logger or null
+     */
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    @Override
+    public RegionIndex load(RegionIndexFactory factory) throws IOException {
+        YamlConfiguration config = new YamlConfigurationFile(file);
         try {
-            config.load();
-        } catch (IOException e) {
-            throw new ProtectionDatabaseException(e);
-        }
-        
-        Map<String, YAMLNode> regionData = config.getNodes("regions");
-        
-        // No regions are even configured
-        if (regionData == null) {
-            this.regions = new HashMap<String, Region>();
-            return;
+            config.load(); // Load data (may raise an exception)
+        } catch (ConfigurationException e) {
+            throw new IOException("Fatal syntax or other error in YAML-formatted data", e);
         }
 
-        Map<String,Region> regions =
-            new HashMap<String,Region>();
-        Map<Region,String> parentSets =
-            new LinkedHashMap<Region, String>();
-        
-        for (Map.Entry<String, YAMLNode> entry : regionData.entrySet()) {
-            String id = entry.getKey().toLowerCase().replace(".", "");
-            YAMLNode node = entry.getValue();
-            
-            String type = node.getString("type");
-            Region region;
-            
+        // Create an index
+        RegionIndex index = factory.newIndex();
+
+        // Store a list of parent relationships that we have to set later on
+        Map<Region, String> parentSets = new LinkedHashMap<Region, String>();
+
+        for (Entry<String, ConfigurationNode> entry : config.getNodes("regions").entrySet()) {
+            ConfigurationNode node = entry.getValue();
+
             try {
-                if (type == null) {
-                    logger.warning("Undefined region type for region '" + id + '"');
-                    continue;
-                } else if (type.equals("cuboid")) {
-                    Vector pt1 = checkNonNull(node.getVector("min"));
-                    Vector pt2 = checkNonNull(node.getVector("max"));
-                    BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
-                    BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
-                    region = new Cuboid(id, min, max);
+                IndexableShape shape;
+                String id = node.getString("id");
+                String type = node.getString("type");
+
+                Validate.notNull(id, "Missing an 'id' parameter for: " + node);
+                Validate.notNull(type, "Missing a 'type' parameter for: " + node);
+
+                // Axis-aligned cuboid type
+                if (type.equals("cuboid")) {
+                    Vector pt1 = config.getOf("min", vectorLB);
+                    Vector pt2 = config.getOf("max", vectorLB);
+                    Validate.notNull(pt1, "Missing a 'min' parameter for: " + node);
+                    Validate.notNull(pt2, "Missing a 'max' parameter for: " + node);
+                    shape = new Cuboid(pt1, pt2);
+
+                // Extruded polygon type
                 } else if (type.equals("poly2d")) {
-                    Integer minY = checkNonNull(node.getInt("min-y"));
-                    Integer maxY = checkNonNull(node.getInt("max-y"));
-                    List<BlockVector2D> points = node.getBlockVector2dList("points", null);
-                    region = new ExtrudedPolygon(id, points, minY, maxY);
+                    Integer minY = node.getInt("min-y");
+                    Integer maxY = node.getInt("max-y");
+                    Validate.notNull(minY, "Missing a 'min-y' parameter for: " + node);
+                    Validate.notNull(maxY, "Missing a 'max-y' parameter for: " + node);
+                    List<BlockVector2D> points = node.listOf("points", blockVec2dLB);
+                    // Note: Invalid points are discarded!
+                    shape = new ExtrudedPolygon(points, minY, maxY);
+
+                // "Everywhere" type
                 } else if (type.equals("global")) {
-                    region = new GlobalProtectedRegion(id);
+                    shape = new Everywhere();
+
+                // ???
                 } else {
-                    logger.warning("Unknown region type for region '" + id + '"');
-                    continue;
+                    throw new IllegalArgumentException("Don't know what type of shape '" +
+                            type + "' is! In: " + node);
                 }
-                
-                Integer priority = checkNonNull(node.getInt("priority"));
-                region.setPriority(priority);
-                setFlags(region, node.getNode("flags"));
-                region.setOwners(parseDomain(node.getNode("owners")));
-                region.setMembers(parseDomain(node.getNode("members")));
-                regions.put(id, region);
-                
+
+                Region region = new Region(id, shape);
+                region.setPriority(node.getInt("priority", 0));
+                loadFlags(region, node.getNode("flags"));
+
+                // Remember the parent so that it can be linked lateron
                 String parentId = node.getString("parent");
                 if (parentId != null) {
                     parentSets.put(region, parentId);
                 }
-            } catch (NullPointerException e) {
-                logger.warning("Missing data for region '" + id + '"');
+            } catch (IllegalArgumentException e) {
+                logger.warning(e.getMessage());
             }
         }
-        
-        // Relink parents
+
+        // Re-link parents
         for (Map.Entry<Region, String> entry : parentSets.entrySet()) {
-            Region parent = regions.get(entry.getValue());
+            Region parent = index.get(entry.getValue());
             if (parent != null) {
                 try {
                     entry.getKey().setParent(parent);
-                } catch (CircularInheritanceException e) {
+                } catch (IllegalArgumentException e) {
                     logger.warning("Circular inheritance detect with '"
                             + entry.getValue() + "' detected as a parent");
                 }
@@ -142,174 +192,135 @@ public class YamlStore extends AbstractProtectionDatabase {
                 logger.warning("Unknown region parent: " + entry.getValue());
             }
         }
-        
-        this.regions = regions;
-    }
-    
-    private <V> V checkNonNull(V val) throws NullPointerException {
-        if (val == null) {
-            throw new NullPointerException();
-        }
-        
-        return val;
-    }
-    
-    private void setFlags(Region region, YAMLNode flagsData) {
-        if (flagsData == null) {
-            return;
-        }
-        
-        // @TODO: Make this better
-        for (Flag<?> flag : DefaultFlag.getFlags()) {
-            Object o = flagsData.getProperty(flag.getName());
-            if (o != null) {
-                setFlag(region, flag, o);
-            }
-            
-            if (flag.getRegionGroupFlag() != null) {
-            Object o2 = flagsData.getProperty(flag.getRegionGroupFlag().getName());
-                if (o2 != null) {
-                    setFlag(region, flag.getRegionGroupFlag(), o2);
-                }
-            }
-        }
-    }
-    
-    private <T> void setFlag(Region region, Flag<T> flag, Object rawValue) {
-        T val = flag.unmarshal(rawValue);
-        if (val == null) {
-            logger.warning("Failed to parse flag '" + flag.getName()
-                    + "' with value '" + rawValue.toString() + "'");
-            return;
-        }
-        region.setFlag(flag, val);
-    }
-    
-    private DefaultDomain parseDomain(YAMLNode node) {
-        if (node == null) {
-            return new DefaultDomain();
-        }
-        
-        DefaultDomain domain = new DefaultDomain();
-        
-        for (String name : node.getStringList("players", null)) {
-            domain.addPlayer(name);
-        }
-        
-        for (String name : node.getStringList("groups", null)) {
-            domain.addGroup(name);
-        }
-        
-        return domain;
+
+        return index;
     }
 
-    public void save() throws ProtectionDatabaseException {
-        config.clear();
-        
-        for (Map.Entry<String, Region> entry : regions.entrySet()) {
-            Region region = entry.getValue();
-            YAMLNode node = config.addNode("regions." + entry.getKey());
-            
-            if (region instanceof Cuboid) {
-                Cuboid cuboid = (Cuboid) region;
-                node.setProperty("type", "cuboid");
-                node.setProperty("min", cuboid.getAABBMin());
-                node.setProperty("max", cuboid.getAABBMax());
-            } else if (region instanceof ExtrudedPolygon) {
-                ExtrudedPolygon poly = (ExtrudedPolygon) region;
-                node.setProperty("type", "poly2d");
-                node.setProperty("min-y", poly.getAABBMin().getBlockY());
-                node.setProperty("max-y", poly.getAABBMax().getBlockY());
-                
-                List<Map<String, Object>> points = new ArrayList<Map<String,Object>>();
-                for (BlockVector2D point : poly.getPoints()) {
-                    Map<String, Object> data = new HashMap<String, Object>();
-                    data.put("x", point.getBlockX());
-                    data.put("z", point.getBlockZ());
-                    points.add(data);
-                }
-                
-                node.setProperty("points", points);
-            } else if (region instanceof GlobalProtectedRegion) {
-                node.setProperty("type", "global");
+    @Override
+    public void save(Collection<Region> regions) throws IOException {
+        YamlConfiguration config = new YamlConfigurationFile(file, style);
+
+        for (Region region : regions) {
+            ConfigurationNode node = config.setNode("regions").setNode(region.getId());
+            IndexableShape shape = region.getShape();
+
+            if (shape instanceof Cuboid) {
+                Cuboid cuboid = (Cuboid) shape;
+                node.set("type", "cuboid");
+                node.set("min", cuboid.getAABBMin(), blockVec2dLB);
+                node.set("max", cuboid.getAABBMax(), blockVec2dLB);
+            } else if (shape instanceof ExtrudedPolygon) {
+                ExtrudedPolygon poly = (ExtrudedPolygon) shape;
+                node.set("type", "poly2d");
+                node.set("min-y", poly.getAABBMin().getBlockY());
+                node.set("max-y", poly.getAABBMax().getBlockY());
+                node.set("points", poly.getProjectedVerts(),
+                        new ListBuilder<BlockVector2D>(blockVec2dLB));
+            } else if (shape instanceof Everywhere) {
+                node.set("type", "global");
             } else {
-                node.setProperty("type", region.getClass().getCanonicalName());
+                // This means that it's not supported!
+                node.set("type", region.getClass().getCanonicalName());
             }
 
-            node.setProperty("priority", region.getPriority());
-            node.setProperty("flags", getFlagData(region));
-            node.setProperty("owners", getDomainData(region.getOwners()));
-            node.setProperty("members", getDomainData(region.getMembers()));
+            node.set("priority", region.getPriority());
+            node.set("flags", buildFlags(region));
             Region parent = region.getParent();
             if (parent != null) {
-                node.setProperty("parent", parent.getId());
+                node.set("parent", parent.getId());
             }
         }
-        
+
         config.setHeader("#\r\n" +
-                "# WorldGuard regions file\r\n" +
-                "#\r\n" +
-                "# WARNING: THIS FILE IS AUTOMATICALLY GENERATED. If you modify this file by\r\n" +
-                "# hand, be aware that A SINGLE MISTYPED CHARACTER CAN CORRUPT THE FILE. If\r\n" +
-                "# WorldGuard is unable to parse the file, your regions will FAIL TO LOAD and\r\n" +
-                "# the contents of this file will reset. Please use a YAML validator such as\r\n" +
-                "# http://yaml-online-parser.appspot.com (for smaller files).\r\n" +
+                "# WARNING: THIS FILE IS AUTOMATICALLY GENERATED.\r\n" +
+                "# A minor error in this file WILL DESTROY ALL YOUR DATA.\r\n" +
                 "#\r\n" +
                 "# REMEMBER TO KEEP PERIODICAL BACKUPS.\r\n" +
                 "#");
+
         config.save();
     }
-    
-    private Map<String, Object> getFlagData(Region region) {
-        Map<String, Object> flagData = new HashMap<String, Object>();
-        
-        for (Map.Entry<Flag<?>, Object> entry : region.getFlags().entrySet()) {
-            Flag<?> flag = entry.getKey();
-            addMarshalledFlag(flagData, flag, entry.getValue());
+
+    /**
+     * Read flag data from the given node and apply it to the region.
+     *
+     * @param region region to apply flags to
+     * @param node node, or null
+     */
+    private void loadFlags(Region region, ConfigurationNode node) {
+        if (node == null) {
+            return;
         }
-        
-        return flagData;
+
+        for (Flag<?> flag : DefaultFlag.getFlags()) {
+            Flag<?> groupFlag = flag.getRegionGroupFlag();
+            Object rawValue = node.get(flag.getName());
+
+            if (rawValue != null) {
+                setFlagFromRaw(region, flag, rawValue);
+            }
+
+            // Also get the group flag
+            if (groupFlag != null) {
+                rawValue = node.get(groupFlag.getName());
+
+                if (rawValue != null) {
+                    setFlagFromRaw(region, groupFlag, rawValue);
+                }
+            }
+        }
     }
-    
+
+    /**
+     * Try to set a flag on a region from its raw value. The flag will be properly
+     * unmarshalled, and if that fails, then the flag won't be set.
+     *
+     * @param region region to affect
+     * @param flag the flag to set
+     * @param rawValue the raw value before unmarshalling
+     */
+    private void setFlagFromRaw(Region region, Flag<?> flag, Object rawValue) {
+        Object value = flag.unmarshal(rawValue);
+        if (value == null) {
+            logger.warning("Failed to parse flag '" + flag.getName()
+                    + "' with value '" + rawValue.toString() + "'");
+        } else {
+            region.setFlagUnsafe(flag, flag.unmarshal(rawValue));
+        }
+    }
+
+    /**
+     * Build a map of flag data to store to disk.
+     *
+     * @param region the region to read the flags from
+     * @return map of flag data
+     */
+    private Map<String, Object> buildFlags(Region region) {
+        Map<String, Object> data = new HashMap<String, Object>();
+
+        for (Map.Entry<Flag<?>, Object> entry : region.getFlags().entrySet()) {
+            storeFlagFromValue(data, entry.getKey(), entry.getValue());
+        }
+
+        return data;
+    }
+
+    /**
+     * Marshal a flag's value into something YAML-compatible.
+     * <p>
+     * if the given value is null, the flag is ignored.
+     *
+     * @param data map to put the data into
+     * @param flag the flag
+     * @param val the value, or null
+     */
     @SuppressWarnings("unchecked")
-    private <V> void addMarshalledFlag(Map<String, Object> flagData,
-            Flag<V> flag, Object val) {
+    private <V> void storeFlagFromValue(Map<String, Object> data, Flag<V> flag, Object val) {
         if (val == null) {
             return;
+        } else {
+            data.put(flag.getName(), flag.marshal((V) val));
         }
-        flagData.put(flag.getName(), flag.marshal((V) val));
-    }
-    
-    private Map<String, Object> getDomainData(DefaultDomain domain) {
-        Map<String, Object> domainData = new HashMap<String, Object>();
-
-        setDomainData(domainData, "players", domain.getPlayers());
-        setDomainData(domainData, "groups", domain.getGroups());
-        
-        return domainData;
-    }
-    
-    private void setDomainData(Map<String, Object> domainData,
-            String key, Set<String> domain) {
-        if (domain.size() == 0) {
-            return;
-        }
-        
-        List<String> list = new ArrayList<String>();
-        
-        for (String str : domain) {
-            list.add(str);
-        }
-        
-        domainData.put(key, list);
     }
 
-    public Map<String, Region> getRegions() {
-        return regions;
-    }
-
-    public void setRegions(Map<String, Region> regions) {
-        this.regions = regions;
-    }
-    
 }
