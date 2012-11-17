@@ -323,4 +323,9 @@ public class YamlStore implements RegionStore {
         }
     }
 
+    @Override
+    public void close() throws IOException {
+        // Do nothing
+    }
+
 }
