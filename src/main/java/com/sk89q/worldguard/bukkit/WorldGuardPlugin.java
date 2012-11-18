@@ -30,8 +30,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -100,7 +98,6 @@ import com.sk89q.worldguard.bukkit.resolvers.TargetBlockResolver;
 import com.sk89q.worldguard.bukkit.resolvers.TargetEntityResolver;
 import com.sk89q.worldguard.region.RegionManager;
 import com.sk89q.worldguard.region.indices.RegionIndex;
-import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
@@ -110,7 +107,6 @@ public class WorldGuardPlugin extends JavaPlugin {
     private final CommandsManager<CommandSender> commands;
     private final RegionManager globalRegionManager;
     private final ConfigurationManager configuration;
-    private FlagStateManager flagStateManager;
     private RuleListsManager ruleListsManager;
     private RegionQueryCache regionCache;
     private final LagStopMode lagStopper;
@@ -173,24 +169,13 @@ public class WorldGuardPlugin extends JavaPlugin {
         // This must be done before configuration is loaded
         LegacyWorldGuardMigration.migrateBlacklist(this);
 
-        try {
-        	// Load the configuration
-        	configuration.load();
-        	globalRegionManager.preload();
-        } catch (FatalConfigurationLoadingException e) {
-            getLogger().log(Level.SEVERE, "Fatal error encountered", e);
-        	getServer().shutdown();
-        }
+    	// Load the configuration
+    	configuration.load();
+    	globalRegionManager.preload();
 
         // Migrate regions after the regions were loaded because
         // the migration code reuses the loaded region managers
         LegacyWorldGuardMigration.migrateRegions(this);
-
-        flagStateManager = new FlagStateManager(this);
-
-        if (configuration.useRegionsScheduler) {
-            getServer().getScheduler().scheduleAsyncRepeatingTask(this, flagStateManager, FlagStateManager.RUN_DELAY, FlagStateManager.RUN_DELAY);
-        }
 
         // Register events
         (new WorldGuardPlayerListener(this)).registerEvents();
@@ -278,15 +263,6 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Deprecated
     public ConfigurationManager getGlobalConfiguration() {
         return getGlobalStateManager();
-    }
-
-    /**
-     * Gets the flag state manager.
-     *
-     * @return The flag state manager
-     */
-    public FlagStateManager getFlagStateManager() {
-        return flagStateManager;
     }
 
     /**
@@ -882,7 +858,6 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param player The player to remove state information for
      */
     public void forgetPlayer(Player player) {
-        flagStateManager.forget(player);
     }
 
     /**
