@@ -18,10 +18,6 @@
  */
 package com.sk89q.worldguard.region.flags;
 
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.region.ApplicableRegionSet;
-import com.sk89q.worldguard.region.Region;
-
 /**
  *
  * @author sk89q
@@ -58,55 +54,6 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
         } else {
             return null;
         }
-    }
-
-    public static boolean isMember(Region region, RegionGroup group, LocalPlayer player) {
-        if (group == null || group == RegionGroup.ALL) {
-            return true;
-        } else if (group == RegionGroup.OWNERS) {
-            if (region.isOwner(player)) {
-                return true;
-            }
-        } else if (group == RegionGroup.MEMBERS) {
-            if (region.isMember(player)) {
-                return true;
-            }
-        } else if (group == RegionGroup.NON_OWNERS) {
-            if (!region.isOwner(player)) {
-                return true;
-            }
-        } else if (group == RegionGroup.NON_MEMBERS) {
-            if (!region.isMember(player)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static boolean isMember(ApplicableRegionSet set,
-                                   RegionGroup group, LocalPlayer player) {
-        if (group == null || group == RegionGroup.ALL) {
-            return true;
-        } else if (group == RegionGroup.OWNERS) {
-            if (set.isOwnerOfAll(player)) {
-                return true;
-            }
-        } else if (group == RegionGroup.MEMBERS) {
-            if (set.isMemberOfAll(player)) {
-                return true;
-            }
-        } else if (group == RegionGroup.NON_OWNERS) {
-            if (!set.isOwnerOfAll(player)) {
-                return true;
-            }
-        } else if (group == RegionGroup.NON_MEMBERS) {
-            if (!set.isMemberOfAll(player)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
 }
