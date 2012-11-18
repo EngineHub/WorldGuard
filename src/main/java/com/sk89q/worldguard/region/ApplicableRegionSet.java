@@ -31,7 +31,7 @@ import java.util.*;
  * region or point. This object contains the list of applicable regions and so
  * the expensive search of regions that are in the desired area has already
  * been completed.
- * 
+ *
  * @author sk89q
  */
 public class ApplicableRegionSet implements Iterable<Region> {
@@ -41,7 +41,7 @@ public class ApplicableRegionSet implements Iterable<Region> {
 
     /**
      * Construct the object.
-     * 
+     *
      * @param applicable The regions contained in this set
      * @param globalRegion The global region, set aside for special handling.
      */
@@ -50,10 +50,10 @@ public class ApplicableRegionSet implements Iterable<Region> {
         this.applicable = applicable;
         this.globalRegion = globalRegion;
     }
-    
+
     /**
      * Checks if a player can build in an area.
-     * 
+     *
      * @param player The player to chec
      * @return build ability
      */
@@ -68,7 +68,7 @@ public class ApplicableRegionSet implements Iterable<Region> {
 
     /**
      * Checks if a player can use buttons and such in an area.
-     * 
+     *
      * @param player The player to check
      * @return able to use items
      * @deprecated This method seems to be the opposite of its name
@@ -92,10 +92,10 @@ public class ApplicableRegionSet implements Iterable<Region> {
         }
         return internalGetState(flag, null, null);
     }
-    
+
     /**
      * Gets the state of a state flag. This cannot be used for the build flag.
-     * 
+     *
      * @param flag flag to check
      * @param player player (used by some flags)
      * @return whether the state is allows for it
@@ -107,43 +107,10 @@ public class ApplicableRegionSet implements Iterable<Region> {
         }
         return internalGetState(flag, null, player);
     }
-    
-    /**
-     * Indicates whether a player is an owner of all regions in this set.
-     * 
-     * @param player player
-     * @return whether the player is an owner of all regions
-     */
-    public boolean isOwnerOfAll(LocalPlayer player) {
-        for (Region region : applicable) {
-            if (!region.isOwner(player)) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-    
-    /**
-     * Indicates whether a player is an owner or member of all regions in
-     * this set.
-     * 
-     * @param player player
-     * @return whether the player is a member of all regions
-     */
-    public boolean isMemberOfAll(LocalPlayer player) {
-        for (Region region : applicable) {
-            if (!region.isMember(player)) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
 
     /**
      * Checks to see if a flag is permitted.
-     * 
+     *
      * @param flag flag to check
      * @param player null to not check owners and members
      * @param groupPlayer player to use for the group flag check
@@ -155,7 +122,7 @@ public class ApplicableRegionSet implements Iterable<Region> {
         boolean hasFlagDefined = false;
         boolean allowed = false; // Used for ALLOW override
         boolean def = flag.getDefault();
-        
+
         // Handle defaults
         if (globalRegion != null) {
             State globalState = globalRegion.getFlag(flag);
@@ -175,16 +142,16 @@ public class ApplicableRegionSet implements Iterable<Region> {
                 }
             }
         }
-        
+
         // The player argument is used if and only if the flag is the build
         // flag -- in which case, if there are any regions in this area, we
         // default to FALSE, otherwise true if there are no defined regions.
         // However, other flags are different -- if there are regions defined,
-        // we default to the global region value. 
+        // we default to the global region value.
         if (player == null) {
-            allowed = def; 
+            allowed = def;
         }
-        
+
         int lastPriority = Integer.MIN_VALUE;
 
         // The algorithm is as follows:
@@ -273,7 +240,7 @@ public class ApplicableRegionSet implements Iterable<Region> {
 
     /**
      * Clear a region's parents for isFlagAllowed().
-     * 
+     *
      * @param needsClear The regions that should be cleared
      * @param hasCleared The regions already cleared
      * @param region The region to start from
@@ -303,7 +270,7 @@ public class ApplicableRegionSet implements Iterable<Region> {
     /**
      * Gets the value of a flag. Do not use this for state flags
      * (use {@link #allows(StateFlag, LocalPlayer)} for that).
-     * 
+     *
      * @param flag flag to check
      * @param groupPlayer player to check {@link RegionGroup}s against
      * @return value of the flag
@@ -351,7 +318,7 @@ public class ApplicableRegionSet implements Iterable<Region> {
 
             lastPriority = region.getPriority();
         }
-        
+
         try {
             return needsClear.values().iterator().next();
         } catch (NoSuchElementException e) {
@@ -365,7 +332,7 @@ public class ApplicableRegionSet implements Iterable<Region> {
 
     /**
      * Clear a region's parents for getFlag().
-     * 
+     *
      * @param needsClear The regions that should be cleared
      * @param hasCleared The regions already cleared
      * @param region The region to start from
@@ -382,19 +349,20 @@ public class ApplicableRegionSet implements Iterable<Region> {
             parent = parent.getParent();
         }
     }
-    
+
     /**
      * Get the number of regions that are included.
-     * 
+     *
      * @return the size of this ApplicbleRegionSet
      */
     public int size() {
         return applicable.size();
     }
-    
+
     /**
      * Get an iterator of affected regions.
      */
+    @Override
     public Iterator<Region> iterator() {
         return applicable.iterator();
     }
