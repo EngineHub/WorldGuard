@@ -31,21 +31,15 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.migration.AbstractDatabaseMigrator;
 import com.sk89q.worldguard.migration.MigrationException;
 import com.sk89q.worldguard.migration.MigratorKey;
 import com.sk89q.worldguard.region.ApplicableRegionSet;
 import com.sk89q.worldguard.region.Region;
-import com.sk89q.worldguard.region.Region.CircularInheritanceException;
 import com.sk89q.worldguard.region.flags.*;
 import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.region.shapes.Cuboid;
 import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
-import com.sk89q.worldguard.region.shapes.GlobalProtectedRegion;
-import com.sk89q.worldguard.region.stores.ProtectionDatabaseException;
-import com.sk89q.worldguard.region.stores.RegionDBUtil;
-
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -59,40 +53,40 @@ public class RegionCommands {
 
     private MigratorKey migrateDBRequest;
     private Date migrateDBRequestDate;
-    
+
     public RegionCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     @Command(aliases = {"define", "def", "d"}, usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
             desc = "Defines a region", min = 1)
     @CommandPermissions({"worldguard.region.define"})
     public void define(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
         String id = args.getString(0);
-        
+
         if (!Region.isValidId(id)) {
             throw new CommandException("Invalid region ID specified!");
         }
-        
+
         if (id.equalsIgnoreCase("__global__")) {
             throw new CommandException("A region cannot be named __global__");
         }
-        
+
         // Attempt to get the player's selection from WorldEdit
         Selection sel = worldEdit.getSelection(player);
-        
+
         if (sel == null) {
             throw new CommandException("Select a region with WorldEdit first.");
         }
-        
+
         RegionIndex mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         if (mgr.hasRegion(id)) {
             throw new CommandException("That region is already defined. Use redefine instead.");
         }
-        
+
         Region region;
 
         // Detect the type of region from WorldEdit
@@ -114,9 +108,9 @@ public class RegionCommands {
         if (args.argsLength() > 1) {
             region.setOwners(RegionDBUtil.parseDomainString(args.getSlice(1), 1));
         }
-        
+
         mgr.addRegion(region);
-        
+
         try {
             mgr.save();
             sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
@@ -125,17 +119,17 @@ public class RegionCommands {
                     + e.getMessage());
         }
     }
-    
+
     @Command(aliases = {"redefine", "update", "move"}, usage = "<id>",
             desc = "Re-defines the shape of a region", min = 1, max = 1)
     public void redefine(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         String id = args.getString(0);
-        
+
         if (id.equalsIgnoreCase("__global__")) {
             throw new CommandException("The region cannot be named __global__");
         }
@@ -153,17 +147,17 @@ public class RegionCommands {
             plugin.checkPermission(sender, "worldguard.region.redefine.member");
         } else {
             plugin.checkPermission(sender, "worldguard.region.redefine");
-        } 
-        
+        }
+
         // Attempt to get the player's selection from WorldEdit
         Selection sel = worldEdit.getSelection(player);
-        
+
         if (sel == null) {
             throw new CommandException("Select a region with WorldEdit first.");
         }
-        
+
         Region region;
-        
+
         // Detect the type of region from WorldEdit
         if (sel instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
@@ -187,144 +181,13 @@ public class RegionCommands {
             region.setParent(existing.getParent());
         } catch (CircularInheritanceException ignore) {
         }
-        
+
         mgr.addRegion(region);
-        
+
         sender.sendMessage(ChatColor.YELLOW + "Region updated with new area.");
-        
+
         try {
             mgr.save();
-        } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
-                    + e.getMessage());
-        }
-    }
-    
-    @Command(aliases = {"claim"}, usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
-            desc = "Claim a region", min = 1)
-    @CommandPermissions({"worldguard.region.claim"})
-    public void claim(CommandContext args, CommandSender sender) throws CommandException {
-        
-        Player player = plugin.checkPlayer(sender);
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        WorldEditPlugin worldEdit = plugin.getWorldEdit();
-        String id = args.getString(0);
-        
-        if (!Region.isValidId(id)) {
-            throw new CommandException("Invalid region ID specified!");
-        }
-        
-        if (id.equalsIgnoreCase("__global__")) {
-            throw new CommandException("A region cannot be named __global__");
-        }
-        
-        // Attempt to get the player's selection from WorldEdit
-        Selection sel = worldEdit.getSelection(player);
-        
-        if (sel == null) {
-            throw new CommandException("Select a region with WorldEdit first.");
-        }
-        
-        RegionIndex mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
-
-        if (mgr.hasRegion(id)) {
-            throw new CommandException("That region already exists. Please choose a different name.");
-        }
-        
-        Region region;
-
-        // Detect the type of region from WorldEdit
-        if (sel instanceof Polygonal2DSelection) {
-            Polygonal2DSelection polySel = (Polygonal2DSelection) sel;
-            int minY = polySel.getNativeMinimumPoint().getBlockY();
-            int maxY = polySel.getNativeMaximumPoint().getBlockY();
-            region = new ExtrudedPolygon(id, polySel.getNativePoints(), minY, maxY);
-        } else if (sel instanceof CuboidSelection) {
-            BlockVector min = sel.getNativeMinimumPoint().toBlockVector();
-            BlockVector max = sel.getNativeMaximumPoint().toBlockVector();
-            region = new Cuboid(id, min, max);
-        } else {
-            throw new CommandException(
-                    "The type of region selected in WorldEdit is unsupported in WorldGuard!");
-        }
-
-        // Get the list of region owners
-        if (args.argsLength() > 1) {
-            region.setOwners(RegionDBUtil.parseDomainString(args.getSlice(1), 1));
-        }
-
-        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
-        
-        if (!plugin.hasPermission(sender, "worldguard.region.unlimited")) {
-            // Check whether the player has created too many regions 
-            int maxRegionCount = wcfg.getMaxRegionCount(player);
-            if (maxRegionCount >= 0
-                    && mgr.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
-                throw new CommandException("You own too many regions, delete one first to claim a new one.");
-            }
-        }
-
-        Region existing = mgr.getRegionExact(id);
-
-        // Check for an existing region
-        if (existing != null) {
-            if (!existing.getOwners().contains(localPlayer)) {
-                throw new CommandException("This region already exists and you don't own it.");
-            }
-        }
-        
-        ApplicableRegionSet regions = mgr.getApplicableRegions(region);
-        
-        // Check if this region overlaps any other region
-        if (regions.size() > 0) {
-            if (!regions.isOwnerOfAll(localPlayer)) {
-                throw new CommandException("This region overlaps with someone else's region.");
-            }
-        } else {
-            if (wcfg.claimOnlyInsideExistingRegions) {
-                throw new CommandException("You may only claim regions inside " +
-                        "existing regions that you or your group own.");
-            }
-        }
-
-        /*if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
-            if (iConomy.getBank().hasAccount(player.getName())) {
-                Account account = iConomy.getBank().getAccount(player.getName());
-                double balance = account.getBalance();
-                double regionCosts = region.countBlocks() * wcfg.buyOnClaimPrice;
-                if (balance >= regionCosts) {
-                    account.subtract(regionCosts);
-                    player.sendMessage(ChatColor.YELLOW + "You have bought that region for "
-                            + iConomy.getBank().format(regionCosts));
-                    account.save();
-                } else {
-                    player.sendMessage(ChatColor.RED + "You have not enough money.");
-                    player.sendMessage(ChatColor.RED + "The region you want to claim costs "
-                            + iConomy.getBank().format(regionCosts));
-                    player.sendMessage(ChatColor.RED + "You have " + iConomy.getBank().format(balance));
-                    return;
-                }
-            } else {
-                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-                return;
-            }
-        }*/
-
-        if (!plugin.hasPermission(sender, "worldguard.region.unlimited")) {
-            if (region.volume() > wcfg.maxClaimVolume) {
-                player.sendMessage(ChatColor.RED + "This region is too large to claim.");
-                player.sendMessage(ChatColor.RED +
-                        "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
-                return;
-            }
-        }
-
-        region.getOwners().addPlayer(player.getName());
-        mgr.addRegion(region);
-        
-        try {
-            mgr.save();
-            sender.sendMessage(ChatColor.YELLOW + "Region saved as " + id + ".");
         } catch (ProtectionDatabaseException e) {
             throw new CommandException("Failed to write regions: "
                     + e.getMessage());
@@ -653,11 +516,11 @@ public class RegionCommands {
     @Command(aliases = {"flag", "f"}, usage = "<id> <flag> [-g group] [value]", flags = "g:",
             desc = "Set flags", min = 2)
     public void flag(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+
         String id = args.getString(0);
         String flagName = args.getString(1);
         String value = null;
@@ -692,9 +555,9 @@ public class RegionCommands {
             else if (plugin.hasPermission(sender, "worldguard.region.flag.regions." + id.toLowerCase())) hasPerm = true;
         }
         if (!hasPerm) throw new CommandPermissionsException();
-        
+
         Flag<?> foundFlag = null;
-        
+
         // Now time to find the flag!
         for (Flag<?> flag : DefaultFlag.getFlags()) {
             // Try to detect the flag
@@ -703,10 +566,10 @@ public class RegionCommands {
                 break;
             }
         }
-        
+
         if (foundFlag == null) {
             StringBuilder list = new StringBuilder();
-            
+
             // Need to build a list
             for (Flag<?> flag : DefaultFlag.getFlags()) {
                 if (list.length() > 0) {
@@ -731,8 +594,8 @@ public class RegionCommands {
                                 + flag.getName() + "." + id.toLowerCase())) {
                         continue;
                     }
-                } 
-                
+                }
+
                 list.append(flag.getName());
             }
 
@@ -818,27 +681,27 @@ public class RegionCommands {
                     + e.getMessage());
         }
     }
-    
+
     public <V> void setFlag(Region region,
             Flag<V> flag, CommandSender sender, String value)
                 throws InvalidFlagFormat {
         region.setFlag(flag, flag.parseInput(plugin, sender, value));
     }
-    
+
     @Command(aliases = {"setpriority", "priority", "pri"}, usage = "<id> <priority>",
             desc = "Set the priority of a region", min = 2, max = 2)
     public void setPriority(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+
         String id = args.getString(0);
         int priority = args.getInteger(1);
-        
+
         if (id.equalsIgnoreCase("__global__")) {
             throw new CommandException("The region cannot be named __global__");
         }
-        
+
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         Region region = mgr.getRegion(id);
         if (region == null) {
@@ -853,14 +716,14 @@ public class RegionCommands {
             plugin.checkPermission(sender, "worldguard.region.setpriority.member." + id.toLowerCase());
         } else {
             plugin.checkPermission(sender, "worldguard.region.setpriority." + id.toLowerCase());
-        } 
+        }
 
         region.setPriority(priority);
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Priority of '" + region.getId() + "' set to "
                 + priority + ".");
-        
+
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
@@ -868,20 +731,20 @@ public class RegionCommands {
                     + e.getMessage());
         }
     }
-    
+
     @Command(aliases = {"setparent", "parent", "par"}, usage = "<id> [parent-id]",
             desc = "Set the parent of a region", min = 1, max = 2)
     public void setParent(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+
         String id = args.getString(0);
-        
+
         if (id.equalsIgnoreCase("__global__")) {
             throw new CommandException("The region cannot be named __global__");
         }
-        
+
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
         Region region = mgr.getRegion(id);
         if (region == null) {
@@ -895,25 +758,25 @@ public class RegionCommands {
                 region.setParent(null);
             } catch (CircularInheritanceException ignore) {
             }
-    
+
             sender.sendMessage(ChatColor.YELLOW
                     + "Parent of '" + region.getId() + "' cleared.");
         } else {
             String parentId = args.getString(1);
             Region parent = mgr.getRegion(parentId);
-    
+
             if (parent == null) {
                 throw new CommandException("Could not find the parent region by that ID.");
             }
-            
+
             if (region.isOwner(localPlayer)) {
                 plugin.checkPermission(sender, "worldguard.region.setparent.own." + id.toLowerCase());
             } else if (region.isMember(localPlayer)) {
                 plugin.checkPermission(sender, "worldguard.region.setparent.member." + id.toLowerCase());
             } else {
                 plugin.checkPermission(sender, "worldguard.region.setparent." + id.toLowerCase());
-            } 
-            
+            }
+
             if (parent.isOwner(localPlayer)) {
                 plugin.checkPermission(sender, "worldguard.region.setparent.own." + parentId.toLowerCase());
             } else if (parent.isMember(localPlayer)) {
@@ -921,18 +784,18 @@ public class RegionCommands {
             } else {
                 plugin.checkPermission(sender, "worldguard.region.setparent." + parentId.toLowerCase());
             }
-            
+
             try {
                 region.setParent(parent);
             } catch (CircularInheritanceException e) {
                 throw new CommandException("Circular inheritance detected!");
             }
-    
+
             sender.sendMessage(ChatColor.YELLOW
                     + "Parent of '" + region.getId() + "' set to '"
                     + parent.getId() + "'.");
         }
-        
+
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
@@ -940,15 +803,15 @@ public class RegionCommands {
                     + e.getMessage());
         }
     }
-    
+
     @Command(aliases = {"remove", "delete", "del", "rem"}, usage = "<id>",
             desc = "Remove a region", min = 1, max = 1)
     public void remove(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+
         String id = args.getString(0);
 
         RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
@@ -957,7 +820,7 @@ public class RegionCommands {
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
         }
-        
+
         if (region.isOwner(localPlayer)) {
             plugin.checkPermission(sender, "worldguard.region.remove.own." + id.toLowerCase());
         } else if (region.isMember(localPlayer)) {
@@ -965,12 +828,12 @@ public class RegionCommands {
         } else {
             plugin.checkPermission(sender, "worldguard.region.remove." + id.toLowerCase());
         }
-        
+
         mgr.removeRegion(id);
-        
+
         sender.sendMessage(ChatColor.YELLOW
                 + "Region '" + id + "' removed.");
-        
+
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
@@ -978,21 +841,21 @@ public class RegionCommands {
                     + e.getMessage());
         }
     }
-    
+
     @Command(aliases = {"load", "reload"}, usage = "[world]",
             desc = "Reload regions from file", max = 1)
     @CommandPermissions({"worldguard.region.load"})
     public void load(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         World world = null;
-        
+
         if (args.argsLength() > 0) {
             world = plugin.matchWorld(sender, args.getString(0));
         }
 
         if (world != null) {
             RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-            
+
             try {
                 mgr.load();
                 sender.sendMessage(ChatColor.YELLOW
@@ -1004,7 +867,7 @@ public class RegionCommands {
         } else {
             for (World w : plugin.getServer().getWorlds()) {
                 RegionIndex mgr = plugin.getGlobalRegionManager().get(w);
-                
+
                 try {
                     mgr.load();
                 } catch (ProtectionDatabaseException e) {
@@ -1012,26 +875,26 @@ public class RegionCommands {
                             + e.getMessage());
                 }
             }
-            
+
             sender.sendMessage(ChatColor.YELLOW
                     + "Region databases loaded.");
         }
     }
-    
+
     @Command(aliases = {"save", "write"}, usage = "[world]",
             desc = "Re-save regions to file", max = 1)
     @CommandPermissions({"worldguard.region.save"})
     public void save(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         World world = null;
-        
+
         if (args.argsLength() > 0) {
             world = plugin.matchWorld(sender, args.getString(0));
         }
 
         if (world != null) {
             RegionIndex mgr = plugin.getGlobalRegionManager().get(world);
-            
+
             try {
                 mgr.save();
                 sender.sendMessage(ChatColor.YELLOW
@@ -1043,7 +906,7 @@ public class RegionCommands {
         } else {
             for (World w : plugin.getServer().getWorlds()) {
                 RegionIndex mgr = plugin.getGlobalRegionManager().get(w);
-                
+
                 try {
                     mgr.save();
                 } catch (ProtectionDatabaseException e) {
@@ -1051,7 +914,7 @@ public class RegionCommands {
                             + e.getMessage());
                 }
             }
-            
+
             sender.sendMessage(ChatColor.YELLOW
                     + "Region databases saved.");
         }
@@ -1076,14 +939,14 @@ public class RegionCommands {
         }
 
         long lastRequest = 10000000;
-        if (this.migrateDBRequestDate != null) { 
+        if (this.migrateDBRequestDate != null) {
             lastRequest = new Date().getTime() - this.migrateDBRequestDate.getTime();
         }
         if (this.migrateDBRequest == null || lastRequest > 60000) {
             this.migrateDBRequest = key;
             this.migrateDBRequestDate = new Date();
 
-            throw new CommandException("This command is potentially dangerous.\n" + 
+            throw new CommandException("This command is potentially dangerous.\n" +
                     "Please ensure you have made a backup of your data, and then re-enter the command exactly to procede.");
         }
 
