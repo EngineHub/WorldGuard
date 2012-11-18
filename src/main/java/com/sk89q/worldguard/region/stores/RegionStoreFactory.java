@@ -19,6 +19,7 @@
 package com.sk89q.worldguard.region.stores;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * Used to create instances of {@link RegionStore} to access collections of regions
@@ -30,6 +31,13 @@ import java.io.Closeable;
  * @see RegionStore
  */
 public interface RegionStoreFactory extends Closeable {
+
+    /**
+     * Do any prior setup that may be needed, such as creating database tables.
+     *
+     * @throws IOException thrown on any error
+     */
+    void initialize() throws IOException;
 
     /**
      * Returns a store for the collection of regions identified by the given ID.

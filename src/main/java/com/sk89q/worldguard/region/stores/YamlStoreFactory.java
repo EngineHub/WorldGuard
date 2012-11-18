@@ -95,6 +95,11 @@ public class YamlStoreFactory implements RegionStoreFactory {
     }
 
     @Override
+    public void initialize() throws IOException {
+        // Nothing to do
+    }
+
+    @Override
     public RegionStore getStore(String id) {
         Validate.notNull(id, "ID cannot be null");
         return new YamlStore(getFile(id));
