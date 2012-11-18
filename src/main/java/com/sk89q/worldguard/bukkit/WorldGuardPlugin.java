@@ -189,10 +189,6 @@ public class WorldGuardPlugin extends JavaPlugin {
             (new WorldGuardPaintingListener(this)).registerEvents();
         }
         configuration.updateCommandBookGodMode();
-
-        if (getServer().getPluginManager().isPluginEnabled("CommandBook")) {
-            getServer().getPluginManager().registerEvents(new WorldGuardCommandBookListener(this), this);
-        }
     }
 
     @Override
