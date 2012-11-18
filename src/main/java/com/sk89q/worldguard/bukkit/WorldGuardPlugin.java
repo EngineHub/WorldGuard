@@ -166,16 +166,9 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         PermissionsResolverManager.initialize(this);
 
-        // This must be done before configuration is loaded
-        LegacyWorldGuardMigration.migrateBlacklist(this);
-
     	// Load the configuration
     	configuration.load();
     	globalRegionManager.preload();
-
-        // Migrate regions after the regions were loaded because
-        // the migration code reuses the loaded region managers
-        LegacyWorldGuardMigration.migrateRegions(this);
 
         // Register events
         (new WorldGuardPlayerListener(this)).registerEvents();
