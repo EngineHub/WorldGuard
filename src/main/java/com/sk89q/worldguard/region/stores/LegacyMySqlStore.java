@@ -19,15 +19,17 @@
 
 package com.sk89q.worldguard.region.stores;
 
-
-import com.sk89q.worldedit.BlockVector;
+import com.jolbox.bonecp.BoneCP;
+import com.sk89q.rebar.util.LoggerUtils;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.region.Region;
 import com.sk89q.worldguard.region.flags.DefaultFlag;
 import com.sk89q.worldguard.region.flags.Flag;
+import com.sk89q.worldguard.region.indices.RegionIndex;
+import com.sk89q.worldguard.region.indices.RegionIndexFactory;
 import com.sk89q.worldguard.region.shapes.Cuboid;
+import com.sk89q.worldguard.region.shapes.Everywhere;
 import com.sk89q.worldguard.region.shapes.ExtrudedPolygon;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
@@ -36,87 +38,37 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * A MySQL store that overly normalizes all the data, resulting in extremely slow
+ * load and save performance.
+ * <p>
+ * This store cannot be used anymore as it no longer knows how to save data.
+ */
+@Deprecated
 public class LegacyMySqlStore implements RegionStore {
-    private final Logger logger;
 
-    private Yaml yaml;
+    private static final Logger defaultLogger = LoggerUtils.getLogger(YamlStore.class);
 
-    private Map<String, Region> regions;
+    private Logger logger = defaultLogger;
+    private final BoneCP connPool;
+    private final String id;
+    private int internalId = -1;
+    private final Yaml yaml;
 
-    private Map<String, Region> cuboidRegions;
-    private Map<String, Region> poly2dRegions;
-    private Map<String, Region> globalRegions;
-    private Map<Region, String> parentSets;
-
-    private final ConfigurationManager config;
-
-    private Connection conn;
-    private int worldDbId = -1; // The database will never have an id of -1;
-
-    public LegacyMySqlStore(ConfigurationManager config, String world, Logger logger) throws ProtectionDatabaseException {
-        this.config = config;
-        String world1 = world;
-        this.logger = logger;
-
-        try {
-            connect();
-
-            try {
-            	// Test if the database is up to date, if not throw a critical error
-            	PreparedStatement verTest = this.conn.prepareStatement(
-            			"SELECT `world_id` FROM `region_cuboid` LIMIT 0,1;"
-            		);
-            	verTest.execute();
-            } catch (SQLException ex) {
-            	throw new InvalidTableFormatException(
-            			"region_storage_update_20110325.sql"
-            		);
-            }
-
-            PreparedStatement worldStmt = conn.prepareStatement(
-                    "SELECT `id` FROM " +
-                    "`world` " +
-                    "WHERE `name` = ? LIMIT 0,1"
-            );
-
-            worldStmt.setString(1, world1);
-            ResultSet worldResult = worldStmt.executeQuery();
-
-            if (worldResult.first()) {
-                this.worldDbId = worldResult.getInt("id");
-            } else {
-                PreparedStatement insertWorldStatement = this.conn.prepareStatement(
-                        "INSERT INTO " +
-                        "`world` " +
-                        "(`id`, `name`) VALUES (null, ?)",
-                        Statement.RETURN_GENERATED_KEYS
-                );
-
-                insertWorldStatement.setString(1, world);
-                insertWorldStatement.execute();
-                ResultSet generatedKeys = insertWorldStatement.getGeneratedKeys();
-                if (generatedKeys.first()) {
-                    this.worldDbId = generatedKeys.getInt(1);
-                }
-            }
-        } catch (SQLException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            // We havn't connected to the databases, or there was an error
-            // initialising the world record, so there is no point continuing
-            return;
-        }
-
-        if (this.worldDbId <= 0) {
-            logger.log(Level.SEVERE, "Could not find or create the world");
-            // There was an error initialising the world record, so there is
-            // no point continuing
-            return;
-        }
+    /**
+     * Create a new MySQL store.
+     *
+     * @param connPool connection pool
+     * @param id ID for this store
+     */
+    public LegacyMySqlStore(BoneCP connPool, String id) {
+        this.connPool = connPool;
+        this.id = id;
 
         DumperOptions options = new DumperOptions();
         options.setIndent(2);
@@ -128,366 +80,83 @@ public class LegacyMySqlStore implements RegionStore {
         yaml = new Yaml(new SafeConstructor(), new Representer(), options);
     }
 
-    private void connect() throws SQLException {
-    	if (conn != null) {
-    		// Make a dummy query to check the connnection is alive.
-    		try {
-    			conn.prepareStatement("SELECT 1;").execute();
-    		} catch (SQLException ex) {
-                // Test if the dummy query failed because the connection is dead,
-                // and if it is mark the connection as closed (the MySQL Driver
-                // does not ensure that the connection is marked as closed unless
-                // the close() method has been called.
-    			if ("08S01".equals(ex.getSQLState())) {
-    				conn.close();
-    			}
-    		}
-    	}
-        if (conn == null || conn.isClosed()) {
-            conn = DriverManager.getConnection(config.sqlDsn, config.sqlUsername, config.sqlPassword);
-        }
-    }
+    /**
+     * Do initial setup that that is required to get the internal ID used per-world
+     * (or set of regions).
+     *
+     * @throws SQLException on an SQL error
+     */
+    private void setup(Connection conn) throws SQLException {
+        PreparedStatement stmt;
+        ResultSet result;
 
-    private void loadFlags(Region region) {
-        // @TODO: Iterate _ONCE_
-        try {
-            PreparedStatement flagsStatement = this.conn.prepareStatement(
-                    "SELECT " +
-                    "`region_flag`.`flag`, " +
-                    "`region_flag`.`value` " +
-                    "FROM `region_flag` " +
-                    "WHERE `region_flag`.`region_id` = ? " +
-                    "AND `region_flag`.`world_id` = " + this.worldDbId
-            );
+        // Does the database know about this world?
+        stmt = conn.prepareStatement("SELECT id FROM world WHERE name = ? LIMIT 0, 1");
+        stmt.setString(1, id);
+        result = stmt.executeQuery();
 
-            flagsStatement.setString(1, region.getId().toLowerCase());
-            ResultSet flagsResultSet = flagsStatement.executeQuery();
+        if (result.next() == false) { // Looks like we have to add it
+            stmt = conn.prepareStatement(
+                    "INSERT INTO world (id, name) VALUES (null, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, id);
+            stmt.execute();
 
-            Map<String,Object> regionFlags = new HashMap<String,Object>();
-            while (flagsResultSet.next()) {
-                regionFlags.put(
-                        flagsResultSet.getString("flag"),
-                        sqlUnmarshal(flagsResultSet.getString("value"))
-                        );
-            }
-
-            // @TODO: Make this better
-            for (Flag<?> flag : DefaultFlag.getFlags()) {
-                Object o = regionFlags.get(flag.getName());
-                if (o != null) {
-                    setFlag(region, flag, o);
-                }
-            }
-        } catch (SQLException ex) {
-            logger.warning(
-                    "Unable to load flags for region "
-                    + region.getId().toLowerCase() + ": " + ex.getMessage()
-            );
-        }
-    }
-
-    private <T> void setFlag(Region region, Flag<T> flag, Object rawValue) {
-        T val = flag.unmarshal(rawValue);
-        if (val == null) {
-            logger.warning("Failed to parse flag '" + flag.getName()
-                    + "' with value '" + rawValue.toString() + "'");
-            return;
-        }
-        region.setFlag(flag, val);
-    }
-
-    private void loadOwnersAndMembers(Region region) {
-        DefaultDomain owners = new DefaultDomain();
-        DefaultDomain members = new DefaultDomain();
-
-        try {
-            PreparedStatement usersStatement = this.conn.prepareStatement(
-                    "SELECT " +
-                    "`user`.`name`, " +
-                    "`region_players`.`owner` " +
-                    "FROM `region_players` " +
-                    "LEFT JOIN `user` ON ( " +
-                    "`region_players`.`user_id` = " +
-                    "`user`.`id`) " +
-                    "WHERE `region_players`.`region_id` = ? " +
-                    "AND `region_players`.`world_id` = " + this.worldDbId
-            );
-
-            usersStatement.setString(1, region.getId().toLowerCase());
-            ResultSet userSet = usersStatement.executeQuery();
-            while(userSet.next()) {
-                if (userSet.getBoolean("owner")) {
-                    owners.addPlayer(userSet.getString("name"));
-                } else {
-                    members.addPlayer(userSet.getString("name"));
-                }
-            }
-        } catch (SQLException ex) {
-            logger.warning("Unable to load users for region " + region.getId().toLowerCase() + ": " + ex.getMessage());
-        }
-
-        try {
-            PreparedStatement groupsStatement = this.conn.prepareStatement(
-                    "SELECT " +
-                    "`group`.`name`, " +
-                    "`region_groups`.`owner` " +
-                    "FROM `region_groups` " +
-                    "LEFT JOIN `group` ON ( " +
-                    "`region_groups`.`group_id` = " +
-                    "`group`.`id`) " +
-                    "WHERE `region_groups`.`region_id` = ? " +
-                    "AND `region_groups`.`world_id` = " + this.worldDbId
-            );
-
-            groupsStatement.setString(1, region.getId().toLowerCase());
-            ResultSet groupSet = groupsStatement.executeQuery();
-            while(groupSet.next()) {
-                if (groupSet.getBoolean("owner")) {
-                    owners.addGroup(groupSet.getString("name"));
-                } else {
-                    members.addGroup(groupSet.getString("name"));
-                }
-            }
-        } catch (SQLException ex) {
-            logger.warning("Unable to load groups for region " + region.getId().toLowerCase() + ": " + ex.getMessage());
-        }
-
-        region.setOwners(owners);
-        region.setMembers(members);
-    }
-
-    private void loadGlobal() {
-        Map<String,Region> regions =
-                new HashMap<String,Region>();
-
-        try {
-            PreparedStatement globalRegionStatement = this.conn.prepareStatement(
-                    "SELECT " +
-                    "`region`.`id`, " +
-                    "`region`.`priority`, " +
-                    "`parent`.`id` AS `parent` " +
-                    "FROM `region` " +
-                    "LEFT JOIN `region` AS `parent` " +
-                    "ON (`region`.`parent` = `parent`.`id` " +
-                    "AND `region`.`world_id` = `parent`.`world_id`) " +
-                    "WHERE `region`.`type` = 'global' " +
-                    "AND `region`.`world_id` = ? "
-            );
-
-            globalRegionStatement.setInt(1, this.worldDbId);
-            ResultSet globalResultSet = globalRegionStatement.executeQuery();
-
-            while (globalResultSet.next()) {
-                Region region = new GlobalProtectedRegion(globalResultSet.getString("id"));
-
-                region.setPriority(globalResultSet.getInt("priority"));
-
-                this.loadFlags(region);
-                this.loadOwnersAndMembers(region);
-
-                regions.put(globalResultSet.getString("id"), region);
-
-                String parentId = globalResultSet.getString("parent");
-                if (parentId != null) {
-                    parentSets.put(region, parentId);
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            logger.warning("Unable to load regions from sql database: " + ex.getMessage());
-            Throwable t = ex.getCause();
-            while (t != null) {
-                logger.warning("\t\tCause: " + t.getMessage());
-                t = t.getCause();
+            ResultSet generatedKeys = stmt.getGeneratedKeys();
+            if (generatedKeys.first()) {
+                internalId = generatedKeys.getInt(1);
             }
         }
-
-        globalRegions = regions;
-    }
-
-    private void loadCuboid() {
-        Map<String,Region> regions =
-                new HashMap<String,Region>();
-
-        try {
-            PreparedStatement cuboidRegionStatement = this.conn.prepareStatement(
-                    "SELECT " +
-                    "`region_cuboid`.`min_z`, " +
-                    "`region_cuboid`.`min_y`, " +
-                    "`region_cuboid`.`min_x`, " +
-                    "`region_cuboid`.`max_z`, " +
-                    "`region_cuboid`.`max_y`, " +
-                    "`region_cuboid`.`max_x`, " +
-                    "`region`.`id`, " +
-                    "`region`.`priority`, " +
-                    "`parent`.`id` AS `parent` " +
-                    "FROM `region_cuboid` " +
-                    "LEFT JOIN `region` " +
-                    "ON (`region_cuboid`.`region_id` = `region`.`id` " +
-                    "AND `region_cuboid`.`world_id` = `region`.`world_id`) " +
-                    "LEFT JOIN `region` AS `parent` " +
-                    "ON (`region`.`parent` = `parent`.`id` " +
-                    "AND `region`.`world_id` = `parent`.`world_id`) " +
-                    "WHERE `region`.`world_id` = ? "
-            );
-
-            cuboidRegionStatement.setInt(1, this.worldDbId);
-            ResultSet cuboidResultSet = cuboidRegionStatement.executeQuery();
-
-            while (cuboidResultSet.next()) {
-                Vector pt1 = new Vector(
-                        cuboidResultSet.getInt("min_x"),
-                        cuboidResultSet.getInt("min_y"),
-                        cuboidResultSet.getInt("min_z")
-                );
-                Vector pt2 = new Vector(
-                        cuboidResultSet.getInt("max_x"),
-                        cuboidResultSet.getInt("max_y"),
-                        cuboidResultSet.getInt("max_z")
-                );
-
-                BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
-                BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
-                Region region = new Cuboid(
-                        cuboidResultSet.getString("id"),
-                        min,
-                        max
-                );
-
-                region.setPriority(cuboidResultSet.getInt("priority"));
-
-                this.loadFlags(region);
-                this.loadOwnersAndMembers(region);
-
-                regions.put(cuboidResultSet.getString("id"), region);
-
-                String parentId = cuboidResultSet.getString("parent");
-                if (parentId != null) {
-                    parentSets.put(region, parentId);
-                }
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            logger.warning("Unable to load regions from sql database: " + ex.getMessage());
-            Throwable t = ex.getCause();
-            while (t != null) {
-                logger.warning("\t\tCause: " + t.getMessage());
-                t = t.getCause();
-            }
-        }
-
-        cuboidRegions = regions;
-    }
-
-    private void loadPoly2d() {
-        Map<String,Region> regions =
-                new HashMap<String,Region>();
-
-        try {
-            PreparedStatement poly2dRegionStatement = this.conn.prepareStatement(
-                    "SELECT " +
-                    "`region_poly2d`.`min_y`, " +
-                    "`region_poly2d`.`max_y`, " +
-                    "`region`.`id`, " +
-                    "`region`.`priority`, " +
-                    "`parent`.`id` AS `parent` " +
-                    "FROM `region_poly2d` " +
-                    "LEFT JOIN `region` " +
-                    "ON (`region_poly2d`.`region_id` = `region`.`id` " +
-                    "AND `region_poly2d`.`world_id` = `region`.`world_id`) " +
-                    "LEFT JOIN `region` AS `parent` " +
-                    "ON (`region`.`parent` = `parent`.`id` " +
-                    "AND `region`.`world_id` = `parent`.`world_id`) " +
-                    "WHERE `region`.`world_id` = ? "
-            );
-
-            poly2dRegionStatement.setInt(1, this.worldDbId);
-            ResultSet poly2dResultSet = poly2dRegionStatement.executeQuery();
-
-            PreparedStatement poly2dVectorStatement = this.conn.prepareStatement(
-                    "SELECT " +
-                    "`region_poly2d_point`.`x`, " +
-                    "`region_poly2d_point`.`z` " +
-                    "FROM `region_poly2d_point` " +
-                    "WHERE `region_poly2d_point`.`region_id` = ? " +
-                    "AND `region_poly2d_point`.`world_id` = " + this.worldDbId
-            );
-
-            while (poly2dResultSet.next()) {
-                String id = poly2dResultSet.getString("id");
-
-                Integer minY = poly2dResultSet.getInt("min_y");
-                Integer maxY = poly2dResultSet.getInt("max_y");
-                List<BlockVector2D> points = new ArrayList<BlockVector2D>();
-
-                poly2dVectorStatement.setString(1, id);
-                ResultSet poly2dVectorResultSet = poly2dVectorStatement.executeQuery();
-
-                while(poly2dVectorResultSet.next()) {
-                    points.add(new BlockVector2D(
-                            poly2dVectorResultSet.getInt("x"),
-                            poly2dVectorResultSet.getInt("z")
-                    ));
-                }
-                Region region = new ExtrudedPolygon(id, points, minY, maxY);
-
-                region.setPriority(poly2dResultSet.getInt("priority"));
-
-                this.loadFlags(region);
-                this.loadOwnersAndMembers(region);
-
-                regions.put(poly2dResultSet.getString("id"), region);
-
-                String parentId = poly2dResultSet.getString("parent");
-                if (parentId != null) {
-                    parentSets.put(region, parentId);
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            logger.warning("Unable to load regions from sql database: " + ex.getMessage());
-            Throwable t = ex.getCause();
-            while (t != null) {
-                logger.warning("\t\tCause: " + t.getMessage());
-                t = t.getCause();
-            }
-        }
-
-        poly2dRegions = regions;
     }
 
     @Override
-    public void load() throws ProtectionDatabaseException {
+    public RegionIndex load(RegionIndexFactory factory) throws IOException {
+        RegionIndex index = factory.newIndex();
+
         try {
-            connect();
-        } catch (SQLException ex) {
-            throw new ProtectionDatabaseException(ex);
+            performLoad(index);
+        } catch (SQLException e) {
+            throw new IOException("Failed to load regions from database", e);
         }
 
-        parentSets = new HashMap<Region,String>();
+        return index;
+    }
 
-        // We load the cuboid regions first, as this is likely to be the
-        // largest dataset. This should save time in regards to the putAll()s
-        this.loadCuboid();
-        Map<String,Region> regions = this.cuboidRegions;
-        this.cuboidRegions = null;
+    /**
+     * Actually perform the load.
+     *
+     * @param index the index to put the regions into
+     * @throws SQLException on an SQL error
+     */
+    private void performLoad(RegionIndex index) throws SQLException {
+        Connection conn = null;
+        Map<Region, String> parentSets = new HashMap<Region, String>();
 
-        this.loadPoly2d();
-        regions.putAll(this.poly2dRegions);
-        this.poly2dRegions = null;
+        try {
+            conn = connPool.getConnection();
 
-        this.loadGlobal();
-        regions.putAll(this.globalRegions);
-        this.globalRegions = null;
+            // Make sure that we have the database setup for this particular store
+            if (internalId == -1) {
+                setup(conn);
+            }
 
-        // Relink parents // Taken verbatim from YAMLDatabase
+            // Load the regions
+            loadCuboid(conn, index, parentSets);
+            loadExtrudedPoly(conn, index, parentSets);
+            loadGlobal(conn, index, parentSets);
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+        }
+
+        // Re-link parents
         for (Map.Entry<Region, String> entry : parentSets.entrySet()) {
-            Region parent = regions.get(entry.getValue());
+            Region parent = index.get(entry.getValue());
             if (parent != null) {
                 try {
                     entry.getKey().setParent(parent);
-                } catch (CircularInheritanceException e) {
+                } catch (IllegalArgumentException e) {
                     logger.warning("Circular inheritance detect with '"
                             + entry.getValue() + "' detected as a parent");
                 }
@@ -496,534 +165,263 @@ public class LegacyMySqlStore implements RegionStore {
             }
         }
 
-        this.regions = regions;
+        index.reindex(); // Important!
     }
 
-
-    /*
-     * Returns the database id for the user
-     * If it doesn't exits it adds the user and returns the id.
-     */
-    private Map<String,Integer> getUserIds(String... usernames) {
-        Map<String,Integer> users = new HashMap<String,Integer>();
-
-        if (usernames.length < 1) return users;
-
-        try {
-            PreparedStatement findUsersStatement = this.conn.prepareStatement(
-                    String.format(
-                            "SELECT " +
-                            "`user`.`id`, " +
-                            "`user`.`name` " +
-                            "FROM `user` " +
-                            "WHERE `name` IN (%s)",
-                            RegionDBUtil.preparePlaceHolders(usernames.length)
-                    )
-            );
-
-            RegionDBUtil.setValues(findUsersStatement, usernames);
-
-            ResultSet findUsersResults = findUsersStatement.executeQuery();
-
-            while(findUsersResults.next()) {
-                users.put(findUsersResults.getString("name"), findUsersResults.getInt("id"));
-            }
-
-            PreparedStatement insertUserStatement = this.conn.prepareStatement(
-                    "INSERT INTO " +
-                    "`user` ( " +
-                    "`id`, " +
-                    "`name`" +
-                    ") VALUES (null, ?)",
-                    Statement.RETURN_GENERATED_KEYS
-            );
-
-            for (String username : usernames) {
-                if (!users.containsKey(username)) {
-                    insertUserStatement.setString(1, username);
-                    insertUserStatement.execute();
-                    ResultSet generatedKeys = insertUserStatement.getGeneratedKeys();
-                    if (generatedKeys.first()) {
-                        users.put(username, generatedKeys.getInt(1));
-                    } else {
-                        logger.warning("Could not get the database id for user " + username);
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            logger.warning("Could not get the database id for the users " + usernames.toString() + "\n\t" + ex.getMessage());
-            Throwable t = ex.getCause();
-            while (t != null) {
-                logger.warning(t.getMessage());
-                t = t.getCause();
-            }
-        }
-
-        return users;
-    }
-
-
-    /*
-     * Returns the database id for the groups
-     * If it doesn't exits it adds the group and returns the id.
-     */
-    private Map<String,Integer> getGroupIds(String... groupnames) {
-        Map<String,Integer> groups = new HashMap<String,Integer>();
-
-        if (groupnames.length < 1) return groups;
-
-        try {
-            PreparedStatement findGroupsStatement = this.conn.prepareStatement(
-                    String.format(
-                            "SELECT " +
-                            "`group`.`id`, " +
-                            "`group`.`name` " +
-                            "FROM `group` " +
-                            "WHERE `name` IN (%s)",
-                            RegionDBUtil.preparePlaceHolders(groupnames.length)
-                    )
-            );
-
-            RegionDBUtil.setValues(findGroupsStatement, groupnames);
-
-            ResultSet findGroupsResults = findGroupsStatement.executeQuery();
-
-            while(findGroupsResults.next()) {
-                groups.put(findGroupsResults.getString("name"), findGroupsResults.getInt("id"));
-            }
-
-            PreparedStatement insertGroupStatement = this.conn.prepareStatement(
-                    "INSERT INTO " +
-                    "`group` ( " +
-                    "`id`, " +
-                    "`name`" +
-                    ") VALUES (null, ?)",
-                    Statement.RETURN_GENERATED_KEYS
-            );
-
-            for (String groupname : groupnames) {
-                if (!groups.containsKey(groupname)) {
-                    insertGroupStatement.setString(1, groupname);
-                    insertGroupStatement.execute();
-                    ResultSet generatedKeys = insertGroupStatement.getGeneratedKeys();
-                    if (generatedKeys.first()) {
-                        groups.put(groupname, generatedKeys.getInt(1));
-                    } else {
-                        logger.warning("Could not get the database id for user " + groupname);
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            logger.warning("Could not get the database id for the groups " + groupnames.toString() + ex.getMessage());
-        }
-
-        return groups;
-    }
-
-    /*
-     * As we don't get notified on the creation/removal of regions:
-     *  1) We get a list of all of the in-database regions
-     *  2) We iterate over all of the in-memory regions
-     *  2a) If the region is in the database, we update the database and
-     *      remove the region from the in-database list
-     *   b) If the region is not in the database, we insert it
-     *  3) We iterate over what remains of the in-database list and remove
-     *     them from the database
+    /**
+     * Load cuboid regions.
      *
-     * TODO: Look at adding/removing/updating the database when the in
-     *       memory region is created/remove/updated
-     *
-     * @see com.sk89q.worldguard.protection.databases.ProtectionDatabase#save()
+     * @param conn the database connection
+     * @param index the index to put the regions into
+     * @param parentSets map of regions that need parents set for them
+     * @throws SQLException on SQL error
      */
-    @Override
-    public void save() throws ProtectionDatabaseException {
-        try {
-            connect();
-        } catch (SQLException ex) {
-            throw new ProtectionDatabaseException(ex);
-        }
+    private void loadCuboid(Connection conn, RegionIndex index,
+            Map<Region, String> parentSets) throws SQLException {
 
-        List<String> regionsInDatabase = new ArrayList<String>();
+        PreparedStatement stmt;
+        ResultSet result;
 
-        try {
-            PreparedStatement getAllRegionsStatement = this.conn.prepareStatement(
-                    "SELECT `region`.`id` FROM " +
-                    "`region` " +
-                    "WHERE `world_id` = ? "
-            );
+        stmt = conn.prepareStatement(
+                "SELECT c.min_z, c.min_y, c.min_x, c.max_z, c.max_y, c.max_x, " +
+                        "r.id, r.priority, r.id AS parent " +
+                "FROM region_cuboid AS c " +
+                "LEFT JOIN region AS r ON (region_cuboid.region_id = r.id " +
+                    "AND region_cuboid.world_id = r.world_id) " +
+                "LEFT JOIN region AS p ON (region.p = p.id AND region.world_id = p.world_id) " +
+                "WHERE region.world_id = ?");
+        stmt.setInt(1, internalId);
+        result = stmt.executeQuery();
 
-            getAllRegionsStatement.setInt(1, this.worldDbId);
-            ResultSet getAllRegionsResult = getAllRegionsStatement.executeQuery();
+        while (result.next()) {
+            Vector pt1 = new Vector(result.getInt("min_x"),
+                    result.getInt("min_y"), result.getInt("min_z") );
+            Vector pt2 = new Vector(result.getInt("max_x"),
+                    result.getInt("max_y"), result.getInt("max_z") );
 
-            while(getAllRegionsResult.next()) {
-                regionsInDatabase.add(getAllRegionsResult.getString("id"));
+            Cuboid cuboid = new Cuboid(pt1, pt2);
+            Region region = new Region(result.getString("id"), cuboid);
+            region.setPriority(result.getInt("priority"));
+
+            loadFlags(conn, region);
+            importDomain(conn, region);
+
+            index.add(region);
+
+            String parentId = result.getString("parent");
+            if (parentId != null) {
+                parentSets.put(region, parentId);
             }
-        } catch (SQLException ex) {
-            logger.warning("Could not get region list for save comparison: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Load extruded polygonal regions.
+     *
+     * @param conn the database connection
+     * @param index the index to put the regions into
+     * @param parentSets map of regions that need parents set for them
+     * @throws SQLException on SQL error
+     */
+    private void loadExtrudedPoly(Connection conn, RegionIndex index,
+            Map<Region, String> parentSets) throws SQLException {
+
+        PreparedStatement polyStmt = conn.prepareStatement(
+                "SELECT y.min_y, y.max_y, r.id, r.priority, p.id AS parent " +
+                "FROM region_poly2d AS y " +
+                "LEFT JOIN region AS r ON (y.region_id = r.id " +
+                    "AND y.world_id = r.world_id) " +
+                "LEFT JOIN region AS p  ON (r.p = p.id AND r.world_id = p.world_id) " +
+                "WHERE r.world_id = ?");
+        polyStmt.setInt(1, internalId);
+        ResultSet polyResult = polyStmt.executeQuery();
+
+        PreparedStatement pointStmt = conn.prepareStatement(
+                "SELECT r.x, r.z " +
+                "FROM region_poly2d_point AS r " +
+                "WHERE r.region_id = ? " +
+                    "AND r.world_id = ?");
+
+        while (polyResult.next()) {
+            Integer minY = polyResult.getInt("min_y");
+            Integer maxY = polyResult.getInt("max_y");
+
+            // Fetch the points
+            pointStmt.setString(1, id);
+            pointStmt.setInt(2, internalId);
+            ResultSet pointResult = pointStmt.executeQuery();
+
+            List<BlockVector2D> points = new ArrayList<BlockVector2D>();
+            while (pointResult.next()) {
+                points.add(new BlockVector2D(
+                        pointResult.getInt("x"),
+                        pointResult.getInt("z")));
+            }
+
+            ExtrudedPolygon polygon = new ExtrudedPolygon(points, minY, maxY);
+
+            Region region = new Region(polyResult.getString("id"), polygon);
+            region.setPriority(polyResult.getInt("priority"));
+
+            loadFlags(conn, region);
+            importDomain(conn, region);
+
+            index.add(region);
+
+            String parentId = polyResult.getString("parent");
+            if (parentId != null) {
+                parentSets.put(region, parentId);
+            }
+        }
+    }
+
+    /**
+     * Load global regions.
+     *
+     * @param conn the database connection
+     * @param index the index to put the regions into
+     * @param parentSets map of regions that need parents set for them
+     * @throws SQLException on SQL error
+     */
+    private void loadGlobal(Connection conn, RegionIndex index,
+            Map<Region, String> parentSets) throws SQLException {
+
+        PreparedStatement stmt;
+        ResultSet result;
+
+        stmt = conn.prepareStatement(
+                "SELECT r.id, r.priority, p.id AS parent " +
+                "FROM region AS r " +
+                "LEFT JOIN region AS p ON (r.p = p.id " +
+                    "AND r.world_id = p.world_id) " +
+                "WHERE r.type = 'global' AND r.world_id = ?");
+        stmt.setInt(1, internalId);
+        result = stmt.executeQuery();
+
+        while (result.next()) {
+            Everywhere everywhere = new Everywhere();
+
+            Region region = new Region(result.getString("id"), everywhere);
+            region.setPriority(result.getInt("priority"));
+
+            loadFlags(conn, region);
+            importDomain(conn, region);
+
+            index.add(region);
+
+            String parentId = result.getString("parent");
+            if (parentId != null) {
+                parentSets.put(region, parentId);
+            }
+        }
+    }
+
+    /**
+     * Load the flags for the given region.
+     *
+     * @param conn
+     * @param region
+     * @throws SQLException
+     */
+    private void loadFlags(Connection conn, Region region) throws SQLException {
+        PreparedStatement stmt;
+        ResultSet result;
+
+        stmt = conn.prepareStatement(
+                "SELECT f.flag, f.value " +
+                "FROM region_flag AS f " +
+                "WHERE f.region_id = ? " +
+                "AND f.world_id = ?");
+        stmt.setString(1, region.getId());
+        stmt.setInt(2, internalId);
+        result = stmt.executeQuery();
+
+        Map<String, String> data = new HashMap<String, String>();
+        while (result.next()) {
+            data.put(result.getString("flag"), result.getString("value"));
         }
 
-        for (Map.Entry<String, Region> entry : regions.entrySet()) {
-            String name = entry.getKey();
-            Region region = entry.getValue();
+        // Apply flag
+        for (Flag<?> flag : DefaultFlag.getFlags()) {
+            String o = data.get(flag.getName());
+            if (o != null) {
+                region.setFlagUnsafe(flag, unmarshal(o));
+            }
 
-            try {
-                if (regionsInDatabase.contains(name)) {
-                    regionsInDatabase.remove(name);
-
-                    if (region instanceof Cuboid) {
-                        updateRegionCuboid( (Cuboid) region );
-                    } else if (region instanceof ExtrudedPolygon) {
-                        updateRegionPoly2D( (ExtrudedPolygon) region );
-                    } else if (region instanceof GlobalProtectedRegion) {
-                        updateRegionGlobal( (GlobalProtectedRegion) region );
-                    } else {
-                        this.updateRegion(region, region.getClass().getCanonicalName());
-                    }
-                } else {
-                    if (region instanceof Cuboid) {
-                        insertRegionCuboid( (Cuboid) region );
-                    } else if (region instanceof ExtrudedPolygon) {
-                        insertRegionPoly2D( (ExtrudedPolygon) region );
-                    } else if (region instanceof GlobalProtectedRegion) {
-                        insertRegionGlobal( (GlobalProtectedRegion) region );
-                    } else {
-                        this.insertRegion(region, region.getClass().getCanonicalName());
-                    }
+            Flag<?> groupFlag = flag.getRegionGroupFlag();
+            if (groupFlag != null) {
+                o = data.get(groupFlag.getName());
+                if (o != null) {
+                    region.setFlagUnsafe(flag, unmarshal(o));
                 }
-            } catch (SQLException ex) {
-                logger.warning("Could not save region " + region.getId().toLowerCase() + ": " + ex.getMessage());
-                throw new ProtectionDatabaseException(ex);
+            }
+        }
+    }
+
+    /**
+     * Load old owners/members information.
+     *
+     * @param conn database connection
+     * @param region region
+     * @throws SQLException on SQL error
+     */
+    private void importDomain(Connection conn, Region region) throws SQLException {
+        PreparedStatement stmt;
+        ResultSet result;
+
+        List<String> owners = new ArrayList<String>();
+        List<String> members = new ArrayList<String>();
+
+        // First load players
+        stmt = conn.prepareStatement(
+                "SELECT o.name, p.owner " +
+                "FROM region_players AS p " +
+                "LEFT JOIN user AS o ON (p.user_id = o.id) " +
+                "WHERE p.region_id = ? " +
+                "AND p.world_id = ?");
+        stmt.setString(1, region.getId());
+        stmt.setInt(2, internalId);
+        result = stmt.executeQuery();
+
+        while (result.next()) {
+            if (result.getBoolean("owner")) {
+                owners.add("player:" + result.getString("name"));
+            } else {
+                members.add("player:" + result.getString("name"));
             }
         }
 
-        for (Map.Entry<String, Region> entry : regions.entrySet()) {
-            try {
-                if (entry.getValue().getParent() == null) continue;
+        // Then load groups
+        stmt = conn.prepareStatement(
+                "SELECT o.name, g.owner " +
+                "FROM region_groups AS g" +
+                "LEFT JOIN o AS o ON (g.group_id = o.id) " +
+                "WHERE g.region_id = ? " +
+                "AND g.world_id = ?");
+        stmt.setString(1, region.getId());
+        stmt.setInt(2, internalId);
+        result = stmt.executeQuery();
 
-                PreparedStatement setParentStatement = this.conn.prepareStatement(
-                        "UPDATE `region` SET " +
-                        "`parent` = ? " +
-                        "WHERE `id` = ? AND `world_id` = " + this.worldDbId
-                );
-
-                setParentStatement.setString(1, entry.getValue().getParent().getId().toLowerCase());
-                setParentStatement.setString(2, entry.getValue().getId().toLowerCase());
-
-                setParentStatement.execute();
-            } catch (SQLException ex) {
-                logger.warning("Could not save region parents " + entry.getValue().getId().toLowerCase() + ": " + ex.getMessage());
-                throw new ProtectionDatabaseException(ex);
+        while (result.next()) {
+            if (result.getBoolean("owner")) {
+                owners.add("group:" + result.getString("name"));
+            } else {
+                members.add("group:" + result.getString("name"));
             }
         }
 
-        for (String name : regionsInDatabase) {
-            try {
-                PreparedStatement removeRegion = this.conn.prepareStatement(
-                        "DELETE FROM `region` WHERE `id` = ? "
-                );
-
-                removeRegion.setString(1, name);
-                removeRegion.execute();
-            } catch (SQLException ex) {
-                logger.warning("Could not remove region from database " + name + ": " + ex.getMessage());
-            }
-        }
-
+        // TODO: Something here
     }
 
-    private void updateFlags(Region region) throws SQLException {
-        PreparedStatement clearCurrentFlagStatement = this.conn.prepareStatement(
-                "DELETE FROM `region_flag` " +
-                "WHERE `region_id` = ? " +
-                "AND `world_id` = " + this.worldDbId
-        );
-
-        clearCurrentFlagStatement.setString(1, region.getId().toLowerCase());
-        clearCurrentFlagStatement.execute();
-
-        for (Map.Entry<Flag<?>, Object> entry : region.getFlags().entrySet()) {
-            if (entry.getValue() == null) continue;
-
-            Object flag = sqlMarshal(marshalFlag(entry.getKey(), entry.getValue()));
-
-            PreparedStatement insertFlagStatement = this.conn.prepareStatement(
-                    "INSERT INTO `region_flag` ( " +
-                    "`id`, " +
-                    "`region_id`, " +
-                    "`world_id`, " +
-                    "`flag`, " +
-                    "`value` " +
-                    ") VALUES (null, ?, " + this.worldDbId + ", ?, ?)"
-            );
-
-            insertFlagStatement.setString(1, region.getId().toLowerCase());
-            insertFlagStatement.setString(2, entry.getKey().getName());
-            insertFlagStatement.setObject(3, flag);
-
-            insertFlagStatement.execute();
-        }
-    }
-
-    private void updatePlayerAndGroups(Region region, Boolean owners) throws SQLException {
-        DefaultDomain domain;
-
-        if (owners) {
-            domain = region.getOwners();
-        } else {
-            domain = region.getMembers();
-        }
-
-        PreparedStatement deleteUsersForRegion = this.conn.prepareStatement(
-                "DELETE FROM `region_players` " +
-                "WHERE `region_id` = ? " +
-                "AND `world_id` = " + this.worldDbId + " " +
-                "AND `owner` = ?"
-        );
-
-        deleteUsersForRegion.setString(1, region.getId().toLowerCase());
-        deleteUsersForRegion.setBoolean(2, owners);
-        deleteUsersForRegion.execute();
-
-        PreparedStatement insertUsersForRegion = this.conn.prepareStatement(
-                "INSERT INTO `region_players` " +
-                "(`region_id`, `world_id`, `user_id`, `owner`) " +
-                "VALUES (?, " + this.worldDbId + ",  ?, ?)"
-        );
-
-        Set<String> var = domain.getPlayers();
-
-        for (Integer player : getUserIds(var.toArray(new String[var.size()])).values()) {
-            insertUsersForRegion.setString(1, region.getId().toLowerCase());
-            insertUsersForRegion.setInt(2, player);
-            insertUsersForRegion.setBoolean(3, owners);
-
-            insertUsersForRegion.execute();
-        }
-
-        PreparedStatement deleteGroupsForRegion = this.conn.prepareStatement(
-                "DELETE FROM `region_groups` " +
-                "WHERE `region_id` = ? " +
-                "AND `world_id` = " + this.worldDbId + " " +
-                "AND `owner` = ?"
-        );
-
-        deleteGroupsForRegion.setString(1, region.getId().toLowerCase());
-        deleteGroupsForRegion.setBoolean(2, owners);
-        deleteGroupsForRegion.execute();
-
-        PreparedStatement insertGroupsForRegion = this.conn.prepareStatement(
-                "INSERT INTO `region_groups` " +
-                "(`region_id`, `world_id`, `group_id`, `owner`) " +
-                "VALUES (?, " + this.worldDbId + ",  ?, ?)"
-        );
-
-        Set<String> groupVar = domain.getGroups();
-        for (Integer group : getGroupIds(groupVar.toArray(new String[groupVar.size()])).values()) {
-            insertGroupsForRegion.setString(1, region.getId().toLowerCase());
-            insertGroupsForRegion.setInt(2, group);
-            insertGroupsForRegion.setBoolean(3, owners);
-
-            insertGroupsForRegion.execute();
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <V> Object marshalFlag(Flag<V> flag, Object val) {
-        return flag.marshal( (V) val );
-    }
-
-    private void insertRegion(Region region, String type) throws SQLException {
-        PreparedStatement insertRegionStatement = this.conn.prepareStatement(
-                "INSERT INTO `region` (" +
-                "`id`, " +
-                "`world_id`, " +
-                "`type`, " +
-                "`priority`, " +
-                "`parent` " +
-                ") VALUES (?, ?, ?, ?, null)"
-        );
-
-        insertRegionStatement.setString(1, region.getId().toLowerCase());
-        insertRegionStatement.setInt(2, this.worldDbId);
-        insertRegionStatement.setString(3, type);
-        insertRegionStatement.setInt(4, region.getPriority());
-
-        insertRegionStatement.execute();
-
-        updateFlags(region);
-
-        updatePlayerAndGroups(region, false);
-        updatePlayerAndGroups(region, true);
-    }
-
-    private void insertRegionCuboid(Cuboid region) throws SQLException {
-        insertRegion(region, "cuboid");
-
-        PreparedStatement insertCuboidRegionStatement = this.conn.prepareStatement(
-                "INSERT INTO `region_cuboid` (" +
-                "`region_id`, " +
-                "`world_id`, " +
-                "`min_z`, " +
-                "`min_y`, " +
-                "`min_x`, " +
-                "`max_z`, " +
-                "`max_y`, " +
-                "`max_x` " +
-                ") VALUES (?, " + this.worldDbId + ", ?, ?, ?, ?, ?, ?)"
-        );
-
-        BlockVector min = region.getAABBMin();
-        BlockVector max = region.getAABBMax();
-
-        insertCuboidRegionStatement.setString(1, region.getId().toLowerCase());
-        insertCuboidRegionStatement.setInt(2, min.getBlockZ());
-        insertCuboidRegionStatement.setInt(3, min.getBlockY());
-        insertCuboidRegionStatement.setInt(4, min.getBlockX());
-        insertCuboidRegionStatement.setInt(5, max.getBlockZ());
-        insertCuboidRegionStatement.setInt(6, max.getBlockY());
-        insertCuboidRegionStatement.setInt(7, max.getBlockX());
-
-        insertCuboidRegionStatement.execute();
-    }
-
-    private void insertRegionPoly2D(ExtrudedPolygon region) throws SQLException {
-        insertRegion(region, "poly2d");
-
-        PreparedStatement insertPoly2dRegionStatement = this.conn.prepareStatement(
-                "INSERT INTO `region_poly2d` (" +
-                "`region_id`, " +
-                "`world_id`, " +
-                "`max_y`, " +
-                "`min_y` " +
-                ") VALUES (?, " + this.worldDbId + ", ?, ?)"
-        );
-
-        insertPoly2dRegionStatement.setString(1, region.getId().toLowerCase());
-        insertPoly2dRegionStatement.setInt(2, region.getAABBMax().getBlockY());
-        insertPoly2dRegionStatement.setInt(3, region.getAABBMin().getBlockY());
-
-        insertPoly2dRegionStatement.execute();
-
-        updatePoly2dPoints(region);
-    }
-
-    private void updatePoly2dPoints(ExtrudedPolygon region) throws SQLException {
-        PreparedStatement clearPoly2dPointsForRegionStatement = this.conn.prepareStatement(
-                "DELETE FROM `region_poly2d_point` " +
-                "WHERE `region_id` = ? " +
-                "AND `world_id` = " + this.worldDbId
-        );
-
-        clearPoly2dPointsForRegionStatement.setString(1, region.getId().toLowerCase());
-
-        clearPoly2dPointsForRegionStatement.execute();
-
-        PreparedStatement insertPoly2dPointStatement = this.conn.prepareStatement(
-                "INSERT INTO `region_poly2d_point` (" +
-                "`id`, " +
-                "`region_id`, " +
-                "`world_id`, " +
-                "`z`, " +
-                "`x` " +
-                ") VALUES (null, ?, " + this.worldDbId + ", ?, ?)"
-        );
-
-        String lowerId = region.getId();
-        for (BlockVector2D point : region.getPoints()) {
-            insertPoly2dPointStatement.setString(1, lowerId);
-            insertPoly2dPointStatement.setInt(2, point.getBlockZ());
-            insertPoly2dPointStatement.setInt(3, point.getBlockX());
-
-            insertPoly2dPointStatement.execute();
-        }
-    }
-
-    private void insertRegionGlobal(GlobalProtectedRegion region) throws SQLException {
-        insertRegion(region, "global");
-    }
-
-    private void updateRegion(Region region, String type) throws SQLException  {
-        PreparedStatement updateRegionStatement = this.conn.prepareStatement(
-                "UPDATE `region` SET " +
-                "`priority` = ? WHERE `id` = ? AND `world_id` = " + this.worldDbId
-        );
-
-        updateRegionStatement.setInt(1, region.getPriority());
-        updateRegionStatement.setString(2, region.getId().toLowerCase());
-
-        updateRegionStatement.execute();
-
-        updateFlags(region);
-
-        updatePlayerAndGroups(region, false);
-        updatePlayerAndGroups(region, true);
-    }
-
-    private void updateRegionCuboid(Cuboid region) throws SQLException  {
-        updateRegion(region, "cuboid");
-
-        PreparedStatement updateCuboidRegionStatement = this.conn.prepareStatement(
-                "UPDATE `region_cuboid` SET " +
-                "`min_z` = ?, " +
-                "`min_y` = ?, " +
-                "`min_x` = ?, " +
-                "`max_z` = ?, " +
-                "`max_y` = ?, " +
-                "`max_x` = ? " +
-                "WHERE `region_id` = ? " +
-                "AND `world_id` = " + this.worldDbId
-        );
-
-        BlockVector min = region.getAABBMin();
-        BlockVector max = region.getAABBMax();
-
-        updateCuboidRegionStatement.setInt(1, min.getBlockZ());
-        updateCuboidRegionStatement.setInt(2, min.getBlockY());
-        updateCuboidRegionStatement.setInt(3, min.getBlockX());
-        updateCuboidRegionStatement.setInt(4, max.getBlockZ());
-        updateCuboidRegionStatement.setInt(5, max.getBlockY());
-        updateCuboidRegionStatement.setInt(6, max.getBlockX());
-        updateCuboidRegionStatement.setString(7, region.getId().toLowerCase());
-
-        updateCuboidRegionStatement.execute();
-    }
-
-    private void updateRegionPoly2D(ExtrudedPolygon region) throws SQLException  {
-        updateRegion(region, "poly2d");
-
-        PreparedStatement updatePoly2dRegionStatement = this.conn.prepareStatement(
-                "UPDATE `region_poly2d` SET " +
-                "`max_y` = ?, " +
-                "`min_y` = ? " +
-                "WHERE `region_id` = ? " +
-                "AND `world_id` = " + this.worldDbId
-        );
-
-        updatePoly2dRegionStatement.setInt(1, region.getAABBMax().getBlockY());
-        updatePoly2dRegionStatement.setInt(2, region.getAABBMin().getBlockY());
-        updatePoly2dRegionStatement.setString(3, region.getId().toLowerCase());
-
-        updatePoly2dRegionStatement.execute();
-
-        updatePoly2dPoints(region);
-    }
-
-    private void updateRegionGlobal(GlobalProtectedRegion region) throws SQLException {
-        updateRegion(region, "global");
-    }
-
-    @Override
-    public Map<String, Region> getRegions() {
-        return regions;
-    }
-
-    @Override
-    public void setRegions(Map<String, Region> regions) {
-        this.regions = regions;
-    }
-
-    protected Object sqlUnmarshal(String rawValue) {
+    /**
+     * Load flag data from the database, unmarshalling as needed.
+     * <p>
+     * Errors will be returned, and the raw value will be returned.
+     *
+     * @param rawValue the raw value
+     * @return the valid value
+     */
+    private Object unmarshal(String rawValue) {
         try {
             return yaml.load(rawValue);
         } catch (YAMLException e) {
@@ -1031,7 +429,15 @@ public class LegacyMySqlStore implements RegionStore {
         }
     }
 
-    protected String sqlMarshal(Object rawObject) {
-        return yaml.dump(rawObject);
+    @Override
+    public void save(Collection<Region> regions) throws IOException {
+        throw new UnsupportedOperationException("Not implemented");
     }
+
+    @Override
+    public void close() throws IOException {
+        // We don't actually have to do anything because we are using a connection
+        // pool and that is already taken care of
+    }
+
 }
