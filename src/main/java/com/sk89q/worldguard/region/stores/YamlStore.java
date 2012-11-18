@@ -193,6 +193,8 @@ public class YamlStore implements RegionStore {
             }
         }
 
+        index.reindex(); // Important!
+
         return index;
     }
 
