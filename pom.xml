@@ -99,6 +99,13 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.3</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.jolbox</groupId>
+      <artifactId>bonecp</artifactId>
+      <version>0.7.1.RELEASE</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <distributionManagement>
@@ -144,6 +151,7 @@
         <directory>${basedir}/src/main/resources/</directory>
         <includes>
           <include>models/</include>
+          <include>sql/</include>
         </includes>
       </resource>
     </resources>
