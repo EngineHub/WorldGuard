@@ -216,7 +216,7 @@ public class WorldGuardPlayerListener implements Listener {
                 }
             }
         }
-	}
+    }
 
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
@@ -694,7 +694,8 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.BREWING_STAND
                     || type == BlockID.ENCHANTMENT_TABLE
                     || type == BlockID.CAULDRON
-                    || type == BlockID.BEACON) {
+                    || type == BlockID.BEACON
+                    || type == BlockID.ANVIL) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.USE, localPlayer)) {
