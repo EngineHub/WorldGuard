@@ -27,10 +27,7 @@ import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -685,6 +682,18 @@ public class WorldGuardEntityListener implements Listener {
                 && event.getSpawnReason() == SpawnReason.NATURAL) {
             event.setCancelled(true);
             return;
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onCreatePortal(EntityCreatePortalEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
+
+        switch (event.getEntityType()) {
+            case ENDER_DRAGON:
+                if (wcfg.blockEnderDragonBlockDamage) event.setCancelled(true);
+                break;
         }
     }
 

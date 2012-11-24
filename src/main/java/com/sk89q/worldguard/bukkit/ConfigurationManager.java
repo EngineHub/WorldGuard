@@ -18,6 +18,15 @@
  */
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.commandbook.CommandBook;
+import com.sk89q.commandbook.GodComponent;
+import com.sk89q.util.yaml.YAMLFormat;
+import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.Blacklist;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,16 +35,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.GodComponent;
-import com.sk89q.util.yaml.YAMLFormat;
-import com.sk89q.util.yaml.YAMLProcessor;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.Blacklist;
 
 /**
  * Represents the global configuration and also delegates configuration
@@ -140,20 +139,14 @@ public class ConfigurationManager {
         }
 
         config.removeProperty("suppress-tick-sync-warnings");
-        useRegionsScheduler = config.getBoolean(
-                "regions.use-scheduler", true);
-        useRegionsCreatureSpawnEvent = config.getBoolean(
-                "regions.use-creature-spawn-event", true);
-        autoGodMode = config.getBoolean(
-                "auto-invincible", config.getBoolean("auto-invincible-permission", false));
+        useRegionsScheduler = config.getBoolean("regions.use-scheduler", true);
+        useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
+        autoGodMode = config.getBoolean("auto-invincible", config.getBoolean("auto-invincible-permission", false));
         config.removeProperty("auto-invincible-permission");
-        usePlayerMove = config.getBoolean(
-                "use-player-move-event", true);
+        usePlayerMove = config.getBoolean("use-player-move-event", true);
 
-        deopOnJoin = config.getBoolean(
-                "security.deop-everyone-on-join", false);
-        blockInGameOp = config.getBoolean(
-                "security.block-in-game-op-command", false);
+        deopOnJoin = config.getBoolean("security.deop-everyone-on-join", false);
+        blockInGameOp = config.getBoolean("security.block-in-game-op-command", false);
 
         hostKeys = new HashMap<String, String>();
         Object hostKeysRaw = config.getProperty("host-keys");
