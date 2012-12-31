@@ -192,15 +192,15 @@ public class WorldGuardHangingListener implements Listener {
                 return;
             }
 
-            if (entity instanceof ItemFrame
-                    && ((!plugin.getGlobalRegionManager().allows(
-                            DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, entity.getLocation())))) {
-                event.setCancelled(true);
-            } else if (entity instanceof Painting
-                    && ((!plugin.getGlobalRegionManager().allows(
-                            DefaultFlag.ENTITY_PAINTING_DESTROY, entity.getLocation())))) {
-                event.setCancelled(true);
-            }
+//            if (entity instanceof ItemFrame
+//                    && ((!plugin.getGlobalRegionManager().allows(
+//                            DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, entity.getLocation())))) {
+//                event.setCancelled(true);
+//            } else if (entity instanceof Painting
+//                    && ((!plugin.getGlobalRegionManager().allows(
+//                            DefaultFlag.ENTITY_PAINTING_DESTROY, entity.getLocation())))) {
+//                event.setCancelled(true);
+//            }
         }
     }
 }
