@@ -30,6 +30,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -379,6 +380,7 @@ public class WorldGuardEntityListener implements Listener {
             // Check Player
             // if (event.getDamager() instanceof EnderPearl || event.getDamager() instanceof Snowball) return;
             if (attacker != null && attacker instanceof Player) {
+                if (event.getDamager() instanceof EnderPearl && attacker == player) return;
                 if (wcfg.useRegions) {
                     Vector pt = toVector(defender.getLocation());
                     Vector pt2 = toVector(attacker.getLocation());
