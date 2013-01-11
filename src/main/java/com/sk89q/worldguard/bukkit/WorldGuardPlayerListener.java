@@ -89,7 +89,9 @@ public class WorldGuardPlayerListener implements Listener {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(world);
 
-            if (player.getVehicle() != null) return; // handled in vehicle listener
+            if (player.getVehicle() != null) {
+                return; // handled in vehicle listener
+            }
             if (wcfg.useRegions) {
                 // Did we move a block?
                 if (event.getFrom().getBlockX() != event.getTo().getBlockX()
@@ -110,9 +112,34 @@ public class WorldGuardPlayerListener implements Listener {
                     Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
+                    // check if region is full
+                    Integer maxPlayers = set.getFlag(DefaultFlag.MAX_PLAYERS);
+                    boolean regionFull = false;
+                    String maxPlayerMessage = null;
+                    if (maxPlayers != null && !hasBypass) {
+                        for (ProtectedRegion region : set) {
+                            int occupantCount = 0;
+                            for(Player occupant : world.getPlayers()) {
+                                // Make sure you're not checking the same player
+                                // A person with bypass doesn't count as an occupant of the region
+                                if (!occupant.equals(player) && !plugin.getGlobalRegionManager().hasBypass(occupant, world)) {
+                                    if (region.contains(BukkitUtil.toVector(occupant.getLocation()))) {
+                                        if (++occupantCount >= maxPlayers) {
+                                            regionFull = true;
+                                            maxPlayerMessage = region.getFlag(DefaultFlag.MAX_PLAYERS_MESSAGE);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-                    if (!hasBypass && !entryAllowed) {
-                        player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
+                    if (!hasBypass && (!entryAllowed || regionFull)) {
+                        String message = maxPlayerMessage != null ? maxPlayerMessage : "You are not permitted to enter this area.";
+
+                        player.sendMessage(ChatColor.DARK_RED + message);
 
                         Location newLoc = event.getFrom();
                         newLoc.setX(newLoc.getBlockX() + 0.5);
