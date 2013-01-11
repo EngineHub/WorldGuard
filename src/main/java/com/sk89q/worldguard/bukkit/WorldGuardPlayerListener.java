@@ -54,6 +54,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.potion.Potion;
@@ -118,6 +120,24 @@ public class WorldGuardPlayerListener implements Listener {
                 return; // handled in vehicle listener
             }
             if (wcfg.useRegions) {
+                if (event instanceof PlayerTeleportEvent) {
+                    PlayerTeleportEvent tpEvent = (PlayerTeleportEvent) event;
+                    if (tpEvent.getCause() == TeleportCause.ENDER_PEARL) {
+                        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                        Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
+                        Vector ptFrom = new Vector(event.getFrom().getBlockX(), event.getFrom().getBlockY(), event.getFrom().getBlockZ());
+                        ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+                        ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
+                        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+                        if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
+                                && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
+                                        && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
+                            tpEvent.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
                 // Did we move a block?
                 if (event.getFrom().getBlockX() != event.getTo().getBlockX()
                         || event.getFrom().getBlockY() != event.getTo().getBlockY()
