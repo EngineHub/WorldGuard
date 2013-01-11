@@ -110,9 +110,45 @@ public class WorldGuardPlayerListener implements Listener {
                     Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
+                    // check if region is full
+                    Integer maxPlayers = set.getFlag(DefaultFlag.MAX_PLAYERS);
+                    boolean regionFull = false;
+                    String regionMessage = null;
+                    if(maxPlayers != null) {
+                        for(ProtectedRegion region : set) {
+                            int occupantCount = 0;
+                            for(Player daPlayer : world.getPlayers()) {
+                                // Make sure you're not checking the same player
+                                if(!daPlayer.equals(player) && !region.isOwner(daPlayer.getName()) 
+                                        && !plugin.getGlobalRegionManager().hasBypass(daPlayer, world)) {
+                                    if(region.contains(
+                                            daPlayer.getLocation().getBlockX(),
+                                            daPlayer.getLocation().getBlockY(),
+                                            daPlayer.getLocation().getBlockZ())) {
+                                        occupantCount++;                      
+                                    }
+                                }
+                            }
+                            if (occupantCount >= maxPlayers && !hasBypass) {
+                            	regionFull = true;
+                                regionMessage = set.getFlag(DefaultFlag.MAX_PLAYERS_MESSAGE);
+                            }
+                        }
+                    }
+                    
                     boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-                    if (!hasBypass && !entryAllowed) {
-                        player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
+                    if (!hasBypass && (!entryAllowed | regionFull)) {
+                    	String message = "You are not permitted to enter this area.";
+                        if(regionFull) {
+                        	if(regionMessage!=null){
+                        		message = regionMessage;
+                        	}
+                        	else {
+                        		message = "Region is full.";
+                        	}
+                        }
+                        
+                        player.sendMessage(ChatColor.DARK_RED + message);
 
                         Location newLoc = event.getFrom();
                         newLoc.setX(newLoc.getBlockX() + 0.5);
