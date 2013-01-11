@@ -18,19 +18,19 @@
  */
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldedit.blocks.BlockType;
-import com.sk89q.worldedit.blocks.ItemID;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.*;
-import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.*;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+
+import java.util.Iterator;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -39,17 +39,42 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.blocks.ItemID;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**
  * Handles all events thrown in relation to a player.
@@ -659,13 +684,27 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (item.getTypeId() == ItemID.INK_SACK
-                    && item.getData() != null
-                    && item.getData().getData() == 15 // bonemeal
-                    && type == BlockID.GRASS) {
-                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !set.canBuild(localPlayer)) {
-                    event.setCancelled(true);
-                    event.setUseItemInHand(Result.DENY);
+                    && item.getData() != null) {
+                if (item.getData().getData() == 15 // bonemeal
+                        && type == BlockID.GRASS) {
+                    if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                            && !set.canBuild(localPlayer)) {
+                        event.setCancelled(true);
+                        event.setUseItemInHand(Result.DENY);
+                        player.sendMessage(ChatColor.DARK_RED + "You're not allowed to use that here.");
+                        return;
+                    }
+                } else if (item.getData().getData() == 3) { // cocoa beans
+                    // craftbukkit doesn't throw a block place for this, so workaround
+                    if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                            && !set.canBuild(localPlayer)) {
+                        if (!(event.getBlockFace() == BlockFace.DOWN || event.getBlockFace() == BlockFace.UP)) {
+                            event.setCancelled(true);
+                            event.setUseItemInHand(Result.DENY);
+                            player.sendMessage(ChatColor.DARK_RED + "You're not allowed to plant that here.");
+                            return;
+                        }
+                    }
                 }
             }
 
