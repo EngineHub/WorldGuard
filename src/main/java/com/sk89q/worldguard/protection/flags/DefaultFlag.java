@@ -66,6 +66,7 @@ public final class DefaultFlag {
     public static final StateFlag ENTRY = new StateFlag("entry", true);
     public static final StateFlag EXIT = new StateFlag("exit", true);
     public static final StateFlag ITEM_DROP = new StateFlag("item-drop", true);
+    public static final StateFlag ENDERPEARL = new StateFlag("enderpearl", true);
     public static final StateFlag ENTITY_PAINTING_DESTROY = new StateFlag("entity-painting-destroy", true);
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = new StateFlag("entity-item-frame-destroy", true);
     public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
@@ -98,7 +99,7 @@ public final class DefaultFlag {
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
         CREEPER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
-        EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY,
+        EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,
         ENTITY_ITEM_FRAME_DESTROY, ITEM_DROP, MAX_PLAYERS, MAX_PLAYERS_MESSAGE,
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
