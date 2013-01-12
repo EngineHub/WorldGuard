@@ -112,6 +112,7 @@ public class WorldConfiguration {
     public boolean blockEntityItemFrameDestroy;
     public boolean blockPluginSpawning;
     public boolean blockGroundSlimes;
+    public boolean blockZombieDoorDestruction;
     public boolean disableContactDamage;
     public boolean disableFallDamage;
     public boolean disableLavaDamage;
@@ -352,6 +353,7 @@ public class WorldConfiguration {
         blockPluginSpawning = getBoolean("mobs.block-plugin-spawning", true);
         blockGroundSlimes = getBoolean("mobs.block-above-ground-slimes", false);
         blockOtherExplosions = getBoolean("mobs.block-other-explosions", false);
+        blockZombieDoorDestruction = getBoolean("mobs.block-zombie-door-destruction", false);
 
         disableFallDamage = getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = getBoolean("player-damage.disable-lava-damage", false);
