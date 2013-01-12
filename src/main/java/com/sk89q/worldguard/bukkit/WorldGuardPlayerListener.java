@@ -120,24 +120,6 @@ public class WorldGuardPlayerListener implements Listener {
                 return; // handled in vehicle listener
             }
             if (wcfg.useRegions) {
-                if (event instanceof PlayerTeleportEvent) {
-                    PlayerTeleportEvent tpEvent = (PlayerTeleportEvent) event;
-                    if (tpEvent.getCause() == TeleportCause.ENDER_PEARL) {
-                        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                        Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
-                        Vector ptFrom = new Vector(event.getFrom().getBlockX(), event.getFrom().getBlockY(), event.getFrom().getBlockZ());
-                        ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                        ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
-                        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-                        if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
-                                && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
-                                        && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
-                            tpEvent.setCancelled(true);
-                            return;
-                        }
-                    }
-                }
                 // Did we move a block?
                 if (event.getFrom().getBlockX() != event.getTo().getBlockX()
                         || event.getFrom().getBlockY() != event.getTo().getBlockY()
@@ -1204,6 +1186,39 @@ public class WorldGuardPlayerListener implements Listener {
                     event.setCancelled(true);
                     player.sendMessage("This bed doesn't belong to you!");
                     return;
+            }
+        }
+    }
+
+    @EventHandler(priority= EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        World world = event.getFrom().getWorld();
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.useRegions) {
+            if (event.getCause() == TeleportCause.ENDER_PEARL) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(event.getFrom().getWorld());
+                Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
+                Vector ptFrom = new Vector(event.getFrom().getBlockX(), event.getFrom().getBlockY(), event.getFrom().getBlockZ());
+                ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+                ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
+                LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
+
+                if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
+                        && !(set.allows(DefaultFlag.ENTRY, localPlayer)
+                                && setFrom.allows(DefaultFlag.EXIT, localPlayer))) {
+                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
+                    event.setCancelled(true);
+                    return;
+                }
+                if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
+                        && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
+                                && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
+                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
     }
