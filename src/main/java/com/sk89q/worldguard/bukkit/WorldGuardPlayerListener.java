@@ -120,24 +120,6 @@ public class WorldGuardPlayerListener implements Listener {
                 return; // handled in vehicle listener
             }
             if (wcfg.useRegions) {
-                if (event instanceof PlayerTeleportEvent) {
-                    PlayerTeleportEvent tpEvent = (PlayerTeleportEvent) event;
-                    if (tpEvent.getCause() == TeleportCause.ENDER_PEARL) {
-                        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                        Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
-                        Vector ptFrom = new Vector(event.getFrom().getBlockX(), event.getFrom().getBlockY(), event.getFrom().getBlockZ());
-                        ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                        ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
-                        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-                        if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
-                                && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
-                                        && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
-                            tpEvent.setCancelled(true);
-                            return;
-                        }
-                    }
-                }
                 // Did we move a block?
                 if (event.getFrom().getBlockX() != event.getTo().getBlockX()
                         || event.getFrom().getBlockY() != event.getTo().getBlockY()
@@ -285,6 +267,28 @@ public class WorldGuardPlayerListener implements Listener {
                     state.lastBlockX = event.getTo().getBlockX();
                     state.lastBlockY = event.getTo().getBlockY();
                     state.lastBlockZ = event.getTo().getBlockZ();
+                }
+            }
+        }
+        
+        @EventHandler
+        public void onPlayerTeleport(PlayerTeleportEvent event) {
+            if (event.getCause() == TeleportCause.ENDER_PEARL) {
+                Player player = event.getPlayer();
+                World world = player.getWorld();
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
+                Vector ptFrom = new Vector(event.getFrom().getBlockX(), event.getFrom().getBlockY(), event.getFrom().getBlockZ());
+                ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+                ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
+                LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+                if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
+                       && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
+                                && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
+                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to use enderpearls here.");
+                    event.setCancelled(true);
+                    return;
                 }
             }
         }
