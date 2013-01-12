@@ -546,7 +546,7 @@ public class WorldGuardPlayerListener implements Listener {
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-            if (type == BlockID.STONE_BUTTON
+            /*if (type == BlockID.STONE_BUTTON
                   || type == BlockID.LEVER
                   || type == BlockID.WOODEN_DOOR
                   || type == BlockID.TRAP_DOOR
@@ -559,7 +559,7 @@ public class WorldGuardPlayerListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-            }
+            }*/
 
             if (type == BlockID.DRAGON_EGG) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
@@ -652,8 +652,7 @@ public class WorldGuardPlayerListener implements Listener {
                 || type == BlockID.FURNACE
                 || type == BlockID.BURNING_FURNACE
                 || type == BlockID.BREWING_STAND
-                || type == BlockID.ENCHANTMENT_TABLE
-                || type == BlockID.CAULDRON)
+                || type == BlockID.ENCHANTMENT_TABLE)
                 && wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
             for (int slot = 0; slot < 40; slot++) {
@@ -728,6 +727,22 @@ public class WorldGuardPlayerListener implements Listener {
                 }
             }
 
+            if (type == BlockID.FLOWER_POT) { // no api for this atm
+                if (item.getTypeId() == BlockID.RED_FLOWER
+                        || item.getTypeId() == BlockID.YELLOW_FLOWER
+                        || item.getTypeId() == BlockID.SAPLING
+                        || item.getTypeId() == BlockID.RED_MUSHROOM
+                        || item.getTypeId() == BlockID.BROWN_MUSHROOM
+                        || item.getTypeId() == BlockID.CACTUS
+                        || item.getTypeId() == BlockID.LONG_GRASS
+                        || item.getTypeId() == BlockID.DEAD_BUSH) {
+                    event.setUseItemInHand(Result.DENY);
+                    event.setCancelled(true);
+                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to plant that here.");
+                    return;
+                }
+            }
+
             if (type == BlockID.BED) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.SLEEP, localPlayer)) {
@@ -743,7 +758,8 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.DISPENSER
                     || type == BlockID.FURNACE
                     || type == BlockID.BURNING_FURNACE
-                    || type == BlockID.BREWING_STAND) {
+                    || type == BlockID.BREWING_STAND
+                    || type == BlockID.ENDER_CHEST) { // meh?
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.CHEST_ACCESS, localPlayer)) {
@@ -766,6 +782,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (type == BlockID.LEVER
                     || type == BlockID.STONE_BUTTON
+                    || type == BlockID.WOODEN_BUTTON
                     || type == BlockID.NOTE_BLOCK
                     || type == BlockID.REDSTONE_REPEATER_OFF
                     || type == BlockID.REDSTONE_REPEATER_ON
@@ -827,13 +844,13 @@ public class WorldGuardPlayerListener implements Listener {
         }
 
         if (wcfg.getBlacklist() != null) {
-            if(type != BlockID.CHEST
+            if (player.isSneaking() // sneak + right clicking no longer activates blocks as of some recent version
+                    || (type != BlockID.CHEST
                     && type != BlockID.DISPENSER
                     && type != BlockID.FURNACE
                     && type != BlockID.BURNING_FURNACE
                     && type != BlockID.BREWING_STAND
-                    && type != BlockID.ENCHANTMENT_TABLE
-                    && type != BlockID.CAULDRON) {
+                    && type != BlockID.ENCHANTMENT_TABLE)) {
                 if (!wcfg.getBlacklist().check(
                         new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
                                 item.getTypeId()), false, false)) {
@@ -956,7 +973,8 @@ public class WorldGuardPlayerListener implements Listener {
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-            if (type == BlockID.STONE_PRESSURE_PLATE || type == BlockID.WOODEN_PRESSURE_PLATE) {
+            if (type == BlockID.STONE_PRESSURE_PLATE || type == BlockID.WOODEN_PRESSURE_PLATE
+                    || type == BlockID.TRIPWIRE) {
                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                        && !set.canBuild(localPlayer)
                        && !set.allows(DefaultFlag.USE, localPlayer)) {
