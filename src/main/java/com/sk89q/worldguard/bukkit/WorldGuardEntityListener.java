@@ -428,6 +428,25 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
 
+            if (type == DamageCause.WITHER) {
+                // wither boss DoT tick
+                if (wcfg.disableMobDamage) {
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (wcfg.useRegions) {
+                    Vector pt = toVector(defender.getLocation());
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
+                    ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+                    if (!set.allows(DefaultFlag.MOB_DAMAGE, plugin.wrapPlayer(player))) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+
             if (type == DamageCause.DROWNING && cfg.hasAmphibiousMode(player)) {
                 player.setRemainingAir(player.getMaximumAir());
                 event.setCancelled(true);
