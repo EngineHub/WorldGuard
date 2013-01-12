@@ -1,3 +1,33 @@
+5.7:
+- Fixed thread sync issue with FlagStateManager.
+- Fixed dragon egg region protection not working in certain cases.
+- Added beacon and anvil usage protection in regions.
+- Add mobs.block-enderdragon-portal-creation to stop enderdragons
+    from making portals on death.
+- Fix TNT being lethal in some case when damage was disabled.
+- Fix snowballs and enderpearls being able to knock players back in
+    pvp deny regions.
+- Add subcommand support for allowed and blocked command flags.
+- Add max-players-allowed and max-players-reject-message flags to
+    limit the numbers of players in a region.
+- Fix players being able to plant cocoa beans in protected areas.
+- Add an enderpearl flag to prevent players from teleporting to and
+    from regions.
+- Added mobs.block-other-explosions config setting and other-explosion
+    flag to block explosions caused by uncovered things, such as other
+    plugins. (It doesn't actually have to be a mob)
+- Fix mob damage setting and flag not blocking the DoT wither effect.
+- Ghast fireball flag will not block blaze fireballs from lighting things
+    on fire.
+- Fixed players without region permissions being able to trigger tripwires,
+    use enderchests, use wooden buttons, and put plants in flower pots.
+- Added mobs.block-zombie-door-destruction setting to stop zombies from
+    breaking down doors while difficulty is set to hard.
+- Added a texture-pack flag that sends players a texture pack url when in
+    certain regions.
+
+Thank you to thvortex, Dilandau, tophathacker, and Dark_arc for their contributions this release.
+
 5.6.5:
 - Fixed a regression that caused paintings and item frames to no longer be properly
     protected.
