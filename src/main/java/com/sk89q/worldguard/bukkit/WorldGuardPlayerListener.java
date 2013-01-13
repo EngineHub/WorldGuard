@@ -758,8 +758,7 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.DISPENSER
                     || type == BlockID.FURNACE
                     || type == BlockID.BURNING_FURNACE
-                    || type == BlockID.BREWING_STAND
-                    || type == BlockID.ENDER_CHEST) { // meh?
+                    || type == BlockID.BREWING_STAND) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.CHEST_ACCESS, localPlayer)) {
@@ -797,6 +796,7 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.BREWING_STAND
                     || type == BlockID.ENCHANTMENT_TABLE
                     || type == BlockID.CAULDRON
+                    || type == BlockID.ENDER_CHEST // blah
                     || type == BlockID.BEACON
                     || type == BlockID.ANVIL) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
