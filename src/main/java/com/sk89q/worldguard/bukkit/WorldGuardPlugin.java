@@ -34,9 +34,6 @@ import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import com.sk89q.bukkit.util.CommandsManagerRegistration;
-import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.wepif.PermissionsResolverManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -50,6 +47,15 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sk89q.bukkit.util.CommandsManagerRegistration;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.minecraft.util.commands.CommandUsageException;
+import com.sk89q.minecraft.util.commands.CommandsManager;
+import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
+import com.sk89q.minecraft.util.commands.SimpleInjector;
+import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
@@ -138,12 +144,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         LegacyWorldGuardMigration.migrateBlacklist(this);
 
         try {
-        	// Load the configuration
-        	configuration.load();
-        	globalRegionManager.preload();
+            // Load the configuration
+            configuration.load();
+            globalRegionManager.preload();
         } catch (FatalConfigurationLoadingException e) {
-        	e.printStackTrace();
-        	getServer().shutdown();
+            e.printStackTrace();
+            getServer().shutdown();
         }
 
         // Migrate regions after the regions were loaded because

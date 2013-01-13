@@ -36,12 +36,11 @@ import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
-import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.databases.MySQLDatabase;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.FlatRegionManager;
 import com.sk89q.worldguard.protection.managers.PRTreeRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
@@ -160,8 +159,10 @@ public class GlobalRegionManager {
             RegionManager manager = new PRTreeRegionManager(database);
             manager.load();
 
-            plugin.getLogger().info(manager.getRegions().size()
-                    + " regions loaded for '" + name + "'");
+            if (plugin.getGlobalStateManager().get(world).summaryOnStart) {
+                plugin.getLogger().info(manager.getRegions().size()
+                        + " regions loaded for '" + name + "'");
+            }
 
             return manager;
         } catch (ProtectionDatabaseException e) {
