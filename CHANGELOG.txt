@@ -23,8 +23,6 @@
     use enderchests, use wooden buttons, and put plants in flower pots.
 - Added mobs.block-zombie-door-destruction setting to stop zombies from
     breaking down doors while difficulty is set to hard.
-- Added a texture-pack flag that sends players a texture pack url when in
-    certain regions.
 
 Thank you to thvortex, Dilandau, tophathacker, and Dark_arc for their contributions this release.
 
