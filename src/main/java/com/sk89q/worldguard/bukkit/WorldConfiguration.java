@@ -75,6 +75,7 @@ public class WorldConfiguration {
     private ChestProtection chestProtection = new SignChestProtection();
 
     /* Configuration data start */
+    public boolean summaryOnStart;
     public boolean opPermissions;
     public boolean fireSpreadDisableToggle;
     public boolean itemDurability;
@@ -189,7 +190,9 @@ public class WorldConfiguration {
         config = new YAMLProcessor(configFile, true, YAMLFormat.EXTENDED);
         loadConfiguration();
 
-        plugin.getLogger().info("Loaded configuration for world '" + worldName + "'");
+        if (summaryOnStart) {
+            plugin.getLogger().info("Loaded configuration for world '" + worldName + "'");
+        }
     }
 
     private boolean getBoolean(String node, boolean def) {
@@ -295,6 +298,7 @@ public class WorldConfiguration {
             e.printStackTrace();
         }
 
+        summaryOnStart = getBoolean("summary-on-start", true);
         opPermissions = getBoolean("op-permissions", true);
 
         itemDurability = getBoolean("protection.item-durability", true);
@@ -464,7 +468,9 @@ public class WorldConfiguration {
                 this.blacklist = null;
             } else {
                 this.blacklist = blist;
-                plugin.getLogger().log(Level.INFO, "Blacklist loaded.");
+                if (summaryOnStart) {
+                    plugin.getLogger().log(Level.INFO, "Blacklist loaded.");
+                }
 
                 BlacklistLogger blacklistLogger = blist.getLogger();
 
@@ -490,7 +496,7 @@ public class WorldConfiguration {
         }
 
         // Print an overview of settings
-        if (getBoolean("summary-on-start", true)) {
+        if (summaryOnStart) {
             plugin.getLogger().log(Level.INFO, blockTNTExplosions
                     ? "(" + worldName + ") TNT ignition is blocked."
                     : "(" + worldName + ") TNT ignition is PERMITTED.");
