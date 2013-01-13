@@ -19,7 +19,23 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.minecraft.util.commands.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Location;
 import com.sk89q.worldedit.Vector;
@@ -38,20 +54,17 @@ import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 import com.sk89q.worldguard.protection.databases.migrators.AbstractDatabaseMigrator;
 import com.sk89q.worldguard.protection.databases.migrators.MigrationException;
 import com.sk89q.worldguard.protection.databases.migrators.MigratorKey;
-import com.sk89q.worldguard.protection.flags.*;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
 
 public class RegionCommands {
     private final WorldGuardPlugin plugin;
@@ -1108,7 +1121,6 @@ public class RegionCommands {
 
     @Command(aliases = {"teleport", "tp"}, usage = "<id>", flags = "s",
             desc = "Teleports you to the location associated with the region.", min = 1, max = 1)
-    @CommandPermissions({"worldguard.region.teleport"})
     public void teleport(CommandContext args, CommandSender sender) throws CommandException {
         final Player player = plugin.checkPlayer(sender);
 
