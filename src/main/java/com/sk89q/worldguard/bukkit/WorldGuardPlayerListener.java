@@ -733,10 +733,13 @@ public class WorldGuardPlayerListener implements Listener {
                         || item.getTypeId() == BlockID.CACTUS
                         || item.getTypeId() == BlockID.LONG_GRASS
                         || item.getTypeId() == BlockID.DEAD_BUSH) {
-                    event.setUseItemInHand(Result.DENY);
-                    event.setCancelled(true);
-                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to plant that here.");
-                    return;
+                    if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                            && !set.canBuild(localPlayer)) {
+                        event.setUseItemInHand(Result.DENY);
+                        event.setCancelled(true);
+                        player.sendMessage(ChatColor.DARK_RED + "You're not allowed to plant that here.");
+                        return;
+                    }
                 }
             }
 
