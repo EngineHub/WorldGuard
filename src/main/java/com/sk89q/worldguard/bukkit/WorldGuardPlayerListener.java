@@ -139,21 +139,35 @@ public class WorldGuardPlayerListener implements Listener {
                     Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
                     ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
+                    /*
                     // check if region is full
-                    Integer maxPlayers = set.getFlag(DefaultFlag.MAX_PLAYERS);
+                    // get the lowest number of allowed members in any region
                     boolean regionFull = false;
                     String maxPlayerMessage = null;
-                    if (maxPlayers != null && !hasBypass) {
+                    if (!hasBypass) {
                         for (ProtectedRegion region : set) {
+                            if (region instanceof GlobalProtectedRegion) {
+                                continue; // global region can't have a max
+                            }
+                            // get the max for just this region
+                            Integer maxPlayers = region.getFlag(DefaultFlag.MAX_PLAYERS);
+                            if (maxPlayers == null) {
+                                continue;
+                            }
                             int occupantCount = 0;
                             for(Player occupant : world.getPlayers()) {
-                                // Make sure you're not checking the same player
+                                // each player in this region counts as one toward the max of just this region
                                 // A person with bypass doesn't count as an occupant of the region
                                 if (!occupant.equals(player) && !plugin.getGlobalRegionManager().hasBypass(occupant, world)) {
                                     if (region.contains(BukkitUtil.toVector(occupant.getLocation()))) {
                                         if (++occupantCount >= maxPlayers) {
                                             regionFull = true;
                                             maxPlayerMessage = region.getFlag(DefaultFlag.MAX_PLAYERS_MESSAGE);
+                                            // At least one region in the set is full, we are going to use this message because it
+                                            // was the first one we detected as full. In reality we should check them all and then
+                                            // resolve the message from full regions, but that is probably a lot laggier (and this
+                                            // is already pretty laggy. In practice, we can't really control which one we get first
+                                            // right here.
                                             break;
                                         }
                                     }
@@ -161,10 +175,11 @@ public class WorldGuardPlayerListener implements Listener {
                             }
                         }
                     }
+                    */
 
                     boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-                    if (!hasBypass && (!entryAllowed || regionFull)) {
-                        String message = maxPlayerMessage != null ? maxPlayerMessage : "You are not permitted to enter this area.";
+                    if (!hasBypass && (!entryAllowed /*|| regionFull*/)) {
+                        String message = /*maxPlayerMessage != null ? maxPlayerMessage :*/ "You are not permitted to enter this area.";
 
                         player.sendMessage(ChatColor.DARK_RED + message);
 
