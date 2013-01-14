@@ -850,7 +850,9 @@ public class WorldGuardPlayerListener implements Listener {
                     && type != BlockID.FURNACE
                     && type != BlockID.BURNING_FURNACE
                     && type != BlockID.BREWING_STAND
-                    && type != BlockID.ENCHANTMENT_TABLE)) {
+                    && type != BlockID.ENCHANTMENT_TABLE
+                    && type != BlockID.ANVIL
+                    && type != BlockID.ENDER_CHEST)) {
                 if (!wcfg.getBlacklist().check(
                         new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
                                 item.getTypeId()), false, false)) {
