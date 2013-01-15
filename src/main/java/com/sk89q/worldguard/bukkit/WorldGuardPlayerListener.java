@@ -689,13 +689,34 @@ public class WorldGuardPlayerListener implements Listener {
                 return;
             }
 
+            Block placedOn = block.getRelative(event.getBlockFace());
             if (item.getTypeId() == BlockID.TNT) {
-                Block placedOn = block.getRelative(event.getBlockFace());
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !plugin.getGlobalRegionManager().allows(
                         DefaultFlag.TNT, placedOn.getLocation(), localPlayer)) {
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
+                }
+            }
+
+            // hacky workaround for craftbukkit bug
+            if (item.getTypeId() == BlockID.STEP
+                    || item.getTypeId() == BlockID.WOODEN_STEP) {
+                if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)) {
+                    boolean cancel = false;
+                    if ((block.getTypeId() == item.getTypeId()) 
+                        && !plugin.getGlobalRegionManager().canBuild(player, block.getLocation())) {
+                    // if we are on a step already, the new block will end up in the same block as the interact
+                        cancel = true;
+                    } else if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
+                    // if we are on another block, the half-slab in hand will be pushed to the adjacent block
+                        cancel = true;
+                    }
+                    if (cancel) {
+                        player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
             }
 
