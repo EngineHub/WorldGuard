@@ -41,6 +41,8 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -533,7 +535,7 @@ public class WorldGuardEntityListener implements Listener {
 
         // Not all explosions come from an entity
         if (ent != null) {
-            if (ent.getType() == witherType) {
+            if (ent instanceof Wither) {
                 if (wcfg.blockWitherBlockDamage) {
                     event.blockList().clear();
                     event.setCancelled(true);
@@ -546,7 +548,7 @@ public class WorldGuardEntityListener implements Listener {
                 }
             }
 
-            if (ent.getType() == witherSkullType) {
+            if (ent instanceof WitherSkull) {
                 if (wcfg.blockWitherSkullBlockDamage) {
                     event.blockList().clear();
                     event.setCancelled(true);
@@ -625,7 +627,7 @@ public class WorldGuardEntityListener implements Listener {
                         }
                     }
                 }
-            } else if (ent instanceof Fireball) {
+            } else if (ent instanceof Fireball && !(ent instanceof WitherSkull)) {
                 if (wcfg.blockFireballBlockDamage) {
                     event.blockList().clear();
                     event.setCancelled(true);
