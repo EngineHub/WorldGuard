@@ -642,6 +642,19 @@ public class WorldGuardPlayerListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
+        // work around to fix a CraftBukkit bug
+        if (item.getTypeId() == BlockID.STEP) {
+            if (wcfg.useRegions) {
+                final Location location = block.getLocation();
+                if (!plugin.getGlobalRegionManager().canBuild(player, location)
+                 || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+        
         // Infinite stack removal
         if ((type == BlockID.CHEST
                 || type == BlockID.JUKEBOX
