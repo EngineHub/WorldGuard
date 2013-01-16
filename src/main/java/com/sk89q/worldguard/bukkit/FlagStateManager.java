@@ -121,6 +121,10 @@ public class FlagStateManager implements Runnable {
         if (minHealth == null) minHealth = 0;
         if (maxHealth == null) maxHealth = 20;
 
+        // Apply a cap to prevent possible exceptions
+        minHealth = Math.min(player.getMaxHealth(), minHealth);
+        maxHealth = Math.min(player.getMaxHealth(), maxHealth);
+
         if (player.getHealth() >= maxHealth && healAmount > 0) {
             return;
         }
@@ -157,6 +161,10 @@ public class FlagStateManager implements Runnable {
         }
         if (minHunger == null) minHunger = 0;
         if (maxHunger == null) maxHunger = 20;
+
+        // Apply a cap to prevent possible exceptions
+        minHunger = Math.min(20, minHunger);
+        maxHunger = Math.min(20, maxHunger);
 
         if (player.getFoodLevel() >= maxHunger && feedAmount > 0) {
             return;
