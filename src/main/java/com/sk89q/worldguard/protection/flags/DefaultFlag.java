@@ -81,6 +81,10 @@ public final class DefaultFlag {
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount", RegionGroup.ALL);
     public static final IntegerFlag MIN_HEAL = new IntegerFlag("heal-min-health", RegionGroup.ALL);
     public static final IntegerFlag MAX_HEAL = new IntegerFlag("heal-max-health", RegionGroup.ALL);
+    public static final IntegerFlag DAMAGE_DELAY = new IntegerFlag("damage-delay", RegionGroup.ALL);
+    public static final IntegerFlag DAMAGE_AMOUNT = new IntegerFlag("damage-amount", RegionGroup.ALL);
+    public static final IntegerFlag MIN_DAMAGE = new IntegerFlag("damage-min-health", RegionGroup.ALL);
+    public static final IntegerFlag MAX_DAMAGE = new IntegerFlag("damage-max-health", RegionGroup.ALL);
     public static final IntegerFlag FEED_DELAY = new IntegerFlag("feed-delay", RegionGroup.ALL);
     public static final IntegerFlag FEED_AMOUNT = new IntegerFlag("feed-amount", RegionGroup.ALL);
     public static final IntegerFlag MIN_FOOD = new IntegerFlag("feed-min-hunger", RegionGroup.ALL);
@@ -103,6 +107,7 @@ public final class DefaultFlag {
         EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,
         ENTITY_ITEM_FRAME_DESTROY, ITEM_DROP, /*MAX_PLAYERS, MAX_PLAYERS_MESSAGE,*/
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
+	DAMAGE_AMOUNT, DAMAGE_DELAY, MIN_DAMAGE, MAX_DAMAGE,
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
         SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, GAME_MODE,
         MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, SEND_CHAT,

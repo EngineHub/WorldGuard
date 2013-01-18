@@ -90,6 +90,7 @@ public class FlagStateManager implements Runnable {
                     && !(player.getGameMode() == GameMode.CREATIVE)) {
                 processHeal(applicable, player, state);
                 processFeed(applicable, player, state);
+		processDamage(applicable, player, state);
             }
         }
     }
@@ -179,6 +180,49 @@ public class FlagStateManager implements Runnable {
             state.lastFeed = now;
         }
     }
+    
+/**
+     * Process damaging for a player.
+     *
+     * @param applicable The set of applicable regions
+     * @param player The player to process damaging flags on
+     * @param state The player's state
+     */
+    private void processDamage(ApplicableRegionSet applicable, Player player,
+            PlayerFlagState state) {
+        if (player.getHealth() <= 0) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+
+        Integer damageAmount = applicable.getFlag(DefaultFlag.DAMAGE_AMOUNT);
+        Integer damageDelay = applicable.getFlag(DefaultFlag.DAMAGE_DELAY);
+        Integer minHealth = applicable.getFlag(DefaultFlag.MIN_DAMAGE);
+        Integer maxHealth = applicable.getFlag(DefaultFlag.MAX_DAMAGE);
+
+        if (damageAmount == null || damageDelay == null || damageAmount == 0 || damageDelay < 0) {
+            return;
+        }
+        if (minHealth == null) minHealth = 0;
+        if (maxHealth == null) maxHealth = 20;
+
+	// Apply a cap to prevent possible exceptions
+        minHealth = Math.min(player.getMaxHealth(), minHealth);
+        maxHealth = Math.min(player.getMaxHealth(), maxHealth);
+
+        if (player.getHealth() <= minHealth && damageAmount > 0) {//we dont deal damage under minimum defined
+            return;
+        }
+
+        if (damageDelay <= 0) {
+            player.setHealth(damageAmount > 0 ? minHealth : maxHealth); // if no delay and damage amount set, going to minhealth instant (can insta-kill if minHealth=0)
+            state.lastDamage = now;
+        } else if (now - state.lastDamage > damageDelay * 1000) {
+            // clamp health between minimum and maximum
+            player.setHealth(Math.min(maxHealth, Math.max(minHealth, player.getHealth() - damageAmount)));
+            state.lastDamage = now;
+        }
+    }    
 
     /**
      * Forget a player.
@@ -220,6 +264,7 @@ public class FlagStateManager implements Runnable {
     public static class PlayerFlagState {
         public long lastHeal;
         public long lastFeed;
+	public long lastDamage;
         public String lastGreeting;
         public String lastFarewell;
         public Boolean lastExitAllowed = null;
