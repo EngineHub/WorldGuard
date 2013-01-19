@@ -337,7 +337,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (!cfg.hasCommandBookGodMode() && cfg.autoGodMode && (plugin.inGroup(player, "wg-invincible")
                 || plugin.hasPermission(player, "worldguard.auto-invincible"))) {
-            cfg.enableGodMode(player);
+            cfg.setGodMode(player, true);
         }
 
         if (plugin.inGroup(player, "wg-amphibious")) {
