@@ -266,6 +266,29 @@ public class ConfigurationManager {
     }
 
     /**
+     * Function to enable/disable the god mode for a player
+     * Warning: Experimental
+     * 
+     * @param player The player
+     * @param state true if the player should gain, otherwise false
+     * @return true if the god mode could be set, otherwise false
+     */
+    public boolean setGodMode(Player player, boolean state) {
+    	if (hasCommandBookGodMode) {
+            GodComponent god = CommandBook.inst().getComponentManager().getComponent(GodComponent.class);
+            if (god != null) {
+            	if (state) {
+            		god.enableGodMode(player);
+            	} else {
+            		god.disableGodMode(player);
+            	}
+                return true;
+            }
+        }
+    	return false;
+    }
+    
+    /**
      * Enable amphibious mode for a player.
      *
      * @param player The player to enable amphibious mode for
