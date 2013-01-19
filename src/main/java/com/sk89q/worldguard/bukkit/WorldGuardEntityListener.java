@@ -538,7 +538,6 @@ public class WorldGuardEntityListener implements Listener {
             if (ent instanceof Wither) {
                 if (wcfg.blockWitherBlockDamage) {
                     event.blockList().clear();
-                    event.setCancelled(true);
                     return;
                 }
 
@@ -551,7 +550,6 @@ public class WorldGuardEntityListener implements Listener {
             if (ent instanceof WitherSkull) {
                 if (wcfg.blockWitherSkullBlockDamage) {
                     event.blockList().clear();
-                    event.setCancelled(true);
                     return;
                 }
 
@@ -564,7 +562,6 @@ public class WorldGuardEntityListener implements Listener {
             if (ent instanceof Creeper) {
                 if (wcfg.blockCreeperBlockDamage) {
                     event.blockList().clear();
-                    event.setCancelled(true);
                     return;
                 }
 
@@ -607,7 +604,6 @@ public class WorldGuardEntityListener implements Listener {
             } else if (ent instanceof TNTPrimed) {
                 if (wcfg.blockTNTBlockDamage) {
                     event.blockList().clear();
-                    event.setCancelled(true);
                     return;
                 }
 
@@ -630,7 +626,6 @@ public class WorldGuardEntityListener implements Listener {
             } else if (ent instanceof Fireball && !(ent instanceof WitherSkull)) {
                 if (wcfg.blockFireballBlockDamage) {
                     event.blockList().clear();
-                    event.setCancelled(true);
                     return;
                 }
 
