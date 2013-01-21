@@ -169,7 +169,7 @@ public class WorldGuardHangingListener implements Listener {
         }
 
         if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
+            if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getRelative(event.getBlockFace()))) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
