@@ -30,6 +30,7 @@ import org.bukkit.entity.Hanging;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -79,6 +80,10 @@ public class WorldGuardHangingListener implements Listener {
         if (event instanceof HangingBreakByEntityEvent) {
             HangingBreakByEntityEvent entityEvent = (HangingBreakByEntityEvent) event;
             Entity removerEntity = entityEvent.getRemover();
+            if (removerEntity instanceof Projectile) {
+                Projectile projectile = (Projectile) removerEntity; 
+                removerEntity = projectile.getShooter() != null ? projectile.getShooter() : removerEntity; 
+            }
 
             if (removerEntity instanceof Player) {
                 Player player = (Player) removerEntity;
