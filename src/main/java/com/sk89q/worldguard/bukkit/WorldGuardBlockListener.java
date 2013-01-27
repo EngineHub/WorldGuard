@@ -121,7 +121,13 @@ public class WorldGuardBlockListener implements Listener {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
                 player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
                 event.setCancelled(true);
+        
+        if (blockDamaged.getTypeId() == BlockID.DIODE) {
+            if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
+                player.sendMessage(ChatColor.DARK_RED + "You've been a naughty steve! Stop touching!");
+                event.setCancelled(true);
                 return;
+        }
             }
         }
     }
