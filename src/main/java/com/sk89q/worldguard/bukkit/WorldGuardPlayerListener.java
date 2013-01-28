@@ -723,7 +723,16 @@ public class WorldGuardPlayerListener implements Listener {
             if (item.getTypeId() == ItemID.INK_SACK
                     && item.getData() != null) {
                 if (item.getData().getData() == 15 // bonemeal
-                        && type == BlockID.GRASS) {
+                        && (type == BlockID.GRASS
+                        || type == BlockID.SAPLING
+                        || type == BlockID.CROPS
+                        || type == BlockID.BROWN_MUSHROOM
+                        || type == BlockID.RED_MUSHROOM
+                        || type == BlockID.PUMPKIN_STEM
+                        || type == BlockID.MELON_STEM
+                        || type == BlockID.POTATOES
+                        || type == BlockID.CARROTS
+                        || type == BlockID.COCOA_PLANT)) {
                     if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                             && !set.canBuild(localPlayer)) {
                         event.setCancelled(true);
@@ -841,7 +850,10 @@ public class WorldGuardPlayerListener implements Listener {
                 }
             }
 
-            if (BlockType.isRailBlock(type) && item.getTypeId() == ItemID.MINECART) {
+            if (BlockType.isRailBlock(type)
+                    && (item.getTypeId() == ItemID.MINECART
+                    || item.getTypeId() == ItemID.POWERED_MINECART
+                    || item.getTypeId() == ItemID.STORAGE_MINECART)) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.PLACE_VEHICLE, localPlayer)) {
