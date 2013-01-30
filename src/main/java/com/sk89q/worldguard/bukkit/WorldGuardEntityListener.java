@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
@@ -328,7 +327,7 @@ public class WorldGuardEntityListener implements Listener {
                         RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
                         ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-                        if (!set.allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
+                        if (!set.allows(DefaultFlag.MOB_DAMAGE, localPlayer) && !(attacker instanceof Tameable)) {
                             event.setCancelled(true);
                             return;
                         }
@@ -337,6 +336,20 @@ public class WorldGuardEntityListener implements Listener {
                             if (!set.allows(DefaultFlag.CREEPER_EXPLOSION, localPlayer)) {
                                 event.setCancelled(true);
                                 return;
+                            }
+                        } else if (attacker instanceof Tameable) {
+                            if (((Tameable) attacker).getOwner() == null) {
+                                if (!set.allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
+                                    event.setCancelled(true);
+                                    return;
+                                }
+                            }
+                            Player beastMaster = (Player) ((Tameable) attacker).getOwner();
+                            Vector pt2 = toVector(attacker.getLocation());
+                            if (!mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer(beastMaster))) {
+                                tryCancelPVPEvent(beastMaster, player, event, true);
+                            } else if (!set.allows(DefaultFlag.PVP, localPlayer)) {
+                                tryCancelPVPEvent(beastMaster, player, event, false);
                             }
                         }
                     }
@@ -834,33 +847,15 @@ public class WorldGuardEntityListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(ent.getWorld());
         if (ent instanceof Enderman) {
-            if (event.getTo() == Material.AIR) {
-                // pickup
+            if (wcfg.disableEndermanGriefing) {
+                event.setCancelled(true);
+                return;
+            }
 
-                if (wcfg.disableEndermanGriefing) {
+            if (wcfg.useRegions) {
+                if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, location)) {
                     event.setCancelled(true);
                     return;
-                }
-
-                if (wcfg.useRegions) {
-                    if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, location)) {
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            } else {
-                // place
-
-                if (wcfg.disableEndermanGriefing) {
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (wcfg.useRegions) {
-                    if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ENDER_BUILD, location)) {
-                        event.setCancelled(true);
-                        return;
-                    }
                 }
             }
         } else if (ent.getType() == witherType) {
