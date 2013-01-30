@@ -159,6 +159,7 @@ public class WorldConfiguration {
     public boolean disableLeafDecay;
     public boolean disableGrassGrowth;
     public boolean disableMyceliumSpread;
+    public boolean disableVineGrowth;
     public boolean disableEndermanGriefing;
     public boolean regionInvinciblityRemovesMobs;
     public boolean disableDeathMessages;
@@ -396,6 +397,7 @@ public class WorldConfiguration {
         disableLeafDecay = getBoolean("dynamics.disable-leaf-decay", false);
         disableGrassGrowth = getBoolean("dynamics.disable-grass-growth", false);
         disableMyceliumSpread = getBoolean("dynamics.disable-mycelium-spread", false);
+        disableVineGrowth = getBoolean("dynamics.disable-vine-growth", false);
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);

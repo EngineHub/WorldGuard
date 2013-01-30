@@ -760,6 +760,20 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
         }
+
+        if (fromType == BlockID.VINE) {
+            if (wcfg.disableVineGrowth) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions
+                    && !plugin.getGlobalRegionManager().allows(
+                            DefaultFlag.VINE_GROWTH, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     /*
