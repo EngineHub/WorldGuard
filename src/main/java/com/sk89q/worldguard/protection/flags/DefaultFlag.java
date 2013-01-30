@@ -59,6 +59,7 @@ public final class DefaultFlag {
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
     public static final StateFlag GRASS_SPREAD = new StateFlag("grass-growth", true);
     public static final StateFlag MYCELIUM_SPREAD = new StateFlag("mycelium-spread", true);
+    public static final StateFlag VINE_GROWTH = new StateFlag("vine-growth", true);
     public static final StateFlag ENDER_BUILD = new StateFlag("enderman-grief", true);
     public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false, RegionGroup.ALL);
     public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true, RegionGroup.ALL);
@@ -89,6 +90,7 @@ public final class DefaultFlag {
     // public static final StringFlag MAX_PLAYERS_MESSAGE = new StringFlag("max-players-reject-message", RegionGroup.ALL);
     public static final LocationFlag TELE_LOC = new LocationFlag("teleport", RegionGroup.MEMBERS);
     public static final LocationFlag SPAWN_LOC = new LocationFlag("spawn", RegionGroup.MEMBERS);
+    public static final StateFlag ENABLE_SHOP = new StateFlag("allow-shop", false);
     public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
     public static final DoubleFlag PRICE = new DoubleFlag("price");
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
@@ -105,12 +107,11 @@ public final class DefaultFlag {
         HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
         SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, GAME_MODE,
-        MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, SEND_CHAT,
-        RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
+        MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, VINE_GROWTH,
+        SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
         TELE_LOC, SPAWN_LOC, POTION_SPLASH,
-        BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
+        BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
     };
-
 
     private DefaultFlag() {
     }
