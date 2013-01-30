@@ -720,6 +720,37 @@ public class WorldGuardPlayerListener implements Listener {
                 }
             }
 
+            if (item.getTypeId() == ItemID.BED_ITEM) {
+                // this is mojang-level code, it had better give us the right direction
+                double yaw = (player.getLocation().getYaw() * 4.0F / 360.0F) + 0.5D;
+                int i = (int) yaw;
+                int i1 = (yaw < i ? i - 1 : i) & 3;
+                byte b0 = 0;
+                byte b1 = 0;
+                if (i1 == 0) {
+                    b1 = 1;
+                }
+                if (i1 == 1) {
+                    b0 = -1;
+                }
+                if (i1 == 2) {
+                    b1 = -1;
+                }
+                if (i1 == 3) {
+                    b0 = 1;
+                }
+                // end mojang-level code
+                Block headLoc = placedOn.getRelative(b0, 0, b1);
+                if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world) 
+                        && !(plugin.canBuild(player, block) && plugin.canBuild(player, headLoc))) {
+                    // note that normal block placement is handled later, this is just a workaround
+                    // for the location of the head block of the bed
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
             if (item.getTypeId() == ItemID.INK_SACK
                     && item.getData() != null) {
                 if (item.getData().getData() == 15 // bonemeal
