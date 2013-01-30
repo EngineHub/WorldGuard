@@ -1,3 +1,22 @@
+5.7.1:
+- Added a vine growth config option and flag.
+- Added support for many commands to be used from console.
+  Usage is with -w flag and a world name e.g.
+  /rg addmem <id> <player> -w <worldname>
+  /rg flag <id> <flag> -w <worldname> <flagvalue>
+- Fixed bug that blocks placing plants in flower pots.
+- Fixed permissions check for /rg tp
+- Fixed enderchests not being accessible (they are now part of the USE flag)
+- Fixed an issue with slabs being placable in protected regions. This was
+  also fixed in CraftBukkit but has been left in for users running other versions.
+- Fixed wither skulls being handled with other fireballs, despite having their own settings.
+- Fixed item frames being placable on region borders.
+- Fixed a bug that made explosions more ineffective than they should have been.
+- Fixed bonemeal usage in protected regions.
+- Fixed special minecarts being placable in protected regions.
+- Fixed bugs being placable on region borders.
+- Fixed wolves bypassing pvp flags.
+
 5.7:
 - Fixed thread sync issue with FlagStateManager.
 - Fixed dragon egg region protection not working in certain cases.
