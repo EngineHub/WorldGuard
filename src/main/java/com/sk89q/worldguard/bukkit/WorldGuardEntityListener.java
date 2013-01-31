@@ -337,12 +337,16 @@ public class WorldGuardEntityListener implements Listener {
                                 event.setCancelled(true);
                                 return;
                             }
-                        } else if (attacker instanceof Tameable) {
+                        }
+                        if (attacker instanceof Tameable) {
                             if (((Tameable) attacker).getOwner() == null) {
                                 if (!set.allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
                                     event.setCancelled(true);
                                     return;
                                 }
+                            }
+                            if (!(((Tameable) attacker).getOwner() instanceof Player)) {
+                                return;
                             }
                             Player beastMaster = (Player) ((Tameable) attacker).getOwner();
                             Vector pt2 = toVector(attacker.getLocation());
