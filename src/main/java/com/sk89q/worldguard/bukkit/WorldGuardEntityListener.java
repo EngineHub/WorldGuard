@@ -341,7 +341,7 @@ public class WorldGuardEntityListener implements Listener {
                             if (!((Tameable) attacker).isTamed()) {
                                 if (!set.allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
                                     event.setCancelled(true);
-                                    }
+                                }
                                 return;
                             }
                             Player beastMaster = (Player) ((Tameable) attacker).getOwner();
