@@ -124,11 +124,18 @@ public class LegacyMySqlStoreFactory implements RegionStoreFactory {
     private static String getSql(String filename) throws IOException {
         String path = "/sql/" + filename;
         InputStream is = LegacyMySqlStoreFactory.class.getResourceAsStream(path);
-        if (is == null) {
-            throw new FileNotFoundException("Failed to get internal file: " + path);
+        Scanner s = null;
+        try {
+            if (is == null) {
+                throw new FileNotFoundException("Failed to get internal file: " + path);
+            }
+            s = new java.util.Scanner(is).useDelimiter("\\A");
+            return s.hasNext() ? s.next() : "";
+        } finally {
+            if (s != null) {
+                s.close();
+            }
         }
-        Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
     }
 
 }
