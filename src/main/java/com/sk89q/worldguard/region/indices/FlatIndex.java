@@ -18,10 +18,7 @@
 
 package com.sk89q.worldguard.region.indices;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.region.Region;
-import com.sk89q.worldguard.region.UnsupportedIntersectionException;
-
 import java.util.*;
 
 import org.apache.commons.lang.Validate;
@@ -58,40 +55,6 @@ public class FlatIndex extends AbstractRegionIndex {
     public synchronized boolean contains(String id) {
         Validate.notNull(id, "The id parameter cannot be null");
         return regions.containsKey(normalizeId(id));
-    }
-
-    @Override
-    public synchronized Collection<Region> queryContains(
-            Vector location, boolean preferOnlyCached) {
-        Validate.notNull(location, "The location parameter cannot be null");
-
-        List<Region> result = new ArrayList<Region>();
-
-        for (Region region : regions.values()) {
-            if (region.getShape().contains(location)) {
-                result.add(region);
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public synchronized Collection<Region> queryOverlapping(
-            Region region, boolean preferOnlyCached) {
-        Validate.notNull(region, "The location parameter cannot be null");
-
-        List<Region> testRegions = new ArrayList<Region>();
-        testRegions.addAll(regions.values());
-        List<Region> result;
-
-        try {
-            result = region.getIntersectingRegions(testRegions);
-        } catch (UnsupportedIntersectionException e) { // This is bad!
-            result = new ArrayList<Region>();
-        }
-
-        return result;
     }
 
     @Override

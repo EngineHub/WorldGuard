@@ -62,7 +62,7 @@ public interface RegionIndex extends Collection<Region> {
      * @param preferOnlyCached true to only search cached regions (see class docs)
      * @return a collection of regions matching the criteria
      */
-    Collection<Region> queryOverlapping(
+    Collection<Region> queryIntersects(
             Region region, boolean preferOnlyCached);
 
     /**
@@ -80,7 +80,7 @@ public interface RegionIndex extends Collection<Region> {
     Collection<Region> queryContains(Vector location);
 
     /**
-     * Queries the index for a list of {@link Region}s that overlap with
+     * Queries the index for a list of {@link Region}s that intersects with
      * the given region. Parent regions of regions that match the criteria may NOT
      * be included in the returned list unless they also match the criteria. Regions
      * in the index do not have to be wholly contained by the provided region
@@ -93,7 +93,7 @@ public interface RegionIndex extends Collection<Region> {
      * @param region the area that returned regions must overlap with
      * @return a collection of regions matching the criteria
      */
-    Collection<Region> queryOverlapping(Region region);
+    Collection<Region> queryIntersects(Region region);
 
     /**
      * Add the given region to this index. If a region already in this index is

@@ -18,10 +18,15 @@
 
 package com.sk89q.worldguard.region.indices;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.region.Region;
+import com.sk89q.worldguard.region.shapes.IndexableShape;
 
 /**
  * An abstract implementation of {@link RegionIndex} to make it easier to implement
@@ -46,8 +51,41 @@ public abstract class AbstractRegionIndex implements RegionIndex {
     }
 
     @Override
-    public Collection<Region> queryOverlapping(Region region) {
-        return queryOverlapping(region, false);
+    public Collection<Region> queryIntersects(Region region) {
+        return queryIntersects(region, false);
+    }
+
+    @Override
+    public synchronized Collection<Region> queryContains(
+            Vector location, boolean preferOnlyCached) {
+        Validate.notNull(location, "The location parameter cannot be null");
+
+        List<Region> result = new ArrayList<Region>();
+
+        for (Region region : this) {
+            if (region.getShape().contains(location)) {
+                result.add(region);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public synchronized Collection<Region> queryIntersects(
+            Region region, boolean preferOnlyCached) {
+        Validate.notNull(region, "The region parameter cannot be null");
+
+        IndexableShape shape = region.getShape();
+        List<Region> result = new ArrayList<Region>();
+
+        for (Region other : this) {
+            if (other.getShape().intersectsEdges(shape)) {
+                result.add(region);
+            }
+        }
+
+        return result;
     }
 
     @Override
