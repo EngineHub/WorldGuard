@@ -24,8 +24,6 @@ import java.io.IOException;
 
 import org.apache.commons.lang.Validate;
 
-import com.sk89q.worldguard.region.indices.RegionIndex;
-
 /**
  * Attributes can be attached to regions to store all sorts of data.
  * <p>
@@ -70,12 +68,13 @@ public abstract class Attribute {
     
     /**
      * Set the name of an attribute. Remember that the corresponding
-     * {@link RegionIndex} must be made aware of this change or very bad
+     * {@link Region} must be made aware of this change or very bad
      * things may happen.
      * <p>
      * All valid Unicode strings are supported for names.
      * 
      * @param name new name to use
+     * @see Region#rename(Attribute, String)
      */
     public void setName(String name) {
         Validate.notNull(name);

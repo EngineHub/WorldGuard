@@ -23,12 +23,11 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
-import com.sk89q.worldguard.region.flags.Flag;
 import com.sk89q.worldguard.region.shapes.IndexableShape;
 
 /**
- * A region that has an ID, shape, priority, parent, and flags assigned to it. It is
- * used for defining areas on a world.
+ * A region that has an ID, shape, priority, parent, and attributes assigned
+ * to it. It is used for defining areas on a world.
  * <p>
  * The casing of region IDs are maintained, but they are case insensitive for the
  * purposes of indexing.
@@ -42,7 +41,7 @@ public class Region implements Comparable<Region> {
     private IndexableShape shape;
     private int priority = 0;
     private Region parent;
-    private Map<Flag<?>, Object> flags = new HashMap<Flag<?>, Object>();
+    private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
     /**
      * Construct a new instance of this region.
@@ -147,90 +146,86 @@ public class Region implements Comparable<Region> {
             this.parent = parent;
         }
     }
-
+    
     /**
-     * Get a flag's value. May return null if the flag has been set.
-     *
-     * @param <T> the flag type
-     * @param <V> the type of the flag's value
-     * @param flag the flag to check
-     * @return value or null if isn't defined
+     * Set an attribute to this region.
+     * <p>
+     * While more than one region can share an attribute, this is not
+     * recommended. On region index save and then load, the attribute would
+     * be created individually for each region.
+     * <p>
+     * If an attribute of the same name already exists on this region, the
+     * existing attribute will be replaced with the given one.
+     * <p>
+     * This method is thread-safe.
+     * 
+     * @param attribute the attribute
+     */
+    public synchronized void set(Attribute attribute) {
+        attributes.put(attribute.getName(), attribute);
+    }
+    
+    /**
+     * Remove an attribute with the same name from this region.
+     * <p>
+     * This method is thread-safe.
+     * 
+     * @param attribute the attribute
+     */
+    public synchronized void remove(Attribute attribute) {
+        attributes.remove(attribute.getName());
+    }
+    
+    /**
+     * Returns whether this region contains this attribute.
+     * <p>
+     * Recall that {@link Attribute#equals(Object)} is true if two attributes
+     * have the same name, and so this merely checks whether an attribute
+     * of the same name exists on this region.
+     * <p>
+     * This method is thread-safe.
+     * 
+     * @param attribute the attribute
+     * @return true if this region contains the attribute
+     */
+    public synchronized boolean contains(Attribute attribute) {
+        return attributes.containsKey(attribute.getName());
+    }
+    
+    /**
+     * Get the actual stored attribute on this region based on the attribute
+     * type given as a parameter.
+     * <p>
+     * The returned object may or may not be the same as the given object,
+     * but the returned attribute will definitely have the same name.
+     * <p>
+     * At the moment, if the attribute stored on this region is of a different
+     * type than the given attribute, that is an undefined situation and
+     * bad things will occur.
+     * 
+     * @param attribute attribute to get
+     * @return the attribute stored on this region or null otherwise
      */
     @SuppressWarnings("unchecked")
-    public synchronized <T extends Flag<V>, V> V getFlag(T flag) {
-        Object obj = flags.get(flag);
-        V val;
-        if (obj != null) {
-            val = (V) obj;
-        } else {
-            return null;
-        }
-        return val;
+    public synchronized <E extends Attribute> E get(E attribute) {
+        return (E) attributes.get(attribute.getName());
     }
-
+    
     /**
-     * Set a flag's value with compile-time type checking (via generics).
+     * Rename the given attribute to a new name, and add the attribute to
+     * this region if doesn't already exist on this region.
      * <p>
-     * If the value is null, then the flag is unset. If the flag has already been set,
-     * then the existing value will be replaced with the new one.
-     *
-     * @param <T> the flag type
-     * @param <V> the type of the flag's value
-     * @param flag the flag to set
-     * @param value the value to set, or null to unset
-     * @see #setFlagUnsafe(Flag, Object) to set flags in a type-unsafe manner
+     * This is the only safe way to rename an attribute, assuming that the
+     * given attribute is not being used across several regions
+     * (not good!).
+     * 
+     * @param attribute attribute to rename
+     * @param newName new attribute name to use
      */
-    public <T extends Flag<V>, V> void setFlag(T flag, V value) {
-        setFlagUnsafe(flag, value);
-    }
-
-    /**
-     * Set a flag's value without compile-time type checking.
-     * <p>
-     * If the value is null, then the flag is unset. If the flag has already been set,
-     * then the existing value will be replaced with the new one. When possible,
-     * use the {@link #setFlag(Flag, Object)} method, as it allows for compile-time
-     * type checking with generics.
-     *
-     * @param flag the flag to set
-     * @param value the value to set, or null to unset
-     * @see #setFlag(Flag, Object) a preferred method for setting flags
-     */
-    public synchronized void setFlagUnsafe(Flag<?> flag, Object value) {
-        Validate.notNull(flag, "Flag parameter cannot be null");
-        if (value == null) {
-            flags.remove(flag);
-        } else {
-            flags.put(flag, value);
-        }
-    }
-
-    /**
-     * Unset a flag. If the flag is not yet set, nothing will happen.
-     *
-     * @param flag the flag to unset
-     */
-    public void unsetFlag(Flag<?> flag) {
-        setFlag(flag, null);
-    }
-
-    /**
-     * Get the map of all flags. Please avoid using this.
-     *
-     * @return the map of flags currently used for this region
-     */
-    public Map<Flag<?>, Object> getFlags() {
-        return flags;
-    }
-
-    /**
-     * Get the map of flags. Please avoid using this.
-     *
-     * @param flags the flags to set
-     */
-    public void setFlags(Map<Flag<?>, Object> flags) {
-        Validate.notNull(flags, "Flags parameter cannot be null");
-        this.flags = flags;
+    public synchronized void rename(Attribute attribute, String newName) {
+        remove(attribute);
+        attribute.setName(newName);
+        set(attribute);
     }
 
     /**
