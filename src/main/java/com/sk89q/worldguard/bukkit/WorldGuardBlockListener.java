@@ -124,8 +124,15 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
         }
+        
+        if (blockDamaged.getTypeId() == BlockID.DIODE) {
+            if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
+                player.sendMessage(ChatColor.DARK_RED + "Stop! You naughty Steve!");
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
-
     /*
      * Called when a block is broken.
      */
