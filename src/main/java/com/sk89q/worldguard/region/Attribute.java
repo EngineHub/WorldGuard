@@ -43,7 +43,7 @@ import org.apache.commons.lang.Validate;
  * To create your own attributes, see the class documentation for
  * {@link DataValuedAttribute}.
  */
-public abstract class Attribute {
+public class Attribute {
     
     private String name;
 
