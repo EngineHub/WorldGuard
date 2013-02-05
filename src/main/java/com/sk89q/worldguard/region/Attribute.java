@@ -114,5 +114,27 @@ public abstract class Attribute {
     public void write(DataOutputStream out) throws IOException {
         
     }
+
+    /**
+     * Hash codes are based on attribute name.
+     */
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
+    /**
+     * Two attributes are equal if they have the same name.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Attribute)) return false;
+        return getName().equals(((Attribute) obj).getName());
+    }
+
+    @Override
+    public String toString() {
+        return "[Attribute: " + getName() + "]";
+    }
     
 }
