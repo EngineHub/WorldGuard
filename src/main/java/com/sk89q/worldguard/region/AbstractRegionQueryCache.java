@@ -21,25 +21,41 @@ package com.sk89q.worldguard.region;
 import java.util.WeakHashMap;
 
 /**
- * To facilitate performing regions-containing-point lookups from multiple stack frames
- * but within the same context (the same event), a cache is important in preventing the
- * need for redundant lookups made for the same point. This class serves as such a cache.
+ * A simple cache to reduce hits to the region manager when region information
+ * is needed for the same location in the same event context.
  * <p>
- * A key needs to be selected to store cache entries against. The best key is one that
- * is highly temporal, and would represent a certain "snapshot in time," such as
- * an event object. The event objects are indexed in this class using weak references,
- * and they will be removed by the garbage collector automatically. Because it
- * <em>is</em>  a weak reference, the key object needs to be held somewhere with a strong
- * reference until the "snapshot" ends.
+ * If two or more pieces of code (such as from different programs or plugins)
+ * need to ask the question of "which regions contain this point" within the
+ * same event (such as when a player breaks a block), it is ideal that a query
+ * is only performed once and a cached answer is returned for the subsequent
+ * requests for this information (but only within the same context or event!).
+ * This is because queries to the region manager are often demanding and it
+ * would be taxing to perform the same search more than once. The purpose of
+ * this class is to facilitate exactly that.
  * <p>
- * This class is abstract because implementing class should provide methods to check
- * against a standard key object. This cache itself is thread-safe.
+ * In order for this cache to work, a key must be generated for each query to
+ * this cache. If two pieces of code need to execute the same region query
+ * during the same event (consider this at time A), both pieces of code must
+ * give the instance of this class the exact same 'key' object in order for the
+ * second calling piece of code to receive the cached result. However, once that
+ * event has been processed and time has moved on (proceeding to time X+1), that
+ * previously chosen key object must not ever be used again, otherwise it may
+ * return the results that were found at time X, which may be out of date.
+ * <p>
+ * Weak references are used to refer to that key object, and so whatever key
+ * object is chosen can be properly garbage collected once it is no longer
+ * needed outside the context of this cache.
+ * <p>
+ * This cache itself is thread-safe.
  */
 public abstract class AbstractRegionQueryCache {
 
     private final WeakHashMap<Object, RegionQueryCacheEntry> cache =
             new WeakHashMap<Object, RegionQueryCacheEntry>();
 
+    /**
+     * Construct a copy of this cache.
+     */
     public AbstractRegionQueryCache() {
     }
 
