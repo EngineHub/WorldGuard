@@ -22,32 +22,23 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-/**
- * A simple implementation of {@link Attribute} that saves the raw binary 
- * data stream for exact recall later during runtime and during serialization.
- * <p>
- * By itself, this class will accept binary data, store it as-is, then
- * dump it back out as binary data when requested. If you have special needs,
- * and do not want to have to explicitly deserialize the contents contained
- * within this attribute, consider subclassing {@link Attribute} instead.
- * <p>
- * This is the automatic fallback attribute in case custom attribute
- * classes are unavailable during load.
- */
-public final class DataValuedAttribute extends Attribute {
-    
-    private byte[] buffer;
+import org.junit.Ignore;
+
+@Ignore
+public class TestAttribute extends Attribute {
+
+    public TestAttribute(String name) {
+        super(name);
+    }
 
     @Override
     public void read(DataInputStream in, int len) throws IOException {
-        byte[] buffer = new byte[len];
-        in.read(buffer, 0, len);
-        this.buffer = buffer;
+        // do nothing
     }
 
     @Override
     public void write(DataOutputStream out) throws IOException {
-        out.write(buffer);
+        // do nothing
     }
 
 }
