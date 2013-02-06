@@ -22,6 +22,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.apache.commons.lang.Validate;
+
 /**
  * A simple implementation of {@link Attribute} that saves the raw binary 
  * data stream for exact recall later during runtime and during serialization.
@@ -37,6 +39,56 @@ import java.io.IOException;
 public final class DataValuedAttribute extends Attribute {
     
     private byte[] buffer;
+
+    /**
+     * Construct the attribute with a default name.
+     */
+    public DataValuedAttribute() {
+        super();
+    }
+
+    /**
+     * Construct the attribute with a given name.
+     */
+    public DataValuedAttribute(String name) {
+        super(name);
+    }
+    
+    /**
+     * Get the raw byte array.
+     * <p>
+     * Modifying the returned byte array directly modifies the byte
+     * array stored within the instance of this class.
+     * 
+     * @return data
+     */
+    public byte[] getByteArray() {
+        return buffer;
+    }
+    
+    /**
+     * Set the raw byte array.
+     * <p>
+     * The given byte array is not copied and so further modifications to the
+     * given byte array will have the changes reflect on the byte array
+     * inside this object.
+     * 
+     * @param data new data
+     */
+    public void setByteArray(byte[] data) {
+        Validate.notNull(data);
+        
+        this.buffer = data;
+    }
+    
+    /**
+     * Get the size in bytes of the data.
+     * 
+     * @return length in bytes of data
+     */
+    public int size() {
+        return buffer.length;
+    }
 
     @Override
     public void read(DataInputStream in, int len) throws IOException {

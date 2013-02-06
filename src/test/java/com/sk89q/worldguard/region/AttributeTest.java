@@ -29,49 +29,53 @@ import java.io.IOException;
 import org.junit.Test;
 
 public class AttributeTest {
-
-    @Test
-    public void testHashCode() {
-        assertEquals(new TestAttribute("testing").hashCode(), "testing".hashCode());
-        assertFalse(new TestAttribute("broken").hashCode() == "testing".hashCode());
+    
+    private Attribute makeAttribute(String name) {
+        return new TestAttribute(name);
     }
 
     @Test
-    public void testAttribute() {
-        new TestAttribute("testing");
+    public final void testHashCode() {
+        assertEquals(makeAttribute("testing").hashCode(), "testing".hashCode());
+        assertFalse(makeAttribute("broken").hashCode() == "testing".hashCode());
     }
 
     @Test
-    public void testGetName() {
-        assertEquals(new TestAttribute("testing").getName(), "testing");
-        assertFalse(new TestAttribute("testing").getName().equals("broken"));
+    public final void testAttribute() {
+        makeAttribute("testing");
     }
 
     @Test
-    public void testSetName() {
-        assertEquals(new TestAttribute("testing").getName(), "testing");
-        assertFalse(new TestAttribute("testing").getName().equals("broken"));
+    public final void testGetName() {
+        assertEquals(makeAttribute("testing").getName(), "testing");
+        assertFalse(makeAttribute("testing").getName().equals("broken"));
+    }
+
+    @Test
+    public final void testSetName() {
+        assertEquals(makeAttribute("testing").getName(), "testing");
+        assertFalse(makeAttribute("testing").getName().equals("broken"));
     }
 
     @Test
     public void testRead() throws IOException {
-        Attribute attribute = new TestAttribute("testing");
+        Attribute attribute = makeAttribute("testing");
         byte[] data = new byte[] { 1, 2, 3, 4, 5, 6 };
         attribute.read(new DataInputStream(new ByteArrayInputStream(data)), data.length); // Do nothing
     }
 
     @Test
     public void testWrite() throws IOException {
-        Attribute attribute = new TestAttribute("testing");
+        Attribute attribute = makeAttribute("testing");
         ByteArrayOutputStream stream = new ByteArrayOutputStream(100);
         attribute.write(new DataOutputStream(stream)); // Do nothing
         assertEquals(stream.size(), 0);
     }
 
     @Test
-    public void testEqualsObject() {
-        assertTrue(new TestAttribute("testing").equals(new TestAttribute("testing")));
-        assertFalse(new TestAttribute("testing").equals(new TestAttribute("broken")));
+    public final void testEqualsObject() {
+        assertTrue(makeAttribute("testing").equals(makeAttribute("testing")));
+        assertFalse(makeAttribute("testing").equals(makeAttribute("broken")));
     }
 
 }
