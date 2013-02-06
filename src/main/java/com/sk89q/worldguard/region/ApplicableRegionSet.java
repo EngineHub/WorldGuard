@@ -26,7 +26,7 @@ import com.sk89q.worldguard.region.indices.RegionIndex;
 /**
  * Container for the results of region queries issued to {@link RegionIndex}es.
  */
-public class ApplicableRegionSet implements Iterable<Region> {
+public class ApplicableRegionSet implements Iterable<Region>, Collection<Region> {
 
     private Collection<Region> regions;
 
@@ -54,5 +54,60 @@ public class ApplicableRegionSet implements Iterable<Region> {
     @Override
     public Iterator<Region> iterator() {
         return regions.iterator();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return regions.contains(o);
+    }
+
+    @Override
+    public Object[] toArray() {
+        return regions.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return regions.toArray(a);
+    }
+
+    @Override
+    public boolean add(Region e) {
+        throw new UnsupportedOperationException("Cannot modify ApplicableRegionSets");
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        throw new UnsupportedOperationException("Cannot modify ApplicableRegionSets");
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return regions.containsAll(c);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Region> c) {
+        throw new UnsupportedOperationException("Cannot modify ApplicableRegionSets");
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        throw new UnsupportedOperationException("Cannot modify ApplicableRegionSets");
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException("Cannot modify ApplicableRegionSets");
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException("Cannot modify ApplicableRegionSets");
     }
 }
