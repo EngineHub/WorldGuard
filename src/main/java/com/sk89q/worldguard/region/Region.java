@@ -26,11 +26,11 @@ import org.apache.commons.lang.Validate;
 import com.sk89q.worldguard.region.shapes.IndexableShape;
 
 /**
- * A region that has an ID, shape, priority, parent, and attributes assigned
- * to it. It is used for defining areas on a world.
+ * A region that has an ID, shape, priority, parent, and attributes assigned to
+ * it. It is used for defining areas on a world.
  * <p>
- * The casing of region IDs are maintained, but they are case insensitive for the
- * purposes of indexing.
+ * The casing of region IDs are maintained, but they are case insensitive for
+ * the purposes of indexing.
  * <p>
  * If changes are made to this region, and it is contained within a region
  * index, the index must be notified of the change.
@@ -150,12 +150,13 @@ public class Region implements Comparable<Region> {
     /**
      * Set an attribute to this region.
      * <p>
-     * While more than one region can share an attribute, this is not
+     * While more than one region can share an attribute object, this is not
      * recommended. On region index save and then load, the attribute would
-     * be created individually for each region.
+     * be re-created individually for each region.
      * <p>
      * If an attribute of the same name already exists on this region, the
-     * existing attribute will be replaced with the given one.
+     * existing attribute will be replaced with the given one. Attribute
+     * names are case-sensitive.
      * <p>
      * This method is thread-safe.
      * 
@@ -168,7 +169,7 @@ public class Region implements Comparable<Region> {
     /**
      * Remove an attribute with the same name from this region.
      * <p>
-     * This method is thread-safe.
+     * Attribute names are case-sensitive. This method is thread-safe.
      * 
      * @param attribute the attribute
      */
@@ -181,7 +182,8 @@ public class Region implements Comparable<Region> {
      * <p>
      * Recall that {@link Attribute#equals(Object)} is true if two attributes
      * have the same name, and so this merely checks whether an attribute
-     * of the same name exists on this region.
+     * of the same name exists on this region. Attribute names are
+     * case-sensitive.
      * <p>
      * This method is thread-safe.
      * 
@@ -197,7 +199,8 @@ public class Region implements Comparable<Region> {
      * type given as a parameter.
      * <p>
      * The returned object may or may not be the same as the given object,
-     * but the returned attribute will definitely have the same name.
+     * but the returned attribute will definitely have the same name. Attribute
+     * names are case-sensitive.
      * <p>
      * At the moment, if the attribute stored on this region is of a different
      * type than the given attribute, that is an undefined situation and
@@ -217,12 +220,18 @@ public class Region implements Comparable<Region> {
      * <p>
      * This is the only safe way to rename an attribute, assuming that the
      * given attribute is not being used across several regions
-     * (not good!).
+     * (not good!). Attribute names are also case-sensitive. Attempting
+     * to rename an attribute to the same name does nothing.
+     * <p>
+     * While this method is thread safe, the given attribute must not change
+     * in another thread in the process of the rename operation.
      * 
      * @param attribute attribute to rename
      * @param newName new attribute name to use
      */
     public synchronized void rename(Attribute attribute, String newName) {
+        if (attribute.getName().equals(newName)) return;
+        
         remove(attribute);
         attribute.setName(newName);
         set(attribute);
@@ -231,8 +240,8 @@ public class Region implements Comparable<Region> {
     /**
      * Compares to another region.
      * <ul>
-     * <li>Orders primarily by the priority, descending</li>
-     * Orders secondarily by the id, ascending</li>
+     *   <li>Orders primarily by the priority, descending</li>
+     *   <li>Orders secondarily by the id, ascending</li>
      * </ul>
      *
      * @param other the region to compare to

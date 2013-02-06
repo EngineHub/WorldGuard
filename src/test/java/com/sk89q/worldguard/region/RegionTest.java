@@ -33,7 +33,7 @@ public class RegionTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void testConstructor() {
+    public void testRegion() {
         thrown.expect(IllegalArgumentException.class);
         new Region(null, null);
     }
@@ -50,7 +50,7 @@ public class RegionTest {
     }
 
     @Test
-    public void testNameCompareTo() {
+    public void testCompareTo() {
         Region regionA = new Region("A", mock(IndexableShape.class));
         Region regionB = new Region("B", mock(IndexableShape.class));
         
@@ -61,41 +61,41 @@ public class RegionTest {
     }
 
     @Test
-    public void testSetParentSelf() {
+    public void testSetParent() {
+        // Test self setting
         Region regionA = new Region("A", mock(IndexableShape.class));
-        
         thrown.expect(IllegalArgumentException.class);
         regionA.setParent(regionA);
-    }
-
-    @Test
-    public void testSetParentOther() {
+        
+        // Test regular setting
         Region child = new Region("A", mock(IndexableShape.class));
         Region parent = new Region("B", mock(IndexableShape.class));
-
         child.setParent(parent);
         assertEquals(child.getParent(), parent);
         assertEquals(parent.getParent(), null);
-    }
-
-    @Test
-    public void testSetParentCircular() {
-        Region child = new Region("A", mock(IndexableShape.class));
-        Region parent = new Region("B", mock(IndexableShape.class));
-
+        
+        // Test circular
+        child = new Region("A", mock(IndexableShape.class));
+        parent = new Region("B", mock(IndexableShape.class));
         child.setParent(parent);
         thrown.expect(IllegalArgumentException.class);
         parent.setParent(child);
     }
 
     @Test
-    public void testGetPriorityDefault() {
+    public void testGetPriority() {
         Region regionA = new Region("A", mock(IndexableShape.class));
         assertEquals(regionA.getPriority(), 0);
     }
 
     @Test
-    public void testShouldCacheDefault() {
+    public void testShouldCache() {
+        Region regionA = new Region("A", mock(IndexableShape.class));
+        assertFalse(regionA.shouldCache());
+    }
+    
+    @Test
+    public void testSet() {
         Region regionA = new Region("A", mock(IndexableShape.class));
         assertFalse(regionA.shouldCache());
     }
