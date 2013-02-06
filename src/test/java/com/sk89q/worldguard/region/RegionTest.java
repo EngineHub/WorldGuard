@@ -61,28 +61,6 @@ public class RegionTest {
     }
 
     @Test
-    public void testSetParent() {
-        // Test self setting
-        Region regionA = new Region("A", mock(IndexableShape.class));
-        thrown.expect(IllegalArgumentException.class);
-        regionA.setParent(regionA);
-        
-        // Test regular setting
-        Region child = new Region("A", mock(IndexableShape.class));
-        Region parent = new Region("B", mock(IndexableShape.class));
-        child.setParent(parent);
-        assertEquals(child.getParent(), parent);
-        assertEquals(parent.getParent(), null);
-        
-        // Test circular
-        child = new Region("A", mock(IndexableShape.class));
-        parent = new Region("B", mock(IndexableShape.class));
-        child.setParent(parent);
-        thrown.expect(IllegalArgumentException.class);
-        parent.setParent(child);
-    }
-
-    @Test
     public void testGetPriority() {
         Region regionA = new Region("A", mock(IndexableShape.class));
         assertEquals(regionA.getPriority(), 0);
