@@ -19,23 +19,38 @@
 package com.sk89q.worldguard.region;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 
 import com.sk89q.worldguard.region.indices.RegionIndex;
 
 /**
  * Container for the results of region queries issued to {@link RegionIndex}es.
+ * <p>
+ * The list of regions in this object are sorted according to
+ * {@link Region#compareTo(Region)}, so the highest priority regions will
+ * be emitted by the iterator first.
  */
 public class ApplicableRegionSet implements Iterable<Region>, Collection<Region> {
 
-    private Collection<Region> regions;
+    private List<Region> regions;
 
     /**
      * Construct the object.
+     * <p>
+     * The given list does not have to be sorted as this set will do the
+     * sorting in-place. Once the region set is constructed, the list given
+     * to it must not be modified outside the instance of this class.
      *
-     * @param regions the regions contained in this set
+     * @param regions the regions to be contained by this set
      */
-    public ApplicableRegionSet(Collection<Region> regions) {
+    public ApplicableRegionSet(List<Region> regions) {
+        Validate.notNull(regions);
+        
+        Collections.sort(regions);
         this.regions = regions;
     }
 
@@ -48,9 +63,6 @@ public class ApplicableRegionSet implements Iterable<Region>, Collection<Region>
         return regions.size();
     }
 
-    /**
-     * Get an iterator of affected regions.
-     */
     @Override
     public Iterator<Region> iterator() {
         return regions.iterator();
