@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
+import com.sk89q.worldguard.region.attribute.Attribute;
 import com.sk89q.worldguard.region.shapes.IndexableShape;
 
 /**

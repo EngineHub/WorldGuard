@@ -16,13 +16,15 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region;
+package com.sk89q.worldguard.region.attribute;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.lang.Validate;
+
+import com.sk89q.worldguard.region.Region;
 
 /**
  * Attributes can be attached to regions to store all sorts of data.
@@ -36,16 +38,16 @@ import org.apache.commons.lang.Validate;
  * </ul>
  * <p>
  * Asking for attributes from a region will return a subclass of
- * this class, which can be either an instance of {@link DataValuedAttribute}
+ * this class, which can be either an instance of {@link ByteArray}
  * or a custom overriding attribute class available in WorldGuard or
  * from another project.
  * <p>
  * Creating your attributes to store any type of data is easy. The most
- * important decision to make is whether to use {@link DataValuedAttribute}
+ * important decision to make is whether to use {@link ByteArray}
  * or your own subclass. The latter lets you store the attribute data
  * in a structure more native to your software (using primitive data types and
  * your own objects), but it may be not be necessary if your payload does
- * consist of raw binary data, which is what {@link DataValuedAttribute} does.
+ * consist of raw binary data, which is what {@link ByteArray} does.
  * <p>
  * When you make a subclass, you must define the
  * {@link #read(DataInputStream, int)} and
@@ -62,7 +64,7 @@ import org.apache.commons.lang.Validate;
  * the classpath, as the canonical name of each attribute's class is saved
  * during saving. The process involved here is outlined more closely on
  * the WorldGuard wiki. If worse comes to worse, and the subclass cannot
- * be found, then the data will be loaded as an {@link DataValuedAttribute},
+ * be found, then the data will be loaded as an {@link ByteArray},
  * which prevents loss of the raw binary data, but it will render the
  * data unusuable during runtime unless explicitly deserialization is
  * conducted when recalling the attribute.
@@ -72,9 +74,10 @@ public abstract class Attribute {
     private String name = "unnamed";
 
     /**
-     * A no-arg constructor required for automatic instantiation of
-     * attributes. If you are overriding this class, you must provide
-     * this constructor.
+     * A constructor required for automatic instantiation of attributes.
+     * <p>
+     * If you are overriding this class, you must provide this constructor.
+     * Be aware that the default name of attributes is 'unnamed'.
      */
     public Attribute() {
     }
@@ -134,7 +137,7 @@ public abstract class Attribute {
      * @param len length of the data
      * @throw IOException thrown on read error, which would cause the instance
      *                    of this class to fail, causing the region index to
-     *                    fall back to {@link DataValuedAttribute}
+     *                    fall back to {@link ByteArray}
      */
     public abstract void read(DataInputStream in, int len) throws IOException;
     

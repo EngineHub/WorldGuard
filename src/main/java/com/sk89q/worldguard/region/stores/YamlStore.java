@@ -44,8 +44,6 @@ import com.sk89q.rebar.util.LoggerUtils;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.region.Region;
-import com.sk89q.worldguard.region.flags.DefaultFlag;
-import com.sk89q.worldguard.region.flags.Flag;
 import com.sk89q.worldguard.region.indices.RegionIndex;
 import com.sk89q.worldguard.region.indices.RegionIndexFactory;
 import com.sk89q.worldguard.region.shapes.Cuboid;
@@ -166,7 +164,8 @@ public class YamlStore implements RegionStore {
 
                 Region region = new Region(id, shape);
                 region.setPriority(node.getInt("priority", 0));
-                loadFlags(region, node.getNode("flags"));
+                loadFlags(region, node.getNode("flags")); // Legacy flags support
+                loadAttributes(region, node.getNode("attr"));
 
                 // Remember the parent so that it can be linked lateron
                 String parentId = node.getString("parent");
@@ -271,6 +270,9 @@ public class YamlStore implements RegionStore {
                 }
             }
         }
+    }
+    private void loadAttributes(Region region, ConfigurationNode node) {
+        
     }
 
     /**

@@ -16,25 +16,29 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region;
+package com.sk89q.worldguard.region.attribute;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.apache.commons.lang.Validate;
-
 /**
- * An attribute that stores string data.
+ * An attribute that stores whole numbers (integers) with a range of
+ * {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}.
+ * 
+ * @see Managed another way to store numbers (with more memory cost and null
+ *      support)
  */
-public class StringAttr extends Attribute {
+public class Number extends Attribute {
     
-    private String data;
+    private int value;
 
     /**
-     * No-arg constructor.
+     * Construct an instance and assign a default name.
+     * 
+     * @see Attribute#Attribute() for basic mechanics
      */
-    public StringAttr() {
+    public Number() {
     }
 
     /**
@@ -42,43 +46,41 @@ public class StringAttr extends Attribute {
      * 
      * @param name name of the attribute
      */
-    public StringAttr(String name) {
+    public Number(String name) {
         super(name);
     }
 
     /**
-     * Get the text.
+     * Get the value.
      * 
-     * @return the text
+     * @return the value
      */
-    public String getText() {
-        return data;
+    public int getValue() {
+        return value;
     }
 
     /**
-     * Set the stored text.
+     * Set the value.
      * 
-     * @param text the new text
+     * @param value the new value
      */
-    public void setText(String text) {
-        Validate.notNull(text);
-        
-        this.data = text;
+    public void setValue(int value) {
+        this.value = value;
     }
 
     @Override
     public void read(DataInputStream in, int len) throws IOException {
-        data = in.readUTF();
+        value = in.readInt();
     }
 
     @Override
     public void write(DataOutputStream out) throws IOException {
-        out.writeUTF(data);
+        out.write(value);
     }
     
     @Override
     public String toString() {
-        return data;
+        return String.valueOf(value);
     }
 
 }

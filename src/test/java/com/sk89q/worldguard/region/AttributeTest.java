@@ -28,6 +28,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.sk89q.worldguard.region.attribute.Attribute;
+
 public class AttributeTest {
     
     private Attribute makeAttribute(String name) {

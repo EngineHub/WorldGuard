@@ -16,31 +16,70 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region;
+package com.sk89q.worldguard.region.attribute;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.junit.Ignore;
+/**
+ * An attribute that stores doubles.
+ * 
+ * @see Managed another way to store numbers (with more memory cost and null
+ *      support)
+ */
+public class Fraction extends Attribute {
+    
+    private double value;
 
-import com.sk89q.worldguard.region.attribute.Attribute;
+    /**
+     * Construct an instance and assign a default name.
+     * 
+     * @see Attribute#Attribute() for basic mechanics
+     */
+    public Fraction() {
+    }
 
-@Ignore
-public class TestAttribute extends Attribute {
-
-    public TestAttribute(String name) {
+    /**
+     * Construct an instance and specify an attribute name.
+     * 
+     * @param name name of the attribute
+     */
+    public Fraction(String name) {
         super(name);
+    }
+
+    /**
+     * Get the value.
+     * 
+     * @return the value
+     */
+    public double getValue() {
+        return value;
+    }
+
+    /**
+     * Set the value.
+     * 
+     * @param value the new value
+     */
+    public void setValue(double value) {
+        this.value = value;
     }
 
     @Override
     public void read(DataInputStream in, int len) throws IOException {
-        // do nothing
+        value = in.readDouble();
     }
 
     @Override
     public void write(DataOutputStream out) throws IOException {
-        // do nothing
+        out.writeDouble(value);
+    }
+    
+    @Override
+    public String toString() {
+        return String.valueOf(value);
     }
 
 }

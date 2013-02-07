@@ -16,7 +16,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region;
+package com.sk89q.worldguard.region.attribute;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

@@ -28,15 +28,17 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.sk89q.worldguard.region.attribute.ByteArray;
+
 public class DataValuedAttributeTest extends AttributeTest {
     
-    private DataValuedAttribute makeAttribute(String name) {
-        return new DataValuedAttribute(name);
+    private ByteArray makeAttribute(String name) {
+        return new ByteArray(name);
     }
 
     @Test
     public void testRead() throws IOException {
-        DataValuedAttribute attribute = makeAttribute("testing");
+        ByteArray attribute = makeAttribute("testing");
         byte[] data = new byte[] { 1, 2, 3, 4, 5, 6 };
         attribute.read(new DataInputStream(new ByteArrayInputStream(data)), data.length);
         assertArrayEquals(data, attribute.getByteArray());
@@ -45,8 +47,8 @@ public class DataValuedAttributeTest extends AttributeTest {
     @Test
     public void testWrite() throws IOException {
         byte[] data = new byte[] { 1, 2, 3, 4, 5, 6 };
-        DataValuedAttribute attribute = makeAttribute("testing");
-        attribute.setByteArray(data);
+        ByteArray attribute = makeAttribute("testing");
+        attribute.setValue(data);
         
         ByteArrayOutputStream stream = new ByteArrayOutputStream(100);
         attribute.write(new DataOutputStream(stream));

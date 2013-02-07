@@ -16,7 +16,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.sk89q.worldguard.region;
+package com.sk89q.worldguard.region.attribute;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -25,32 +25,31 @@ import java.io.IOException;
 import org.apache.commons.lang.Validate;
 
 /**
- * A simple implementation of {@link Attribute} that saves the raw binary 
- * data stream for exact recall later during runtime and during serialization.
+ * Stores raw byte array data.
  * <p>
- * By itself, this class will accept binary data, store it as-is, then
- * dump it back out as binary data when requested. If you have special needs,
- * and do not want to have to explicitly deserialize the contents contained
- * within this attribute, consider subclassing {@link Attribute} instead.
- * <p>
- * This is the automatic fallback attribute in case custom attribute
- * classes are unavailable during load.
+ * If no more accurate {@link Attribute} class is found during deserialization,
+ * this class is used because it would maintain the data. If you wish to create
+ * your own {@link Attribute}s, consider subclassing that class rather than
+ * using this class.
+ * 
+ * @see Managed another way to store byte arrays (with more memory cost and null
+ *      support)
  */
-public final class DataValuedAttribute extends Attribute {
+public final class ByteArray extends Attribute {
     
-    private byte[] buffer;
+    private byte[] value;
 
     /**
      * Construct the attribute with a default name.
      */
-    public DataValuedAttribute() {
+    public ByteArray() {
         super();
     }
 
     /**
      * Construct the attribute with a given name.
      */
-    public DataValuedAttribute(String name) {
+    public ByteArray(String name) {
         super(name);
     }
     
@@ -62,23 +61,21 @@ public final class DataValuedAttribute extends Attribute {
      * 
      * @return data
      */
-    public byte[] getByteArray() {
-        return buffer;
+    public byte[] getValue() {
+        return value;
     }
     
     /**
      * Set the raw byte array.
      * <p>
-     * The given byte array is not copied and so further modifications to the
-     * given byte array will have the changes reflect on the byte array
-     * inside this object.
+     * The given byte array is stored as a reference within this instance.
      * 
      * @param data new data
      */
-    public void setByteArray(byte[] data) {
-        Validate.notNull(data);
+    public void setValue(byte[] value) {
+        Validate.notNull(value);
         
-        this.buffer = data;
+        this.value = value;
     }
     
     /**
@@ -87,19 +84,19 @@ public final class DataValuedAttribute extends Attribute {
      * @return length in bytes of data
      */
     public int size() {
-        return buffer.length;
+        return value.length;
     }
 
     @Override
     public void read(DataInputStream in, int len) throws IOException {
         byte[] buffer = new byte[len];
         in.read(buffer, 0, len);
-        this.buffer = buffer;
+        this.value = buffer;
     }
 
     @Override
     public void write(DataOutputStream out) throws IOException {
-        out.write(buffer);
+        out.write(value);
     }
 
 }
