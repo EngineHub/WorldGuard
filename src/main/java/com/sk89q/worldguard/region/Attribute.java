@@ -93,9 +93,11 @@ public abstract class Attribute {
     }
 
     /**
-     * Get the name of this attribute. Attribute names allow for distinguishing
-     * different attributes (such as between a PvP flag and an image storage
-     * attribute). A region cannot have two attributes with the same name.
+     * Get the name of this attribute.
+     * <p>
+     * Attribute names allow for distinguishing different attributes (such as
+     * between a PvP flag and an image storage attribute). A region cannot have
+     * two attributes with the same name.
      * 
      * @return the name of the attribute
      */
@@ -104,13 +106,15 @@ public abstract class Attribute {
     }
     
     /**
-     * Set the name of an attribute. Remember that the corresponding
-     * {@link Region} must be made aware of this change or very bad
-     * things may happen.
+     * Set the name of an attribute.
+     * <p>
+     * Remember that the corresponding {@link Region} must be made aware of this
+     * change or very bad things may happen.
      * <p>
      * All valid non-empty Unicode strings are supported for names.
      * 
-     * @param name new name to use
+     * @param name
+     *            new name to use
      * @see Region#rename(Attribute, String)
      */
     public void setName(String name) {
@@ -158,8 +162,12 @@ public abstract class Attribute {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!(obj instanceof Attribute)) return false;
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Attribute)) {
+            return false;
+        }
         return getName().equals(((Attribute) obj).getName());
     }
 
