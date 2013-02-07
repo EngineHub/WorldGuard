@@ -40,6 +40,7 @@ public class Region implements Comparable<Region> {
     private final String id;
     private IndexableShape shape;
     private int priority = 0;
+    private Region parent;
     private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
     /**
@@ -104,6 +105,46 @@ public class Region implements Comparable<Region> {
      */
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+
+    /**
+     * Get the parent of the region. Parents can determine how multiple overlapping
+     * regions are handled in regards to some flags, but it is dependent on the flag.
+     *
+     * @return parent region or null
+     */
+    public Region getParent() {
+        return parent;
+    }
+
+    /**
+     * Set the parent of this region.
+     *
+     * @see #getParent() for an explanation of parents
+     * @param parent the new parent, or null
+     * @throws IllegalArgumentException when circular inheritance is detected
+     */
+    public synchronized void setParent(Region parent) throws IllegalArgumentException {
+        if (parent == null) {
+            this.parent = null;
+        } else {
+            if (parent == this) {
+                throw new IllegalArgumentException(
+                        "Circular region inheritance detected");
+            }
+
+            Region p = parent.getParent();
+            while (p != null) {
+                if (p == this) {
+                    throw new IllegalArgumentException(
+                            "Circular region inheritance detected");
+                }
+
+                p = p.getParent();
+            }
+
+            this.parent = parent;
+        }
     }
     
     /**
