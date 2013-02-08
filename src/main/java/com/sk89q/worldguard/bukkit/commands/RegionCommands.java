@@ -667,7 +667,7 @@ public class RegionCommands {
     public void flag(CommandContext args, CommandSender sender) throws CommandException {
 
         final World world;
-        Player player;
+        Player player = null;
         LocalPlayer localPlayer = null;
         if (args.hasFlag('w')) {
             world = plugin.matchWorld(sender, args.getFlag('w'));
