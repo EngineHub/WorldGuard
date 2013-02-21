@@ -61,6 +61,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
@@ -124,6 +125,17 @@ public class WorldGuardEntityListener implements Listener {
                 wcfg.disableCreatureCropTrampling) {
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onExpBottle(ExpBottleEvent event) {
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
+
+        if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
+                event.getEntity().getLocation())) {
+            event.setExperience(0);
+            // event.setShowEffect(false); // don't want to cancel the bottle entirely I suppose, just the exp
         }
     }
 
