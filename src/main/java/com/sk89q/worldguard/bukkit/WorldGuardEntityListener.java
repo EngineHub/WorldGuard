@@ -120,7 +120,8 @@ public class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(entity.getWorld());
 
         if (block.getTypeId() == BlockID.SOIL) {
-            if (entity instanceof Creature && wcfg.disableCreatureCropTrampling) {
+            if (/* entity instanceof Creature && // catch for any entity (not thrown for players) */
+                wcfg.disableCreatureCropTrampling) {
                 event.setCancelled(true);
             }
         }
