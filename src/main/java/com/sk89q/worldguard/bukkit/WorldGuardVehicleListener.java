@@ -121,6 +121,7 @@ public class WorldGuardVehicleListener implements Listener {
 
                 String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE, localPlayer);
                 String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE, localPlayer);
+                String texturepack = set.getFlag(DefaultFlag.TEXTUREPACK);
                 Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER, localPlayer);
                 Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE, localPlayer);
 
@@ -138,6 +139,11 @@ public class WorldGuardVehicleListener implements Listener {
                     player.sendMessage(ChatColor.AQUA + " ** " + replacedGreeting);
                 }
 
+                if (texturepack != null && (state.lastTexturepack == null
+                        || !state.lastTexturepack.equals(texturepack))) {
+                    player.setTexturePack(texturepack);
+                }
+                
                 if ((notifyLeave == null || !notifyLeave)
                         && state.notifiedForLeave != null && state.notifiedForLeave) {
                     plugin.broadcastNotification(ChatColor.GRAY + "WG: "
@@ -165,6 +171,7 @@ public class WorldGuardVehicleListener implements Listener {
 
                 state.lastGreeting = greeting;
                 state.lastFarewell = farewell;
+                state.lastTexturepack = texturepack;
                 state.notifiedForEnter = notifyEnter;
                 state.notifiedForLeave = notifyLeave;
                 state.lastExitAllowed = exitAllowed;

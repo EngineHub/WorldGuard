@@ -211,6 +211,7 @@ public class WorldGuardPlayerListener implements Listener {
 
                     String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);//, localPlayer);
                     String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);//, localPlayer);
+                    String texturepack = set.getFlag(DefaultFlag.TEXTUREPACK);
                     Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);//, localPlayer);
                     Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);//, localPlayer);
                     GameMode gameMode = set.getFlag(DefaultFlag.GAME_MODE);
@@ -231,6 +232,11 @@ public class WorldGuardPlayerListener implements Listener {
                         for (String line : replacedGreeting.split("\n")) {
                             player.sendMessage(ChatColor.AQUA + " ** " + line);
                         }
+                    }
+                    
+                    if(texturepack != null && (state.lastTexturepack == null
+                            || !state.lastTexturepack.equals(texturepack))){
+                        player.setTexturePack(texturepack);
                     }
 
                     if ((notifyLeave == null || !notifyLeave)
@@ -275,6 +281,7 @@ public class WorldGuardPlayerListener implements Listener {
 
                     state.lastGreeting = greeting;
                     state.lastFarewell = farewell;
+                    state.lastTexturepack = texturepack;
                     state.notifiedForEnter = notifyEnter;
                     state.notifiedForLeave = notifyLeave;
                     state.lastExitAllowed = exitAllowed;
@@ -346,7 +353,17 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (wcfg.useRegions) {
             PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+            RegionManager mgr = plugin.getRegionManager(world);
             Location loc = player.getLocation();
+            ApplicableRegionSet set = mgr.getApplicableRegions(loc);
+            
+            String texturepack = set.getFlag(DefaultFlag.TEXTUREPACK);
+            
+            if(texturepack != null){
+                player.setTexturePack(texturepack);
+            }
+            
+            state.lastTexturepack = texturepack;
             state.lastWorld = loc.getWorld();
             state.lastBlockX = loc.getBlockX();
             state.lastBlockY = loc.getBlockY();
@@ -1224,13 +1241,24 @@ public class WorldGuardPlayerListener implements Listener {
             Vector pt = toVector(location);
             RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            PlayerFlagState state = plugin.getFlagStateManager().getState(player);
 
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
             com.sk89q.worldedit.Location spawn = set.getFlag(DefaultFlag.SPAWN_LOC, localPlayer);
-
+            
             if (spawn != null) {
                 event.setRespawnLocation(com.sk89q.worldedit.bukkit.BukkitUtil.toLocation(spawn));
             }
+            
+            String texturepack = plugin.getRegionManager(event.getRespawnLocation().getWorld())
+                    .getApplicableRegions(event.getRespawnLocation()).getFlag(DefaultFlag.TEXTUREPACK);
+            
+            if (texturepack != null && (state.lastTexturepack == null
+                    || !state.lastTexturepack.equals(texturepack))) {
+                player.setTexturePack(texturepack);
+            }
+            
+            state.lastTexturepack = texturepack;
         }
     }
 
@@ -1276,17 +1304,19 @@ public class WorldGuardPlayerListener implements Listener {
 
     @EventHandler(priority= EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
+        Player player = event.getPlayer();
         World world = event.getFrom().getWorld();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
+            RegionManager mgrFrom = plugin.getRegionManager(event.getFrom().getWorld());
+            RegionManager mgr = plugin.getRegionManager(world);
+            ApplicableRegionSet setFrom = mgrFrom.getApplicableRegions(event.getFrom());
+            ApplicableRegionSet set = mgr.getApplicableRegions(event.getTo());
+            PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+            
             if (event.getCause() == TeleportCause.ENDER_PEARL) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(event.getFrom().getWorld());
-                Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
-                Vector ptFrom = new Vector(event.getFrom().getBlockX(), event.getFrom().getBlockY(), event.getFrom().getBlockZ());
-                ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
                 LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
 
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
@@ -1304,6 +1334,15 @@ public class WorldGuardPlayerListener implements Listener {
                     return;
                 }
             }
+            
+            String texturepack = set.getFlag(DefaultFlag.TEXTUREPACK);
+
+            if (texturepack != null && (state.lastTexturepack == null
+                    || !state.lastTexturepack.equals(texturepack))) {
+                event.getPlayer().setTexturePack(texturepack);
+            }
+
+            state.lastTexturepack = texturepack;
         }
     }
 
