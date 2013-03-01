@@ -19,10 +19,10 @@
 
 package com.sk89q.worldguard;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
+
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.LocalPlayer;
 
 @org.junit.Ignore
 public class TestPlayer extends LocalPlayer {
@@ -49,32 +49,27 @@ public class TestPlayer extends LocalPlayer {
 
     @Override
     public Vector getPosition() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Vector(0, 0, 0);
     }
 
     @Override
     public void kick(String msg) {
-        // TODO Auto-generated method stub
-        
+        System.out.println("TestPlayer{" + this.name + "} kicked!");
     }
 
     @Override
     public void ban(String msg) {
-        // TODO Auto-generated method stub
-        
+        System.out.println("TestPlayer{" + this.name + "} banned!");
     }
 
     @Override
     public void printRaw(String msg) {
-        // TODO Auto-generated method stub
-        
+        System.out.println("-> TestPlayer{" + this.name + "}: " + msg);
     }
 
     @Override
     public String[] getGroups() {
-        // TODO Auto-generated method stub
-        return null;
+        return groups.toArray(new String[groups.size()]);
     }
 
     @Override
