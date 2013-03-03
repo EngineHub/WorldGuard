@@ -862,7 +862,10 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.DISPENSER
                     || type == BlockID.FURNACE
                     || type == BlockID.BURNING_FURNACE
-                    || type == BlockID.BREWING_STAND) {
+                    || type == BlockID.BREWING_STAND
+                    || type == BlockID.TRAPPED_CHEST
+                    || type == BlockID.HOPPER
+                    || type == BlockID.DROPPER) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.CHEST_ACCESS, localPlayer)) {
@@ -902,10 +905,26 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.CAULDRON
                     || type == BlockID.ENDER_CHEST // blah
                     || type == BlockID.BEACON
-                    || type == BlockID.ANVIL) {
+                    || type == BlockID.ANVIL
+                    || type == BlockID.HOPPER
+                    || type == BlockID.DROPPER) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.USE, localPlayer)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            if (type == BlockID.REDSTONE_REPEATER_OFF
+                    || type == BlockID.REDSTONE_REPEATER_ON
+                    || type == BlockID.COMPARATOR_OFF
+                    || type == BlockID.COMPARATOR_ON) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)) {
+                    // using build and not use because it can potentially damage a circuit and use is more general-purposed
                     player.sendMessage(ChatColor.DARK_RED + "You don't have permission to use that in this area.");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
@@ -927,7 +946,9 @@ public class WorldGuardPlayerListener implements Listener {
             if (BlockType.isRailBlock(type)
                     && (item.getTypeId() == ItemID.MINECART
                     || item.getTypeId() == ItemID.POWERED_MINECART
-                    || item.getTypeId() == ItemID.STORAGE_MINECART)) {
+                    || item.getTypeId() == ItemID.STORAGE_MINECART
+                    || item.getTypeId() == ItemID.TNT_MINECART
+                    || item.getTypeId() == ItemID.HOPPER_MINECART)) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !placedInSet.canBuild(localPlayer)
                         && !placedInSet.allows(DefaultFlag.PLACE_VEHICLE, localPlayer)) {
@@ -951,7 +972,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
 
         if (wcfg.getBlacklist() != null) {
-            if (player.isSneaking() // sneak + right clicking no longer activates blocks as of some recent version
+            if (player.isSneaking() // sneak + right clicking no longer opens guis as of some recent version
                     || (type != BlockID.CHEST
                     && type != BlockID.DISPENSER
                     && type != BlockID.FURNACE
@@ -959,7 +980,10 @@ public class WorldGuardPlayerListener implements Listener {
                     && type != BlockID.BREWING_STAND
                     && type != BlockID.ENCHANTMENT_TABLE
                     && type != BlockID.ANVIL
-                    && type != BlockID.ENDER_CHEST)) {
+                    && type != BlockID.ENDER_CHEST
+                    && type != BlockID.TRAPPED_CHEST
+                    && type != BlockID.HOPPER
+                    && type != BlockID.DROPPER)) {
                 if (!wcfg.getBlacklist().check(
                         new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
                                 item.getTypeId()), false, false)) {
@@ -995,7 +1019,10 @@ public class WorldGuardPlayerListener implements Listener {
                 || type == BlockID.FURNACE
                 || type == BlockID.BURNING_FURNACE
                 || type == BlockID.ENCHANTMENT_TABLE
-                || type == BlockID.BREWING_STAND)) {
+                || type == BlockID.BREWING_STAND
+                || type == BlockID.TRAPPED_CHEST
+                || type == BlockID.HOPPER
+                || type == BlockID.DROPPER)) {
 
             if (wcfg.isChestProtected(block, player)) {
                 player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
@@ -1083,7 +1110,8 @@ public class WorldGuardPlayerListener implements Listener {
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
             if (type == BlockID.STONE_PRESSURE_PLATE || type == BlockID.WOODEN_PRESSURE_PLATE
-                    || type == BlockID.TRIPWIRE) {
+                    || type == BlockID.TRIPWIRE || type == BlockID.PRESSURE_PLATE_LIGHT
+                    || type == BlockID.PRESSURE_PLATE_HEAVY) {
                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                        && !set.canBuild(localPlayer)
                        && !set.allows(DefaultFlag.USE, localPlayer)) {
