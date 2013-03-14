@@ -88,9 +88,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 public class WorldGuardEntityListener implements Listener {
 
     private WorldGuardPlugin plugin;
-    private EntityType fireballType;
-    private EntityType witherType;
-    private EntityType witherSkullType;
 
     /**
      * Construct the object;
@@ -99,10 +96,6 @@ public class WorldGuardEntityListener implements Listener {
      */
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-
-        fireballType = BukkitUtil.tryEnum(EntityType.class, "LARGE_FIREBALL", "FIREBALL");
-        witherType = BukkitUtil.tryEnum(EntityType.class, "WITHER");
-        witherSkullType = BukkitUtil.tryEnum(EntityType.class, "WITHER_SKULL");
     }
 
     /**
@@ -563,20 +556,71 @@ public class WorldGuardEntityListener implements Listener {
             return;
         }
 
-        // Not all explosions come from an entity
-        if (ent != null) {
-            if (ent instanceof Wither) {
-                if (wcfg.blockWitherBlockDamage) {
-                    event.blockList().clear();
-                    return;
-                }
-
-                if (wcfg.blockWitherExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
+        if (ent instanceof Creeper) {
+            if (wcfg.blockCreeperBlockDamage) {
+                event.blockList().clear();
+                return;
             }
 
+            if (wcfg.blockCreeperExplosions) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions) {
+                if (wcfg.useRegions) {
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                    for (Block block : event.blockList()) {
+                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
+                            event.blockList().clear();
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+        } else if (ent instanceof EnderDragon) {
+            if (wcfg.blockEnderDragonBlockDamage) {
+                event.blockList().clear();
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                for (Block block : event.blockList()) {
+                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
+                        event.blockList().clear();
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        } else if (ent instanceof TNTPrimed) {
+            if (wcfg.blockTNTBlockDamage) {
+                event.blockList().clear();
+                return;
+            }
+
+            if (wcfg.blockTNTExplosions) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                for (Block block : event.blockList()) {
+                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
+                        event.blockList().clear();
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        } else if (ent instanceof Fireball) {
             if (ent instanceof WitherSkull) {
                 if (wcfg.blockWitherSkullBlockDamage) {
                     event.blockList().clear();
@@ -587,73 +631,7 @@ public class WorldGuardEntityListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-            }
-
-            if (ent instanceof Creeper) {
-                if (wcfg.blockCreeperBlockDamage) {
-                    event.blockList().clear();
-                    return;
-                }
-
-                if (wcfg.blockCreeperExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (wcfg.useRegions) {
-                    if (wcfg.useRegions) {
-                        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                        for (Block block : event.blockList()) {
-                            if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
-                                event.blockList().clear();
-                                event.setCancelled(true);
-                                return;
-                            }
-                        }
-                    }
-                }
-            } else if (ent instanceof EnderDragon) {
-                if (wcfg.blockEnderDragonBlockDamage) {
-                    event.blockList().clear();
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (wcfg.useRegions) {
-                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                    for (Block block : event.blockList()) {
-                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
-                            event.blockList().clear();
-                            event.setCancelled(true);
-                            return;
-                        }
-                    }
-                }
-            } else if (ent instanceof TNTPrimed) {
-                if (wcfg.blockTNTBlockDamage) {
-                    event.blockList().clear();
-                    return;
-                }
-
-                if (wcfg.blockTNTExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (wcfg.useRegions) {
-                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                    for (Block block : event.blockList()) {
-                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
-                            event.blockList().clear();
-                            event.setCancelled(true);
-                            return;
-                        }
-                    }
-                }
-            } else if (ent instanceof Fireball && !(ent instanceof WitherSkull)) {
+            } else {
                 if (wcfg.blockFireballBlockDamage) {
                     event.blockList().clear();
                     return;
@@ -663,21 +641,31 @@ public class WorldGuardEntityListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+            }
+            // allow wither skull blocking since there is no dedicated flag atm
+            if (wcfg.useRegions) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
-                if (wcfg.useRegions) {
-                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                    for (Block block : event.blockList()) {
-                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
-                            event.blockList().clear();
-                            event.setCancelled(true);
-                            return;
-                        }
+                for (Block block : event.blockList()) {
+                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
+                        event.blockList().clear();
+                        event.setCancelled(true);
+                        return;
                     }
                 }
             }
+        } else if (ent instanceof Wither) {
+            if (wcfg.blockWitherBlockDamage) {
+                event.blockList().clear();
+                return;
+            }
+
+            if (wcfg.blockWitherExplosions) {
+                event.setCancelled(true);
+                return;
+            }
         } else {
-            // null entity, caused by another plugin or so
+            // unhandled entity
             if (wcfg.blockOtherExplosions) {
                 event.blockList().clear();
                 event.setCancelled(true);
@@ -693,6 +681,7 @@ public class WorldGuardEntityListener implements Listener {
                 }
             }
         }
+
 
         if (wcfg.signChestProtection) {
             for (Block block : event.blockList()) {
@@ -720,31 +709,27 @@ public class WorldGuardEntityListener implements Listener {
             return;
         }
 
-        if (event.getEntityType() == witherType) {
+        if (event.getEntityType() == EntityType.WITHER) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
                 return;
             }
-        }
-        else if (event.getEntityType() == witherSkullType) {
+        } else if (event.getEntityType() == EntityType.WITHER_SKULL) {
             if (wcfg.blockWitherSkullExplosions) {
                 event.setCancelled(true);
                 return;
             }
-        }
-        else if (event.getEntityType() == fireballType) {
+        } else if (event.getEntityType() == EntityType.FIREBALL) {
             if (wcfg.blockFireballExplosions) {
                 event.setCancelled(true);
                 return;
             }
-        }
-        else if (event.getEntityType() == EntityType.CREEPER) {
+        } else if (event.getEntityType() == EntityType.CREEPER) {
             if (wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
                 return;
             }
-        }
-        else if (event.getEntityType() == EntityType.PRIMED_TNT) {
+        } else if (event.getEntityType() == EntityType.PRIMED_TNT) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
@@ -810,7 +795,7 @@ public class WorldGuardEntityListener implements Listener {
 
         switch (event.getEntityType()) {
             case ENDER_DRAGON:
-                if (wcfg.blockEnderDragonBlockDamage) event.setCancelled(true);
+                if (wcfg.blockEnderDragonPortalCreation) event.setCancelled(true);
                 break;
         }
     }
@@ -856,7 +841,7 @@ public class WorldGuardEntityListener implements Listener {
      * @param event Relevant event details
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEndermanPickup(EntityChangeBlockEvent event) {
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         Entity ent = event.getEntity();
         Block block = event.getBlock();
         Location location = block.getLocation();
@@ -875,8 +860,7 @@ public class WorldGuardEntityListener implements Listener {
                     return;
                 }
             }
-        } else if (ent.getType() == witherType) {
-
+        } else if (ent.getType() == EntityType.WITHER) {
             if (wcfg.blockWitherBlockDamage || wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
                 return;
