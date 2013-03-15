@@ -35,6 +35,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
+import org.bukkit.entity.MinecartTNT;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
@@ -272,7 +274,7 @@ public class WorldGuardEntityListener implements Listener {
                     }
                 }
 
-                if (attacker instanceof TNTPrimed) {
+                if (attacker instanceof TNTPrimed || attacker instanceof MinecartTNT) {
 
                     // The check for explosion damage should be handled already... But... What ever...
                     if (wcfg.blockTNTExplosions) {
@@ -598,7 +600,7 @@ public class WorldGuardEntityListener implements Listener {
                     }
                 }
             }
-        } else if (ent instanceof TNTPrimed) {
+        } else if (ent instanceof TNTPrimed || ent instanceof MinecartTNT) {
             if (wcfg.blockTNTBlockDamage) {
                 event.blockList().clear();
                 return;
