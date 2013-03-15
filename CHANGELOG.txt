@@ -1,3 +1,10 @@
+5.7.2:
+- Updated to MineCraft 1.5.
+- Added TNT Minecart support. They are handled with the same flags/settings as TNT.
+- Added mining and smelting xp handling to the xp drops flag and setting.
+- Fixed a few edge cases for placing items on region borders.
+- Legacy: Fixed issue with //stack not respecting item metadata.
+
 5.7.1:
 - Added a vine growth config option and flag.
 - Added support for many commands to be used from console.
