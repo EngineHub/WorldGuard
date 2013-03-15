@@ -881,7 +881,8 @@ public class WorldGuardBlockListener implements Listener {
     public void onBlockExp(BlockExpEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-        if (wcfg.disableExpDrops) {
+        if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
+                event.getBlock().getLocation())) {
             event.setExpToDrop(0);
         }
     }
