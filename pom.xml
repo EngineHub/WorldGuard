@@ -3,6 +3,9 @@
   <groupId>com.sk89q</groupId>
   <artifactId>worldguard</artifactId>
   <version>5.7.3-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  
+  <!-- Project information -->
   <name>WorldGuard</name>
   <description>WorldGuard protects your Minecraft servers.</description>
   <licenses>
@@ -13,15 +16,42 @@
       <comments>License on all contributions</comments>
     </license>
   </licenses>
+  
+  <issueManagement>
+    <system>YouTrack</system>
+    <url>http://youtrack.sk89q.com</url>
+  </issueManagement>
+  
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>http://build.sk89q.com</url>
+  </ciManagement>
+  
   <scm>
     <connection>scm:git:git://github.com/sk89q/worldguard.git</connection>
+    <developerConnection>scm:git:git@github.com:sk89q/worldguard.git</developerConnection>
     <url>https://github.com/sk89q/worldguard</url>
     <tag>master</tag>
-    <developerConnection>scm:git:git@github.com:sk89q/worldguard.git</developerConnection>
   </scm>
-  <properties>
+  
+  <mailingLists>
+    <mailingList>
+      <name>Developer Discussion</name>
+      <archive>https://groups.google.com/d/forum/sk-dev-discuss</archive>
+    </mailingList>
+  </mailingLists>
+  
+  <distributionManagement>
+    <site>
+      <id>sk89q-docs-upload</id>
+      <url>ftp://sk89q-maven-deploy/worldguard/</url>
+    </site>
+  </distributionManagement>
+  
+  <properties> <!-- Fix encoding warnings -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  
   <repositories>
     <repository>
       <id>sk89q-repo</id>
@@ -36,24 +66,30 @@
       <url>http://repo.bukkit.org/content/groups/public</url>
     </repository>
   </repositories>
+  
   <dependencies>
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>5.5.3-SNAPSHOT</version>
+      <version>5.5.3</version>
       <scope>compile</scope>
+      <type>jar</type>
     </dependency>
+    
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
       <version>1.5-R0.1-SNAPSHOT</version>
       <scope>compile</scope>
+      <type>jar</type>
     </dependency>
+    
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>commandbook</artifactId>
       <version>2.1</version>
       <scope>compile</scope>
+      <type>jar</type>
       <exclusions>
         <exclusion>
           <groupId>com.zachsthings.libcomponents</groupId>
@@ -65,42 +101,45 @@
         </exclusion>
       </exclusions>
     </dependency>
+    
     <dependency>
       <groupId>com.nijikokun</groupId>
       <artifactId>iconomy</artifactId>
       <version>5.0</version>
       <scope>compile</scope>
+      <type>jar</type>
     </dependency>
+    
     <dependency>
       <groupId>org.khelekore</groupId>
       <artifactId>prtree</artifactId>
       <version>1.5.0</version>
       <scope>compile</scope>
+      <type>jar</type>
     </dependency>
+    
     <dependency>
       <groupId>net.sf.opencsv</groupId>
       <artifactId>opencsv</artifactId>
       <version>2.0</version>
       <scope>compile</scope>
+      <type>jar</type>
     </dependency>
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.8.1</version>
       <scope>test</scope>
+      <type>jar</type>
     </dependency>
   </dependencies>
-  <distributionManagement>
-    <site>
-      <id>sk89q-docs-upload</id>
-      <url>ftp://sk89q-maven-deploy/worldguard/</url>
-    </site>
-  </distributionManagement>
+  
   <build>
     <defaultGoal>install</defaultGoal>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
     
-    <extensions>
+    <extensions> <!-- Used for uploading the docs -->
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
          <artifactId>wagon-ftp</artifactId>
@@ -207,26 +246,27 @@
           <tagNameFormat>@{project.version}</tagNameFormat>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>3.1</version>
         <configuration>
           <reportPlugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-project-info-reports-plugin</artifactId>
-            <version>2.5</version>
-            <reportSets>
-              <reportSet>
-                <reports>
-                  <report>license</report>
-                  <report>index</report>
-                </reports>
-              </reportSet>
-            </reportSets>
-          </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+              <version>2.5</version>
+              <reportSets>
+                <reportSet>
+                  <reports>
+                    <report>license</report>
+                    <report>index</report>
+                  </reports>
+                </reportSet>
+              </reportSets>
+            </plugin>
+            
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-javadoc-plugin</artifactId>
@@ -237,4 +277,43 @@
       </plugin>
     </plugins>
   </build>
+  
+  <profiles>
+    <!-- Attach javadocs and source .jars -->
+    <profile>
+      <id>attach-docs</id>
+      
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.8.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
