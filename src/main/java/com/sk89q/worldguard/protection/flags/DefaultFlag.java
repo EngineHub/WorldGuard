@@ -35,12 +35,16 @@ public final class DefaultFlag {
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", true, RegionGroup.ALL);
     public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true, RegionGroup.ALL);
     public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", true, RegionGroup.ALL);
+    public static final StateFlag CREEPER_EXPLOSION_BLOCK_DAMAGE = new StateFlag("creeper-explosion-block-damage", true, RegionGroup.ALL);
     public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = new StateFlag("enderdragon-block-damage", true);
     public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true, RegionGroup.ALL);
+    public static final StateFlag GHAST_FIREBALL_BLOCK_DAMAGE = new StateFlag("ghast-fireball-block-damage", true, RegionGroup.ALL);
     public static final StateFlag OTHER_EXPLOSION = new StateFlag("other-explosion", true);
+    public static final StateFlag OTHER_EXPLOSION_BLOCK_DAMAGE = new StateFlag("other-explosion-block-damage", true);
     public static final StateFlag SLEEP = new StateFlag("sleep", true);
     public static final StateFlag TNT = new StateFlag("tnt", true, RegionGroup.ALL);
     public static final StateFlag LIGHTER = new StateFlag("lighter", true, RegionGroup.MEMBERS);
+    public static final StateFlag TNT_BLOCK_DAMAGE = new StateFlag("tnt-block-damage", true, RegionGroup.ALL);
     public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", true);
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", true);
     public static final StateFlag LIGHTNING = new StateFlag("lightning", true);
@@ -98,9 +102,10 @@ public final class DefaultFlag {
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
-        TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
+        TNT, TNT_BLOCK_DAMAGE, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
-        CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
+        CREEPER_EXPLOSION, CREEPER_EXPLOSION_BLOCK_DAMAGE, OTHER_EXPLOSION, OTHER_EXPLOSION_BLOCK_DAMAGE,
+        ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, GHAST_FIREBALL_BLOCK_DAMAGE, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
         EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,
         ENTITY_ITEM_FRAME_DESTROY, ITEM_DROP, /*MAX_PLAYERS, MAX_PLAYERS_MESSAGE,*/

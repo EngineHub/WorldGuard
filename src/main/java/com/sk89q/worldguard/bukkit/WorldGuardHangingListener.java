@@ -21,7 +21,9 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
@@ -73,6 +75,7 @@ public class WorldGuardHangingListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onHangingingBreak(HangingBreakEvent event) {
         Hanging hanging = event.getEntity();
+        Location loc = hanging.getLocation();
         World world = hanging.getWorld();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
@@ -117,9 +120,15 @@ public class WorldGuardHangingListener implements Listener {
                         event.setCancelled(true);
                         return;
                     }
-                    if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(DefaultFlag.CREEPER_EXPLOSION, hanging.getLocation())) {
-                        event.setCancelled(true);
-                        return;
+                    if (wcfg.useRegions) {
+                        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                        if (!mgr.getApplicableRegions(toVector(loc)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
+                            event.setCancelled(true);
+                            return;
+                        } else if (!mgr.getApplicableRegions(toVector(loc)).allows(DefaultFlag.CREEPER_EXPLOSION_BLOCK_DAMAGE)) {
+                            event.setCancelled(true);
+                            return;
+                        }
                     }
                 }
 

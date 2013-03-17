@@ -582,8 +582,11 @@ public class WorldGuardEntityListener implements Listener {
 
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
-                        event.blockList().clear();
                         event.setCancelled(true);
+                        return;
+                    } else if (!mgr.getApplicableRegions(toVector(block))
+                            .allows(DefaultFlag.CREEPER_EXPLOSION_BLOCK_DAMAGE)) {
+                        event.blockList().clear();
                         return;
                     }
                 }
@@ -621,8 +624,10 @@ public class WorldGuardEntityListener implements Listener {
 
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
-                        event.blockList().clear();
                         event.setCancelled(true);
+                        return;
+                    } else if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT_BLOCK_DAMAGE)) {
+                        event.blockList().clear();
                         return;
                     }
                 }
@@ -653,8 +658,11 @@ public class WorldGuardEntityListener implements Listener {
 
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
-                        event.blockList().clear();
                         event.setCancelled(true);
+                        return;
+                    } else if (!mgr.getApplicableRegions(toVector(block))
+                            .allows(DefaultFlag.GHAST_FIREBALL_BLOCK_DAMAGE)) {
+                        event.blockList().clear();
                         return;
                     }
                 }
@@ -679,6 +687,10 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.OTHER_EXPLOSION)) {
+                        event.setCancelled(true);
+                        return;
+                    } else if (!mgr.getApplicableRegions(toVector(block))
+                            .allows(DefaultFlag.OTHER_EXPLOSION_BLOCK_DAMAGE)) {
                         event.blockList().clear();
                         return;
                     }
