@@ -1,3 +1,6 @@
+5.7.3:
+- Fixed the error caused by Bukkit's change of the TNT minecart API.
+
 5.7.2:
 - Updated to MineCraft 1.5.
 - Added TNT Minecart support. They are handled with the same flags/settings as TNT.
