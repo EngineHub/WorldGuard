@@ -140,7 +140,7 @@ public class WorldGuardBlockListener implements Listener {
             if (held.getTypeId() > 0
                     && !(ItemType.usesDamageValue(held.getTypeId())
                     || BlockType.usesData(held.getTypeId()))) {
-                held.setDurability(Material.getMaterial(held.getTypeId()).getMaxDurability());
+                held.setDurability((short) 0);
                 player.setItemInHand(held);
             }
         }
