@@ -295,9 +295,16 @@ public class WorldGuardEntityListener implements Listener {
                 }
 
                 if (attacker instanceof Fireball) {
-                    if (wcfg.blockFireballExplosions) {
-                        event.setCancelled(true);
-                        return;
+                    if (attacker instanceof WitherSkull) {
+                        if (wcfg.blockWitherSkullExplosions) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    } else {
+                        if (wcfg.blockFireballExplosions) {
+                            event.setCancelled(true);
+                            return;
+                        }
                     }
                     if (wcfg.useRegions) {
                         Fireball fireball = (Fireball) attacker;
