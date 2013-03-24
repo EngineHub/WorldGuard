@@ -340,10 +340,6 @@ public class WorldGuardBlockListener implements Listener {
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
                 if (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL) {
-                    if (!set.canBuild(localPlayer)) {
-                        event.setCancelled(true);
-                        return;
-                    }
                     if (!set.allows(DefaultFlag.LIGHTER, localPlayer)
                             && !plugin.hasPermission(player, "worldguard.override.lighter")) {
                         event.setCancelled(true);
