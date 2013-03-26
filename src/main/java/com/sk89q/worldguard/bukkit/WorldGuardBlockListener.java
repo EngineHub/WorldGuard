@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.sk89q.worldguard.bukkit;
+import java.io.*;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
@@ -175,6 +176,39 @@ public class WorldGuardBlockListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        
+        if ( event.getBlock().getTypeId() == 516 ) {
+        	int Qcount = 0;
+        	//Parse existing logs for user
+        	try {
+        		BufferedReader in = new BufferedReader(new FileReader("quarryGuard/" + player.getName()+".txt"));
+        	    String str = in.readLine();
+        	    Qcount = Integer.parseInt(str);
+        	    }
+        	 catch (IOException e) {
+    			System.err.println ("Unable to read from file");
+    		}
+        	
+        	// clear an entry
+        	if ( Qcount > 0 ) {
+        		Qcount = Qcount - 1;
+        	}
+        	
+        	
+        	// write
+        	FileOutputStream fout;		
+    		try {
+    		    fout = new FileOutputStream("quarryGuard/" + player.getName()+".txt");
+    		    new PrintStream(fout).println (Qcount);
+    		    fout.close();		
+    		}
+    		// Catches any error conditions
+    		catch (IOException e) {
+    			System.err.println ("Unable to write to file");
+    		}
+        	return;
+        }
+        
     }
 
     /*
@@ -536,8 +570,46 @@ public class WorldGuardBlockListener implements Listener {
 
             SpongeUtil.clearSpongeWater(plugin, world, ox, oy, oz);
         }
+        
+        if ( blockPlaced.getTypeId() == 516 ) {
+        	int Qcount = 0;
+        	
+        	//Parse existing logs for user
+        	try {
+        		BufferedReader in = new BufferedReader(new FileReader("quarryGuard/" + player.getName()+".txt"));
+        	    String str = in.readLine();
+        	    System.out.println(str + " " + blockPlaced.getTypeId());
+        	    Qcount = Integer.parseInt(str);
+        	    }
+        	 catch (IOException e) {
+    			System.err.println ("Unable to read from file");
+    		}
+        	
+        	// Do the check
+        	if ( Qcount == 1 ) {
+        		event.setCancelled(true);
+				player.sendMessage(ChatColor.DARK_RED + "You already have a Quarry placed.");
+        	} else {
+				 Qcount=Qcount+1;
+        	}
+        	
+        	// write
+        	FileOutputStream fout;		
+    		try {
+    		    fout = new FileOutputStream("quarryGuard/" + player.getName()+".txt");
+    		    new PrintStream(fout).println (Qcount);
+    		    fout.close();		
+    		}
+    		// Catches any error conditions
+    		catch (IOException e) {
+    			System.err.println ("Unable to write to file");
+    		}
+        	return;
+        }
+        
     }
-
+    
+    
     /*
      * Called when redstone changes.
      */
