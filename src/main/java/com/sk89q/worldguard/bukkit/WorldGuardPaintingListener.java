@@ -111,6 +111,28 @@ public class WorldGuardPaintingListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+                    
+                Creeper creeper = (Creeper) removerEntity;
+                if (creeper.getTarget() instanceof Player) {
+                    Player player = (Player) creeper.getTarget();
+                    
+                    if (wcfg.getBlacklist() != null) {
+                        if (!wcfg.getBlacklist().check(
+                                    new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                                            toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+        
+                    if (wcfg.useRegions) {
+                        if (!plugin.getGlobalRegionManager().canBuild(player, painting.getLocation())) {
+                            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
             }
 
             if (wcfg.blockEntityPaintingDestroy
