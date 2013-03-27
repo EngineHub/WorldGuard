@@ -121,6 +121,38 @@ public class WorldGuardHangingListener implements Listener {
                         event.setCancelled(true);
                         return;
                     }
+                    
+                    Creeper creeper = (Creeper) removerEntity;
+                    if (creeper.getTarget() instanceof Player) {
+                        Player player = (Player) creeper.getTarget();
+                        
+                        if (wcfg.getBlacklist() != null) {
+                            if (hanging instanceof Painting
+                                    && !wcfg.getBlacklist().check(
+                                        new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                                                toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
+                                event.setCancelled(true);
+                                return;
+                            } else if (hanging instanceof ItemFrame
+                                    && !wcfg.getBlacklist().check(
+                                        new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                                                toVector(player.getLocation()), ItemID.ITEM_FRAME), false, false)) {
+                                event.setCancelled(true);
+                                return;
+                            }
+                        }
+        
+                        if (wcfg.useRegions) {
+                            if (!plugin.getGlobalRegionManager().canBuild(player, hanging.getLocation())) {
+                                player.sendMessage(ChatColor.DARK_RED + "You don't have permission to blow up creepers for this area.");
+                                event.setCancelled(true);
+                                return;
+                            }
+                        }
+                        
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
 
                 if (hanging instanceof Painting
