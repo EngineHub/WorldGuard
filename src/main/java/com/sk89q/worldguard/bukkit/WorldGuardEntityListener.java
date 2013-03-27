@@ -594,7 +594,6 @@ public class WorldGuardEntityListener implements Listener {
         } else if (ent instanceof EnderDragon) {
             if (wcfg.blockEnderDragonBlockDamage) {
                 event.blockList().clear();
-                event.setCancelled(true);
                 return;
             }
 
@@ -604,7 +603,6 @@ public class WorldGuardEntityListener implements Listener {
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
                         event.blockList().clear();
-                        event.setCancelled(true);
                         return;
                     }
                 }
