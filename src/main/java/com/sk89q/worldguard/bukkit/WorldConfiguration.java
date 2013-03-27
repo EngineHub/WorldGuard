@@ -98,6 +98,7 @@ public class WorldConfiguration {
     public Set<Integer> allowedLavaSpreadOver;
     public boolean blockTNTExplosions;
     public boolean blockTNTBlockDamage;
+    public boolean blockTNTChainReaction;
     public boolean blockCreeperExplosions;
     public boolean blockCreeperBlockDamage;
     public boolean blockWitherExplosions;
@@ -334,6 +335,7 @@ public class WorldConfiguration {
 
         blockTNTExplosions = getBoolean("ignition.block-tnt", false);
         blockTNTBlockDamage = getBoolean("ignition.block-tnt-block-damage", false);
+        blockTNTChainReaction = getBoolean("ignition.block-tnt-chain-reaction", false);
         blockLighter = getBoolean("ignition.block-lighter", false);
 
         preventLavaFire = getBoolean("fire.disable-lava-fire-spread", true);

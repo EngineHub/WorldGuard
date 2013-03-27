@@ -21,9 +21,11 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Set;
+import java.util.Iterator;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
@@ -610,15 +612,28 @@ public class WorldGuardEntityListener implements Listener {
                 }
             }
         } else if (ent instanceof TNTPrimed || (ent != null && ent.getType() == tntMinecartType)) {
-            if (wcfg.blockTNTBlockDamage) {
-                event.blockList().clear();
-                return;
-            }
-
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
             }
+            
+            if (wcfg.blockTNTBlockDamage && wcfg.blockTNTChainReaction) {
+                event.blockList().clear();
+                return;
+            }
+
+            Iterator<Block> blockIterator = event.blockList().iterator();
+            while (blockIterator.hasNext()) {
+                if (blockIterator.next().getType().equals(Material.TNT)) {
+                    if (wcfg.blockTNTChainReaction) {
+                        blockIterator.remove();
+                    };
+                } else {
+                    if (wcfg.blockTNTBlockDamage) {
+                        blockIterator.remove();
+                    };
+                };
+            };
 
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
