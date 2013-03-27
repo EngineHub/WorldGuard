@@ -25,7 +25,6 @@ import java.util.Iterator;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
@@ -624,7 +623,7 @@ public class WorldGuardEntityListener implements Listener {
 
             Iterator<Block> blockIterator = event.blockList().iterator();
             while (blockIterator.hasNext()) {
-                if (blockIterator.next().getType().equals(Material.TNT)) {
+                if (blockIterator.next().getTypeId() == BlockID.TNT) {
                     if (wcfg.blockTNTChainReaction) {
                         blockIterator.remove();
                     };
