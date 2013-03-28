@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,6 +29,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
@@ -115,17 +117,33 @@ public class WorldGuardHangingListener implements Listener {
                     }
                 }
             } else {
+                RegionManager mgr = wcfg.useRegions ? plugin.getGlobalRegionManager().get(world) : null;
+                ApplicableRegionSet appSet = mgr != null ? mgr.getApplicableRegions(toVector(loc)) : null;
+
                 if (removerEntity instanceof Creeper) {
                     if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
                         event.setCancelled(true);
                         return;
                     }
-                    if (wcfg.useRegions) {
-                        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                        if (!mgr.getApplicableRegions(toVector(loc)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
+                    if (appSet != null) {
+                        if (!appSet.allows(DefaultFlag.CREEPER_EXPLOSION)) {
                             event.setCancelled(true);
                             return;
-                        } else if (!mgr.getApplicableRegions(toVector(loc)).allows(DefaultFlag.CREEPER_EXPLOSION_BLOCK_DAMAGE)) {
+                        } else if (!appSet.allows(DefaultFlag.CREEPER_EXPLOSION_BLOCK_DAMAGE)) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                } else if (removerEntity instanceof Ghast) {
+                    if (wcfg.blockFireballExplosions || wcfg.blockFireballBlockDamage) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                    if (appSet != null) {
+                        if (!appSet.allows(DefaultFlag.GHAST_FIREBALL)) {
+                            event.setCancelled(true);
+                            return;
+                        } else if (!appSet.allows(DefaultFlag.GHAST_FIREBALL_BLOCK_DAMAGE)) {
                             event.setCancelled(true);
                             return;
                         }
@@ -134,13 +152,11 @@ public class WorldGuardHangingListener implements Listener {
 
                 if (hanging instanceof Painting
                         && (wcfg.blockEntityPaintingDestroy
-                        || (wcfg.useRegions
-                        && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_PAINTING_DESTROY, hanging.getLocation())))) {
+                        || (appSet != null && !appSet.allows(DefaultFlag.ENTITY_PAINTING_DESTROY)))) {
                     event.setCancelled(true);
                 } else if (hanging instanceof ItemFrame
                         && (wcfg.blockEntityItemFrameDestroy
-                        || (wcfg.useRegions
-                        && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, hanging.getLocation())))) {
+                        || (appSet != null && !appSet.allows(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY)))) {
                     event.setCancelled(true);
                 }
             }
