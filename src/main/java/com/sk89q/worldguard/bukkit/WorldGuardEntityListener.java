@@ -621,27 +621,26 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
 
+            RegionManager mgr = null;
+            if (wcfg.useRegions) {
+                mgr = plugin.getGlobalRegionManager().get(world);
+            }
+
             Iterator<Block> blockIterator = event.blockList().iterator();
             while (blockIterator.hasNext()) {
-                if (blockIterator.next().getTypeId() == BlockID.TNT) {
-                    if (wcfg.blockTNTChainReaction) {
+                Block block = blockIterator.next();
+
+                
+                if (mgr != null && !mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) { // Check if the block is protected by a region
+                    blockIterator.remove(); // If protected, remove
+                } else if (block.getTypeId() == BlockID.TNT) { // Check if the block is TNT
+                    if (wcfg.blockTNTChainReaction) { // Remove it if we're not allowing TNT explosion chaining
                         blockIterator.remove();
-                    };
-                } else {
+                    }
+                } else { // If the block is not protected by a region and it is not TNT
+                    // Remove if we're blocking block damage
                     if (wcfg.blockTNTBlockDamage) {
                         blockIterator.remove();
-                    };
-                };
-            };
-
-            if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
-                        event.blockList().clear();
-                        event.setCancelled(true);
-                        return;
                     }
                 }
             }

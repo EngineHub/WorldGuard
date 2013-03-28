@@ -335,7 +335,7 @@ public class WorldConfiguration {
 
         blockTNTExplosions = getBoolean("ignition.block-tnt", false);
         blockTNTBlockDamage = getBoolean("ignition.block-tnt-block-damage", false);
-        blockTNTChainReaction = getBoolean("ignition.block-tnt-chain-reaction", false);
+        blockTNTChainReaction = getBoolean("ignition.block-tnt-chain-reaction", blockTNTBlockDamage);
         blockLighter = getBoolean("ignition.block-lighter", false);
 
         preventLavaFire = getBoolean("fire.disable-lava-fire-spread", true);
