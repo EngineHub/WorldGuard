@@ -601,10 +601,6 @@ public class WorldGuardPlayerListener implements Listener {
      * @param event Thrown event
      */
     private void handleAirRightClick(PlayerInteractEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         Player player = event.getPlayer();
         World world = player.getWorld();
         ItemStack item = player.getItemInHand();
