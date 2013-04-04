@@ -156,43 +156,43 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         return "polygon";
     }
 
+    /**
+     * Get the volume of the area covered by this polygonal region.
+     * <p>
+     * Notice that the value returned can differ from the real amount of protected blocks
+     * in this region!
+     */
     @Override
     public int volume() {
-        int volume = 0;
-        // TODO: Fix this
-        /*int numPoints = points.size();
+        int numPoints = points.size();
+     
         if (numPoints < 3) {
             return 0;
         }
-
+     
         double area = 0;
-        int xa, z1, z2;
-
-        for (int i = 0; i < numPoints; i++) {
-            xa = points.get(i).getBlockX();
-            //za = points.get(i).getBlockZ();
-
-            if (points.get(i + 1) == null) {
-                z1 = points.get(0).getBlockZ();
-            } else {
-                z1 = points.get(i + 1).getBlockZ();
-            }
-            if (points.get(i - 1) == null) {
-                z2 = points.get(numPoints - 1).getBlockZ();
-            } else {
-                z2 = points.get(i - 1).getBlockZ();
-            }
-
-            area = area + (xa * (z1 - z2));
+        int x1, x2, z1, z2;
+     
+        for (int i = 0; i <= numPoints - 2; i++) {
+            x1 = points.get(i).getBlockX();
+            z1 = points.get(i).getBlockZ();
+            
+            x2 = points.get(i + 1).getBlockX();
+            z2 = points.get(i + 1).getBlockZ();
+            
+            area = area + ((z1 + z2) * (x1 - x2));
         }
-
-        xa = points.get(0).getBlockX();
-        //za = points.get(0).getBlockZ();
-
-        area = area + (xa * (points.get(1).getBlockZ() - points.get(numPoints - 1).getBlockZ()));
-
-        volume = (Math.abs(maxY - minY) + 1) * (int) Math.ceil((Math.abs(area) / 2));*/
-
-        return volume;
+        
+        x1 = points.get(numPoints - 1).getBlockX();
+        z1 = points.get(numPoints - 1).getBlockZ();
+        x2 = points.get(0).getBlockX();
+        z2 = points.get(0).getBlockZ();
+        area = area + ((z1 + z2) * (x1 - x2));
+        
+        area = Math.ceil(Math.abs(area) / 2);
+        
+        int height = maxY - minY + 1;
+     
+        return (int) (area * height);
     }
 }
