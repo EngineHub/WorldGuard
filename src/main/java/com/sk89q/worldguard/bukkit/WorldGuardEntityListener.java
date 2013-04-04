@@ -582,8 +582,11 @@ public class WorldGuardEntityListener implements Listener {
 
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
-                        event.blockList().clear();
                         event.setCancelled(true);
+                        return;
+                    } else if (!mgr.getApplicableRegions(toVector(block))
+                            .allows(DefaultFlag.CREEPER_EXPLOSION_BLOCK_DAMAGE)) {
+                        event.blockList().clear();
                         return;
                     }
                 }
@@ -591,7 +594,6 @@ public class WorldGuardEntityListener implements Listener {
         } else if (ent instanceof EnderDragon) {
             if (wcfg.blockEnderDragonBlockDamage) {
                 event.blockList().clear();
-                event.setCancelled(true);
                 return;
             }
 
@@ -601,7 +603,6 @@ public class WorldGuardEntityListener implements Listener {
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
                         event.blockList().clear();
-                        event.setCancelled(true);
                         return;
                     }
                 }
@@ -621,8 +622,10 @@ public class WorldGuardEntityListener implements Listener {
 
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
-                        event.blockList().clear();
                         event.setCancelled(true);
+                        return;
+                    } else if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT_BLOCK_DAMAGE)) {
+                        event.blockList().clear();
                         return;
                     }
                 }
@@ -633,29 +636,45 @@ public class WorldGuardEntityListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+
                 if (wcfg.blockWitherSkullBlockDamage) {
                     event.blockList().clear();
                     return;
+                }
+
+                if (wcfg.useRegions) {
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                    for (Block block : event.blockList()) {
+                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.WITHER_SKULL_BLOCK_DAMAGE)) {
+                            event.blockList().clear();
+                            return;
+                        }
+                    }
                 }
             } else {
                 if (wcfg.blockFireballExplosions) {
                     event.setCancelled(true);
                     return;
                 }
+
                 if (wcfg.blockFireballBlockDamage) {
                     event.blockList().clear();
                     return;
                 }
-            }
-            // allow wither skull blocking since there is no dedicated flag atm
-            if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
-                        event.blockList().clear();
-                        event.setCancelled(true);
-                        return;
+                if (wcfg.useRegions) {
+                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+
+                    for (Block block : event.blockList()) {
+                        if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
+                            event.setCancelled(true);
+                            return;
+                        } else if (!mgr.getApplicableRegions(toVector(block))
+                                .allows(DefaultFlag.GHAST_FIREBALL_BLOCK_DAMAGE)) {
+                            event.blockList().clear();
+                            return;
+                        }
                     }
                 }
             }
@@ -668,10 +687,19 @@ public class WorldGuardEntityListener implements Listener {
                 event.blockList().clear();
                 return;
             }
+
+            if (wcfg.useRegions) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                for (Block block : event.blockList()) {
+                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.WITHER_BLOCK_DAMAGE)) {
+                        event.blockList().clear();
+                        return;
+                    }
+                }
+            }
         } else {
             // unhandled entity
             if (wcfg.blockOtherExplosions) {
-                event.blockList().clear();
                 event.setCancelled(true);
                 return;
             }
@@ -679,6 +707,10 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.OTHER_EXPLOSION)) {
+                        event.setCancelled(true);
+                        return;
+                    } else if (!mgr.getApplicableRegions(toVector(block))
+                            .allows(DefaultFlag.OTHER_EXPLOSION_BLOCK_DAMAGE)) {
                         event.blockList().clear();
                         return;
                     }
@@ -850,6 +882,7 @@ public class WorldGuardEntityListener implements Listener {
         Entity ent = event.getEntity();
         Block block = event.getBlock();
         Location location = block.getLocation();
+        World world = location.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(ent.getWorld());
@@ -870,10 +903,26 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
+
+            if (wcfg.useRegions) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.WITHER_BLOCK_DAMAGE)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         } else if (/*ent instanceof Zombie && */event instanceof EntityBreakDoorEvent) {
             if (wcfg.blockZombieDoorDestruction) {
                 event.setCancelled(true);
                 return;
+            }
+
+            if (wcfg.useRegions) {
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.MOB_DOOR_BREAK)) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
     }
