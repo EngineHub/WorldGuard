@@ -27,6 +27,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
@@ -37,6 +38,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
@@ -788,6 +790,16 @@ public class WorldGuardEntityListener implements Listener {
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             if (!set.allows(DefaultFlag.MOB_SPAWNING)) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (event.getEntity() instanceof Animals && !set.allows(DefaultFlag.ANIMAL_SPAWNING)) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (event.getEntity() instanceof Monster && !set.allows(DefaultFlag.MONSTER_SPAWNING)) {
                 event.setCancelled(true);
                 return;
             }

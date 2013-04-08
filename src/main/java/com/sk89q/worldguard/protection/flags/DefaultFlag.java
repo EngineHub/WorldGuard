@@ -34,6 +34,8 @@ public final class DefaultFlag {
     public static final StateFlag PVP = new StateFlag("pvp", true, RegionGroup.ALL);
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", true, RegionGroup.ALL);
     public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true, RegionGroup.ALL);
+    public static final StateFlag MONSTER_SPAWNING = new StateFlag("monster-spawning", true, RegionGroup.ALL);
+    public static final StateFlag ANIMAL_SPAWNING = new StateFlag("animal-spawning", true, RegionGroup.ALL);
     public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", true, RegionGroup.ALL);
     public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = new StateFlag("enderdragon-block-damage", true);
     public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true, RegionGroup.ALL);
