@@ -671,7 +671,6 @@ public class WorldGuardEntityListener implements Listener {
         } else {
             // unhandled entity
             if (wcfg.blockOtherExplosions) {
-                event.blockList().clear();
                 event.setCancelled(true);
                 return;
             }
@@ -679,7 +678,7 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.OTHER_EXPLOSION)) {
-                        event.blockList().clear();
+                        event.setCancelled(true);
                         return;
                     }
                 }
