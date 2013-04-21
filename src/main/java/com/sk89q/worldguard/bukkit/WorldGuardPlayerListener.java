@@ -45,6 +45,7 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -1252,6 +1253,16 @@ public class WorldGuardPlayerListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerFish(PlayerFishEvent event) {
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getPlayer().getWorld());
+
+        if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
+                event.getPlayer().getLocation())) {
+            event.setExpToDrop(0);
         }
     }
 
