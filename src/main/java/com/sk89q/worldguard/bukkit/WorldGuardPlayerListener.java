@@ -221,7 +221,7 @@ public class WorldGuardPlayerListener implements Listener {
                         String replacedFarewell = plugin.replaceMacros(
                                 player, BukkitUtil.replaceColorMacros(state.lastFarewell));
                         for (String line : replacedFarewell.split("\n")) {
-                            player.sendMessage(ChatColor.AQUA + " ** " + line);
+                            player.sendMessage(line);
                         }
                     }
 
@@ -230,7 +230,7 @@ public class WorldGuardPlayerListener implements Listener {
                         String replacedGreeting = plugin.replaceMacros(
                                 player, BukkitUtil.replaceColorMacros(greeting));
                         for (String line : replacedGreeting.split("\n")) {
-                            player.sendMessage(ChatColor.AQUA + " ** " + line);
+                            player.sendMessage(line);
                         }
                     }
 
@@ -298,8 +298,6 @@ public class WorldGuardPlayerListener implements Listener {
             if (plugin.getFlagStateManager().getState(player).lastGameMode != null
                     && gameMode != null && event.getNewGameMode() != gameMode) {
                 event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "Your game mode is locked to "
-                        + gameMode + "in this region!");
             }
         }
     }
