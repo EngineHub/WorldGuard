@@ -128,7 +128,7 @@ public class ToggleCommands {
 
                 if (removed > 10) {
                     sender.sendMessage("" + removed + " entities (>10) auto-removed from "
-                            + world.toString());
+                            + world.getName());
                 }
             }
 
