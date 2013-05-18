@@ -108,6 +108,166 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
+    /**
+     * Handles movement related events, including changing gamemode, sending
+     * greeting/farewell messages, etc.
+     * A reference to WorldGuardPlugin is required to keep this method static
+     * although WGBukkit.getPlugin() may be used.
+     * @return true if the movement should not be allowed
+     */
+    public static boolean checkMove(WorldGuardPlugin plugin, Player player, World world, Location from, Location to) {
+        PlayerFlagState state = plugin.getFlagStateManager().getState(player);
+
+        //Flush states in multiworld scenario
+        if (state.lastWorld != null && !state.lastWorld.equals(world)) {
+            plugin.getFlagStateManager().forget(player);
+            state = plugin.getFlagStateManager().getState(player);
+        }
+
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
+
+        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        Vector pt = new Vector(to.getBlockX(), to.getBlockY(), to.getBlockZ());
+        ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+        /*
+        // check if region is full
+        // get the lowest number of allowed members in any region
+        boolean regionFull = false;
+        String maxPlayerMessage = null;
+        if (!hasBypass) {
+            for (ProtectedRegion region : set) {
+                if (region instanceof GlobalProtectedRegion) {
+                    continue; // global region can't have a max
+                }
+                // get the max for just this region
+                Integer maxPlayers = region.getFlag(DefaultFlag.MAX_PLAYERS);
+                if (maxPlayers == null) {
+                    continue;
+                }
+                int occupantCount = 0;
+                for(Player occupant : world.getPlayers()) {
+                    // each player in this region counts as one toward the max of just this region
+                    // A person with bypass doesn't count as an occupant of the region
+                    if (!occupant.equals(player) && !plugin.getGlobalRegionManager().hasBypass(occupant, world)) {
+                        if (region.contains(BukkitUtil.toVector(occupant.getLocation()))) {
+                            if (++occupantCount >= maxPlayers) {
+                                regionFull = true;
+                                maxPlayerMessage = region.getFlag(DefaultFlag.MAX_PLAYERS_MESSAGE);
+                                // At least one region in the set is full, we are going to use this message because it
+                                // was the first one we detected as full. In reality we should check them all and then
+                                // resolve the message from full regions, but that is probably a lot laggier (and this
+                                // is already pretty laggy. In practice, we can't really control which one we get first
+                                // right here.
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        */
+
+        boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
+        if (!hasBypass && (!entryAllowed /*|| regionFull*/)) {
+            String message = /*maxPlayerMessage != null ? maxPlayerMessage :*/ "You are not permitted to enter this area.";
+
+            player.sendMessage(ChatColor.DARK_RED + message);
+            return true;
+        }
+
+        // Have to set this state
+        if (state.lastExitAllowed == null) {
+            state.lastExitAllowed = mgr.getApplicableRegions(toVector(from))
+                    .allows(DefaultFlag.EXIT, localPlayer);
+        }
+
+        boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
+        if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
+            player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
+            return true;
+        }
+
+//        WorldGuardRegionMoveEvent event = new WorldGuardRegionMoveEvent(plugin, player, state, set, from, to);
+//        Bukkit.getPluginManager().callEvent(event);
+
+        String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);//, localPlayer);
+        String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);//, localPlayer);
+        Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);//, localPlayer);
+        Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);//, localPlayer);
+        GameMode gameMode = set.getFlag(DefaultFlag.GAME_MODE);
+
+        if (state.lastFarewell != null && (farewell == null
+                || !state.lastFarewell.equals(farewell))) {
+            String replacedFarewell = plugin.replaceMacros(
+                    player, BukkitUtil.replaceColorMacros(state.lastFarewell));
+            for (String line : replacedFarewell.split("\n")) {
+                player.sendMessage(line);
+            }
+        }
+
+        if (greeting != null && (state.lastGreeting == null
+                || !state.lastGreeting.equals(greeting))) {
+            String replacedGreeting = plugin.replaceMacros(
+                    player, BukkitUtil.replaceColorMacros(greeting));
+            for (String line : replacedGreeting.split("\n")) {
+                player.sendMessage(line);
+            }
+        }
+
+        if ((notifyLeave == null || !notifyLeave)
+                && state.notifiedForLeave != null && state.notifiedForLeave) {
+            plugin.broadcastNotification(ChatColor.GRAY + "WG: "
+                    + ChatColor.LIGHT_PURPLE + player.getName()
+                    + ChatColor.GOLD + " left NOTIFY region");
+        }
+
+        if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
+                || !state.notifiedForEnter)) {
+            StringBuilder regionList = new StringBuilder();
+
+            for (ProtectedRegion region : set) {
+                if (regionList.length() != 0) {
+                    regionList.append(", ");
+                }
+                regionList.append(region.getId());
+            }
+
+            plugin.broadcastNotification(ChatColor.GRAY + "WG: "
+                    + ChatColor.LIGHT_PURPLE + player.getName()
+                    + ChatColor.GOLD + " entered NOTIFY region: "
+                    + ChatColor.WHITE
+                    + regionList);
+        }
+
+        if (!hasBypass && gameMode != null) {
+            if (player.getGameMode() != gameMode) {
+                state.lastGameMode = player.getGameMode();
+                player.setGameMode(gameMode);
+            } else if (state.lastGameMode == null) {
+                state.lastGameMode = player.getServer().getDefaultGameMode();
+            }
+        } else {
+            if (state.lastGameMode != null) {
+                GameMode mode = state.lastGameMode;
+                state.lastGameMode = null;
+                player.setGameMode(mode);
+            }
+        }
+
+        state.lastGreeting = greeting;
+        state.lastFarewell = farewell;
+        state.notifiedForEnter = notifyEnter;
+        state.notifiedForLeave = notifyLeave;
+        state.lastExitAllowed = exitAllowed;
+        state.lastWorld = to.getWorld();
+        state.lastBlockX = to.getBlockX();
+        state.lastBlockY = to.getBlockY();
+        state.lastBlockZ = to.getBlockZ();
+        return false;
+    }
+
     class PlayerMoveHandler implements Listener {
         @EventHandler(priority = EventPriority.HIGH)
         public void onPlayerMove(PlayerMoveEvent event) {
@@ -125,164 +285,14 @@ public class WorldGuardPlayerListener implements Listener {
                 if (event.getFrom().getBlockX() != event.getTo().getBlockX()
                         || event.getFrom().getBlockY() != event.getTo().getBlockY()
                         || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-                    PlayerFlagState state = plugin.getFlagStateManager().getState(player);
-
-                    //Flush states in multiworld scenario
-                    if (state.lastWorld != null && !state.lastWorld.equals(world)) {
-                        plugin.getFlagStateManager().forget(player);
-                        state = plugin.getFlagStateManager().getState(player);
-                    }
-
-                    LocalPlayer localPlayer = plugin.wrapPlayer(player);
-                    boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
-
-                    RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                    Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
-                    ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-                    /*
-                    // check if region is full
-                    // get the lowest number of allowed members in any region
-                    boolean regionFull = false;
-                    String maxPlayerMessage = null;
-                    if (!hasBypass) {
-                        for (ProtectedRegion region : set) {
-                            if (region instanceof GlobalProtectedRegion) {
-                                continue; // global region can't have a max
-                            }
-                            // get the max for just this region
-                            Integer maxPlayers = region.getFlag(DefaultFlag.MAX_PLAYERS);
-                            if (maxPlayers == null) {
-                                continue;
-                            }
-                            int occupantCount = 0;
-                            for(Player occupant : world.getPlayers()) {
-                                // each player in this region counts as one toward the max of just this region
-                                // A person with bypass doesn't count as an occupant of the region
-                                if (!occupant.equals(player) && !plugin.getGlobalRegionManager().hasBypass(occupant, world)) {
-                                    if (region.contains(BukkitUtil.toVector(occupant.getLocation()))) {
-                                        if (++occupantCount >= maxPlayers) {
-                                            regionFull = true;
-                                            maxPlayerMessage = region.getFlag(DefaultFlag.MAX_PLAYERS_MESSAGE);
-                                            // At least one region in the set is full, we are going to use this message because it
-                                            // was the first one we detected as full. In reality we should check them all and then
-                                            // resolve the message from full regions, but that is probably a lot laggier (and this
-                                            // is already pretty laggy. In practice, we can't really control which one we get first
-                                            // right here.
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    */
-
-                    boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-                    if (!hasBypass && (!entryAllowed /*|| regionFull*/)) {
-                        String message = /*maxPlayerMessage != null ? maxPlayerMessage :*/ "You are not permitted to enter this area.";
-
-                        player.sendMessage(ChatColor.DARK_RED + message);
-
+                    boolean result = checkMove(plugin, player, world, event.getFrom(), event.getTo());
+                    if (result) {
                         Location newLoc = event.getFrom();
                         newLoc.setX(newLoc.getBlockX() + 0.5);
                         newLoc.setY(newLoc.getBlockY());
                         newLoc.setZ(newLoc.getBlockZ() + 0.5);
                         event.setTo(newLoc);
-                        return;
                     }
-
-                    // Have to set this state
-                    if (state.lastExitAllowed == null) {
-                        state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))
-                                .allows(DefaultFlag.EXIT, localPlayer);
-                    }
-
-                    boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
-                    if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
-                        player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
-
-                        Location newLoc = event.getFrom();
-                        newLoc.setX(newLoc.getBlockX() + 0.5);
-                        newLoc.setY(newLoc.getBlockY());
-                        newLoc.setZ(newLoc.getBlockZ() + 0.5);
-                        event.setTo(newLoc);
-                        return;
-                    }
-
-                    String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);//, localPlayer);
-                    String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);//, localPlayer);
-                    Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);//, localPlayer);
-                    Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);//, localPlayer);
-                    GameMode gameMode = set.getFlag(DefaultFlag.GAME_MODE);
-
-                    if (state.lastFarewell != null && (farewell == null
-                            || !state.lastFarewell.equals(farewell))) {
-                        String replacedFarewell = plugin.replaceMacros(
-                                player, BukkitUtil.replaceColorMacros(state.lastFarewell));
-                        for (String line : replacedFarewell.split("\n")) {
-                            player.sendMessage(line);
-                        }
-                    }
-
-                    if (greeting != null && (state.lastGreeting == null
-                            || !state.lastGreeting.equals(greeting))) {
-                        String replacedGreeting = plugin.replaceMacros(
-                                player, BukkitUtil.replaceColorMacros(greeting));
-                        for (String line : replacedGreeting.split("\n")) {
-                            player.sendMessage(line);
-                        }
-                    }
-
-                    if ((notifyLeave == null || !notifyLeave)
-                            && state.notifiedForLeave != null && state.notifiedForLeave) {
-                        plugin.broadcastNotification(ChatColor.GRAY + "WG: "
-                                + ChatColor.LIGHT_PURPLE + player.getName()
-                                + ChatColor.GOLD + " left NOTIFY region");
-                    }
-
-                    if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
-                            || !state.notifiedForEnter)) {
-                        StringBuilder regionList = new StringBuilder();
-
-                        for (ProtectedRegion region : set) {
-                            if (regionList.length() != 0) {
-                                regionList.append(", ");
-                            }
-                            regionList.append(region.getId());
-                        }
-
-                        plugin.broadcastNotification(ChatColor.GRAY + "WG: "
-                                + ChatColor.LIGHT_PURPLE + player.getName()
-                                + ChatColor.GOLD + " entered NOTIFY region: "
-                                + ChatColor.WHITE
-                                + regionList);
-                    }
-
-                    if (!hasBypass && gameMode != null) {
-                        if (player.getGameMode() != gameMode) {
-                            state.lastGameMode = player.getGameMode();
-                            player.setGameMode(gameMode);
-                        } else if (state.lastGameMode == null) {
-                            state.lastGameMode = player.getServer().getDefaultGameMode();
-                        }
-                    } else {
-                        if (state.lastGameMode != null) {
-                            GameMode mode = state.lastGameMode;
-                            state.lastGameMode = null;
-                            player.setGameMode(mode);
-                        }
-                    }
-
-                    state.lastGreeting = greeting;
-                    state.lastFarewell = farewell;
-                    state.notifiedForEnter = notifyEnter;
-                    state.notifiedForLeave = notifyLeave;
-                    state.lastExitAllowed = exitAllowed;
-                    state.lastWorld = event.getTo().getWorld();
-                    state.lastBlockX = event.getTo().getBlockX();
-                    state.lastBlockY = event.getTo().getBlockY();
-                    state.lastBlockZ = event.getTo().getBlockZ();
                 }
             }
         }
@@ -1358,21 +1368,20 @@ public class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
-            if (event.getCause() == TeleportCause.ENDER_PEARL) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(event.getFrom().getWorld());
-                Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
-                Vector ptFrom = new Vector(event.getFrom().getBlockX(), event.getFrom().getBlockY(), event.getFrom().getBlockZ());
-                ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-                ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
-                LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
+            RegionManager mgr = plugin.getGlobalRegionManager().get(event.getFrom().getWorld());
+            Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
+            Vector ptFrom = new Vector(event.getFrom().getBlockX(), event.getFrom().getBlockY(), event.getFrom().getBlockZ());
+            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
+            LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
 
-                if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
-                        && !(set.allows(DefaultFlag.ENTRY, localPlayer)
-                                && setFrom.allows(DefaultFlag.EXIT, localPlayer))) {
-                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
-                    event.setCancelled(true);
-                    return;
-                }
+            boolean result = checkMove(plugin, event.getPlayer(), event.getPlayer().getWorld(), event.getFrom(), event.getTo());
+            if (result) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (event.getCause() == TeleportCause.ENDER_PEARL) {
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
                         && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
                                 && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
@@ -1397,32 +1406,88 @@ public class WorldGuardPlayerListener implements Listener {
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-            String lowerCommand = event.getMessage().toLowerCase();
+            String usedCommand = event.getMessage().toLowerCase();
 
             Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS, localPlayer);
             Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS, localPlayer);
 
-            String blockedCommand = "";
-            if (blockedCommands != null){
-                for (String aCommand : blockedCommands) {
-                    if (lowerCommand.startsWith(aCommand)) {
-                        blockedCommand = aCommand;
-                        break;
-                    }
-                }
-            }
-            if (allowedCommands != null) {
-                if (blockedCommand.isEmpty()) blockedCommand = lowerCommand.split(" ")[0];
-                for (String aCommand : allowedCommands) {
-                    if (lowerCommand.startsWith(aCommand)) {
-                        blockedCommand = "";
-                        break;
+            /*
+             * blocked      used        allow?
+             * x            x           no
+             * x            x y         no
+             * x y          x           yes
+             * x y          x y         no
+             * 
+             * allowed      used        allow?
+             * x            x           yes
+             * x            x y         yes
+             * x y          x           no
+             * x y          x y         yes
+             */
+            String result = "";
+            String[] usedParts = usedCommand.split(" ");
+            if (blockedCommands != null) {
+                blocked:
+                for (String blockedCommand : blockedCommands) {
+                    String[] blockedParts = blockedCommand.split(" ");
+                    for (int i = 0; i < blockedParts.length && i < usedParts.length; i++) {
+                        if (blockedParts[i].equalsIgnoreCase(usedParts[i])) {
+                            // first part matches - check if it's the whole thing
+                            if (i + 1 == blockedParts.length) {
+                                // consumed all blocked parts, block entire command
+                                result = blockedCommand;
+                                break blocked;
+                            } else {
+                                // more blocked parts to check, also check used length
+                                if (i + 1 == usedParts.length) {
+                                    // all that was used, but there is more in blocked
+                                    // allow this, check next command in flag
+                                    continue blocked;
+                                } else {
+                                    // more in both blocked and used, continue checking
+                                    continue;
+                                }
+                            }
+                        }
                     }
                 }
             }
 
-            if (!blockedCommand.isEmpty()) {
-                player.sendMessage(ChatColor.RED + blockedCommand + " is not allowed in this area.");
+            if (allowedCommands != null) {
+                allowed:
+                for (String allowedCommand : allowedCommands) {
+                    String[] allowedParts = allowedCommand.split(" ");
+                    for (int i = 0; i < allowedParts.length && i < usedParts.length; i++) {
+                        if (allowedParts[i].equalsIgnoreCase(usedParts[i])) {
+                            // this part matches - check if it's the whole thing
+                            if (i + 1 == allowedParts.length) {
+                                // consumed all allowed parts before reaching used length
+                                // this command is definitely allowed
+                                result = "";
+                                break allowed;
+                            } else {
+                                // more allowed parts to check
+                                if (i + 1 == usedParts.length) {
+                                    // all that was used, but there is more in allowed
+                                    // block for now, check next part of flag
+                                    result = usedCommand;
+                                    continue allowed;
+                                } else {
+                                    // more in both allowed and used, continue checking for match
+                                    continue;
+                                }
+                            }
+                        } else {
+                            // doesn't match at all, block it, check next flag string
+                            result = usedCommand;
+                            continue allowed;
+                        }
+                    }
+                }
+            }
+
+            if (!result.isEmpty()) {
+                player.sendMessage(ChatColor.RED + result + " is not allowed in this area.");
                 event.setCancelled(true);
                 return;
             }
