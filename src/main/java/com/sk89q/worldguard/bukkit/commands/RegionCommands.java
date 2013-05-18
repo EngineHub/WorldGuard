@@ -667,14 +667,20 @@ public class RegionCommands {
     public void flag(CommandContext args, CommandSender sender) throws CommandException {
 
         final World world;
-        Player player;
+        Player player = null;
         LocalPlayer localPlayer = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+            localPlayer = plugin.wrapPlayer(player);
+        }
         if (args.hasFlag('w')) {
             world = plugin.matchWorld(sender, args.getFlag('w'));
         } else {
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
+            if (player != null) {
+                world = player.getWorld();
+            } else {
+                throw new CommandException("No world specified. Use -w <worldname>.");
+            }
         }
 
         String id = args.getString(0);
@@ -859,14 +865,20 @@ public class RegionCommands {
             min = 2, max = 2)
     public void setPriority(CommandContext args, CommandSender sender) throws CommandException {
         final World world;
-        Player player;
+        Player player = null;
         LocalPlayer localPlayer = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+            localPlayer = plugin.wrapPlayer(player);
+        }
         if (args.hasFlag('w')) {
             world = plugin.matchWorld(sender, args.getFlag('w'));
         } else {
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
+            if (player != null) {
+                world = player.getWorld();
+            } else {
+                throw new CommandException("No world specified. Use -w <worldname>.");
+            }
         }
 
         String id = args.getString(0);
@@ -915,14 +927,20 @@ public class RegionCommands {
             min = 1, max = 2)
     public void setParent(CommandContext args, CommandSender sender) throws CommandException {
         final World world;
-        Player player;
+        Player player = null;
         LocalPlayer localPlayer = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+            localPlayer = plugin.wrapPlayer(player);
+        }
         if (args.hasFlag('w')) {
             world = plugin.matchWorld(sender, args.getFlag('w'));
         } else {
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
+            if (player != null) {
+                world = player.getWorld();
+            } else {
+                throw new CommandException("No world specified. Use -w <worldname>.");
+            }
         }
 
         String id = args.getString(0);
@@ -998,14 +1016,20 @@ public class RegionCommands {
             min = 1, max = 1)
     public void remove(CommandContext args, CommandSender sender) throws CommandException {
         final World world;
-        Player player;
+        Player player = null;
         LocalPlayer localPlayer = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+            localPlayer = plugin.wrapPlayer(player);
+        }
         if (args.hasFlag('w')) {
             world = plugin.matchWorld(sender, args.getFlag('w'));
         } else {
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
+            if (player != null) {
+                world = player.getWorld();
+            } else {
+                throw new CommandException("No world specified. Use -w <worldname>.");
+            }
         }
 
         String id = args.getString(0);
