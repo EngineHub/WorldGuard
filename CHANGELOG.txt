@@ -1,3 +1,21 @@
+5.7.5:
+- Refixed a few issues from 5.7.4.
+
+5.7.4:
+- BREAKING CHANGE: Removed the cyan "**" in front of greeting
+  and farewell messages to allow more customizability. You can
+  re-add them by adding "&c**" to the flag.
+- Fixed an issue enderpearling inside exit/entry deny regions.
+- Added checks to players teleporting in and out of exit/entry regions. 
+- Fix bad matching in blocked and allowed command flags.
+- Fixed heal flag bugs when player max health was increased. 
+- Add fishing to xp blocker.
+- Applied other-explosion flag to entity damage as well.
+- Fixed an issue with interaction that should allow blacklisting item use actions with no block involved (eg fishing rods, potions) 
+- Fix witherskull/fireball settings not being differentiated in one case 
+- Allow cow milking in no-build areas
+- Fix infinite durability breaking items instantly.
+
 5.7.3:
 - Fixed the error caused by Bukkit's change of the TNT minecart API.
 
