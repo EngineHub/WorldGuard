@@ -34,6 +34,8 @@ public final class DefaultFlag {
     public static final StateFlag PVP = new StateFlag("pvp", true, RegionGroup.ALL);
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", true, RegionGroup.ALL);
     public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true, RegionGroup.ALL);
+    public static final StateFlag MONSTER_SPAWNING = new StateFlag("monster-spawning", true, RegionGroup.ALL);
+    public static final StateFlag ANIMAL_SPAWNING = new StateFlag("animal-spawning", true, RegionGroup.ALL);
     public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", true, RegionGroup.ALL);
     public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = new StateFlag("enderdragon-block-damage", true);
     public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true, RegionGroup.ALL);
@@ -99,7 +101,7 @@ public final class DefaultFlag {
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
-        MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
+        MOB_DAMAGE, MOB_SPAWNING, MONSTER_SPAWNING, ANIMAL_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
         CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
         EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,

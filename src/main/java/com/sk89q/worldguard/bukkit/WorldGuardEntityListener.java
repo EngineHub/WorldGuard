@@ -21,11 +21,13 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Set;
+import java.util.Iterator;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
@@ -36,6 +38,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
@@ -623,19 +626,32 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            if (wcfg.blockTNTBlockDamage) {
+
+            if (wcfg.blockTNTBlockDamage && wcfg.blockTNTChainReaction) {
                 event.blockList().clear();
                 return;
             }
 
+            RegionManager mgr = null;
             if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                mgr = plugin.getGlobalRegionManager().get(world);
+            }
 
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
-                        event.blockList().clear();
-                        event.setCancelled(true);
-                        return;
+            Iterator<Block> blockIterator = event.blockList().iterator();
+            while (blockIterator.hasNext()) {
+                Block block = blockIterator.next();
+
+                
+                if (mgr != null && !mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) { // Check if the block is protected by a region
+                    blockIterator.remove(); // If protected, remove
+                } else if (block.getTypeId() == BlockID.TNT) { // Check if the block is TNT
+                    if (wcfg.blockTNTChainReaction) { // Remove it if we're not allowing TNT explosion chaining
+                        blockIterator.remove();
+                    }
+                } else { // If the block is not protected by a region and it is not TNT
+                    // Remove if we're blocking block damage
+                    if (wcfg.blockTNTBlockDamage) {
+                        blockIterator.remove();
                     }
                 }
             }
@@ -785,6 +801,16 @@ public class WorldGuardEntityListener implements Listener {
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             if (!set.allows(DefaultFlag.MOB_SPAWNING)) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (event.getEntity() instanceof Animals && !set.allows(DefaultFlag.ANIMAL_SPAWNING)) {
+                event.setCancelled(true);
+                return;
+            }
+            
+            if (event.getEntity() instanceof Monster && !set.allows(DefaultFlag.MONSTER_SPAWNING)) {
                 event.setCancelled(true);
                 return;
             }
