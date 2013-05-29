@@ -174,9 +174,9 @@ public class RegionMemberCommands {
 
     @Command(aliases = {"removemember", "remmember", "removemem", "remmem"},
             usage = "<id> <owners...>",
-            flags = "w:",
+            flags = "aw:",
             desc = "Remove an owner to a region",
-            min = 2)
+            min = 1)
     public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
         final World world;
         Player player = null;
@@ -216,7 +216,14 @@ public class RegionMemberCommands {
             }
         }
 
-        RegionDBUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
+        if (args.hasFlag('a')) {
+            region.getMembers().removaAll();
+        } else {
+            if (args.argsLength() < 2) {
+                throw new CommandException("List some names to remove, or use -a to remove all.");
+            }
+            RegionDBUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
+        }
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Region '" + id + "' updated.");
@@ -231,9 +238,9 @@ public class RegionMemberCommands {
 
     @Command(aliases = {"removeowner", "remowner"},
             usage = "<id> <owners...>",
-            flags = "w:",
+            flags = "aw:",
             desc = "Remove an owner to a region",
-            min = 2)
+            min = 1)
     public void removeOwner(CommandContext args,
             CommandSender sender) throws CommandException {
         final World world;
@@ -274,7 +281,14 @@ public class RegionMemberCommands {
             }
         }
 
-        RegionDBUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
+        if (args.hasFlag('a')) {
+            region.getOwners().removaAll();
+        } else {
+            if (args.argsLength() < 2) {
+                throw new CommandException("List some names to remove, or use -a to remove all.");
+            }
+            RegionDBUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
+        }
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Region '" + id + "' updated.");
