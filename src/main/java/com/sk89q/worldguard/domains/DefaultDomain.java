@@ -30,8 +30,8 @@ import java.util.Set;
 import com.sk89q.worldguard.LocalPlayer;
 
 public class DefaultDomain implements Domain {
-    private Set<String> groups;
-    private Set<String> players;
+    private final Set<String> groups;
+    private final Set<String> players;
     
     public DefaultDomain() {
         this.groups = new LinkedHashSet<String>();
@@ -134,5 +134,10 @@ public class DefaultDomain implements Domain {
         }
         
         return str.toString();
+    }
+
+    public void removaAll() {
+        groups.clear();
+        players.clear();
     }
 }
