@@ -119,4 +119,20 @@ public final class DefaultFlag {
     public static Flag<?>[] getFlags() {
         return flagsList;
     }
+    
+    /**
+     * Try to match the flag with the given ID using a fuzzy name match.
+     * 
+     * @param id the flag ID
+     * @return a flag, or null
+     */
+    public static Flag<?> fuzzyMatchFlag(String id) {
+        for (Flag<?> flag : DefaultFlag.getFlags()) {
+            if (flag.getName().replace("-", "").equalsIgnoreCase(id.replace("-", ""))) {
+                return flag;
+            }
+        }
+        
+        return null;
+    }
 }
