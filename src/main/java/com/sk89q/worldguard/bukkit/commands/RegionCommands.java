@@ -377,7 +377,7 @@ public final class RegionCommands {
         Player player = plugin.checkPlayer(sender);
 
         // Check permissions
-        if (!getPermissionModel(sender).canDefine()) {
+        if (!getPermissionModel(sender).mayDefine()) {
             throw new CommandPermissionsException();
         }
         
@@ -447,7 +447,7 @@ public final class RegionCommands {
         ProtectedRegion existing = findExistingRegion(regionManager, id, false);
 
         // Check permissions
-        if (!getPermissionModel(sender).canRedefine(existing)) {
+        if (!getPermissionModel(sender).mayRedefine(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -498,7 +498,7 @@ public final class RegionCommands {
         RegionPermissionModel permModel = getPermissionModel(sender);
         
         // Check permissions
-        if (!permModel.canClaim()) {
+        if (!permModel.mayClaim()) {
             throw new CommandPermissionsException();
         }
         
@@ -523,7 +523,7 @@ public final class RegionCommands {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
 
         // Check whether the player has created too many regions
-        if (!permModel.canClaimRegionsUnbounded()) {
+        if (!permModel.mayClaimRegionsUnbounded()) {
             int maxRegionCount = wcfg.getMaxRegionCount(player);
             if (maxRegionCount >= 0
                     && mgr.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
@@ -558,7 +558,7 @@ public final class RegionCommands {
         }
 
         // Check claim volume
-        if (!permModel.canClaimRegionsUnbounded()) {
+        if (!permModel.mayClaimRegionsUnbounded()) {
             if (region.volume() > wcfg.maxClaimVolume) {
                 player.sendMessage(ChatColor.RED + "This region is too large to claim.");
                 player.sendMessage(ChatColor.RED +
@@ -622,7 +622,7 @@ public final class RegionCommands {
         }
 
         // Check permissions
-        if (!getPermissionModel(sender).canSelect(existing)) {
+        if (!getPermissionModel(sender).maySelect(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -662,7 +662,7 @@ public final class RegionCommands {
         }
 
         // Check permissions
-        if (!permModel.canLookup(existing)) {
+        if (!permModel.mayLookup(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -674,7 +674,7 @@ public final class RegionCommands {
         // Let the player also select the region
         if (args.hasFlag('s')) {
             // Check permissions
-            if (!permModel.canSelect(existing)) {
+            if (!permModel.maySelect(existing)) {
                 throw new CommandPermissionsException();
             }
             
@@ -712,7 +712,7 @@ public final class RegionCommands {
         }
         
         // Check permissions
-        if (!getPermissionModel(sender).canList(ownedBy)) {
+        if (!getPermissionModel(sender).mayList(ownedBy)) {
             throw new CommandPermissionsException();
         }
 
@@ -786,7 +786,7 @@ public final class RegionCommands {
                 args.getString(0), false);
 
         // Check permissions
-        if (!permModel.canSetFlag(existing)) {
+        if (!permModel.maySetFlag(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -800,7 +800,7 @@ public final class RegionCommands {
             // Need to build a list
             for (Flag<?> flag : DefaultFlag.getFlags()) {
                 // Can the user set this flag?
-                if (!permModel.canSetFlag(existing, flag)) {
+                if (!permModel.maySetFlag(existing, flag)) {
                     throw new CommandPermissionsException();
                 }
 
@@ -820,7 +820,7 @@ public final class RegionCommands {
         // Also make sure that we can use this flag
         // This permission is confusing and probably should be replaced, but
         // but not here -- in the model
-        if (!permModel.canSetFlag(existing, foundFlag)) {
+        if (!permModel.maySetFlag(existing, foundFlag)) {
             throw new CommandPermissionsException();
         }
 
@@ -924,7 +924,7 @@ public final class RegionCommands {
                 args.getString(0), false);
 
         // Check permissions
-        if (!getPermissionModel(sender).canSetPriority(existing)) {
+        if (!getPermissionModel(sender).maySetPriority(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -965,7 +965,7 @@ public final class RegionCommands {
         }
 
         // Check permissions
-        if (!getPermissionModel(sender).canSetParent(child, parent)) {
+        if (!getPermissionModel(sender).maySetParent(child, parent)) {
             throw new CommandPermissionsException();
         }
 
@@ -1024,7 +1024,7 @@ public final class RegionCommands {
                 args.getString(0), true);
 
         // Check permissions
-        if (!getPermissionModel(sender).canDelete(existing)) {
+        if (!getPermissionModel(sender).mayDelete(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -1048,7 +1048,7 @@ public final class RegionCommands {
         World world = getWorld(args, sender, 'w'); // Get the world
 
         // Check permissions
-        if (!getPermissionModel(sender).canForceLoadRegions()) {
+        if (!getPermissionModel(sender).mayForceLoadRegions()) {
             throw new CommandPermissionsException();
         }
 
@@ -1071,7 +1071,7 @@ public final class RegionCommands {
         World world = getWorld(args, sender, 'w'); // Get the world
 
         // Check permissions
-        if (!getPermissionModel(sender).canForceSaveRegions()) {
+        if (!getPermissionModel(sender).mayForceSaveRegions()) {
             throw new CommandPermissionsException();
         }
 
@@ -1092,7 +1092,7 @@ public final class RegionCommands {
             desc = "Migrate from one Protection Database to another.", min = 1)
     public void migrateDB(CommandContext args, CommandSender sender) throws CommandException {
         // Check permissions
-        if (!getPermissionModel(sender).canMigrateRegionStore()) {
+        if (!getPermissionModel(sender).mayMigrateRegionStore()) {
             throw new CommandPermissionsException();
         }
         
@@ -1165,7 +1165,7 @@ public final class RegionCommands {
                 args.getString(0), false);
 
         // Check permissions
-        if (!getPermissionModel(sender).canTeleportTo(existing)) {
+        if (!getPermissionModel(sender).mayTeleportTo(existing)) {
             throw new CommandPermissionsException();
         }
 
