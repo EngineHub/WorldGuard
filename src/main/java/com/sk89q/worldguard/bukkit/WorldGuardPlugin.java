@@ -73,6 +73,11 @@ import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 public class WorldGuardPlugin extends JavaPlugin {
 
     /**
+     * Current instance of this plugin.
+     */
+    private static WorldGuardPlugin inst;
+
+    /**
      * Manager for commands. This automatically handles nested commands,
      * permissions checking, and a number of other fancy command things.
      * We just set it up and register commands against it.
@@ -102,13 +107,21 @@ public class WorldGuardPlugin extends JavaPlugin {
         configuration = new ConfigurationManager(this);
         globalRegionManager = new GlobalRegionManager(this);
 
-        final WorldGuardPlugin plugin = this;
+        final WorldGuardPlugin plugin = inst = this;
         commands = new CommandsManager<CommandSender>() {
             @Override
             public boolean hasPermission(CommandSender player, String perm) {
                 return plugin.hasPermission(player, perm);
             }
         };
+    }
+
+    /**
+     * Get the current instance of WorldGuard
+     * @return WorldGuardPlugin instance
+     */
+    public static WorldGuardPlugin inst() {
+        return inst;
     }
 
     /**
