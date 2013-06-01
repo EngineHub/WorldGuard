@@ -73,7 +73,7 @@ public class WorldGuardCommands {
             plugin.getGlobalRegionManager().unload();
             plugin.getGlobalStateManager().load();
             plugin.getGlobalRegionManager().preload();
-            WGBukkit.cleanCache();
+            // WGBukkit.cleanCache();
             sender.sendMessage("WorldGuard configuration reloaded.");
         } catch (Throwable t) {
             sender.sendMessage("Error while reloading: "

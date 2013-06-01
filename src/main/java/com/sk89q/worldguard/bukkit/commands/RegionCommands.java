@@ -84,8 +84,8 @@ public final class RegionCommands {
      * @param sender the sender
      * @return the permission model
      */
-    private RegionPermissionModel getPermissionModel(CommandSender sender) {
-        return new RegionPermissionModel(plugin, sender);
+    private static RegionPermissionModel getPermissionModel(CommandSender sender) {
+        return new RegionPermissionModel(WorldGuardPlugin.inst(), sender);
     }
     
     /**
@@ -98,13 +98,13 @@ public final class RegionCommands {
      * @return a world
      * @throws CommandException on error
      */
-    private World getWorld(CommandContext args, CommandSender sender, char flag)
+    private static World getWorld(CommandContext args, CommandSender sender, char flag)
             throws CommandException {
         if (args.hasFlag(flag)) {
-            return plugin.matchWorld(sender, args.getFlag('w'));
+            return WorldGuardPlugin.inst().matchWorld(sender, args.getFlag(flag));
         } else {
             if (sender instanceof Player) {
-                return plugin.checkPlayer(sender).getWorld();
+                return WorldGuardPlugin.inst().checkPlayer(sender).getWorld();
             } else {
                 throw new CommandException("Please specify " +
                         "the world with -" + flag + " world_name.");
@@ -120,18 +120,16 @@ public final class RegionCommands {
      * @return the id given
      * @throws CommandException thrown on an error
      */
-    private String validateRegionId(String id, boolean allowGlobal)
+    private static String validateRegionId(String id, boolean allowGlobal)
             throws CommandException {
         if (!ProtectedRegion.isValidId(id)) {
             throw new CommandException(
                     "The region name of '" + id + "' contains characters that are not allowed.");
         }
 
-        if (id.equalsIgnoreCase("__global__")) { // Sorry, no global
-            if (!allowGlobal) {
-                throw new CommandException(
-                        "Sorry, you can't use __global__ here.");
-            }
+        if (!allowGlobal && id.equalsIgnoreCase("__global__")) { // Sorry, no global
+            throw new CommandException(
+                    "Sorry, you can't use __global__ here.");
         }
         
         return id;
@@ -148,7 +146,7 @@ public final class RegionCommands {
      * @param allowGlobal true to allow selecting __global__
      * @throws CommandException thrown if no region is found by the given name
      */
-    private ProtectedRegion findExistingRegion(
+    private static ProtectedRegion findExistingRegion(
             RegionManager regionManager, String id, boolean allowGlobal)
             throws CommandException {
         // Validate the id
@@ -184,7 +182,7 @@ public final class RegionCommands {
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    private ProtectedRegion findRegionStandingIn(
+    private static ProtectedRegion findRegionStandingIn(
             RegionManager regionManager, Player player) throws CommandException {
         return findRegionStandingIn(regionManager, player, false);
     }
@@ -204,7 +202,7 @@ public final class RegionCommands {
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    private ProtectedRegion findRegionStandingIn(
+    private static ProtectedRegion findRegionStandingIn(
             RegionManager regionManager, Player player, boolean allowGlobal) throws CommandException {
         ApplicableRegionSet set = regionManager.getApplicableRegions(
                 player.getLocation());
@@ -248,8 +246,8 @@ public final class RegionCommands {
      * @return the selection
      * @throws CommandException thrown on an error
      */
-    private Selection getSelection(Player player) throws CommandException {
-        WorldEditPlugin worldEdit = plugin.getWorldEdit();
+    private static Selection getSelection(Player player) throws CommandException {
+        WorldEditPlugin worldEdit = WorldGuardPlugin.inst().getWorldEdit();
         Selection selection = worldEdit.getSelection(player);
 
         if (selection == null) {
@@ -270,7 +268,7 @@ public final class RegionCommands {
      * @return a new region
      * @throws CommandException thrown on an error
      */
-    private ProtectedRegion createRegionFromSelection(Player player, String id)
+    private static ProtectedRegion createRegionFromSelection(Player player, String id)
             throws CommandException {
         
         Selection selection = getSelection(player);
@@ -298,7 +296,7 @@ public final class RegionCommands {
      * @param regionManager the region manager
      * @throws CommandException throw on an error
      */
-    private void commitChanges(CommandSender sender, RegionManager regionManager)
+    private static void commitChanges(CommandSender sender, RegionManager regionManager)
             throws CommandException {
         try {
             if (regionManager.getRegions().size() >= 500) {
@@ -318,7 +316,7 @@ public final class RegionCommands {
      * @param regionManager the region manager
      * @throws CommandException throw on an error
      */
-    private void reloadChanges(CommandSender sender, RegionManager regionManager)
+    private static void reloadChanges(CommandSender sender, RegionManager regionManager)
             throws CommandException {
         try {
             if (regionManager.getRegions().size() >= 500) {
@@ -338,9 +336,9 @@ public final class RegionCommands {
      * @param region the region
      * @throws CommandException thrown on a command error
      */
-    private void setPlayerSelection(Player player, ProtectedRegion region)
+    private static void setPlayerSelection(Player player, ProtectedRegion region)
             throws CommandException {
-        WorldEditPlugin worldEdit = plugin.getWorldEdit();
+        WorldEditPlugin worldEdit = WorldGuardPlugin.inst().getWorldEdit();
 
         World world = player.getWorld();
         
@@ -365,7 +363,7 @@ public final class RegionCommands {
         } else if (region instanceof GlobalProtectedRegion) {
             throw new CommandException(
                     "Can't select global regions! " +
-            		"That would cover the entire world.");
+                    "That would cover the entire world.");
             
         } else {
             throw new CommandException("Unknown region type: " +
@@ -382,10 +380,10 @@ public final class RegionCommands {
      * @param value the value
      * @throws InvalidFlagFormat thrown if the value is invalid
      */
-    private <V> void setFlag(ProtectedRegion region,
+    private static <V> void setFlag(ProtectedRegion region,
             Flag<V> flag, CommandSender sender, String value)
                     throws InvalidFlagFormat {
-        region.setFlag(flag, flag.parseInput(plugin, sender, value));
+        region.setFlag(flag, flag.parseInput(WorldGuardPlugin.inst(), sender, value));
     }
     
     /**
