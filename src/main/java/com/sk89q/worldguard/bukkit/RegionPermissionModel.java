@@ -34,81 +34,81 @@ public class RegionPermissionModel extends AbstractPermissionModel {
         super(plugin, sender);
     }
     
-    public boolean canForceLoadRegions() {
+    public boolean mayForceLoadRegions() {
         return hasPluginPermission("region.load");
     }
     
-    public boolean canForceSaveRegions() {
+    public boolean mayForceSaveRegions() {
         return hasPluginPermission("region.save");
     }
     
-    public boolean canMigrateRegionStore() {
+    public boolean mayMigrateRegionStore() {
         return hasPluginPermission("region.migratedb");
     }
     
-    public boolean canDefine() {
+    public boolean mayDefine() {
         return hasPluginPermission("region.define");
     }
     
-    public boolean canRedefine(ProtectedRegion region) {
+    public boolean mayRedefine(ProtectedRegion region) {
         return hasPatternPermission("redefine", region);
     }
     
-    public boolean canClaim() {
+    public boolean mayClaim() {
         return hasPluginPermission("region.claim");
     }
     
-    public boolean canClaimRegionsUnbounded() {
+    public boolean mayClaimRegionsUnbounded() {
         return hasPluginPermission("region.unlimited");
     }
     
-    public boolean canDelete(ProtectedRegion region) {
+    public boolean mayDelete(ProtectedRegion region) {
         return hasPatternPermission("remove", region);
     }
     
-    public boolean canSetPriority(ProtectedRegion region) {
+    public boolean maySetPriority(ProtectedRegion region) {
         return hasPatternPermission("setpriority", region);
     }
     
-    public boolean canSetParent(ProtectedRegion child, ProtectedRegion parent) {
+    public boolean maySetParent(ProtectedRegion child, ProtectedRegion parent) {
         return hasPatternPermission("setparent", child) &&
                 (parent == null ||
                 hasPatternPermission("setparent", parent));
     }
     
-    public boolean canSelect(ProtectedRegion region) {
+    public boolean maySelect(ProtectedRegion region) {
         return hasPatternPermission("select", region);
     }
     
-    public boolean canLookup(ProtectedRegion region) {
+    public boolean mayLookup(ProtectedRegion region) {
         return hasPatternPermission("info", region);
     }
     
-    public boolean canTeleportTo(ProtectedRegion region) {
+    public boolean mayTeleportTo(ProtectedRegion region) {
         return hasPatternPermission("teleport", region);
     }
     
-    public boolean canList() {
+    public boolean mayList() {
         return hasPluginPermission("region.list");
     }
     
-    public boolean canList(String targetPlayer) {
+    public boolean mayList(String targetPlayer) {
         if (targetPlayer == null) {
-            return canList();
+            return mayList();
         }
         
         if (targetPlayer.equalsIgnoreCase(getSender().getName())) {
             return hasPluginPermission("region.list.own");
         } else {
-            return canList();
+            return mayList();
         }
     }
     
-    public boolean canSetFlag(ProtectedRegion region) {
+    public boolean maySetFlag(ProtectedRegion region) {
         return hasPatternPermission("flag", region);
     }
     
-    public boolean canSetFlag(ProtectedRegion region, Flag<?> flag) {
+    public boolean maySetFlag(ProtectedRegion region, Flag<?> flag) {
         // This is a WTF permission
         return hasPatternPermission(
                 "flag.flags." + flag.getName().toLowerCase(), region);
