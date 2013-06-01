@@ -172,6 +172,7 @@ public final class RegionCommands {
         return region;
     }
     
+
     /**
      * Get the region at the player's location, if possible.
      * 
@@ -185,13 +186,39 @@ public final class RegionCommands {
      */
     private ProtectedRegion findRegionStandingIn(
             RegionManager regionManager, Player player) throws CommandException {
+        return findRegionStandingIn(regionManager, player, false);
+    }
+
+    /**
+     * Get the region at the player's location, if possible.
+     * 
+     * <p>If the player is standing in several regions, an error will be raised
+     * and a list of regions will be provided.</p>
+     * 
+     * <p>If the player is not standing in any regions, the global region will
+     * returned if allowGlobal is true and it exists.</p>
+     * 
+     * @param regionManager the region manager
+     * @param player the player
+     * @param allowGlobal whether to search for a global region if no others are found
+     * @return a region
+     * @throws CommandException thrown if no region was found
+     */
+    private ProtectedRegion findRegionStandingIn(
+            RegionManager regionManager, Player player, boolean allowGlobal) throws CommandException {
         ApplicableRegionSet set = regionManager.getApplicableRegions(
                 player.getLocation());
         
         if (set.size() == 0) {
+            if (allowGlobal) {
+                 ProtectedRegion global = findExistingRegion(regionManager, "__global__", true);
+                 player.sendMessage(ChatColor.GRAY + "You're not standing in any " +
+                         "regions. Using the global region for this world instead.");
+                 return global;
+            }
             throw new CommandException(
-                    "You're not standing in a region. Specify an ID if " +
-                    "you want to select a specific region.");
+                "You're not standing in a region." +
+                "Specify an ID if you want to select a specific region.");
         } else if (set.size() > 1) {
             StringBuilder builder = new StringBuilder();
             boolean first = true;
@@ -228,8 +255,8 @@ public final class RegionCommands {
         if (selection == null) {
             throw new CommandException(
                     "Please select an area first. " +
-            		"Use WorldEdit to make a selection! " +
-            		"(wiki: http://wiki.sk89q.com/wiki/WorldEdit).");
+                    "Use WorldEdit to make a selection! " +
+                    "(wiki: http://wiki.sk89q.com/wiki/WorldEdit).");
         }
         
         return selection;
@@ -296,7 +323,7 @@ public final class RegionCommands {
         try {
             if (regionManager.getRegions().size() >= 500) {
                 sender.sendMessage(ChatColor.GRAY +
-                        "Now saving region list to disk... (Taking too long? We're fixing it)");
+                        "Now loading region list from disk... (Taking too long? We're fixing it)");
             }
             regionManager.load();
         } catch (ProtectionDatabaseException e) {
@@ -656,7 +683,7 @@ public final class RegionCommands {
                         "the region with /region info -w world_name region_name.");
             }
             
-            existing = findRegionStandingIn(regionManager, (Player) sender);
+            existing = findRegionStandingIn(regionManager, (Player) sender, true);
         } else { // Get region from the ID
             existing = findExistingRegion(regionManager, args.getString(0), true);
         }
@@ -783,7 +810,7 @@ public final class RegionCommands {
         // Lookup the existing region
         RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion existing = findExistingRegion(regionManager,
-                args.getString(0), false);
+                args.getString(0), true);
 
         // Check permissions
         if (!permModel.maySetFlag(existing)) {
@@ -801,7 +828,7 @@ public final class RegionCommands {
             for (Flag<?> flag : DefaultFlag.getFlags()) {
                 // Can the user set this flag?
                 if (!permModel.maySetFlag(existing, flag)) {
-                    throw new CommandPermissionsException();
+                    continue;
                 }
 
                 if (list.length() > 0) {
