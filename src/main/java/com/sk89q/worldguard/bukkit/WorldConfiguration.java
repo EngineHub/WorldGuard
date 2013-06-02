@@ -161,6 +161,7 @@ public class WorldConfiguration {
     public boolean disableMyceliumSpread;
     public boolean disableVineGrowth;
     public boolean disableEndermanGriefing;
+    public boolean disableSnowmanTrails;
     public boolean regionInvinciblityRemovesMobs;
     public boolean disableDeathMessages;
     public boolean disableObsidianGenerators;
@@ -353,6 +354,7 @@ public class WorldConfiguration {
         blockFireballBlockDamage = getBoolean("mobs.block-fireball-block-damage", false);
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
         disableEndermanGriefing = getBoolean("mobs.disable-enderman-griefing", false);
+        disableSnowmanTrails = getBoolean("mobs.disable-snowman-trails", false);
         blockEntityPaintingDestroy = getBoolean("mobs.block-painting-destroy", false);
         blockEntityItemFrameDestroy = getBoolean("mobs.block-item-frame-destroy", false);
         blockPluginSpawning = getBoolean("mobs.block-plugin-spawning", true);
@@ -583,7 +585,9 @@ public class WorldConfiguration {
         for (String group : plugin.getGroups(player)) {
             if (maxRegionCounts.containsKey(group)) {
                 int groupMax = maxRegionCounts.get(group);
-                if (max < groupMax) max = groupMax;
+                if (max < groupMax) {
+                    max = groupMax;
+                }
             }
         }
         if (max <= -1) {
