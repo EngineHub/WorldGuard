@@ -339,8 +339,11 @@ public class WorldGuardBlockListener implements Listener {
             if (player != null && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
+                // this is preliminarily handled in the player listener under handleBlockRightClick
+                // why it's handled here too, no one knows
                 if (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL) {
-                    if (!set.allows(DefaultFlag.LIGHTER, localPlayer)
+                    if (!set.allows(DefaultFlag.LIGHTER)
+                            && !set.canBuild(localPlayer)
                             && !plugin.hasPermission(player, "worldguard.override.lighter")) {
                         event.setCancelled(true);
                         return;
