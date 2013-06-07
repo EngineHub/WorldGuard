@@ -816,30 +816,32 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
-        int type = event.getBlock().getTypeId();
-
-        if (type == BlockID.ICE) {
+        switch (event.getBlock().getTypeId()) {
+        case BlockID.ICE:
             if (wcfg.disableIceMelting) {
                 event.setCancelled(true);
                 return;
             }
+
             if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
                     DefaultFlag.ICE_MELT, event.getBlock().getLocation())) {
                 event.setCancelled(true);
                 return;
             }
-        }
+            break;
 
-        if (type == BlockID.SNOW) {
+        case BlockID.SNOW:
             if (wcfg.disableSnowMelting) {
                 event.setCancelled(true);
                 return;
             }
+
             if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
                     DefaultFlag.SNOW_MELT, event.getBlock().getLocation())) {
                 event.setCancelled(true);
                 return;
             }
+            break;
         }
 
         if (type == BlockID.SOIL) {
