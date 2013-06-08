@@ -1376,10 +1376,12 @@ public class WorldGuardPlayerListener implements Listener {
             ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
             LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
 
-            boolean result = checkMove(plugin, event.getPlayer(), event.getPlayer().getWorld(), event.getFrom(), event.getTo());
-            if (result) {
-                event.setCancelled(true);
-                return;
+            if (cfg.usePlayerTeleports) {
+                boolean result = checkMove(plugin, event.getPlayer(), event.getPlayer().getWorld(), event.getFrom(), event.getTo());
+                if (result) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
 
             if (event.getCause() == TeleportCause.ENDER_PEARL) {

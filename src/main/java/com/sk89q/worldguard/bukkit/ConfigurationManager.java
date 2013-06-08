@@ -99,6 +99,7 @@ public class ConfigurationManager {
     public boolean activityHaltToggle = false;
     public boolean autoGodMode;
     public boolean usePlayerMove;
+    public boolean usePlayerTeleports;
     public boolean deopOnJoin;
     public boolean blockInGameOp;
     public Map<String, String> hostKeys = new HashMap<String, String>();
@@ -144,6 +145,7 @@ public class ConfigurationManager {
         autoGodMode = config.getBoolean("auto-invincible", config.getBoolean("auto-invincible-permission", false));
         config.removeProperty("auto-invincible-permission");
         usePlayerMove = config.getBoolean("use-player-move-event", true);
+        usePlayerTeleports = config.getBoolean("use-player-teleports", true);
 
         deopOnJoin = config.getBoolean("security.deop-everyone-on-join", false);
         blockInGameOp = config.getBoolean("security.block-in-game-op-command", false);

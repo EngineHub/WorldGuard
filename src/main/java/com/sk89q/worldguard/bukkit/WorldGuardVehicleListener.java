@@ -82,96 +82,16 @@ public class WorldGuardVehicleListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
-        // unfortunate code duplication
         if (wcfg.useRegions) {
             // Did we move a block?
             if (event.getFrom().getBlockX() != event.getTo().getBlockX()
                     || event.getFrom().getBlockY() != event.getTo().getBlockY()
                     || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-                PlayerFlagState state = plugin.getFlagStateManager().getState(player);
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-                boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
-
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                Vector pt = new Vector(event.getTo().getBlockX(), event.getTo().getBlockY(), event.getTo().getBlockZ());
-                ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-                boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-                if (!hasBypass && !entryAllowed) {
-
+                boolean result = WorldGuardPlayerListener.checkMove(plugin, player, world, event.getFrom(), event.getTo());
+                if (result) {
                     vehicle.setVelocity(new org.bukkit.util.Vector(0,0,0));
                     vehicle.teleport(event.getFrom());
-                    return;
                 }
-
-                // Have to set this state
-                if (state.lastExitAllowed == null) {
-                    state.lastExitAllowed = mgr.getApplicableRegions(toVector(event.getFrom()))
-                            .allows(DefaultFlag.EXIT, localPlayer);
-                }
-
-                boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
-                if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
-                    player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
-
-                    vehicle.setVelocity(new org.bukkit.util.Vector(0,0,0));
-                    vehicle.teleport(event.getFrom());
-                    return;
-                }
-
-                String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE, localPlayer);
-                String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE, localPlayer);
-                Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER, localPlayer);
-                Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE, localPlayer);
-
-                if (state.lastFarewell != null && (farewell == null
-                        || !state.lastFarewell.equals(farewell))) {
-                    String replacedFarewell = plugin.replaceMacros(
-                            player, BukkitUtil.replaceColorMacros(state.lastFarewell));
-                    player.sendMessage(ChatColor.AQUA + " ** " + replacedFarewell);
-                }
-
-                if (greeting != null && (state.lastGreeting == null
-                        || !state.lastGreeting.equals(greeting))) {
-                    String replacedGreeting = plugin.replaceMacros(
-                            player, BukkitUtil.replaceColorMacros(greeting));
-                    player.sendMessage(ChatColor.AQUA + " ** " + replacedGreeting);
-                }
-
-                if ((notifyLeave == null || !notifyLeave)
-                        && state.notifiedForLeave != null && state.notifiedForLeave) {
-                    plugin.broadcastNotification(ChatColor.GRAY + "WG: "
-                            + ChatColor.LIGHT_PURPLE + player.getName()
-                            + ChatColor.GOLD + " left NOTIFY region");
-                }
-
-                if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
-                        || !state.notifiedForEnter)) {
-                    StringBuilder regionList = new StringBuilder();
-
-                    for (ProtectedRegion region : set) {
-                        if (regionList.length() != 0) {
-                            regionList.append(", ");
-                        }
-                        regionList.append(region.getId());
-                    }
-
-                    plugin.broadcastNotification(ChatColor.GRAY + "WG: "
-                            + ChatColor.LIGHT_PURPLE + player.getName()
-                            + ChatColor.GOLD + " entered NOTIFY region: "
-                            + ChatColor.WHITE
-                            + regionList);
-                }
-
-                state.lastGreeting = greeting;
-                state.lastFarewell = farewell;
-                state.notifiedForEnter = notifyEnter;
-                state.notifiedForLeave = notifyLeave;
-                state.lastExitAllowed = exitAllowed;
-                state.lastWorld = event.getTo().getWorld();
-                state.lastBlockX = event.getTo().getBlockX();
-                state.lastBlockY = event.getTo().getBlockY();
-                state.lastBlockZ = event.getTo().getBlockZ();
             }
         }
     }
