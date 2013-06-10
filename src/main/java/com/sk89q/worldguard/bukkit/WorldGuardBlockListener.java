@@ -39,7 +39,6 @@ import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -272,55 +271,80 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
+    /**
+     * Determines whether fire can spread into a block.
+     *
+     * @param block The block in question
+     * @return true if allowed, false otherwise
+     */
+    private boolean isFireSpreadAllowed(Block block) {
+        final ConfigurationManager cfg = plugin.getGlobalStateManager();
+        final WorldConfiguration wcfg = cfg.get(block.getWorld());
+
+        if (wcfg.disableFireSpread) {
+            return false;
+        }
+
+        if (wcfg.fireSpreadDisableToggle) {
+            return false;
+        }
+
+        if (!wcfg.highFreqFlags) {
+            return true;
+        }
+
+        if (!wcfg.useRegions) {
+            return true;
+        }
+
+        final Vector pt = toVector(block);
+        final RegionManager mgr = plugin.getGlobalRegionManager().get(block.getWorld());
+        final ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+
+        return set.allows(DefaultFlag.FIRE_SPREAD);
+
+    }
+
     /*
      * Called when a block gets ignited.
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent event) {
-        IgniteCause cause = event.getCause();
-        Block block = event.getBlock();
-        World world = block.getWorld();
+        final Block block = event.getBlock();
+        final World world = block.getWorld();
 
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        final ConfigurationManager cfg = plugin.getGlobalStateManager();
+        final WorldConfiguration wcfg = cfg.get(world);
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
             return;
         }
-        boolean isFireSpread = cause == IgniteCause.SPREAD;
 
-        if (wcfg.preventLightningFire && cause == IgniteCause.LIGHTNING) {
-            event.setCancelled(true);
-            return;
+        final ApplicableRegionSet set;
+
+        if (wcfg.useRegions) {
+            Vector pt = toVector(block);
+            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            set = mgr.getApplicableRegions(pt);
+        } else {
+            set = null;
         }
 
-        if (wcfg.preventLavaFire && cause == IgniteCause.LAVA) {
-            event.setCancelled(true);
-            return;
-        }
+        switch (event.getCause()) {
+        case SPREAD:
+            if (!isFireSpreadAllowed(block)) {
+                event.setCancelled(true);
+                return;
+            }
 
-        if (wcfg.disableFireSpread && isFireSpread) {
-            event.setCancelled(true);
-            return;
-        }
+            if (wcfg.disableFireSpreadBlocks.size() <= 0) {
+                break;
+            }
 
-        if (wcfg.blockLighter && (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL)
-                && event.getPlayer() != null
-                && !plugin.hasPermission(event.getPlayer(), "worldguard.override.lighter")) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.fireSpreadDisableToggle && isFireSpread) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.disableFireSpreadBlocks.size() > 0 && isFireSpread) {
-            int x = block.getX();
-            int y = block.getY();
-            int z = block.getZ();
+            final int x = block.getX();
+            final int y = block.getY();
+            final int z = block.getZ();
 
             if (wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x, y - 1, z))
                     || wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x + 1, y, z))
@@ -330,53 +354,92 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        }
 
-        if (wcfg.useRegions) {
-            Vector pt = toVector(block);
-            Player player = event.getPlayer();
-            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            break;
 
-            if (player != null && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-                // this is preliminarily handled in the player listener under handleBlockRightClick
-                // why it's handled here too, no one knows
-                if (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL) {
-                    if (!set.allows(DefaultFlag.LIGHTER)
-                            && !set.canBuild(localPlayer)
-                            && !plugin.hasPermission(player, "worldguard.override.lighter")) {
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-
-            if (wcfg.highFreqFlags && isFireSpread
-                    && !set.allows(DefaultFlag.FIRE_SPREAD)) {
+        case LIGHTNING:
+            if (wcfg.preventLightningFire) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (wcfg.highFreqFlags && cause == IgniteCause.LAVA
-                    && !set.allows(DefaultFlag.LAVA_FIRE)) {
+            if (!wcfg.useRegions) {
+                break;
+            }
+
+            if (set.allows(DefaultFlag.LIGHTNING)) {
+                break;
+            }
+
+            event.setCancelled(true);
+            return;
+
+        case LAVA:
+            if (wcfg.preventLavaFire) {
                 event.setCancelled(true);
                 return;
             }
 
-            if (cause == IgniteCause.FIREBALL && event.getPlayer() == null) {
-                // wtf bukkit, FIREBALL is supposed to be reserved to players
-                if (!set.allows(DefaultFlag.GHAST_FIREBALL)) {
-                    event.setCancelled(true);
-                    return;
-                }
+            if (!wcfg.useRegions) {
+                break;
             }
 
-            if (cause == IgniteCause.LIGHTNING && !set.allows(DefaultFlag.LIGHTNING)) {
+            if (!wcfg.highFreqFlags) {
+                break;
+            }
+
+            if (set.allows(DefaultFlag.LAVA_FIRE)) {
+                break;
+            }
+
+            event.setCancelled(true);
+            return;
+
+        case FIREBALL:
+            if (wcfg.useRegions && event.getPlayer() == null && !set.allows(DefaultFlag.GHAST_FIREBALL)) {
                 event.setCancelled(true);
                 return;
             }
+
+            /* FALL-THROUGH */
+
+        case FLINT_AND_STEEL:
+            final Player player = event.getPlayer();
+            if (player == null) {
+                break;
+            }
+
+            if (wcfg.blockLighter && !plugin.hasPermission(player, "worldguard.override.lighter")) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (!wcfg.useRegions) {
+                break;
+            }
+
+            if (plugin.getGlobalRegionManager().hasBypass(player, world)) {
+                break;
+            }
+
+            final LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+            // Lighters are preliminarily handled in the player listener under handleBlockRightClick.
+            // Why they're handled here too, no one knows
+            if (set.allows(DefaultFlag.LIGHTER)) {
+                break;
+            }
+
+            if (set.canBuild(localPlayer)) {
+                break;
+            }
+
+            if (plugin.hasPermission(player, "worldguard.override.lighter")) {
+                break;
+            }
+
+            event.setCancelled(true);
+            return;
         }
     }
 
@@ -385,26 +448,16 @@ public class WorldGuardBlockListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBurn(BlockBurnEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+        final ConfigurationManager cfg = plugin.getGlobalStateManager();
+        final WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
             return;
         }
 
-        if (wcfg.disableFireSpread) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.fireSpreadDisableToggle) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (wcfg.disableFireSpreadBlocks.size() > 0) {
-            Block block = event.getBlock();
+            final Block block = event.getBlock();
 
             if (wcfg.disableFireSpreadBlocks.contains(block.getTypeId())) {
                 event.setCancelled(true);
@@ -417,17 +470,9 @@ public class WorldGuardBlockListener implements Listener {
             return;
         }
 
-        if (wcfg.useRegions) {
-            Block block = event.getBlock();
-            Vector pt = toVector(block);
-            RegionManager mgr = plugin.getGlobalRegionManager().get(block.getWorld());
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-            if (!set.allows(DefaultFlag.FIRE_SPREAD)) {
-                event.setCancelled(true);
-                return;
-            }
-
+        if (!isFireSpreadAllowed(event.getBlock())) {
+            event.setCancelled(true);
+            return;
         }
     }
 
