@@ -399,9 +399,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.fireSpreadDisableToggle) {
-            Block block = event.getBlock();
             event.setCancelled(true);
-            checkAndDestroyAround(block.getWorld(), block.getX(), block.getY(), block.getZ(), BlockID.FIRE);
             return;
         }
 
@@ -410,7 +408,6 @@ public class WorldGuardBlockListener implements Listener {
 
             if (wcfg.disableFireSpreadBlocks.contains(block.getTypeId())) {
                 event.setCancelled(true);
-                checkAndDestroyAround(block.getWorld(), block.getX(), block.getY(), block.getZ(), BlockID.FIRE);
                 return;
             }
         }
@@ -422,34 +419,15 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.useRegions) {
             Block block = event.getBlock();
-            int x = block.getX();
-            int y = block.getY();
-            int z = block.getZ();
             Vector pt = toVector(block);
             RegionManager mgr = plugin.getGlobalRegionManager().get(block.getWorld());
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
             if (!set.allows(DefaultFlag.FIRE_SPREAD)) {
-                checkAndDestroyAround(block.getWorld(), x, y, z, BlockID.FIRE);
                 event.setCancelled(true);
                 return;
             }
 
-        }
-    }
-
-    private void checkAndDestroyAround(World world, int x, int y, int z, int required) {
-        checkAndDestroy(world, x, y, z + 1, required);
-        checkAndDestroy(world, x, y, z - 1, required);
-        checkAndDestroy(world, x, y + 1, z, required);
-        checkAndDestroy(world, x, y - 1, z, required);
-        checkAndDestroy(world, x + 1, y, z, required);
-        checkAndDestroy(world, x - 1, y, z, required);
-    }
-
-    private void checkAndDestroy(World world, int x, int y, int z, int required) {
-        if (world.getBlockTypeIdAt(x, y, z) == required) {
-            world.getBlockAt(x, y, z).setTypeId(BlockID.AIR);
         }
     }
 
