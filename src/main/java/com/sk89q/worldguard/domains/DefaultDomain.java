@@ -136,7 +136,7 @@ public class DefaultDomain implements Domain {
         return str.toString();
     }
 
-    public void removaAll() {
+    public void removeAll() {
         groups.clear();
         players.clear();
     }
