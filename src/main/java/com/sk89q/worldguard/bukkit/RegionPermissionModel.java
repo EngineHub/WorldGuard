@@ -105,7 +105,7 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     }
     
     public boolean maySetFlag(ProtectedRegion region) {
-        return hasPatternPermission("flag", region);
+        return hasPatternPermission("flag.regions", region);
     }
     
     public boolean maySetFlag(ProtectedRegion region, Flag<?> flag) {
