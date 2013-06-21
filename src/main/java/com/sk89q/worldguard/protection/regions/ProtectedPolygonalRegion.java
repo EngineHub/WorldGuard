@@ -158,41 +158,49 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     @Override
     public int volume() {
-        int volume = 0;
-        // TODO: Fix this
-        /*int numPoints = points.size();
+        int yLength = max.getBlockY() - min.getBlockY() + 1;
+
+        int numPoints = points.size();
         if (numPoints < 3) {
-            return 0;
+            int xLength = max.getBlockX() - min.getBlockX() + 1;
+            int zLength = max.getBlockZ() - min.getBlockZ() + 1;
+
+            return xLength * yLength * zLength;
         }
 
-        double area = 0;
-        int xa, z1, z2;
+        int area = 0;
+        int x1, z1, x2, z2;
+        BlockVector2D p0 = points.get(0);
+        BlockVector2D p1, p2;
 
         for (int i = 0; i < numPoints; i++) {
-            xa = points.get(i).getBlockX();
-            //za = points.get(i).getBlockZ();
 
-            if (points.get(i + 1) == null) {
-                z1 = points.get(0).getBlockZ();
+            // Define/update p1 & p2
+            p1 = points.get(i);
+            p2 = points.get(i + 1);
+
+            // Determine x1 and z2
+            x1 = p1.getBlockX();
+            if (p2 == null) {
+                z2 = p0.getBlockZ();
             } else {
-                z1 = points.get(i + 1).getBlockZ();
-            }
-            if (points.get(i - 1) == null) {
-                z2 = points.get(numPoints - 1).getBlockZ();
-            } else {
-                z2 = points.get(i - 1).getBlockZ();
+                z2 = p2.getBlockZ();
             }
 
-            area = area + (xa * (z1 - z2));
+            // Determine z1 and x2
+            z1 = points.get(i).getBlockZ();
+            if (p2 == null) {
+                x2 = p0.getBlockX();
+            } else {
+                x2 = p2.getBlockX();
+            }
+
+            // Do the multiplication and subtraction
+            area += (x1 * z2) - (z1 * x2);
         }
 
-        xa = points.get(0).getBlockX();
-        //za = points.get(0).getBlockZ();
-
-        area = area + (xa * (points.get(1).getBlockZ() - points.get(numPoints - 1).getBlockZ()));
-
-        volume = (Math.abs(maxY - minY) + 1) * (int) Math.ceil((Math.abs(area) / 2));*/
-
-        return volume;
+        // Multiply by 1/2 and then scale to height, the scaling is done
+        // outside to avoid inflation/deflation from the unrounded version
+        return (int) Math.ceil(.5 * area) * yLength;
     }
 }
