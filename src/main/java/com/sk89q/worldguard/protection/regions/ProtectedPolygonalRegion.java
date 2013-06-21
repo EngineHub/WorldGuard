@@ -169,38 +169,19 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         }
 
         int area = 0;
-        int x1, z1, x2, z2;
-        BlockVector2D p0 = points.get(0);
         BlockVector2D p1, p2;
+        int s = numPoints - 1;
 
         for (int i = 0; i < numPoints; i++) {
 
-            // Define/update p1 & p2
+            // Update/define p1 & p2
             p1 = points.get(i);
-            p2 = points.get(i + 1);
+            p2 = points.get(s);
 
-            // Determine x1 and z2
-            x1 = p1.getBlockX();
-            if (p2 == null) {
-                z2 = p0.getBlockZ();
-            } else {
-                z2 = p2.getBlockZ();
-            }
-
-            // Determine z1 and x2
-            z1 = points.get(i).getBlockZ();
-            if (p2 == null) {
-                x2 = p0.getBlockX();
-            } else {
-                x2 = p2.getBlockX();
-            }
-
-            // Do the multiplication and subtraction
-            area += (x1 * z2) - (z1 * x2);
+            // Do the math, then reassign s
+            area += (p2.getBlockX() + p1.getBlockX()) * (p2.getBlockZ() - p1.getBlockZ());
+            s = i;
         }
-
-        // Multiply by 1/2 and then scale to height, the scaling is done
-        // outside to avoid inflation/deflation from the unrounded version
-        return (int) Math.ceil(.5 * area) * yLength;
+        return (area / 2) * yLength;
     }
 }
