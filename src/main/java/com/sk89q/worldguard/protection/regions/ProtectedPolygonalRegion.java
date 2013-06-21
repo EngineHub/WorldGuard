@@ -158,41 +158,30 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     @Override
     public int volume() {
-        int volume = 0;
-        // TODO: Fix this
-        /*int numPoints = points.size();
+        int yLength = max.getBlockY() - min.getBlockY() + 1;
+
+        int numPoints = points.size();
         if (numPoints < 3) {
-            return 0;
+            int xLength = max.getBlockX() - min.getBlockX() + 1;
+            int zLength = max.getBlockZ() - min.getBlockZ() + 1;
+
+            return xLength * yLength * zLength;
         }
 
-        double area = 0;
-        int xa, z1, z2;
+        int area = 0;
+        BlockVector2D p1, p2;
+        int s = numPoints - 1;
 
         for (int i = 0; i < numPoints; i++) {
-            xa = points.get(i).getBlockX();
-            //za = points.get(i).getBlockZ();
 
-            if (points.get(i + 1) == null) {
-                z1 = points.get(0).getBlockZ();
-            } else {
-                z1 = points.get(i + 1).getBlockZ();
-            }
-            if (points.get(i - 1) == null) {
-                z2 = points.get(numPoints - 1).getBlockZ();
-            } else {
-                z2 = points.get(i - 1).getBlockZ();
-            }
+            // Update/define p1 & p2
+            p1 = points.get(i);
+            p2 = points.get(s);
 
-            area = area + (xa * (z1 - z2));
+            // Do the math, then reassign s
+            area += (p2.getBlockX() + p1.getBlockX()) * (p2.getBlockZ() - p1.getBlockZ());
+            s = i;
         }
-
-        xa = points.get(0).getBlockX();
-        //za = points.get(0).getBlockZ();
-
-        area = area + (xa * (points.get(1).getBlockZ() - points.get(numPoints - 1).getBlockZ()));
-
-        volume = (Math.abs(maxY - minY) + 1) * (int) Math.ceil((Math.abs(area) / 2));*/
-
-        return volume;
+        return (int) Math.abs(Math.ceil(area / 2D) * yLength);
     }
 }

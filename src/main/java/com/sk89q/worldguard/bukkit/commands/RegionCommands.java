@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -697,6 +698,8 @@ public final class RegionCommands {
         } else { // Get region from the ID
             existing = findExistingRegion(regionManager, args.getString(0), true);
         }
+
+        Bukkit.getLogger().info(String.valueOf(existing.volume()));
 
         // Check permissions
         if (!permModel.mayLookup(existing)) {
