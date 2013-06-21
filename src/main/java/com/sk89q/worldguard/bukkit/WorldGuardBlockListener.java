@@ -113,7 +113,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block is damaged.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockDamage(BlockDamageEvent event) {
         Player player = event.getPlayer();
         Block blockDamaged = event.getBlock();
@@ -132,7 +132,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block is broken.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         WorldConfiguration wcfg = getWorldConfig(player);
@@ -275,7 +275,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block gets ignited.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent event) {
         IgniteCause cause = event.getCause();
         Block block = event.getBlock();
@@ -383,7 +383,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block is destroyed from burning.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockBurn(BlockBurnEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
@@ -494,7 +494,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a player places a block.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         Block blockPlaced = event.getBlock();
         Player player = event.getPlayer();
@@ -546,7 +546,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when redstone changes.
      */
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
         Block blockTo = event.getBlock();
         World world = blockTo.getWorld();
@@ -581,7 +581,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a sign is changed.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
         WorldConfiguration wcfg = getWorldConfig(player);
@@ -647,7 +647,7 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onLeavesDecay(LeavesDecayEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
@@ -673,7 +673,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block is formed based on world conditions.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockForm(BlockFormEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
@@ -713,7 +713,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block is formed by an entity.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onEntityBlockForm(EntityBlockFormEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
@@ -734,7 +734,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block spreads based on world conditions.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockSpread(BlockSpreadEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
@@ -802,7 +802,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block fades.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent event) {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
@@ -838,7 +838,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a piston extends
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
@@ -860,7 +860,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a piston retracts
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockPistonRetract(BlockPistonRetractEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
@@ -877,7 +877,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block is damaged.
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockDispense(BlockDispenseEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
@@ -899,7 +899,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when a block yields exp
      */
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void onBlockExp(BlockExpEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
