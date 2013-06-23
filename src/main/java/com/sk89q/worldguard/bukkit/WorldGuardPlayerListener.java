@@ -119,7 +119,7 @@ public class WorldGuardPlayerListener implements Listener {
         PlayerFlagState state = plugin.getFlagStateManager().getState(player);
 
         //Flush states in multiworld scenario
-        if (state.lastWorld != null && !state.lastWorld.equals(world)) {
+        if (state.lastWorld != null && !state.lastWorld.equals(to.getWorld())) {
             plugin.getFlagStateManager().forget(player);
             state = plugin.getFlagStateManager().getState(player);
         }
