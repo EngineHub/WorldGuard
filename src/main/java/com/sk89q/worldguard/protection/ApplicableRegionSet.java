@@ -55,7 +55,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Checks if a player can build in an area.
      * 
-     * @param player The player to chec
+     * @param player The player to check
      * @return build ability
      */
     public boolean canBuild(LocalPlayer player) {
