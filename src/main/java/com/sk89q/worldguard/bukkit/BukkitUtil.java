@@ -257,6 +257,7 @@ public class BukkitUtil {
                 || entity instanceof ExperienceOrb
                 || entity instanceof FallingSand
                 || (entity instanceof LivingEntity
+                    && !(entity instanceof Horse)
                     && !(entity instanceof Tameable)
                     && !(entity instanceof Player));
     }
