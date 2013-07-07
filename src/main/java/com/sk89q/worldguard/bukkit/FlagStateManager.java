@@ -19,18 +19,19 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import org.bukkit.GameMode;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+import org.bukkit.GameMode;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
  * This processes per-player state information and is also meant to be used
@@ -59,7 +60,8 @@ public class FlagStateManager implements Runnable {
     /**
      * Run the task.
      */
-    public void run() {
+    @Override
+	public void run() {
         Player[] players = plugin.getServer().getOnlinePlayers();
         ConfigurationManager config = plugin.getGlobalStateManager();
 
@@ -112,14 +114,18 @@ public class FlagStateManager implements Runnable {
 
         Integer healAmount = applicable.getFlag(DefaultFlag.HEAL_AMOUNT);
         Integer healDelay = applicable.getFlag(DefaultFlag.HEAL_DELAY);
-        Integer minHealth = applicable.getFlag(DefaultFlag.MIN_HEAL);
-        Integer maxHealth = applicable.getFlag(DefaultFlag.MAX_HEAL);
+        Double minHealth = applicable.getFlag(DefaultFlag.MIN_HEAL);
+        Double maxHealth = applicable.getFlag(DefaultFlag.MAX_HEAL);
 
         if (healAmount == null || healDelay == null || healAmount == 0 || healDelay < 0) {
             return;
         }
-        if (minHealth == null) minHealth = 0;
-        if (maxHealth == null) maxHealth = player.getMaxHealth();
+        if (minHealth == null) {
+			minHealth = 0.0;
+		}
+        if (maxHealth == null) {
+			maxHealth = player.getMaxHealth();
+		}
 
         // Apply a cap to prevent possible exceptions
         minHealth = Math.min(player.getMaxHealth(), minHealth);
@@ -159,8 +165,12 @@ public class FlagStateManager implements Runnable {
         if (feedAmount == null || feedDelay == null || feedAmount == 0 || feedDelay < 0) {
             return;
         }
-        if (minHunger == null) minHunger = 0;
-        if (maxHunger == null) maxHunger = 20;
+        if (minHunger == null) {
+			minHunger = 0;
+		}
+        if (maxHunger == null) {
+			maxHunger = 20;
+		}
 
         // Apply a cap to prevent possible exceptions
         minHunger = Math.min(20, minHunger);

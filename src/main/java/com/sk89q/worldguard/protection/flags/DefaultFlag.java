@@ -80,8 +80,8 @@ public final class DefaultFlag {
     public static final EnumFlag<GameMode> GAME_MODE = new EnumFlag<GameMode>("game-mode", GameMode.class, RegionGroup.ALL);
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay", RegionGroup.ALL);
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount", RegionGroup.ALL);
-    public static final IntegerFlag MIN_HEAL = new IntegerFlag("heal-min-health", RegionGroup.ALL);
-    public static final IntegerFlag MAX_HEAL = new IntegerFlag("heal-max-health", RegionGroup.ALL);
+    public static final DoubleFlag MIN_HEAL = new DoubleFlag("heal-min-health", RegionGroup.ALL);
+    public static final DoubleFlag MAX_HEAL = new DoubleFlag("heal-max-health", RegionGroup.ALL);
     public static final IntegerFlag FEED_DELAY = new IntegerFlag("feed-delay", RegionGroup.ALL);
     public static final IntegerFlag FEED_AMOUNT = new IntegerFlag("feed-amount", RegionGroup.ALL);
     public static final IntegerFlag MIN_FOOD = new IntegerFlag("feed-min-hunger", RegionGroup.ALL);
