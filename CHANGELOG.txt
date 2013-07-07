@@ -1,3 +1,20 @@
+5.8:
+- BREAKING CHANGE: This version has been built for versions of Bukkit for MC 1.6.1 and
+  newer. Do not try to use this version of WG on an older Bukkit version.
+- Added support for Minecraft 1.6+. Actual support of new 1.6 additions is dependant on
+    Bukkit. Please use a newer build of Bukkit if, for example, you seem to be unable to
+    add "Horses" to your lists of entities.
+- Added mobs.disable-snowman-trails to disable the trails left by walking snowmen.
+- Added -a flag to /region removeowner and /region removemember to remove all objects.
+- Teleporting is now handled by entry/exit flags. If this is causing people to get
+    entirely stuck inside entry/exit deny regions, set the new setting
+    'use-player-teleports' to 'false' in your configuration.
+- Updated formatting for region commands, especially /region info.
+- Changed permissions checking for /region commands to be more consistent, checking for
+    region IDs as a sub-node. This means that if some permissions for some region
+    commands no longer work, add '.*' to the end of permission lines for WG in your
+    permission plugin.
+
 5.7.5:
 - Refixed a few issues from 5.7.4.
 
