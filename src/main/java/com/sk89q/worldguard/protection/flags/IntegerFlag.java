@@ -52,6 +52,8 @@ public class IntegerFlag extends Flag<Integer> {
     public Integer unmarshal(Object o) {
         if (o instanceof Integer) {
             return (Integer) o;
+        } else if (o instanceof Number) {
+        	return ((Number) o).intValue();
         } else {
             return null;
         }
