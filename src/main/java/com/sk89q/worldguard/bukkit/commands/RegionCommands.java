@@ -1067,7 +1067,7 @@ public final class RegionCommands {
      * @param sender the sender
      * @throws CommandException any error
      */
-    @Command(aliases = {"load", "reload"}, usage = "[world]",
+    @Command(aliases = {"load", "reload"}, usage = "[-w world]", flags = "w:",
             desc = "Reload regions from file", max = 1)
     public void load(CommandContext args, CommandSender sender) throws CommandException {
         World world = getWorld(args, sender, 'w'); // Get the world
@@ -1090,7 +1090,7 @@ public final class RegionCommands {
      * @param sender the sender
      * @throws CommandException any error
      */
-    @Command(aliases = {"save", "write"}, usage = "[world]",
+    @Command(aliases = {"save", "write"}, usage = "[-w world]", flags = "w:",
             desc = "Re-save regions to file", max = 1)
     public void save(CommandContext args, CommandSender sender) throws CommandException {
         World world = getWorld(args, sender, 'w'); // Get the world
