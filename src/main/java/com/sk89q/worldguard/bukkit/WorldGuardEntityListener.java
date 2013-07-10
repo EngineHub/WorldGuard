@@ -113,7 +113,7 @@ public class WorldGuardEntityListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
-        if (event.getEntityType() == EntityType.ARROW && wcfg.disableArrowShooting) {
+        if (wcfg.disableArrowShooting && event.getEntityType() == EntityType.ARROW) {
             event.setCancelled(true);
         }
     }
