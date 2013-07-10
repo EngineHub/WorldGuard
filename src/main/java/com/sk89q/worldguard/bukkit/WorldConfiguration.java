@@ -165,6 +165,7 @@ public class WorldConfiguration {
     public boolean regionInvinciblityRemovesMobs;
     public boolean disableDeathMessages;
     public boolean disableObsidianGenerators;
+	public boolean disableArrowShooting;
 
     private Map<String, Integer> maxRegionCounts;
 
@@ -326,6 +327,7 @@ public class WorldConfiguration {
 
         pumpkinScuba = getBoolean("default.pumpkin-scuba", false);
         disableHealthRegain = getBoolean("default.disable-health-regain", false);
+		disableArrowShooting = getBoolean("default.disable-arrow-shooting", false);
 
         noPhysicsGravel = getBoolean("physics.no-physics-gravel", false);
         noPhysicsSand = getBoolean("physics.no-physics-sand", false);
