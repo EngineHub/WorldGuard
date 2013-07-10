@@ -898,6 +898,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.disableArrowShooting && event.getItem().getTypeId() == ItemID.ARROW) {
             event.setCancelled(true);
+            return;
         }
     }
 
