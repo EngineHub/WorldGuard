@@ -896,8 +896,9 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-		if (wcfg.disableArrowShooting && event.getItem().getTypeId() == ItemID.ARROW)
+		if (wcfg.disableArrowShooting && event.getItem().getTypeId() == ItemID.ARROW) {
 			event.setCancelled(true);
+        }
     }
 
     /*

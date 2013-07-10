@@ -108,14 +108,15 @@ public class WorldGuardEntityListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void onEntityShootBow(EntityShootBowEvent event) {
-		ConfigurationManager cfg = plugin.getGlobalStateManager();
-		WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityShootBow(EntityShootBowEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
-		if (wcfg.disableArrowShooting)
-			event.setCancelled(true);
-	}
+        if (wcfg.disableArrowShooting) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
