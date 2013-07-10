@@ -20,6 +20,7 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
+import com.sk89q.worldedit.blocks.ItemID;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -894,6 +895,9 @@ public class WorldGuardBlockListener implements Listener {
                 }
             }
         }
+
+		if (wcfg.disableArrowShooting && event.getItem().getTypeId() == ItemID.ARROW)
+			event.setCancelled(true);
     }
 
     /*
