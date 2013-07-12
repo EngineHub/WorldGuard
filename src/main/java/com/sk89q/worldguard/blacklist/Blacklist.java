@@ -223,6 +223,8 @@ public abstract class Blacklist {
                             entry.setDropActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("on-acquire")) {
                             entry.setAcquireActions(parts[1].split(","));
+                        } else if (parts[0].equalsIgnoreCase("on-stack")) {
+                        	entry.setStackActions(parts[1].split(","));
                         } else if (parts[0].equalsIgnoreCase("message")) {
                             entry.setMessage(parts[1].trim());
                         } else if (parts[0].equalsIgnoreCase("comment")) {
