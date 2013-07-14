@@ -35,10 +35,10 @@ public class ProtectionCommands {
     }
 
     @Command(aliases = {"region", "regions", "rg"}, desc = "Region management commands")
-    @NestedCommand({RegionCommands.class, RegionMemberCommands.class})
+    @NestedCommand(RegionCommands.class)
     public void region(CommandContext args, CommandSender sender) {}
 
     @Command(aliases = {"worldguard", "wg"}, desc = "WorldGuard commands")
-    @NestedCommand({WorldGuardCommands.class})
+    @NestedCommand(WorldGuardCommands.class)
     public void worldGuard(CommandContext args, CommandSender sender) {}
 }
