@@ -213,18 +213,14 @@ public class WorldGuardPlayerListener implements Listener {
                 || !state.lastFarewell.equals(farewell))) {
             String replacedFarewell = plugin.replaceMacros(
                     player, BukkitUtil.replaceColorMacros(state.lastFarewell));
-            for (String line : replacedFarewell.split("\n")) {
-                player.sendMessage(line);
-            }
+            player.sendMessage(replacedFarewell.replaceAll("\\\\n", "\n").split("\\n"));
         }
 
         if (greeting != null && (state.lastGreeting == null
                 || !state.lastGreeting.equals(greeting))) {
             String replacedGreeting = plugin.replaceMacros(
                     player, BukkitUtil.replaceColorMacros(greeting));
-            for (String line : replacedGreeting.split("\n")) {
-                player.sendMessage(line);
-            }
+            player.sendMessage(replacedGreeting.replaceAll("\\\\n", "\n").split("\\n"));
         }
 
         if ((notifyLeave == null || !notifyLeave)
