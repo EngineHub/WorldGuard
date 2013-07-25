@@ -109,6 +109,7 @@ public class WorldGuardPlayerListener implements Listener {
     }
 
     // unsure if anyone actually started using this yet, but just in case...
+    @Deprecated
     public static boolean checkMove(WorldGuardPlugin plugin, Player player, World world, Location from, Location to) {
         return checkMove(plugin, player, from, to); // drop world since it used to be mishandled
     }
