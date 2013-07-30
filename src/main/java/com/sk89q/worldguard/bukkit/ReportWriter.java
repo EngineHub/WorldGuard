@@ -231,7 +231,7 @@ public class ReportWriter {
             for (Map.Entry<Class<? extends Entity>, Integer> entry
                     : entityCounts.entrySet()) {
                 entitiesLog.put(entry.getKey().getSimpleName(),
-                        "%d [%f]",
+                        "%d [%f/chunk]",
                         entry.getValue(),
                         (float) (entry.getValue() / (double) loadedChunkCount));
             }
