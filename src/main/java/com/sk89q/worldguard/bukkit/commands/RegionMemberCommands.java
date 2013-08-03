@@ -89,7 +89,7 @@ public class RegionMemberCommands {
             }
         }
 
-        RegionDBUtil.addToDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
+        RegionDBUtil.addToDomain(region.getMembers(), args.getParsedPaddedSlice(1, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Region '" + id + "' updated.");
@@ -159,7 +159,7 @@ public class RegionMemberCommands {
             }
         }
 
-        RegionDBUtil.addToDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
+        RegionDBUtil.addToDomain(region.getOwners(), args.getParsedPaddedSlice(1, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Region '" + id + "' updated.");
@@ -217,12 +217,12 @@ public class RegionMemberCommands {
         }
 
         if (args.hasFlag('a')) {
-            region.getMembers().removaAll();
+            region.getMembers().removeAll();
         } else {
             if (args.argsLength() < 2) {
                 throw new CommandException("List some names to remove, or use -a to remove all.");
             }
-            RegionDBUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
+            RegionDBUtil.removeFromDomain(region.getMembers(), args.getParsedPaddedSlice(1, 0), 0);
         }
 
         sender.sendMessage(ChatColor.YELLOW
@@ -282,12 +282,12 @@ public class RegionMemberCommands {
         }
 
         if (args.hasFlag('a')) {
-            region.getOwners().removaAll();
+            region.getOwners().removeAll();
         } else {
             if (args.argsLength() < 2) {
                 throw new CommandException("List some names to remove, or use -a to remove all.");
             }
-            RegionDBUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
+            RegionDBUtil.removeFromDomain(region.getOwners(), args.getParsedPaddedSlice(1, 0), 0);
         }
 
         sender.sendMessage(ChatColor.YELLOW
