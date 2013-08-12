@@ -163,6 +163,7 @@ public class WorldConfiguration {
     public boolean disableEndermanGriefing;
     public boolean disableSnowmanTrails;
     public boolean disableSoilDehydration;
+    public Set<Integer> allowedSnowFallOver;
     public boolean regionInvinciblityRemovesMobs;
     public boolean disableDeathMessages;
     public boolean disableObsidianGenerators;
@@ -403,6 +404,7 @@ public class WorldConfiguration {
         disableMyceliumSpread = getBoolean("dynamics.disable-mycelium-spread", false);
         disableVineGrowth = getBoolean("dynamics.disable-vine-growth", false);
         disableSoilDehydration = getBoolean("dynamics.disable-soil-dehydration", false);
+        allowedSnowFallOver = new HashSet<Integer>(getIntList("dynamics.snow-fall-blocks", null));
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
