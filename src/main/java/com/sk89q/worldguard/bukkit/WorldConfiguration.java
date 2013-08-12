@@ -162,11 +162,13 @@ public class WorldConfiguration {
     public boolean disableVineGrowth;
     public boolean disableEndermanGriefing;
     public boolean disableSnowmanTrails;
+    public boolean disableSoilDehydration;
     public boolean regionInvinciblityRemovesMobs;
     public boolean disableDeathMessages;
     public boolean disableObsidianGenerators;
 
     private Map<String, Integer> maxRegionCounts;
+
 
     /* Configuration data end */
 
@@ -400,6 +402,7 @@ public class WorldConfiguration {
         disableGrassGrowth = getBoolean("dynamics.disable-grass-growth", false);
         disableMyceliumSpread = getBoolean("dynamics.disable-mycelium-spread", false);
         disableVineGrowth = getBoolean("dynamics.disable-vine-growth", false);
+        disableSoilDehydration = getBoolean("dynamics.disable-soil-dehydration", false);
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);

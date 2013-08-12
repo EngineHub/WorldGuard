@@ -833,6 +833,18 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
         }
+
+        if (type == BlockID.SOIL) {
+            if (wcfg.disableSoilDehydration) {
+                event.setCancelled(true);
+                return;
+            }
+            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.SOIL_DRY, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     /*
