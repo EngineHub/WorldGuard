@@ -47,6 +47,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -460,6 +461,27 @@ public class WorldGuardPlayerListener implements Listener {
 
         cfg.forgetPlayer(plugin.wrapPlayer(player));
         plugin.forgetPlayer(player);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        // TODO reduce duplication with right-click-air
+        Player player = event.getPlayer();
+        World world = player.getWorld();
+        ItemStack item = player.getItemInHand();
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.getBlacklist() != null) {
+            if (!wcfg.getBlacklist().check(
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
+                            toVector(player.getLocation()),
+                    item.getTypeId()), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
