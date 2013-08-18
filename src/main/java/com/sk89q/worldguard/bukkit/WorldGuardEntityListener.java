@@ -42,6 +42,7 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Wolf;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -88,8 +89,6 @@ public class WorldGuardEntityListener implements Listener {
 
     private WorldGuardPlugin plugin;
 
-    private EntityType tntMinecartType;
-
     /**
      * Construct the object;
      *
@@ -97,7 +96,6 @@ public class WorldGuardEntityListener implements Listener {
      */
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-        tntMinecartType = BukkitUtil.tryEnum(EntityType.class, "MINECART_TNT");
     }
 
     /**
@@ -286,7 +284,7 @@ public class WorldGuardEntityListener implements Listener {
                     }
                 }
 
-                if (attacker instanceof TNTPrimed || attacker.getType() == tntMinecartType) {
+                if (attacker instanceof TNTPrimed || attacker instanceof ExplosiveMinecart) {
 
                     // The check for explosion damage should be handled already... But... What ever...
                     if (wcfg.blockTNTExplosions) {
@@ -616,7 +614,7 @@ public class WorldGuardEntityListener implements Listener {
                     }
                 }
             }
-        } else if (ent instanceof TNTPrimed || (ent != null && ent.getType() == tntMinecartType)) {
+        } else if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
@@ -743,7 +741,7 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
         } else if (event.getEntityType() == EntityType.PRIMED_TNT
-                || event.getEntityType() == tntMinecartType) {
+                || event.getEntityType() == EntityType.MINECART_TNT) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;

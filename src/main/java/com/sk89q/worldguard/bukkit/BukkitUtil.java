@@ -255,24 +255,10 @@ public class BukkitUtil {
         return entity instanceof Item
                 || entity instanceof TNTPrimed
                 || entity instanceof ExperienceOrb
-                || entity instanceof FallingSand
+                || entity instanceof FallingBlock
                 || (entity instanceof LivingEntity
                     && !(entity instanceof Tameable)
                     && !(entity instanceof Player));
-    }
-
-    /**
-     * Returns whether our running CraftBukkit already supports
-     * the HangingEvent instead of the PaintingEvent
-     *
-     * @return true if the hanging event is supported
-     */
-    public static boolean hasHangingEvent() {
-        Class<?> tmp = null;
-        try {
-            tmp = Class.forName("org.bukkit.event.hanging.HangingEvent");
-        } catch (ClassNotFoundException ignored) { }
-        return (tmp != null);
     }
 
     /**
