@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.hasHangingEvent;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -183,11 +181,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardWeatherListener(this)).registerEvents();
         (new WorldGuardVehicleListener(this)).registerEvents();
         (new WorldGuardServerListener(this)).registerEvents();
-        if (hasHangingEvent()) {
-            (new WorldGuardHangingListener(this)).registerEvents();
-        } else {
-            (new WorldGuardPaintingListener(this)).registerEvents();
-        }
+        (new WorldGuardHangingListener(this)).registerEvents();
         configuration.updateCommandBookGodMode();
 
         if (getServer().getPluginManager().isPluginEnabled("CommandBook")) {
