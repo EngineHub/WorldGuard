@@ -130,6 +130,7 @@ public class WorldConfiguration {
     public boolean highFreqFlags;
     public int regionWand;
     public Set<EntityType> blockCreatureSpawn;
+    public boolean allowTamedSpawns;
     // public boolean useiConomy;
     // public boolean buyOnClaim;
     // public double buyOnClaimPrice;
@@ -356,6 +357,7 @@ public class WorldConfiguration {
         blockFireballExplosions = getBoolean("mobs.block-fireball-explosions", false);
         blockFireballBlockDamage = getBoolean("mobs.block-fireball-block-damage", false);
         antiWolfDumbness = getBoolean("mobs.anti-wolf-dumbness", false);
+        allowTamedSpawns = getBoolean("mobs.allow-tamed-spawns", true);
         disableEndermanGriefing = getBoolean("mobs.disable-enderman-griefing", false);
         disableSnowmanTrails = getBoolean("mobs.disable-snowman-trails", false);
         blockEntityPaintingDestroy = getBoolean("mobs.block-painting-destroy", false);

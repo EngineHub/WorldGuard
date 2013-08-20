@@ -761,8 +761,15 @@ public class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
         // allow spawning of creatures from plugins
-        if (!wcfg.blockPluginSpawning && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM)
+        if (!wcfg.blockPluginSpawning && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) {
             return;
+        }
+
+        if (wcfg.allowTamedSpawns
+                && event.getEntity() instanceof Tameable // nullsafe check
+                && ((Tameable) event.getEntity()).isTamed()) {
+            return;
+        }
 
         EntityType entityType = event.getEntityType();
 
