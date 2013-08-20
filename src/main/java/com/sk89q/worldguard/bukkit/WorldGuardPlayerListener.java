@@ -1232,7 +1232,8 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
 
         if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.ITEM_DROP, player.getLocation())) {
+            if (!plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())
+                    && !plugin.getGlobalRegionManager().allows(DefaultFlag.ITEM_DROP, player.getLocation())) {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.RED + "You don't have permission to do that in this area.");
             }
