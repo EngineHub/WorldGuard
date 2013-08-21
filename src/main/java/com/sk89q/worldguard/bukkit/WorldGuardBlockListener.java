@@ -122,7 +122,7 @@ public class WorldGuardBlockListener implements Listener {
         // handle them a bit separately
         if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
-                player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
+ 
                 event.setCancelled(true);
                 return;
             }
@@ -149,7 +149,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
          || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+ 
             event.setCancelled(true);
             return;
         }
@@ -507,7 +507,7 @@ public class WorldGuardBlockListener implements Listener {
             final Location location = blockPlaced.getLocation();
             if (!plugin.getGlobalRegionManager().canBuild(player, location)
              || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+
                 event.setCancelled(true);
                 return;
             }
