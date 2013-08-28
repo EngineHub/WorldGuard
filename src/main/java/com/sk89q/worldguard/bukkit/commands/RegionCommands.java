@@ -750,7 +750,10 @@ public final class RegionCommands {
         
         // Check permissions
         if (!getPermissionModel(sender).mayList(ownedBy)) {
-            throw new CommandPermissionsException();
+            ownedBy = sender.getName(); // assume they only want their own
+            if (!getPermissionModel(sender).mayList(ownedBy)) {
+                throw new CommandPermissionsException();
+            }
         }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
