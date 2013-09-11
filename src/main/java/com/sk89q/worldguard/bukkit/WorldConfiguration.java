@@ -166,6 +166,7 @@ public class WorldConfiguration {
     public boolean disableSoilDehydration;
     public Set<Integer> allowedSnowFallOver;
     public boolean regionInvinciblityRemovesMobs;
+    public boolean explosionFlagCancellation;
     public boolean disableDeathMessages;
     public boolean disableObsidianGenerators;
 
@@ -410,6 +411,7 @@ public class WorldConfiguration {
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
+        explosionFlagCancellation = getBoolean("regions.explosion-flags-block-entity-damage", true);
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
         regionWand = getInt("regions.wand", 334);
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
