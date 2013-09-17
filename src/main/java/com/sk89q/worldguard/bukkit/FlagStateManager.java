@@ -19,19 +19,21 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.GameMode;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * This processes per-player state information and is also meant to be used
@@ -136,11 +138,36 @@ public class FlagStateManager implements Runnable {
         }
 
         if (healDelay <= 0) {
-            player.setHealth(healAmount > 0 ? maxHealth : minHealth); // this will insta-kill if the flag is unset
+            if (healAmount > 0) {
+                EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, maxHealth, EntityRegainHealthEvent.RegainReason.CUSTOM);
+                Bukkit.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    player.setHealth(event.getAmount());
+                }
+            } else {
+                EntityDamageEvent event = new EntityDamageEvent(player, EntityDamageEvent.DamageCause.CUSTOM, player.getHealth());
+                Bukkit.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    player.setHealth(event.getDamage());
+                }
+            }
             state.lastHeal = now;
         } else if (now - state.lastHeal > healDelay * 1000) {
             // clamp health between minimum and maximum
-            player.setHealth(Math.min(maxHealth, Math.max(minHealth, player.getHealth() + healAmount)));
+            double newHealth = Math.min(maxHealth, Math.max(minHealth, player.getHealth() + healAmount));
+            if (newHealth > player.getHealth()) {
+                EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, newHealth - player.getHealth(), EntityRegainHealthEvent.RegainReason.CUSTOM);
+                Bukkit.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    player.setHealth(player.getHealth() + event.getAmount());
+                }
+            } else if (newHealth < player.getHealth()) {
+                EntityDamageEvent event = new EntityDamageEvent(player, EntityDamageEvent.DamageCause.CUSTOM, player.getHealth() - newHealth);
+                Bukkit.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    player.setHealth(player.getHealth() - event.getDamage());
+                }
+            }
             state.lastHeal = now;
         }
     }
