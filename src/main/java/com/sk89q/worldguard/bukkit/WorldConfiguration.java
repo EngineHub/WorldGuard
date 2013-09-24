@@ -161,6 +161,7 @@ public class WorldConfiguration {
     public boolean disableGrassGrowth;
     public boolean disableMyceliumSpread;
     public boolean disableVineGrowth;
+    public boolean disableCropGrowth;
     public boolean disableEndermanGriefing;
     public boolean disableSnowmanTrails;
     public boolean disableSoilDehydration;
@@ -406,6 +407,7 @@ public class WorldConfiguration {
         disableGrassGrowth = getBoolean("dynamics.disable-grass-growth", false);
         disableMyceliumSpread = getBoolean("dynamics.disable-mycelium-spread", false);
         disableVineGrowth = getBoolean("dynamics.disable-vine-growth", false);
+        disableCropGrowth = getBoolean("dynamics.disable-crop-growth", false);
         disableSoilDehydration = getBoolean("dynamics.disable-soil-dehydration", false);
         allowedSnowFallOver = new HashSet<Integer>(getIntList("dynamics.snow-fall-blocks", null));
 

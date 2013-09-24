@@ -38,6 +38,7 @@ import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -926,6 +927,29 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
                 event.getBlock().getLocation())) {
             event.setExpToDrop(0);
+        }
+    }
+
+    /*
+     * Called when a block grows naturally in the world.
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockGrow(BlockGrowEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+
+        int type = event.getNewState().getTypeId();
+
+        if (type == BlockID.CROPS || type == BlockID.CARROTS || type == BlockID.POTATOES) {
+            if (wcfg.disableCropGrowth) {
+                event.setCancelled(true);
+                return;
+            }
+            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.CROP_GROWTH, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
