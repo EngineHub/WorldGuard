@@ -21,8 +21,8 @@ package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.events.WorldGuardRegionDamageEvent;
-import com.sk89q.worldguard.protection.events.WorldGuardRegionHealEvent;
+import com.sk89q.worldguard.bukkit.events.WorldGuardRegionDamageEvent;
+import com.sk89q.worldguard.bukkit.events.WorldGuardRegionHealEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.Bukkit;

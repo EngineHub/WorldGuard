@@ -1,4 +1,4 @@
-package com.sk89q.worldguard.protection.events;
+package com.sk89q.worldguard.bukkit.events;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageEvent;
