@@ -147,8 +147,7 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
-         || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
+        if (!plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
@@ -338,7 +337,7 @@ public class WorldGuardBlockListener implements Listener {
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-            if (player != null && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
+            if (player != null) {
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
                 // this is preliminarily handled in the player listener under handleBlockRightClick
@@ -346,7 +345,8 @@ public class WorldGuardBlockListener implements Listener {
                 if (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL) {
                     if (!set.allows(DefaultFlag.LIGHTER)
                             && !set.canBuild(localPlayer)
-                            && !plugin.hasPermission(player, "worldguard.override.lighter")) {
+                            && !plugin.hasPermission(player, "worldguard.override.lighter")
+                            && !plugin.getGlobalRegionManager().hasBypass(player, world, set)) {
                         event.setCancelled(true);
                         return;
                     }
@@ -505,8 +505,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.useRegions) {
             final Location location = blockPlaced.getLocation();
-            if (!plugin.getGlobalRegionManager().canBuild(player, location)
-             || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
+            if (!plugin.getGlobalRegionManager().canConstruct(player, location)) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
