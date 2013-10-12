@@ -149,7 +149,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
          || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            player.sendMessage(ChatColor.DARK_RED + "Not tolerated.");
             event.setCancelled(true);
             return;
         }
