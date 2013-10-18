@@ -28,6 +28,8 @@ import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -43,6 +45,7 @@ import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.PRTreeRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**
  * This class keeps track of region information for every world. It loads
@@ -253,8 +256,36 @@ public class GlobalRegionManager {
      * @return Whether {@code player} has bypass permission for {@code world}
      */
     public boolean hasBypass(LocalPlayer player, World world) {
-        return player.hasPermission("worldguard.region.bypass."
-                        + world.getName());
+        return hasBypass(player, world, null, true);
+    }
+
+    /**
+     * Returns whether the player can bypass.
+     *
+     * @param player The player to check
+     * @param world The world to check for
+     * @param set The regions being bypassed
+     * @return Whether {@code player} has bypass permission for {@code world}
+     */
+    public boolean hasBypass(LocalPlayer player, World world, ApplicableRegionSet set) {
+        return hasBypass(player, world, set, false);
+    }
+
+    /**
+     * Returns whether the player can bypass.
+     *
+     * @param player The player to check
+     * @param world The world to check for
+     * @param set The regions being bypassed
+     * @param silent Hide warnings to player
+     * @return Whether {@code player} has bypass permission for {@code world}
+     */
+    public boolean hasBypass(LocalPlayer player, World world, ApplicableRegionSet set, boolean silent) {
+        boolean bypass = player.hasPermission("worldguard.region.bypass."
+                                              + world.getName());
+        if (bypass && !silent)
+            bypassWarning(player, set);
+        return bypass;
     }
 
     /**
@@ -265,8 +296,72 @@ public class GlobalRegionManager {
      * @return Whether {@code player} has bypass permission for {@code world}
      */
     public boolean hasBypass(Player player, World world) {
-        return plugin.hasPermission(player, "worldguard.region.bypass."
-                + world.getName());
+        return hasBypass(player, world, null, true);
+    }
+
+    /**
+     * Returns whether the player can bypass.
+     *
+     * @param player The player to check
+     * @param world The world to check
+     * @param set The regions being bypassed
+     * @return Whether {@code player} has bypass permission for {@code world}
+     */
+    public boolean hasBypass(Player player, World world, ApplicableRegionSet set) {
+        return hasBypass(player, world, set, false);
+    }
+
+    /**
+     * Returns whether the player can bypass.
+     *
+     * @param player The player to check
+     * @param world The world to check
+     * @param set The regions being bypassed
+     * @param silent Hide warnings to player
+     * @return Whether {@code player} has bypass permission for {@code world}
+     */
+    public boolean hasBypass(Player player, World world, ApplicableRegionSet set, boolean silent) {
+        boolean bypass = plugin.hasPermission(player, "worldguard.region.bypass."
+                                              + world.getName());
+        if (bypass && !silent)
+            bypassWarning(player, set);
+        return bypass;
+    }
+
+    /**
+     * Warns the user that they're taking advantage of their bypass permission.
+     *
+     * @param sender The user to warn.
+     * @param set The region set they're bypassing into. Can be null.
+     * @return Whether {@code player} has bypass permission for {@code world}
+     */
+    public void bypassWarning(LocalPlayer sender, ApplicableRegionSet set) {
+        sender.printRaw(bypassWarningString(set));
+    }
+
+    /**
+     * Warns the user that they're taking advantage of their bypass permission.
+     *
+     * @param sender The user to warn.
+     * @param set The region set they're bypassing into. Can be null.
+     * @return Whether {@code player} has bypass permission for {@code world}
+     */
+    public void bypassWarning(CommandSender sender, ApplicableRegionSet set) {
+        sender.sendMessage(bypassWarningString(set));
+    }
+
+    /**
+     * Generates the bypass warning message.
+     *
+     * @param set The region set they're bypassing into. Can be null.
+     */
+    private String bypassWarningString(ApplicableRegionSet set) {
+        if (set != null) {
+            for (ProtectedRegion reg : set) {
+                return ChatColor.RED + "Bypassing protections of region " + ChatColor.YELLOW + reg.getId();
+            }
+        }
+        return ChatColor.RED + "Bypassing region protections.";
     }
 
     /**
@@ -297,14 +392,10 @@ public class GlobalRegionManager {
 
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-        if (!hasBypass(player, world)) {
-            RegionManager mgr = get(world);
-
-            if (!mgr.getApplicableRegions(BukkitUtil.toVector(loc))
-                    .canBuild(localPlayer)) {
-                return false;
-            }
-        }
+        RegionManager mgr = get(world);
+        final ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(BukkitUtil.toVector(loc));
+        if (!applicableRegions.canBuild(localPlayer))
+            return hasBypass(player, world, applicableRegions);
 
         return true;
     }
@@ -323,17 +414,11 @@ public class GlobalRegionManager {
 
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-        if (!hasBypass(player, world)) {
-            RegionManager mgr = get(world);
-
-            final ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(BukkitUtil.toVector(loc));
-            if (!applicableRegions.canBuild(localPlayer)) {
-                return false;
-            }
-            if (!applicableRegions.canConstruct(localPlayer)) {
-                return false;
-            }
-        }
+        RegionManager mgr = get(world);
+        final ApplicableRegionSet applicableRegions = mgr.getApplicableRegions(BukkitUtil.toVector(loc));
+        if (!applicableRegions.canBuild(localPlayer)
+            || !applicableRegions.canConstruct(localPlayer))
+            return hasBypass(player, world, applicableRegions);
 
         return true;
     }
