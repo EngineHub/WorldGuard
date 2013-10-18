@@ -78,6 +78,7 @@ public final class DefaultFlag {
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave", RegionGroup.ALL);
     public static final SetFlag<EntityType> DENY_SPAWN = new SetFlag<EntityType>("deny-spawn", RegionGroup.ALL, new EntityTypeFlag(null));
+    public static final SetFlag<EntityType> DENY_PVM = new SetFlag<EntityType>("deny-pvm", new EntityTypeFlag(null));
     public static final EnumFlag<GameMode> GAME_MODE = new EnumFlag<GameMode>("game-mode", GameMode.class, RegionGroup.ALL);
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay", RegionGroup.ALL);
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount", RegionGroup.ALL);
@@ -100,7 +101,7 @@ public final class DefaultFlag {
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
-        MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
+        MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, DENY_PVM, INVINCIBILITY, EXP_DROPS,
         CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
         GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
         EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,
