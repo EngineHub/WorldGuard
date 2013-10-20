@@ -182,7 +182,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
         if (!hasRemoteBypass && (!entryAllowed /*|| regionFull*/)) {
-            String message = /*maxPlayerMessage != null ? maxPlayerMessage :*/ "You are not permitted to enter this area.";
+            String message = /*maxPlayerMessage != null ? maxPlayerMessage :*/ "";
 
             player.sendMessage(ChatColor.DARK_RED + message);
             return true;
