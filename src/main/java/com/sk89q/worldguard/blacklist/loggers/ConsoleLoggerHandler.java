@@ -30,6 +30,7 @@ import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemStackBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 
 /**
@@ -97,6 +98,13 @@ public class ConsoleLoggerHandler implements BlacklistLoggerHandler {
             logger.log(Level.INFO, "[" + worldName + "] " + event.getPlayer().getName()
                     + " tried to use " + getFriendlyItemName(evt.getType())
                     + (comment != null ? " (" + comment + ")" : ""));
+         
+        // Stack
+        } else if (event instanceof ItemStackBlacklistEvent) {
+        	ItemStackBlacklistEvent evt = (ItemStackBlacklistEvent)event;
+        	logger.log(Level.INFO, "[" + worldName + "]" + event.getPlayer().getName()
+        			+ " tried to stack " + getFriendlyItemName(evt.getType())
+        			+ (comment != null ? " (" + comment + ")" : ""));
 
         // Unknown
         } else {

@@ -19,6 +19,7 @@
 # - on-interact (when a block in used (doors, chests, etc.))
 # - on-drop (an item is being dropped from the player's inventory)
 # - on-acquire (an item enters a player's inventory via some method)
+# - on-stack (when an item is attempted to stack via /stack)
 #
 # Actions (for events):
 # - deny (deny completely, used blacklist mode)

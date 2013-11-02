@@ -35,6 +35,7 @@ import com.sk89q.worldguard.blacklist.events.BlockInteractBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemStackBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 
 /**
@@ -183,6 +184,11 @@ public class DatabaseLoggerHandler implements BlacklistLoggerHandler {
             logEvent("USE", evt.getPlayer(), evt.getPlayer().getPosition(),
                     evt.getType(), comment);
 
+        // Stack
+        } else if (event instanceof ItemStackBlacklistEvent) {
+        	ItemStackBlacklistEvent evt = (ItemStackBlacklistEvent)event;
+        	logEvent("STACK", evt.getPlayer(), evt.getPlayer().getPosition(),
+        			evt.getType(), comment);
         // Unknown
         } else {
             logEvent("UNKNOWN", event.getPlayer(), event.getPlayer().getPosition(),

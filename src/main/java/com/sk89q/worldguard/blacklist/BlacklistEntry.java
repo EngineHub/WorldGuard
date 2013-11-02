@@ -34,6 +34,7 @@ import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemStackBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 
 /**
@@ -63,6 +64,7 @@ public class BlacklistEntry {
     private String[] useActions;
     private String[] dropActions;
     private String[] acquireActions;
+    private String[] stackActions;
 
     private String message;
     private String comment;
@@ -207,6 +209,20 @@ public class BlacklistEntry {
     public void setAcquireActions(String[] actions) {
         this.acquireActions = actions;
     }
+    
+    /**
+     * @return The actions that will occur when stacking
+     */
+    public String[] getStackActions() {
+    	return stackActions;
+    }
+    
+    /**
+     * @param actions The actions to occur when stacking
+     */
+    public void setStackActions(String[] actions) {
+    	this.stackActions = actions;
+    }
 
     /**
      * @return the message
@@ -290,6 +306,9 @@ public class BlacklistEntry {
         } else if (event instanceof ItemUseBlacklistEvent) {
             return useActions;
 
+        } else if (event instanceof ItemStackBlacklistEvent) {
+        	return stackActions;
+        	
         } else {
             return null;
         }

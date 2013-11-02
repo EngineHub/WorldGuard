@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,7 +31,10 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldguard.blacklist.Blacklist;
+import com.sk89q.worldguard.blacklist.events.ItemStackBlacklistEvent;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class GeneralCommands {
@@ -241,6 +246,10 @@ public class GeneralCommands {
         boolean ignoreMax = plugin.hasPermission(player, "worldguard.stack.illegitimate");
         boolean ignoreDamaged = plugin.hasPermission(player, "worldguard.stack.damaged");
         
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        Blacklist blacklist = wcfg.getBlacklist();
+        
         ItemStack[] items = player.getInventory().getContents();
         int len = items.length;
 
@@ -253,6 +262,15 @@ public class GeneralCommands {
             if (item == null || item.getAmount() <= 0
                     || (!ignoreMax && item.getMaxStackSize() == 1)) {
                 continue;
+            }
+            
+            // Avoid stacks in the blacklist
+            if (blacklist != null) {
+                if (!blacklist.check(
+                        new ItemStackBlacklistEvent(plugin.wrapPlayer(player),
+                                toVector(player.getLocation()), item.getTypeId()), false, false)) {
+                	continue;
+                }
             }
 
             int max = ignoreMax ? 64 : item.getMaxStackSize();
