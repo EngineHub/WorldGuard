@@ -120,10 +120,10 @@ public final class DefaultFlag {
     public static Flag<?>[] getFlags() {
         return flagsList;
     }
-    
+
     /**
      * Try to match the flag with the given ID using a fuzzy name match.
-     * 
+     *
      * @param id the flag ID
      * @return a flag, or null
      */
@@ -133,7 +133,7 @@ public final class DefaultFlag {
                 return flag;
             }
         }
-        
+
         return null;
     }
 }
