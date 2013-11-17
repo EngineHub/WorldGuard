@@ -382,7 +382,6 @@ public class WorldGuardEntityListener implements Listener {
                             }
                         }
                     }
-
                 }
             }
         }
@@ -526,7 +525,7 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
 
-           if (wcfg.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
+            if (wcfg.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
                 BukkitUtil.findFreePosition(player);
                 event.setCancelled(true);
                 return;
