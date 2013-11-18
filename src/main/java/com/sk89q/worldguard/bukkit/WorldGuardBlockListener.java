@@ -842,9 +842,8 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
             break;
-        }
 
-        if (type == BlockID.SOIL) {
+        case BlockID.SOIL:
             if (wcfg.disableSoilDehydration) {
                 event.setCancelled(true);
                 return;
@@ -854,7 +853,9 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
+            break;
         }
+
     }
 
     /*
