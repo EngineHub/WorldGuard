@@ -71,7 +71,7 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>5.5.9-SNAPSHOT</version>
+      <version>5.5.8</version>
       <scope>compile</scope>
       <type>jar</type>
     </dependency>
