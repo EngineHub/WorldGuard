@@ -928,6 +928,7 @@ public class WorldGuardEntityListener implements Listener {
         GlobalRegionManager regionMan = plugin.getGlobalRegionManager();
 
         if (event.getAffectedEntities().isEmpty()) {
+            event.setCancelled(!regionMan.allows(DefaultFlag.POTION_SPLASH, potion.getLocation()));
             return;
         }
         
