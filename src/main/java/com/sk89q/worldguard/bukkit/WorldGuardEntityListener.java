@@ -20,12 +20,17 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EnderPearl;
@@ -33,6 +38,7 @@ import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -562,7 +568,7 @@ public class WorldGuardEntityListener implements Listener {
     public void onEntityExplode(EntityExplodeEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         Location l = event.getLocation();
-        World world = l.getWorld();
+        final World world = l.getWorld();
         WorldConfiguration wcfg = cfg.get(world);
         Entity ent = event.getEntity();
 
@@ -624,14 +630,30 @@ public class WorldGuardEntityListener implements Listener {
 
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
+                
+                final List<Block> blocks = new ArrayList<Block>();
+                                
                 for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
+                    if (mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {                    	
+                    		blocks.add(block);                    
                     }
-                }
+                }  
+                
+                //Java reflection to modifie BlockList   
+                Field f;
+				try {
+					f = event.getClass().getDeclaredField("blocks");
+					f.setAccessible(true);
+					f.set(event, blocks);
+					f.setAccessible(false);
+				} 
+				catch (NoSuchFieldException e) {e.printStackTrace();} 
+				catch (SecurityException e) {e.printStackTrace();} 
+				catch (IllegalArgumentException e) {e.printStackTrace();} 
+				catch (IllegalAccessException e) {e.printStackTrace();}
+                                
+				if (wcfg.explosionFlagCancellation) event.setCancelled(true);
+                
             }
         } else if (ent instanceof Fireball) {
             if (ent instanceof WitherSkull) {
