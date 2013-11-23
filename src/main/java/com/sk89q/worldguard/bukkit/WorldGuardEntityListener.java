@@ -20,6 +20,7 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
@@ -78,6 +79,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
@@ -586,14 +588,9 @@ public class WorldGuardEntityListener implements Listener {
 
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.CREEPER_EXPLOSION)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
+                
+                //Filter blocks and edit 'blockList()'
+                filterExplosionBlocks(event, DefaultFlag.CREEPER_EXPLOSION, wcfg, mgr);   
             }
         } else if (ent instanceof EnderDragon) {
             if (wcfg.blockEnderDragonBlockDamage) {
@@ -603,14 +600,9 @@ public class WorldGuardEntityListener implements Listener {
 
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
+                
+                //Filter blocks and edit 'blockList()'
+                filterExplosionBlocks(event, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE, wcfg, mgr);   
             }
         } else if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
             if (wcfg.blockTNTExplosions) {
@@ -624,14 +616,9 @@ public class WorldGuardEntityListener implements Listener {
 
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
+                
+                //Filter blocks and edit 'blockList()'
+                filterExplosionBlocks(event, DefaultFlag.TNT, wcfg, mgr);                
             }
         } else if (ent instanceof Fireball) {
             if (ent instanceof WitherSkull) {
@@ -656,14 +643,9 @@ public class WorldGuardEntityListener implements Listener {
             // allow wither skull blocking since there is no dedicated flag atm
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.GHAST_FIREBALL)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
+                
+                //Filter blocks and edit 'blockList()'
+                filterExplosionBlocks(event, DefaultFlag.GHAST_FIREBALL, wcfg, mgr);   
             }
         } else if (ent instanceof Wither) {
             if (wcfg.blockWitherExplosions) {
@@ -682,13 +664,9 @@ public class WorldGuardEntityListener implements Listener {
             }
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                for (Block block : event.blockList()) {
-                    if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.OTHER_EXPLOSION)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
+                
+                //Filter blocks and edit 'blockList()'
+                filterExplosionBlocks(event, DefaultFlag.OTHER_EXPLOSION, wcfg, mgr);   
             }
         }
 
@@ -701,7 +679,42 @@ public class WorldGuardEntityListener implements Listener {
                 }
             }
         }
-
+    }
+    
+    /**
+     * Filters the blocks after their flags
+     * Blocks which are protected, will not be broken
+     * 
+     * @param event
+     * @param flag
+     * @param wcfg
+     *     WorldGuardConfiguration to get flags
+     * @param mgr
+     *     RegionManager to get regions
+     */
+    private void filterExplosionBlocks(EntityExplodeEvent event, StateFlag flag, WorldConfiguration wcfg, RegionManager mgr){
+       
+        //Iterate through all blocks which will be destroyed and filter them
+        Iterator<Block> it =  event.blockList().iterator();
+      
+        while (it.hasNext()){     
+            
+            //if the flag disallows breaking this block by an explosion --> remove from List
+            if (!mgr.getApplicableRegions(toVector(it.next())).allows(flag)) {     
+              
+                //Set canceled if flag is true
+                if (!wcfg.useExplosionBlockFiltering || wcfg.explosionFlagCancellation) {                      
+                      if (wcfg.explosionFlagCancellation) {
+                          event.setCancelled(true);
+                      } else {
+                          event.blockList().clear();
+                      }
+                      break;
+                }
+                
+                it.remove();
+            }                
+        }  
     }
 
     /*
