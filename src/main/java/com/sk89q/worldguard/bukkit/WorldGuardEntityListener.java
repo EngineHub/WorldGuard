@@ -20,8 +20,7 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -592,7 +591,7 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 
                 //Filter blocks and edit 'blockList()'
-                modifieInvolved(event, DefaultFlag.CREEPER_EXPLOSION, wcfg, mgr);   
+                filterExplosionBlocks(event, DefaultFlag.CREEPER_EXPLOSION, wcfg, mgr);   
             }
         } else if (ent instanceof EnderDragon) {
             if (wcfg.blockEnderDragonBlockDamage) {
@@ -604,7 +603,7 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 
                 //Filter blocks and edit 'blockList()'
-                modifieInvolved(event, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE, wcfg, mgr);   
+                filterExplosionBlocks(event, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE, wcfg, mgr);   
             }
         } else if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
             if (wcfg.blockTNTExplosions) {
@@ -620,7 +619,7 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 
                 //Filter blocks and edit 'blockList()'
-                modifieInvolved(event, DefaultFlag.TNT, wcfg, mgr);                
+                filterExplosionBlocks(event, DefaultFlag.TNT, wcfg, mgr);                
             }
         } else if (ent instanceof Fireball) {
             if (ent instanceof WitherSkull) {
@@ -647,7 +646,7 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 
                 //Filter blocks and edit 'blockList()'
-                modifieInvolved(event, DefaultFlag.GHAST_FIREBALL, wcfg, mgr);   
+                filterExplosionBlocks(event, DefaultFlag.GHAST_FIREBALL, wcfg, mgr);   
             }
         } else if (ent instanceof Wither) {
             if (wcfg.blockWitherExplosions) {
@@ -668,7 +667,7 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 
                 //Filter blocks and edit 'blockList()'
-                modifieInvolved(event, DefaultFlag.OTHER_EXPLOSION, wcfg, mgr);   
+                filterExplosionBlocks(event, DefaultFlag.OTHER_EXPLOSION, wcfg, mgr);   
             }
         }
 
@@ -685,7 +684,7 @@ public class WorldGuardEntityListener implements Listener {
     }
     
     /**
-     * Filters the blocks after their flags and edit the event via Java reflection.
+     * Filters the blocks after their flags
      * Blocks which are protected, will not be broken
      * 
      * @param event
@@ -695,46 +694,29 @@ public class WorldGuardEntityListener implements Listener {
      * @param mgr
      *     RegionManager to get regions
      */
-    private void modifieInvolved(EntityExplodeEvent event, StateFlag flag, WorldConfiguration wcfg, RegionManager mgr){
-    	
-    	//List with all filtered Blocks
-    	final List<Block> blocks = new ArrayList<Block>();
+    private void filterExplosionBlocks(EntityExplodeEvent event, StateFlag flag, WorldConfiguration wcfg, RegionManager mgr){
         
-    	//Iterate through all blocks which will be destroyed and filter them
-        for (Block block : event.blockList()) {
-        	
-        	//if the flag allows breaking this block by an explosion --> add to List
-            if (mgr.getApplicableRegions(toVector(block)).allows(flag)) {                    	
-            		blocks.add(block);                    
-            }
-        }  
+   
+      final List<Block> blocks =  event.blockList();
+      
+      //Iterate through all blocks which will be destroyed and filter them
+      Iterator<Block> it = blocks.iterator();
+      
+      while(it.hasNext()){
+          
+          Block currentBlock = it.next();
+          
+          //if the flag disallows breaking this block by an explosion --> remove from List
+          if (!mgr.getApplicableRegions(toVector(currentBlock)).allows(flag)) {     
+              
+              it.remove();
+              
+              //Set canceled if flag is true
+              if (wcfg.explosionFlagCancellation) event.setCancelled(true);
+          }
+                
+      }        
         
-        //Java reflection to modifie BlockList   
-        Field f;
-        
-		try {
-			
-			//get private final field 'blocks' of the EntityExplodeEvent class
-			f = event.getClass().getDeclaredField("blocks");
-			
-			//set accessible
-			f.setAccessible(true);
-			
-			//set blocks to destroy
-			f.set(event, blocks);
-			
-			//set unaccesible
-			f.setAccessible(false);
-		} 
-		
-		//catch Exceptions and print them if they are thrown
-		catch (NoSuchFieldException e) {e.printStackTrace();} 
-		catch (SecurityException e) {e.printStackTrace();} 
-		catch (IllegalArgumentException e) {e.printStackTrace();} 
-		catch (IllegalAccessException e) {e.printStackTrace();}
-        
-		//Set canceled if Flag is true
-		if (wcfg.explosionFlagCancellation) event.setCancelled(true);
     }
 
     /*
