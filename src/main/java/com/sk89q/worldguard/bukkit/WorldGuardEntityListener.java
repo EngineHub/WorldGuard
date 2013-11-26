@@ -695,24 +695,22 @@ public class WorldGuardEntityListener implements Listener {
      *     RegionManager to get regions
      */
     private void filterExplosionBlocks(EntityExplodeEvent event, StateFlag flag, WorldConfiguration wcfg, RegionManager mgr){
-        
-   
-      final List<Block> blocks =  event.blockList();
-      
+       
       //Iterate through all blocks which will be destroyed and filter them
-      Iterator<Block> it = blocks.iterator();
+      Iterator<Block> it =  event.blockList().iterator();
       
       while(it.hasNext()){
-          
-          Block currentBlock = it.next();
-          
+    	  
           //if the flag disallows breaking this block by an explosion --> remove from List
-          if (!mgr.getApplicableRegions(toVector(currentBlock)).allows(flag)) {     
+          if (!mgr.getApplicableRegions(toVector(it.next())).allows(flag)) {     
               
               it.remove();
               
               //Set canceled if flag is true
-              if (wcfg.explosionFlagCancellation) event.setCancelled(true);
+              if (wcfg.explosionFlagCancellation) {
+            	  event.setCancelled(true);
+            	  break;
+              }
           }
                 
       }        
