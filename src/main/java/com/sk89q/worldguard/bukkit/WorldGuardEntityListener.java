@@ -680,7 +680,6 @@ public class WorldGuardEntityListener implements Listener {
                 }
             }
         }
-
     }
     
     /**
@@ -699,7 +698,7 @@ public class WorldGuardEntityListener implements Listener {
       //Iterate through all blocks which will be destroyed and filter them
       Iterator<Block> it =  event.blockList().iterator();
       
-      while(it.hasNext()){
+      while (it.hasNext()){
     	  
           //if the flag disallows breaking this block by an explosion --> remove from List
           if (!mgr.getApplicableRegions(toVector(it.next())).allows(flag)) {     
@@ -707,15 +706,17 @@ public class WorldGuardEntityListener implements Listener {
               it.remove();
               
               //Set canceled if flag is true
-              if (wcfg.explosionFlagCancellation) {
-            	  event.setCancelled(true);
-            	  break;
-              }
-          }
-                
-      }        
-        
-    }
+              	if (wcfg.useExplosionBlockFiltering || wcfg.explosionFlagCancellation) {
+            	    if (wcfg.explosionFlagCancellation) {
+            	        event.setCancelled(true);
+            	    } else {
+            	        event.blockList().clear();
+            	    }
+            	    break;
+            	}
+          	}                
+      	}  
+	}
 
     /*
      * Called on explosion prime
