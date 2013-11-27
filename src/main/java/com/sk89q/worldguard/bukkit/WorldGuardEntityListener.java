@@ -706,7 +706,7 @@ public class WorldGuardEntityListener implements Listener {
               it.remove();
               
               //Set canceled if flag is true
-                  if (wcfg.useExplosionBlockFiltering || wcfg.explosionFlagCancellation) {
+                  if (!wcfg.useExplosionBlockFiltering || wcfg.explosionFlagCancellation) {
                     if (wcfg.explosionFlagCancellation) {
                         event.setCancelled(true);
                     } else {
