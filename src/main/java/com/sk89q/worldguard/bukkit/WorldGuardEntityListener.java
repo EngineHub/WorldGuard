@@ -21,7 +21,6 @@ package com.sk89q.worldguard.bukkit;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
@@ -695,27 +694,27 @@ public class WorldGuardEntityListener implements Listener {
      */
     private void filterExplosionBlocks(EntityExplodeEvent event, StateFlag flag, WorldConfiguration wcfg, RegionManager mgr){
        
-      //Iterate through all blocks which will be destroyed and filter them
-      Iterator<Block> it =  event.blockList().iterator();
+        //Iterate through all blocks which will be destroyed and filter them
+        Iterator<Block> it =  event.blockList().iterator();
       
-      while (it.hasNext()){
-          
-          //if the flag disallows breaking this block by an explosion --> remove from List
-          if (!mgr.getApplicableRegions(toVector(it.next())).allows(flag)) {     
+        while (it.hasNext()){     
+            
+            //if the flag disallows breaking this block by an explosion --> remove from List
+            if (!mgr.getApplicableRegions(toVector(it.next())).allows(flag)) {     
               
-              it.remove();
-              
-              //Set canceled if flag is true
-                  if (!wcfg.useExplosionBlockFiltering || wcfg.explosionFlagCancellation) {
-                    if (wcfg.explosionFlagCancellation) {
-                        event.setCancelled(true);
-                    } else {
-                        event.blockList().clear();
-                    }
-                    break;
+                //Set canceled if flag is true
+                if (!wcfg.useExplosionBlockFiltering || wcfg.explosionFlagCancellation) {                      
+                      if (wcfg.explosionFlagCancellation) {
+                          event.setCancelled(true);
+                      } else {
+                          event.blockList().clear();
+                      }
+                      break;
                 }
-              }                
-          }  
+                
+                it.remove();
+            }                
+        }  
     }
 
     /*
@@ -974,7 +973,7 @@ public class WorldGuardEntityListener implements Listener {
             boolean invincible = RegionQueryUtil.isInvincible(plugin, player);
 
             if (allowed) {
-                return god || invincible;
+                return god || invincible;    
             } else {
                 return (god && plugin.hasPermission(player, "worldguard.god.override-regions"))
                     || invincible;
