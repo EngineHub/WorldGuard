@@ -973,7 +973,7 @@ public class WorldGuardEntityListener implements Listener {
             boolean invincible = RegionQueryUtil.isInvincible(plugin, player);
 
             if (allowed) {
-                return god || invincible;    
+                return god || invincible;
             } else {
                 return (god && plugin.hasPermission(player, "worldguard.god.override-regions"))
                     || invincible;
