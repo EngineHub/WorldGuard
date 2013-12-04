@@ -146,8 +146,8 @@ public class WorldGuardBlockListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onBlockDamageNotify(BlockDamageEvent event) {
-        if (event.isCancelled() && notify.containsKey(event)) {
-            String msg = notify.remove(event);
+        String msg = notify.remove(event);
+        if (msg != null && event.isCancelled()) {
             event.getPlayer().sendMessage(msg);
         }
     }
@@ -207,8 +207,8 @@ public class WorldGuardBlockListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onBlockBreakNotify(BlockBreakEvent event) {
-        if (event.isCancelled() && notify.containsKey(event)) {
-            String msg = notify.remove(event);
+        String msg = notify.remove(event);
+        if (msg != null && event.isCancelled()) {
             event.getPlayer().sendMessage(msg);
         }
     }
@@ -582,8 +582,8 @@ public class WorldGuardBlockListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onBlockPlaceNotify(BlockPlaceEvent event) {
-        if (event.isCancelled() && notify.containsKey(event)) {
-            String msg = notify.remove(event);
+        String msg = notify.remove(event);
+        if (msg != null && event.isCancelled()) {
             event.getPlayer().sendMessage(msg);
         }
     }
