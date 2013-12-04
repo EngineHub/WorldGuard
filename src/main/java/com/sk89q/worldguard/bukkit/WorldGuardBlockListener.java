@@ -125,10 +125,21 @@ public class WorldGuardBlockListener implements Listener {
         // handle them a bit separately
         if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
-                player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
+                notify.put(event, ChatColor.DARK_RED + "You're not invited to this tea party!");
                 event.setCancelled(true);
                 return;
             }
+        }
+    }
+
+    /*
+     * Send notification if event was cancelled but not if it was reenabled.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void onBlockDamageNotify(BlockDamageEvent event) {
+        if (event.isCancelled() && notify.containsKey(event)) {
+            String msg = notify.remove(event);
+            event.getPlayer().sendMessage(msg);
         }
     }
 
@@ -521,7 +532,7 @@ public class WorldGuardBlockListener implements Listener {
             final Location location = blockPlaced.getLocation();
             if (!plugin.getGlobalRegionManager().canBuild(player, location)
              || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                notify.put(event, ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);
                 return;
             }
@@ -538,7 +549,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getTypeId())) {
             if (wcfg.isAdjacentChestProtected(event.getBlock(), player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
+                notify.put(event, ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
                 event.setCancelled(true);
                 return;
             }
@@ -554,6 +565,17 @@ public class WorldGuardBlockListener implements Listener {
             int oz = blockPlaced.getZ();
 
             SpongeUtil.clearSpongeWater(plugin, world, ox, oy, oz);
+        }
+    }
+
+    /*
+     * Send notification if event was cancelled but not if it was reenabled.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void onBlockPlaceNotify(BlockPlaceEvent event) {
+        if (event.isCancelled() && notify.containsKey(event)) {
+            String msg = notify.remove(event);
+            event.getPlayer().sendMessage(msg);
         }
     }
 
