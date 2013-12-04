@@ -82,7 +82,7 @@ public class WorldGuardBlockListener implements Listener {
      * 
      * @return The HashMap with all pending event messages.
      */
-    public static HashMap<Event, String> getNotifyMyp() {
+    public static HashMap<Event, String> getNotifyMap() {
         return notify;
     }
 
