@@ -20,6 +20,8 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
+import java.util.HashMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -73,6 +75,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 public class WorldGuardBlockListener implements Listener {
 
     private WorldGuardPlugin plugin;
+    private HashMap<Event, String> notify = new HashMap<Event, String>();
 
     /**
      * Construct the object.
@@ -149,7 +152,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
          || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            notify.put(event, ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
         }
@@ -173,9 +176,20 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.isChestProtected(event.getBlock(), player)) {
-            player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
+            notify.put(event, ChatColor.DARK_RED + "The chest is protected.");
             event.setCancelled(true);
             return;
+        }
+    }
+
+    /*
+     * Send notification if event was cancelled but not if it was reenabled.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void onBlockBreakNotify(BlockBreakEvent event) {
+        if (event.isCancelled() && notify.containsKey(event)) {
+            String msg = notify.remove(event);
+            event.getPlayer().sendMessage(msg);
         }
     }
 
