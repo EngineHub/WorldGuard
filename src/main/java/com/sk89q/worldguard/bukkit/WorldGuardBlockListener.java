@@ -75,16 +75,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 public class WorldGuardBlockListener implements Listener {
 
     private WorldGuardPlugin plugin;
-    private static HashMap<Event, String> notify = new HashMap<Event, String>();
-
-    /**
-     * Get all pending messages from block events.
-     * 
-     * @return The HashMap with all pending event messages.
-     */
-    public static HashMap<Event, String> getNotifyMap() {
-        return notify;
-    }
+    public static HashMap<Event, String> notify = new HashMap<Event, String>();
 
     /**
      * Construct the object.
@@ -144,7 +135,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Send notification if event was cancelled but not if it was reenabled.
      */
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockDamageNotify(BlockDamageEvent event) {
         String msg = notify.remove(event);
         if (msg != null && event.isCancelled()) {
@@ -205,7 +196,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Send notification if event was cancelled but not if it was reenabled.
      */
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockBreakNotify(BlockBreakEvent event) {
         String msg = notify.remove(event);
         if (msg != null && event.isCancelled()) {
@@ -580,7 +571,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Send notification if event was cancelled but not if it was reenabled.
      */
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockPlaceNotify(BlockPlaceEvent event) {
         String msg = notify.remove(event);
         if (msg != null && event.isCancelled()) {
