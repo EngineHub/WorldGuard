@@ -75,7 +75,16 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 public class WorldGuardBlockListener implements Listener {
 
     private WorldGuardPlugin plugin;
-    private HashMap<Event, String> notify = new HashMap<Event, String>();
+    private static HashMap<Event, String> notify = new HashMap<Event, String>();
+
+    /**
+     * Get all pending messages from block events.
+     * 
+     * @return The HashMap with all pending event messages.
+     */
+    public static HashMap<Event, String> getNotifyMyp() {
+        return notify;
+    }
 
     /**
      * Construct the object.
