@@ -33,6 +33,7 @@ import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -233,6 +234,19 @@ public class WorldGuardEntityListener implements Listener {
                         event.setCancelled(true);
                         return;
                     }
+                }
+            }
+
+            if (defender instanceof ItemFrame && wcfg.useRegions) {
+                // bukkit throws this event when a player attempts to remove an item from a frame
+                World world = player.getWorld();
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !mgr.getApplicableRegions(defender.getLocation())
+                                .canBuild(plugin.wrapPlayer(player))) {
+                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    event.setCancelled(true);
+                    return;
                 }
             }
         }
