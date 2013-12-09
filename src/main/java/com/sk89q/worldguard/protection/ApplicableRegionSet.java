@@ -353,15 +353,12 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             lastPriority = region.getPriority();
         }
         
-        try {
-            return needsClear.values().iterator().next();
-        } catch (NoSuchElementException e) {
-            if (globalRegion != null) {
-                V gFlag = globalRegion.getFlag(flag);
-                if (gFlag != null) return gFlag;
-            }
-            return null;
-        }
+        V gFlag;
+        // If needsClear is empty, we check the global region.
+        // If the global region flag is set, we return that.
+        // If needsClear is not empty, we return its first value.
+        // Otherwise we return null.
+        return needsClear.isEmpty() ? globalRegion != null ? (gFlag = globalRegion.getFlag(flag)) != null ? gFlag : null : null : needsClear.values().iterator().next();
     }
 
     /**
