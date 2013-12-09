@@ -136,6 +136,7 @@ public class WorldGuardBlockListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         WorldConfiguration wcfg = getWorldConfig(player);
+        Block block = event.getBlock();
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getItemInHand();
@@ -147,8 +148,8 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
-         || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
+        if (!plugin.getGlobalRegionManager().canBuild(player, block)
+         || !plugin.getGlobalRegionManager().canConstruct(player, block) {
             player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
             event.setCancelled(true);
             return;
@@ -157,22 +158,22 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
                     new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
-                    toVector(event.getBlock()),
-                    event.getBlock().getTypeId()), false, false)) {
+                    toVector(block,
+                    block.getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
 
             if (!wcfg.getBlacklist().check(
                     new DestroyWithBlacklistEvent(plugin.wrapPlayer(player),
-                    toVector(event.getBlock()),
+                    toVector(block,
                     player.getItemInHand().getTypeId()), false, false)) {
                 event.setCancelled(true);
                 return;
             }
         }
 
-        if (wcfg.isChestProtected(event.getBlock(), player)) {
+        if (wcfg.isChestProtected(block, player)) {
             player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
             event.setCancelled(true);
             return;
