@@ -600,8 +600,7 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);                
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.CREEPER_EXPLOSION, wcfg, mgr);   
             }
@@ -612,8 +611,7 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);                
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE, wcfg, mgr);   
             }
@@ -628,8 +626,7 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);                
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.TNT, wcfg, mgr);                
             }
@@ -655,8 +652,7 @@ public class WorldGuardEntityListener implements Listener {
             }
             // allow wither skull blocking since there is no dedicated flag atm
             if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);                
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.GHAST_FIREBALL, wcfg, mgr);   
             }
@@ -676,13 +672,11 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
             if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-                
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);                
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.OTHER_EXPLOSION, wcfg, mgr);   
             }
         }
-
 
         if (wcfg.signChestProtection) {
             for (Block block : event.blockList()) {
@@ -705,16 +699,13 @@ public class WorldGuardEntityListener implements Listener {
      * @param mgr
      *     RegionManager to get regions
      */
-    private void filterExplosionBlocks(EntityExplodeEvent event, StateFlag flag, WorldConfiguration wcfg, RegionManager mgr){
-       
+    private void filterExplosionBlocks(EntityExplodeEvent event, StateFlag flag, WorldConfiguration wcfg, RegionManager mgr){       
         //Iterate through all blocks which will be destroyed and filter them
-        Iterator<Block> it =  event.blockList().iterator();
-      
-        while (it.hasNext()){     
-            
+        Iterator<Block> it =  event.blockList().iterator(); 
+        
+        while (it.hasNext()){        	
             //if the flag disallows breaking this block by an explosion --> remove from List
-            if (!mgr.getApplicableRegions(toVector(it.next())).allows(flag)) {     
-              
+            if (!mgr.getApplicableRegions(toVector(it.next())).allows(flag)) {              
                 //Set canceled if flag is true
                 if (!wcfg.useExplosionBlockFiltering || wcfg.explosionFlagCancellation) {                      
                       if (wcfg.explosionFlagCancellation) {
@@ -723,13 +714,12 @@ public class WorldGuardEntityListener implements Listener {
                           event.blockList().clear();
                       }
                       break;
-                }
-                
+                }                
                 it.remove();
             }                
         }  
     }
-
+    
     /*
      * Called on explosion prime
      */
