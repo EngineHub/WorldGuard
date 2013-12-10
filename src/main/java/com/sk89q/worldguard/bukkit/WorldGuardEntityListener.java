@@ -595,10 +595,15 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 <<<<<<< HEAD
+<<<<<<< HEAD
                 
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.CREEPER_EXPLOSION, wcfg, mgr);   
 =======
+=======
+                
+                //Filter blocks and edit 'blockList()'
+>>>>>>> 6ecf9d9... Update Java-Docs in WorldGuardEntityListener
                 modifieInvolved(event, DefaultFlag.CREEPER_EXPLOSION, wcfg, mgr);   
 >>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
@@ -611,10 +616,15 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 <<<<<<< HEAD
+<<<<<<< HEAD
                 
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE, wcfg, mgr);   
 =======
+=======
+                
+                //Filter blocks and edit 'blockList()'
+>>>>>>> 6ecf9d9... Update Java-Docs in WorldGuardEntityListener
                 modifieInvolved(event, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE, wcfg, mgr);   
 >>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
@@ -629,6 +639,7 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (wcfg.useRegions) {
+<<<<<<< HEAD
 <<<<<<< HEAD
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 
@@ -662,6 +673,11 @@ public class WorldGuardEntityListener implements Listener {
 >>>>>>> 7c208e3... WorldGuardEntityListener updated. Destroy all involved blocks at
 =======
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);                
+=======
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+                
+                //Filter blocks and edit 'blockList()'
+>>>>>>> 6ecf9d9... Update Java-Docs in WorldGuardEntityListener
                 modifieInvolved(event, DefaultFlag.TNT, wcfg, mgr);                
 >>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
@@ -689,10 +705,15 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 <<<<<<< HEAD
+<<<<<<< HEAD
                 
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.GHAST_FIREBALL, wcfg, mgr);   
 =======
+=======
+                
+                //Filter blocks and edit 'blockList()'
+>>>>>>> 6ecf9d9... Update Java-Docs in WorldGuardEntityListener
                 modifieInvolved(event, DefaultFlag.GHAST_FIREBALL, wcfg, mgr);   
 >>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
@@ -714,10 +735,15 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 <<<<<<< HEAD
+<<<<<<< HEAD
                 
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.OTHER_EXPLOSION, wcfg, mgr);   
 =======
+=======
+                
+                //Filter blocks and edit 'blockList()'
+>>>>>>> 6ecf9d9... Update Java-Docs in WorldGuardEntityListener
                 modifieInvolved(event, DefaultFlag.OTHER_EXPLOSION, wcfg, mgr);   
 >>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
@@ -769,11 +795,27 @@ public class WorldGuardEntityListener implements Listener {
             }                
         }  
     }
-
+    
+    /**
+     * Filters the blocks after their flags and edit the event via Java reflection.
+     * Blocks which are protected, will not be broken
+     * 
+     * @param event
+     * @param flag
+     * @param wcfg
+     *     WorldGuardConfiguration to get flags
+     * @param mgr
+     *     RegionManager to get regions
+     */
     private void modifieInvolved(EntityExplodeEvent event, StateFlag flag, WorldConfiguration wcfg, RegionManager mgr){
+    	
+    	//List with all filtered Blocks
     	final List<Block> blocks = new ArrayList<Block>();
         
+    	//Iterate through all blocks which will be destroyed and filter them
         for (Block block : event.blockList()) {
+        	
+        	//if the flag allows breaking this block by an explosion --> add to List
             if (mgr.getApplicableRegions(toVector(block)).allows(flag)) {                    	
             		blocks.add(block);                    
             }
@@ -781,17 +823,29 @@ public class WorldGuardEntityListener implements Listener {
         
         //Java reflection to modifie BlockList   
         Field f;
+        
 		try {
+			
+			//get private final field 'blocks' of the EntityExplodeEvent class
 			f = event.getClass().getDeclaredField("blocks");
+			
+			//set accessible
 			f.setAccessible(true);
+			
+			//set blocks to destroy
 			f.set(event, blocks);
+			
+			//set unaccesible
 			f.setAccessible(false);
 		} 
+		
+		//catch Exceptions and print them if they are thrown
 		catch (NoSuchFieldException e) {e.printStackTrace();} 
 		catch (SecurityException e) {e.printStackTrace();} 
 		catch (IllegalArgumentException e) {e.printStackTrace();} 
 		catch (IllegalAccessException e) {e.printStackTrace();}
-                        
+        
+		//Set canceled if Flag is true
 		if (wcfg.explosionFlagCancellation) event.setCancelled(true);
     }
 
