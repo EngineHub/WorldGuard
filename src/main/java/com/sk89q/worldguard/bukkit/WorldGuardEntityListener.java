@@ -20,7 +20,13 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+<<<<<<< HEAD
 import java.util.Iterator;
+=======
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+>>>>>>> 7c208e3... WorldGuardEntityListener updated. Destroy all involved blocks at
 import java.util.Set;
 
 import org.bukkit.ChatColor;
@@ -588,9 +594,13 @@ public class WorldGuardEntityListener implements Listener {
 
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+<<<<<<< HEAD
                 
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.CREEPER_EXPLOSION, wcfg, mgr);   
+=======
+                modifieInvolved(event, DefaultFlag.CREEPER_EXPLOSION, wcfg, mgr);   
+>>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
         } else if (ent instanceof EnderDragon) {
             if (wcfg.blockEnderDragonBlockDamage) {
@@ -600,9 +610,13 @@ public class WorldGuardEntityListener implements Listener {
 
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+<<<<<<< HEAD
                 
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE, wcfg, mgr);   
+=======
+                modifieInvolved(event, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE, wcfg, mgr);   
+>>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
         } else if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
             if (wcfg.blockTNTExplosions) {
@@ -615,10 +629,41 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (wcfg.useRegions) {
+<<<<<<< HEAD
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 
+<<<<<<< HEAD
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.TNT, wcfg, mgr);                
+=======
+                final List<Block> blocks = new ArrayList<Block>();
+                                
+                for (Block block : event.blockList()) {
+                    if (mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.TNT)) {                    	
+                    		blocks.add(block);                    
+                    }
+                }  
+                
+                //Java reflection to modifie BlockList   
+                Field f;
+				try {
+					f = event.getClass().getDeclaredField("blocks");
+					f.setAccessible(true);
+					f.set(event, blocks);
+					f.setAccessible(false);
+				} 
+				catch (NoSuchFieldException e) {e.printStackTrace();} 
+				catch (SecurityException e) {e.printStackTrace();} 
+				catch (IllegalArgumentException e) {e.printStackTrace();} 
+				catch (IllegalAccessException e) {e.printStackTrace();}
+                                
+				if (wcfg.explosionFlagCancellation) event.setCancelled(true);
+                
+>>>>>>> 7c208e3... WorldGuardEntityListener updated. Destroy all involved blocks at
+=======
+                RegionManager mgr = plugin.getGlobalRegionManager().get(world);                
+                modifieInvolved(event, DefaultFlag.TNT, wcfg, mgr);                
+>>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
         } else if (ent instanceof Fireball) {
             if (ent instanceof WitherSkull) {
@@ -643,9 +688,13 @@ public class WorldGuardEntityListener implements Listener {
             // allow wither skull blocking since there is no dedicated flag atm
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+<<<<<<< HEAD
                 
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.GHAST_FIREBALL, wcfg, mgr);   
+=======
+                modifieInvolved(event, DefaultFlag.GHAST_FIREBALL, wcfg, mgr);   
+>>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
         } else if (ent instanceof Wither) {
             if (wcfg.blockWitherExplosions) {
@@ -664,9 +713,13 @@ public class WorldGuardEntityListener implements Listener {
             }
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+<<<<<<< HEAD
                 
                 //Filter blocks and edit 'blockList()'
                 filterExplosionBlocks(event, DefaultFlag.OTHER_EXPLOSION, wcfg, mgr);   
+=======
+                modifieInvolved(event, DefaultFlag.OTHER_EXPLOSION, wcfg, mgr);   
+>>>>>>> 286733f... WorldGuardEntityListener updated. Destroy all involved blocks at
             }
         }
 
@@ -715,6 +768,31 @@ public class WorldGuardEntityListener implements Listener {
                 it.remove();
             }                
         }  
+    }
+
+    private void modifieInvolved(EntityExplodeEvent event, StateFlag flag, WorldConfiguration wcfg, RegionManager mgr){
+    	final List<Block> blocks = new ArrayList<Block>();
+        
+        for (Block block : event.blockList()) {
+            if (mgr.getApplicableRegions(toVector(block)).allows(flag)) {                    	
+            		blocks.add(block);                    
+            }
+        }  
+        
+        //Java reflection to modifie BlockList   
+        Field f;
+		try {
+			f = event.getClass().getDeclaredField("blocks");
+			f.setAccessible(true);
+			f.set(event, blocks);
+			f.setAccessible(false);
+		} 
+		catch (NoSuchFieldException e) {e.printStackTrace();} 
+		catch (SecurityException e) {e.printStackTrace();} 
+		catch (IllegalArgumentException e) {e.printStackTrace();} 
+		catch (IllegalAccessException e) {e.printStackTrace();}
+                        
+		if (wcfg.explosionFlagCancellation) event.setCancelled(true);
     }
 
     /*
