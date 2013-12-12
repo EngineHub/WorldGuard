@@ -81,7 +81,7 @@ public class WorldGuardVehicleListener implements Listener {
     public void onVehicleDestroyNotify(VehicleDestroyEvent event) {
         String msg = notify.remove(event);
         if (msg != null && event.isCancelled()) {
-            event.getPlayer().sendMessage(msg);
+            ((Player)event.getAttacker()).sendMessage(msg);
         }
     }
 
