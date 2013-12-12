@@ -7,11 +7,14 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
+import java.util.HashMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
@@ -25,6 +28,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 public class WorldGuardVehicleListener implements Listener {
 
     private WorldGuardPlugin plugin;
+    public static HashMap<Event, String> notify = new HashMap<Event, String>();
 
     /**
      * Construct the object;
@@ -63,10 +67,21 @@ public class WorldGuardVehicleListener implements Listener {
             if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                     && !set.canBuild(localPlayer)
                     && !set.allows(DefaultFlag.DESTROY_VEHICLE, localPlayer)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission to destroy vehicles here.");
+                notify.put(event, ChatColor.DARK_RED + "You don't have permission to destroy vehicles here.");
                 event.setCancelled(true);
                 return;
             }
+        }
+    }
+
+    /*
+     * Send notification if event was cancelled but not if it was reenabled.
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onVehicleDestroyNotify(VehicleDestroyEvent event) {
+        String msg = notify.remove(event);
+        if (msg != null && event.isCancelled()) {
+            event.getPlayer().sendMessage(msg);
         }
     }
 
