@@ -67,8 +67,7 @@ public abstract class LocalPlayer {
     
     /**
      * Get the player's list of groups.
-     * 
-     * @return The groups this player is in
+     * f
      */
     public abstract String[] getGroups();
     
@@ -78,7 +77,7 @@ public abstract class LocalPlayer {
      * @param perm The permission to check
      * @return Whether this player has {@code perm}
      */
-    public abstract boolean hasPermission(String perm);
+    public abstract boolean hasPermission(String perm);ffgfge
     
     @Override
     public boolean equals(Object obj) {
