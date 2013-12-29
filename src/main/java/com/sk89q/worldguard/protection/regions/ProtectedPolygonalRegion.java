@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.regions;
 
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -158,8 +159,49 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     @Override
     public int volume() {
-        // TODO: Fix this -- the previous algorithm returned incorrect results, but the current state of this method is even worse
-        return 0;
+        int yLength = max.getBlockY() - min.getBlockY() + 1;
+
+        int numPoints = points.size();
+        if (numPoints < 3) {
+            return -1; // Invalid polygon region
+        }
+
+        double a = 0;
+        double b = 0;
+
+        List<BlockVector2D> points = getPoints();
+        for (int i = 0; i < points.size(); ++i) {
+            Vector2D cur = points.get(i);
+            Vector2D next;
+            if (i + 1 >= points.size()) {
+                next = points.get(0);
+            } else {
+                next = points.get(i + 1);
+            }
+
+            int cx = 0, cz = 0;
+            int nx = 0, nz = 0;
+
+            if (!contains(new Vector(cur.getX() + 1, minY, cur.getZ()))) {
+                ++cx;
+            }
+            if (!contains(new Vector(cur.getX(), minY, cur.getZ() + 1))) {
+                ++cz;
+            }
+            if (!contains(new Vector(next.getX() + 1, minY, next.getZ()))) {
+                ++nx;
+            }
+            if (!contains(new Vector(next.getX(), minY, next.getZ() + 1))) {
+                ++nz;
+            }
+
+            cur = cur.add(cx, cz);
+            next = next.add(nx, nz);
+
+            a += cur.getX() * next.getZ();
+            b += cur.getZ() * next.getX();
+        }
+        return (int) (.5 * Math.abs(a - b)) * yLength;
     }
 
 }
