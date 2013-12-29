@@ -179,7 +179,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
             p2 = points.get(s);
 
             // Do the math, then reassign s
-            area += (p2.getBlockX() + p1.getBlockX()) * (p2.getBlockZ() - p1.getBlockZ());
+            area += ((p2.getBlockX() + .5) + (p1.getBlockX() + .5)) * ((p2.getBlockZ() + .5) - (p1.getBlockZ() + .5));
             s = i;
         }
         return (int) Math.abs(Math.ceil(area / 2D) * yLength);
