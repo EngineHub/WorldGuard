@@ -56,7 +56,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
 public class MySQLDatabase extends AbstractProtectionDatabase {
-    private final Logger logger;
+    private static final String COMM_LINK_FAILURE = "08S01";
+
+	private final Logger logger;
 
     private Yaml yaml;
 
@@ -165,7 +167,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 // and if it is mark the connection as closed (the MySQL Driver
                 // does not ensure that the connection is marked as closed unless
                 // the close() method has been called.
-                if ("08S01".equals(ex.getSQLState())) {
+                if (COMM_LINK_FAILURE.equals(ex.getSQLState())) {
                     conn.close();
                 }
             }

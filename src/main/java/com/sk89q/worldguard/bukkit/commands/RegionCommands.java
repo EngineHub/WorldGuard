@@ -372,11 +372,13 @@ public final class RegionCommands {
             CuboidSelection selection = new CuboidSelection(world, pt1, pt2);
             worldEdit.setSelection(player, selection);
             player.sendMessage(ChatColor.YELLOW + "Region selected as a cuboid.");
+            
         } else if (region instanceof ProtectedCylinderRegion) {
             ProtectedCylinderRegion cylReg = (ProtectedCylinderRegion) region;
             CylinderSelection selection = new CylinderSelection(world,cylReg.getCenter(),cylReg.getRadius(),cylReg.getMinY(),cylReg.getMaxY());
             worldEdit.setSelection(player, selection);
             player.sendMessage(ChatColor.YELLOW + "Region selected as a cylinder.");
+            
         } else if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
             Polygonal2DSelection selection = new Polygonal2DSelection(
@@ -385,6 +387,7 @@ public final class RegionCommands {
                     poly2d.getMaximumPoint().getBlockY() );
             worldEdit.setSelection(player, selection);
             player.sendMessage(ChatColor.YELLOW + "Region selected as a polygon.");
+            
         } else if (region instanceof GlobalProtectedRegion) {
             throw new CommandException(
                     "Can't select global regions! " +
@@ -935,7 +938,7 @@ public final class RegionCommands {
                 existing.setFlag(groupFlag, null);
                 sender.sendMessage(ChatColor.YELLOW
                         + "Region group flag for '" + foundFlag.getName() + "' reset to " +
-                                "default.");
+                        		"default.");
             } else {
                 existing.setFlag(groupFlag, groupValue);
                 sender.sendMessage(ChatColor.YELLOW
@@ -1029,7 +1032,7 @@ public final class RegionCommands {
             RegionPrintoutBuilder printout = new RegionPrintoutBuilder(parent);
             printout.append(ChatColor.RED);
             printout.append("Uh oh! Setting '" + parent.getId() + "' to be the parent " +
-                    "of '" + child.getId() + "' would cause circular inheritance.\n");
+            		"of '" + child.getId() + "' would cause circular inheritance.\n");
             printout.append(ChatColor.GRAY);
             printout.append("(Current inheritance on '" + parent.getId() + "':\n");
             printout.appendParentTree(true);
