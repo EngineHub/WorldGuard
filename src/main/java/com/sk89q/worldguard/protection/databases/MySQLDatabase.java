@@ -57,8 +57,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritan
 
 public class MySQLDatabase extends AbstractProtectionDatabase {
     private static final String COMM_LINK_FAILURE = "08S01";
-
-	private final Logger logger;
+    private final Logger logger;
 
     private Yaml yaml;
 
@@ -84,11 +83,11 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             connect();
 
             try {
-                // Test if the database is up to date, if not throw a critical error
-                PreparedStatement verTest = this.conn.prepareStatement(
-                        "SELECT `world_id` FROM `region_cuboid` LIMIT 0,1;"
-                    );
-                verTest.execute();
+              // Test if the database is up to date, if not throw a critical error
+              PreparedStatement verTest = this.conn.prepareStatement(
+                  "SELECT `world_id` FROM `region_cuboid` LIMIT 0,1;"
+                );
+              verTest.execute();
             } catch (SQLException ex) {
                 throw new InvalidTableFormatException(
                         "region_storage_update_20110325.sql"
@@ -96,7 +95,6 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             }
             
             try {
-
                 PreparedStatement verTest = this.conn.prepareStatement(
                         "SELECT `world_id` FROM `region_cylinder` LIMIT 0,1;"
                     );
@@ -104,7 +102,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             } catch (SQLException ex) {
                 throw new InvalidTableFormatException(
                         "region_storage_update_20140106.sql"
-                        );
+                    );
             }
 
             PreparedStatement worldStmt = conn.prepareStatement(
