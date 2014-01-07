@@ -41,11 +41,35 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedCylinderRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
 public class YAMLDatabase extends AbstractProtectionDatabase {
+    
+    private static final String GROUPS = "groups";
+    private static final String PLAYERS = "players";
+    private static final String PARENT = "parent";
+    private static final String MEMBERS = "members";
+    private static final String OWNERS = "owners";
+    private static final String FLAGS = "flags";
+    private static final String GLOBAL = "global";
+    private static final String CUBOID = "cuboid";
+    private static final String CYLINDER = "cylinder";
+    private static final String Z = "z";
+    private static final String X = "x";
+    private static final String POLY2D = "poly2d";
+    private static final String TYPE = "type";
+    private static final String MAX = "max";
+    private static final String MIN = "min";
+    private static final String POINTS = "points";
+    private static final String CENTER_Z = "center-z";
+    private static final String CENTER_X = "center-x";
+    private static final String RADIUS_Z = "radius-z";
+    private static final String MIN_Y = "min-y";
+    private static final String MAX_Y = "max-y";
+    private static final String RADIUS_X = "radius-x";
     
     private YAMLProcessor config;
     private Map<String, ProtectedRegion> regions;
@@ -87,25 +111,35 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
             String id = entry.getKey().toLowerCase().replace(".", "");
             YAMLNode node = entry.getValue();
             
-            String type = node.getString("type");
+            String type = node.getString(TYPE);
             ProtectedRegion region;
             
             try {
                 if (type == null) {
                     logger.warning("Undefined region type for region '" + id + '"');
                     continue;
-                } else if (type.equals("cuboid")) {
-                    Vector pt1 = checkNonNull(node.getVector("min"));
-                    Vector pt2 = checkNonNull(node.getVector("max"));
+                } else if (type.equals(CUBOID)) {
+                    Vector pt1 = checkNonNull(node.getVector(MIN));
+                    Vector pt2 = checkNonNull(node.getVector(MAX));
                     BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
                     BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
                     region = new ProtectedCuboidRegion(id, min, max);
-                } else if (type.equals("poly2d")) {
-                    Integer minY = checkNonNull(node.getInt("min-y"));
-                    Integer maxY = checkNonNull(node.getInt("max-y"));
-                    List<BlockVector2D> points = node.getBlockVector2dList("points", null);
+                } else if (type.equals(POLY2D)) {
+                    Integer minY = checkNonNull(node.getInt(MIN_Y));
+                    Integer maxY = checkNonNull(node.getInt(MAX_Y));
+                    List<BlockVector2D> points = node.getBlockVector2dList(POINTS, null);
                     region = new ProtectedPolygonalRegion(id, points, minY, maxY);
-                } else if (type.equals("global")) {
+                } else if (type.equals(CYLINDER)) {
+                    Integer minY = checkNonNull(node.getInt(MIN_Y));
+                    Integer maxY = checkNonNull(node.getInt(MAX_Y));
+                    Integer radiusX = checkNonNull(node.getInt(RADIUS_X));
+                    Integer radiusZ = checkNonNull(node.getInt(RADIUS_Z));
+                    Integer centerX = checkNonNull(node.getInt(CENTER_X));
+                    Integer centerZ = checkNonNull(node.getInt(CENTER_Z));
+                    BlockVector2D center = new BlockVector2D(centerX, centerZ);
+                    BlockVector2D radius = new BlockVector2D(radiusX, radiusZ);
+                    region = new ProtectedCylinderRegion(id, center, radius, minY, maxY);
+                } else if (type.equals(GLOBAL)) {
                     region = new GlobalProtectedRegion(id);
                 } else {
                     logger.warning("Unknown region type for region '" + id + '"');
@@ -114,12 +148,12 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                 
                 Integer priority = checkNonNull(node.getInt("priority"));
                 region.setPriority(priority);
-                setFlags(region, node.getNode("flags"));
-                region.setOwners(parseDomain(node.getNode("owners")));
-                region.setMembers(parseDomain(node.getNode("members")));
+                setFlags(region, node.getNode(FLAGS));
+                region.setOwners(parseDomain(node.getNode(OWNERS)));
+                region.setMembers(parseDomain(node.getNode(MEMBERS)));
                 regions.put(id, region);
                 
-                String parentId = node.getString("parent");
+                String parentId = node.getString(PARENT);
                 if (parentId != null) {
                     parentSets.put(region, parentId);
                 }
@@ -192,11 +226,11 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         
         DefaultDomain domain = new DefaultDomain();
         
-        for (String name : node.getStringList("players", null)) {
+        for (String name : node.getStringList(PLAYERS, null)) {
             domain.addPlayer(name);
         }
         
-        for (String name : node.getStringList("groups", null)) {
+        for (String name : node.getStringList(GROUPS, null)) {
             domain.addGroup(name);
         }
         
@@ -212,37 +246,46 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
             
             if (region instanceof ProtectedCuboidRegion) {
                 ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
-                node.setProperty("type", "cuboid");
-                node.setProperty("min", cuboid.getMinimumPoint());
-                node.setProperty("max", cuboid.getMaximumPoint());
+                node.setProperty(TYPE, CUBOID);
+                node.setProperty(MIN, cuboid.getMinimumPoint());
+                node.setProperty(MAX, cuboid.getMaximumPoint());
+            } else if (region instanceof ProtectedCylinderRegion) {
+                ProtectedCylinderRegion cylReg = (ProtectedCylinderRegion) region;
+                node.setProperty(TYPE, CYLINDER);
+                node.setProperty(MIN_Y, cylReg.getMinY());
+                node.setProperty(MAX_Y, cylReg.getMaxY());
+                node.setProperty(RADIUS_X, cylReg.getRadius().getBlockX());
+                node.setProperty(RADIUS_Z, cylReg.getRadius().getBlockZ());
+                node.setProperty(CENTER_X, cylReg.getCenter().getBlockX());
+                node.setProperty(CENTER_Z, cylReg.getCenter().getBlockZ());
             } else if (region instanceof ProtectedPolygonalRegion) {
                 ProtectedPolygonalRegion poly = (ProtectedPolygonalRegion) region;
-                node.setProperty("type", "poly2d");
-                node.setProperty("min-y", poly.getMinimumPoint().getBlockY());
-                node.setProperty("max-y", poly.getMaximumPoint().getBlockY());
+                node.setProperty(TYPE, POLY2D);
+                node.setProperty(MIN_Y, poly.getMinimumPoint().getBlockY());
+                node.setProperty(MAX_Y, poly.getMaximumPoint().getBlockY());
                 
                 List<Map<String, Object>> points = new ArrayList<Map<String,Object>>();
                 for (BlockVector2D point : poly.getPoints()) {
                     Map<String, Object> data = new HashMap<String, Object>();
-                    data.put("x", point.getBlockX());
-                    data.put("z", point.getBlockZ());
+                    data.put(X, point.getBlockX());
+                    data.put(Z, point.getBlockZ());
                     points.add(data);
                 }
                 
-                node.setProperty("points", points);
+                node.setProperty(POINTS, points);
             } else if (region instanceof GlobalProtectedRegion) {
-                node.setProperty("type", "global");
+                node.setProperty(TYPE, GLOBAL);
             } else {
-                node.setProperty("type", region.getClass().getCanonicalName());
+                node.setProperty(TYPE, region.getClass().getCanonicalName());
             }
 
             node.setProperty("priority", region.getPriority());
-            node.setProperty("flags", getFlagData(region));
-            node.setProperty("owners", getDomainData(region.getOwners()));
-            node.setProperty("members", getDomainData(region.getMembers()));
+            node.setProperty(FLAGS, getFlagData(region));
+            node.setProperty(OWNERS, getDomainData(region.getOwners()));
+            node.setProperty(MEMBERS, getDomainData(region.getMembers()));
             ProtectedRegion parent = region.getParent();
             if (parent != null) {
-                node.setProperty("parent", parent.getId());
+                node.setProperty(PARENT, parent.getId());
             }
         }
         
@@ -283,8 +326,8 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
     private Map<String, Object> getDomainData(DefaultDomain domain) {
         Map<String, Object> domainData = new HashMap<String, Object>();
 
-        setDomainData(domainData, "players", domain.getPlayers());
-        setDomainData(domainData, "groups", domain.getGroups());
+        setDomainData(domainData, PLAYERS, domain.getPlayers());
+        setDomainData(domainData, GROUPS, domain.getGroups());
         
         return domainData;
     }

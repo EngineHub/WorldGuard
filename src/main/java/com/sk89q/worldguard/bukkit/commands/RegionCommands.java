@@ -35,11 +35,13 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Location;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
+import com.sk89q.worldedit.bukkit.selections.CylinderSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.LocalPlayer;
@@ -60,6 +62,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedCylinderRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
@@ -274,7 +277,14 @@ public final class RegionCommands {
         Selection selection = getSelection(player);
         
         // Detect the type of region from WorldEdit
-        if (selection instanceof Polygonal2DSelection) {
+        if(selection instanceof CylinderSelection) {
+            CylinderSelection cylSel = (CylinderSelection) selection;
+            int minY = cylSel.getNativeMinimumPoint().getBlockY();
+            int maxY = cylSel.getNativeMaximumPoint().getBlockY();
+            BlockVector2D center = cylSel.getCenter();
+            BlockVector2D radius = cylSel.getRadius();
+            return new ProtectedCylinderRegion(id, center, radius, minY, maxY);
+        } else if (selection instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) selection;
             int minY = polySel.getNativeMinimumPoint().getBlockY();
             int maxY = polySel.getNativeMaximumPoint().getBlockY();
@@ -285,7 +295,7 @@ public final class RegionCommands {
             return new ProtectedCuboidRegion(id, min, max);
         } else {
             throw new CommandException(
-                    "Sorry, you can only use cuboids and polygons for WorldGuard regions.");
+                    "Sorry, you can only use cuboids, polygons and cylinders for WorldGuard regions.");
         }
     }
 
@@ -362,7 +372,11 @@ public final class RegionCommands {
             CuboidSelection selection = new CuboidSelection(world, pt1, pt2);
             worldEdit.setSelection(player, selection);
             player.sendMessage(ChatColor.YELLOW + "Region selected as a cuboid.");
-            
+        } else if (region instanceof ProtectedCylinderRegion) {
+            ProtectedCylinderRegion cylReg = (ProtectedCylinderRegion) region;
+            CylinderSelection selection = new CylinderSelection(world,cylReg.getCenter(),cylReg.getRadius(),cylReg.getMinY(),cylReg.getMaxY());
+            worldEdit.setSelection(player, selection);
+            player.sendMessage(ChatColor.YELLOW + "Region selected as a cylinder.");
         } else if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
             Polygonal2DSelection selection = new Polygonal2DSelection(
@@ -371,7 +385,6 @@ public final class RegionCommands {
                     poly2d.getMaximumPoint().getBlockY() );
             worldEdit.setSelection(player, selection);
             player.sendMessage(ChatColor.YELLOW + "Region selected as a polygon.");
-            
         } else if (region instanceof GlobalProtectedRegion) {
             throw new CommandException(
                     "Can't select global regions! " +
@@ -922,7 +935,7 @@ public final class RegionCommands {
                 existing.setFlag(groupFlag, null);
                 sender.sendMessage(ChatColor.YELLOW
                         + "Region group flag for '" + foundFlag.getName() + "' reset to " +
-                        		"default.");
+                                "default.");
             } else {
                 existing.setFlag(groupFlag, groupValue);
                 sender.sendMessage(ChatColor.YELLOW
@@ -1016,7 +1029,7 @@ public final class RegionCommands {
             RegionPrintoutBuilder printout = new RegionPrintoutBuilder(parent);
             printout.append(ChatColor.RED);
             printout.append("Uh oh! Setting '" + parent.getId() + "' to be the parent " +
-            		"of '" + child.getId() + "' would cause circular inheritance.\n");
+                    "of '" + child.getId() + "' would cause circular inheritance.\n");
             printout.append(ChatColor.GRAY);
             printout.append("(Current inheritance on '" + parent.getId() + "':\n");
             printout.appendParentTree(true);
