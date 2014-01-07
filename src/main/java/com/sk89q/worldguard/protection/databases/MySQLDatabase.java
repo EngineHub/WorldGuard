@@ -92,6 +92,18 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                         "region_storage_update_20110325.sql"
                     );
             }
+            
+            try {
+
+                PreparedStatement verTest = this.conn.prepareStatement(
+                        "SELECT `world_id` FROM `region_cylinder` LIMIT 0,1;"
+                    );
+                verTest.execute();
+            } catch (SQLException ex) {
+                throw new InvalidTableFormatException(
+                        "region_storage_update_20140106.sql"
+                        );
+            }
 
             PreparedStatement worldStmt = conn.prepareStatement(
                     "SELECT `id` FROM " +
