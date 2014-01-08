@@ -841,7 +841,8 @@ public class WorldGuardPlayerListener implements Listener {
                         || type == BlockID.MELON_STEM
                         || type == BlockID.POTATOES
                         || type == BlockID.CARROTS
-                        || type == BlockID.COCOA_PLANT)) {
+                        || type == BlockID.COCOA_PLANT
+                        || type == BlockID.LONG_GRASS)) {
                     if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                             && !set.canBuild(localPlayer)) {
                         event.setCancelled(true);
