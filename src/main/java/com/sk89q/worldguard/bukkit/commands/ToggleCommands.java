@@ -98,48 +98,68 @@ public class ToggleCommands {
     }
 
     @Command(aliases = {"halt-activity", "stoplag", "haltactivity"},
-            desc = "Attempts to cease as much activity in order to stop lag", flags = "c", max = 0)
+            desc = "Attempts to cease as much activity in order to stop lag", flags = "ris", max = 0)
     @CommandPermissions({"worldguard.halt-activity"})
     public void stopLag(CommandContext args, CommandSender sender) throws CommandException {
 
         ConfigurationManager configManager = plugin.getGlobalStateManager();
 
-        configManager.activityHaltToggle = !args.hasFlag('c');
-
-        if (configManager.activityHaltToggle) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.YELLOW
-                        + "ALL intensive server activity halted.");
+        if (args.hasFlag('i')) {
+            if (configManager.activityHaltToggle) {
+                 sender.sendMessage(ChatColor.YELLOW
+                         + "ALL intensive server activity is not allowed.");
+            } else {
+                 sender.sendMessage(ChatColor.YELLOW
+                         + "ALL intensive server activity is allowed.");
             }
+        } else {
+            configManager.activityHaltToggle = !args.hasFlag('r');
 
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "ALL intensive server activity halted by "
-                    + plugin.toName(sender) + ".");
+            if (configManager.activityHaltToggle) {
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(ChatColor.YELLOW
+                            + "ALL intensive server activity halted.");
+                }
 
-            for (World world : plugin.getServer().getWorlds()) {
-                int removed = 0;
+                if (!args.hasFlag('s')) {
+                    plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                             + "ALL intensive server activity halted by "
+                             + plugin.toName(sender) + ".");
+                } else {
+                    sender.sendMessage(ChatColor.YELLOW
+                        + "(Silent) ALL intensive server activity halted by "
+                        + plugin.toName(sender) + ".");
+                }
 
-                for (Entity entity : world.getEntities()) {
-                    if (BukkitUtil.isIntensiveEntity(entity)) {
-                        entity.remove();
-                        removed++;
+                for (World world : plugin.getServer().getWorlds()) {
+                    int removed = 0;
+
+                    for (Entity entity : world.getEntities()) {
+                        if (BukkitUtil.isIntensiveEntity(entity)) {
+                            entity.remove();
+                            removed++;
+                        }
+                    }
+
+                    if (removed > 10) {
+                        sender.sendMessage("" + removed + " entities (>10) auto-removed from "
+                                + world.getName());
                     }
                 }
-
-                if (removed > 10) {
-                    sender.sendMessage("" + removed + " entities (>10) auto-removed from "
-                            + world.getName());
+            } else {
+                if (!args.hasFlag('s')) {
+                    plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                            + "ALL intensive server activity is now allowed.");
+                    
+                    if (!(sender instanceof Player)) {
+                        sender.sendMessage(ChatColor.YELLOW
+                                + "ALL intensive server activity is now allowed.");
+                    }
+                } else {
+                    sender.sendMessage(ChatColor.YELLOW
+                            + "(Silent) ALL intensive server activity is now allowed.");
                 }
             }
-
-        } else {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.YELLOW
-                        + "ALL intensive server activity no longer halted.");
-            }
-
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "ALL intensive server activity is now allowed.");
         }
     }
 }
