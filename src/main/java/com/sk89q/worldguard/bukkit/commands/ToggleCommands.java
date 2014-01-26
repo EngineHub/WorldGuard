@@ -106,9 +106,9 @@ public class ToggleCommands {
 
         if (args.hasFlag('s')) {
         	if (configManager.activityHaltToggle) {
-        		 sender.sendMessage(ChatColor.YELLOW  + "Intensive server has been halted.");
+        		 sender.sendMessage(ChatColor.YELLOW  + "Intensive server is not allowed.");
         	} else {
-        		 sender.sendMessage(ChatColor.YELLOW + "Intensive server has not been halted.");
+        		 sender.sendMessage(ChatColor.YELLOW + "Intensive server is allowed.");
         	}
         } else {
         	configManager.activityHaltToggle = !args.hasFlag('c');
