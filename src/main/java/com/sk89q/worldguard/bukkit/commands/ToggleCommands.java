@@ -140,7 +140,6 @@ public class ToggleCommands {
                                 + world.getName());
                     }
                 }
-
             } else {
                 if (!args.hasFlag('s')) {
                     plugin.getServer().broadcastMessage(ChatColor.YELLOW
@@ -154,7 +153,7 @@ public class ToggleCommands {
                     sender.sendMessage(ChatColor.YELLOW
                             + "(Silent) ALL intensive server activity is now allowed.");
                 }
-            }    
+            }
         }
     }
 }
