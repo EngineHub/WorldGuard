@@ -98,7 +98,7 @@ public class ToggleCommands {
     }
 
     @Command(aliases = {"halt-activity", "stoplag", "haltactivity"},
-            desc = "Attempts to cease as much activity in order to stop lag", flags = "ris", max = 0)
+            desc = "Attempts to cease as much activity in order to stop lag", flags = "cis", max = 0)
     @CommandPermissions({"worldguard.halt-activity"})
     public void stopLag(CommandContext args, CommandSender sender) throws CommandException {
 
@@ -113,7 +113,7 @@ public class ToggleCommands {
                          + "ALL intensive server activity is allowed.");
             }
         } else {
-            configManager.activityHaltToggle = !args.hasFlag('r');
+            configManager.activityHaltToggle = !args.hasFlag('c');
 
             if (configManager.activityHaltToggle) {
                 if (!(sender instanceof Player)) {
