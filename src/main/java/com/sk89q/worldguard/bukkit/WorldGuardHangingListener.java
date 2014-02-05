@@ -28,6 +28,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LeashHitch;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -101,6 +102,12 @@ public class WorldGuardHangingListener implements Listener {
                                         toVector(player.getLocation()), ItemID.ITEM_FRAME), false, false)) {
                         event.setCancelled(true);
                         return;
+                    } else if (hanging instanceof LeashHitch
+                            && !wcfg.getBlacklist().check(
+                                new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                                        toVector(player.getLocation()), ItemID.LEAD), false, false)) {
+                        event.setCancelled(true);
+                        return;
                     }
                 }
 
@@ -133,6 +140,11 @@ public class WorldGuardHangingListener implements Listener {
                         || (wcfg.useRegions
                         && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, hanging.getLocation())))) {
                     event.setCancelled(true);
+                } else if (hanging instanceof LeashHitch
+                        && (wcfg.blockEntityLeashHitchDestroy
+                        || (wcfg.useRegions
+                        && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_LEASH_HITCH_DESTROY, hanging.getLocation())))) {
+                    event.setCancelled(true);
                 }
             }
         } else {
@@ -141,6 +153,9 @@ public class WorldGuardHangingListener implements Listener {
                     && event.getCause() == RemoveCause.EXPLOSION) {
                 event.setCancelled(true);
             } else if (hanging instanceof ItemFrame && wcfg.blockEntityItemFrameDestroy
+                    && event.getCause() == RemoveCause.EXPLOSION) {
+                event.setCancelled(true);
+            } else if (hanging instanceof LeashHitch && wcfg.blockEntityLeashHitchDestroy
                     && event.getCause() == RemoveCause.EXPLOSION) {
                 event.setCancelled(true);
             }
@@ -170,6 +185,12 @@ public class WorldGuardHangingListener implements Listener {
                                 toVector(player.getLocation()), ItemID.ITEM_FRAME), false, false)) {
                 event.setCancelled(true);
                 return;
+            } else if (event.getEntity() instanceof LeashHitch
+                    && !wcfg.getBlacklist().check(
+                        new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
+                                toVector(player.getLocation()), ItemID.LEAD), false, false)) {
+                event.setCancelled(true);
+                return;
             }
         }
 
@@ -190,7 +211,7 @@ public class WorldGuardHangingListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(entity.getWorld());
 
-        if (wcfg.useRegions && (entity instanceof ItemFrame || entity instanceof Painting)) {
+        if (wcfg.useRegions && (entity instanceof ItemFrame || entity instanceof Painting || entity instanceof LeashHitch)) {
             if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
                 player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
                 event.setCancelled(true);

@@ -111,6 +111,7 @@ public class WorldConfiguration {
     public boolean blockOtherExplosions;
     public boolean blockEntityPaintingDestroy;
     public boolean blockEntityItemFrameDestroy;
+    public boolean blockEntityLeashHitchDestroy;
     public boolean blockPluginSpawning;
     public boolean blockGroundSlimes;
     public boolean blockZombieDoorDestruction;
@@ -363,6 +364,7 @@ public class WorldConfiguration {
         disableSnowmanTrails = getBoolean("mobs.disable-snowman-trails", false);
         blockEntityPaintingDestroy = getBoolean("mobs.block-painting-destroy", false);
         blockEntityItemFrameDestroy = getBoolean("mobs.block-item-frame-destroy", false);
+        blockEntityLeashHitchDestroy = getBoolean("mobs.block-leash-hitch-destroy", false);
         blockPluginSpawning = getBoolean("mobs.block-plugin-spawning", true);
         blockGroundSlimes = getBoolean("mobs.block-above-ground-slimes", false);
         blockOtherExplosions = getBoolean("mobs.block-other-explosions", false);
