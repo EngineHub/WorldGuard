@@ -73,6 +73,8 @@ public final class DefaultFlag {
     public static final StateFlag ENTITY_PAINTING_DESTROY = new StateFlag("entity-painting-destroy", true);
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = new StateFlag("entity-item-frame-destroy", true);
     public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
+    public static final StateFlag PROJECTILE_LAUNCH = new StateFlag("projectile-launch", true);
+    public static final StateFlag BOW_SHOOT = new StateFlag("bow-shoot", true);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting", RegionGroup.ALL);
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell", RegionGroup.ALL);
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
@@ -110,7 +112,7 @@ public final class DefaultFlag {
         SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, SOIL_DRY, GAME_MODE,
         MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, VINE_GROWTH,
         SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
-        TELE_LOC, SPAWN_LOC, POTION_SPLASH,
+        TELE_LOC, SPAWN_LOC, POTION_SPLASH, PROJECTILE_LAUNCH, BOW_SHOOT,
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
     };
 

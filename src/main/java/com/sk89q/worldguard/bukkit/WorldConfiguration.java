@@ -82,6 +82,8 @@ public class WorldConfiguration {
     public boolean simulateSponge;
     public int spongeRadius;
     public boolean disableExpDrops;
+    public boolean disableProjectileLaunch;
+    public boolean blockBowShoot;
     public Set<PotionEffectType> blockPotions;
     public boolean blockPotionsAlways;
     public boolean pumpkinScuba;
@@ -312,6 +314,8 @@ public class WorldConfiguration {
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
         disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
+        disableProjectileLaunch = getBoolean("protection.disable-launching-projectiles", false);
+        blockBowShoot = getBoolean("protection.block-bow-shooting", false);
 
         blockPotions = new HashSet<PotionEffectType>();
         for (String potionName : getStringList("gameplay.block-potions", null)) {

@@ -26,6 +26,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EnderPearl;
@@ -62,12 +63,14 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
@@ -953,6 +956,61 @@ public class WorldGuardEntityListener implements Listener {
 
         if (blockedEntities == event.getAffectedEntities().size()) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        Projectile proj = event.getEntity();
+        GlobalRegionManager mgr = plugin.getGlobalRegionManager();
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(proj.getWorld());
+
+        LocalPlayer player = null;
+        if (proj.getShooter() instanceof Player) {
+            player = plugin.wrapPlayer((Player) proj.getShooter());
+        }
+
+        // Projectiles disabled in this world
+        if (wcfg.disableProjectileLaunch) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.useRegions) {
+            // Projectiles not allowed in this region and player has no bypass
+            if (!mgr.allows(DefaultFlag.PROJECTILE_LAUNCH, proj.getLocation(), player)
+                    && (player == null || !mgr.hasBypass(player, proj.getWorld()))) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityShootBow(EntityShootBowEvent event) {
+        if (!(event.getEntity() instanceof Player)) {
+            // Entity is not a player (so probably a skeleton)
+            return;
+        }
+
+        LocalPlayer player = plugin.wrapPlayer((Player) event.getEntity());
+        Arrow arrow = (Arrow) event.getProjectile();
+        GlobalRegionManager mgr = plugin.getGlobalRegionManager();
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(arrow.getWorld());
+
+        // Bow shooting disabled in this world
+        if (wcfg.blockBowShoot) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.useRegions) {
+            // Cancel if shooting arrows is blocked and player has no bypass
+            if (!mgr.allows(DefaultFlag.BOW_SHOOT, arrow.getLocation(), player)
+                    && !mgr.hasBypass(player, arrow.getWorld())) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
