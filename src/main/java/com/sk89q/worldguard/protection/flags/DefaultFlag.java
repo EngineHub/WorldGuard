@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 
@@ -114,11 +117,32 @@ public final class DefaultFlag {
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
     };
 
+    public static ArrayList<Flag<?>> customFlagsList = new ArrayList<Flag<?>> ();
+
     private DefaultFlag() {
     }
 
-    public static Flag<?>[] getFlags() {
-        return flagsList;
+    public static void addCustomFlag(Flag<?> flag) {
+        customFlagsList.add(flag);
+    }
+
+    public static boolean removeCustomFlag(Flag<?> flag) {
+       return customFlagsList.remove(flag);
+    }
+
+    public static void clearCustomFlags() {
+        customFlagsList.clear();;
+    }
+
+    public static ArrayList<Flag<?>> getCustomFlags() {
+        return customFlagsList;
+    }
+
+    public static ArrayList<Flag<?>> getFlags() {
+        ArrayList<Flag<?>> flags = new ArrayList<Flag<?>> ();
+         flags.addAll(Arrays.asList(flagsList));
+         flags.addAll(customFlagsList);
+        return flags;
     }
 
     /**
