@@ -88,6 +88,22 @@ public class RegionPermissionModel extends AbstractPermissionModel {
         return hasPatternPermission("teleport", region);
     }
     
+    public boolean mayAddMember(ProtectedRegion region) {
+        return hasPatternPermission("addmember", region);
+    }
+    
+    public boolean mayAddOwner(ProtectedRegion region) {
+        return hasPatternPermission("addowner", region);
+    }
+    
+    public boolean mayRemoveMember(ProtectedRegion region) {
+        return hasPatternPermission("removemember", region);
+    }
+    
+    public boolean mayRemoveOwner(ProtectedRegion region) {
+        return hasPatternPermission("removeowner", region);
+    }
+    
     public boolean mayList() {
         return hasPluginPermission("region.list");
     }
@@ -105,7 +121,7 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     }
     
     public boolean maySetFlag(ProtectedRegion region) {
-        return hasPatternPermission("flag.regions", region);
+        return hasPatternPermission("flag", region);
     }
     
     public boolean maySetFlag(ProtectedRegion region, Flag<?> flag) {
