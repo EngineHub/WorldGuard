@@ -20,6 +20,27 @@
 package com.sk89q.worldguard.protection.databases;
 
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.representer.Representer;
+
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
@@ -29,22 +50,13 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedCylinderRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.DumperOptions.FlowStyle;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
-import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.representer.Representer;
-
-import java.sql.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MySQLDatabase extends AbstractProtectionDatabase {
+    private static final String COMM_LINK_FAILURE = "08S01";
     private final Logger logger;
 
     private Yaml yaml;
@@ -53,6 +65,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
     private Map<String, ProtectedRegion> cuboidRegions;
     private Map<String, ProtectedRegion> poly2dRegions;
+    private Map<String, ProtectedRegion> cylinderRegions;
     private Map<String, ProtectedRegion> globalRegions;
     private Map<ProtectedRegion, String> parentSets;
 
@@ -70,15 +83,26 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             connect();
 
             try {
-            	// Test if the database is up to date, if not throw a critical error
-            	PreparedStatement verTest = this.conn.prepareStatement(
-            			"SELECT `world_id` FROM `region_cuboid` LIMIT 0,1;"
-            		);
-            	verTest.execute();
+              // Test if the database is up to date, if not throw a critical error
+              PreparedStatement verTest = this.conn.prepareStatement(
+                  "SELECT `world_id` FROM `region_cuboid` LIMIT 0,1;"
+                );
+              verTest.execute();
             } catch (SQLException ex) {
-            	throw new InvalidTableFormatException(
-            			"region_storage_update_20110325.sql"
-            		);
+                throw new InvalidTableFormatException(
+                        "region_storage_update_20110325.sql"
+                    );
+            }
+            
+            try {
+                PreparedStatement verTest = this.conn.prepareStatement(
+                        "SELECT `world_id` FROM `region_cylinder` LIMIT 0,1;"
+                    );
+                verTest.execute();
+            } catch (SQLException ex) {
+                throw new InvalidTableFormatException(
+                        "region_storage_update_20140106.sql"
+                    );
             }
 
             PreparedStatement worldStmt = conn.prepareStatement(
@@ -132,20 +156,20 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     }
 
     private void connect() throws SQLException {
-    	if (conn != null) {
-    		// Make a dummy query to check the connnection is alive.
-    		try {
-    			conn.prepareStatement("SELECT 1;").execute();
-    		} catch (SQLException ex) {
+        if (conn != null) {
+            // Make a dummy query to check the connnection is alive.
+            try {
+                conn.prepareStatement("SELECT 1;").execute();
+            } catch (SQLException ex) {
                 // Test if the dummy query failed because the connection is dead,
                 // and if it is mark the connection as closed (the MySQL Driver
                 // does not ensure that the connection is marked as closed unless
                 // the close() method has been called.
-    			if ("08S01".equals(ex.getSQLState())) {
-    				conn.close();
-    			}
-    		}
-    	}
+                if (COMM_LINK_FAILURE.equals(ex.getSQLState())) {
+                    conn.close();
+                }
+            }
+        }
         if (conn == null || conn.isClosed()) {
             conn = DriverManager.getConnection(config.sqlDsn, config.sqlUsername, config.sqlPassword);
         }
@@ -479,6 +503,10 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         this.loadPoly2d();
         regions.putAll(this.poly2dRegions);
         this.poly2dRegions = null;
+        
+        this.loadCylinder();
+        regions.putAll(this.cylinderRegions);
+        this.cylinderRegions = null;
 
         this.loadGlobal();
         regions.putAll(this.globalRegions);
@@ -502,6 +530,72 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
         this.regions = regions;
     }
 
+
+    private void loadCylinder() {
+        Map<String,ProtectedRegion> regions =
+                new HashMap<String,ProtectedRegion>();
+
+        try {
+            PreparedStatement cylinderRegionStatement = this.conn.prepareStatement(
+                    "SELECT " +
+                    "`region_cylinder`.`min_y`, " +
+                    "`region_cylinder`.`max_y`, " +
+                    "`region_cylinder`.`center_x`, " +
+                    "`region_cylinder`.`center_z`, " +
+                    "`region_cylinder`.`radius_x`, " +
+                    "`region_cylinder`.`radius_z`, " +
+                    "`region`.`id`, " +
+                    "`region`.`priority`, " +
+                    "`parent`.`id` AS `parent` " +
+                    "FROM `region_cylinder` " +
+                    "LEFT JOIN `region` " +
+                    "ON (`region_cylinder`.`region_id` = `region`.`id` " +
+                    "AND `region_cylinder`.`world_id` = `region`.`world_id`) " +
+                    "LEFT JOIN `region` AS `parent` " +
+                    "ON (`region`.`parent` = `parent`.`id` " +
+                    "AND `region`.`world_id` = `parent`.`world_id`) " +
+                    "WHERE `region`.`world_id` = ? "
+            );
+
+            cylinderRegionStatement.setInt(1, this.worldDbId);
+            ResultSet cylinderResultSet = cylinderRegionStatement.executeQuery();
+
+            while (cylinderResultSet.next()) {
+                String id = cylinderResultSet.getString("id");
+
+                Integer minY = cylinderResultSet.getInt("min_y");
+                Integer maxY = cylinderResultSet.getInt("max_y");
+                Integer centerX = cylinderResultSet.getInt("center_x");
+                Integer centerZ = cylinderResultSet.getInt("center_z");
+                Integer radiusX = cylinderResultSet.getInt("radius_x");
+                Integer radiusZ = cylinderResultSet.getInt("radius_z");
+
+                ProtectedRegion region = new ProtectedCylinderRegion(id, new BlockVector2D(centerX, centerZ), new BlockVector2D(radiusX, radiusZ), minY, maxY);
+
+                region.setPriority(cylinderResultSet.getInt("priority"));
+
+                this.loadFlags(region);
+                this.loadOwnersAndMembers(region);
+
+                regions.put(cylinderResultSet.getString("id"), region);
+
+                String parentId = cylinderResultSet.getString("parent");
+                if (parentId != null) {
+                    parentSets.put(region, parentId);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            logger.warning("Unable to load regions from sql database: " + ex.getMessage());
+            Throwable t = ex.getCause();
+            while (t != null) {
+                logger.warning("\t\tCause: " + t.getMessage());
+                t = t.getCause();
+            }
+        }
+
+        cylinderRegions = regions;
+    }
 
     /*
      * Returns the database id for the user
@@ -678,6 +772,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                         updateRegionCuboid( (ProtectedCuboidRegion) region );
                     } else if (region instanceof ProtectedPolygonalRegion) {
                         updateRegionPoly2D( (ProtectedPolygonalRegion) region );
+                    } else if (region instanceof ProtectedCylinderRegion) {
+                        updateRegionCylinder( (ProtectedCylinderRegion)region );
                     } else if (region instanceof GlobalProtectedRegion) {
                         updateRegionGlobal( (GlobalProtectedRegion) region );
                     } else {
@@ -688,6 +784,8 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                         insertRegionCuboid( (ProtectedCuboidRegion) region );
                     } else if (region instanceof ProtectedPolygonalRegion) {
                         insertRegionPoly2D( (ProtectedPolygonalRegion) region );
+                    } else if (region instanceof ProtectedCylinderRegion) {
+                        insertRegionCylinder( (ProtectedCylinderRegion)region );
                     } else if (region instanceof GlobalProtectedRegion) {
                         insertRegionGlobal( (GlobalProtectedRegion) region );
                     } else {
@@ -732,6 +830,59 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 logger.warning("Could not remove region from database " + name + ": " + ex.getMessage());
             }
         }
+
+    }
+
+    private void insertRegionCylinder(ProtectedCylinderRegion region) throws SQLException {
+        insertRegion(region, "poly2d");
+
+        PreparedStatement insertCylinderStatement = this.conn.prepareStatement(
+                "INSERT INTO `region_cylinder` (" +
+                "`region_id`, " +
+                "`world_id`, " +
+                "`max_y`, " +
+                "`min_y`," +
+                "`center_x`," +
+                "`center_z`," +
+                "`radius_x`," +
+                "`radius_z`" +
+                ") VALUES (?, " + this.worldDbId + ", ?, ?, ?, ?, ?, ?)"
+        );
+
+        insertCylinderStatement.setString(1, region.getId().toLowerCase());
+        insertCylinderStatement.setInt(2, region.getMaxY());
+        insertCylinderStatement.setInt(3, region.getMinY());
+        insertCylinderStatement.setInt(4, region.getCenter().getBlockX());
+        insertCylinderStatement.setInt(5, region.getCenter().getBlockZ());
+        insertCylinderStatement.setInt(6, region.getRadius().getBlockX());
+        insertCylinderStatement.setInt(7, region.getRadius().getBlockZ());
+        insertCylinderStatement.execute();
+    }
+
+    private void updateRegionCylinder(ProtectedCylinderRegion region) throws SQLException {
+        updateRegion(region, "cylinder");
+
+        PreparedStatement updateCylinderRegionStatement = this.conn.prepareStatement(
+                "UPDATE `region_cylinder` SET " +
+                "`max_y` = ?, " +
+                "`min_y` = ?," +
+                "`center_x` = ?," +
+                "`center_z` = ?," +
+                "`radius_x` = ?," +
+                "`radius_z` = ? " +
+                "WHERE `region_id` = ? " +
+                "AND `world_id` = " + this.worldDbId
+        );
+
+        updateCylinderRegionStatement.setInt(1, region.getMaxY());
+        updateCylinderRegionStatement.setInt(2, region.getMinY());
+        updateCylinderRegionStatement.setInt(3, region.getCenter().getBlockX());
+        updateCylinderRegionStatement.setInt(4, region.getCenter().getBlockZ());
+        updateCylinderRegionStatement.setInt(5, region.getRadius().getBlockX());
+        updateCylinderRegionStatement.setInt(6, region.getRadius().getBlockZ());
+        updateCylinderRegionStatement.setString(7, region.getId().toLowerCase());
+
+        updateCylinderRegionStatement.execute();
 
     }
 

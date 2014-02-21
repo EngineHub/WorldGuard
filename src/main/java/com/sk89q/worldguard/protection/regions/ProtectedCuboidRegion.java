@@ -138,7 +138,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
             if (region instanceof ProtectedCuboidRegion) {
                 intersectingRegions.add(region);
                 continue;
-            } else if (region instanceof ProtectedPolygonalRegion) {
+            } else if (region instanceof ProtectedPolygonalRegion || region instanceof ProtectedCylinderRegion) {
                 // If either region contains the points of the other,
                 // or if any edges intersect, the regions intersect
                 if (containsAny(region.getPoints())

@@ -129,7 +129,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         for (ProtectedRegion region : regions) {
             if (!intersectsBoundingBox(region)) continue;
 
-            if (region instanceof ProtectedPolygonalRegion || region instanceof ProtectedCuboidRegion) {
+            if (region instanceof ProtectedPolygonalRegion || region instanceof ProtectedCuboidRegion || region instanceof ProtectedCylinderRegion) {
                 // If either region contains the points of the other,
                 // or if any edges intersect, the regions intersect
                 if (containsAny(region.getPoints())
