@@ -36,7 +36,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.AllFlags;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -298,7 +298,7 @@ public class ReportWriter {
             if (globalRegion == null) {
                 globalRegionLog.put("Status", "UNDEFINED");
             } else {
-                for (Flag<?> flag : DefaultFlag.getFlags()) {
+                for (Flag<?> flag : AllFlags.getFlags()) {
                     if (flag instanceof StateFlag) {
                         globalRegionLog.put(flag.getName(),
                                 globalRegion.getFlag(flag));

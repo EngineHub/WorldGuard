@@ -68,6 +68,10 @@ public class EnumFlag<T extends Enum<T>> extends Flag<T> {
         return null;
     }
 
+    public Class<T> getEnumClass() {
+        return this.enumClass;
+    }
+
     @Override
     public T parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat {

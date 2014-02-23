@@ -60,6 +60,7 @@ import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.flags.CustomFlags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 
@@ -88,6 +89,11 @@ public class WorldGuardPlugin extends JavaPlugin {
     private final GlobalRegionManager globalRegionManager;
 
     /**
+     * Handles the custom flags databases.
+     */
+    private final CustomFlags flagsManager;
+
+    /**
      * Handles all configuration.
      */
     private final ConfigurationManager configuration;
@@ -104,6 +110,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public WorldGuardPlugin() {
         configuration = new ConfigurationManager(this);
         globalRegionManager = new GlobalRegionManager(this);
+        flagsManager = new CustomFlags(this);
 
         final WorldGuardPlugin plugin = inst = this;
         commands = new CommandsManager<CommandSender>() {
@@ -157,6 +164,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             // Load the configuration
             configuration.load();
+            flagsManager.load();
             globalRegionManager.preload();
         } catch (FatalConfigurationLoadingException e) {
             e.printStackTrace();
@@ -212,6 +220,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         globalRegionManager.unload();
+        flagsManager.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
     }
@@ -253,6 +262,16 @@ public class WorldGuardPlugin extends JavaPlugin {
     public GlobalRegionManager getGlobalRegionManager() {
         return globalRegionManager;
     }
+
+    /**
+     * Get CustomFlags.
+     *
+     * @return WorldGuard's flags manager
+     */
+    public CustomFlags getFlagsManager() {
+        return flagsManager;
+    }
+
 
     /**
      * Get the WorldGuard Configuration.

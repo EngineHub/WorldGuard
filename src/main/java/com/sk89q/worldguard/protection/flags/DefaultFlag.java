@@ -19,9 +19,6 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 
@@ -100,7 +97,7 @@ public final class DefaultFlag {
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
 
-    public static final Flag<?>[] flagsList = new Flag<?>[] {
+    public static final FlagsList flagsList = new FlagsList(new Flag<?>[]{
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
@@ -115,49 +112,12 @@ public final class DefaultFlag {
         SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
         TELE_LOC, SPAWN_LOC, POTION_SPLASH,
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
-    };
-
-    public static ArrayList<Flag<?>> customFlagsList = new ArrayList<Flag<?>> ();
+    });
 
     private DefaultFlag() {
     }
 
-    public static void addCustomFlag(Flag<?> flag) {
-        customFlagsList.add(flag);
-    }
-
-    public static boolean removeCustomFlag(Flag<?> flag) {
-       return customFlagsList.remove(flag);
-    }
-
-    public static void clearCustomFlags() {
-        customFlagsList.clear();;
-    }
-
-    public static ArrayList<Flag<?>> getCustomFlags() {
-        return customFlagsList;
-    }
-
-    public static ArrayList<Flag<?>> getFlags() {
-        ArrayList<Flag<?>> flags = new ArrayList<Flag<?>> ();
-         flags.addAll(Arrays.asList(flagsList));
-         flags.addAll(customFlagsList);
-        return flags;
-    }
-
-    /**
-     * Try to match the flag with the given ID using a fuzzy name match.
-     *
-     * @param id the flag ID
-     * @return a flag, or null
-     */
-    public static Flag<?> fuzzyMatchFlag(String id) {
-        for (Flag<?> flag : DefaultFlag.getFlags()) {
-            if (flag.getName().replace("-", "").equalsIgnoreCase(id.replace("-", ""))) {
-                return flag;
-            }
-        }
-
-        return null;
+    public static FlagsList getFlags() {
+        return flagsList;
     }
 }

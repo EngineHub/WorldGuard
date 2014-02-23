@@ -20,8 +20,8 @@
 package com.sk89q.worldguard.protection.databases;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -37,7 +37,7 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.AllFlags;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -160,7 +160,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         }
         
         // @TODO: Make this better
-        for (Flag<?> flag : DefaultFlag.getFlags()) {
+        for (Flag<?> flag : AllFlags.getFlags()) {
             Object o = flagsData.getProperty(flag.getName());
             if (o != null) {
                 setFlag(region, flag, o);

@@ -69,8 +69,10 @@ public class WorldGuardCommands {
 
         try {
             plugin.getGlobalStateManager().unload();
+            plugin.getFlagsManager().unload();
             plugin.getGlobalRegionManager().unload();
             plugin.getGlobalStateManager().load();
+            plugin.getFlagsManager().load();
             plugin.getGlobalRegionManager().preload();
             // WGBukkit.cleanCache();
             sender.sendMessage("WorldGuard configuration reloaded.");

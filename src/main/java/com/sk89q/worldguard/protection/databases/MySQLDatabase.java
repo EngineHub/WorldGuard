@@ -25,7 +25,7 @@ import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.AllFlags;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -175,7 +175,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             }
 
             // @TODO: Make this better
-            for (Flag<?> flag : DefaultFlag.getFlags()) {
+            for (Flag<?> flag : AllFlags.getFlags()) {
                 Object o = regionFlags.get(flag.getName());
                 if (o != null) {
                     setFlag(region, flag, o);
