@@ -122,7 +122,7 @@ public class WorldGuardBlockListener implements Listener {
         // handle them a bit separately
         if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
-                player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
+                player.sendMessage(ChatColor.DARK_GREEN + "Dino-Protection > You're not invited to this tea party!");
                 event.setCancelled(true);
                 return;
             }
@@ -149,7 +149,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
          || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            player.sendMessage(ChatColor.DARK_RED + "Dino-Protection > not Enough permissions for this Area.");
             event.setCancelled(true);
             return;
         }
@@ -173,7 +173,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.isChestProtected(event.getBlock(), player)) {
-            player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
+            player.sendMessage(ChatColor.DARK_RED + "Dino-Protection > This chest is protected.");
             event.setCancelled(true);
             return;
         }
