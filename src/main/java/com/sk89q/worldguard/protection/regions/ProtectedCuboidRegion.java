@@ -76,6 +76,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         setMinMaxPoints(min, pt);
     }
 
+    @Override
     public List<BlockVector2D> getPoints() {
         List<BlockVector2D> pts = new ArrayList<BlockVector2D>();
         int x1 = min.getBlockX();
@@ -85,8 +86,8 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
 
         pts.add(new BlockVector2D(x1, z1));
         pts.add(new BlockVector2D(x2, z1));
-        pts.add(new BlockVector2D(x1, z2));
         pts.add(new BlockVector2D(x2, z2));
+        pts.add(new BlockVector2D(x1, z2));
 
         return pts;
     }
