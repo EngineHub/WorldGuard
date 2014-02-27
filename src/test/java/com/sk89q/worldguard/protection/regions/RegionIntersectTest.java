@@ -1,14 +1,12 @@
-package com.sk89q.worldguard.protection;
+package com.sk89q.worldguard.protection.regions;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RegionIntersectTest {
@@ -78,5 +76,28 @@ public class RegionIntersectTest {
         }
 
         assertEquals("Check for '" + region2.getId() + "' region failed.", expected, actual);
+    }
+
+    private static final BlockVector2D[] polygon = {
+            new BlockVector2D(1, 0),
+            new BlockVector2D(4, 3),
+            new BlockVector2D(4, -3),
+    };
+
+    @Test
+    public void testIntersection() throws Exception {
+        final ProtectedCuboidRegion cuboidRegion = new ProtectedCuboidRegion("cuboidRegion", new BlockVector(-3, -3, -3), new BlockVector(3, 3, 3));
+        for (int angle = 0; angle < 360; angle += 90) {
+            final BlockVector2D[] rotatedPolygon = new BlockVector2D[polygon.length];
+            for (int i = 0; i < polygon.length; i++) {
+                final BlockVector2D vertex = polygon[i];
+                rotatedPolygon[i] = vertex.transform2D(angle, 0, 0, 0, 0).toBlockVector2D();
+            }
+
+            final ProtectedPolygonalRegion polygonalRegion = new ProtectedPolygonalRegion("polygonalRegion", Arrays.asList(rotatedPolygon), -3, 3);
+
+            assertTrue(String.format("%s does not intersect (cuboid.intersectsEdges(polygonal)", Arrays.asList(rotatedPolygon)), cuboidRegion.intersectsEdges(polygonalRegion));
+            assertTrue(String.format("%s does not intersect (polygonal.intersectsEdges(cuboid)", Arrays.asList(rotatedPolygon)), polygonalRegion.intersectsEdges(cuboidRegion));
+        }
     }
 }
