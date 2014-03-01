@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldguard</artifactId>
-  <version>5.9-SNAPSHOT</version>
+  <version>5.9</version>
   <packaging>jar</packaging>
   
   <!-- Project information -->
@@ -31,7 +31,7 @@
     <connection>scm:git:git://github.com/sk89q/worldguard.git</connection>
     <developerConnection>scm:git:git@github.com:sk89q/worldguard.git</developerConnection>
     <url>https://github.com/sk89q/worldguard</url>
-    <tag>master</tag>
+    <tag>5.9</tag>
   </scm>
   
   <mailingLists>
@@ -87,7 +87,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.6.2-R0.1-SNAPSHOT</version>
+      <version>1.7.2-R0.3</version>
       <scope>compile</scope>
       <type>jar</type>
     </dependency>
