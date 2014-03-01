@@ -129,30 +129,14 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     */
 
     @Override
-    public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
-        List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
-
-        for (ProtectedRegion region : regions) {
-            if (!intersectsBoundingBox(region)) continue;
-
-            // If both regions are Cuboids and their bounding boxes intersect, they intersect
-            if (region instanceof ProtectedCuboidRegion) {
-                intersectingRegions.add(region);
-                continue;
-            } else if (region instanceof ProtectedPolygonalRegion) {
-                // If either region contains the points of the other,
-                // or if any edges intersect, the regions intersect
-                if (containsAny(region.getPoints())
-                        || region.containsAny(getPoints())
-                        || intersectsEdges(region)) {
-                    intersectingRegions.add(region);
-                    continue;
-                }
-            } else {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
+    public boolean intersectsRegion(ProtectedRegion region) {
+        if (region instanceof ProtectedPolygonalRegion) {
+            return intersectsRegionHelper(region);
+        } else if (region instanceof ProtectedCuboidRegion) {
+            return intersectsBoundingBox(region);
+        } else {
+            throw new UnsupportedOperationException("Not supported yet.");
         }
-        return intersectingRegions;
     }
 
     @Override

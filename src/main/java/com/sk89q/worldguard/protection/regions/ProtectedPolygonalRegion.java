@@ -23,7 +23,6 @@ import java.util.List;
 
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 
 public class ProtectedPolygonalRegion extends ProtectedRegion {
 
@@ -121,30 +120,6 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
         return inside;
     }
-
-    @Override
-    public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
-        List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
-
-        for (ProtectedRegion region : regions) {
-            if (!intersectsBoundingBox(region)) continue;
-
-            if (region instanceof ProtectedPolygonalRegion || region instanceof ProtectedCuboidRegion) {
-                // If either region contains the points of the other,
-                // or if any edges intersect, the regions intersect
-                if (containsAny(region.getPoints())
-                        || region.containsAny(getPoints())
-                        || intersectsEdges(region)) {
-                    intersectingRegions.add(region);
-                    continue;
-                }
-            } else {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-        }
-        return intersectingRegions;
-    }
-
 
     /**
      * Return the type of region as a user-friendly name.

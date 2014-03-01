@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.flags.Flag;
 
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -487,6 +488,24 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
         return id.compareTo(other.id);
     }
 
+    protected boolean intersectsRegionHelper(ProtectedRegion region) {
+        if (!intersectsBoundingBox(region)) {
+            return false;
+        }
+
+        // If either region contains the points of the other,
+        // or if any edges intersect, the regions intersect
+        return containsAny(region.getPoints()) || region.containsAny(getPoints()) || intersectsEdges(region);
+    }
+
+    public boolean intersectsRegion(ProtectedRegion region) {
+        if (!(region instanceof ProtectedPolygonalRegion) && (!(region instanceof ProtectedCuboidRegion))) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        return intersectsRegionHelper(region);
+    }
+
     /**
      * Return the type of region as a user-friendly, lowercase name.
      *
@@ -501,9 +520,16 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * @return The elements of {@code regions} that intersect with this region
      * @throws UnsupportedIntersectionException if an invalid intersection is detected
      */
-    public abstract List<ProtectedRegion> getIntersectingRegions(
-            List<ProtectedRegion> regions)
-            throws UnsupportedIntersectionException;
+    public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
+        List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
+
+        for (ProtectedRegion region : regions) {
+            if (intersectsRegion(region)) {
+                intersectingRegions.add(region);
+            }
+        }
+        return intersectingRegions;
+    }
 
     /**
      * Checks if the bounding box of a region intersects with with the bounding
