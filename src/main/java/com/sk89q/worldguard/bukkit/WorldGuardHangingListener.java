@@ -28,6 +28,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -39,6 +40,7 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.sk89q.worldedit.blocks.ItemID;
 import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
@@ -81,8 +83,9 @@ public class WorldGuardHangingListener implements Listener {
             HangingBreakByEntityEvent entityEvent = (HangingBreakByEntityEvent) event;
             Entity removerEntity = entityEvent.getRemover();
             if (removerEntity instanceof Projectile) {
-                Projectile projectile = (Projectile) removerEntity; 
-                removerEntity = projectile.getShooter() != null ? projectile.getShooter() : removerEntity; 
+                Projectile projectile = (Projectile) removerEntity;
+                ProjectileSource remover = projectile.getShooter(); 
+                removerEntity = (remover instanceof LivingEntity ? (LivingEntity) remover : null);
             }
 
             if (removerEntity instanceof Player) {
@@ -123,6 +126,8 @@ public class WorldGuardHangingListener implements Listener {
                     }
                 }
 
+                // this now covers dispensers as well, if removerEntity is null above,
+                // due to a non-LivingEntity ProjectileSource
                 if (hanging instanceof Painting
                         && (wcfg.blockEntityPaintingDestroy
                         || (wcfg.useRegions
