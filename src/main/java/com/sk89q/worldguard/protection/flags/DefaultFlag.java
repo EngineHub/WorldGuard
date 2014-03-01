@@ -42,6 +42,7 @@ public final class DefaultFlag {
     public static final StateFlag TNT = new StateFlag("tnt", true, RegionGroup.ALL);
     public static final StateFlag LIGHTER = new StateFlag("lighter", true);
     public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", true);
+    public static final StateFlag FIRE_EXTINGUISH = new StateFlag("fire-extinguish", true);
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", true);
     public static final StateFlag LIGHTNING = new StateFlag("lightning", true);
     public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", false);
@@ -109,7 +110,7 @@ public final class DefaultFlag {
         FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
         SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, SOIL_DRY, GAME_MODE,
         MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, VINE_GROWTH,
-        SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
+        SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, FIRE_EXTINGUISH, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
         TELE_LOC, SPAWN_LOC, POTION_SPLASH,
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
     };
