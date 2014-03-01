@@ -1,3 +1,29 @@
+5.9
+- Added a config option to allow explosion flags to only prevent block damage
+- Added allow-tamed-spawns setting, on by default. This will stop WorldGuard
+    from culling tamed animals.
+- Added config option and flag to prevent soil from drying naturally.
+- Added formatting codes, &k/l/m/n/o and &x (reset).
+- Added snow-fall-blocks option to config to restrict snow fall to certain blocks
+- Allow players to add newlines (\n) via command, not just manually in yml.
+- Allow the console to load/save all region managers with one command.
+- Changed entity report format slightly.
+- Check bypass perms for item-drop flag.
+- Check for entities and projectiles removing items from frames too.
+- Fix being able to use bonemeal to turn tall grass into double plants.
+- Fix number of arguments for migratedb command.
+- Fixed addowner/addmember commands adding command artifacts. Specifically, 
+    "-w <world>" will no longer be added when using it.
+- Fixed milking cows in protected areas due to changes in Bukkit.
+- Fixed ProtectedCuboidRegion::getPoints() returning points in wrong order.
+- Fixed snowman trails being treated as snow fall.
+- Make /rg list default to own regions if the player doesn't have permission otherwise.
+- Protected items in item frames in protected regions.
+- Resolved an issue where explosions of type OTHER_EXPLOSION were ignoring the world 
+    configuration settings.
+- Send item-use blacklist event when right-clicking entities.
+- Transformed the BlockFadeEvent handler into a switch.
+
 5.8:
 - BREAKING CHANGE: This version has been built for versions of Bukkit for MC 1.6.1 and
   newer. Do not try to use this version of WG on an older Bukkit version.
