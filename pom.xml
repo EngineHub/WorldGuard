@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldguard</artifactId>
-  <version>5.9</version>
+  <version>5.9.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   
   <!-- Project information -->
@@ -31,7 +31,7 @@
     <connection>scm:git:git://github.com/sk89q/worldguard.git</connection>
     <developerConnection>scm:git:git@github.com:sk89q/worldguard.git</developerConnection>
     <url>https://github.com/sk89q/worldguard</url>
-    <tag>5.9</tag>
+    <tag>master</tag>
   </scm>
   
   <mailingLists>
