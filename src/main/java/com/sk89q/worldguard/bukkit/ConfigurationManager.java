@@ -232,12 +232,13 @@ public class ConfigurationManager {
     }
 
     /**
-     * Get the locale configuration.
+     * Get a locale string given an identifier.
      *
-     * @return locale configuration
-     */    
-    public Locale getLocale() {
-        return locale;
+     * @param identifier The locale string identifier.
+     * @return locale string
+     */
+    public String getLocale(String identifier) {
+        return locale.get(identifier);
     }
 
     /**

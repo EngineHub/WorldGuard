@@ -75,10 +75,10 @@ public class WorldGuardCommands {
             plugin.getGlobalRegionManager().preload();
             // WGBukkit.cleanCache();
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().commandReloadSuccess));
+                    plugin.getGlobalStateManager().getLocale("COMMAND_RELOAD_SUCCESS")));
         } catch (Throwable t) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().commandReloadError
+                    plugin.getGlobalStateManager().getLocale("COMMAND_RELOAD_ERROR")
                     .replace("%errorMessage%", t.getMessage())));
         } finally {
             if (minecraftLogger != null) {
@@ -97,10 +97,10 @@ public class WorldGuardCommands {
         try {
             report.write(dest);
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().commandReportWritten
+                    plugin.getGlobalStateManager().getLocale("COMMAND_REPORT_WRITTEN")
                     .replace("%path%", dest.getAbsolutePath())));
         } catch (IOException e) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionReportError
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_REPORT_ERROR")
                     .replace("%errorMessage%", e.getMessage()));
         }
         
@@ -108,20 +108,20 @@ public class WorldGuardCommands {
             plugin.checkPermission(sender, "worldguard.report.pastebin");
             
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().commandReportUploading));
+                    plugin.getGlobalStateManager().getLocale("COMMAND_REPORT_UPLOADING")));
             PastebinPoster.paste(report.toString(), new PasteCallback() {
                 
                 public void handleSuccess(String url) {
                     // Hope we don't have a thread safety issue here
                     sender.sendMessage(BukkitUtil.replaceColorMacros(
-                            plugin.getGlobalStateManager().getLocale().commandReportUploadSuccess)
+                            plugin.getGlobalStateManager().getLocale("COMMAND_REPORT_UPLOAD_SUCCESS"))
                             .replace("%url%", url));
                 }
                 
                 public void handleError(String err) {
                     // Hope we don't have a thread safety issue here
                     sender.sendMessage(BukkitUtil.replaceColorMacros(
-                            plugin.getGlobalStateManager().getLocale().commandReportUploadError)
+                            plugin.getGlobalStateManager().getLocale("COMMAND_REPORT_UPLOAD_ERROR"))
                             .replace("%errorMessage%", err));
                 }
             });
@@ -136,13 +136,13 @@ public class WorldGuardCommands {
         if (args.argsLength() == 0) {
             plugin.getFlagStateManager().forgetAll();
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().commandFlushStatesSelf));
+                    plugin.getGlobalStateManager().getLocale("COMMAND_FLUSHSTATES_SELF")));
         } else {
             Player player = plugin.getServer().getPlayer(args.getString(0));
             if (player != null) {
                 plugin.getFlagStateManager().forget(player);
                 sender.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().commandFlushStatesOthers
+                        plugin.getGlobalStateManager().getLocale("COMMAND_FLUSHSTATES_OTHERS")
                         .replace("%playerName%", player.getName())));
             }
         }

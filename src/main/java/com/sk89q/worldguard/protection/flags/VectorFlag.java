@@ -65,7 +65,7 @@ public class VectorFlag extends Flag<Vector> {
                 }
             }
 
-            throw new InvalidFlagFormat(plugin.getGlobalStateManager().getLocale().commandExceptionInvalidFlagFormat);
+            throw new InvalidFlagFormat(plugin.getGlobalStateManager().getLocale("EX_INVALID_FLAG_FORMAT"));
         }
     }
 

@@ -106,7 +106,7 @@ public final class RegionCommands {
             if (sender instanceof Player) {
                 return WorldGuardPlugin.inst().checkPlayer(sender).getWorld();
             } else {
-                throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager().getLocale().commandExceptionNoSuchWorld);
+                throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager().getLocale("EX_NO_SUCH_WORLD"));
             }
         }
     }
@@ -123,12 +123,12 @@ public final class RegionCommands {
             throws CommandException {
         if (!ProtectedRegion.isValidId(id)) {
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionInvalidRegionId.replace("%regionId%", id));
+                    .getLocale("EX_INVALID_REGION_ID").replace("%regionId%", id));
         }
 
         if (!allowGlobal && id.equalsIgnoreCase("__global__")) { // Sorry, no global
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionNoGlobal);
+                    .getLocale("EX_NO_GLOBAL_HERE"));
         }
         
         return id;
@@ -163,7 +163,7 @@ public final class RegionCommands {
             }
             
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionNoSuchRegionId
+                    .getLocale("EX_NO_SUCH_REGION_ID")
                     .replace("%regionId%", id));
         }
         
@@ -211,11 +211,11 @@ public final class RegionCommands {
             if (allowGlobal) {
                  ProtectedRegion global = findExistingRegion(regionManager, "__global__", true);
                  player.sendMessage(BukkitUtil.replaceColorMacros(
-                         WorldGuardPlugin.inst().getGlobalStateManager().getLocale().regionNotStanding));
+                         WorldGuardPlugin.inst().getGlobalStateManager().getLocale("REGION_NOT_STANDING")));
                  return global;
             }
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionNotStanding);
+                    .getLocale("EX_REGION_NOT_STANDING"));
         } else if (set.size() > 1) {
             StringBuilder builder = new StringBuilder();
             boolean first = true;
@@ -229,7 +229,7 @@ public final class RegionCommands {
             }
             
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionStandingSeveral
+                    .getLocale("EX_REGION_STANDING_SEVERAL")
                     .replace("%regionList%", builder.toString()));
         }
         
@@ -250,7 +250,7 @@ public final class RegionCommands {
 
         if (selection == null) {
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionNoSelection);
+                    .getLocale("EX_NO_SELECTION"));
         }
         
         return selection;
@@ -281,7 +281,7 @@ public final class RegionCommands {
             return new ProtectedCuboidRegion(id, min, max);
         } else {
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionInvalidSelection);
+                    .getLocale("EX_INVALID_SELECTION"));
         }
     }
 
@@ -308,12 +308,12 @@ public final class RegionCommands {
         try {
             if (!silent && regionManager.getRegions().size() >= 500) {
                 sender.sendMessage(BukkitUtil.replaceColorMacros(
-                        WorldGuardPlugin.inst().getGlobalStateManager().getLocale().regionDbListSaving));
+                        WorldGuardPlugin.inst().getGlobalStateManager().getLocale("REGION_DB_LIST_SAVING")));
             }
             regionManager.save();
         } catch (ProtectionDatabaseException e) {
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionRegionSaving
+                    .getLocale("EX_REGION_SAVING")
                     .replace("%errorMessage%", e.getMessage()));
         }
     }
@@ -331,12 +331,12 @@ public final class RegionCommands {
         try {
             if (!silent && regionManager.getRegions().size() >= 500) {
                 sender.sendMessage(BukkitUtil.replaceColorMacros(
-                        WorldGuardPlugin.inst().getGlobalStateManager().getLocale().regionDbListLoading));
+                        WorldGuardPlugin.inst().getGlobalStateManager().getLocale("REGION_DB_LIST_LOADING")));
             }
             regionManager.load();
         } catch (ProtectionDatabaseException e) {
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionRegionLoading
+                    .getLocale("EX_REGION_LOADING")
                     .replace("%errorMessage%", e.getMessage()));
         }
     }
@@ -362,7 +362,7 @@ public final class RegionCommands {
             CuboidSelection selection = new CuboidSelection(world, pt1, pt2);
             worldEdit.setSelection(player, selection);
             player.sendMessage(BukkitUtil.replaceColorMacros(
-                    WorldGuardPlugin.inst().getGlobalStateManager().getLocale().regionSelectedCuboid));
+                    WorldGuardPlugin.inst().getGlobalStateManager().getLocale("REGION_SELECTED_CUBOID")));
             
         } else if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
@@ -372,15 +372,15 @@ public final class RegionCommands {
                     poly2d.getMaximumPoint().getBlockY() );
             worldEdit.setSelection(player, selection);
             player.sendMessage(BukkitUtil.replaceColorMacros(
-                    WorldGuardPlugin.inst().getGlobalStateManager().getLocale().regionSelectedPolygon));
+                    WorldGuardPlugin.inst().getGlobalStateManager().getLocale("REGION_SELECTED_POLYGON")));
             
         } else if (region instanceof GlobalProtectedRegion) {
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionGlobalSelection);
+                    .getLocale("EX_GLOBAL_SELECTION"));
             
         } else {
             throw new CommandException(WorldGuardPlugin.inst().getGlobalStateManager()
-                    .getLocale().commandExceptionUnknownRegionType
+                    .getLocale("EX_REGION_UNKNOWN_TYPE")
                     .replace("%regionType%", region.getClass().getCanonicalName()));
         }
     }
@@ -426,7 +426,7 @@ public final class RegionCommands {
         // Can't replace regions with this command
         RegionManager regionManager = plugin.getGlobalRegionManager().get(player.getWorld());
         if (regionManager.hasRegion(id)) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionRegionAlreadyDefined
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_REGION_ALREADY_DEFINED")
                     .replace("%regionId%", id));
         }
 
@@ -445,20 +445,20 @@ public final class RegionCommands {
         int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
         if (height <= 2) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().regionDefineHeightWarn
+                    plugin.getGlobalStateManager().getLocale("REGION_DEFINE_HEIGHT_WARN")
                     .replace("%regionHeight%", String.valueOf(height + 1))));
         }
 
         // Hint
         if (regionManager.getRegions().size() <= 2) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().regionDefineHint
+                    plugin.getGlobalStateManager().getLocale("REGION_DEFINE_HINT")
                     .replace("%regionId%", id)));
         }
         
         // Tell the user
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionDefineTell
+                plugin.getGlobalStateManager().getLocale("REGION_DEFINE_TELL")
                 .replace("%regionId%", id)));
     }
 
@@ -511,12 +511,12 @@ public final class RegionCommands {
         int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
         if (height <= 2) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().regionDefineHeightWarn
+                    plugin.getGlobalStateManager().getLocale("REGION_DEFINE_HEIGHT_WARN")
                     .replace("%regionHeight%", String.valueOf(height + 1))));
         }
         
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionRedefine
+                plugin.getGlobalStateManager().getLocale("REGION_REDEFINE")
                 .replace("%regionId%", id)));
     }
 
@@ -551,7 +551,7 @@ public final class RegionCommands {
         RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
         if (mgr.hasRegion(id)) {
             throw new CommandException(plugin.getGlobalStateManager()
-                    .getLocale().commandExceptionExistingRegion);
+                    .getLocale("EX_REGION_EXISTING"));
         }
 
         // Make a region from the user's selection
@@ -570,7 +570,7 @@ public final class RegionCommands {
             if (maxRegionCount >= 0
                     && mgr.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionClaimTooManyRegions);
+                        .getLocale("EX_CLAIM_TOO_MANY_REGIONS"));
             }
         }
 
@@ -580,7 +580,7 @@ public final class RegionCommands {
         if (existing != null) {
             if (!existing.getOwners().contains(localPlayer)) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionClaimExistingRegion);
+                        .getLocale("EX_CLAIM_EXISTING_REGION"));
             }
         }
 
@@ -591,12 +591,12 @@ public final class RegionCommands {
         if (regions.size() > 0) {
             if (!regions.isOwnerOfAll(localPlayer)) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionClaimOverlap);
+                        .getLocale("EX_CLAIM_OVERLAP_REGION"));
             }
         } else {
             if (wcfg.claimOnlyInsideExistingRegions) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionClaimInsideExistingRegion);
+                        .getLocale("EX_CLAIM_INSIDE_EXISTING_REGION"));
             }
         }
 
@@ -604,9 +604,9 @@ public final class RegionCommands {
         if (!permModel.mayClaimRegionsUnbounded()) {
             if (region.volume() > wcfg.maxClaimVolume) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().regionClaimTooLarge));
+                        plugin.getGlobalStateManager().getLocale("REGION_CLAIM_TOO_LARGE")));
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().regionClaimTooLargeHint
+                        plugin.getGlobalStateManager().getLocale("REGION_CLAIM_TOO_LARGE_HINT")
                         .replace("%maxClaimVolume%", String.valueOf(wcfg.maxClaimVolume))
                         .replace("%regionVolume%", String.valueOf(region.volume()))));
                 return;
@@ -641,7 +641,7 @@ public final class RegionCommands {
         mgr.addRegion(region);
         commitChanges(sender, mgr); // Save to disk
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionRedefine
+                plugin.getGlobalStateManager().getLocale("REGION_REDEFINE")
                 .replace("%regionId%", id)));
     }
 
@@ -701,7 +701,7 @@ public final class RegionCommands {
         if (args.argsLength() == 0) { // Get region from where the player is
             if (!(sender instanceof Player)) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionNoRegionSpecified);
+                        .getLocale("EX_NO_REGION_SPECIFIED"));
             }
             
             existing = findRegionStandingIn(regionManager, (Player) sender, true);
@@ -797,7 +797,7 @@ public final class RegionCommands {
         final int pages = (int) Math.ceil(totalSize / (float) pageSize);
 
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionList
+                plugin.getGlobalStateManager().getLocale("REGION_LIST")
                 .replace("%regionOwner%", ownedBy == null ? "" : "[" + ownedBy + "]")
                 .replace("%pageNumber%", String.valueOf(page + 1))
                 .replace("%pageCount%", String.valueOf(pages))));
@@ -865,10 +865,10 @@ public final class RegionCommands {
             }
 
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().regionFlagUnknown
+                    plugin.getGlobalStateManager().getLocale("REGION_FLAG_UNKNOWN")
                     .replace("%flagName%", flagName)));
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().regionFlagList
+                    plugin.getGlobalStateManager().getLocale("REGION_FLAG_LIST")
                     .replace("%flagList%", list)));
             
             return;
@@ -888,7 +888,7 @@ public final class RegionCommands {
             
             if (groupFlag == null) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionNoRegionGroupFlag
+                        .getLocale("EX_NO_REGION_GROUPFLAG")
                         .replace("%flagName%", foundFlag.getName()));
             }
 
@@ -912,7 +912,7 @@ public final class RegionCommands {
             }
 
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().regionFlagSet
+                    plugin.getGlobalStateManager().getLocale("REGION_FLAG_SET")
                     .replace("%flagName%", foundFlag.getName())
                     .replace("%regionId%", existing.getId())
                     .replace("%flagValue%", value)));
@@ -929,7 +929,7 @@ public final class RegionCommands {
             }
 
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().regionFlagRemoved
+                    plugin.getGlobalStateManager().getLocale("REGION_FLAG_REMOVED")
                     .replace("%flagName%", foundFlag.getName())
                     .replace("%regionId%", existing.getId())));
         }
@@ -942,12 +942,12 @@ public final class RegionCommands {
             if (groupValue == groupFlag.getDefault()) {
                 existing.setFlag(groupFlag, null);
                 sender.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().regionGroupFlagRemoved
+                        plugin.getGlobalStateManager().getLocale("REGION_GROUPFLAG_REMOVED")
                         .replace("%flagName%", foundFlag.getName())));
             } else {
                 existing.setFlag(groupFlag, groupValue);
                 sender.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().regionGroupFlagSet
+                        plugin.getGlobalStateManager().getLocale("REGION_GROUPFLAG_SET")
                         .replace("%flagName%", foundFlag.getName())));
             }
         }
@@ -994,7 +994,7 @@ public final class RegionCommands {
         commitChanges(sender, regionManager); // Save to disk
 
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionSetPriority
+                plugin.getGlobalStateManager().getLocale("REGION_SETPRIORITY")
                 .replace("%regionId%", existing.getId())
                 .replace("%priority%", String.valueOf(priority))));
     }
@@ -1095,7 +1095,7 @@ public final class RegionCommands {
         commitChanges(sender, regionManager); // Save to disk
 
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionRemove
+                plugin.getGlobalStateManager().getLocale("REGION_REMOVE")
                 .replace("%regionId%", existing.getId())));
     }
 
@@ -1127,13 +1127,13 @@ public final class RegionCommands {
             RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
             if (regionManager == null) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionNoRegionManager
+                        .getLocale("EX_NO_REGION_MANAGER")
                         .replace("%worldName%", world.getName()));
             }
             reloadChanges(sender, regionManager);
         } else {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().regionDbLoading));
+                    plugin.getGlobalStateManager().getLocale("REGION_DB_LOADING")));
             for (World w : plugin.getServer().getWorlds()) {
                 RegionManager regionManager = plugin.getGlobalRegionManager().get(w);
                 if (regionManager == null) {
@@ -1144,7 +1144,7 @@ public final class RegionCommands {
         }
 
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionDbLoaded));
+                plugin.getGlobalStateManager().getLocale("REGION_DB_LOADED")));
     }
 
     /**
@@ -1175,13 +1175,13 @@ public final class RegionCommands {
             RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
             if (regionManager == null) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionNoRegionManager
+                        .getLocale("EX_NO_REGION_MANAGER")
                         .replace("%worldName%", world.getName()));
             }
             commitChanges(sender, regionManager);
         } else {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().regionDbSaving));
+                    plugin.getGlobalStateManager().getLocale("REGION_DB_SAVING")));
             for (World w : plugin.getServer().getWorlds()) {
                 RegionManager regionManager = plugin.getGlobalRegionManager().get(w);
                 if (regionManager == null) {
@@ -1191,7 +1191,7 @@ public final class RegionCommands {
             }
         }
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionDbSaved));
+                plugin.getGlobalStateManager().getLocale("REGION_DB_SAVED")));
     }
 
     /**
@@ -1214,7 +1214,7 @@ public final class RegionCommands {
 
         if (from.equals(to)) {
             throw new CommandException(plugin.getGlobalStateManager()
-                    .getLocale().commandExceptionMigrateCommon);
+                    .getLocale("EX_MIGRATE_COMMON"));
         }
 
         Map<MigratorKey, Class<? extends AbstractDatabaseMigrator>> migrators =
@@ -1223,7 +1223,7 @@ public final class RegionCommands {
 
         if (!migrators.containsKey(key)) {
             throw new CommandException(plugin.getGlobalStateManager()
-                    .getLocale().commandExceptionNoMigratorFound);
+                    .getLocale("EX_NO_MIGRATOR_FOUND"));
         }
 
         long lastRequest = 10000000;
@@ -1235,7 +1235,7 @@ public final class RegionCommands {
             this.migrateDBRequestDate = new Date();
 
             throw new CommandException(plugin.getGlobalStateManager()
-                    .getLocale().commandExceptionMigrateWarn);
+                    .getLocale("EX_MIGRATE_WARN"));
         }
 
         Class<? extends AbstractDatabaseMigrator> cls = migrators.get(key);
@@ -1252,12 +1252,12 @@ public final class RegionCommands {
         } catch (NoSuchMethodException ignore) {
         } catch (MigrationException e) {
             throw new CommandException(plugin.getGlobalStateManager()
-                    .getLocale().commandExceptionMigrateError
+                    .getLocale("EX_MIGRATE_ERROR")
                     .replace("%errorMessage%", e.getMessage()));
         }
 
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionDbMigrated));
+                plugin.getGlobalStateManager().getLocale("REGION_DB_MIGRATED")));
     }
 
     /**
@@ -1292,20 +1292,20 @@ public final class RegionCommands {
             
             if (teleportLocation == null) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionNoRegionSpawn);
+                        .getLocale("EX_NO_REGION_SPAWN_POINT"));
             }
         } else {
             teleportLocation = existing.getFlag(DefaultFlag.TELE_LOC);
             
             if (teleportLocation == null) {
                 throw new CommandException(plugin.getGlobalStateManager()
-                        .getLocale().commandExceptionNoRegionTeleport);
+                        .getLocale("EX_NO_REGION_TELEPORT_POINT"));
             }
         }
 
         player.teleport(com.sk89q.worldedit.bukkit.BukkitUtil.toLocation(teleportLocation));
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionTeleport
+                plugin.getGlobalStateManager().getLocale("REGION_TELEPORT")
                 .replace("%regionId%", existing.getId())));
     }
 }

@@ -86,7 +86,7 @@ public class LocationFlag extends Flag<Location> {
                 }
             }
 
-            throw new InvalidFlagFormat(plugin.getGlobalStateManager().getLocale().commandExceptionInvalidFlagFormat);
+            throw new InvalidFlagFormat(plugin.getGlobalStateManager().getLocale("EX_INVALID_FLAG_FORMAT"));
         }
     }
 

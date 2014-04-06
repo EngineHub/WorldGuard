@@ -108,7 +108,7 @@ public class WorldGuardHangingListener implements Listener {
 
                 if (wcfg.useRegions) {
                     if (!plugin.getGlobalRegionManager().canBuild(player, hanging.getLocation())) {
-                        player.sendMessage(plugin.getGlobalStateManager().getLocale().hangingBreak);
+                        player.sendMessage(plugin.getGlobalStateManager().getLocale("HANGING_BREAK"));
                         event.setCancelled(true);
                         return;
                     }
@@ -179,7 +179,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getRelative(event.getBlockFace()))) {
-                player.sendMessage(plugin.getGlobalStateManager().getLocale().hangingPlace);
+                player.sendMessage(plugin.getGlobalStateManager().getLocale("HANGING_PLACE"));
                 event.setCancelled(true);
                 return;
             }
@@ -196,7 +196,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions && (entity instanceof ItemFrame || entity instanceof Painting)) {
             if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
-                player.sendMessage(plugin.getGlobalStateManager().getLocale().hangingEntityInteract);
+                player.sendMessage(plugin.getGlobalStateManager().getLocale("HANGING_ENTITY_INTERACT"));
                 event.setCancelled(true);
                 return;
             }

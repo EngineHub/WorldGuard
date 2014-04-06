@@ -181,7 +181,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
         if (!hasRemoteBypass && (!entryAllowed /*|| regionFull*/)) {
-            String message = /*maxPlayerMessage != null ? maxPlayerMessage :*/ plugin.getGlobalStateManager().getLocale().playerRegionCantEnter;
+            String message = /*maxPlayerMessage != null ? maxPlayerMessage :*/ plugin.getGlobalStateManager().getLocale("PLAYER_REGION_CANT_ENTER");
 
             player.sendMessage(BukkitUtil.replaceColorMacros(message));
             return true;
@@ -197,7 +197,7 @@ public class WorldGuardPlayerListener implements Listener {
         boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
         if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
             player.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().playerRegionCantLeave));
+                    plugin.getGlobalStateManager().getLocale("PLAYER_REGION_CANT_LEAVE")));
             return true;
         }
 
@@ -227,7 +227,7 @@ public class WorldGuardPlayerListener implements Listener {
         if ((notifyLeave == null || !notifyLeave)
                 && state.notifiedForLeave != null && state.notifiedForLeave) {
             plugin.broadcastNotification(BukkitUtil.replaceColorMacros(plugin.getGlobalStateManager()
-                    .getLocale().playerRegionNotifyLeave
+                    .getLocale("PLAYER_REGION_NOTIFY_LEAVE")
                     .replace("%playerName%", player.getName())));
         }
 
@@ -243,7 +243,7 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             plugin.broadcastNotification(BukkitUtil.replaceColorMacros(plugin.getGlobalStateManager()
-    		        .getLocale().playerRegionNotifyEnter
+    		        .getLocale("PLAYER_REGION_NOTIFY_ENTER")
     		        .replace("%playerName%", player.getName()))
                     .replace("%regionList%", regionList));
         }
@@ -329,7 +329,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (cfg.activityHaltToggle) {
             player.sendMessage(BukkitUtil.replaceColorMacros(
-                    cfg.getLocale().playerJoinActivityHalted));
+                    cfg.getLocale("PLAYER_JOIN_ACTIVITY_HALTED")));
 
             int removed = 0;
 
@@ -348,7 +348,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(BukkitUtil.replaceColorMacros(
-                    cfg.getLocale().playerJoinFirespreadDisabled));
+                    cfg.getLocale("PLAYER_JOIN_FIRESPREAD_DISABLED")));
         }
 
         if (!cfg.hasCommandBookGodMode() && cfg.autoGodMode && (plugin.inGroup(player, "wg-invincible")
@@ -377,7 +377,7 @@ public class WorldGuardPlayerListener implements Listener {
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SEND_CHAT, player.getLocation())) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().playerChatDeny));
+                        plugin.getGlobalStateManager().getLocale("PLAYER_CHAT_DENY")));
                 event.setCancelled(true);
                 return;
             }
@@ -511,7 +511,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(slot, null);
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        cfg.getLocale().playerInfiniteStackRemoved));
+                        cfg.getLocale("PLAYER_INFINITE_STACK_REMOVED")));
             }
         }
 
@@ -532,14 +532,14 @@ public class WorldGuardPlayerListener implements Listener {
                     if (plugin.hasPermission(player, "worldguard.override.potions")) {
                         if (potion.isSplash() && wcfg.blockPotionsAlways) {
                             player.sendMessage(BukkitUtil.replaceColorMacros(
-                                    cfg.getLocale().playerSplashDeny
+                                    cfg.getLocale("PLAYER_SPLASH_DENY")
                                     .replace("%potionEffect%", blockedEffect.getType().getName())));
                             event.setUseItemInHand(Result.DENY);
                             return;
                         }
                     } else {
                         player.sendMessage(BukkitUtil.replaceColorMacros(
-                                cfg.getLocale().playerSplashDeny
+                                cfg.getLocale("PLAYER_POTIONS_DENY")
                                 .replace("%potionEffect%", blockedEffect.getType().getName())));
                         event.setUseItemInHand(Result.DENY);
                         return;
@@ -600,7 +600,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (type == BlockID.DRAGON_EGG) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerMoveDragonEgg));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_MOVE_DRAGON_EGG")));
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -693,7 +693,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (heldItem != null && heldItem.getAmount() < 0) {
                     player.getInventory().setItem(slot, null);
                     player.sendMessage(BukkitUtil.replaceColorMacros(
-                            cfg.getLocale().playerInfiniteStackRemovedSlot
+                            cfg.getLocale("PLAYER_INFINITE_STACK_REMOVED_SLOT")
                             .replace("%slotNumber%", String.valueOf(slot))));
                 }
             }
@@ -709,10 +709,10 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (item.getTypeId() == wcfg.regionWand && plugin.hasPermission(player, "worldguard.region.wand")) {
                 if (set.size() > 0) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerWandCanYouBuild)
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_WAND_CAN_YOU_BUILD"))
                             + " " + (set.canBuild(localPlayer) ? 
-                                    BukkitUtil.replaceColorMacros(cfg.getLocale().playerWandCanBuildYes) : 
-                                    BukkitUtil.replaceColorMacros(cfg.getLocale().playerWandCanBuildNo)));
+                                    BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_WAND_CAN_BUILD_YES")) : 
+                                    BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_WAND_CAN_BUILD_NO"))));
 
                     StringBuilder str = new StringBuilder();
                     for (Iterator<ProtectedRegion> it = set.iterator(); it.hasNext();) {
@@ -723,11 +723,11 @@ public class WorldGuardPlayerListener implements Listener {
                     }
 
                     player.sendMessage(BukkitUtil.replaceColorMacros(
-                            cfg.getLocale().playerWandRegionList)
+                            cfg.getLocale("PLAYER_WAND_REGION_LIST"))
                                     .replace("%regionList%", str.toString()));
                 } else {
                     player.sendMessage(BukkitUtil.replaceColorMacros(
-                            cfg.getLocale().playerWandNoRegion));
+                            cfg.getLocale("PLAYER_WAND_NO_REGION")));
                 }
 
                 event.setCancelled(true);
@@ -760,7 +760,7 @@ public class WorldGuardPlayerListener implements Listener {
                         cancel = true;
                     }
                     if (cancel) {
-                        player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerPlaceStep));
+                        player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_PLACE_STEP")));
                         event.setCancelled(true);
                         return;
                     }
@@ -792,7 +792,7 @@ public class WorldGuardPlayerListener implements Listener {
                         && !mgr.getApplicableRegions(headLoc).canBuild(localPlayer)) {
                     // note that normal block placement is handled later, this is just a workaround
                     // for the location of the head block of the bed
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerPlaceBed));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_PLACE_BED")));
                     event.setCancelled(true);
                     return;
                 }
@@ -810,7 +810,7 @@ public class WorldGuardPlayerListener implements Listener {
                         && !placedInSet.canBuild(localPlayer)) {
                     // note that normal block placement is handled later, this is just a workaround
                     // for the location of the top block of the door
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerPlaceDoor));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_PLACE_DOOR")));
                     event.setCancelled(true);
                     return;
                 }
@@ -822,7 +822,7 @@ public class WorldGuardPlayerListener implements Listener {
                         && !placedInSet.allows(DefaultFlag.LIGHTER)) {
                     event.setCancelled(true);
                     event.setUseItemInHand(Result.DENY);
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerTryFire));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_TRY_FIRE")));
                     return;
                 }
             }
@@ -832,7 +832,7 @@ public class WorldGuardPlayerListener implements Listener {
                         && !set.canBuild(localPlayer)) {
                     event.setCancelled(true);
                     event.setUseItemInHand(Result.DENY);
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerPlaceEnderpearl));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_PLACE_ENDERPEARL")));
                     return;
                 }
             }
@@ -855,7 +855,7 @@ public class WorldGuardPlayerListener implements Listener {
                             && !set.canBuild(localPlayer)) {
                         event.setCancelled(true);
                         event.setUseItemInHand(Result.DENY);
-                        player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerUseBonemeal));
+                        player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_USE_BONEMEAL")));
                         return;
                     }
                 } else if (item.getData().getData() == 3) { // cocoa beans
@@ -865,7 +865,7 @@ public class WorldGuardPlayerListener implements Listener {
                         if (!(event.getBlockFace() == BlockFace.DOWN || event.getBlockFace() == BlockFace.UP)) {
                             event.setCancelled(true);
                             event.setUseItemInHand(Result.DENY);
-                            player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerUseCocoaBeans));
+                            player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_USE_COCOA_BEANS")));
                             return;
                         }
                     }
@@ -885,7 +885,7 @@ public class WorldGuardPlayerListener implements Listener {
                             && !set.canBuild(localPlayer)) {
                         event.setUseItemInHand(Result.DENY);
                         event.setCancelled(true);
-                        player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerPlacePlantFlowerPot));
+                        player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_PLACE_PLANT_FLOWERPOT")));
                         return;
                     }
                 }
@@ -894,7 +894,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (type == BlockID.BED) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.allows(DefaultFlag.SLEEP, localPlayer)) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerUseBed));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_USE_BED")));
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -913,7 +913,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.CHEST_ACCESS, localPlayer)) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerOpenContainer));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_OPEN_CONTAINER")));
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -923,7 +923,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (type == BlockID.DRAGON_EGG) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerMoveDragonEgg));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_MOVE_DRAGON_EGG")));
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -955,7 +955,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.USE, localPlayer)) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerUseEntityBlock));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_USE_ENTITY_BLOCK")));
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -969,7 +969,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)) {
                     // using build and not use because it can potentially damage a circuit and use is more general-purposed
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerUseRedstoneMechanism));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_USE_REDSTONE_MECHANISM")));
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -980,7 +980,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.USE, localPlayer)) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerUseCake));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_USE_CAKE")));
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -996,7 +996,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !placedInSet.canBuild(localPlayer)
                         && !placedInSet.allows(DefaultFlag.PLACE_VEHICLE, localPlayer)) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerPlaceMinecart));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_PLACE_MINECART")));
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -1007,7 +1007,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !placedInSet.canBuild(localPlayer)
                         && !placedInSet.allows(DefaultFlag.PLACE_VEHICLE, localPlayer)) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerPlaceBoat));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_PLACE_BOAT")));
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -1069,7 +1069,7 @@ public class WorldGuardPlayerListener implements Listener {
                 || type == BlockID.DROPPER)) {
 
             if (wcfg.isChestProtected(block, player)) {
-                player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerOpenProtectedChest));
+                player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_OPEN_PROTECTED_CHEST")));
                 event.setUseInteractedBlock(Result.DENY);
                 event.setCancelled(true);
                 return;
@@ -1244,7 +1244,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (!plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())
                     && !plugin.getGlobalRegionManager().allows(DefaultFlag.ITEM_DROP, player.getLocation())) {
                 event.setCancelled(true);
-                player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerDropItem));
+                player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_DROP_ITEM")));
             }
         }
 
@@ -1289,7 +1289,7 @@ public class WorldGuardPlayerListener implements Listener {
         if (!plugin.getGlobalRegionManager().canBuild(
                 player, event.getBlockClicked().getRelative(event.getBlockFace()))
                 && !(event.getItemStack().getTypeId() == ItemID.MILK_BUCKET)) {
-            player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerBucketFill));
+            player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_BUCKET_FILL")));
             event.setCancelled(true);
             return;
         }
@@ -1324,7 +1324,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (!plugin.getGlobalRegionManager().canBuild(
                 player, event.getBlockClicked().getRelative(event.getBlockFace()))) {
-            player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerBucketEmpty));
+            player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_BUCKET_EMPTY")));
             event.setCancelled(true);
             return;
         }
@@ -1374,7 +1374,7 @@ public class WorldGuardPlayerListener implements Listener {
             ItemStack heldItem = player.getInventory().getItem(newSlot);
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(newSlot, null);
-                player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerInfiniteStackRemoved));
+                player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_INFINITE_STACK_REMOVED")));
             }
         }
     }
@@ -1395,7 +1395,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (!plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())
                 && !set.allows(DefaultFlag.SLEEP, plugin.wrapPlayer(player))) {
                     event.setCancelled(true);
-                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerBedEnter));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_BED_ENTER")));
                     return;
             }
         }
@@ -1427,7 +1427,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
                         && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
                                 && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
-                    event.getPlayer().sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerTeleport));
+                    event.getPlayer().sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_TELEPORT")));
                     event.setCancelled(true);
                     return;
                 }
@@ -1530,7 +1530,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (!result.isEmpty()) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                		cfg.getLocale().playerBlockedCmd.replace("%cmd%", result)));
+                		cfg.getLocale("PLAYER_BLOCKED_CMD").replace("%cmd%", result)));
                 event.setCancelled(true);
                 return;
             }
@@ -1538,7 +1538,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (cfg.blockInGameOp) {
             if (opPattern.matcher(event.getMessage()).matches()) {
-                player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale().playerNoOp));
+                player.sendMessage(BukkitUtil.replaceColorMacros(cfg.getLocale("PLAYER_NO_OP")));
                 event.setCancelled(true);
                 return;
             }

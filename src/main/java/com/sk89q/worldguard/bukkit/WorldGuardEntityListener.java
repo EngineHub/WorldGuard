@@ -1005,8 +1005,8 @@ public class WorldGuardEntityListener implements Listener {
         final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
         plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
         if (!disallowedPVPEvent.isCancelled()) {
-            if (aggressorTriggered) attackingPlayer.sendMessage(plugin.getGlobalStateManager().getLocale().entityCancelPVP);
-            else attackingPlayer.sendMessage(plugin.getGlobalStateManager().getLocale().entityCancelPVPOthers);
+            if (aggressorTriggered) attackingPlayer.sendMessage(plugin.getGlobalStateManager().getLocale("ENTITY_CANCEL_PVP"));
+            else attackingPlayer.sendMessage(plugin.getGlobalStateManager().getLocale("ENTITY_CANCEL_PVP_OTHERS"));
             event.setCancelled(true);
         }
     }
@@ -1031,7 +1031,7 @@ public class WorldGuardEntityListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !mgr.getApplicableRegions(defender.getLocation())
                                 .canBuild(localPlayer)) {
-                    player.sendMessage(plugin.getGlobalStateManager().getLocale().entityItemFrameDestroy);
+                    player.sendMessage(plugin.getGlobalStateManager().getLocale("ENTITY_ITEM_FRAME_DESTROY"));
                     return true;
                 }
             } else {

@@ -67,13 +67,13 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(BukkitUtil.replaceColorMacros(config.getLocale().commandGodSelf));
+                player.sendMessage(BukkitUtil.replaceColorMacros(config.getLocale("COMMAND_GOD_SELF")));
                 
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        config.getLocale().commandGodOthers
+                        config.getLocale("COMMAND_GOD_OTHERS")
                         .replace("%playerName%", plugin.toName(sender))));
             }
         }
@@ -82,7 +82,7 @@ public class GeneralCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    config.getLocale().commandGodOthersNotification));
+                    config.getLocale("COMMAND_GOD_OTHERS_NOTIFICATION")));
         }
     }
     
@@ -114,13 +114,13 @@ public class GeneralCommands {
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        config.getLocale().commandUngodSelf));
+                        config.getLocale("COMMAND_UNGOD_SELF")));
                 
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        config.getLocale().commandUngodOthers
+                        config.getLocale("COMMAND_UNGOD_OTHERS")
                         .replace("%playerName%", plugin.toName(sender))));
             }
         }
@@ -129,7 +129,7 @@ public class GeneralCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    config.getLocale().commandUngodOthersNotification));
+                    config.getLocale("COMMAND_UNGOD_OTHERS_NOTIFICATION")));
         }
     }
     
@@ -159,13 +159,13 @@ public class GeneralCommands {
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().commandHealSelf));
+                        plugin.getGlobalStateManager().getLocale("COMMAND_HEAL_SELF")));
                 
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().commandHealOthers
+                        plugin.getGlobalStateManager().getLocale("COMMAND_HEAL_OTHERS")
                         .replace("%playerName%", plugin.toName(sender))));                
             }
         }
@@ -174,7 +174,7 @@ public class GeneralCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().commandHealOthersNotification));
+                    plugin.getGlobalStateManager().getLocale("COMMAND_HEAL_OTHERS_NOTIFICATION")));
         }
     }
     
@@ -203,13 +203,13 @@ public class GeneralCommands {
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().commandSlaySelf));
+                        plugin.getGlobalStateManager().getLocale("COMMAND_SLAY_SELF")));
                 
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale().commandSlayOthers
+                        plugin.getGlobalStateManager().getLocale("COMMAND_SLAY_OTHERS")
                         .replace("%playerName%", plugin.toName(sender))));                
             }
         }
@@ -218,7 +218,7 @@ public class GeneralCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().commandSlayOthersNotification));
+                    plugin.getGlobalStateManager().getLocale("COMMAND_SLAY_OTHERS_NOTIFICATION")));
         }
     }
     
@@ -232,13 +232,13 @@ public class GeneralCommands {
             player.setCompassTarget(player.getWorld().getSpawnLocation());
             
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().commandLocateSelf));
+                    plugin.getGlobalStateManager().getLocale("COMMAND_LOCATE_SELF")));
         } else {
             Player target = plugin.matchSinglePlayer(sender, args.getString(0));
             player.setCompassTarget(target.getLocation());
             
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale().commandLocateOthers));
+                    plugin.getGlobalStateManager().getLocale("COMMAND_LOCATE_OTHERS")));
         }
     }
     
@@ -310,6 +310,6 @@ public class GeneralCommands {
         }
 
         player.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().commandStackSelf));
+                plugin.getGlobalStateManager().getLocale("COMMAND_STACK")));
     }
 }

@@ -171,7 +171,7 @@
         <includes>
           <include>config.yml</include>
           <include>config_world.yml</include>
-          <include>locale_en.yml</include>
+          <include>locale_en.properties</include>
           <include>blacklist.txt</include>
         </includes>
       </resource>

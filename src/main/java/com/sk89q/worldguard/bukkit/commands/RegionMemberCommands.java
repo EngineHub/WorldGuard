@@ -64,7 +64,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoWorldSpecified);
+                throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_NO_WORLD_SPECIFIED"));
             }
         }
 
@@ -74,7 +74,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoSuchRegion);
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_NO_SUCH_REGION"));
         }
 
         id = region.getId();
@@ -92,13 +92,13 @@ public class RegionMemberCommands {
         RegionDBUtil.addToDomain(region.getMembers(), args.getParsedPaddedSlice(1, 0), 0);
 
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionUpdated
+                plugin.getGlobalStateManager().getLocale("REGION_UPDATED")
                 .replace("%regionId%", id)));
 
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoSuchRegion
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_FAILED_WRITE_REGIONS")
                     .replace("%errorMessage%", e.getMessage()));
         }
     }
@@ -122,7 +122,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoWorldSpecified);
+                throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_NO_WORLD_SPECIFIED"));
             }
         }
 
@@ -132,7 +132,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoSuchRegion);
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_NO_SUCH_REGION"));
         }
 
         id = region.getId();
@@ -145,7 +145,7 @@ public class RegionMemberCommands {
                     int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
                     if (maxRegionCount >= 0 && mgr.getRegionCountOfPlayer(localPlayer)
                             >= maxRegionCount) {
-                        throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionOwnMaxRegions);
+                        throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_OWN_MAX_REGIONS"));
                     }
                 }
                 plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
@@ -163,13 +163,13 @@ public class RegionMemberCommands {
         RegionDBUtil.addToDomain(region.getOwners(), args.getParsedPaddedSlice(1, 0), 0);
 
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionUpdated
+                plugin.getGlobalStateManager().getLocale("REGION_UPDATED")
                 .replace("%regionId%", id)));
 
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoSuchRegion
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_FAILED_WRITE_REGIONS")
                     .replace("%errorMessage%", e.getMessage()));
         }
     }
@@ -193,7 +193,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoWorldSpecified);
+                throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_NO_WORLD_SPECIFIED"));
             }
         }
 
@@ -203,7 +203,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoSuchRegion);
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_NO_SUCH_REGION"));
         }
 
         id = region.getId();
@@ -222,19 +222,19 @@ public class RegionMemberCommands {
             region.getMembers().removeAll();
         } else {
             if (args.argsLength() < 2) {
-                throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionRemoveWithoutName);
+                throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_REMOVE_WITHOUT_NAME"));
             }
             RegionDBUtil.removeFromDomain(region.getMembers(), args.getParsedPaddedSlice(1, 0), 0);
         }
 
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionUpdated
+                plugin.getGlobalStateManager().getLocale("REGION_UPDATED")
                 .replace("%regionId%", id)));
 
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoSuchRegion
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_FAILED_WRITE_REGIONS")
                     .replace("%errorMessage%", e.getMessage()));
         }
     }
@@ -259,7 +259,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoWorldSpecified);
+                throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_NO_WORLD_SPECIFIED"));
             }
         }
 
@@ -269,7 +269,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoSuchRegion);
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_NO_SUCH_REGION"));
         }
 
         id = region.getId();
@@ -288,19 +288,19 @@ public class RegionMemberCommands {
             region.getOwners().removeAll();
         } else {
             if (args.argsLength() < 2) {
-                throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionRemoveWithoutName);
+                throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_REMOVE_WITHOUT_NAME"));
             }
             RegionDBUtil.removeFromDomain(region.getOwners(), args.getParsedPaddedSlice(1, 0), 0);
         }
 
         sender.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale().regionUpdated
+                plugin.getGlobalStateManager().getLocale("REGION_UPDATED")
                 .replace("%regionId%", id)));
 
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException(plugin.getGlobalStateManager().getLocale().commandExceptionNoSuchRegion
+            throw new CommandException(plugin.getGlobalStateManager().getLocale("EX_FAILED_WRITE_REGIONS")
                     .replace("%errorMessage%", e.getMessage()));
         }
     }

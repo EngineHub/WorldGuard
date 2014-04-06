@@ -63,7 +63,7 @@ public class WorldGuardVehicleListener implements Listener {
                     && !set.canBuild(localPlayer)
                     && !set.allows(DefaultFlag.DESTROY_VEHICLE, localPlayer)) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        cfg.getLocale().vehicleDestroy));
+                        cfg.getLocale("VEHICLE_DESTROY")));
                 event.setCancelled(true);
                 return;
             }
