@@ -65,7 +65,7 @@ public class VectorFlag extends Flag<Vector> {
                 }
             }
 
-            throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
+            throw new InvalidFlagFormat(plugin.getGlobalStateManager().getLocale().commandExceptionInvalidFlagFormat);
         }
     }
 

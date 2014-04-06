@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -57,14 +56,13 @@ public class ToggleCommands {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(world);
 
         if (!wcfg.fireSpreadDisableToggle) {
-            plugin.getServer().broadcastMessage(
-                    ChatColor.YELLOW
-                    + "Fire spread has been globally disabled for '" + world.getName() + "' by "
-                    + plugin.toName(sender) + ".");
+            plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
+                    plugin.getGlobalStateManager().getLocale().commandStopFireBroadcast
+                            .replace("%worldName%", world.getName())
+                            .replace("%playerName%", plugin.toName(sender))));
         } else {
-            sender.sendMessage(
-                    ChatColor.YELLOW
-                    + "Fire spread was already globally disabled.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(
+                    plugin.getGlobalStateManager().getLocale().commandStopFireAlreadyDisabled));
         }
 
         wcfg.fireSpreadDisableToggle = true;
@@ -86,12 +84,13 @@ public class ToggleCommands {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "Fire spread has been globally for '" + world.getName() + "' re-enabled by "
-                    + plugin.toName(sender) + ".");
+            plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
+                    plugin.getGlobalStateManager().getLocale().commandAllowFireBroadcast
+                    .replace("%worldName%", world.getName())
+                    .replace("%playerName%", plugin.toName(sender))));
         } else {
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Fire spread was already globally enabled.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(
+                    plugin.getGlobalStateManager().getLocale().commandAllowFireAlreadyEnabled));
         }
 
         wcfg.fireSpreadDisableToggle = false;
@@ -108,13 +107,13 @@ public class ToggleCommands {
 
         if (configManager.activityHaltToggle) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.YELLOW
-                        + "ALL intensive server activity halted.");
+                sender.sendMessage(BukkitUtil.replaceColorMacros(
+                        configManager.getLocale().commandStopLagActivityHalted));
             }
 
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "ALL intensive server activity halted by "
-                    + plugin.toName(sender) + ".");
+            plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
+                    configManager.getLocale().commandStopLagActivityHaltedBroadcast
+                    .replace("%playerName%", plugin.toName(sender))));
 
             for (World world : plugin.getServer().getWorlds()) {
                 int removed = 0;
@@ -127,19 +126,21 @@ public class ToggleCommands {
                 }
 
                 if (removed > 10) {
-                    sender.sendMessage("" + removed + " entities (>10) auto-removed from "
-                            + world.getName());
+                    sender.sendMessage(BukkitUtil.replaceColorMacros(
+                            configManager.getLocale().commandStopLagEntitiesRemoved
+                                    .replace("%entitiesNumber%", String.valueOf(removed))
+                                    .replace("%worldName%", world.getName())));
                 }
             }
 
         } else {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.YELLOW
-                        + "ALL intensive server activity no longer halted.");
+                sender.sendMessage(BukkitUtil.replaceColorMacros(
+                        configManager.getLocale().commandStopLagActivityEnabled));
             }
 
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "ALL intensive server activity is now allowed.");
+            plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
+                    configManager.getLocale().commandStopLagActivityEnabledBroadcast));
         }
     }
 }

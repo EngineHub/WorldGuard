@@ -24,6 +24,7 @@ import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
+import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -82,6 +83,11 @@ public class ConfigurationManager {
     private YAMLProcessor config;
 
     /**
+     * The locale configuration 
+     */
+    private Locale locale;
+
+    /**
      * List of people with god mode.
      */
     @Deprecated
@@ -111,6 +117,11 @@ public class ConfigurationManager {
     public String sqlDsn;
     public String sqlUsername;
     public String sqlPassword;
+
+    /**
+     * Locale configuration
+     */
+    public String language;
 
     /**
      * Construct the object.
@@ -174,6 +185,16 @@ public class ConfigurationManager {
             get(world);
         }
 
+        // Load locale configuration
+        language = config.getString("language.locale", "en");
+        locale = new Locale(plugin, language);
+        try {
+            locale.load();
+        } catch (FatalConfigurationLoadingException e) {
+            e.printStackTrace();
+            plugin.getServer().shutdown();
+        }
+
         config.setHeader(CONFIG_HEADER);
 
         if (!config.save()) {
@@ -208,6 +229,15 @@ public class ConfigurationManager {
         }
 
         return config;
+    }
+
+    /**
+     * Get the locale configuration.
+     *
+     * @return locale configuration
+     */    
+    public Locale getLocale() {
+        return locale;
     }
 
     /**

@@ -22,7 +22,6 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Set;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -1006,8 +1005,8 @@ public class WorldGuardEntityListener implements Listener {
         final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
         plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
         if (!disallowedPVPEvent.isCancelled()) {
-            if (aggressorTriggered) attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-            else attackingPlayer.sendMessage(ChatColor.DARK_RED + "That player is in a no-PvP area.");
+            if (aggressorTriggered) attackingPlayer.sendMessage(plugin.getGlobalStateManager().getLocale().entityCancelPVP);
+            else attackingPlayer.sendMessage(plugin.getGlobalStateManager().getLocale().entityCancelPVPOthers);
             event.setCancelled(true);
         }
     }
@@ -1032,7 +1031,7 @@ public class WorldGuardEntityListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !mgr.getApplicableRegions(defender.getLocation())
                                 .canBuild(localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    player.sendMessage(plugin.getGlobalStateManager().getLocale().entityItemFrameDestroy);
                     return true;
                 }
             } else {

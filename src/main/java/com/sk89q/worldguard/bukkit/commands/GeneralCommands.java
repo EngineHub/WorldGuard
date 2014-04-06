@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +28,7 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
@@ -67,21 +67,22 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "God mode enabled! Use /ungod to disable.");
+                player.sendMessage(BukkitUtil.replaceColorMacros(config.getLocale().commandGodSelf));
                 
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "God enabled by "
-                        + plugin.toName(sender) + ".");
-                
+                player.sendMessage(BukkitUtil.replaceColorMacros(
+                        config.getLocale().commandGodOthers
+                        .replace("%playerName%", plugin.toName(sender))));
             }
         }
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players now have god mode.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(
+                    config.getLocale().commandGodOthersNotification));
         }
     }
     
@@ -112,21 +113,23 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "God mode disabled!");
+                player.sendMessage(BukkitUtil.replaceColorMacros(
+                        config.getLocale().commandUngodSelf));
                 
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "God disabled by "
-                        + plugin.toName(sender) + ".");
-                
+                player.sendMessage(BukkitUtil.replaceColorMacros(
+                        config.getLocale().commandUngodOthers
+                        .replace("%playerName%", plugin.toName(sender))));
             }
         }
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players no longer have god mode.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(
+                    config.getLocale().commandUngodOthersNotification));
         }
     }
     
@@ -155,21 +158,23 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Healed!");
+                player.sendMessage(BukkitUtil.replaceColorMacros(
+                        plugin.getGlobalStateManager().getLocale().commandHealSelf));
                 
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Healed by "
-                        + plugin.toName(sender) + ".");
-                
+                player.sendMessage(BukkitUtil.replaceColorMacros(
+                        plugin.getGlobalStateManager().getLocale().commandHealOthers
+                        .replace("%playerName%", plugin.toName(sender))));                
             }
         }
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(
+                    plugin.getGlobalStateManager().getLocale().commandHealOthersNotification));
         }
     }
     
@@ -197,21 +202,23 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Slain!");
+                player.sendMessage(BukkitUtil.replaceColorMacros(
+                        plugin.getGlobalStateManager().getLocale().commandSlaySelf));
                 
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Slain by "
-                        + plugin.toName(sender) + ".");
-                
+                player.sendMessage(BukkitUtil.replaceColorMacros(
+                        plugin.getGlobalStateManager().getLocale().commandSlayOthers
+                        .replace("%playerName%", plugin.toName(sender))));                
             }
         }
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(
+                    plugin.getGlobalStateManager().getLocale().commandSlayOthersNotification));
         }
     }
     
@@ -224,12 +231,14 @@ public class GeneralCommands {
         if (args.argsLength() == 0) {
             player.setCompassTarget(player.getWorld().getSpawnLocation());
             
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Compass reset to spawn.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(
+                    plugin.getGlobalStateManager().getLocale().commandLocateSelf));
         } else {
             Player target = plugin.matchSinglePlayer(sender, args.getString(0));
             player.setCompassTarget(target.getLocation());
             
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(
+                    plugin.getGlobalStateManager().getLocale().commandLocateOthers));
         }
     }
     
@@ -300,6 +309,7 @@ public class GeneralCommands {
             player.getInventory().setContents(items);
         }
 
-        player.sendMessage(ChatColor.YELLOW + "Items compacted into stacks!");
+        player.sendMessage(BukkitUtil.replaceColorMacros(
+                plugin.getGlobalStateManager().getLocale().commandStackSelf));
     }
 }

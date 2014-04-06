@@ -21,7 +21,6 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
@@ -109,7 +108,7 @@ public class WorldGuardHangingListener implements Listener {
 
                 if (wcfg.useRegions) {
                     if (!plugin.getGlobalRegionManager().canBuild(player, hanging.getLocation())) {
-                        player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                        player.sendMessage(plugin.getGlobalStateManager().getLocale().hangingBreak);
                         event.setCancelled(true);
                         return;
                     }
@@ -180,7 +179,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getRelative(event.getBlockFace()))) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(plugin.getGlobalStateManager().getLocale().hangingPlace);
                 event.setCancelled(true);
                 return;
             }
@@ -197,7 +196,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions && (entity instanceof ItemFrame || entity instanceof Painting)) {
             if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(plugin.getGlobalStateManager().getLocale().hangingEntityInteract);
                 event.setCancelled(true);
                 return;
             }

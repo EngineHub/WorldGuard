@@ -86,7 +86,7 @@ public class LocationFlag extends Flag<Location> {
                 }
             }
 
-            throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
+            throw new InvalidFlagFormat(plugin.getGlobalStateManager().getLocale().commandExceptionInvalidFlagFormat);
         }
     }
 
