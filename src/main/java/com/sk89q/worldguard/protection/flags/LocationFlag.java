@@ -33,6 +33,8 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
+
 /**
  *
  * @author sk89q
@@ -86,7 +88,7 @@ public class LocationFlag extends Flag<Location> {
                 }
             }
 
-            throw new InvalidFlagFormat(plugin.getGlobalStateManager().getLocale("EX_INVALID_FLAG_FORMAT"));
+            throw new InvalidFlagFormat(tr("ex.invalidFlagFormat"));
         }
     }
 

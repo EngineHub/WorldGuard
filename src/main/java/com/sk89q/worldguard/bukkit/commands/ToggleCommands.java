@@ -33,6 +33,8 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
+
 public class ToggleCommands {
     private final WorldGuardPlugin plugin;
 
@@ -57,12 +59,9 @@ public class ToggleCommands {
 
         if (!wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale("COMMAND_STOPFIRE_BROADCAST")
-                            .replace("%worldName%", world.getName())
-                            .replace("%playerName%", plugin.toName(sender))));
+                    tr("command.stopfire.broadcast", world.getName(), plugin.toName(sender))));
         } else {
-            sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale("COMMAND_STOPFIRE_ALREADY_DISABLED")));
+            sender.sendMessage(BukkitUtil.replaceColorMacros(tr("command.stopfire.alreadyDisabled")));
         }
 
         wcfg.fireSpreadDisableToggle = true;
@@ -85,12 +84,9 @@ public class ToggleCommands {
 
         if (wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale("COMMAND_ALLOWFIRE_BROADCAST")
-                    .replace("%worldName%", world.getName())
-                    .replace("%playerName%", plugin.toName(sender))));
+                    tr("command.allowfire.broadcast", world.getName(), plugin.toName(sender))));
         } else {
-            sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale("COMMAND_ALLOWFIRE_ALREADY_ENABLED")));
+            sender.sendMessage(BukkitUtil.replaceColorMacros(tr("command.allowfire.alreadyEnabled")));
         }
 
         wcfg.fireSpreadDisableToggle = false;
@@ -107,13 +103,11 @@ public class ToggleCommands {
 
         if (configManager.activityHaltToggle) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(BukkitUtil.replaceColorMacros(
-                        configManager.getLocale("COMMAND_STOPLAG_ACTIVITY_HALTED")));
+                sender.sendMessage(BukkitUtil.replaceColorMacros(tr("command.stoplag.activityHalted")));
             }
 
             plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
-                    configManager.getLocale("COMMAND_STOPLAG_ACTIVITY_HALTED_BROADCAST")
-                    .replace("%playerName%", plugin.toName(sender))));
+                    tr("command.stoplag.activityHalted.broadcast", plugin.toName(sender))));
 
             for (World world : plugin.getServer().getWorlds()) {
                 int removed = 0;
@@ -127,20 +121,17 @@ public class ToggleCommands {
 
                 if (removed > 10) {
                     sender.sendMessage(BukkitUtil.replaceColorMacros(
-                            configManager.getLocale("COMMAND_STOPLAG_ENTITIES_REMOVED")
-                                    .replace("%entitiesNumber%", String.valueOf(removed))
-                                    .replace("%worldName%", world.getName())));
+                            tr("command.stoplag.entitiesRemoved", removed, world.getName())));
                 }
             }
 
         } else {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(BukkitUtil.replaceColorMacros(
-                        configManager.getLocale("COMMAND_STOPLAG_ACTIVITY_ENABLED")));
+                sender.sendMessage(BukkitUtil.replaceColorMacros(tr("command.stoplag.activityEnabled")));
             }
 
             plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
-                    configManager.getLocale("COMMAND_STOPLAG_ACTIVITY_ENABLED_BROADCAST")));
+                    tr("command.stoplag.activityEnabled.broadcast")));
         }
     }
 }

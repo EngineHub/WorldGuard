@@ -24,7 +24,6 @@ import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -32,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -81,11 +81,6 @@ public class ConfigurationManager {
      * The global configuration for use when loading worlds
      */
     private YAMLProcessor config;
-
-    /**
-     * The locale configuration 
-     */
-    private Locale locale;
 
     /**
      * List of people with god mode.
@@ -187,13 +182,7 @@ public class ConfigurationManager {
 
         // Load locale configuration
         language = config.getString("language.locale", "en");
-        locale = new Locale(plugin, language);
-        try {
-            locale.load();
-        } catch (FatalConfigurationLoadingException e) {
-            e.printStackTrace();
-            plugin.getServer().shutdown();
-        }
+        LocaleManager.loadLocale(plugin, new Locale(language));
 
         config.setHeader(CONFIG_HEADER);
 
@@ -229,16 +218,6 @@ public class ConfigurationManager {
         }
 
         return config;
-    }
-
-    /**
-     * Get a locale string given an identifier.
-     *
-     * @param identifier The locale string identifier.
-     * @return locale string
-     */
-    public String getLocale(String identifier) {
-        return locale.get(identifier);
     }
 
     /**

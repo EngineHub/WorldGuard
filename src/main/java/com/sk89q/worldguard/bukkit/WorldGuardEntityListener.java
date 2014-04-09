@@ -81,6 +81,8 @@ import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
+
 /**
  * Listener for entity related events.
  *
@@ -1005,8 +1007,8 @@ public class WorldGuardEntityListener implements Listener {
         final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
         plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
         if (!disallowedPVPEvent.isCancelled()) {
-            if (aggressorTriggered) attackingPlayer.sendMessage(plugin.getGlobalStateManager().getLocale("ENTITY_CANCEL_PVP"));
-            else attackingPlayer.sendMessage(plugin.getGlobalStateManager().getLocale("ENTITY_CANCEL_PVP_OTHERS"));
+            if (aggressorTriggered) attackingPlayer.sendMessage(BukkitUtil.replaceColorMacros(tr("entity.cancelPVP")));
+            else attackingPlayer.sendMessage(BukkitUtil.replaceColorMacros(tr("entity.cancelPVPOthers")));
             event.setCancelled(true);
         }
     }
@@ -1031,7 +1033,7 @@ public class WorldGuardEntityListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !mgr.getApplicableRegions(defender.getLocation())
                                 .canBuild(localPlayer)) {
-                    player.sendMessage(plugin.getGlobalStateManager().getLocale("ENTITY_ITEM_FRAME_DESTROY"));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("entity.itemFrameDestroy")));
                     return true;
                 }
             } else {

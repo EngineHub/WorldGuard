@@ -21,6 +21,8 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
+
 public class WorldGuardVehicleListener implements Listener {
 
     private WorldGuardPlugin plugin;
@@ -62,8 +64,7 @@ public class WorldGuardVehicleListener implements Listener {
             if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                     && !set.canBuild(localPlayer)
                     && !set.allows(DefaultFlag.DESTROY_VEHICLE, localPlayer)) {
-                player.sendMessage(BukkitUtil.replaceColorMacros(
-                        cfg.getLocale("VEHICLE_DESTROY")));
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("vehicle.destroy")));
                 event.setCancelled(true);
                 return;
             }

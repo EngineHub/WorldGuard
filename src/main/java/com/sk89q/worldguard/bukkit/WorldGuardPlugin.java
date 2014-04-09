@@ -63,6 +63,8 @@ import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
+
 /**
  * The main class for WorldGuard as a Bukkit plugin.
  *
@@ -226,7 +228,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             commands.execute(cmd.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    configuration.getLocale("EX_PERMISSIONS")));
+                    tr("ex.permissions")));
         } catch (MissingNestedCommandException e) {
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (CommandUsageException e) {
@@ -235,10 +237,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         } catch (WrappedCommandException e) {
             if (e.getCause() instanceof NumberFormatException) {
                 sender.sendMessage(BukkitUtil.replaceColorMacros(
-                        configuration.getLocale("EX_NUMBERFORMAT")));
+                        tr("ex.numberformat")));
             } else {
                 sender.sendMessage(BukkitUtil.replaceColorMacros(
-                        configuration.getLocale("EX_OTHER")));
+                        tr("ex.other")));
                 e.printStackTrace();
             }
         } catch (CommandException e) {
@@ -403,7 +405,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         if (sender instanceof Player) {
             return (Player) sender;
         } else {
-            throw new CommandException(configuration.getLocale("EX_PLAYER_EXPECTED"));
+            throw new CommandException(tr("ex.playerExpected"));
         }
     }
 
@@ -476,7 +478,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             throws CommandException {
         // Check to see if there were any matches
         if (players.size() == 0) {
-            throw new CommandException(configuration.getLocale("EX_NO_SUCH_PLAYER"));
+            throw new CommandException(tr("ex.noSuchPlayer"));
         }
 
         return players;
@@ -501,7 +503,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             throws CommandException {
 
         if (getServer().getOnlinePlayers().length == 0) {
-            throw new CommandException(configuration.getLocale("EX_NO_SUCH_PLAYER"));
+            throw new CommandException(tr("ex.noSuchPlayer"));
         }
 
         if (filter.equals("*")) {
@@ -544,8 +546,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 return checkPlayerMatch(players);
 
             } else {
-                throw new CommandException(configuration.getLocale("EX_INVALID_GROUP")
-                        .replace("%groupFilter%", filter));
+                throw new CommandException(tr("ex.invalidGroup", filter));
             }
         }
 
@@ -574,7 +575,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         // players were found (we don't want to just pick off the first one,
         // as that may be the wrong player)
         if (players.hasNext()) {
-            throw new CommandException(configuration.getLocale("EX_TOO_MANY_PLAYERS"));
+            throw new CommandException(tr("ex.tooManyPlayers"));
         }
 
         return match;
@@ -646,7 +647,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     }
                 }
 
-                throw new CommandException(configuration.getLocale("EX_NO_NORMAL_WORLD"));
+                throw new CommandException(tr("ex.noNormalWorld"));
 
             // #nether for the first nether world
             } else if (filter.equalsIgnoreCase("#nether")) {
@@ -656,7 +657,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     }
                 }
 
-                throw new CommandException(configuration.getLocale("EX_NO_NETHER_WORLD"));
+                throw new CommandException(tr("ex.noNetherWorld"));
 
             // Handle getting a world from a player
             } else if (filter.matches("^#player$")) {
@@ -664,13 +665,12 @@ public class WorldGuardPlugin extends JavaPlugin {
 
                 // They didn't specify an argument for the player!
                 if (parts.length == 1) {
-                    throw new CommandException(configuration.getLocale("EX_PLAYER_ARGUMENT_EXPECTED"));
+                    throw new CommandException(tr("ex.playerArgumentExpected"));
                 }
 
                 return matchPlayers(sender, parts[1]).iterator().next().getWorld();
             } else {
-                throw new CommandException(configuration.getLocale("EX_INVALID_IDENTIFIER")
-                        .replace("%playerFilter%", filter));
+                throw new CommandException(tr("ex.invalidIdentifier", filter));
             }
         }
 
@@ -680,7 +680,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             }
         }
 
-        throw new CommandException(configuration.getLocale("EX_NO_SUCH_WORLD"));
+        throw new CommandException(tr("ex.noSuchWorld"));
     }
 
     /**
@@ -692,13 +692,13 @@ public class WorldGuardPlugin extends JavaPlugin {
     public WorldEditPlugin getWorldEdit() throws CommandException {
         Plugin worldEdit = getServer().getPluginManager().getPlugin("WorldEdit");
         if (worldEdit == null) {
-            throw new CommandException(configuration.getLocale("EX_WORLDEDIT_NOT_FOUND"));
+            throw new CommandException(tr("ex.worldEditNotFound"));
         }
 
         if (worldEdit instanceof WorldEditPlugin) {
             return (WorldEditPlugin) worldEdit;
         } else {
-            throw new CommandException(configuration.getLocale("EX_WORLDEDIT_DETECTION_FAILED"));
+            throw new CommandException(tr("ex.worldEditDetectionFailed"));
         }
     }
 

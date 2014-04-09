@@ -32,6 +32,8 @@ import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
+
 public class GeneralCommands {
     private final WorldGuardPlugin plugin;
 
@@ -67,14 +69,13 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(BukkitUtil.replaceColorMacros(config.getLocale("COMMAND_GOD_SELF")));
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("command.god.self")));
                 
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        config.getLocale("COMMAND_GOD_OTHERS")
-                        .replace("%playerName%", plugin.toName(sender))));
+                        tr("command.god.others", plugin.toName(sender))));
             }
         }
         
@@ -82,7 +83,7 @@ public class GeneralCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    config.getLocale("COMMAND_GOD_OTHERS_NOTIFICATION")));
+                    tr("command.god.others.self")));
         }
     }
     
@@ -114,14 +115,13 @@ public class GeneralCommands {
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        config.getLocale("COMMAND_UNGOD_SELF")));
+                        tr("command.ungod.self")));
                 
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        config.getLocale("COMMAND_UNGOD_OTHERS")
-                        .replace("%playerName%", plugin.toName(sender))));
+                        tr("command.ungod.others", plugin.toName(sender))));
             }
         }
         
@@ -129,7 +129,7 @@ public class GeneralCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    config.getLocale("COMMAND_UNGOD_OTHERS_NOTIFICATION")));
+                    tr("command.ungod.others.self")));
         }
     }
     
@@ -159,14 +159,13 @@ public class GeneralCommands {
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale("COMMAND_HEAL_SELF")));
+                        tr("command.heal.self")));
                 
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale("COMMAND_HEAL_OTHERS")
-                        .replace("%playerName%", plugin.toName(sender))));                
+                        tr("command.heal.others", plugin.toName(sender))));                
             }
         }
         
@@ -174,7 +173,7 @@ public class GeneralCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale("COMMAND_HEAL_OTHERS_NOTIFICATION")));
+                    tr("command.heal.others.self")));
         }
     }
     
@@ -203,14 +202,13 @@ public class GeneralCommands {
             // Tell the user
             if (player.equals(sender)) {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale("COMMAND_SLAY_SELF")));
+                        tr("command.slay.self")));
                 
                 // Keep track of this
                 included = true;
             } else {
                 player.sendMessage(BukkitUtil.replaceColorMacros(
-                        plugin.getGlobalStateManager().getLocale("COMMAND_SLAY_OTHERS")
-                        .replace("%playerName%", plugin.toName(sender))));                
+                        tr("command.slay.others", plugin.toName(sender))));                
             }
         }
         
@@ -218,7 +216,7 @@ public class GeneralCommands {
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale("COMMAND_SLAY_OTHERS_NOTIFICATION")));
+                    tr("command.slay.others.self")));
         }
     }
     
@@ -232,13 +230,13 @@ public class GeneralCommands {
             player.setCompassTarget(player.getWorld().getSpawnLocation());
             
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale("COMMAND_LOCATE_SELF")));
+                    tr("command.locate.self")));
         } else {
             Player target = plugin.matchSinglePlayer(sender, args.getString(0));
             player.setCompassTarget(target.getLocation());
             
             sender.sendMessage(BukkitUtil.replaceColorMacros(
-                    plugin.getGlobalStateManager().getLocale("COMMAND_LOCATE_OTHERS")));
+                    tr("command.locate.others")));
         }
     }
     
@@ -309,7 +307,6 @@ public class GeneralCommands {
             player.getInventory().setContents(items);
         }
 
-        player.sendMessage(BukkitUtil.replaceColorMacros(
-                plugin.getGlobalStateManager().getLocale("COMMAND_STACK")));
+        player.sendMessage(BukkitUtil.replaceColorMacros(tr("command.stack")));
     }
 }

@@ -46,6 +46,8 @@ import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
+
 /**
  * Listener for painting related events.
  *
@@ -108,7 +110,7 @@ public class WorldGuardHangingListener implements Listener {
 
                 if (wcfg.useRegions) {
                     if (!plugin.getGlobalRegionManager().canBuild(player, hanging.getLocation())) {
-                        player.sendMessage(plugin.getGlobalStateManager().getLocale("HANGING_BREAK"));
+                        player.sendMessage(BukkitUtil.replaceColorMacros(tr("hanging.break")));
                         event.setCancelled(true);
                         return;
                     }
@@ -179,7 +181,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getRelative(event.getBlockFace()))) {
-                player.sendMessage(plugin.getGlobalStateManager().getLocale("HANGING_PLACE"));
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("hanging.place")));
                 event.setCancelled(true);
                 return;
             }
@@ -196,7 +198,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions && (entity instanceof ItemFrame || entity instanceof Painting)) {
             if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
-                player.sendMessage(plugin.getGlobalStateManager().getLocale("HANGING_ENTITY_INTERACT"));
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("hanging.entityInteract")));
                 event.setCancelled(true);
                 return;
             }

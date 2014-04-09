@@ -64,6 +64,8 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
+
 /**
  * The listener for block events.
  *
@@ -87,16 +89,6 @@ public class WorldGuardBlockListener implements Listener {
      */
     public void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    }
-
-    /**
-     * Get a locale string given an identifier.
-     *
-     * @param identifier The locale string identifier.
-     * @return The locale string
-     */
-    protected String getLocale(String identifier) {
-        return plugin.getGlobalStateManager().getLocale(identifier);
     }
 
     /**
@@ -131,7 +123,7 @@ public class WorldGuardBlockListener implements Listener {
         // handle them a bit separately
         if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
-                player.sendMessage(BukkitUtil.replaceColorMacros(getLocale("PLAYER_USE_CAKE")));
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("player.use.cake")));
                 event.setCancelled(true);
                 return;
             }
@@ -158,7 +150,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
          || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
-            player.sendMessage(BukkitUtil.replaceColorMacros(getLocale("BLOCK_BREAK")));
+            player.sendMessage(BukkitUtil.replaceColorMacros(tr("block.break")));
             event.setCancelled(true);
             return;
         }
@@ -182,7 +174,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.isChestProtected(event.getBlock(), player)) {
-            player.sendMessage(BukkitUtil.replaceColorMacros(getLocale("BLOCK_BREAK_CHEST")));
+            player.sendMessage(BukkitUtil.replaceColorMacros(tr("block.breakChest")));
             event.setCancelled(true);
             return;
         }
@@ -516,7 +508,7 @@ public class WorldGuardBlockListener implements Listener {
             final Location location = blockPlaced.getLocation();
             if (!plugin.getGlobalRegionManager().canBuild(player, location)
              || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
-                player.sendMessage(BukkitUtil.replaceColorMacros(getLocale("BLOCK_PLACE")));
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("block.place")));
                 event.setCancelled(true);
                 return;
             }
@@ -533,7 +525,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getTypeId())) {
             if (wcfg.isAdjacentChestProtected(event.getBlock(), player)) {
-                player.sendMessage(BukkitUtil.replaceColorMacros(getLocale("BLOCK_PLACE_CHEST")));
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("block.placeChest")));
                 event.setCancelled(true);
                 return;
             }
@@ -598,16 +590,14 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 if (wcfg.isChestProtectedPlacement(event.getBlock(), player)) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(
-                            getLocale("SIGN_CHANGE_CHEST")));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.doNotOwnChest")));
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
                     return;
                 }
 
                 if (event.getBlock().getTypeId() != BlockID.SIGN_POST) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(
-                            getLocale("SIGN_CHANGE_NOT_POST")));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.notPost")));
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -615,8 +605,7 @@ public class WorldGuardBlockListener implements Listener {
                 }
 
                 if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(
-                            getLocale("SIGN_CHANGE_INVALID_SIGN")));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.invalid")));
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -627,8 +616,7 @@ public class WorldGuardBlockListener implements Listener {
 
                 if (below == BlockID.TNT || below == BlockID.SAND
                         || below == BlockID.GRAVEL || below == BlockID.SIGN_POST) {
-                    player.sendMessage(BukkitUtil.replaceColorMacros(
-                            getLocale("SIGN_CHANGE_UNSAFE_BLOCK")));
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.unsafeBlock")));
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -636,13 +624,11 @@ public class WorldGuardBlockListener implements Listener {
                 }
 
                 event.setLine(0, "[Lock]");
-                player.sendMessage(BukkitUtil.replaceColorMacros(
-                        getLocale("SIGN_CHANGE_CHEST_PROTECTED")));
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.chestProtected")));
             }
         } else if (!wcfg.disableSignChestProtectionCheck) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
-                player.sendMessage(BukkitUtil.replaceColorMacros(
-                        getLocale("SIGN_CHANGE_NO_CHEST_PROTECTION")));
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.noChestProtection")));
 
                 event.getBlock().breakNaturally();
                 event.setCancelled(true);
@@ -651,8 +637,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())) {
-            player.sendMessage(BukkitUtil.replaceColorMacros(
-                    getLocale("SIGN_CHANGE_CANT_BUILD")));
+            player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.cantBuild")));
             event.setCancelled(true);
             return;
         }
