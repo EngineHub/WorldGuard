@@ -82,8 +82,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             	throw new InvalidTableFormatException(
             			"region_storage_update_20110325.sql"
             		);
-            }
-            finally {
+            } finally {
                 closeResource(verTest);
             }
 
@@ -118,8 +117,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             // We havn't connected to the databases, or there was an error
             // initialising the world record, so there is no point continuing
             return;
-        }
-        finally {
+        } finally {
             closeResource(worldResult);
             closeResource(worldStmt);
             closeResource(insertWorldStatement);
@@ -198,8 +196,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                     "Unable to load flags for region "
                     + region.getId().toLowerCase() + ": " + ex.getMessage()
             );
-        }
-        finally {
+        } finally {
             closeResource(flagsResultSet);
             closeResource(flagsStatement);
         }
@@ -245,8 +242,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             }
         } catch (SQLException ex) {
             logger.warning("Unable to load users for region " + region.getId().toLowerCase() + ": " + ex.getMessage());
-        }
-        finally {
+        } finally {
             closeResource(userSet);
             closeResource(usersStatement);
         }
@@ -277,8 +273,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             }
         } catch (SQLException ex) {
             logger.warning("Unable to load groups for region " + region.getId().toLowerCase() + ": " + ex.getMessage());
-        }
-        finally {
+        } finally {
             closeResource(groupSet);
             closeResource(groupsStatement);
         }
@@ -333,8 +328,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 logger.warning("\t\tCause: " + t.getMessage());
                 t = t.getCause();
             }
-        }
-        finally {
+        } finally {
             closeResource(globalResultSet);
             closeResource(globalRegionStatement);
         }
@@ -414,8 +408,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 logger.warning("\t\tCause: " + t.getMessage());
                 t = t.getCause();
             }
-        }
-        finally {
+        } finally {
             closeResource(cuboidResultSet);
             closeResource(cuboidRegionStatement);
         }
@@ -500,8 +493,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 logger.warning("\t\tCause: " + t.getMessage());
                 t = t.getCause();
             }
-        }
-        finally {
+        } finally {
             closeResource(poly2dResultSet);
             closeResource(poly2dRegionStatement);
             closeResource(poly2dVectorStatement);
@@ -614,8 +606,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 logger.warning(t.getMessage());
                 t = t.getCause();
             }
-        }
-        finally {
+        } finally {
             closeResource(findUsersResults);
             closeResource(findUsersStatement);
             closeResource(insertUserStatement);
@@ -680,8 +671,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             }
         } catch (SQLException ex) {
             logger.warning("Could not get the database id for the groups " + groupnames.toString() + ex.getMessage());
-        }
-        finally {
+        } finally {
             closeResource(findGroupsResults);
             closeResource(findGroupsStatement);
             closeResource(insertGroupStatement);
@@ -732,8 +722,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             }
         } catch (SQLException ex) {
             logger.warning("Could not get region list for save comparison: " + ex.getMessage());
-        }
-        finally {
+        } finally {
             closeResource(getAllRegionsResult);
             closeResource(getAllRegionsStatement);
         }
@@ -790,8 +779,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             } catch (SQLException ex) {
                 logger.warning("Could not save region parents " + entry.getValue().getId().toLowerCase() + ": " + ex.getMessage());
                 throw new ProtectionDatabaseException(ex);
-            }
-            finally {
+            } finally {
                 closeResource(setParentStatement);
             }
         }
@@ -807,8 +795,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 removeRegion.execute();
             } catch (SQLException ex) {
                 logger.warning("Could not remove region from database " + name + ": " + ex.getMessage());
-            }
-            finally {
+            } finally {
                 closeResource(removeRegion);
             }
         }
