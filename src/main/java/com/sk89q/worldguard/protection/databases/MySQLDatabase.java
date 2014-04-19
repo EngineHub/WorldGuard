@@ -50,6 +50,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     private Yaml yaml;
 
     private Map<String, ProtectedRegion> regions;
+
     private Map<String, ProtectedRegion> cuboidRegions;
     private Map<String, ProtectedRegion> poly2dRegions;
     private Map<String, ProtectedRegion> globalRegions;
@@ -142,10 +143,11 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
     private void connect() throws SQLException {
     	if (conn != null) {
+            // Check if the connection is still alive/valid.
     		try {
     			conn.isValid(2);
     		} catch (SQLException ex) {
-                // Test if the dummy query failed because the connection is dead,
+                // Test if validation failed because the connection is dead,
                 // and if it is mark the connection as closed (the MySQL Driver
                 // does not ensure that the connection is marked as closed unless
                 // the close() method has been called.
