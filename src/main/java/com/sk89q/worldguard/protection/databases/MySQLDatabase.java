@@ -74,15 +74,15 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
             PreparedStatement verTest = null;
             try {
-            	// Test if the database is up to date, if not throw a critical error
+                // Test if the database is up to date, if not throw a critical error
                 verTest = this.conn.prepareStatement(
-            			"SELECT `world_id` FROM `region_cuboid` LIMIT 0,1;"
-            		);
-            	verTest.execute();
+                        "SELECT `world_id` FROM `region_cuboid` LIMIT 0,1;"
+                );
+                verTest.execute();
             } catch (SQLException ex) {
-            	throw new InvalidTableFormatException(
-            			"region_storage_update_20110325.sql"
-            		);
+                throw new InvalidTableFormatException(
+                        "region_storage_update_20110325.sql"
+                );
             } finally {
                 closeResource(verTest);
             }
@@ -142,20 +142,20 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     }
 
     private void connect() throws SQLException {
-    	if (conn != null) {
+        if (conn != null) {
             // Check if the connection is still alive/valid.
-    		try {
-    			conn.isValid(2);
-    		} catch (SQLException ex) {
+            try {
+                conn.isValid(2);
+            } catch (SQLException ex) {
                 // Test if validation failed because the connection is dead,
                 // and if it is mark the connection as closed (the MySQL Driver
                 // does not ensure that the connection is marked as closed unless
                 // the close() method has been called.
-    			if ("08S01".equals(ex.getSQLState())) {
-    				conn.close();
-    			}
-    		}
-    	}
+                if ("08S01".equals(ex.getSQLState())) {
+                    conn.close();
+                }
+            }
+        }
         if (conn == null || conn.isClosed()) {
             conn = DriverManager.getConnection(config.sqlDsn, config.sqlUsername, config.sqlPassword);
         }
@@ -1169,7 +1169,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
     public void setRegions(Map<String, ProtectedRegion> regions) {
         this.regions = regions;
     }
-    
+
     protected Object sqlUnmarshal(String rawValue) {
         try {
             return yaml.load(rawValue);
@@ -1177,7 +1177,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
             return String.valueOf(rawValue);
         }
     }
-    
+
     protected String sqlMarshal(Object rawObject) {
         return yaml.dump(rawObject);
     }
