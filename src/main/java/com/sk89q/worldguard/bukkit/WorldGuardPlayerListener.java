@@ -1483,8 +1483,8 @@ public class WorldGuardPlayerListener implements Listener {
                                 }
                             }
                         } else {
-                            // found non-matching part, stop checking
-                            break blocked;
+                            // found non-matching part, stop checking this command
+                            continue blocked;
                         }
                     }
                 }
