@@ -266,8 +266,9 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.disableObsidianGenerators && (isAir || isLava)
-                && blockTo.getTypeId() == 55) {
-            blockTo.setTypeId(0);
+                && (blockTo.getTypeId() == BlockID.REDSTONE_WIRE
+                    || blockTo.getTypeId() == BlockID.TRIPWIRE)) {
+            blockTo.setTypeId(BlockID.AIR);
             return;
         }
     }
