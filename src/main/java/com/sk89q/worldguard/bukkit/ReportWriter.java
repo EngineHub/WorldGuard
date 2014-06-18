@@ -122,9 +122,15 @@ public class ReportWriter {
         Class<? extends ConfigurationManager> cls = config.getClass();
         for (Field field : cls.getFields()) {
             try {
-                if (field.getName().equalsIgnoreCase("CONFIG_HEADER")) continue;
+                String name = field.getName();
+                // store these elsewhere maybe?
+                if (name.equals("CONFIG_HEADER")
+                    || name.equals("hostKeys")
+                    || name.equals("sqlPassword")) {
+                        continue;
+                }
                 Object val = field.get(config);
-                configLog.put(field.getName(), val);
+                configLog.put(name, val);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException ignore) {
