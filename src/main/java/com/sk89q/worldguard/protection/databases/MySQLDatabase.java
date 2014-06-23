@@ -433,6 +433,12 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                             poly2dVectorResultSet.getInt("z")
                     ));
                 }
+
+                if (points.size() < 3) {
+                    logger.warning(String.format("Invalid polygonal region '%s': region only has %d point(s). Ignoring.", id, points.size()));
+                    continue;
+                }
+
                 ProtectedRegion region = new ProtectedPolygonalRegion(id, points, minY, maxY);
 
                 region.setPriority(poly2dResultSet.getInt("priority"));
@@ -932,7 +938,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 ") VALUES (null, ?, " + this.worldDbId + ", ?, ?)"
         );
 
-        String lowerId = region.getId();
+        String lowerId = region.getId().toLowerCase();
         for (BlockVector2D point : region.getPoints()) {
             insertPoly2dPointStatement.setString(1, lowerId);
             insertPoly2dPointStatement.setInt(2, point.getBlockZ());
