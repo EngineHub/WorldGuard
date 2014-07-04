@@ -731,9 +731,15 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 PreparedStatement removeRegion = this.conn.prepareStatement(
                         "DELETE FROM `region` WHERE `id` = ? "
                 );
+                PreparedStatement removeCuboidRegion = this.conn.prepareStatement(
+                		"DELETE FROM `region_cuboid` WHERE `region_id` = ? "
+                );
 
                 removeRegion.setString(1, name);
+                removeCuboidRegion.setString(1, name);
+                
                 removeRegion.execute();
+                removeCuboidRegion.execute();
             } catch (SQLException ex) {
                 logger.warning("Could not remove region from database " + name + ": " + ex.getMessage());
             }
