@@ -740,6 +740,9 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                 
                 removeRegion.execute();
                 removeCuboidRegion.execute();
+                
+                removeRegion.close();
+                removeCuboidRegion.close();
             } catch (SQLException ex) {
                 logger.warning("Could not remove region from database " + name + ": " + ex.getMessage());
             }
