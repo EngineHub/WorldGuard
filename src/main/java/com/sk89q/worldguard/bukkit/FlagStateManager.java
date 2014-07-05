@@ -19,19 +19,18 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.GameMode;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import org.bukkit.GameMode;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * This processes per-player state information and is also meant to be used
@@ -182,10 +181,12 @@ public class FlagStateManager implements Runnable {
 
         if (feedDelay <= 0) {
             player.setFoodLevel(feedAmount > 0 ? maxHunger : minHunger);
+            player.setSaturation(player.getFoodLevel());
             state.lastFeed = now;
         } else if (now - state.lastFeed > feedDelay * 1000) {
             // clamp health between minimum and maximum
             player.setFoodLevel(Math.min(maxHunger, Math.max(minHunger, player.getFoodLevel() + feedAmount)));
+            player.setSaturation(player.getFoodLevel());
             state.lastFeed = now;
         }
     }
