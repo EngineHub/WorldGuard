@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,6 +27,7 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
@@ -35,6 +35,8 @@ import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
 
 // @TODO: A lot of code duplication here! Need to fix.
 
@@ -64,7 +66,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException("No world specified. Use -w <worldname>.");
+                throw new CommandException(tr("ex.noWorldSpecified"));
             }
         }
 
@@ -74,7 +76,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException(tr("ex.noSuchRegion"));
         }
 
         id = region.getId();
@@ -91,14 +93,12 @@ public class RegionMemberCommands {
 
         RegionDBUtil.addToDomain(region.getMembers(), args.getParsedPaddedSlice(1, 0), 0);
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+        sender.sendMessage(BukkitUtil.replaceColorMacros(tr("region.updated", id)));
 
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
-                    + e.getMessage());
+            throw new CommandException(tr("ex.failedWriteRegions", e.getMessage()));
         }
     }
 
@@ -121,7 +121,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException("No world specified. Use -w <worldname>.");
+                throw new CommandException(tr("ex.noWorldSpecified"));
             }
         }
 
@@ -131,7 +131,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException(tr("ex.noSuchRegion"));
         }
 
         id = region.getId();
@@ -144,7 +144,7 @@ public class RegionMemberCommands {
                     int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
                     if (maxRegionCount >= 0 && mgr.getRegionCountOfPlayer(localPlayer)
                             >= maxRegionCount) {
-                        throw new CommandException("You already own the maximum allowed amount of regions.");
+                        throw new CommandException(tr("ex.ownMaxRegions"));
                     }
                 }
                 plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
@@ -161,14 +161,12 @@ public class RegionMemberCommands {
 
         RegionDBUtil.addToDomain(region.getOwners(), args.getParsedPaddedSlice(1, 0), 0);
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+        sender.sendMessage(BukkitUtil.replaceColorMacros(tr("region.updated", id)));
 
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
-                    + e.getMessage());
+            throw new CommandException(tr("ex.failedWriteRegions", e.getMessage()));
         }
     }
 
@@ -191,7 +189,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException("No world specified. Use -w <worldname>.");
+                throw new CommandException(tr("ex.noWorldSpecified"));
             }
         }
 
@@ -201,7 +199,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException(tr("ex.noSuchRegion"));
         }
 
         id = region.getId();
@@ -220,19 +218,17 @@ public class RegionMemberCommands {
             region.getMembers().removeAll();
         } else {
             if (args.argsLength() < 2) {
-                throw new CommandException("List some names to remove, or use -a to remove all.");
+                throw new CommandException(tr("ex.removeWithoutName"));
             }
             RegionDBUtil.removeFromDomain(region.getMembers(), args.getParsedPaddedSlice(1, 0), 0);
         }
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+        sender.sendMessage(BukkitUtil.replaceColorMacros(tr("region.updated", id)));
 
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
-                    + e.getMessage());
+            throw new CommandException(tr("ex.failedWriteRegions", e.getMessage()));
         }
     }
 
@@ -256,7 +252,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException("No world specified. Use -w <worldname>.");
+                throw new CommandException(tr("ex.noWorldSpecified"));
             }
         }
 
@@ -266,7 +262,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException(tr("ex.noSuchRegion"));
         }
 
         id = region.getId();
@@ -285,19 +281,17 @@ public class RegionMemberCommands {
             region.getOwners().removeAll();
         } else {
             if (args.argsLength() < 2) {
-                throw new CommandException("List some names to remove, or use -a to remove all.");
+                throw new CommandException(tr("ex.removeWithoutName"));
             }
             RegionDBUtil.removeFromDomain(region.getOwners(), args.getParsedPaddedSlice(1, 0), 0);
         }
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+        sender.sendMessage(BukkitUtil.replaceColorMacros(tr("region.updated", id)));
 
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
-                    + e.getMessage());
+            throw new CommandException(tr("ex.failedWriteRegions", e.getMessage()));
         }
     }
 }

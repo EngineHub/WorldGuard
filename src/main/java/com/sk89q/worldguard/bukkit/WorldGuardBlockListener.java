@@ -20,7 +20,6 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -64,6 +63,8 @@ import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
 
 /**
  * The listener for block events.
@@ -122,7 +123,7 @@ public class WorldGuardBlockListener implements Listener {
         // handle them a bit separately
         if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
-                player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("player.use.cake")));
                 event.setCancelled(true);
                 return;
             }
@@ -149,7 +150,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
          || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            player.sendMessage(BukkitUtil.replaceColorMacros(tr("block.break")));
             event.setCancelled(true);
             return;
         }
@@ -173,7 +174,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.isChestProtected(event.getBlock(), player)) {
-            player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
+            player.sendMessage(BukkitUtil.replaceColorMacros(tr("block.breakChest")));
             event.setCancelled(true);
             return;
         }
@@ -508,7 +509,7 @@ public class WorldGuardBlockListener implements Listener {
             final Location location = blockPlaced.getLocation();
             if (!plugin.getGlobalRegionManager().canBuild(player, location)
              || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("block.place")));
                 event.setCancelled(true);
                 return;
             }
@@ -525,7 +526,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getTypeId())) {
             if (wcfg.isAdjacentChestProtected(event.getBlock(), player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("block.placeChest")));
                 event.setCancelled(true);
                 return;
             }
@@ -590,15 +591,14 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 if (wcfg.isChestProtectedPlacement(event.getBlock(), player)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You do not own the adjacent chest.");
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.doNotOwnChest")));
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
                     return;
                 }
 
                 if (event.getBlock().getTypeId() != BlockID.SIGN_POST) {
-                    player.sendMessage(ChatColor.RED
-                            + "The [Lock] sign must be a sign post, not a wall sign.");
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.notPost")));
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -606,8 +606,7 @@ public class WorldGuardBlockListener implements Listener {
                 }
 
                 if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
-                    player.sendMessage(ChatColor.RED
-                            + "The first owner line must be your name.");
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.invalid")));
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -618,8 +617,7 @@ public class WorldGuardBlockListener implements Listener {
 
                 if (below == BlockID.TNT || below == BlockID.SAND
                         || below == BlockID.GRAVEL || below == BlockID.SIGN_POST) {
-                    player.sendMessage(ChatColor.RED
-                            + "That is not a safe block that you're putting this sign on.");
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.unsafeBlock")));
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -627,13 +625,11 @@ public class WorldGuardBlockListener implements Listener {
                 }
 
                 event.setLine(0, "[Lock]");
-                player.sendMessage(ChatColor.YELLOW
-                        + "A chest or double chest above is now protected.");
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.chestProtected")));
             }
         } else if (!wcfg.disableSignChestProtectionCheck) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
-                player.sendMessage(ChatColor.RED
-                        + "WorldGuard's sign chest protection is disabled.");
+                player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.noChestProtection")));
 
                 event.getBlock().breakNaturally();
                 event.setCancelled(true);
@@ -642,7 +638,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            player.sendMessage(BukkitUtil.replaceColorMacros(tr("sign.cantBuild")));
             event.setCancelled(true);
             return;
         }

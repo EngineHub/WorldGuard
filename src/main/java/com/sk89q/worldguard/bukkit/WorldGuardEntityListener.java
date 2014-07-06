@@ -22,7 +22,6 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 import java.util.Set;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -81,6 +80,8 @@ import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
 
 /**
  * Listener for entity related events.
@@ -1006,8 +1007,8 @@ public class WorldGuardEntityListener implements Listener {
         final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
         plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
         if (!disallowedPVPEvent.isCancelled()) {
-            if (aggressorTriggered) attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-            else attackingPlayer.sendMessage(ChatColor.DARK_RED + "That player is in a no-PvP area.");
+            if (aggressorTriggered) attackingPlayer.sendMessage(BukkitUtil.replaceColorMacros(tr("entity.cancelPVP")));
+            else attackingPlayer.sendMessage(BukkitUtil.replaceColorMacros(tr("entity.cancelPVPOthers")));
             event.setCancelled(true);
         }
     }
@@ -1032,7 +1033,7 @@ public class WorldGuardEntityListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !mgr.getApplicableRegions(defender.getLocation())
                                 .canBuild(localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    player.sendMessage(BukkitUtil.replaceColorMacros(tr("entity.itemFrameDestroy")));
                     return true;
                 }
             } else {

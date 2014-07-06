@@ -28,6 +28,8 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
+
 /**
  *
  * @author sk89q
@@ -65,7 +67,7 @@ public class VectorFlag extends Flag<Vector> {
                 }
             }
 
-            throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
+            throw new InvalidFlagFormat(tr("ex.invalidFlagFormat"));
         }
     }
 

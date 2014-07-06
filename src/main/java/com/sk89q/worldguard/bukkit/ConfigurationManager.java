@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -114,6 +115,11 @@ public class ConfigurationManager {
     public String sqlTablePrefix;
 
     /**
+     * Locale configuration
+     */
+    public String language;
+
+    /**
      * Construct the object.
      *
      * @param plugin The plugin instance
@@ -175,6 +181,10 @@ public class ConfigurationManager {
         for (World world : plugin.getServer().getWorlds()) {
             get(world);
         }
+
+        // Load locale configuration
+        language = config.getString("language.locale", "en");
+        LocaleManager.loadLocale(plugin, new Locale(language));
 
         config.setHeader(CONFIG_HEADER);
 

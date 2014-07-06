@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -33,6 +32,8 @@ import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
+import static com.sk89q.worldguard.bukkit.LocaleManager.tr;
 
 public class ToggleCommands {
     private final WorldGuardPlugin plugin;
@@ -57,14 +58,10 @@ public class ToggleCommands {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(world);
 
         if (!wcfg.fireSpreadDisableToggle) {
-            plugin.getServer().broadcastMessage(
-                    ChatColor.YELLOW
-                    + "Fire spread has been globally disabled for '" + world.getName() + "' by "
-                    + plugin.toName(sender) + ".");
+            plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
+                    tr("command.stopfire.broadcast", world.getName(), plugin.toName(sender))));
         } else {
-            sender.sendMessage(
-                    ChatColor.YELLOW
-                    + "Fire spread was already globally disabled.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(tr("command.stopfire.alreadyDisabled")));
         }
 
         wcfg.fireSpreadDisableToggle = true;
@@ -86,12 +83,10 @@ public class ToggleCommands {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "Fire spread has been globally for '" + world.getName() + "' re-enabled by "
-                    + plugin.toName(sender) + ".");
+            plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
+                    tr("command.allowfire.broadcast", world.getName(), plugin.toName(sender))));
         } else {
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Fire spread was already globally enabled.");
+            sender.sendMessage(BukkitUtil.replaceColorMacros(tr("command.allowfire.alreadyEnabled")));
         }
 
         wcfg.fireSpreadDisableToggle = false;
@@ -108,13 +103,11 @@ public class ToggleCommands {
 
         if (configManager.activityHaltToggle) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.YELLOW
-                        + "ALL intensive server activity halted.");
+                sender.sendMessage(BukkitUtil.replaceColorMacros(tr("command.stoplag.activityHalted")));
             }
 
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "ALL intensive server activity halted by "
-                    + plugin.toName(sender) + ".");
+            plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
+                    tr("command.stoplag.activityHalted.broadcast", plugin.toName(sender))));
 
             for (World world : plugin.getServer().getWorlds()) {
                 int removed = 0;
@@ -127,19 +120,18 @@ public class ToggleCommands {
                 }
 
                 if (removed > 10) {
-                    sender.sendMessage("" + removed + " entities (>10) auto-removed from "
-                            + world.getName());
+                    sender.sendMessage(BukkitUtil.replaceColorMacros(
+                            tr("command.stoplag.entitiesRemoved", removed, world.getName())));
                 }
             }
 
         } else {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.YELLOW
-                        + "ALL intensive server activity no longer halted.");
+                sender.sendMessage(BukkitUtil.replaceColorMacros(tr("command.stoplag.activityEnabled")));
             }
 
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "ALL intensive server activity is now allowed.");
+            plugin.getServer().broadcastMessage(BukkitUtil.replaceColorMacros(
+                    tr("command.stoplag.activityEnabled.broadcast")));
         }
     }
 }
