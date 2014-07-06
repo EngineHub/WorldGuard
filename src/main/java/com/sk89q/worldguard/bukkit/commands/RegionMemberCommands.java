@@ -45,7 +45,7 @@ public class RegionMemberCommands {
         this.plugin = plugin;
     }
 
-    @Command(aliases = {"addmember", "addmember"},
+    @Command(aliases = {"addmember", "addmember", "addmem", "am"},
             usage = "<id> <members...>",
             flags = "w:",
             desc = "Add a member to a region",
@@ -102,7 +102,7 @@ public class RegionMemberCommands {
         }
     }
 
-    @Command(aliases = {"addowner", "addowner"},
+    @Command(aliases = {"addowner", "addowner", "ao"},
             usage = "<id> <owners...>",
             flags = "w:",
             desc = "Add an owner to a region",
@@ -172,7 +172,7 @@ public class RegionMemberCommands {
         }
     }
 
-    @Command(aliases = {"removemember", "remmember", "removemem", "remmem"},
+    @Command(aliases = {"removemember", "remmember", "removemem", "remmem", "rm"},
             usage = "<id> <owners...>",
             flags = "aw:",
             desc = "Remove an owner to a region",
@@ -236,7 +236,7 @@ public class RegionMemberCommands {
         }
     }
 
-    @Command(aliases = {"removeowner", "remowner"},
+    @Command(aliases = {"removeowner", "remowner", "ro"},
             usage = "<id> <owners...>",
             flags = "aw:",
             desc = "Remove an owner to a region",
