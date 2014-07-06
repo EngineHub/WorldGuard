@@ -111,6 +111,7 @@ public class ConfigurationManager {
     public String sqlDsn;
     public String sqlUsername;
     public String sqlPassword;
+    public String sqlTablePrefix;
 
     /**
      * Construct the object.
@@ -168,6 +169,7 @@ public class ConfigurationManager {
         sqlDsn = config.getString("regions.sql.dsn", "jdbc:mysql://localhost/worldguard");
         sqlUsername = config.getString("regions.sql.username", "worldguard");
         sqlPassword = config.getString("regions.sql.password", "worldguard");
+        sqlTablePrefix = config.getString("regions.sql.table-prefix", "");
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
