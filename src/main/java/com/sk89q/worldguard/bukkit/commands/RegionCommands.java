@@ -1270,4 +1270,150 @@ public final class RegionCommands {
         player.teleport(BukkitUtil.toLocation(teleportLocation));
         sender.sendMessage("Teleported you to the region '" + existing.getId() + "'.");
     }
+
+    /**
+     * Add member(s) to a region
+     * 
+     * @param args the arguments
+     * @param sender the sender
+     * @throws CommandException any error
+     */
+    @Command(aliases = {"addmember", "addmember"},
+            usage = "<id> <members...>",
+            flags = "w:",
+            desc = "Add a member to a region",
+            min = 2)
+    public void addMember(CommandContext args, CommandSender sender) throws CommandException {
+        World world = getWorld(args, sender, 'w'); // Get the world
+
+        // Lookup the existing region
+        RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion existing = findExistingRegion(regionManager,
+                args.getString(0), false);
+
+        // Check permissions
+        if (!getPermissionModel(sender).mayAddMember(existing)) {
+            throw new CommandPermissionsException();
+        }
+
+        RegionDBUtil.addToDomain(existing.getMembers(), args.getPaddedSlice(2, 0), 0);
+
+        sender.sendMessage(ChatColor.YELLOW
+                + "Region '" + existing.getId() + "' updated.");
+
+        commitChanges(sender, regionManager); // Save to disk
+    }
+
+    /**
+     * Add owner(s) to a region
+     * 
+     * @param args the arguments
+     * @param sender the sender
+     * @throws CommandException any error
+     */
+    @Command(aliases = {"addowner", "addowner"},
+            usage = "<id> <owners...>",
+            flags = "w:",
+            desc = "Add an owner to a region",
+            min = 2)
+    public void addOwner(CommandContext args, CommandSender sender) throws CommandException {
+        World world = getWorld(args, sender, 'w'); // Get the world
+
+        // Lookup the existing region
+        RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion existing = findExistingRegion(regionManager,
+                args.getString(0), false);
+
+        // Check permissions
+        if (!getPermissionModel(sender).mayAddOwner(existing)) {
+            throw new CommandPermissionsException();
+        }
+
+        RegionDBUtil.addToDomain(existing.getOwners(), args.getPaddedSlice(2, 0), 0);
+
+        sender.sendMessage(ChatColor.YELLOW
+                + "Region '" + existing.getId() + "' updated.");
+
+        commitChanges(sender, regionManager); // Save to disk
+    }
+
+    /**
+     * Remove member(s) from a region
+     * 
+     * @param args the arguments
+     * @param sender the sender
+     * @throws CommandException any error
+     */
+    @Command(aliases = {"removemember", "remmember", "removemem", "remmem"},
+            usage = "<id> <members...>",
+            flags = "aw:",
+            desc = "Remove a member from a region",
+            min = 1)
+    public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
+        World world = getWorld(args, sender, 'w'); // Get the world
+
+        // Lookup the existing region
+        RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion existing = findExistingRegion(regionManager,
+                args.getString(0), false);
+
+        // Check permissions
+        if (!getPermissionModel(sender).mayRemoveMember(existing)) {
+            throw new CommandPermissionsException();
+        }
+
+        if (args.hasFlag('a')) {
+            existing.getMembers().removeAll();
+        } else {
+            if (args.argsLength() < 2) {
+                throw new CommandException("List some names to remove, or use -a to remove all.");
+            }
+            RegionDBUtil.removeFromDomain(existing.getMembers(), args.getPaddedSlice(2, 0), 0);
+        }
+
+        sender.sendMessage(ChatColor.YELLOW
+                + "Region '" + existing.getId() + "' updated.");
+
+        commitChanges(sender, regionManager); // Save to disk
+    }
+
+    /**
+     * Remove owner(s) from a region
+     * 
+     * @param args the arguments
+     * @param sender the sender
+     * @throws CommandException any error
+     */
+    @Command(aliases = {"removeowner", "remowner"},
+            usage = "<id> <owners...>",
+            flags = "aw:",
+            desc = "Remove an owner from a region",
+            min = 1)
+    public void removeOwner(CommandContext args, CommandSender sender) throws CommandException {
+        World world = getWorld(args, sender, 'w'); // Get the world
+
+        // Lookup the existing region
+        RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion existing = findExistingRegion(regionManager,
+                args.getString(0), false);
+
+        // Check permissions
+        if (!getPermissionModel(sender).mayRemoveOwner(existing)) {
+            throw new CommandPermissionsException();
+        }
+
+        if (args.hasFlag('a')) {
+            existing.getOwners().removeAll();
+        } else {
+            if (args.argsLength() < 2) {
+                throw new CommandException("List some names to remove, or use -a to remove all.");
+            }
+            RegionDBUtil.removeFromDomain(existing.getOwners(), args.getPaddedSlice(2, 0), 0);
+        }
+
+        sender.sendMessage(ChatColor.YELLOW
+                + "Region '" + existing.getId() + "' updated.");
+
+        commitChanges(sender, regionManager); // Save to disk
+    }
 }
