@@ -52,6 +52,7 @@ import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 import com.sk89q.worldguard.protection.databases.migrators.AbstractDatabaseMigrator;
 import com.sk89q.worldguard.protection.databases.migrators.MigrationException;
 import com.sk89q.worldguard.protection.databases.migrators.MigratorKey;
+import com.sk89q.worldguard.protection.flags.AllFlags;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
@@ -830,7 +831,7 @@ public final class RegionCommands {
             throw new CommandPermissionsException();
         }
 
-        Flag<?> foundFlag = DefaultFlag.fuzzyMatchFlag(flagName);
+        Flag<?> foundFlag = AllFlags.fuzzyMatchFlag(flagName);
 
         // We didn't find the flag, so let's print a list of flags that the user
         // can use, and do nothing afterwards
@@ -838,7 +839,7 @@ public final class RegionCommands {
             StringBuilder list = new StringBuilder();
 
             // Need to build a list
-            for (Flag<?> flag : DefaultFlag.getFlags()) {
+            for (Flag<?> flag : AllFlags.getFlags()) {
                 // Can the user set this flag?
                 if (!permModel.maySetFlag(existing, flag)) {
                     continue;

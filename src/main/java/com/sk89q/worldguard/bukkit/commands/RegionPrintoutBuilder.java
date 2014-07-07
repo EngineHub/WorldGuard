@@ -27,7 +27,7 @@ import org.bukkit.command.CommandSender;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.AllFlags;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -98,7 +98,7 @@ public class RegionPrintoutBuilder {
     public void appendFlagsList(boolean useColors) {
         boolean hasFlags = false;
         
-        for (Flag<?> flag : DefaultFlag.getFlags()) {
+        for (Flag<?> flag : AllFlags.getFlags()) {
             Object val = region.getFlag(flag), group = null;
             
             // No value

@@ -97,7 +97,7 @@ public final class DefaultFlag {
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
 
-    public static final Flag<?>[] flagsList = new Flag<?>[] {
+    public static final FlagsList flagsList = new FlagsList(new Flag<?>[]{
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
@@ -112,28 +112,12 @@ public final class DefaultFlag {
         SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
         TELE_LOC, SPAWN_LOC, POTION_SPLASH,
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
-    };
+    });
 
     private DefaultFlag() {
     }
 
-    public static Flag<?>[] getFlags() {
+    public static FlagsList getFlags() {
         return flagsList;
-    }
-
-    /**
-     * Try to match the flag with the given ID using a fuzzy name match.
-     *
-     * @param id the flag ID
-     * @return a flag, or null
-     */
-    public static Flag<?> fuzzyMatchFlag(String id) {
-        for (Flag<?> flag : DefaultFlag.getFlags()) {
-            if (flag.getName().replace("-", "").equalsIgnoreCase(id.replace("-", ""))) {
-                return flag;
-            }
-        }
-
-        return null;
     }
 }
