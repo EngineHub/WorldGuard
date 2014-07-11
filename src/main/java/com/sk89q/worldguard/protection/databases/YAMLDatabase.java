@@ -19,17 +19,6 @@
 
 package com.sk89q.worldguard.protection.databases;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLNode;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -44,9 +33,31 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.representer.Representer;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class YAMLDatabase extends AbstractProtectionDatabase {
-    
+
+    /**
+     * Used to dump YAML when an error occurs
+     */
+    private static Yaml yaml;
+
     private YAMLProcessor config;
     private Map<String, ProtectedRegion> regions;
     private final Logger logger;
@@ -78,21 +89,20 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
             return;
         }
 
-        Map<String,ProtectedRegion> regions =
-            new HashMap<String,ProtectedRegion>();
-        Map<ProtectedRegion,String> parentSets =
-            new LinkedHashMap<ProtectedRegion, String>();
+        Map<String,ProtectedRegion> regions = new HashMap<String,ProtectedRegion>();
+        Map<ProtectedRegion,String> parentSets = new LinkedHashMap<ProtectedRegion, String>();
         
         for (Map.Entry<String, YAMLNode> entry : regionData.entrySet()) {
             String id = entry.getKey().toLowerCase().replace(".", "");
             YAMLNode node = entry.getValue();
-            
+
             String type = node.getString("type");
             ProtectedRegion region;
             
             try {
                 if (type == null) {
-                    logger.warning("Undefined region type for region '" + id + '"');
+                    logger.warning("Undefined region type for region '" + id + "'!\n" +
+                            "Here is what the region data looks like:\n\n" + dumpAsYaml(entry.getValue().getMap()) + "\n");
                     continue;
                 } else if (type.equals("cuboid")) {
                     Vector pt1 = checkNonNull(node.getVector("min"));
@@ -108,7 +118,8 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                 } else if (type.equals("global")) {
                     region = new GlobalProtectedRegion(id);
                 } else {
-                    logger.warning("Unknown region type for region '" + id + '"');
+                    logger.warning("Unknown region type for region '" + id + "'!\n" +
+                            "Here is what the region data looks like:\n\n" + dumpAsYaml(entry.getValue().getMap()) + "\n");
                     continue;
                 }
                 
@@ -124,7 +135,10 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                     parentSets.put(region, parentId);
                 }
             } catch (NullPointerException e) {
-                logger.warning("Missing data for region '" + id + '"');
+                logger.log(Level.WARNING,
+                        "Unexpected NullPointerException encountered during parsing for the region '" + id + "'!\n" +
+                        "Here is what the region data looks like:\n\n" + dumpAsYaml(entry.getValue().getMap()) +
+                        "\n\nNote: This region will disappear as a result!", e);
             }
         }
         
@@ -135,8 +149,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                 try {
                     entry.getKey().setParent(parent);
                 } catch (CircularInheritanceException e) {
-                    logger.warning("Circular inheritance detect with '"
-                            + entry.getValue() + "' detected as a parent");
+                    logger.warning("Circular inheritance detect with '" + entry.getValue() + "' detected as a parent");
                 }
             } else {
                 logger.warning("Unknown region parent: " + entry.getValue());
@@ -310,6 +323,28 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
 
     public void setRegions(Map<String, ProtectedRegion> regions) {
         this.regions = regions;
+    }
+
+    /**
+     * Dump the given object as YAML for debugging purposes.
+     *
+     * @param object the object
+     * @return the YAML string or an error string if dumping fals
+     */
+    private static String dumpAsYaml(Object object) {
+        if (yaml == null) {
+            DumperOptions options = new DumperOptions();
+            options.setIndent(4);
+            options.setDefaultFlowStyle(FlowStyle.AUTO);
+
+            yaml = new Yaml(new SafeConstructor(), new Representer(), options);
+        }
+
+        try {
+            return yaml.dump(object).replaceAll("(?m)^", "\t");
+        } catch (Throwable t) {
+            return "<error while dumping object>";
+        }
     }
     
 }
