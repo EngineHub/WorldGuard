@@ -15,8 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit.commands;
 
 import org.bukkit.command.CommandSender;
@@ -27,6 +26,7 @@ import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class ProtectionCommands {
+
     @SuppressWarnings("unused")
     private final WorldGuardPlugin plugin;
 
@@ -36,9 +36,11 @@ public class ProtectionCommands {
 
     @Command(aliases = {"region", "regions", "rg"}, desc = "Region management commands")
     @NestedCommand({RegionCommands.class, RegionMemberCommands.class})
-    public void region(CommandContext args, CommandSender sender) {}
+    public void region(CommandContext args, CommandSender sender) {
+    }
 
     @Command(aliases = {"worldguard", "wg"}, desc = "WorldGuard commands")
     @NestedCommand({WorldGuardCommands.class})
-    public void worldGuard(CommandContext args, CommandSender sender) {}
+    public void worldGuard(CommandContext args, CommandSender sender) {
+    }
 }

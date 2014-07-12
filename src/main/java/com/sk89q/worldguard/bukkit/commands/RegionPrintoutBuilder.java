@@ -14,8 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit.commands;
 
 import java.util.ArrayList;
@@ -26,6 +25,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldguard.bukkit.LanguageManager;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -33,21 +34,24 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**
- * Create a region printout, as used in /region info to show information about
- * a region.
+ * Create a region printout, as used in /region info to show information about a
+ * region.
  */
 public class RegionPrintoutBuilder {
-    
+
     private final ProtectedRegion region;
     private final StringBuilder builder = new StringBuilder();
+    private final LanguageManager lang;
 
     /**
      * Create a new instance with a region to report on.
-     * 
+     *
      * @param region the region
+     * @param lang the language manager object.
      */
-    public RegionPrintoutBuilder(ProtectedRegion region) {
+    public RegionPrintoutBuilder(ProtectedRegion region, LanguageManager lang) {
         this.region = region;
+        this.lang = lang;
     }
 
     /**
@@ -56,40 +60,40 @@ public class RegionPrintoutBuilder {
     private void newLine() {
         builder.append("\n");
     }
-    
+
     /**
      * Add region name, type, and priority.
      */
     public void appendBasics() {
-        builder.append(ChatColor.BLUE);
-        builder.append("Region: ");
+        builder.append(lang.getPrefix()).append(ChatColor.BLUE);
+        builder.append(lang.getText("region", false));
         builder.append(ChatColor.YELLOW);
         builder.append(region.getId());
-        
+
         builder.append(ChatColor.GRAY);
-        builder.append(" (type=");
+        builder.append(lang.getText("-type--", false));
         builder.append(region.getTypeName());
-        
+
         builder.append(ChatColor.GRAY);
-        builder.append(", priority=");
+        builder.append(lang.getText("-priority--", false));
         builder.append(region.getPriority());
         builder.append(")");
 
         newLine();
     }
-    
+
     /**
      * Add information about flags.
      */
     public void appendFlags() {
         builder.append(ChatColor.BLUE);
-        builder.append("Flags: ");
-        
+        builder.append(lang.getText("flags", false));
+
         appendFlagsList(true);
-        
+
         newLine();
     }
-    
+
     /**
      * Append just the list of flags (without "Flags:"), including colors.
      *
@@ -97,10 +101,10 @@ public class RegionPrintoutBuilder {
      */
     public void appendFlagsList(boolean useColors) {
         boolean hasFlags = false;
-        
+
         for (Flag<?> flag : DefaultFlag.getFlags()) {
             Object val = region.getFlag(flag), group = null;
-            
+
             // No value
             if (val == null) {
                 continue;
@@ -119,43 +123,43 @@ public class RegionPrintoutBuilder {
                 group = region.getFlag(groupFlag);
             }
 
-            if(group == null) {
+            if (group == null) {
                 builder.append(flag.getName()).append(": ")
-                    .append(String.valueOf(val));
+                        .append(String.valueOf(val));
             } else {
                 builder.append(flag.getName()).append(" -g ")
-                    .append(String.valueOf(group)).append(": ")
-                    .append(String.valueOf(val));
+                        .append(String.valueOf(group)).append(": ")
+                        .append(String.valueOf(val));
             }
 
             hasFlags = true;
         }
-            
+
         if (!hasFlags) {
             if (useColors) {
                 builder.append(ChatColor.RED);
             }
-            builder.append("(none)");
+            builder.append(lang.getText("-none-", false));
         }
     }
-    
+
     /**
      * Add information about parents.
      */
     public void appendParents() {
         appendParentTree(true);
     }
-    
+
     /**
      * Add information about parents.
-     * 
+     *
      * @param useColors true to use colors
      */
     public void appendParentTree(boolean useColors) {
         if (region.getParent() == null) {
             return;
         }
-        
+
         List<ProtectedRegion> inheritance = new ArrayList<ProtectedRegion>();
 
         ProtectedRegion r = region;
@@ -174,7 +178,7 @@ public class RegionPrintoutBuilder {
             if (useColors) {
                 builder.append(ChatColor.GREEN);
             }
-            
+
             // Put symbol for child
             if (indent != 0) {
                 for (int i = 0; i < indent; i++) {
@@ -182,54 +186,55 @@ public class RegionPrintoutBuilder {
                 }
                 builder.append("\u2517");
             }
-            
+
             // Put name
             builder.append(cur.getId());
-            
+
             // Put (parent)
             if (!cur.equals(region)) {
                 if (useColors) {
                     builder.append(ChatColor.GRAY);
                 }
-                builder.append(" (parent, priority=" + cur.getPriority() + ")");
+                builder.append(" (").append(lang.getText("parent-priority", false))
+                        .append("=").append(cur.getPriority()).append(")");
             }
-            
+
             indent++;
             newLine();
         }
     }
-    
+
     /**
      * Add information about members.
      */
     public void appendDomain() {
         builder.append(ChatColor.BLUE);
-        builder.append("Owners: ");
+        builder.append(lang.getText("owners", false));
         DefaultDomain owners = region.getOwners();
         if (owners.size() != 0) {
             builder.append(ChatColor.YELLOW);
             builder.append(owners.toUserFriendlyString());
         } else {
             builder.append(ChatColor.RED);
-            builder.append("(no owners)");
+            builder.append(lang.getText("-no-owners-", false));
         }
 
         newLine();
 
         builder.append(ChatColor.BLUE);
-        builder.append("Members: ");
+        builder.append(lang.getText("members", false));
         DefaultDomain members = region.getMembers();
         if (members.size() != 0) {
             builder.append(ChatColor.YELLOW);
             builder.append(members.toUserFriendlyString());
         } else {
             builder.append(ChatColor.RED);
-            builder.append("(no members)");
+            builder.append(lang.getText("-no-members-", false));
         }
-        
+
         newLine();
     }
-    
+
     /**
      * Add information about coordinates.
      */
@@ -237,14 +242,14 @@ public class RegionPrintoutBuilder {
         BlockVector min = region.getMinimumPoint();
         BlockVector max = region.getMaximumPoint();
         builder.append(ChatColor.BLUE);
-        builder.append("Bounds:");
+        builder.append(lang.getText("bounds", false));
         builder.append(ChatColor.YELLOW);
         builder.append(" (" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")");
         builder.append(" -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
-        
+
         newLine();
     }
-    
+
     /**
      * Append all the default fields used for /rg info.
      */
@@ -260,16 +265,16 @@ public class RegionPrintoutBuilder {
         appendDomain();
         appendBounds();
     }
-    
+
     /**
      * Send the report to a {@link CommandSender}.
-     * 
+     *
      * @param sender the recepient
      */
     public void send(CommandSender sender) {
         sender.sendMessage(toString());
     }
-    
+
     public StringBuilder append(boolean b) {
         return builder.append(b);
     }
@@ -325,7 +330,7 @@ public class RegionPrintoutBuilder {
     public StringBuilder appendCodePoint(int codePoint) {
         return builder.appendCodePoint(codePoint);
     }
-    
+
     @Override
     public String toString() {
         return builder.toString().trim();

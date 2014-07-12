@@ -55,6 +55,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 public class WorldGuardHangingListener implements Listener {
 
     private WorldGuardPlugin plugin;
+    private final LanguageManager lang;
 
     /**
      * Construct the object;
@@ -63,6 +64,7 @@ public class WorldGuardHangingListener implements Listener {
      */
     public WorldGuardHangingListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
+        lang = plugin.getLang();
     }
 
     /**
@@ -109,7 +111,7 @@ public class WorldGuardHangingListener implements Listener {
 
                 if (wcfg.useRegions) {
                     if (!plugin.getGlobalRegionManager().canBuild(player, hanging.getLocation())) {
-                        player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                        player.sendMessage(lang.getText("you-dont-have-permission-area"));
                         event.setCancelled(true);
                         return;
                     }
@@ -180,7 +182,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getRelative(event.getBlockFace()))) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(lang.getText("you-dont-have-permission-area"));
                 event.setCancelled(true);
                 return;
             }
@@ -197,7 +199,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions && (entity instanceof ItemFrame || entity instanceof Painting)) {
             if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(lang.getText("you-dont-have-permission-area"));
                 event.setCancelled(true);
                 return;
             }

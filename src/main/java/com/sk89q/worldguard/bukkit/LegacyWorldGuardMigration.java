@@ -15,8 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package com.sk89q.worldguard.bukkit;
 
 import java.io.File;
@@ -34,57 +33,58 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
  * Utility methods for porting from legacy versions.
- * 
+ *
  * @author sk89q
  */
 public class LegacyWorldGuardMigration {
-    
+
     /**
      * Port over the blacklist.
-     * 
+     *
      * @param plugin The plugin instance
      */
     public static void migrateBlacklist(WorldGuardPlugin plugin) {
+        LanguageManager lang = plugin.getLang();
         World mainWorld = plugin.getServer().getWorlds().get(0);
         String mainWorldName = mainWorld.getName();
         String newPath = "worlds/" + mainWorldName + "/blacklist.txt";
-        
+
         File oldFile = new File(plugin.getDataFolder(), "blacklist.txt");
         File newFile = new File(plugin.getDataFolder(), newPath);
-        
+
         if (!newFile.exists() && oldFile.exists()) {
-            plugin.getLogger().warning("WorldGuard will now update your blacklist "
-                    + "from an older version of WorldGuard.");
-            
+            plugin.getLogger().warning(
+                    lang.getVerbatimText("update-blacklist-from-older-version"));
+
             // Need to make root directories
             newFile.getParentFile().mkdirs();
-            
+
             if (copyFile(oldFile, newFile)) {
                 oldFile.renameTo(new File(plugin.getDataFolder(),
                         "blacklist.txt.old"));
             } else {
-                plugin.getLogger().warning("blacklist.txt has been converted " +
-                        "for the main world at " + newPath + "");
-                plugin.getLogger().warning("Your other worlds currently have no " +
-                		"blacklist defined!");
+                plugin.getLogger().warning(
+                        lang.getVerbatimText("blacklist-converted-to-vnewpath", "%NEWPATH%", newPath));
+                plugin.getLogger().warning(lang.getVerbatimText("other-worlds-have-no-blacklist"));
             }
-            
+
         }
     }
 
     /**
      * Migrate region settings.
-     * 
+     *
      * @param plugin The plugin instance
      */
     public static void migrateRegions(WorldGuardPlugin plugin) {
+        LanguageManager lang = plugin.getLang();
         try {
             File oldDatabase = new File(plugin.getDataFolder(), "regions.txt");
-            if (!oldDatabase.exists()) return;
-            
-            plugin.getLogger().info("The regions database has changed in 5.x. "
-                    + "Your old regions database will be converted to the new format "
-                    + "and set as your primary world's database.");
+            if (!oldDatabase.exists()) {
+                return;
+            }
+
+            plugin.getLogger().info(lang.getVerbatimText("region-database-will-be-converted"));
 
             World w = plugin.getServer().getWorlds().get(0);
             RegionManager mgr = plugin.getGlobalRegionManager().get(w);
@@ -92,23 +92,23 @@ public class LegacyWorldGuardMigration {
             // First load up the old database using the CSV loader
             CSVDatabase db = new CSVDatabase(oldDatabase, plugin.getLogger());
             db.load();
-            
+
             // Then save the new database
             mgr.setRegions(db.getRegions());
             mgr.save();
-            
+
             oldDatabase.renameTo(new File(plugin.getDataFolder(), "regions.txt.old"));
 
-            plugin.getLogger().info("Regions database converted!");
+            plugin.getLogger().info(lang.getVerbatimText("regions-database-converted"));
         } catch (ProtectionDatabaseException e) {
-            plugin.getLogger().warning("Failed to load regions: "
-                    + e.getMessage());
+            plugin.getLogger().warning(
+                    lang.getVerbatimText("error-reading-regions", "%ERROR%", e.getMessage()));
         }
     }
 
     /**
      * Copies a file.
-     * 
+     *
      * @param from The source file
      * @param to The destination file
      * @return true if successful
@@ -116,7 +116,7 @@ public class LegacyWorldGuardMigration {
     private static boolean copyFile(File from, File to) {
         InputStream in = null;
         OutputStream out = null;
-        
+
         try {
             in = new FileInputStream(from);
             out = new FileOutputStream(to);
@@ -126,10 +126,10 @@ public class LegacyWorldGuardMigration {
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
-            
+
             in.close();
             out.close();
-            
+
             return true;
         } catch (FileNotFoundException ignore) {
         } catch (IOException ignore) {
@@ -140,7 +140,7 @@ public class LegacyWorldGuardMigration {
                 } catch (IOException ignore) {
                 }
             }
-            
+
             if (out != null) {
                 try {
                     out.close();
@@ -148,7 +148,7 @@ public class LegacyWorldGuardMigration {
                 }
             }
         }
-        
+
         return false;
     }
 }

@@ -25,6 +25,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 public class WorldGuardVehicleListener implements Listener {
 
     private WorldGuardPlugin plugin;
+    private final LanguageManager lang;
 
     /**
      * Construct the object;
@@ -33,6 +34,7 @@ public class WorldGuardVehicleListener implements Listener {
      */
     public WorldGuardVehicleListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
+        this.lang = plugin.getLang();
     }
 
     /**
@@ -63,7 +65,7 @@ public class WorldGuardVehicleListener implements Listener {
             if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                     && !set.canBuild(localPlayer)
                     && !set.allows(DefaultFlag.DESTROY_VEHICLE, localPlayer)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission to destroy vehicles here.");
+                player.sendMessage(lang.getText("you-dont-have-permission-to-destroy-vehicles"));
                 event.setCancelled(true);
                 return;
             }

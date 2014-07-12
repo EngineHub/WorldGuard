@@ -47,6 +47,8 @@ Ready to submit? Perform the checklist below:
    small sets of changes at a time. Major changes should be discussed with
    the team prior to starting work.
 6. Are my commit messages descriptive?
+7. Have I writing all texts into messages.yml file and used the LanguageManager
+   class for show them.
 
 You should be aware of [`git rebase`](http://learn.github.com/p/rebasing.html).
 It allows you to modify existing commit messages, and combine, break apart, or

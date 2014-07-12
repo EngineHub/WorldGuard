@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sk89q.worldguard.bukkit;
 
 import java.io.File;
@@ -53,16 +52,16 @@ import com.sk89q.worldguard.chest.SignChestProtection;
  */
 public class WorldConfiguration {
 
-    public static final String CONFIG_HEADER = "#\r\n" +
-            "# WorldGuard's world configuration file\r\n" +
-            "#\r\n" +
-            "# This is a world configuration file. Anything placed into here will only\r\n" +
-            "# affect this world. If you don't put anything in this file, then the\r\n" +
-            "# settings will be inherited from the main configuration file.\r\n" +
-            "#\r\n" +
-            "# If you see {} below, that means that there are NO entries in this file.\r\n" +
-            "# Remove the {} and add your own entries.\r\n" +
-            "#\r\n";
+    public static final String CONFIG_HEADER = "#\r\n"
+            + "# WorldGuard's world configuration file\r\n"
+            + "#\r\n"
+            + "# This is a world configuration file. Anything placed into here will only\r\n"
+            + "# affect this world. If you don't put anything in this file, then the\r\n"
+            + "# settings will be inherited from the main configuration file.\r\n"
+            + "#\r\n"
+            + "# If you see {} below, that means that there are NO entries in this file.\r\n"
+            + "# Remove the {} and add your own entries.\r\n"
+            + "#\r\n";
 
     private WorldGuardPlugin plugin;
 
@@ -171,10 +170,9 @@ public class WorldConfiguration {
     public boolean disableObsidianGenerators;
 
     private Map<String, Integer> maxRegionCounts;
-
+    private final LanguageManager lang;
 
     /* Configuration data end */
-
     /**
      * Construct the object.
      *
@@ -183,6 +181,7 @@ public class WorldConfiguration {
      * @param parentConfig The parent configuration to read defaults from
      */
     public WorldConfiguration(WorldGuardPlugin plugin, String worldName, YAMLProcessor parentConfig) {
+        this.lang = plugin.getLang();
         File baseFolder = new File(plugin.getDataFolder(), "worlds/" + worldName);
         File configFile = new File(baseFolder, "config.yml");
         blacklistFile = new File(baseFolder, "blacklist.txt");
@@ -198,7 +197,7 @@ public class WorldConfiguration {
         loadConfiguration();
 
         if (summaryOnStart) {
-            plugin.getLogger().info("Loaded configuration for world '" + worldName + "'");
+            plugin.getLogger().info(lang.getVerbatimText("config-for-vworldname-loaded", "%WORLDNAME%", worldName));
         }
     }
 
@@ -301,7 +300,9 @@ public class WorldConfiguration {
         try {
             config.load();
         } catch (IOException e) {
-            plugin.getLogger().severe("Error reading configuration for world " + worldName + ": ");
+            plugin.getLogger().severe(
+                    lang.getVerbatimText("error-reading-config-world",
+                            "error-reading-config-world", worldName));
             e.printStackTrace();
         }
 
@@ -318,7 +319,8 @@ public class WorldConfiguration {
             PotionEffectType effect = PotionEffectType.getByName(potionName);
 
             if (effect == null) {
-                plugin.getLogger().warning("Unknown potion effect type '" + potionName + "'");
+                plugin.getLogger().warning(
+                        lang.getVerbatimText("unknown-potion-effect-type-vpotion", "%POTIONNAME%", potionName));
             } else {
                 blockPotions.add(effect);
             }
@@ -433,15 +435,16 @@ public class WorldConfiguration {
         // useiConomy = getBoolean("iconomy.enable", false);
         // buyOnClaim = getBoolean("iconomy.buy-on-claim", false);
         // buyOnClaimPrice = getDouble("iconomy.buy-on-claim-price", 1.0);
-
         blockCreatureSpawn = new HashSet<EntityType>();
         for (String creatureName : getStringList("mobs.block-creature-spawn", null)) {
             EntityType creature = EntityType.fromName(creatureName);
 
             if (creature == null) {
-                plugin.getLogger().warning("Unknown mob type '" + creatureName + "'");
+                plugin.getLogger().warning(
+                        lang.getVerbatimText("%CREATURENAME%", "%CREATURENAME%", creatureName));
             } else if (!creature.isAlive()) {
-                plugin.getLogger().warning("Entity type '" + creatureName + "' is not a creature");
+                plugin.getLogger().warning(
+                        lang.getVerbatimText("entity-type-not-a-creature", "%CREATURENAME%", creatureName));
             } else {
                 blockCreatureSpawn.add(creature);
             }
@@ -496,40 +499,44 @@ public class WorldConfiguration {
                 }
 
                 if (logFile) {
-                    FileLoggerHandler handler =
-                            new FileLoggerHandler(logFilePattern, logFileCacheSize, worldName, plugin.getLogger());
+                    FileLoggerHandler handler
+                            = new FileLoggerHandler(logFilePattern, logFileCacheSize, worldName, plugin.getLogger());
                     blacklistLogger.addHandler(handler);
                 }
             }
         } catch (FileNotFoundException e) {
-            plugin.getLogger().log(Level.WARNING, "WorldGuard blacklist does not exist.");
+            plugin.getLogger().log(Level.WARNING, lang.getVerbatimText("blacklist-does-not-exists"));
         } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, "Could not load WorldGuard blacklist: "
-                    + e.getMessage());
+            plugin.getLogger().log(Level.WARNING,
+                    lang.getVerbatimText("error-loading-blacklist-verror", "%ERROR", e.getMessage()));
         }
 
         // Print an overview of settings
         if (summaryOnStart) {
             plugin.getLogger().log(Level.INFO, blockTNTExplosions
-                    ? "(" + worldName + ") TNT ignition is blocked."
-                    : "(" + worldName + ") TNT ignition is PERMITTED.");
+                    ? lang.getVerbatimText("vworld-tnt-ignition-blocked", "%WORLDNAME%", worldName)
+                    : lang.getVerbatimText("vworld-tnt-ignition-permited", "%WORLDNAME%", worldName));
             plugin.getLogger().log(Level.INFO, blockLighter
-                    ? "(" + worldName + ") Lighters are blocked."
-                    : "(" + worldName + ") Lighters are PERMITTED.");
+                    ? lang.getVerbatimText("vworld-lighters-blocked", "%WORLDNAME%", worldName)
+                    : lang.getVerbatimText("vworld-lighters-permited", "%WORLDNAME%", worldName));
             plugin.getLogger().log(Level.INFO, preventLavaFire
-                    ? "(" + worldName + ") Lava fire is blocked."
-                    : "(" + worldName + ") Lava fire is PERMITTED.");
+                    ? lang.getVerbatimText("vworld-lava-fire-blocked", "%WORLDNAME%", worldName)
+                    : lang.getVerbatimText("vworld-lava-fire-permited", "%WORLDNAME%", worldName));
 
             if (disableFireSpread) {
-                plugin.getLogger().log(Level.INFO, "(" + worldName + ") All fire spread is disabled.");
+                plugin.getLogger().log(
+                        Level.INFO, lang.getVerbatimText("vworld-fire-spread-disabled", "%WORLDNAME%", worldName));
             } else {
                 if (disableFireSpreadBlocks.size() > 0) {
-                    plugin.getLogger().log(Level.INFO, "(" + worldName
-                            + ") Fire spread is limited to "
-                            + disableFireSpreadBlocks.size() + " block types.");
+                    plugin.getLogger().log(Level.INFO, "{0}{1}",
+                            new Object[]{
+                                lang.getVerbatimText("vworld-fire-spread-limited", "%WORLDNAME%", worldName),
+                                lang.getVerbatimText("vnblock-types", "%DISABLED_BLOCK_TYPES%", ""
+                                        + disableFireSpreadBlocks.size())
+                            });
                 } else {
-                    plugin.getLogger().log(Level.INFO, "(" + worldName
-                            + ") Fire spread is UNRESTRICTED.");
+                    plugin.getLogger().log(
+                            Level.INFO, lang.getVerbatimText("vworld-fire-spread-unrestricted", "%WORLDNAME%", worldName));
                 }
             }
         }

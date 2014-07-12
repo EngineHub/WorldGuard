@@ -111,6 +111,7 @@ public class ConfigurationManager {
     public String sqlDsn;
     public String sqlUsername;
     public String sqlPassword;
+    private final LanguageManager lang;
 
     /**
      * Construct the object.
@@ -120,6 +121,7 @@ public class ConfigurationManager {
     public ConfigurationManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
         this.worlds = new ConcurrentHashMap<String, WorldConfiguration>();
+        this.lang = plugin.getLang();
     }
 
     /**
@@ -135,7 +137,7 @@ public class ConfigurationManager {
         try {
             config.load();
         } catch (IOException e) {
-            plugin.getLogger().severe("Error reading configuration for global config: ");
+            plugin.getLogger().severe(lang.getVerbatimText("error-reading-global-config"));
             e.printStackTrace();
         }
 
@@ -177,7 +179,7 @@ public class ConfigurationManager {
         config.setHeader(CONFIG_HEADER);
 
         if (!config.save()) {
-            plugin.getLogger().severe("Error saving configuration!");
+            plugin.getLogger().severe(lang.getVerbatimText("error-saving-config"));
         }
     }
 
