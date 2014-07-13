@@ -19,6 +19,20 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.util.yaml.YAMLFormat;
+import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.worldguard.blacklist.Blacklist;
+import com.sk89q.worldguard.blacklist.BlacklistLogger;
+import com.sk89q.worldguard.blacklist.loggers.ConsoleLoggerHandler;
+import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
+import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
+import com.sk89q.worldguard.chest.ChestProtection;
+import com.sk89q.worldguard.chest.SignChestProtection;
+import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,21 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-
-import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
-
-import com.sk89q.util.yaml.YAMLFormat;
-import com.sk89q.util.yaml.YAMLProcessor;
-import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldguard.blacklist.BlacklistLogger;
-import com.sk89q.worldguard.blacklist.loggers.ConsoleLoggerHandler;
-import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
-import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
-import com.sk89q.worldguard.chest.ChestProtection;
-import com.sk89q.worldguard.chest.SignChestProtection;
 
 /**
  * Holds the configuration for individual worlds.
@@ -77,6 +76,7 @@ public class WorldConfiguration {
     /* Configuration data start */
     public boolean summaryOnStart;
     public boolean opPermissions;
+    public boolean checkAttached;
     public boolean fireSpreadDisableToggle;
     public boolean itemDurability;
     public boolean simulateSponge;
@@ -307,6 +307,8 @@ public class WorldConfiguration {
 
         summaryOnStart = getBoolean("summary-on-start", true);
         opPermissions = getBoolean("op-permissions", true);
+
+        checkAttached = getBoolean("internal.check-attached-blocks", false);
 
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
