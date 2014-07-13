@@ -19,10 +19,19 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.*;
-
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.internal.Events;
+import com.sk89q.worldguard.internal.cause.Causes;
+import com.sk89q.worldguard.internal.event.Action;
+import com.sk89q.worldguard.internal.event.BlockInteractEvent;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -54,17 +63,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldedit.blocks.BlockType;
-import com.sk89q.worldedit.blocks.ItemType;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * The listener for block events.
@@ -116,17 +115,12 @@ public class WorldGuardBlockListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockDamage(BlockDamageEvent event) {
-        Player player = event.getPlayer();
-        Block blockDamaged = event.getBlock();
+        Block target = event.getBlock();
 
         // Cake are damaged and not broken when they are eaten, so we must
         // handle them a bit separately
-        if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
-            if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
-                player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
-                event.setCancelled(true);
-                return;
-            }
+        if (target.getType() == Material.CAKE_BLOCK) {
+            Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Action.INTERACT, target));
         }
     }
 
@@ -136,48 +130,18 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
+        Block target = event.getBlock();
         WorldConfiguration wcfg = getWorldConfig(player);
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getItemInHand();
-            if (held.getTypeId() > 0
-                    && !(ItemType.usesDamageValue(held.getTypeId())
-                    || BlockType.usesData(held.getTypeId()))) {
+            if (held.getType() != Material.AIR && !(ItemType.usesDamageValue(held.getTypeId())|| BlockType.usesData(held.getTypeId()))) {
                 held.setDurability((short) 0);
                 player.setItemInHand(held);
             }
         }
 
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
-         || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.getBlacklist() != null) {
-            if (!wcfg.getBlacklist().check(
-                    new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
-                    toVector(event.getBlock()),
-                    event.getBlock().getTypeId()), false, false)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (!wcfg.getBlacklist().check(
-                    new DestroyWithBlacklistEvent(plugin.wrapPlayer(player),
-                    toVector(event.getBlock()),
-                    player.getItemInHand().getTypeId()), false, false)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (wcfg.isChestProtected(event.getBlock(), player)) {
-            player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
-            event.setCancelled(true);
-            return;
-        }
+        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Action.BREAK, target));
     }
 
     /*
@@ -498,48 +462,22 @@ public class WorldGuardBlockListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        Block blockPlaced = event.getBlock();
-        Player player = event.getPlayer();
-        World world = blockPlaced.getWorld();
+        Block target = event.getBlock();
+        World world = target.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
-        if (wcfg.useRegions) {
-            final Location location = blockPlaced.getLocation();
-            if (!plugin.getGlobalRegionManager().canBuild(player, location)
-             || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-                event.setCancelled(true);
-                return;
-            }
-        }
+        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Action.PLACE, target));
 
-        if (wcfg.getBlacklist() != null) {
-            if (!wcfg.getBlacklist().check(
-                    new BlockPlaceBlacklistEvent(plugin.wrapPlayer(player), toVector(blockPlaced),
-                    blockPlaced.getTypeId()), false, false)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getTypeId())) {
-            if (wcfg.isAdjacentChestProtected(event.getBlock(), player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (wcfg.simulateSponge && blockPlaced.getTypeId() == 19) {
-            if (wcfg.redstoneSponges && blockPlaced.isBlockIndirectlyPowered()) {
+        if (wcfg.simulateSponge && target.getType() == Material.SPONGE) {
+            if (wcfg.redstoneSponges && target.isBlockIndirectlyPowered()) {
                 return;
             }
 
-            int ox = blockPlaced.getX();
-            int oy = blockPlaced.getY();
-            int oz = blockPlaced.getZ();
+            int ox = target.getX();
+            int oy = target.getY();
+            int oz = target.getZ();
 
             SpongeUtil.clearSpongeWater(plugin, world, ox, oy, oz);
         }
