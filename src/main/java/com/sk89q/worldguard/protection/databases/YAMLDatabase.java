@@ -89,6 +89,14 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
             return;
         }
 
+        // Warning for WORLDGUARD-3094
+        for (Flag<?> flag : DefaultFlag.getFlags()) {
+            if (flag == null) {
+                logger.severe("Some 3rd-party plugin has registered an invalid 'null' custom flag with WorldGuard, though we can't tell you which plugin did it - this may cause major problems in other places");
+                break;
+            }
+        }
+
         Map<String,ProtectedRegion> regions = new HashMap<String,ProtectedRegion>();
         Map<ProtectedRegion,String> parentSets = new LinkedHashMap<ProtectedRegion, String>();
         
@@ -174,6 +182,12 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         
         // @TODO: Make this better
         for (Flag<?> flag : DefaultFlag.getFlags()) {
+            if (flag == null) {
+                // Some plugins that add custom flags to WorldGuard are doing
+                // something very wrong -- see WORLDGUARD-3094
+                continue;
+            }
+
             Object o = flagsData.getProperty(flag.getName());
             if (o != null) {
                 setFlag(region, flag, o);
