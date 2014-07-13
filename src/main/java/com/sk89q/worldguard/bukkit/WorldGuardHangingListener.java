@@ -19,8 +19,10 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
+import com.sk89q.worldedit.blocks.ItemID;
+import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
+import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -42,10 +44,7 @@ import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
-import com.sk89q.worldedit.blocks.ItemID;
-import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * Listener for painting related events.
