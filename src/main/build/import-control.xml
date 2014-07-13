@@ -32,4 +32,5 @@
   <allow pkg="org.yaml.snakeyaml"/>
   <allow pkg="au.com.bytecode.opencsv"/>
   <allow pkg="org.khelekore.prtree"/>
+  <allow pkg="com.google.common"/>
 </import-control>
