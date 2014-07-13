@@ -1,6 +1,3 @@
-----------------------------------------------------------------------------
-WorldGuard License
-----------------------------------------------------------------------------
 
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
@@ -169,8 +166,9 @@ permanent authorization for you to choose that version for the
 Library.
 
 ----------------------------------------------------------------------------
-PRTree License
-----------------------------------------------------------------------------
+
+This work includes Robert Olofsson's Priority R-Tree implementation, for which
+its license is reproduced below.
 
 Copyright (c) 2008-2010 Robert Olofsson.
 All rights reserved. 

@@ -1,0 +1,32 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building WorldGuard 5.9.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ worldguard ---
+[INFO] Deleting P:\Projects\MCProjects\WorldGuard\target
+[INFO] 
+[INFO] --- maven-checkstyle-plugin:2.12:check (verify-style) @ worldguard ---
+[INFO] Starting audit...
+P:\Projects\MCProjects\WorldGuard\src\test\java\com\sk89q\worldguard\protection\RegionEntryExitTest.java:53:16: Name 'vip_player' must match pattern '^[a-z_][a-zA-Z0-9]*$'.
+P:\Projects\MCProjects\WorldGuard\src\test\java\com\sk89q\worldguard\protection\RegionEntryExitTest.java:54:16: Name 'builder_player' must match pattern '^[a-z_][a-zA-Z0-9]*$'.
+P:\Projects\MCProjects\WorldGuard\src\test\java\com\sk89q\worldguard\protection\regions\RegionIntersectTest.java:58:29: Name 'triangle_overlap' must match pattern '^[a-z_][a-zA-Z0-9]*$'.
+P:\Projects\MCProjects\WorldGuard\src\test\java\com\sk89q\worldguard\protection\regions\RegionIntersectTest.java:67:29: Name 'triangle_no_overlap' must match pattern '^[a-z_][a-zA-Z0-9]*$'.
+P:\Projects\MCProjects\WorldGuard\src\test\java\com\sk89q\worldguard\protection\regions\RegionIntersectTest.java:76:29: Name 'triangle_overlap_no_points' must match pattern '^[a-z_][a-zA-Z0-9]*$'.
+Audit done.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 4.340s
+[INFO] Finished at: Sat Jul 12 19:24:00 PDT 2014
+[INFO] Final Memory: 13M/229M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-checkstyle-plugin:2.12:check (verify-style) on project worldguard: Failed during checkstyle execution: There are 5 checkstyle errors. -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

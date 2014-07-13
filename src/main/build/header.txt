@@ -16,17 +16,3 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.sk89q.worldguard.protection.flags;
-
-/**
- * A grouping of region membership types
- */
-public enum RegionGroup {
-    MEMBERS,
-    OWNERS,
-    NON_MEMBERS,
-    NON_OWNERS,
-    ALL,
-    NONE
-}
