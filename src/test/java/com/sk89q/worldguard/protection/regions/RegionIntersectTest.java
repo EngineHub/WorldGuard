@@ -1,13 +1,34 @@
+/*
+ * WorldGuard, a suite of tools for Minecraft
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldGuard team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldguard.protection.regions;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RegionIntersectTest {
 
@@ -36,31 +57,31 @@ public class RegionIntersectTest {
                 new BlockVector(0, 40, 5), new BlockVector(1000, 128, 8)),
                 true);
 
-        List<BlockVector2D> triangle_overlap = new ArrayList<BlockVector2D>();
-        triangle_overlap.add(new BlockVector2D(90, -10));
-        triangle_overlap.add(new BlockVector2D(120, -10));
-        triangle_overlap.add(new BlockVector2D(90, 20));
+        List<BlockVector2D> triangleOverlap = new ArrayList<BlockVector2D>();
+        triangleOverlap.add(new BlockVector2D(90, -10));
+        triangleOverlap.add(new BlockVector2D(120, -10));
+        triangleOverlap.add(new BlockVector2D(90, 20));
 
-        assertIntersection(region, new ProtectedPolygonalRegion("triangle_overlap",
-                triangle_overlap, 0, 128),
+        assertIntersection(region, new ProtectedPolygonalRegion("triangleOverlap",
+                triangleOverlap, 0, 128),
                 true);
 
-        List<BlockVector2D> triangle_no_overlap = new ArrayList<BlockVector2D>();
-        triangle_no_overlap.add(new BlockVector2D(90, -10));
-        triangle_no_overlap.add(new BlockVector2D(105, -10));
-        triangle_no_overlap.add(new BlockVector2D(90, 5));
+        List<BlockVector2D> triangleNoOverlap = new ArrayList<BlockVector2D>();
+        triangleNoOverlap.add(new BlockVector2D(90, -10));
+        triangleNoOverlap.add(new BlockVector2D(105, -10));
+        triangleNoOverlap.add(new BlockVector2D(90, 5));
 
-        assertIntersection(region, new ProtectedPolygonalRegion("triangle_no_overlap",
-                triangle_no_overlap, 0, 128),
+        assertIntersection(region, new ProtectedPolygonalRegion("triangleNoOverlap",
+                triangleNoOverlap, 0, 128),
                 false);
 
-        List<BlockVector2D> triangle_overlap_no_points = new ArrayList<BlockVector2D>();
-        triangle_overlap_no_points.add(new BlockVector2D(100, -10));
-        triangle_overlap_no_points.add(new BlockVector2D(120, 50));
-        triangle_overlap_no_points.add(new BlockVector2D(140, -20));
+        List<BlockVector2D> triangleOverlapNoPoints = new ArrayList<BlockVector2D>();
+        triangleOverlapNoPoints.add(new BlockVector2D(100, -10));
+        triangleOverlapNoPoints.add(new BlockVector2D(120, 50));
+        triangleOverlapNoPoints.add(new BlockVector2D(140, -20));
 
-        assertIntersection(region, new ProtectedPolygonalRegion("triangle_overlap_no_points",
-                triangle_overlap_no_points, 60, 80),
+        assertIntersection(region, new ProtectedPolygonalRegion("triangleOverlapNoPoints",
+                triangleOverlapNoPoints, 60, 80),
                 true);
     }
 

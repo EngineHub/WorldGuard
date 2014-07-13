@@ -1,21 +1,21 @@
-// $Id$
 /*
- * WorldGuard
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * WorldGuard, a suite of tools for Minecraft
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldGuard team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldguard.bukkit;
 
@@ -60,7 +60,7 @@ public class FlagStateManager implements Runnable {
      * Run the task.
      */
     @Override
-	public void run() {
+    public void run() {
         Player[] players = plugin.getServer().getOnlinePlayers();
         ConfigurationManager config = plugin.getGlobalStateManager();
 
@@ -120,11 +120,11 @@ public class FlagStateManager implements Runnable {
             return;
         }
         if (minHealth == null) {
-			minHealth = 0.0;
-		}
+            minHealth = 0.0;
+        }
         if (maxHealth == null) {
-			maxHealth = player.getMaxHealth();
-		}
+            maxHealth = player.getMaxHealth();
+        }
 
         // Apply a cap to prevent possible exceptions
         minHealth = Math.min(player.getMaxHealth(), minHealth);
@@ -165,11 +165,11 @@ public class FlagStateManager implements Runnable {
             return;
         }
         if (minHunger == null) {
-			minHunger = 0;
-		}
+            minHunger = 0;
+        }
         if (maxHunger == null) {
-			maxHunger = 20;
-		}
+            maxHunger = 20;
+        }
 
         // Apply a cap to prevent possible exceptions
         minHunger = Math.min(20, minHunger);

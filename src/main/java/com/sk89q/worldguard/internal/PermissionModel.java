@@ -17,16 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.flags;
+package com.sk89q.worldguard.internal;
 
-/**
- * A grouping of region membership types
- */
-public enum RegionGroup {
-    MEMBERS,
-    OWNERS,
-    NON_MEMBERS,
-    NON_OWNERS,
-    ALL,
-    NONE
+public interface PermissionModel {
+
 }

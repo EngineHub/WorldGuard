@@ -1,29 +1,23 @@
-// $Id$
 /*
- * WorldGuard
- * Copyright (C) 2013 sk89q <http://www.sk89q.com> and contributors
+ * WorldGuard, a suite of tools for Minecraft
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldGuard team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldguard.protection;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
@@ -36,6 +30,11 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class RegionEntryExitTest {
     static String ENTRY_ID = "entry_rg";
@@ -50,8 +49,8 @@ public abstract class RegionEntryExitTest {
     ProtectedRegion globalRegion;
     ProtectedRegion entryRegion;
     ProtectedRegion exitRegion;
-    TestPlayer vip_player;
-    TestPlayer builder_player;
+    TestPlayer vipPlayer;
+    TestPlayer builderPlayer;
 
     protected abstract RegionManager createRegionManager() throws Exception;
 
@@ -67,14 +66,14 @@ public abstract class RegionEntryExitTest {
     }
 
     void setUpPlayers() {
-        vip_player = new TestPlayer("dudu");
-        vip_player.addGroup(VIP_GROUP);
+        vipPlayer = new TestPlayer("dudu");
+        vipPlayer.addGroup(VIP_GROUP);
 
-        builder_player = new TestPlayer("esskay");
-        builder_player.addGroup(BUILDER_GROUP);
+        builderPlayer = new TestPlayer("esskay");
+        builderPlayer.addGroup(BUILDER_GROUP);
 
         // @Test
-        // assertFalse(builderPlayer.wuvs(vip_player)); // causes test to fail
+        // assertFalse(builderPlayer.wuvs(vipPlayer)); // causes test to fail
     }
 
     void setUpGlobalRegion() {
@@ -124,8 +123,8 @@ public abstract class RegionEntryExitTest {
 //        System.out.println("flag " + appl.getFlag(DefaultFlag.ENTRY));
 //        System.out.println("grp  " + appl.getFlag(DefaultFlag.ENTRY.getRegionGroupFlag()));
 //        System.out.println("===");
-        assertTrue("Allowed Entry", appl.allows(DefaultFlag.ENTRY, vip_player));
-        assertFalse("Forbidden Entry", appl.allows(DefaultFlag.ENTRY, builder_player));
+        assertTrue("Allowed Entry", appl.allows(DefaultFlag.ENTRY, vipPlayer));
+        assertFalse("Forbidden Entry", appl.allows(DefaultFlag.ENTRY, builderPlayer));
     }
 
     @Test
@@ -139,8 +138,8 @@ public abstract class RegionEntryExitTest {
 //        System.out.println("flag " + appl.getFlag(DefaultFlag.EXIT));
 //        System.out.println("grp  " + appl.getFlag(DefaultFlag.EXIT.getRegionGroupFlag()));
 //        System.out.println("===");
-        assertTrue("Allowed Exit", appl.allows(DefaultFlag.EXIT, builder_player));
-        assertFalse("Forbidden Exit", appl.allows(DefaultFlag.EXIT, vip_player));
+        assertTrue("Allowed Exit", appl.allows(DefaultFlag.EXIT, builderPlayer));
+        assertFalse("Forbidden Exit", appl.allows(DefaultFlag.EXIT, vipPlayer));
     }
 
 }

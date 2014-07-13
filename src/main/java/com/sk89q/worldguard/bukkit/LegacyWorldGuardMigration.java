@@ -1,23 +1,28 @@
-// $Id$
 /*
- * WorldGuard
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * WorldGuard, a suite of tools for Minecraft
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldGuard team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldguard.bukkit;
+
+import com.sk89q.worldguard.protection.databases.CSVDatabase;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import org.bukkit.World;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,18 +31,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.bukkit.World;
-
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.CSVDatabase;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 
 /**
  * Utility methods for porting from legacy versions.
- * 
- * @author sk89q
  */
-public class LegacyWorldGuardMigration {
+public final class LegacyWorldGuardMigration {
+
+    private LegacyWorldGuardMigration() {
+    }
     
     /**
      * Port over the blacklist.
@@ -66,7 +67,7 @@ public class LegacyWorldGuardMigration {
                 plugin.getLogger().warning("blacklist.txt has been converted " +
                         "for the main world at " + newPath + "");
                 plugin.getLogger().warning("Your other worlds currently have no " +
-                		"blacklist defined!");
+                        "blacklist defined!");
             }
             
         }
