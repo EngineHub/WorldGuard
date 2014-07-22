@@ -25,7 +25,9 @@
   <allow pkg="java"/>
   <allow pkg="javax"/>
   <allow pkg="org.junit"/>
+  <allow pkg="junit"/>
   <allow pkg="org.mockito"/>
+  <allow pkg="org.hamcrest"/>
   <allow pkg="com.sk89q"/>
   <allow pkg="org.enginehub"/>
   <allow pkg="org.bukkit"/>

@@ -35,6 +35,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -1443,91 +1444,12 @@ public class WorldGuardPlayerListener implements Listener {
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-            String usedCommand = event.getMessage().toLowerCase();
-
             Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS, localPlayer);
             Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS, localPlayer);
+            CommandFilter test = new CommandFilter(allowedCommands, blockedCommands);
 
-            /*
-             * blocked      used        allow?
-             * x            x           no
-             * x            x y         no
-             * x y          x           yes
-             * x y          x y         no
-             * 
-             * allowed      used        allow?
-             * x            x           yes
-             * x            x y         yes
-             * x y          x           no
-             * x y          x y         yes
-             */
-            String result = "";
-            String[] usedParts = usedCommand.split(" ");
-            if (blockedCommands != null) {
-                blocked:
-                for (String blockedCommand : blockedCommands) {
-                    String[] blockedParts = blockedCommand.split(" ");
-                    for (int i = 0; i < blockedParts.length && i < usedParts.length; i++) {
-                        if (blockedParts[i].equalsIgnoreCase(usedParts[i])) {
-                            // first part matches - check if it's the whole thing
-                            if (i + 1 == blockedParts.length) {
-                                // consumed all blocked parts, block entire command
-                                result = blockedCommand;
-                                break blocked;
-                            } else {
-                                // more blocked parts to check, also check used length
-                                if (i + 1 == usedParts.length) {
-                                    // all that was used, but there is more in blocked
-                                    // allow this, check next command in flag
-                                    continue blocked;
-                                } else {
-                                    // more in both blocked and used, continue checking
-                                    continue;
-                                }
-                            }
-                        } else {
-                            // found non-matching part, stop checking this command
-                            continue blocked;
-                        }
-                    }
-                }
-            }
-
-            if (allowedCommands != null) {
-                allowed:
-                for (String allowedCommand : allowedCommands) {
-                    String[] allowedParts = allowedCommand.split(" ");
-                    for (int i = 0; i < allowedParts.length && i < usedParts.length; i++) {
-                        if (allowedParts[i].equalsIgnoreCase(usedParts[i])) {
-                            // this part matches - check if it's the whole thing
-                            if (i + 1 == allowedParts.length) {
-                                // consumed all allowed parts before reaching used length
-                                // this command is definitely allowed
-                                result = "";
-                                break allowed;
-                            } else {
-                                // more allowed parts to check
-                                if (i + 1 == usedParts.length) {
-                                    // all that was used, but there is more in allowed
-                                    // block for now, check next part of flag
-                                    result = usedCommand;
-                                    continue allowed;
-                                } else {
-                                    // more in both allowed and used, continue checking for match
-                                    continue;
-                                }
-                            }
-                        } else {
-                            // doesn't match at all, block it, check next flag string
-                            result = usedCommand;
-                            continue allowed;
-                        }
-                    }
-                }
-            }
-
-            if (!result.isEmpty()) {
-                player.sendMessage(ChatColor.RED + result + " is not allowed in this area.");
+            if (!test.apply(event.getMessage())) {
+                player.sendMessage(ChatColor.RED + event.getMessage() + " is not allowed in this area.");
                 event.setCancelled(true);
                 return;
             }
