@@ -24,7 +24,13 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StringFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.command.CommandFilter;
 import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 public class ApplicableRegionSetTest {
@@ -479,6 +485,47 @@ public class ApplicableRegionSetTest {
         ApplicableRegionSet set = mock.getApplicableSet();
         assertFalse(set.canBuild(member));
         assertFalse(set.canBuild(nonMember));
+    }
+
+    @Test
+    public void testGlobalRegionCommandBlacklistWithRegionWhitelist() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        ProtectedRegion region;
+
+        LocalPlayer nonMember = mock.createPlayer();
+
+        region = mock.global();
+        Set<String> blocked = new HashSet<String>();
+        blocked.add("/deny");
+        blocked.add("/strange");
+        region.setFlag(DefaultFlag.BLOCKED_CMDS, blocked);
+
+        region = mock.add(0);
+        Set<String> allowed = new HashSet<String>();
+        allowed.add("/permit");
+        allowed.add("/strange");
+        region.setFlag(DefaultFlag.ALLOWED_CMDS, allowed);
+
+        ApplicableRegionSet set;
+        CommandFilter test;
+
+        set = mock.getApplicableSet();
+        test = new CommandFilter(
+                set.getFlag(DefaultFlag.ALLOWED_CMDS, nonMember),
+                set.getFlag(DefaultFlag.BLOCKED_CMDS, nonMember));
+        assertThat(test.apply("/permit"), is(true));
+        assertThat(test.apply("/strange"), is(true));
+        assertThat(test.apply("/other"), is(false));
+        assertThat(test.apply("/deny"), is(false));
+
+        set = mock.getApplicableSetInWilderness();
+        test = new CommandFilter(
+                set.getFlag(DefaultFlag.ALLOWED_CMDS, nonMember),
+                set.getFlag(DefaultFlag.BLOCKED_CMDS, nonMember));
+        assertThat(test.apply("/permit"), is(true));
+        assertThat(test.apply("/strange"), is(false));
+        assertThat(test.apply("/other"), is(true));
+        assertThat(test.apply("/deny"), is(false));
     }
 
 }

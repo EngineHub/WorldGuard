@@ -26,6 +26,7 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import java.util.Collections;
 import java.util.TreeSet;
 
 public class MockApplicableRegionSet {
@@ -66,6 +67,10 @@ public class MockApplicableRegionSet {
         region.setParent(parent);
         add(region);
         return region;
+    }
+
+    public ApplicableRegionSet getApplicableSetInWilderness() {
+        return new ApplicableRegionSet(Collections.<ProtectedRegion>emptyList(), global);
     }
 
     public ApplicableRegionSet getApplicableSet() {
