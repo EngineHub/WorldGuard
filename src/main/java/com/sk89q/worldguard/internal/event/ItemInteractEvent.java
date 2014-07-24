@@ -20,21 +20,23 @@
 package com.sk89q.worldguard.internal.event;
 
 import com.sk89q.worldguard.internal.cause.Cause;
-import org.bukkit.block.Block;
+import org.bukkit.World;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Fired when a block is interacted with.
+ * Fired when an item is interacted with.
  */
-public class BlockInteractEvent extends AbstractInteractEvent {
+public class ItemInteractEvent extends AbstractInteractEvent {
 
     private static final HandlerList handlers = new HandlerList();
-    private final Block target;
+    private final World world;
+    private final ItemStack itemStack;
 
     /**
      * Create a new instance.
@@ -42,21 +44,33 @@ public class BlockInteractEvent extends AbstractInteractEvent {
      * @param originalEvent the original event
      * @param causes a list of causes, where the originating causes are at the beginning
      * @param interaction the action that is being taken
-     * @param target the target block being affected
+     * @param world the world
+     * @param itemStack the item
      */
-    public BlockInteractEvent(Event originalEvent, List<? extends Cause<?>> causes, Interaction interaction, Block target) {
+    public ItemInteractEvent(Event originalEvent, List<? extends Cause<?>> causes, Interaction interaction, World world, ItemStack itemStack) {
         super(originalEvent, causes, interaction);
-        checkNotNull(target);
-        this.target = target;
+        checkNotNull(world);
+        checkNotNull(itemStack);
+        this.world = world;
+        this.itemStack = itemStack;
     }
 
     /**
-     * Get the target block being affected.
+     * Get the world.
      *
-     * @return a block
+     * @return the world
      */
-    public Block getTarget() {
-        return target;
+    public World getWorld() {
+        return world;
+    }
+
+    /**
+     * Get the item stack.
+     *
+     * @return the item stack
+     */
+    public ItemStack getItemStack() {
+        return itemStack;
     }
 
     @Override

@@ -34,6 +34,7 @@ import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.internal.listener.BlacklistListener;
+import com.sk89q.worldguard.internal.listener.BlockedPotionsListener;
 import com.sk89q.worldguard.internal.listener.ChestProtectionListener;
 import com.sk89q.worldguard.internal.listener.RegionProtectionListener;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
@@ -189,6 +190,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new BlacklistListener(this)).registerEvents();
         (new ChestProtectionListener(this)).registerEvents();
         (new RegionProtectionListener(this)).registerEvents();
+        (new BlockedPotionsListener(this)).registerEvents();
 
         configuration.updateCommandBookGodMode();
 

@@ -22,7 +22,7 @@ package com.sk89q.worldguard.internal.listener;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.Action;
+import com.sk89q.worldguard.internal.event.Interaction;
 import com.sk89q.worldguard.internal.event.BlockInteractEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
@@ -61,7 +61,7 @@ public class ChestProtectionListener extends AbstractListener {
                 return;
             }
 
-            if (event.getAction() == Action.PLACE) {
+            if (event.getInteraction() == Interaction.PLACE) {
                 if (wcfg.getChestProtection().isChest(target.getTypeId())) {
                     if (wcfg.isAdjacentChestProtected(target, player)) {
                         player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");

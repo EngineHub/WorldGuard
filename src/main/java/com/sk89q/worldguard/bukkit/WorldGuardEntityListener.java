@@ -19,10 +19,19 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
-import java.util.Set;
-
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.internal.Events;
+import com.sk89q.worldguard.internal.cause.Causes;
+import com.sk89q.worldguard.internal.event.Interaction;
+import com.sk89q.worldguard.internal.event.ItemInteractEvent;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -70,18 +79,11 @@ import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.projectiles.ProjectileSource;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+import java.util.Set;
+
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * Listener for entity related events.
@@ -928,25 +930,12 @@ public class WorldGuardEntityListener implements Listener {
     public void onPotionSplash(PotionSplashEvent event) {
         Entity entity = event.getEntity();
         ThrownPotion potion = event.getPotion();
+        World world = entity.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(entity.getWorld());
+        WorldConfiguration wcfg = cfg.get(world);
 
-        if (wcfg.blockPotionsAlways && wcfg.blockPotions.size() > 0) {
-            boolean blocked = false;
-
-            for (PotionEffect effect : potion.getEffects()) {
-                if (wcfg.blockPotions.contains(effect.getType())) {
-                    blocked = true;
-                    break;
-                }
-            }
-
-            if (blocked) {
-                event.setCancelled(true);
-                return;
-            }
-        }
+        Events.fireToCancel(event, new ItemInteractEvent(event, Causes.create(potion.getShooter()), Interaction.INTERACT, world, potion.getItem()));
 
         GlobalRegionManager regionMan = plugin.getGlobalRegionManager();
 

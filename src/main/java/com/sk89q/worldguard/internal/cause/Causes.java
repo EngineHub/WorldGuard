@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.internal.cause;
 
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
@@ -51,6 +53,25 @@ public final class Causes {
     }
 
     /**
+     * Test whether the list of causes may indicate that a player was part of
+     * the cause, directly or indirectly.
+     *
+     * <p>An indirect cause would be a dispenser, for example.</p>
+     *
+     * @param causes a list of cuases
+     * @return true if the event involved a player
+     */
+    public static boolean mayInvolvePlayer(List<? extends Cause<?>> causes) {
+        for (Cause<?> cause : causes) {
+            if (cause instanceof PlayerCause || cause instanceof BlockCause) {
+                return true; // This needs to be made smarter later
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Create a list of causes from a list of objects representing causes.
      *
      * @param cause an array of causes, where the originating causes are at the beginning
@@ -61,6 +82,10 @@ public final class Causes {
         for (Object o : cause) {
             if (o instanceof Player) {
                 causes.add(new PlayerCause((Player) o));
+            } else if (o instanceof Block) {
+                causes.add(new BlockCause((Block) o));
+            } else if (o instanceof Entity) {
+                causes.add(new EntityCause((Entity) o));
             } else {
                 causes.add(new UnknownCause(o));
             }

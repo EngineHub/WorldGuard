@@ -41,11 +41,11 @@ public class EntityInteractEvent extends AbstractInteractEvent {
      *
      * @param originalEvent the original event
      * @param causes a list of causes, where the originating causes are at the beginning
-     * @param action the action that is being taken
+     * @param interaction the action that is being taken
      * @param target the target entity being affected
      */
-    public EntityInteractEvent(Event originalEvent, List<? extends Cause<?>> causes, Action action, Entity target) {
-        super(originalEvent, causes, action);
+    public EntityInteractEvent(Event originalEvent, List<? extends Cause<?>> causes, Interaction interaction, Entity target) {
+        super(originalEvent, causes, interaction);
         checkNotNull(target);
         this.target = target;
     }
