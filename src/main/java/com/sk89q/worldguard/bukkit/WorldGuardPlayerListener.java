@@ -138,7 +138,12 @@ public class WorldGuardPlayerListener implements Listener {
 
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
-        boolean hasRemoteBypass = plugin.getGlobalRegionManager().hasBypass(player, toWorld);
+        boolean hasRemoteBypass;
+        if (world.equals(toWorld)) {
+            hasRemoteBypass = hasBypass;
+        } else {
+            hasRemoteBypass = plugin.getGlobalRegionManager().hasBypass(player, toWorld);
+        }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(toWorld);
         Vector pt = new Vector(to.getBlockX(), to.getBlockY(), to.getBlockZ());
