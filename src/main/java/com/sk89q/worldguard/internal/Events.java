@@ -22,6 +22,8 @@ package com.sk89q.worldguard.internal;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.Event.Result;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 /**
  * Utility methods to deal with events.
@@ -47,6 +49,25 @@ public final class Events {
                 original.setCancelled(true);
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    /**
+     * Fire the {@code eventToFire} if {@code original}
+     * and cancel the original if the fired event is cancelled.
+     *
+     * @param original the original event to potentially cancel
+     * @param eventToFire the event to fire to consider cancelling the original event
+     * @param <T> an event that can be fired and is cancellable
+     * @return true if the event was fired and it caused the original event to be cancelled
+     */
+    public static <T extends Event & Cancellable> boolean fireItemEventToCancel(PlayerInteractEvent original, T eventToFire) {
+        Bukkit.getServer().getPluginManager().callEvent(eventToFire);
+        if (eventToFire.isCancelled()) {
+            original.setUseItemInHand(Result.DENY);
+            return true;
         }
 
         return false;

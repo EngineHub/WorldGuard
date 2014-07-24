@@ -31,6 +31,10 @@ import com.sk89q.worldguard.blacklist.events.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemDropBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.bukkit.FlagStateManager.PlayerFlagState;
+import com.sk89q.worldguard.internal.Events;
+import com.sk89q.worldguard.internal.cause.Causes;
+import com.sk89q.worldguard.internal.event.Interaction;
+import com.sk89q.worldguard.internal.event.ItemInteractEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -39,7 +43,6 @@ import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -72,8 +75,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionEffect;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -497,6 +498,7 @@ public class WorldGuardPlayerListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
+        ItemStack item = event.getItem();
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             handleBlockRightClick(event);
@@ -523,38 +525,8 @@ public class WorldGuardPlayerListener implements Listener {
             }
         }
 
-        if (wcfg.blockPotions.size() > 0) {
-            ItemStack item = event.getItem();
-            if (item != null && item.getType() == Material.POTION && !BukkitUtil.isWaterPotion(item)) {
-                PotionEffect blockedEffect = null;
-
-                Potion potion = Potion.fromDamage(BukkitUtil.getPotionEffectBits(item));
-                for (PotionEffect effect : potion.getEffects()) {
-                    if (wcfg.blockPotions.contains(effect.getType())) {
-                        blockedEffect = effect;
-                        break;
-                    }
-                }
-
-                if (blockedEffect != null) {
-                    if (plugin.hasPermission(player, "worldguard.override.potions")) {
-                        if (potion.isSplash() && wcfg.blockPotionsAlways) {
-                            player.sendMessage(ChatColor.RED + "Sorry, potions with " +
-                                    blockedEffect.getType().getName() + " can't be thrown, " +
-                                    "even if you have a permission to bypass it, " +
-                                    "due to limitations (and because overly-reliable potion blocking is on).");
-                            event.setUseItemInHand(Result.DENY);
-                            return;
-                        }
-                    } else {
-                        player.sendMessage(ChatColor.RED + "Sorry, potions with "
-                                + blockedEffect.getType().getName() + " are presently disabled.");
-                        event.setUseItemInHand(Result.DENY);
-                        return;
-                    }
-
-                }
-            }
+        if (item != null) {
+            Events.fireItemEventToCancel(event, new ItemInteractEvent(event, Causes.create(event.getPlayer()), Interaction.INTERACT, world, item));
         }
     }
 

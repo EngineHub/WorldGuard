@@ -58,7 +58,7 @@ public class BlacklistListener extends AbstractListener {
         }
 
         if (player != null) {
-            switch (event.getAction()) {
+            switch (event.getInteraction()) {
                 case BREAK:
                     if (!wcfg.getBlacklist().check(
                             new BlockBreakBlacklistEvent(getPlugin().wrapPlayer(player), toVector(target), target.getTypeId()), false, false)) {

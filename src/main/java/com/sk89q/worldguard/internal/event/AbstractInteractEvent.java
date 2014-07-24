@@ -32,7 +32,7 @@ abstract class AbstractInteractEvent extends Event implements Cancellable {
 
     private final Event originalEvent;
     private final List<? extends Cause<?>> causes;
-    private final Action action;
+    private final Interaction interaction;
     private boolean cancelled;
 
     /**
@@ -40,15 +40,15 @@ abstract class AbstractInteractEvent extends Event implements Cancellable {
      *
      * @param originalEvent the original event
      * @param causes a list of causes, where the originating causes are at the beginning
-     * @param action the action that is being taken
+     * @param interaction the action that is being taken
      */
-    protected AbstractInteractEvent(Event originalEvent, List<? extends Cause<?>> causes, Action action) {
+    protected AbstractInteractEvent(Event originalEvent, List<? extends Cause<?>> causes, Interaction interaction) {
         checkNotNull(originalEvent);
         checkNotNull(causes);
-        checkNotNull(action);
+        checkNotNull(interaction);
         this.originalEvent = originalEvent;
         this.causes = causes;
-        this.action = action;
+        this.interaction = interaction;
     }
 
     /**
@@ -75,8 +75,8 @@ abstract class AbstractInteractEvent extends Event implements Cancellable {
      *
      * @return the action
      */
-    public Action getAction() {
-        return action;
+    public Interaction getInteraction() {
+        return interaction;
     }
 
     @Override

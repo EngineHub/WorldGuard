@@ -27,8 +27,9 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.internal.Blocks;
 import com.sk89q.worldguard.internal.Events;
 import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.Action;
+import com.sk89q.worldguard.internal.event.Interaction;
 import com.sk89q.worldguard.internal.event.BlockInteractEvent;
+import com.sk89q.worldguard.internal.event.ItemInteractEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -61,8 +62,6 @@ import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionEffect;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
@@ -121,7 +120,7 @@ public class WorldGuardBlockListener implements Listener {
         // Cake are damaged and not broken when they are eaten, so we must
         // handle them a bit separately
         if (target.getType() == Material.CAKE_BLOCK) {
-            Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Action.INTERACT, target));
+            Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.INTERACT, target));
         }
     }
 
@@ -142,12 +141,12 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Action.BREAK, target));
+        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, target));
 
         if (wcfg.checkAttached) {
             Block attachedTo = Blocks.getAttachesTo(target);
             if (attachedTo != null) {
-                Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Action.BREAK, attachedTo));
+                Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, attachedTo));
             }
         }
     }
@@ -476,12 +475,12 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
-        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Action.PLACE, target));
+        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.PLACE, target));
 
         if (wcfg.checkAttached) {
             Block attachedTo = Blocks.getAttachesTo(event.getBlockPlaced());
             if (attachedTo != null) {
-                Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Action.BREAK, attachedTo));
+                Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, attachedTo));
             }
         }
 
@@ -841,26 +840,9 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    /*
-     * Called when a block is damaged.
-     */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockDispense(BlockDispenseEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (wcfg.blockPotions.size() > 0) {
-            ItemStack item = event.getItem();
-            if (item.getType() == Material.POTION && !BukkitUtil.isWaterPotion(item)) {
-                Potion potion = Potion.fromDamage(BukkitUtil.getPotionEffectBits(item));
-                for (PotionEffect effect : potion.getEffects()) {
-                    if (potion.isSplash() && wcfg.blockPotions.contains(effect.getType())) {
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-        }
+        Events.fireToCancel(event, new ItemInteractEvent(event, Causes.create(event.getBlock()), Interaction.INTERACT, event.getBlock().getWorld(), event.getItem()));
     }
 
     /*

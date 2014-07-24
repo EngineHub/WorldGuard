@@ -22,7 +22,7 @@ package com.sk89q.worldguard.internal.event;
 /**
  * Represents a possible act upon an object.
  */
-public enum Action {
+public enum Interaction {
 
     PLACE,
     BREAK,

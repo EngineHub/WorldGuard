@@ -21,7 +21,7 @@ package com.sk89q.worldguard.internal.listener;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.Action;
+import com.sk89q.worldguard.internal.event.Interaction;
 import com.sk89q.worldguard.internal.event.BlockInteractEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
@@ -59,7 +59,7 @@ public class RegionProtectionListener extends AbstractListener {
                 return;
             }
 
-            if (event.getAction() != Action.INTERACT) {
+            if (event.getInteraction() != Interaction.INTERACT) {
                 if (!getPlugin().getGlobalRegionManager().canConstruct(player, target)) {
                     tellErrorMessage(player, target);
                     event.setCancelled(true);
