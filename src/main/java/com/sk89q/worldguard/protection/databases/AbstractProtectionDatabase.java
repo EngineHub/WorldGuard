@@ -19,28 +19,42 @@
 
 package com.sk89q.worldguard.protection.databases;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
 public abstract class AbstractProtectionDatabase implements ProtectionDatabase {
 
-    /**
-     * Load the list of regions into a region manager.
-     * 
-     * @throws ProtectionDatabaseException
-     */
+    @Override
     public void load(RegionManager manager) throws ProtectionDatabaseException {
         load();
         manager.setRegions(getRegions());
     }
-    
-    /**
-     * Save the list of regions from a region manager.
-     * 
-     * @throws ProtectionDatabaseException
-     */
-    public void save(RegionManager manager) throws ProtectionDatabaseException {
-        setRegions(manager.getRegions());
-        save();
+
+    @Override
+    public final void save(RegionManager manager) throws ProtectionDatabaseException {
+        save(manager, false);
     }
-    
+
+    @Override
+    public ListenableFuture<?> load(RegionManager manager, boolean async) {
+        try {
+            load(manager);
+        } catch (ProtectionDatabaseException e) {
+            return Futures.immediateFailedFuture(e);
+        }
+        return Futures.immediateCheckedFuture(this);
+    }
+
+    @Override
+    public ListenableFuture<?> save(RegionManager manager, boolean async) {
+        setRegions(manager.getRegions());
+        try {
+            save();
+        } catch (ProtectionDatabaseException e) {
+            return Futures.immediateFailedFuture(e);
+        }
+        return Futures.immediateCheckedFuture(this);
+    }
+
 }

@@ -19,23 +19,22 @@
 
 package com.sk89q.worldguard.domains;
 
+import com.sk89q.worldguard.LocalPlayer;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.sk89q.worldguard.LocalPlayer;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class DefaultDomain implements Domain {
     private final Set<String> groups;
     private final Set<String> players;
     
     public DefaultDomain() {
-        this.groups = new LinkedHashSet<String>();
-        this.players = new HashSet<String>();
+        this.groups = new CopyOnWriteArraySet<String>();
+        this.players = new CopyOnWriteArraySet<String>();
     }
     
     public void addPlayer(String name) {

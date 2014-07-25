@@ -51,19 +51,21 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class YAMLDatabase extends AbstractProtectionDatabase {
+public class YAMLDatabase extends AbstractAsynchronousDatabase {
 
     /**
      * Used to dump YAML when an error occurs
      */
     private static Yaml yaml;
 
-    private YAMLProcessor config;
     private Map<String, ProtectedRegion> regions;
+    private final File file;
     private final Logger logger;
     
     public YAMLDatabase(File file, Logger logger) throws ProtectionDatabaseException, FileNotFoundException {
         this.logger = logger;
+        this.file = file;
+
         if (!file.exists()) { // shouldn't be necessary, but check anyways
             try {
                 file.createNewFile();
@@ -71,10 +73,16 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                 throw new FileNotFoundException(file.getAbsolutePath());
             }
         }
-        config = new YAMLProcessor(file, false, YAMLFormat.COMPACT);
     }
 
-    public void load() throws ProtectionDatabaseException {
+    private YAMLProcessor createYamlProcessor() {
+        return new YAMLProcessor(file, false, YAMLFormat.COMPACT);
+    }
+
+    @Override
+    public void performLoad() throws ProtectionDatabaseException {
+        YAMLProcessor config = createYamlProcessor();
+
         try {
             config.load();
         } catch (IOException e) {
@@ -230,13 +238,16 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         return domain;
     }
 
-    public void save() throws ProtectionDatabaseException {
+    @Override
+    protected void performSave() {
+        YAMLProcessor config = createYamlProcessor();
+
         config.clear();
-        
+
         for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
             ProtectedRegion region = entry.getValue();
             YAMLNode node = config.addNode("regions." + entry.getKey());
-            
+
             if (region instanceof ProtectedCuboidRegion) {
                 ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
                 node.setProperty("type", "cuboid");
@@ -247,7 +258,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                 node.setProperty("type", "poly2d");
                 node.setProperty("min-y", poly.getMinimumPoint().getBlockY());
                 node.setProperty("max-y", poly.getMaximumPoint().getBlockY());
-                
+
                 List<Map<String, Object>> points = new ArrayList<Map<String,Object>>();
                 for (BlockVector2D point : poly.getPoints()) {
                     Map<String, Object> data = new HashMap<String, Object>();
@@ -255,7 +266,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                     data.put("z", point.getBlockZ());
                     points.add(data);
                 }
-                
+
                 node.setProperty("points", points);
             } else if (region instanceof GlobalProtectedRegion) {
                 node.setProperty("type", "global");
@@ -272,7 +283,7 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
                 node.setProperty("parent", parent.getId());
             }
         }
-        
+
         config.setHeader("#\r\n" +
                 "# WorldGuard regions file\r\n" +
                 "#\r\n" +
@@ -331,10 +342,12 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         domainData.put(key, list);
     }
 
+    @Override
     public Map<String, ProtectedRegion> getRegions() {
         return regions;
     }
 
+    @Override
     public void setRegions(Map<String, ProtectedRegion> regions) {
         this.regions = regions;
     }
