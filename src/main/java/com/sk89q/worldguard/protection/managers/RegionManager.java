@@ -19,15 +19,16 @@
 
 package com.sk89q.worldguard.protection.managers;
 
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * An abstract class for getting, setting, and looking up regions. The most
@@ -59,6 +60,15 @@ public abstract class RegionManager {
     public void load() throws ProtectionDatabaseException {
         loader.load(this);
     }
+    /**
+     * Load the list of regions. If the regions do not load properly, then
+     * the existing list should be used (as stored previously).
+     *
+     * @param async true to attempt to save the data asynchronously
+     */
+    public ListenableFuture<?> load(boolean async) {
+        return loader.load(this, async);
+    }
 
     /**
      * Save the list of regions.
@@ -67,6 +77,15 @@ public abstract class RegionManager {
      */
     public void save() throws ProtectionDatabaseException {
         loader.save(this);
+    }
+
+    /**
+     * Save the list of regions.
+     *
+     * @param async true to attempt to save the data asynchronously
+     */
+    public ListenableFuture<?> save(boolean async) {
+        return loader.save(this, async);
     }
 
     /**

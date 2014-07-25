@@ -35,18 +35,9 @@ import java.util.*;
 public class PRTreeRegionManager extends RegionManager {
 
     private static final int BRANCH_FACTOR = 30;
-    /**
-     * List of protected regions.
-     */
-    private Map<String, ProtectedRegion> regions;
-    /**
-     * Converter to get coordinates of the tree.
-     */
+
     private MBRConverter<ProtectedRegion> converter = new ProtectedRegionMBRConverter();
-    /**
-     * Priority R-tree.
-     */
-    private PRTree<ProtectedRegion> tree;
+    private RegionsContainer data = new RegionsContainer();
 
     /**
      * Construct the manager.
@@ -55,43 +46,45 @@ public class PRTreeRegionManager extends RegionManager {
      */
     public PRTreeRegionManager(ProtectionDatabase regionLoader) {
         super(regionLoader);
-        regions = new TreeMap<String, ProtectedRegion>();
-        tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
     }
 
     @Override
     public Map<String, ProtectedRegion> getRegions() {
-        return regions;
+        return data.regions;
     }
 
     @Override
     public void setRegions(Map<String, ProtectedRegion> regions) {
-        this.regions = new TreeMap<String, ProtectedRegion>(regions);
-        tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
-        tree.load(regions.values());
+        Map<String, ProtectedRegion> newRegions = new TreeMap<String, ProtectedRegion>(regions);
+        PRTree<ProtectedRegion> tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+        tree.load(newRegions.values());
+        this.data = new RegionsContainer(newRegions, tree);
     }
 
     @Override
     public void addRegion(ProtectedRegion region) {
-        regions.put(region.getId().toLowerCase(), region);
-        tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
-        tree.load(regions.values());
+        RegionsContainer data = this.data;
+        data.regions.put(region.getId().toLowerCase(), region);
+        data.tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+        data.tree.load(data.regions.values());
     }
 
     @Override
     public boolean hasRegion(String id) {
-        return regions.containsKey(id.toLowerCase());
+        return data.regions.containsKey(id.toLowerCase());
     }
 
     @Override
     public void removeRegion(String id) {
-        ProtectedRegion region = regions.get(id.toLowerCase());
+        RegionsContainer data = this.data;
 
-        regions.remove(id.toLowerCase());
+        ProtectedRegion region = data.regions.get(id.toLowerCase());
+
+        data.regions.remove(id.toLowerCase());
 
         if (region != null) {
             List<String> removeRegions = new ArrayList<String>();
-            for (ProtectedRegion curRegion : regions.values()) {
+            for (ProtectedRegion curRegion : data.regions.values()) {
                 if (curRegion.getParent() == region) {
                     removeRegions.add(curRegion.getId().toLowerCase());
                 }
@@ -102,12 +95,13 @@ public class PRTreeRegionManager extends RegionManager {
             }
         }
 
-        tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
-        tree.load(regions.values());
+        data.tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+        data.tree.load(data.regions.values());
     }
 
     @Override
     public ApplicableRegionSet getApplicableRegions(Vector pt) {
+        RegionsContainer data = this.data;
 
         // Floor the vector to ensure we get accurate points
         pt = pt.floor();
@@ -115,7 +109,7 @@ public class PRTreeRegionManager extends RegionManager {
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
         MBR pointMBR = new SimpleMBR(pt.getX(), pt.getX(), pt.getY(), pt.getY(), pt.getZ(), pt.getZ());
 
-        for (ProtectedRegion region : tree.find(pointMBR)) {
+        for (ProtectedRegion region : data.tree.find(pointMBR)) {
             if (region.contains(pt) && !appRegions.contains(region)) {
                 appRegions.add(region);
 
@@ -133,13 +127,15 @@ public class PRTreeRegionManager extends RegionManager {
 
         Collections.sort(appRegions);
 
-        return new ApplicableRegionSet(appRegions, regions.get("__global__"));
+        return new ApplicableRegionSet(appRegions, data.regions.get("__global__"));
     }
 
     @Override
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion checkRegion) {
+        RegionsContainer data = this.data;
+
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
-        appRegions.addAll(regions.values());
+        appRegions.addAll(data.regions.values());
 
         List<ProtectedRegion> intersectRegions;
         try {
@@ -148,11 +144,12 @@ public class PRTreeRegionManager extends RegionManager {
             intersectRegions = new ArrayList<ProtectedRegion>();
         }
 
-        return new ApplicableRegionSet(intersectRegions, regions.get("__global__"));
+        return new ApplicableRegionSet(intersectRegions, data.regions.get("__global__"));
     }
 
     @Override
     public List<String> getApplicableRegionsIDs(Vector pt) {
+        RegionsContainer data = this.data;
 
         // Floor the vector to ensure we get accurate points
         pt = pt.floor();
@@ -160,7 +157,7 @@ public class PRTreeRegionManager extends RegionManager {
         List<String> applicable = new ArrayList<String>();
         MBR pointMBR = new SimpleMBR(pt.getX(), pt.getX(), pt.getY(), pt.getY(), pt.getZ(), pt.getZ());
 
-        for (ProtectedRegion region : tree.find(pointMBR)) {
+        for (ProtectedRegion region : data.tree.find(pointMBR)) {
             if (region.contains(pt) && !applicable.contains(region.getId())) {
                 applicable.add(region.getId());
 
@@ -181,9 +178,11 @@ public class PRTreeRegionManager extends RegionManager {
 
     @Override
     public boolean overlapsUnownedRegion(ProtectedRegion checkRegion, LocalPlayer player) {
+        RegionsContainer data = this.data;
+
         List<ProtectedRegion> appRegions = new ArrayList<ProtectedRegion>();
 
-        for (ProtectedRegion other : regions.values()) {
+        for (ProtectedRegion other : data.regions.values()) {
             if (other.getOwners().contains(player)) {
                 continue;
             }
@@ -203,14 +202,14 @@ public class PRTreeRegionManager extends RegionManager {
 
     @Override
     public int size() {
-        return regions.size();
+        return data.regions.size();
     }
 
     @Override
     public int getRegionCountOfPlayer(LocalPlayer player) {
         int count = 0;
 
-        for (Map.Entry<String, ProtectedRegion> entry : regions.entrySet()) {
+        for (Map.Entry<String, ProtectedRegion> entry : data.regions.entrySet()) {
             if (entry.getValue().getOwners().contains(player)) {
                 count++;
             }
@@ -218,4 +217,20 @@ public class PRTreeRegionManager extends RegionManager {
 
         return count;
     }
+
+    private class RegionsContainer {
+        private final Map<String, ProtectedRegion> regions;
+        private PRTree<ProtectedRegion> tree;
+
+        private RegionsContainer() {
+            regions = new TreeMap<String, ProtectedRegion>();
+            tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+        }
+
+        private RegionsContainer(Map<String, ProtectedRegion> regions, PRTree<ProtectedRegion> tree) {
+            this.regions = regions;
+            this.tree = tree;
+        }
+    }
+
 }

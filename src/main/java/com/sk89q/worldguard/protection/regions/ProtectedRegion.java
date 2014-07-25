@@ -28,9 +28,9 @@ import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.flags.Flag;
 
 import java.awt.geom.Line2D;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -73,7 +73,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * List of flags.
      */
-    private Map<Flag<?>, Object> flags = new HashMap<Flag<?>, Object>();
+    private Map<Flag<?>, Object> flags = new ConcurrentHashMap<Flag<?>, Object>();
 
     /**
      * Construct a new instance of this region.
