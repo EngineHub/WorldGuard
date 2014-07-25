@@ -80,6 +80,10 @@ public final class Causes {
     public static List<? extends Cause<?>> create(Object ... cause) {
         List<Cause<?>> causes = new ArrayList<Cause<?>>(cause.length);
         for (Object o : cause) {
+            if (o == null) {
+                continue;
+            }
+            
             if (o instanceof Player) {
                 causes.add(new PlayerCause((Player) o));
             } else if (o instanceof Block) {
