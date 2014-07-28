@@ -58,3 +58,8 @@
 #[coalore,goldore,ironore]
 #ignore-groups=admins,mods
 #on-break=notify,deny,log
+
+# Some funky data value tests
+#[wood:0;>=2]
+#ignore-groups=admins,mods
+#on-break=notify,deny,log

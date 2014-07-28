@@ -22,12 +22,13 @@ package com.sk89q.worldguard.blacklist;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
-import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.blacklist.action.Action;
 import com.sk89q.worldguard.blacklist.action.ActionType;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.event.EventType;
-import com.sk89q.worldguard.blacklist.target.WildcardDataMatcher;
+import com.sk89q.worldguard.blacklist.target.TargetMatcher;
+import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
+import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
 import org.bukkit.ChatColor;
 
 import java.io.BufferedReader;
@@ -135,6 +136,7 @@ public abstract class Blacklist {
     public void load(File file) throws IOException {
         FileReader input = null;
         MatcherIndex.Builder builder = new MatcherIndex.Builder();
+        TargetMatcherParser targetMatcherParser = new TargetMatcherParser();
 
         try {
             input = new FileReader(file);
@@ -157,29 +159,20 @@ public abstract class Blacklist {
                     currentEntries = new ArrayList<BlacklistEntry>();
 
                     for (String item : items) {
-                        int id;
-
                         try {
-                            id = Integer.parseInt(item.trim());
-                        } catch (NumberFormatException e) {
-                            id = getItemID(item.trim());
-                            if (id == 0) {
-                                logger.log(Level.WARNING, "Unknown block name: " + item);
-                                break;
-                            }
+                            TargetMatcher matcher = targetMatcherParser.fromInput(item.trim());
+                            BlacklistEntry entry = new BlacklistEntry(this);
+                            builder.add(matcher, entry);
+                            currentEntries.add(entry);
+                        } catch (TargetMatcherParseException e) {
+                            logger.log(Level.WARNING, "Could not parse a block/item heading: " + e.getMessage());
                         }
-
-                        BlacklistEntry entry = new BlacklistEntry(this);
-
-                        builder.add(new WildcardDataMatcher(id), entry);
-                        currentEntries.add(entry);
                     }
                 } else if (currentEntries != null) {
                     String[] parts = line.split("=");
 
                     if (parts.length == 1) {
-                        logger.log(Level.WARNING, "Found option with no value "
-                                + file.getName() + " for '" + line + "'");
+                        logger.log(Level.WARNING, "Found option with no value " + file.getName() + " for '" + line + "'");
                         continue;
                     }
 
@@ -292,21 +285,6 @@ public abstract class Blacklist {
      * @param msg The message to broadcast
      */
     public abstract void broadcastNotification(String msg);
-
-    /**
-     * Get an item's ID from its name.
-     *
-     * @param name the name of the item to look up
-     * @return the id for name if contained in ItemId, else -1
-     */
-    private static int getItemID(String name) {
-        ItemType type = ItemType.lookup(name);
-        if (type != null) {
-            return type.getID();
-        } else {
-            return -1;
-        }
-    }
 
     public Cache<String, TrackedEvent> getRepeatingEventCache() {
         return repeatingEventCache;
