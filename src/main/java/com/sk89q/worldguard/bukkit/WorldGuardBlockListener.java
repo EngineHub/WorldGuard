@@ -24,6 +24,7 @@ import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
 import com.sk89q.worldguard.internal.Events;
 import com.sk89q.worldguard.internal.cause.Causes;
 import com.sk89q.worldguard.internal.event.BlockInteractEvent;
@@ -827,6 +828,16 @@ public class WorldGuardBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockDispense(BlockDispenseEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
+
+        if (wcfg.getBlacklist() != null) {
+            if (!wcfg.getBlacklist().check(new BlockDispenseBlacklistEvent(null, toVector(event.getBlock()), event.getItem().getTypeId()), false, false)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         Events.fireToCancel(event, new ItemInteractEvent(event, Causes.create(event.getBlock()), Interaction.INTERACT, event.getBlock().getWorld(), event.getItem()));
     }
 

@@ -24,6 +24,7 @@ public enum EventType {
     BREAK(BlockBreakBlacklistEvent.class, "on-break"),
     PLACE(BlockPlaceBlacklistEvent.class, "on-place"),
     INTERACT(BlockInteractBlacklistEvent.class, "on-interact"),
+    DISPENSE(BlockDispenseBlacklistEvent.class, "on-dispense"),
     DESTROY_WITH(ItemDestroyWithBlacklistEvent.class, "on-destroy-with"),
     ACQUIRE(ItemAcquireBlacklistEvent.class, "on-acquire"),
     DROP(ItemDropBlacklistEvent.class, "on-drop"),
