@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.worldedit.blocks.ItemID;
 import com.sk89q.worldguard.blacklist.event.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.event.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.blacklist.target.MaterialTarget;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -94,13 +95,13 @@ public class WorldGuardHangingListener implements Listener {
                     if (hanging instanceof Painting
                             && !wcfg.getBlacklist().check(
                                 new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
-                                        toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
+                                        toVector(player.getLocation()), new MaterialTarget(ItemID.PAINTING, (short) 0)), false, false)) {
                         event.setCancelled(true);
                         return;
                     } else if (hanging instanceof ItemFrame
                             && !wcfg.getBlacklist().check(
                                 new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
-                                        toVector(player.getLocation()), ItemID.ITEM_FRAME), false, false)) {
+                                        toVector(player.getLocation()), new MaterialTarget(ItemID.ITEM_FRAME, (short) 0)), false, false)) {
                         event.setCancelled(true);
                         return;
                     }
@@ -165,13 +166,13 @@ public class WorldGuardHangingListener implements Listener {
             if (event.getEntity() instanceof Painting
                     && !wcfg.getBlacklist().check(
                         new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                                toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
+                                toVector(player.getLocation()), new MaterialTarget(ItemID.PAINTING, (short) 0)), false, false)) {
                 event.setCancelled(true);
                 return;
             } else if (event.getEntity() instanceof ItemFrame
                     && !wcfg.getBlacklist().check(
                         new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                                toVector(player.getLocation()), ItemID.ITEM_FRAME), false, false)) {
+                                toVector(player.getLocation()), new MaterialTarget(ItemID.ITEM_FRAME, (short) 0)), false, false)) {
                 event.setCancelled(true);
                 return;
             }

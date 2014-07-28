@@ -21,6 +21,7 @@ package com.sk89q.worldguard.blacklist.event;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.target.Target;
 
 import javax.annotation.Nullable;
 
@@ -60,7 +61,7 @@ public interface BlacklistEvent {
      *
      * @return The type associated with this event
      */
-    int getType();
+    Target getTarget();
 
     /**
      * Get a short description such as "break" or "destroy with."

@@ -30,6 +30,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
+import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
@@ -61,13 +62,13 @@ public class BlacklistListener extends AbstractListener {
             switch (event.getInteraction()) {
                 case BREAK:
                     if (!wcfg.getBlacklist().check(
-                            new BlockBreakBlacklistEvent(getPlugin().wrapPlayer(player), toVector(target), target.getTypeId()), false, false)) {
+                            new BlockBreakBlacklistEvent(getPlugin().wrapPlayer(player), toVector(target), createTarget(target)), false, false)) {
                         event.setCancelled(true);
                         return;
                     }
 
                     if (!wcfg.getBlacklist().check(
-                            new ItemDestroyWithBlacklistEvent(getPlugin().wrapPlayer(player), toVector(target), player.getItemInHand().getTypeId()), false, false)) {
+                            new ItemDestroyWithBlacklistEvent(getPlugin().wrapPlayer(player), toVector(target), createTarget(player.getItemInHand())), false, false)) {
                         event.setCancelled(true);
                         return;
                     }
@@ -76,7 +77,7 @@ public class BlacklistListener extends AbstractListener {
 
                 case PLACE:
                     if (!wcfg.getBlacklist().check(
-                            new BlockPlaceBlacklistEvent(getPlugin().wrapPlayer(player), toVector(target), target.getTypeId()), false, false)) {
+                            new BlockPlaceBlacklistEvent(getPlugin().wrapPlayer(player), toVector(target), createTarget(target)), false, false)) {
                         event.setCancelled(true);
                         return;
                     }

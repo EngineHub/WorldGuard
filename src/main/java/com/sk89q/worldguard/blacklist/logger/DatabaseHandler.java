@@ -108,7 +108,7 @@ public class DatabaseHandler implements LoggerHandler {
 
     @Override
     public void logEvent(BlacklistEvent event, String comment) {
-        logEvent(event.getEventType(), event.getPlayer(), event.getLoggedPosition(), event.getType(), comment);
+        logEvent(event.getEventType(), event.getPlayer(), event.getLoggedPosition(), event.getTarget().getTypeId(), comment);
     }
 
     @Override

@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.blacklist;
 
 import com.google.common.cache.Cache;
-import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.action.Action;
 import com.sk89q.worldguard.blacklist.action.ActionResult;
@@ -213,20 +212,6 @@ public class BlacklistEntry {
         }
 
         return ret;
-    }
-
-    /**
-     * Get an item's friendly name with its ID.
-     *
-     * @param id The id to get a name for
-     */
-    public static String getFriendlyItemName(int id) {
-        ItemType type = ItemType.fromID(id);
-        if (type != null) {
-            return type.getName() + " (#" + id + ")";
-        } else {
-            return "#" + id + "";
-        }
     }
 
 }

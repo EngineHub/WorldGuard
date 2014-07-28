@@ -21,17 +21,26 @@ package com.sk89q.worldguard.blacklist.event;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.BlacklistEntry;
+import com.sk89q.worldguard.blacklist.target.Target;
+
+import javax.annotation.Nullable;
 
 abstract class ItemBlacklistEvent extends AbstractBlacklistEvent {
 
-    ItemBlacklistEvent(LocalPlayer player, Vector pos, int type) {
-        super(player, pos, type);
+    /**
+     * Construct the object.
+     *
+     * @param player The player associated with this event
+     * @param position The position the event occurred at
+     * @param target The target of the event
+     */
+    ItemBlacklistEvent(@Nullable LocalPlayer player, Vector position, Target target) {
+        super(player, position, target);
     }
 
     @Override
     public String getLoggerMessage() {
-        return getPlayerName() + " tried to " + getDescription() + " " + BlacklistEntry.getFriendlyItemName(getType());
+        return getPlayerName() + " tried to " + getDescription() + " " + getTarget().getFriendlyName();
     }
 
     @Override

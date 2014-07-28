@@ -22,7 +22,7 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldguard.blacklist.Logger;
+import com.sk89q.worldguard.blacklist.BlacklistLoggerHandler;
 import com.sk89q.worldguard.blacklist.logger.ConsoleHandler;
 import com.sk89q.worldguard.blacklist.logger.DatabaseHandler;
 import com.sk89q.worldguard.blacklist.logger.FileHandler;
@@ -484,7 +484,7 @@ public class WorldConfiguration {
                     plugin.getLogger().log(Level.INFO, "Blacklist loaded.");
                 }
 
-                Logger blacklistLogger = blist.getLogger();
+                BlacklistLoggerHandler blacklistLogger = blist.getLogger();
 
                 if (logDatabase) {
                     blacklistLogger.addHandler(new DatabaseHandler(dsn, user, pass, table, worldName, plugin.getLogger()));
