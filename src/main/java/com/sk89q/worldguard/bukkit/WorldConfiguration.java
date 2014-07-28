@@ -22,10 +22,10 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldguard.blacklist.BlacklistLogger;
-import com.sk89q.worldguard.blacklist.loggers.ConsoleLoggerHandler;
-import com.sk89q.worldguard.blacklist.loggers.DatabaseLoggerHandler;
-import com.sk89q.worldguard.blacklist.loggers.FileLoggerHandler;
+import com.sk89q.worldguard.blacklist.Logger;
+import com.sk89q.worldguard.blacklist.logger.ConsoleHandler;
+import com.sk89q.worldguard.blacklist.logger.DatabaseHandler;
+import com.sk89q.worldguard.blacklist.logger.FileHandler;
 import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.chest.SignChestProtection;
 import org.bukkit.block.Block;
@@ -487,19 +487,19 @@ public class WorldConfiguration {
                     plugin.getLogger().log(Level.INFO, "Blacklist loaded.");
                 }
 
-                BlacklistLogger blacklistLogger = blist.getLogger();
+                Logger blacklistLogger = blist.getLogger();
 
                 if (logDatabase) {
-                    blacklistLogger.addHandler(new DatabaseLoggerHandler(dsn, user, pass, table, worldName, plugin.getLogger()));
+                    blacklistLogger.addHandler(new DatabaseHandler(dsn, user, pass, table, worldName, plugin.getLogger()));
                 }
 
                 if (logConsole) {
-                    blacklistLogger.addHandler(new ConsoleLoggerHandler(worldName, plugin.getLogger()));
+                    blacklistLogger.addHandler(new ConsoleHandler(worldName, plugin.getLogger()));
                 }
 
                 if (logFile) {
-                    FileLoggerHandler handler =
-                            new FileLoggerHandler(logFilePattern, logFileCacheSize, worldName, plugin.getLogger());
+                    FileHandler handler =
+                            new FileHandler(logFilePattern, logFileCacheSize, worldName, plugin.getLogger());
                     blacklistLogger.addHandler(handler);
                 }
             }

@@ -19,9 +19,9 @@
 
 package com.sk89q.worldguard.internal.listener;
 
-import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.BlockPlaceBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.DestroyWithBlacklistEvent;
+import com.sk89q.worldguard.blacklist.event.BlockBreakBlacklistEvent;
+import com.sk89q.worldguard.blacklist.event.BlockPlaceBlacklistEvent;
+import com.sk89q.worldguard.blacklist.event.ItemDestroyWithBlacklistEvent;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.cause.Causes;
@@ -67,7 +67,7 @@ public class BlacklistListener extends AbstractListener {
                     }
 
                     if (!wcfg.getBlacklist().check(
-                            new DestroyWithBlacklistEvent(getPlugin().wrapPlayer(player), toVector(target), player.getItemInHand().getTypeId()), false, false)) {
+                            new ItemDestroyWithBlacklistEvent(getPlugin().wrapPlayer(player), toVector(target), player.getItemInHand().getTypeId()), false, false)) {
                         event.setCancelled(true);
                         return;
                     }
