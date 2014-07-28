@@ -19,8 +19,10 @@
 
 package com.sk89q.worldguard.blacklist;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.sk89q.worldedit.blocks.ItemType;
-import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.action.Action;
 import com.sk89q.worldguard.blacklist.action.ActionType;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
@@ -35,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -44,11 +47,17 @@ public abstract class Blacklist {
     private Map<Integer, List<BlacklistEntry>> blacklist = new HashMap<Integer, List<BlacklistEntry>>();
     private Logger blacklistLogger = new Logger();
     private BlacklistEvent lastEvent;
-    Map<String, TrackedEvent> lastAffected = new HashMap<String, TrackedEvent>();
-
     private boolean useAsWhitelist;
-
     private final java.util.logging.Logger logger;
+    private Cache<String, TrackedEvent> repeatingEventCache = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .expireAfterAccess(30, TimeUnit.SECONDS)
+            .build(new CacheLoader<String, TrackedEvent>() {
+                @Override
+                public TrackedEvent load(String s) throws Exception {
+                    return new TrackedEvent();
+                }
+            });
 
     public Blacklist(boolean useAsWhitelist, java.util.logging.Logger logger) {
         checkNotNull(logger);
@@ -302,22 +311,6 @@ public abstract class Blacklist {
     public abstract void broadcastNotification(String msg);
 
     /**
-     * Forget a player.
-     *
-     * @param player The player to forget
-     */
-    public void forgetPlayer(LocalPlayer player) {
-        lastAffected.remove(player.getName());
-    }
-
-    /**
-     * Forget all players.
-     */
-    public void forgetAllPlayers() {
-        lastAffected.clear();
-    }
-
-    /**
      * Get an item's ID from its name.
      *
      * @param name the name of the item to look up
@@ -347,4 +340,11 @@ public abstract class Blacklist {
         }
     }
 
+    public Cache<String, TrackedEvent> getRepeatingEventCache() {
+        return repeatingEventCache;
+    }
+
+    public void setRepeatingEventCache(Cache<String, TrackedEvent> repeatingEventCache) {
+        this.repeatingEventCache = repeatingEventCache;
+    }
 }

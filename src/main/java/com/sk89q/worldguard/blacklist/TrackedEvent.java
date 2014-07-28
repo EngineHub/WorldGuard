@@ -21,30 +21,27 @@ package com.sk89q.worldguard.blacklist;
 
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 
+import javax.annotation.Nullable;
+
 class TrackedEvent {
 
-    private BlacklistEvent event;
-    private long time;
+    @Nullable
+    private BlacklistEvent lastEvent;
+    private long time = 0;
 
-    /**
-     * Construct the object.
-     *
-     * @param event The event tracked
-     * @param time The time at which the event occurred
-     */
-    TrackedEvent(BlacklistEvent event, long time) {
-        this.event = event;
-        this.time = time;
-    }
-
-    public boolean matches(BlacklistEvent other, long now) {
-        return other.getType() == event.getType()
-                && time > now - 3000
-                && other.getClass() == event.getClass();
+    public boolean matches(BlacklistEvent other) {
+        if (lastEvent == null) {
+            return false;
+        }
+        long now = System.currentTimeMillis();
+        return other.getEventType() == lastEvent.getEventType() && time > now - 3000;
     }
 
     public void resetTimer() {
         time = System.currentTimeMillis();
     }
 
+    public void setLastEvent(@Nullable BlacklistEvent lastEvent) {
+        this.lastEvent = lastEvent;
+    }
 }

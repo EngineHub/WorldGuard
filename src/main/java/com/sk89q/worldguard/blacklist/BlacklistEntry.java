@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.blacklist;
 
+import com.google.common.cache.Cache;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.action.Action;
@@ -171,20 +172,17 @@ public class BlacklistEntry {
             return true;
         }
 
-        String name = player != null ? player.getName() : "<unknown>";
-        long now = System.currentTimeMillis();
         boolean repeating = false;
+        String eventCacheKey = event.getCauseName();
+        Cache<String, TrackedEvent> repeatingEventCache = blacklist.getRepeatingEventCache();
 
         // Check to see whether this event is being repeated
-        TrackedEvent tracked = blacklist.lastAffected.get(name);
-        if (tracked != null) {
-            if (tracked.matches(event, now)) {
-                repeating = true;
-            } else {
-                tracked.resetTimer();
-            }
+        TrackedEvent tracked = repeatingEventCache.getUnchecked(eventCacheKey);
+        if (tracked.matches(event)) {
+            repeating = true;
         } else {
-            blacklist.lastAffected.put(name, new TrackedEvent(event, now));
+            tracked.setLastEvent(event);
+            tracked.resetTimer();
         }
 
         List<Action> actions = getActions(event.getClass());
