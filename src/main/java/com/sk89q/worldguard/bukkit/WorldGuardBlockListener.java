@@ -24,7 +24,6 @@ import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.internal.Blocks;
 import com.sk89q.worldguard.internal.Events;
 import com.sk89q.worldguard.internal.cause.Causes;
 import com.sk89q.worldguard.internal.event.BlockInteractEvent;
@@ -142,13 +141,6 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, target));
-
-        if (wcfg.checkAttached) {
-            Block attachedTo = Blocks.getAttachesTo(target);
-            if (attachedTo != null) {
-                Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, attachedTo));
-            }
-        }
     }
 
     /*
@@ -476,13 +468,6 @@ public class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.PLACE, target));
-
-        if (wcfg.checkAttached) {
-            Block attachedTo = Blocks.getAttachesTo(event.getBlockPlaced());
-            if (attachedTo != null) {
-                Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, attachedTo));
-            }
-        }
 
         if (wcfg.simulateSponge && target.getType() == Material.SPONGE) {
             if (wcfg.redstoneSponges && target.isBlockIndirectlyPowered()) {
