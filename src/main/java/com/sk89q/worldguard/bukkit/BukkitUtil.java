@@ -24,21 +24,27 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemID;
+import com.sk89q.worldguard.blacklist.target.MaterialTarget;
+import com.sk89q.worldguard.blacklist.target.Target;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Tameable;
 import org.bukkit.inventory.ItemStack;
+
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BukkitUtil {
 
@@ -294,4 +300,38 @@ public class BukkitUtil {
 
         return null;
     }
+
+    /**
+     * Get a blacklist target for the given block.
+     * 
+     * @param block the block
+     * @return a target
+     */
+    public static Target createTarget(Block block) {
+        checkNotNull(block);
+        return new MaterialTarget(block.getTypeId(), block.getData());
+    }
+
+    /**
+     * Get a blacklist target for the given item.
+     *
+     * @param item the item
+     * @return a target
+     */
+    public static Target createTarget(ItemStack item) {
+        checkNotNull(item);
+        return new MaterialTarget(item.getTypeId(), item.getDurability());
+    }
+
+    /**
+     * Get a blacklist target for the given material.
+     *
+     * @param material the material
+     * @return a target
+     */
+    public static Target createTarget(Material material) {
+        checkNotNull(material);
+        return new MaterialTarget(material.getId(), (short) 0);
+    }
+
 }

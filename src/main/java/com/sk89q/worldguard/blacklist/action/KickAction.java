@@ -43,9 +43,9 @@ public class KickAction implements Action {
             String message = entry.getMessage();
 
             if (message != null) {
-                event.getPlayer().kick(String.format(message, BlacklistEntry.getFriendlyItemName(event.getType())));
+                event.getPlayer().kick(String.format(message, event.getTarget().getFriendlyName()));
             } else {
-                event.getPlayer().kick("You can't " + event.getDescription() + " " + BlacklistEntry.getFriendlyItemName(event.getType()));
+                event.getPlayer().kick("You can't " + event.getDescription() + " " + event.getTarget().getFriendlyName());
             }
         }
 

@@ -21,6 +21,7 @@ package com.sk89q.worldguard.blacklist.event;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.target.Target;
 
 import javax.annotation.Nullable;
 
@@ -29,22 +30,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 abstract class AbstractBlacklistEvent implements BlacklistEvent {
 
     @Nullable
-    private LocalPlayer player;
-    private Vector position;
-    private int type;
+    private final LocalPlayer player;
+    private final Vector position;
+    private final Target target;
     
     /**
      * Construct the object.
      * 
      * @param player The player associated with this event
      * @param position The position the event occurred at
-     * @param type The type of item used
+     * @param target The target of the event
      */
-    AbstractBlacklistEvent(@Nullable LocalPlayer player, Vector position, int type) {
+    AbstractBlacklistEvent(@Nullable LocalPlayer player, Vector position, Target target) {
         checkNotNull(position);
+        checkNotNull(target);
         this.player = player;
         this.position = position;
-        this.type = type;
+        this.target = target;
     }
 
     @Nullable
@@ -64,8 +66,8 @@ abstract class AbstractBlacklistEvent implements BlacklistEvent {
     }
     
     @Override
-    public int getType() {
-        return type;
+    public Target getTarget() {
+        return target;
     }
 
     protected String getPlayerName() {

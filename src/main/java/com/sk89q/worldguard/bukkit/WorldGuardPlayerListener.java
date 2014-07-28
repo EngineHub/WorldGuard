@@ -81,6 +81,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
@@ -485,9 +486,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
-                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                            toVector(player.getLocation()),
-                    item.getTypeId()), false, false)) {
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(player.getLocation()), createTarget(item)), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -602,9 +601,7 @@ public class WorldGuardPlayerListener implements Listener {
         if (type == BlockID.TNT && player.getItemInHand().getTypeId() == ItemID.FLINT_AND_TINDER) {
             if (wcfg.getBlacklist() != null) {
                 if (!wcfg.getBlacklist().check(
-                        new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
-                        toVector(event.getClickedBlock()),
-                        event.getClickedBlock().getTypeId()), false, false)) {
+                        new BlockBreakBlacklistEvent(plugin.wrapPlayer(player), toVector(event.getClickedBlock()), createTarget(event.getClickedBlock())), false, false)) {
                     event.setUseInteractedBlock(Result.DENY);
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
@@ -629,9 +626,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
-                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                            toVector(player.getLocation()),
-                    item.getTypeId()), false, false)) {
+                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(player.getLocation()), createTarget(item)), false, false)) {
                 event.setCancelled(true);
                 event.setUseItemInHand(Result.DENY);
                 return;
@@ -1002,8 +997,7 @@ public class WorldGuardPlayerListener implements Listener {
                     && type != BlockID.HOPPER
                     && type != BlockID.DROPPER)) {
                 if (!wcfg.getBlacklist().check(
-                        new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
-                                item.getTypeId()), false, false)) {
+                        new ItemUseBlacklistEvent(plugin.wrapPlayer(player), toVector(block), createTarget(item)), false, false)) {
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -1011,8 +1005,7 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (!wcfg.getBlacklist().check(
-                    new BlockInteractBlacklistEvent(plugin.wrapPlayer(player), toVector(block),
-                            block.getTypeId()), false, false)) {
+                    new BlockInteractBlacklistEvent(plugin.wrapPlayer(player), toVector(block), createTarget(block)), false, false)) {
                 event.setUseInteractedBlock(Result.DENY);
                 event.setCancelled(true);
                 return;
@@ -1022,8 +1015,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (item.getTypeId() == BlockID.TNT) {
                 Block placedOn = block.getRelative(event.getBlockFace());
                 if (!wcfg.getBlacklist().check(
-                        new BlockPlaceBlacklistEvent(plugin.wrapPlayer(player), toVector(placedOn),
-                              item.getTypeId()), false, false)) {
+                        new BlockPlaceBlacklistEvent(plugin.wrapPlayer(player), toVector(placedOn), createTarget(item)), false, false)) {
                     event.setUseItemInHand(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -1226,7 +1218,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (!wcfg.getBlacklist().check(
                     new ItemDropBlacklistEvent(plugin.wrapPlayer(event.getPlayer()),
-                            toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, false)) {
+                            toVector(ci.getLocation()), createTarget(ci.getItemStack())), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -1243,7 +1235,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (!wcfg.getBlacklist().check(
                     new ItemAcquireBlacklistEvent(plugin.wrapPlayer(event.getPlayer()),
-                            toVector(ci.getLocation()), ci.getItemStack().getTypeId()), false, true)) {
+                            toVector(ci.getLocation()), createTarget(ci.getItemStack())), false, true)) {
                 event.setCancelled(true);
                 return;
             }
@@ -1270,7 +1262,7 @@ public class WorldGuardPlayerListener implements Listener {
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
                     new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                            toVector(player.getLocation()), event.getBucket().getId()), false, false)) {
+                            toVector(player.getLocation()), createTarget(event.getBucket())), false, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -1305,7 +1297,7 @@ public class WorldGuardPlayerListener implements Listener {
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(
                     new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                            toVector(player.getLocation()), event.getBucket().getId()), false, false)) {
+                            toVector(player.getLocation()), createTarget(event.getBucket())), false, false)) {
                 event.setCancelled(true);
                 return;
             }

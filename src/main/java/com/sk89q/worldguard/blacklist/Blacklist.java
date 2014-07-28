@@ -27,6 +27,7 @@ import com.sk89q.worldguard.blacklist.action.Action;
 import com.sk89q.worldguard.blacklist.action.ActionType;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.event.EventType;
+import com.sk89q.worldguard.blacklist.target.WildcardDataMatcher;
 import org.bukkit.ChatColor;
 
 import java.io.BufferedReader;
@@ -34,9 +35,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -44,8 +43,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class Blacklist {
 
-    private Map<Integer, List<BlacklistEntry>> blacklist = new HashMap<Integer, List<BlacklistEntry>>();
-    private Logger blacklistLogger = new Logger();
+    private MatcherIndex index = MatcherIndex.getEmptyInstance();
+    private final BlacklistLoggerHandler blacklistLogger = new BlacklistLoggerHandler();
     private BlacklistEvent lastEvent;
     private boolean useAsWhitelist;
     private final java.util.logging.Logger logger;
@@ -71,17 +70,7 @@ public abstract class Blacklist {
      * @return whether the blacklist is empty
      */
     public boolean isEmpty() {
-        return blacklist.isEmpty();
-    }
-
-    /**
-     * Get the entries for an item or list.
-     *
-     * @param id The item id to get blacklist information for
-     * @return The blacklist entries for {@code id}
-     */
-    public List<BlacklistEntry> getEntries(int id) {
-        return blacklist.get(id);
+        return index.isEmpty();
     }
 
     /**
@@ -90,7 +79,7 @@ public abstract class Blacklist {
      * @return The number of items in the blacklist
      */
     public int getItemCount() {
-        return blacklist.size();
+        return index.size();
     }
 
     /**
@@ -107,7 +96,7 @@ public abstract class Blacklist {
      *
      * @return The logger used in this blacklist
      */
-    public Logger getLogger() {
+    public BlacklistLoggerHandler getLogger() {
         return blacklistLogger;
     }
 
@@ -120,7 +109,7 @@ public abstract class Blacklist {
      * @return Whether the event is allowed
      */
     public boolean check(BlacklistEvent event, boolean forceRepeat, boolean silent) {
-        List<BlacklistEntry> entries = getEntries(event.getType());
+        List<BlacklistEntry> entries = index.getEntries(event.getTarget());
 
         if (entries == null) {
             return true;
@@ -145,7 +134,7 @@ public abstract class Blacklist {
      */
     public void load(File file) throws IOException {
         FileReader input = null;
-        Map<Integer,List<BlacklistEntry>> blacklist = new HashMap<Integer,List<BlacklistEntry>>();
+        MatcherIndex.Builder builder = new MatcherIndex.Builder();
 
         try {
             input = new FileReader(file);
@@ -175,20 +164,14 @@ public abstract class Blacklist {
                         } catch (NumberFormatException e) {
                             id = getItemID(item.trim());
                             if (id == 0) {
-                                logger.log(Level.WARNING, "Unknown block name: "
-                                        + item);
+                                logger.log(Level.WARNING, "Unknown block name: " + item);
                                 break;
                             }
                         }
 
                         BlacklistEntry entry = new BlacklistEntry(this);
-                        if (blacklist.containsKey(id)) {
-                            blacklist.get(id).add(entry);
-                        } else {
-                            List<BlacklistEntry> entries = new ArrayList<BlacklistEntry>();
-                            entries.add(entry);
-                            blacklist.put(id, entries);
-                        }
+
+                        builder.add(new WildcardDataMatcher(id), entry);
                         currentEntries.add(entry);
                     }
                 } else if (currentEntries != null) {
@@ -241,7 +224,7 @@ public abstract class Blacklist {
                 }
             }
 
-            this.blacklist = blacklist;
+            this.index = builder.build();
         } finally {
             try {
                 if (input != null) {
@@ -299,7 +282,7 @@ public abstract class Blacklist {
                 + ChatColor.LIGHT_PURPLE + event.getCauseName()
                 + ChatColor.GOLD + " (" + event.getDescription() + ") "
                 + ChatColor.WHITE
-                + getFriendlyItemName(event.getType())
+                + event.getTarget().getFriendlyName()
                 + (comment != null ? " (" + comment + ")" : "") + ".");
     }
 
@@ -325,26 +308,8 @@ public abstract class Blacklist {
         }
     }
 
-    /**
-     * Get an item's friendly name with its ID.
-     *
-     * @param id The id to look up
-     * @return The item's friendly name
-     */
-    private static String getFriendlyItemName(int id) {
-        ItemType type = ItemType.fromID(id);
-        if (type != null) {
-            return type.getName() + " (#" + id + ")";
-        } else {
-            return "#" + id + "";
-        }
-    }
-
     public Cache<String, TrackedEvent> getRepeatingEventCache() {
         return repeatingEventCache;
     }
 
-    public void setRepeatingEventCache(Cache<String, TrackedEvent> repeatingEventCache) {
-        this.repeatingEventCache = repeatingEventCache;
-    }
 }

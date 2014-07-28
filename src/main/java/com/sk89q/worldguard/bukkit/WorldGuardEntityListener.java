@@ -83,6 +83,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Set;
 
+import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
@@ -236,7 +237,7 @@ public class WorldGuardEntityListener implements Listener {
                 if (wcfg.getBlacklist() != null) {
                     if (!wcfg.getBlacklist().check(
                             new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                                    toVector(player.getLocation()), held.getTypeId()), false, false)) {
+                                    toVector(player.getLocation()), createTarget(held)), false, false)) {
                         event.setCancelled(true);
                         return;
                     }

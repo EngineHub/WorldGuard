@@ -63,6 +63,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
+import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
@@ -832,7 +833,7 @@ public class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (wcfg.getBlacklist() != null) {
-            if (!wcfg.getBlacklist().check(new BlockDispenseBlacklistEvent(null, toVector(event.getBlock()), event.getItem().getTypeId()), false, false)) {
+            if (!wcfg.getBlacklist().check(new BlockDispenseBlacklistEvent(null, toVector(event.getBlock()), createTarget(event.getItem())), false, false)) {
                 event.setCancelled(true);
                 return;
             }

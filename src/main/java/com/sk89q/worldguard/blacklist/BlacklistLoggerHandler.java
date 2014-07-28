@@ -25,7 +25,7 @@ import com.sk89q.worldguard.blacklist.logger.LoggerHandler;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Logger implements LoggerHandler {
+public class BlacklistLoggerHandler implements LoggerHandler {
 
     /**
      * List of logger handlers.

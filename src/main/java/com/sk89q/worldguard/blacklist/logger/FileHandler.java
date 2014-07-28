@@ -23,6 +23,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
+import com.sk89q.worldguard.blacklist.target.Target;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -221,14 +222,13 @@ public class FileHandler implements LoggerHandler {
         return "@" + pos.getBlockX() + "," + pos.getBlockY() + "," + pos.getBlockZ();
     }
 
-    private void logEvent(BlacklistEvent event, String text, int id, Vector pos, String comment) {
-        log(event.getPlayer(), "Tried to " + text + " " + getFriendlyItemName(id)
-                + " " + getCoordinates(pos), comment);
+    private void logEvent(BlacklistEvent event, String text, Target target, Vector pos, String comment) {
+        log(event.getPlayer(), "Tried to " + text + " " + target.getFriendlyName() + " " + getCoordinates(pos), comment);
     }
 
     @Override
     public void logEvent(BlacklistEvent event, String comment) {
-        logEvent(event, event.getDescription(), event.getType(), event.getPosition(), comment);
+        logEvent(event, event.getDescription(), event.getTarget(), event.getPosition(), comment);
     }
 
     /**
