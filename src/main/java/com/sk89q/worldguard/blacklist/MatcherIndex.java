@@ -43,7 +43,7 @@ class MatcherIndex {
     public List<BlacklistEntry> getEntries(Target target) {
         List<BlacklistEntry> found = new ArrayList<BlacklistEntry>();
         for (Entry<TargetMatcher, BlacklistEntry> entry : entries.row(target.getTypeId()).entrySet()) {
-            if (entry.getKey().matches(target)) {
+            if (entry.getKey().test(target)) {
                 found.add(entry.getValue());
             }
         }
