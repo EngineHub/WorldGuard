@@ -17,26 +17,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.blacklist.loggers;
+package com.sk89q.worldguard.blacklist.event;
 
-import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.LocalPlayer;
 
-/**
- * Interface for loggers for the blacklist.
- *
- * @author sk89q
- */
-public interface BlacklistLoggerHandler {
-    /**
-     * Log an event.
-     *
-     * @param event
-     * @param comment
-     */
-    public void logEvent(BlacklistEvent event, String comment);
+public final class ItemDropBlacklistEvent extends ItemBlacklistEvent {
 
-    /**
-     * Close the logger.
-     */
-    public void close();
+    public ItemDropBlacklistEvent(LocalPlayer player, Vector pos, int type) {
+        super(player, pos, type);
+    }
+
+    @Override
+    public String getDescription() {
+        return "drop";
+    }
+
+    @Override
+    public EventType getEventType() {
+        return EventType.DROP;
+    }
+
 }

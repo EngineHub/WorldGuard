@@ -20,8 +20,8 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.blocks.ItemID;
-import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
-import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.blacklist.event.BlockBreakBlacklistEvent;
+import com.sk89q.worldguard.blacklist.event.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.World;

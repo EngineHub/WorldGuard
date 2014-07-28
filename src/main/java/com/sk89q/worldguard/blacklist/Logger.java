@@ -19,29 +19,26 @@
 
 package com.sk89q.worldguard.blacklist;
 
+import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
+import com.sk89q.worldguard.blacklist.logger.LoggerHandler;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
-import com.sk89q.worldguard.blacklist.loggers.BlacklistLoggerHandler;
+public class Logger implements LoggerHandler {
 
-/**
- *
- * @author sk89q
- */
-public class BlacklistLogger implements BlacklistLoggerHandler {
     /**
      * List of logger handlers.
      */
-    private Set<BlacklistLoggerHandler> handlers
-            = new HashSet<BlacklistLoggerHandler>();
+    private Set<LoggerHandler> handlers
+            = new HashSet<LoggerHandler>();
 
     /**
      * Add a handler.
      *
      * @param handler The handler to add
      */
-    public void addHandler(BlacklistLoggerHandler handler) {
+    public void addHandler(LoggerHandler handler) {
         handlers.add(handler);
     }
 
@@ -50,7 +47,7 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
      *
      * @param handler The handler to remove
      */
-    public void removeHandler(BlacklistLoggerHandler handler) {
+    public void removeHandler(LoggerHandler handler) {
         handlers.remove(handler);
     }
 
@@ -66,8 +63,9 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
      *
      * @param event The event to log
      */
+    @Override
     public void logEvent(BlacklistEvent event, String comment) {
-        for (BlacklistLoggerHandler handler : handlers) {
+        for (LoggerHandler handler : handlers) {
             handler.logEvent(event, comment);
         }
     }
@@ -75,9 +73,11 @@ public class BlacklistLogger implements BlacklistLoggerHandler {
     /**
      * Close the connection.
      */
+    @Override
     public void close() {
-        for (BlacklistLoggerHandler handler : handlers) {
+        for (LoggerHandler handler : handlers) {
             handler.close();
         }
     }
+
 }

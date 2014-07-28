@@ -17,26 +17,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.blacklist.loggers;
+package com.sk89q.worldguard.blacklist.logger;
 
+import javax.annotation.Nullable;
 import java.io.BufferedWriter;
 
-/**
- *
- * @author sk89q
- */
-public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
-    /**
-     * Path.
-     */
+public class LogFileWriter implements Comparable<LogFileWriter> {
+
     public String path;
-    /**
-     * Writer.
-     */
     private BufferedWriter writer;
-    /**
-     * Last use.
-     */
     private long lastUse;
 
     /**
@@ -45,7 +34,7 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
      * @param path The path to write to
      * @param writer The writer for the file
      */
-    public FileLoggerWriter(String path, BufferedWriter writer) {
+    public LogFileWriter(String path, BufferedWriter writer) {
         this.path = path;
         this.writer = writer;
         lastUse = System.currentTimeMillis();
@@ -81,8 +70,11 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
         lastUse = System.currentTimeMillis();
     }
 
-    public int compareTo(FileLoggerWriter other) {
-        if (lastUse > other.lastUse) {
+    @Override
+    public int compareTo(@Nullable LogFileWriter other) {
+        if (other == null) {
+            return 1;
+        } else if (lastUse > other.lastUse) {
             return 1;
         } else if (lastUse < other.lastUse) {
             return -1;
@@ -90,4 +82,5 @@ public class FileLoggerWriter implements Comparable<FileLoggerWriter> {
             return 0;
         }
     }
+
 }

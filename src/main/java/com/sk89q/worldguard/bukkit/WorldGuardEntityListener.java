@@ -22,7 +22,7 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.blacklist.event.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.internal.Events;
 import com.sk89q.worldguard.internal.cause.Causes;
 import com.sk89q.worldguard.internal.event.Interaction;

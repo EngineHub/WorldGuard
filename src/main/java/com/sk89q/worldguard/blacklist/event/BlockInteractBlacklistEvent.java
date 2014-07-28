@@ -17,32 +17,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.blacklist;
+package com.sk89q.worldguard.blacklist.event;
 
-import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.LocalPlayer;
 
-/**
- *
- * @author sk89q
- */
-public class BlacklistTrackedEvent {
-    private BlacklistEvent event;
-    private long time;
+public final class BlockInteractBlacklistEvent extends BlockBlacklistEvent {
 
-    /**
-     * Construct the object.
-     *
-     * @param event The event tracked
-     * @param time The time at which the event occurred
-     */
-    public BlacklistTrackedEvent(BlacklistEvent event, long time) {
-        this.event = event;
-        this.time = time;
+    public BlockInteractBlacklistEvent(LocalPlayer player, Vector pos, int type) {
+        super(player, pos, type);
     }
 
-    public boolean matches(BlacklistEvent other, long now) {
-        return other.getType() == event.getType()
-                && time > now - 3000
-                && other.getClass() == event.getClass();
+    @Override
+    public String getDescription() {
+        return "interact with";
     }
+
+    @Override
+    public EventType getEventType() {
+        return EventType.INTERACT;
+    }
+
 }

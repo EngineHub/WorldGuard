@@ -17,7 +17,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.blacklist.loggers;
+package com.sk89q.worldguard.blacklist.logger;
+
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,54 +40,26 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.ItemType;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
+public class FileHandler implements LoggerHandler {
 
-/**
- *
- * @author sk89q
- */
-public class FileLoggerHandler implements BlacklistLoggerHandler {
-    /**
-     * Regex for patterns in the path.
-     */
     private static Pattern pattern = Pattern.compile("%.");
-    /**
-     * Date format.
-     */
-    private static SimpleDateFormat dateFormat =
-            new SimpleDateFormat("yyyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    /**
-     * Number of files to keep open at a time.
-     */
     private int cacheSize = 10;
-    /**
-     * Path pattern.
-     */
     private String pathPattern;
-    /**
-     * World name.
-     */
     private String worldName;
-    /**
-     * Cache of writers.
-     */
-    private TreeMap<String,FileLoggerWriter> writers =
-            new TreeMap<String,FileLoggerWriter>();
+    private TreeMap<String,LogFileWriter> writers = new TreeMap<String,LogFileWriter>();
     
     private final Logger logger;
 
     /**
      * Construct the object.
      *
-     * @param pathPattern The pattern for the logflie path
+     * @param pathPattern The pattern for the log file path
      * @param worldName The name of the world
      * @param logger The logger used to log errors
      */
-    public FileLoggerHandler(String pathPattern, String worldName, Logger logger) {
+    public FileHandler(String pathPattern, String worldName, Logger logger) {
         this.pathPattern = pathPattern;
         this.worldName = worldName;
         this.logger = logger;
@@ -96,7 +73,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
      * @param worldName The name of the associated world
      * @param logger The logger to log errors with
      */
-    public FileLoggerHandler(String pathPattern, int cacheSize, String worldName, Logger logger) {
+    public FileHandler(String pathPattern, int cacheSize, String worldName, Logger logger) {
         if (cacheSize < 1) {
             throw new IllegalArgumentException("Cache size cannot be less than 1");
         }
@@ -109,7 +86,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
     /**
      * Build the path.
      *
-     * @param playerName The name of the playername
+     * @param playerName The name of the player
      * @return The path for the logfile
      */
     private String buildPath(String playerName) {
@@ -178,7 +155,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
             String line = "[" + date + "] " + player.getName() + ": " + message
                     + (comment != null ? " (" + comment + ")" : "") + "\r\n";
 
-            FileLoggerWriter writer = writers.get(path);
+            LogFileWriter writer = writers.get(path);
 
             // Writer already exists!
             if (writer != null) {
@@ -204,17 +181,17 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
             BufferedWriter out = new BufferedWriter(stream);
             out.write(line);
             out.flush();
-            writer = new FileLoggerWriter(path, out);
+            writer = new LogFileWriter(path, out);
             writers.put(path, writer);
 
             // Check to make sure our cache doesn't get too big!
             if (writers.size() > cacheSize) {
-                Iterator<Map.Entry<String,FileLoggerWriter>> it =
+                Iterator<Map.Entry<String,LogFileWriter>> it =
                         writers.entrySet().iterator();
 
                 // Remove some entries
                 for (; it.hasNext(); ) {
-                    Map.Entry<String,FileLoggerWriter> entry = it.next();
+                    Map.Entry<String,LogFileWriter> entry = it.next();
                     try {
                         entry.getValue().getWriter().close();
                     } catch (IOException ignore) {
@@ -249,11 +226,7 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
                 + " " + getCoordinates(pos), comment);
     }
 
-    /**
-     * Log an event.
-     *
-     * @param event The event to log
-     */
+    @Override
     public void logEvent(BlacklistEvent event, String comment) {
         logEvent(event, event.getDescription(), event.getType(), event.getPosition(), comment);
     }
@@ -273,11 +246,9 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
         }
     }
 
-    /**
-     * Close handles.
-     */
+    @Override
     public void close() {
-        for (Map.Entry<String,FileLoggerWriter> entry : writers.entrySet()) {
+        for (Map.Entry<String,LogFileWriter> entry : writers.entrySet()) {
             try {
                 entry.getValue().getWriter().close();
             } catch (IOException ignore) {
@@ -286,4 +257,5 @@ public class FileLoggerHandler implements BlacklistLoggerHandler {
 
         writers.clear();
     }
+
 }

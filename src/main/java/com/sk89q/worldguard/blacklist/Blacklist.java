@@ -19,6 +19,14 @@
 
 package com.sk89q.worldguard.blacklist;
 
+import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.blacklist.action.Action;
+import com.sk89q.worldguard.blacklist.action.ActionType;
+import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
+import com.sk89q.worldguard.blacklist.event.EventType;
+import org.bukkit.ChatColor;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -28,44 +36,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.bukkit.ChatColor;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.blocks.ItemType;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.BlacklistEvent;
-
-/**
- *
- * @author sk89q
- */
 public abstract class Blacklist {
 
-    /**
-     * List of entries by block ID.
-     */
-    private Map<Integer,List<BlacklistEntry>> blacklist
-            = new HashMap<Integer,List<BlacklistEntry>>();
-    /**
-     * Logger.
-     */
-    private BlacklistLogger blacklistLogger = new BlacklistLogger();
-    /**
-     * Last event.
-     */
+    private Map<Integer, List<BlacklistEntry>> blacklist = new HashMap<Integer, List<BlacklistEntry>>();
+    private Logger blacklistLogger = new Logger();
     private BlacklistEvent lastEvent;
-    /**
-     * Used to prevent flooding.
-     */
-    Map<String,BlacklistTrackedEvent> lastAffected =
-            new HashMap<String,BlacklistTrackedEvent>();
+    Map<String, TrackedEvent> lastAffected = new HashMap<String, TrackedEvent>();
 
     private boolean useAsWhitelist;
 
-    private final Logger logger;
+    private final java.util.logging.Logger logger;
 
-    public Blacklist(Boolean useAsWhitelist, Logger logger) {
+    public Blacklist(boolean useAsWhitelist, java.util.logging.Logger logger) {
+        checkNotNull(logger);
         this.useAsWhitelist = useAsWhitelist;
         this.logger = logger;
     }
@@ -112,7 +98,7 @@ public abstract class Blacklist {
      *
      * @return The logger used in this blacklist
      */
-    public BlacklistLogger getLogger() {
+    public Logger getLogger() {
         return blacklistLogger;
     }
 
@@ -126,15 +112,19 @@ public abstract class Blacklist {
      */
     public boolean check(BlacklistEvent event, boolean forceRepeat, boolean silent) {
         List<BlacklistEntry> entries = getEntries(event.getType());
+
         if (entries == null) {
             return true;
         }
+
         boolean ret = true;
+
         for (BlacklistEntry entry : entries) {
             if (!entry.check(useAsWhitelist, event, forceRepeat, silent)) {
                 ret = false;
             }
         }
+
         return ret;
     }
 
@@ -146,8 +136,7 @@ public abstract class Blacklist {
      */
     public void load(File file) throws IOException {
         FileReader input = null;
-        Map<Integer,List<BlacklistEntry>> blacklist =
-                new HashMap<Integer,List<BlacklistEntry>>();
+        Map<Integer,List<BlacklistEntry>> blacklist = new HashMap<Integer,List<BlacklistEntry>>();
 
         try {
             input = new FileReader(file);
@@ -159,7 +148,7 @@ public abstract class Blacklist {
                 line = line.trim();
 
                 // Blank line
-                if (line.length() == 0) {
+                if (line.isEmpty()) {
                     continue;
                 } else if (line.charAt(0) == ';' || line.charAt(0) == '#') {
                     continue;
@@ -207,34 +196,35 @@ public abstract class Blacklist {
                     for (BlacklistEntry entry : currentEntries) {
                         if (parts[0].equalsIgnoreCase("ignore-groups")) {
                             entry.setIgnoreGroups(parts[1].split(","));
+
                         } else if (parts[0].equalsIgnoreCase("ignore-perms")) {
                             entry.setIgnorePermissions(parts[1].split(","));
-                        } else if (parts[0].equalsIgnoreCase("on-break")) {
-                            entry.setBreakActions(parts[1].split(","));
-                        } else if (parts[0].equalsIgnoreCase("on-destroy-with")) {
-                            entry.setDestroyWithActions(parts[1].split(","));
-                        } else if (parts[0].equalsIgnoreCase("on-place")) {
-                            entry.setPlaceActions(parts[1].split(","));
-                        } else if (parts[0].equalsIgnoreCase("on-interact")) {
-                            entry.setInteractActions(parts[1].split(","));
-                        } else if (parts[0].equalsIgnoreCase("on-use")) {
-                            entry.setUseActions(parts[1].split(","));
-                        } else if (parts[0].equalsIgnoreCase("on-drop")) {
-                            entry.setDropActions(parts[1].split(","));
-                        } else if (parts[0].equalsIgnoreCase("on-acquire")) {
-                            entry.setAcquireActions(parts[1].split(","));
+
                         } else if (parts[0].equalsIgnoreCase("message")) {
                             entry.setMessage(parts[1].trim());
+
                         } else if (parts[0].equalsIgnoreCase("comment")) {
                             entry.setComment(parts[1].trim());
+
                         } else {
-                            unknownOption = true;
+                            boolean found = false;
+
+                            for (EventType type : EventType.values()) {
+                                if (type.getRuleName().equalsIgnoreCase(parts[0])) {
+                                    entry.getActions(type.getEventClass()).addAll(parseActions(entry, parts[1]));
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (!found) {
+                                unknownOption = true;
+                            }
                         }
                     }
 
                     if (unknownOption) {
-                        logger.log(Level.WARNING, "Unknown option '" + parts[0]
-                                + "' in " + file.getName() + " for '" + line + "'");
+                        logger.log(Level.WARNING, "Unknown option '" + parts[0] + "' in " + file.getName() + " for '" + line + "'");
                     }
                 } else {
                     logger.log(Level.WARNING, "Found option with no heading "
@@ -251,6 +241,31 @@ public abstract class Blacklist {
             } catch (IOException ignore) {
             }
         }
+    }
+
+    private List<Action> parseActions(BlacklistEntry entry, String raw) {
+        String[] split = raw.split(",");
+        List<Action> actions = new ArrayList<Action>();
+
+        for (String name : split) {
+            name = name.trim();
+
+            boolean found = false;
+
+            for (ActionType type : ActionType.values()) {
+                if (type.getActionName().equalsIgnoreCase(name)) {
+                    actions.add(type.parseInput(this, entry));
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                logger.log(Level.WARNING, "Unknown blacklist action: " + name);
+            }
+        }
+
+        return actions;
     }
 
     /**
@@ -272,7 +287,7 @@ public abstract class Blacklist {
         lastEvent = event;
 
         broadcastNotification(ChatColor.GRAY + "WG: "
-                + ChatColor.LIGHT_PURPLE + event.getPlayer().getName()
+                + ChatColor.LIGHT_PURPLE + event.getCauseName()
                 + ChatColor.GOLD + " (" + event.getDescription() + ") "
                 + ChatColor.WHITE
                 + getFriendlyItemName(event.getType())
@@ -331,4 +346,5 @@ public abstract class Blacklist {
             return "#" + id + "";
         }
     }
+
 }
