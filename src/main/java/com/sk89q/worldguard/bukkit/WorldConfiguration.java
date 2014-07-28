@@ -76,7 +76,6 @@ public class WorldConfiguration {
     /* Configuration data start */
     public boolean summaryOnStart;
     public boolean opPermissions;
-    public boolean checkAttached;
     public boolean fireSpreadDisableToggle;
     public boolean itemDurability;
     public boolean simulateSponge;
@@ -307,8 +306,6 @@ public class WorldConfiguration {
 
         summaryOnStart = getBoolean("summary-on-start", true);
         opPermissions = getBoolean("op-permissions", true);
-
-        checkAttached = getBoolean("internal.check-attached-blocks", false);
 
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
