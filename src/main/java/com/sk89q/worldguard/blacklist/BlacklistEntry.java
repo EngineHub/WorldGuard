@@ -25,6 +25,7 @@ import com.sk89q.worldguard.blacklist.action.Action;
 import com.sk89q.worldguard.blacklist.action.ActionResult;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -120,7 +121,11 @@ public class BlacklistEntry {
      * @param player The player to check
      * @return whether this player should be ignored for blacklist blocking
      */
-    public boolean shouldIgnore(LocalPlayer player) {
+    public boolean shouldIgnore(@Nullable LocalPlayer player) {
+        if (player == null) {
+            return false; // This is the case if the cause is a dispenser, for example
+        }
+
         if (ignoreGroups != null) {
             for (String group : player.getGroups()) {
                 if (ignoreGroups.contains(group.toLowerCase())) {
