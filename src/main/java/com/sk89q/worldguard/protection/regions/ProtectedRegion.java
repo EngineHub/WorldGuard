@@ -176,17 +176,11 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
             return;
         }
 
-        if (parent == this) {
-            throw new CircularInheritanceException();
-        }
-
-        ProtectedRegion p = parent.getParent();
-        while (p != null) {
-            if (p == this) {
-                throw new CircularInheritanceException();
-            }
+        ProtectedRegion p = parent;
+        do {
+            if (this.equals(p)) throw new CircularInheritanceException();
             p = p.getParent();
-        }
+        } while (p != null);
 
         this.parent = parent;
     }
