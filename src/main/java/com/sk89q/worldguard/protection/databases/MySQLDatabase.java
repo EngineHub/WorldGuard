@@ -1029,7 +1029,7 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
 
         try {
             clearPoly2dPointsForRegionStatement = this.conn.prepareStatement(
-                    "DELETE FROM `region_poly2d_point` " +
+                    "DELETE FROM `" + config.sqlTablePrefix + "region_poly2d_point` " +
                     "WHERE `region_id` = ? " +
                     "AND `world_id` = " + this.worldDbId
             );
