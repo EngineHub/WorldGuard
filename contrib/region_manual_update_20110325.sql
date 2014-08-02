@@ -1,3 +1,11 @@
+--
+-- This file only needs to be run if you are using a very old version
+-- of the region database (before 2011/03/25).
+--
+-- Otherwise, WG knows how to update your tables automatically, as well
+-- as set them up initially.
+--
+
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';

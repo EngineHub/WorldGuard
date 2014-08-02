@@ -177,6 +177,14 @@
     </dependency>
 
     <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>3.0</version>
+      <scope>compile</scope>
+      <type>jar</type>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
@@ -229,6 +237,11 @@
           <include>config_world.yml</include>
           <include>blacklist.txt</include>
         </includes>
+      </resource>
+      <resource>
+        <targetPath>migrations/</targetPath>
+        <filtering>false</filtering>
+        <directory>${basedir}/src/main/resources/migrations/</directory>
       </resource>
     </resources>
 
@@ -361,6 +374,7 @@
                   <include>net.sf.opencsv:opencsv</include>
                   <include>org.khelekore:prtree</include>
                   <include>com.jolbox:bonecp</include>
+                  <include>org.flywaydb:flyway-core</include>
                 </includes>
               </artifactSet>
             </configuration>

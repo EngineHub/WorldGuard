@@ -23,9 +23,12 @@ import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.protection.databases.AbstractAsynchronousDatabase;
-import com.sk89q.worldguard.protection.databases.InvalidTableFormatException;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.io.Closer;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
+import org.flywaydb.core.api.MigrationVersion;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.Yaml;
@@ -39,6 +42,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -77,12 +81,106 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
         }
 
         try {
+            migrate();
+        } catch (FlywayException e) {
+            throw new ProtectionDatabaseException("Failed to migrate tables", e);
+        } catch (SQLException e) {
+            throw new ProtectionDatabaseException("Failed to migrate tables", e);
+        }
+
+        try {
             worldId = chooseWorldId(worldName);
         } catch (SQLException e) {
             throw new ProtectionDatabaseException("Failed to choose the ID for this world", e);
         }
     }
 
+    private boolean tryQuery(Connection conn, String sql) throws SQLException {
+        Closer closer = Closer.create();
+        try {
+            Statement statement = closer.register(conn.createStatement());
+            statement.executeQuery(sql);
+            return true;
+        } catch (SQLException ex) {
+            return false;
+        } finally {
+            closer.closeQuietly();
+        }
+    }
+
+    /**
+     * Migrate the tables to the latest version.
+     *
+     * @throws SQLException thrown if a connection can't be opened
+     * @throws ProtectionDatabaseException thrown on other error
+     */
+    private void migrate() throws SQLException, ProtectionDatabaseException {
+        Closer closer = Closer.create();
+        Connection conn = closer.register(getConnection());
+
+        // Check some tables
+        boolean tablesExist;
+        boolean isRecent;
+        boolean hasMigrations;
+
+        try {
+            tablesExist = tryQuery(conn, "SELECT * FROM `" + config.sqlTablePrefix + "region_cuboid` LIMIT 1");
+            isRecent = tryQuery(conn, "SELECT `world_id` FROM `" + config.sqlTablePrefix + "region_cuboid` LIMIT 1");
+            hasMigrations = tryQuery(conn, "SELECT * FROM `" + config.sqlTablePrefix + "migrations` LIMIT 1");
+        } finally {
+            closer.closeQuietly();
+        }
+
+        // We don't bother with migrating really old tables
+        if (tablesExist && !isRecent) {
+            throw new ProtectionDatabaseException(
+                    "Sorry, your tables are too old for the region SQL auto-migration system. " +
+                    "Please run region_manual_update_20110325.sql on your database, which comes " +
+                    "with WorldGuard or can be found in http://github.com/sk89q/worldguard");
+        }
+
+        // Our placeholders
+        Map<String, String> placeHolders = new HashMap<String, String>();
+        placeHolders.put("tablePrefix", config.sqlTablePrefix);
+
+        BoneCPConfig boneConfig = connectionPool.getConfig();
+
+        Flyway flyway = new Flyway();
+
+        // The MySQL support predates the usage of Flyway, so let's do some
+        // checks and issue messages appropriately
+        if (!hasMigrations) {
+            flyway.setInitOnMigrate(true);
+
+            if (tablesExist) {
+                logger.log(Level.INFO, "The MySQL region tables exist but the migrations table seems to not exist yet. Creating the migrations table...");
+            } else {
+                // By default, if Flyway sees any tables at all in the schema, it
+                // will assume that we are up to date, so we have to manually
+                // check ourselves and then ask Flyway to start from the beginning
+                // if our test table doesn't exist
+                flyway.setInitVersion(MigrationVersion.fromVersion("0"));
+
+                logger.log(Level.INFO, "MySQL region tables do not exist: creating...");
+            }
+        }
+
+        flyway.setClassLoader(getClass().getClassLoader());
+        flyway.setLocations("migrations/region/mysql");
+        flyway.setDataSource(boneConfig.getJdbcUrl(), boneConfig.getUser(), boneConfig.getPassword());
+        flyway.setTable(config.sqlTablePrefix + "migrations");
+        flyway.setPlaceholders(placeHolders);
+        flyway.migrate();
+    }
+
+    /**
+     * Get the ID for this world from the database or pick a new one if
+     * an entry does not exist yet.
+     *
+     * @param worldName the world name
+     * @return a world ID
+     * @throws SQLException on a database access error
+     */
     private int chooseWorldId(String worldName) throws SQLException {
         Connection conn = getConnection();
         PreparedStatement worldStmt = null;
@@ -90,17 +188,6 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
         PreparedStatement insertWorldStatement = null;
 
         try {
-            PreparedStatement verTest = null;
-            try {
-                // Test if the database is up to date, if not throw a critical error
-                verTest = conn.prepareStatement("SELECT `world_id` FROM `" + config.sqlTablePrefix + "region_cuboid` LIMIT 0, 1;");
-                verTest.execute();
-            } catch (SQLException ex) {
-                throw new InvalidTableFormatException("region_storage_update_20110325.sql");
-            } finally {
-                AbstractJob.closeQuietly(verTest);
-            }
-
             worldStmt = conn.prepareStatement(
                     "SELECT `id` FROM `" + config.sqlTablePrefix + "world` WHERE `name` = ? LIMIT 0, 1"
             );
