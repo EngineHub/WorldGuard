@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * asynchronously loading and saving region data while only allowing one
  * single operation (either load or save) occurring at a given time.
  */
-abstract class AbstractAsynchronousDatabase extends AbstractProtectionDatabase {
+public abstract class AbstractAsynchronousDatabase extends AbstractProtectionDatabase {
 
     private static final Logger log = Logger.getLogger(AbstractAsynchronousDatabase.class.getName());
 
