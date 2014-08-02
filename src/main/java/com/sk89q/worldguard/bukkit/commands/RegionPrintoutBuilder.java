@@ -19,36 +19,42 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-
+import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.concurrent.Callable;
 
 /**
  * Create a region printout, as used in /region info to show information about
  * a region.
  */
-public class RegionPrintoutBuilder {
+class RegionPrintoutBuilder implements Callable<String> {
     
     private final ProtectedRegion region;
+    @Nullable
+    private final ProfileCache cache;
     private final StringBuilder builder = new StringBuilder();
 
     /**
      * Create a new instance with a region to report on.
-     * 
+     *
      * @param region the region
+     * @param cache a profile cache, or {@code null}
      */
-    public RegionPrintoutBuilder(ProtectedRegion region) {
+    RegionPrintoutBuilder(ProtectedRegion region, @Nullable ProfileCache cache) {
         this.region = region;
+        this.cache = cache;
     }
 
     /**
@@ -122,11 +128,11 @@ public class RegionPrintoutBuilder {
 
             if(group == null) {
                 builder.append(flag.getName()).append(": ")
-                    .append(String.valueOf(val));
+                    .append(val);
             } else {
                 builder.append(flag.getName()).append(" -g ")
-                    .append(String.valueOf(group)).append(": ")
-                    .append(String.valueOf(val));
+                    .append(group).append(": ")
+                    .append(val);
             }
 
             hasFlags = true;
@@ -192,7 +198,7 @@ public class RegionPrintoutBuilder {
                 if (useColors) {
                     builder.append(ChatColor.GRAY);
                 }
-                builder.append(" (parent, priority=" + cur.getPriority() + ")");
+                builder.append(" (parent, priority=").append(cur.getPriority()).append(")");
             }
             
             indent++;
@@ -206,29 +212,23 @@ public class RegionPrintoutBuilder {
     public void appendDomain() {
         builder.append(ChatColor.BLUE);
         builder.append("Owners: ");
-        DefaultDomain owners = region.getOwners();
-        if (owners.size() != 0) {
-            builder.append(ChatColor.YELLOW);
-            builder.append(owners.toUserFriendlyString());
-        } else {
-            builder.append(ChatColor.RED);
-            builder.append("(no owners)");
-        }
-
+        addDomainString(region.getOwners());
         newLine();
 
         builder.append(ChatColor.BLUE);
         builder.append("Members: ");
-        DefaultDomain members = region.getMembers();
-        if (members.size() != 0) {
+        addDomainString(region.getMembers());
+        newLine();
+    }
+
+    private void addDomainString(DefaultDomain domain) {
+        if (domain.size() != 0) {
             builder.append(ChatColor.YELLOW);
-            builder.append(members.toUserFriendlyString());
+            builder.append(domain.toUserFriendlyString(cache));
         } else {
             builder.append(ChatColor.RED);
-            builder.append("(no members)");
+            builder.append("(none)");
         }
-        
-        newLine();
     }
     
     /**
@@ -240,16 +240,13 @@ public class RegionPrintoutBuilder {
         builder.append(ChatColor.BLUE);
         builder.append("Bounds:");
         builder.append(ChatColor.YELLOW);
-        builder.append(" (" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")");
-        builder.append(" -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
+        builder.append(" (").append(min.getBlockX()).append(",").append(min.getBlockY()).append(",").append(min.getBlockZ()).append(")");
+        builder.append(" -> (").append(max.getBlockX()).append(",").append(max.getBlockY()).append(",").append(max.getBlockZ()).append(")");
         
         newLine();
     }
-    
-    /**
-     * Append all the default fields used for /rg info.
-     */
-    public void appendRegionInfo() {
+
+    private void appendRegionInformation() {
         builder.append(ChatColor.GRAY);
         builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
         builder.append(" Region Info ");
@@ -260,17 +257,28 @@ public class RegionPrintoutBuilder {
         appendParents();
         appendDomain();
         appendBounds();
+
+        if (cache != null) {
+            builder.append(ChatColor.GRAY).append("Any names suffixed by * are 'last seen names' and may not be up to date.");
+            newLine();
+        }
     }
-    
+
+    @Override
+    public String call() throws Exception {
+        appendRegionInformation();
+        return builder.toString();
+    }
+
     /**
      * Send the report to a {@link CommandSender}.
-     * 
-     * @param sender the recepient
+     *
+     * @param sender the recipient
      */
     public void send(CommandSender sender) {
         sender.sendMessage(toString());
     }
-    
+
     public StringBuilder append(boolean b) {
         return builder.append(b);
     }

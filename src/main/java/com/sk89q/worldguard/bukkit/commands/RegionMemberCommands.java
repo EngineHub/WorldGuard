@@ -19,26 +19,29 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.RegionDBUtil;
+import com.sk89q.worldguard.protection.databases.util.DomainInputResolver;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import static com.google.common.util.concurrent.Futures.addCallback;
+import static com.sk89q.worldguard.bukkit.commands.CommandUtils.*;
 
 // @TODO: A lot of code duplication here! Need to fix.
 
 public class RegionMemberCommands {
+
     private final WorldGuardPlugin plugin;
 
     public RegionMemberCommands(WorldGuardPlugin plugin) {
@@ -47,7 +50,7 @@ public class RegionMemberCommands {
 
     @Command(aliases = {"addmember", "addmember", "addmem", "am"},
             usage = "<id> <members...>",
-            flags = "w:",
+            flags = "nw:",
             desc = "Add a member to a region",
             min = 2)
     public void addMember(CommandContext args, CommandSender sender) throws CommandException {
@@ -89,22 +92,24 @@ public class RegionMemberCommands {
             }
         }
 
-        RegionDBUtil.addToDomain(region.getMembers(), args.getParsedPaddedSlice(1, 0), 0);
+        // Resolve members asynchronously
+        DomainInputResolver resolver = new DomainInputResolver(
+                plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
+        resolver.setUseNames(args.hasFlag('n'));
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+        // Then add it to the members
+        ListenableFuture<DefaultDomain> future = Futures.transform(
+                plugin.getExecutorService().submit(resolver),
+                resolver.createAddAllFunction(region.getMembers()));
 
-        try {
-            mgr.save();
-        } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
-                    + e.getMessage());
-        }
+        progressCallback(future, sender, "(Please wait... resolving names into UUIDs...)");
+        addCallback(future, messageCallback(sender, "Region '" + id + "' updated.", "Failed to add members"));
+        addCallback(future, saveRegionsCallback(sender, mgr, world, true));
     }
 
     @Command(aliases = {"addowner", "addowner", "ao"},
             usage = "<id> <owners...>",
-            flags = "w:",
+            flags = "nw:",
             desc = "Add an owner to a region",
             min = 2)
     public void addOwner(CommandContext args, CommandSender sender) throws CommandException {
@@ -159,22 +164,24 @@ public class RegionMemberCommands {
             }
         }
 
-        RegionDBUtil.addToDomain(region.getOwners(), args.getParsedPaddedSlice(1, 0), 0);
+        // Resolve owners asynchronously
+        DomainInputResolver resolver = new DomainInputResolver(
+                plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
+        resolver.setUseNames(args.hasFlag('n'));
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+        // Then add it to the owners
+        ListenableFuture<DefaultDomain> future = Futures.transform(
+                plugin.getExecutorService().submit(resolver),
+                resolver.createAddAllFunction(region.getOwners()));
 
-        try {
-            mgr.save();
-        } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
-                    + e.getMessage());
-        }
+        progressCallback(future, sender, "(Please wait... resolving names into UUIDs...)");
+        addCallback(future, messageCallback(sender, "Region '" + id + "' updated.", "Failed to add owners"));
+        addCallback(future, saveRegionsCallback(sender, mgr, world, true));
     }
 
     @Command(aliases = {"removemember", "remmember", "removemem", "remmem", "rm"},
             usage = "<id> <owners...>",
-            flags = "aw:",
+            flags = "naw:",
             desc = "Remove an owner to a region",
             min = 1)
     public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
@@ -216,29 +223,36 @@ public class RegionMemberCommands {
             }
         }
 
+        ListenableFuture<?> future;
+
         if (args.hasFlag('a')) {
             region.getMembers().removeAll();
+
+            future = Futures.immediateFuture(null);
         } else {
             if (args.argsLength() < 2) {
                 throw new CommandException("List some names to remove, or use -a to remove all.");
             }
-            RegionDBUtil.removeFromDomain(region.getMembers(), args.getParsedPaddedSlice(1, 0), 0);
+
+            // Resolve members asynchronously
+            DomainInputResolver resolver = new DomainInputResolver(
+                    plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
+            resolver.setUseNames(args.hasFlag('n'));
+
+            // Then remove it from the members
+            future = Futures.transform(
+                    plugin.getExecutorService().submit(resolver),
+                    resolver.createRemoveAllFunction(region.getMembers()));
         }
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
-
-        try {
-            mgr.save();
-        } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
-                    + e.getMessage());
-        }
+        progressCallback(future, sender, "(Please wait... resolving names into UUIDs...)");
+        addCallback(future, messageCallback(sender, "Region '" + id + "' updated.", "Failed to remove members"));
+        addCallback(future, saveRegionsCallback(sender, mgr, world, true));
     }
 
     @Command(aliases = {"removeowner", "remowner", "ro"},
             usage = "<id> <owners...>",
-            flags = "aw:",
+            flags = "naw:",
             desc = "Remove an owner to a region",
             min = 1)
     public void removeOwner(CommandContext args,
@@ -281,23 +295,30 @@ public class RegionMemberCommands {
             }
         }
 
+        ListenableFuture<?> future;
+
         if (args.hasFlag('a')) {
             region.getOwners().removeAll();
+
+            future = Futures.immediateFuture(null);
         } else {
             if (args.argsLength() < 2) {
                 throw new CommandException("List some names to remove, or use -a to remove all.");
             }
-            RegionDBUtil.removeFromDomain(region.getOwners(), args.getParsedPaddedSlice(1, 0), 0);
+
+            // Resolve owners asynchronously
+            DomainInputResolver resolver = new DomainInputResolver(
+                    plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
+            resolver.setUseNames(args.hasFlag('n'));
+
+            // Then remove it from the owners
+            future = Futures.transform(
+                    plugin.getExecutorService().submit(resolver),
+                    resolver.createRemoveAllFunction(region.getOwners()));
         }
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
-
-        try {
-            mgr.save();
-        } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
-                    + e.getMessage());
-        }
+        progressCallback(future, sender, "(Please wait... resolving names into UUIDs...)");
+        addCallback(future, messageCallback(sender, "Region '" + id + "' updated.", "Failed to remove owners"));
+        addCallback(future, saveRegionsCallback(sender, mgr, world, true));
     }
 }

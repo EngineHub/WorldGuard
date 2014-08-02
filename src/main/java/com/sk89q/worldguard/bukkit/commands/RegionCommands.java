@@ -706,7 +706,7 @@ public final class RegionCommands {
      */
     @Command(aliases = {"info", "i"},
              usage = "[id]",
-             flags = "sw:",
+             flags = "usw:",
              desc = "Get information about a region",
              min = 0, max = 1)
     public void info(CommandContext args, CommandSender sender) throws CommandException {
@@ -734,9 +734,11 @@ public final class RegionCommands {
         }
 
         // Print region information
-        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing);
-        printout.appendRegionInfo();
-        printout.send(sender);
+        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, args.hasFlag('u') ? null : plugin.getProfileCache());
+        ListenableFuture<?> future = Futures.transform(
+                plugin.getExecutorService().submit(printout),
+                CommandUtils.messageFunction(sender));
+        Futures.addCallback(future, CommandUtils.messageCallback(sender, null, "Failed to retrieve region info"));
 
         // Let the player also select the region
         if (args.hasFlag('s')) {
@@ -964,7 +966,7 @@ public final class RegionCommands {
         commitChanges(sender, regionManager, world, true); // Save to disk
 
         // Print region information
-        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing);
+        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, null);
         printout.append(ChatColor.GRAY);
         printout.append("(Current flags: ");
         printout.appendFlagsList(false);
@@ -1044,7 +1046,7 @@ public final class RegionCommands {
             child.setParent(parent);
         } catch (CircularInheritanceException e) {
             // Tell the user what's wrong
-            RegionPrintoutBuilder printout = new RegionPrintoutBuilder(parent);
+            RegionPrintoutBuilder printout = new RegionPrintoutBuilder(parent, null);
             printout.append(ChatColor.RED);
             printout.append("Uh oh! Setting '" + parent.getId() + "' to be the parent " +
                     "of '" + child.getId() + "' would cause circular inheritance.\n");
@@ -1060,7 +1062,7 @@ public final class RegionCommands {
         commitChanges(sender, regionManager, world, true); // Save to disk
         
         // Tell the user the current inheritance
-        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(child);
+        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(child, null);
         printout.append(ChatColor.YELLOW);
         printout.append("Inheritance set for region '" + child.getId() + "'.\n");
         if (parent != null) {
@@ -1071,7 +1073,6 @@ public final class RegionCommands {
             printout.append(")");
         }
         printout.send(sender);
-        return;
     }
 
     /**
