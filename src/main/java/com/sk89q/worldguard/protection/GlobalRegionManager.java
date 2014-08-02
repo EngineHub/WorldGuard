@@ -19,19 +19,6 @@
 
 package com.sk89q.worldguard.protection;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
@@ -44,6 +31,18 @@ import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.PRTreeRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * This class keeps track of region information for every world. It loads
@@ -129,7 +128,9 @@ public class GlobalRegionManager {
 
     public RegionManager load(World world) {
         RegionManager manager = create(world);
-        managers.put(world.getName(), manager);
+        if (manager != null) {
+            managers.put(world.getName(), manager);
+        }
         return manager;
     }
 
