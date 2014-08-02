@@ -28,6 +28,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.databases.util.DomainInputResolver;
+import com.sk89q.worldguard.protection.databases.util.DomainInputResolver.UserLocatorPolicy;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -95,7 +96,7 @@ public class RegionMemberCommands {
         // Resolve members asynchronously
         DomainInputResolver resolver = new DomainInputResolver(
                 plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
-        resolver.setUseNames(args.hasFlag('n'));
+        resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
 
         // Then add it to the members
         ListenableFuture<DefaultDomain> future = Futures.transform(
@@ -167,7 +168,7 @@ public class RegionMemberCommands {
         // Resolve owners asynchronously
         DomainInputResolver resolver = new DomainInputResolver(
                 plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
-        resolver.setUseNames(args.hasFlag('n'));
+        resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
 
         // Then add it to the owners
         ListenableFuture<DefaultDomain> future = Futures.transform(
@@ -237,7 +238,7 @@ public class RegionMemberCommands {
             // Resolve members asynchronously
             DomainInputResolver resolver = new DomainInputResolver(
                     plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
-            resolver.setUseNames(args.hasFlag('n'));
+            resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
 
             // Then remove it from the members
             future = Futures.transform(
@@ -309,7 +310,7 @@ public class RegionMemberCommands {
             // Resolve owners asynchronously
             DomainInputResolver resolver = new DomainInputResolver(
                     plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
-            resolver.setUseNames(args.hasFlag('n'));
+            resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
 
             // Then remove it from the owners
             future = Futures.transform(

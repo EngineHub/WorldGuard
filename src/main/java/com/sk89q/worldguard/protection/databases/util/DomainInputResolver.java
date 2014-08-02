@@ -39,17 +39,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Resolves input for a domain (i.e. "player1 player2 &lt;uuid&gt; g:group").
- *
- * <p>Unless {@link #getUseNames()} is true, names will be resolved into
- * UUIDs.</p>
  */
 public class DomainInputResolver implements Callable<DefaultDomain> {
 
     private static final Pattern GROUP_PATTERN = Pattern.compile("(?i)^[G]:(.+)$");
 
+    /**
+     * The policy for locating users.
+     */
+    public enum UserLocatorPolicy {
+        UUID_ONLY,
+        NAME_ONLY,
+        UUID_AND_NAME
+    }
+
     private final ProfileService profileService;
     private final String[] input;
-    private boolean useNames = false;
+    private UserLocatorPolicy locatorPolicy = UserLocatorPolicy.UUID_ONLY;
 
     /**
      * Create a new instance.
@@ -65,21 +71,22 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
     }
 
     /**
-     * Get whether names should be used rather than UUIDs.
+     * Get the policy used for identifying users.
      *
-     * @return true to use names
+     * @return the policy
      */
-    public boolean getUseNames() {
-        return useNames;
+    public UserLocatorPolicy getLocatorPolicy() {
+        return locatorPolicy;
     }
 
     /**
-     * Set whether names should be used rather than UUIDs.
+     * Set the policy used for identifying users.
      *
-     * @param useNames true to use names
+     * @param locatorPolicy the policy
      */
-    public void setUseNames(boolean useNames) {
-        this.useNames = useNames;
+    public void setLocatorPolicy(UserLocatorPolicy locatorPolicy) {
+        checkNotNull(locatorPolicy);
+        this.locatorPolicy = locatorPolicy;
     }
 
     @Override
@@ -93,12 +100,19 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
                 domain.addGroup(m.group(1));
             } else {
                 try {
-                    domain.addPlayer(UUID.fromString(UUIDs.addDashes(s)));
+                    // Try to add any UUIDs given
+                    domain.addPlayer(UUID.fromString(UUIDs.addDashes(s.replaceAll("^uuid:", ""))));
                 } catch (IllegalArgumentException e) {
-                    if (useNames) {
-                        domain.addPlayer(s);
-                    } else {
-                        namesToQuery.add(s.toLowerCase());
+                    switch (locatorPolicy) {
+                        case NAME_ONLY:
+                            domain.addPlayer(s);
+                            break;
+                        case UUID_ONLY:
+                            namesToQuery.add(s.toLowerCase());
+                            break;
+                        case UUID_AND_NAME:
+                            domain.addPlayer(s);
+                            namesToQuery.add(s.toLowerCase());
                     }
                 }
             }
