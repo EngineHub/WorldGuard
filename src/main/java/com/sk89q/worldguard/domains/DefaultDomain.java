@@ -223,7 +223,10 @@ public class DefaultDomain implements Domain {
     public String toPlayersString(@Nullable ProfileCache cache) {
         StringBuilder str = new StringBuilder();
         List<String> output = new ArrayList<String>();
-        output.addAll(playerDomain.getPlayers());
+
+        for (String name : playerDomain.getPlayers()) {
+            output.add("name:" + name);
+        }
 
         if (cache != null) {
             ImmutableMap<UUID, Profile> results = cache.getAllPresent(playerDomain.getUniqueIds());
@@ -240,6 +243,7 @@ public class DefaultDomain implements Domain {
                 output.add("uuid:" + uuid);
             }
         }
+
         Collections.sort(output, String.CASE_INSENSITIVE_ORDER);
         for (Iterator<String> it = output.iterator(); it.hasNext();) {
             str.append(it.next());
