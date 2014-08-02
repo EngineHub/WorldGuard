@@ -39,13 +39,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Callable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 class RegionLoader extends AbstractJob implements Callable<Map<String, ProtectedRegion>> {
 
-    private final Map<String, ProtectedRegion> regions;
+    /*
+        ========= Everything below is a nightmare. =========
+     */
+
     private final int worldId;
 
     private Map<String, ProtectedRegion> cuboidRegions;
@@ -53,10 +55,8 @@ class RegionLoader extends AbstractJob implements Callable<Map<String, Protected
     private Map<String, ProtectedRegion> globalRegions;
     private Map<ProtectedRegion, String> parentSets;
 
-    RegionLoader(MySQLDatabaseImpl database, Connection conn, Map<String, ProtectedRegion> regions) {
+    RegionLoader(MySQLDatabaseImpl database, Connection conn) {
         super(database, conn);
-        checkNotNull(regions);
-        this.regions = regions;
         this.worldId = database.getWorldId();
     }
 
@@ -142,8 +142,7 @@ class RegionLoader extends AbstractJob implements Callable<Map<String, Protected
     private <T> void setFlag(ProtectedRegion region, Flag<T> flag, Object rawValue) {
         T val = flag.unmarshal(rawValue);
         if (val == null) {
-            logger.warning("Failed to parse flag '" + flag.getName()
-                    + "' with value '" + rawValue.toString() + "'");
+            logger.warning("Failed to parse flag '" + flag.getName() + "' with value '" + rawValue + "'");
             return;
         }
         region.setFlag(flag, val);
@@ -158,7 +157,7 @@ class RegionLoader extends AbstractJob implements Callable<Map<String, Protected
         try {
             usersStatement = this.conn.prepareStatement(
                     "SELECT " +
-                            "`user`.`name`, " +
+                            "`user`.`name`, `user`.`uuid`, " +
                             "`region_players`.`owner` " +
                             "FROM `" + config.sqlTablePrefix + "region_players` AS `region_players` " +
                             "LEFT JOIN `" + config.sqlTablePrefix + "user` AS `user` ON ( " +
@@ -171,10 +170,23 @@ class RegionLoader extends AbstractJob implements Callable<Map<String, Protected
             usersStatement.setString(1, region.getId().toLowerCase());
             userSet = usersStatement.executeQuery();
             while (userSet.next()) {
+                DefaultDomain domain;
                 if (userSet.getBoolean("owner")) {
-                    owners.addPlayer(userSet.getString("name"));
+                    domain = owners;
                 } else {
-                    members.addPlayer(userSet.getString("name"));
+                    domain = members;
+                }
+
+                String name = userSet.getString("name");
+                String uuid = userSet.getString("uuid");
+                if (name != null) {
+                    domain.addPlayer(name);
+                } else if (uuid != null) {
+                    try {
+                        domain.addPlayer(UUID.fromString(uuid));
+                    } catch (IllegalArgumentException e) {
+                        logger.warning("Invalid UUID in database: " + uuid);
+                    }
                 }
             }
         } catch (SQLException ex) {

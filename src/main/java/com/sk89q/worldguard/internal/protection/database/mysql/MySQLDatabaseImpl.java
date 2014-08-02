@@ -121,11 +121,13 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
         // Check some tables
         boolean tablesExist;
         boolean isRecent;
+        boolean isBeforeMigrations;
         boolean hasMigrations;
 
         try {
             tablesExist = tryQuery(conn, "SELECT * FROM `" + config.sqlTablePrefix + "region_cuboid` LIMIT 1");
             isRecent = tryQuery(conn, "SELECT `world_id` FROM `" + config.sqlTablePrefix + "region_cuboid` LIMIT 1");
+            isBeforeMigrations = !tryQuery(conn, "SELECT `uuid` FROM `" + config.sqlTablePrefix + "user` LIMIT 1");
             hasMigrations = tryQuery(conn, "SELECT * FROM `" + config.sqlTablePrefix + "migrations` LIMIT 1");
         } finally {
             closer.closeQuietly();
@@ -153,6 +155,11 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
             flyway.setInitOnMigrate(true);
 
             if (tablesExist) {
+                // Detect if this is before migrations
+                if (isBeforeMigrations) {
+                    flyway.setInitVersion(MigrationVersion.fromVersion("1"));
+                }
+
                 logger.log(Level.INFO, "The MySQL region tables exist but the migrations table seems to not exist yet. Creating the migrations table...");
             } else {
                 // By default, if Flyway sees any tables at all in the schema, it
@@ -268,7 +275,7 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
         Connection connection = null;
         try {
             connection = getConnection();
-            setRegions(new RegionLoader(this, connection, regions).call());
+            setRegions(new RegionLoader(this, connection).call());
         } catch (SQLException e) {
             throw new ProtectionDatabaseException("Failed to load regions database", e);
         } finally {
