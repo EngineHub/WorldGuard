@@ -26,76 +26,151 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.UUID;
 
+/**
+ * A combination of a {@link PlayerDomain} and a {@link GroupDomain}.
+ */
 public class DefaultDomain implements Domain {
-    private final Set<String> groups;
-    private final Set<String> players;
-    
-    public DefaultDomain() {
-        this.groups = new CopyOnWriteArraySet<String>();
-        this.players = new CopyOnWriteArraySet<String>();
-    }
-    
+
+    private final PlayerDomain playerDomain = new PlayerDomain();
+    private final GroupDomain groupDomain = new GroupDomain();
+
+    /**
+     * Add the given player to the domain, identified by the player's name.
+     *
+     * @param name the name of the player
+     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
+     */
+    @Deprecated
     public void addPlayer(String name) {
-        players.add(name.toLowerCase());
+        playerDomain.addPlayer(name);
     }
-    
-    public void addPlayer(LocalPlayer player) {
-        players.add(player.getName().toLowerCase());
-    }
-    
+
+    /**
+     * Remove the given player from the domain, identified by the player's name.
+     *
+     * @param name the name of the player
+     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
+     */
+    @Deprecated
     public void removePlayer(String name) {
-        players.remove(name.toLowerCase());
+        playerDomain.removePlayer(name);
     }
-    
+
+    /**
+     * Add the given player to the domain, identified by the player's UUID.
+     *
+     * @param uniqueId the UUID of the player
+     */
+    public void addPlayer(UUID uniqueId) {
+        playerDomain.addPlayer(uniqueId);
+    }
+
+    /**
+     * Remove the given player from the domain, identified by either the
+     * player's name, the player's unique ID, or both.
+     *
+     * @param player the player
+     */
     public void removePlayer(LocalPlayer player) {
-        players.remove(player.getName().toLowerCase());
+        playerDomain.removePlayer(player);
     }
-    
-    public void addGroup(String name) {
-        groups.add(name.toLowerCase());
+
+    /**
+     * Add the given player to the domain, identified by the player's UUID.
+     *
+     * @param player the player
+     */
+    public void addPlayer(LocalPlayer player) {
+        playerDomain.addPlayer(player);
     }
-    
-    public void removeGroup(String name) {
-        groups.remove(name.toLowerCase());
-    }
-    
-    public Set<String> getGroups() {
-        return groups;
-    }
-    
+
+    /**
+     * Get the set of player names.
+     *
+     * @return the set of player names
+     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
+     */
+    @Deprecated
     public Set<String> getPlayers() {
-        return players;
+        return playerDomain.getPlayers();
+    }
+
+    /**
+     * Get the set of player UUIDs.
+     *
+     * @return the set of player UUIDs
+     */
+    public Set<UUID> getUniqueIds() {
+        return playerDomain.getUniqueIds();
+    }
+
+    /**
+     * Add the name of the group to the domain.
+     *
+     * @param name the name of the group.
+     */
+    public void addGroup(String name) {
+        groupDomain.addGroup(name);
+    }
+
+    /**
+     * Remove the given group from the domain.
+     *
+     * @param name the name of the group
+     */
+    public void removeGroup(String name) {
+        groupDomain.removeGroup(name);
+    }
+
+    /**
+     * Get the set of group names.
+     *
+     * @return the set of group names
+     */
+    public Set<String> getGroups() {
+        return groupDomain.getGroups();
     }
 
     @Override
     public boolean contains(LocalPlayer player) {
-        if (contains(player.getName())) {
-            return true;
-        }
+        return playerDomain.contains(player) || groupDomain.contains(player);
+    }
 
-        for (String group : groups) {
-            if (player.hasGroup(group)) {
-                return true;
-            }
-        }
-
-        return false;
+    @Override
+    public boolean contains(UUID uniqueId) {
+        return playerDomain.contains(uniqueId);
     }
 
     @Override
     public boolean contains(String playerName) {
-        return players.contains(playerName.toLowerCase());
+        return playerDomain.contains(playerName);
     }
 
+    @Override
     public int size() {
-        return groups.size() + players.size();
+        return groupDomain.size() + playerDomain.size();
     }
-    
+
+    @Override
+    public void clear() {
+        playerDomain.clear();
+        groupDomain.clear();
+    }
+
+    public void removeAll() {
+        clear();
+    }
+
+    @SuppressWarnings("deprecation")
     public String toPlayersString() {
         StringBuilder str = new StringBuilder();
-        List<String> output = new ArrayList<String>(players);
+        List<String> output = new ArrayList<String>();
+        output.addAll(playerDomain.getPlayers());
+        for (UUID uuid : playerDomain.getUniqueIds()) {
+            output.add("uuid:" + uuid);
+        }
         Collections.sort(output, String.CASE_INSENSITIVE_ORDER);
         for (Iterator<String> it = output.iterator(); it.hasNext();) {
             str.append(it.next());
@@ -108,7 +183,7 @@ public class DefaultDomain implements Domain {
     
     public String toGroupsString() {
         StringBuilder str = new StringBuilder();
-        for (Iterator<String> it = groups.iterator(); it.hasNext(); ) {
+        for (Iterator<String> it = groupDomain.getGroups().iterator(); it.hasNext(); ) {
             str.append("*");
             str.append(it.next());
             if (it.hasNext()) {
@@ -120,11 +195,12 @@ public class DefaultDomain implements Domain {
     
     public String toUserFriendlyString() {
         StringBuilder str = new StringBuilder();
-        if (players.size() > 0) {
+
+        if (playerDomain.size() > 0) {
             str.append(toPlayersString());
         }
         
-        if (groups.size() > 0) {
+        if (groupDomain.size() > 0) {
             if (str.length() > 0) {
                 str.append("; ");
             }
@@ -135,8 +211,4 @@ public class DefaultDomain implements Domain {
         return str.toString();
     }
 
-    public void removeAll() {
-        groups.clear();
-        players.clear();
-    }
 }

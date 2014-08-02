@@ -19,12 +19,18 @@
 
 package com.sk89q.worldguard.domains;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.sk89q.worldguard.LocalPlayer;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * @deprecated not used by WorldGuard and not maintained
+ */
+@Deprecated
 public class DomainCollection implements Domain {
+
     private Set<Domain> domains;
 
     public DomainCollection() {
@@ -39,14 +45,31 @@ public class DomainCollection implements Domain {
         domains.remove(domain);
     }
 
+    @Override
     public int size() {
         return domains.size();
+    }
+
+    @Override
+    public void clear() {
+        domains.clear();
     }
 
     @Override
     public boolean contains(LocalPlayer player) {
         for (Domain domain : domains) {
             if (domain.contains(player)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean contains(UUID uniqueId) {
+        for (Domain domain : domains) {
+            if (domain.contains(uniqueId)) {
                 return true;
             }
         }
@@ -64,4 +87,5 @@ public class DomainCollection implements Domain {
 
         return false;
     }
+
 }
