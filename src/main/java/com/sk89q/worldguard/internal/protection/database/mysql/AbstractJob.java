@@ -47,14 +47,6 @@ abstract class AbstractJob {
         this.logger = database.getLogger();
     }
 
-    static void closeQuietly(Connection connection) {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException ignored) {}
-        }
-    }
-
     static void closeQuietly(ResultSet rs) {
         if (rs != null) {
             try {

@@ -99,6 +99,16 @@ public class PlayerDomain implements Domain {
     }
 
     /**
+     * Remove the given player from the domain, identified by the player's UUID.
+     *
+     * @param uuid the UUID of the player
+     */
+    public void removePlayer(UUID uuid) {
+        checkNotNull(uuid);
+        uniqueIds.remove(uuid);
+    }
+
+    /**
      * Remove the given player from the domain, identified by either the
      * player's name, the player's unique ID, or both.
      *

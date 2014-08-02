@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -27,6 +29,14 @@ import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import com.sk89q.squirrelid.cache.HashMapCache;
+import com.sk89q.squirrelid.cache.ProfileCache;
+import com.sk89q.squirrelid.cache.SQLiteCache;
+import com.sk89q.squirrelid.resolver.BukkitPlayerService;
+import com.sk89q.squirrelid.resolver.CacheForwardingService;
+import com.sk89q.squirrelid.resolver.CombinedProfileService;
+import com.sk89q.squirrelid.resolver.HttpRepositoryService;
+import com.sk89q.squirrelid.resolver.ProfileService;
 import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
@@ -40,6 +50,7 @@ import com.sk89q.worldguard.internal.listener.RegionProtectionListener;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
+import com.sk89q.worldguard.util.concurrency.EvenMoreExecutors;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -64,41 +75,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
- *
- * @author sk89q
  */
 public class WorldGuardPlugin extends JavaPlugin {
 
-    /**
-     * Current instance of this plugin.
-     */
     private static WorldGuardPlugin inst;
-
-    /**
-     * Manager for commands. This automatically handles nested commands,
-     * permissions checking, and a number of other fancy command things.
-     * We just set it up and register commands against it.
-     */
     private final CommandsManager<CommandSender> commands;
-
-    /**
-     * Handles the region databases for all worlds.
-     */
     private final GlobalRegionManager globalRegionManager;
-
-    /**
-     * Handles all configuration.
-     */
     private final ConfigurationManager configuration;
-
-    /**
-     * Used for scheduling flags.
-     */
     private FlagStateManager flagStateManager;
+    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
+            EvenMoreExecutors.newBoundedCachedThreadPool(0, 4, 20));
+    private ProfileService profileService;
+    private ProfileCache profileCache;
 
     /**
      * Construct objects. Actual loading occurs when the plugin is enabled, so
@@ -205,6 +198,21 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
+        File cacheDir = new File(getDataFolder(), "cache");
+        cacheDir.mkdirs();
+        try {
+            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Failed to initialize SQLite profile cache");
+            profileCache = new HashMapCache();
+        }
+
+        profileService = new CacheForwardingService(
+                new CombinedProfileService(
+                        BukkitPlayerService.getInstance(),
+                        HttpRepositoryService.forMinecraft()),
+                profileCache);
+
         if (!configuration.hasCommandBookGodMode()) {
             // Check god mode for existing players, if any
             for (Player player : getServer().getOnlinePlayers()) {
@@ -216,9 +224,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
     }
 
-    /**
-     * Called on plugin disable.
-     */
     @Override
     public void onDisable() {
         globalRegionManager.unload();
@@ -226,9 +231,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         this.getServer().getScheduler().cancelTasks(this);
     }
 
-    /**
-     * Handle a command.
-     */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label,
             String[] args) {
@@ -291,6 +293,34 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public ConfigurationManager getGlobalStateManager() {
         return configuration;
+    }
+
+    /**
+     * Get the global executor service for internal usage (please use your
+     * own executor service).
+     *
+     * @return the global executor service
+     */
+    public ListeningExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    /**
+     * Get the profile lookup service.
+     *
+     * @return the profile lookup service
+     */
+    public ProfileService getProfileService() {
+        return profileService;
+    }
+
+    /**
+     * Get the profile cache.
+     *
+     * @return the profile cache
+     */
+    public ProfileCache getProfileCache() {
+        return profileCache;
     }
 
     /**

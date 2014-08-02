@@ -19,14 +19,20 @@
 
 package com.sk89q.worldguard.domains;
 
+import com.google.common.collect.ImmutableMap;
+import com.sk89q.squirrelid.Profile;
+import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldguard.LocalPlayer;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A combination of a {@link PlayerDomain} and a {@link GroupDomain}.
@@ -59,6 +65,15 @@ public class DefaultDomain implements Domain {
     }
 
     /**
+     * Remove the given player from the domain, identified by the player's UUID.
+     *
+     * @param uuid the UUID of the player
+     */
+    public void removePlayer(UUID uuid) {
+        playerDomain.removePlayer(uuid);
+    }
+
+    /**
      * Add the given player to the domain, identified by the player's UUID.
      *
      * @param uniqueId the UUID of the player
@@ -84,6 +99,42 @@ public class DefaultDomain implements Domain {
      */
     public void addPlayer(LocalPlayer player) {
         playerDomain.addPlayer(player);
+    }
+
+    /**
+     * Add all the entries from another domain.
+     *
+     * @param other the other domain
+     */
+    public void addAll(DefaultDomain other) {
+        checkNotNull(other);
+        for (String player : other.getPlayers()) {
+            addPlayer(player);
+        }
+        for (UUID uuid : other.getUniqueIds()) {
+            addPlayer(uuid);
+        }
+        for (String group : other.getGroups()) {
+            addGroup(group);
+        }
+    }
+
+    /**
+     * Remove all the entries from another domain.
+     *
+     * @param other the other domain
+     */
+    public void removeAll(DefaultDomain other) {
+        checkNotNull(other);
+        for (String player : other.getPlayers()) {
+            removePlayer(player);
+        }
+        for (UUID uuid : other.getUniqueIds()) {
+            removePlayer(uuid);
+        }
+        for (String group : other.getGroups()) {
+            removeGroup(group);
+        }
     }
 
     /**
@@ -165,11 +216,29 @@ public class DefaultDomain implements Domain {
 
     @SuppressWarnings("deprecation")
     public String toPlayersString() {
+        return toPlayersString(null);
+    }
+
+    @SuppressWarnings("deprecation")
+    public String toPlayersString(@Nullable ProfileCache cache) {
         StringBuilder str = new StringBuilder();
         List<String> output = new ArrayList<String>();
         output.addAll(playerDomain.getPlayers());
-        for (UUID uuid : playerDomain.getUniqueIds()) {
-            output.add("uuid:" + uuid);
+
+        if (cache != null) {
+            ImmutableMap<UUID, Profile> results = cache.getAllPresent(playerDomain.getUniqueIds());
+            for (UUID uuid : playerDomain.getUniqueIds()) {
+                Profile profile = results.get(uuid);
+                if (profile != null) {
+                    output.add(profile.getName() + "*");
+                } else {
+                    output.add("uuid:" + uuid);
+                }
+            }
+        } else {
+            for (UUID uuid : playerDomain.getUniqueIds()) {
+                output.add("uuid:" + uuid);
+            }
         }
         Collections.sort(output, String.CASE_INSENSITIVE_ORDER);
         for (Iterator<String> it = output.iterator(); it.hasNext();) {
@@ -192,22 +261,40 @@ public class DefaultDomain implements Domain {
         }
         return str.toString();
     }
-    
+
     public String toUserFriendlyString() {
         StringBuilder str = new StringBuilder();
 
         if (playerDomain.size() > 0) {
             str.append(toPlayersString());
         }
-        
+
         if (groupDomain.size() > 0) {
             if (str.length() > 0) {
                 str.append("; ");
             }
-            
+
             str.append(toGroupsString());
         }
-        
+
+        return str.toString();
+    }
+
+    public String toUserFriendlyString(ProfileCache cache) {
+        StringBuilder str = new StringBuilder();
+
+        if (playerDomain.size() > 0) {
+            str.append(toPlayersString(cache));
+        }
+
+        if (groupDomain.size() > 0) {
+            if (str.length() > 0) {
+                str.append("; ");
+            }
+
+            str.append(toGroupsString());
+        }
+
         return str.toString();
     }
 

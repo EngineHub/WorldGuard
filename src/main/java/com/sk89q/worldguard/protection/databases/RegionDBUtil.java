@@ -19,12 +19,12 @@
 
 package com.sk89q.worldguard.protection.databases;
 
+import com.sk89q.worldguard.domains.DefaultDomain;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.sk89q.worldguard.domains.DefaultDomain;
 
 /**
  * Various utility functions for parsing region databases.
@@ -32,6 +32,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
  * @author sk89q
  */
 public class RegionDBUtil {
+
     private static Pattern groupPattern = Pattern.compile("(?i)^[G]:(.+)$");
     
     private RegionDBUtil() {
