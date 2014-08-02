@@ -233,7 +233,7 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
             domain.addPlayer(name);
         }
 
-        for (String stringId : node.getStringList("uuids", null)) {
+        for (String stringId : node.getStringList("unique-ids", null)) {
             try {
                 domain.addPlayer(UUID.fromString(stringId));
             } catch (IllegalArgumentException e) {
@@ -333,7 +333,7 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
         Map<String, Object> domainData = new HashMap<String, Object>();
 
         setDomainData(domainData, "players", domain.getPlayers());
-        setDomainData(domainData, "uuids", domain.getUniqueIds());
+        setDomainData(domainData, "unique-ids", domain.getUniqueIds());
         setDomainData(domainData, "groups", domain.getGroups());
         
         return domainData;

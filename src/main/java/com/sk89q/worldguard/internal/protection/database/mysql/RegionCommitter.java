@@ -22,6 +22,8 @@ package com.sk89q.worldguard.internal.protection.database.mysql;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.internal.protection.database.mysql.UserToIdCache.NameToIdCache;
+import com.sk89q.worldguard.internal.protection.database.mysql.UserToIdCache.UUIDToIdCache;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -40,13 +42,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 class RegionCommitter extends AbstractJob implements Callable<Object> {
 
+    /*
+        ========= Everything below is a nightmare. =========
+     */
+
     private final Map<String, ProtectedRegion> regions;
+    private final NameToIdCache usernameCache;
+    private final UUIDToIdCache uuidCache;
     private final int worldId;
 
     RegionCommitter(MySQLDatabaseImpl database, Connection conn, Map<String, ProtectedRegion> regions) {
@@ -54,6 +64,8 @@ class RegionCommitter extends AbstractJob implements Callable<Object> {
         checkNotNull(regions);
         this.regions = regions;
         this.worldId = database.getWorldId();
+        usernameCache = new NameToIdCache(database, conn);
+        uuidCache = new UUIDToIdCache(database, conn);
     }
 
     @Override
@@ -173,76 +185,6 @@ class RegionCommitter extends AbstractJob implements Callable<Object> {
         }
 
         return null;
-    }
-
-    /*
-     * Returns the database id for the user
-     * If it doesn't exits it adds the user and returns the id.
-     */
-    private Map<String,Integer> getUserIds(String... usernames) {
-        Map<String,Integer> users = new HashMap<String,Integer>();
-
-        if (usernames.length < 1) return users;
-
-        ResultSet findUsersResults = null;
-        PreparedStatement insertUserStatement = null;
-        PreparedStatement findUsersStatement = null;
-        try {
-            findUsersStatement = this.conn.prepareStatement(
-                    String.format(
-                            "SELECT " +
-                                    "`user`.`id`, " +
-                                    "`user`.`name` " +
-                                    "FROM `" + config.sqlTablePrefix + "user` AS `user` " +
-                                    "WHERE `name` IN (%s)",
-                            RegionDBUtil.preparePlaceHolders(usernames.length)
-                    )
-            );
-
-            RegionDBUtil.setValues(findUsersStatement, usernames);
-
-            findUsersResults = findUsersStatement.executeQuery();
-
-            while(findUsersResults.next()) {
-                users.put(findUsersResults.getString("name"), findUsersResults.getInt("id"));
-            }
-
-            insertUserStatement = this.conn.prepareStatement(
-                    "INSERT INTO " +
-                            "`" + config.sqlTablePrefix + "user` ( " +
-                            "`id`, " +
-                            "`name`" +
-                            ") VALUES (null, ?)",
-                    Statement.RETURN_GENERATED_KEYS
-            );
-
-            for (String username : usernames) {
-                if (!users.containsKey(username)) {
-                    insertUserStatement.setString(1, username);
-                    insertUserStatement.execute();
-                    ResultSet generatedKeys = insertUserStatement.getGeneratedKeys();
-                    if (generatedKeys.first()) {
-                        users.put(username, generatedKeys.getInt(1));
-                    } else {
-                        logger.warning("Could not get the database id for user " + username);
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            logger.warning("Could not get the database id for the users " + usernames.toString() + "\n\t" + ex.getMessage());
-            Throwable t = ex.getCause();
-            while (t != null) {
-                logger.warning(t.getMessage());
-                t = t.getCause();
-            }
-        } finally {
-            closeQuietly(findUsersResults);
-            closeQuietly(findUsersStatement);
-            closeQuietly(insertUserStatement);
-        }
-
-        return users;
     }
 
     /*
@@ -384,14 +326,32 @@ class RegionCommitter extends AbstractJob implements Callable<Object> {
                             "VALUES (?, " + this.worldId + ",  ?, ?)"
             );
 
-            Set<String> var = domain.getPlayers();
+            // Map players to IDs
+            usernameCache.fetch(domain.getPlayers());
+            uuidCache.fetch(domain.getUniqueIds());
 
-            for (Integer player : getUserIds(var.toArray(new String[var.size()])).values()) {
-                insertUsersForRegion.setString(1, region.getId().toLowerCase());
-                insertUsersForRegion.setInt(2, player);
-                insertUsersForRegion.setBoolean(3, owners);
+            for (String name : domain.getPlayers()) {
+                Integer id = usernameCache.find(name);
+                if (id != null) {
+                    insertUsersForRegion.setString(1, region.getId().toLowerCase());
+                    insertUsersForRegion.setInt(2, id);
+                    insertUsersForRegion.setBoolean(3, owners);
+                    insertUsersForRegion.execute();
+                } else {
+                    logger.log(Level.WARNING, "Did not find an ID for the user identified as '" + name + "'");
+                }
+            }
 
-                insertUsersForRegion.execute();
+            for (UUID uuid : domain.getUniqueIds()) {
+                Integer id = uuidCache.find(uuid);
+                if (id != null) {
+                    insertUsersForRegion.setString(1, region.getId().toLowerCase());
+                    insertUsersForRegion.setInt(2, id);
+                    insertUsersForRegion.setBoolean(3, owners);
+                    insertUsersForRegion.execute();
+                } else {
+                    logger.log(Level.WARNING, "Did not find an ID for the user identified by '" + uuid + "'");
+                }
             }
 
             deleteGroupsForRegion = this.conn.prepareStatement(
