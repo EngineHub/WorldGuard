@@ -189,28 +189,25 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
      * @throws SQLException on a database access error
      */
     private int chooseWorldId(String worldName) throws SQLException {
-        Connection conn = getConnection();
-        PreparedStatement worldStmt = null;
-        ResultSet worldResult = null;
-        PreparedStatement insertWorldStatement = null;
-
+        Closer closer = Closer.create();
         try {
-            worldStmt = conn.prepareStatement(
+            Connection conn = closer.register(getConnection());
+            PreparedStatement worldStmt = closer.register(conn.prepareStatement(
                     "SELECT `id` FROM `" + config.sqlTablePrefix + "world` WHERE `name` = ? LIMIT 0, 1"
-            );
+            ));
 
             worldStmt.setString(1, worldName);
-            worldResult = worldStmt.executeQuery();
+            ResultSet worldResult = closer.register(worldStmt.executeQuery());
 
             if (worldResult.first()) {
                 return worldResult.getInt("id");
             } else {
-                insertWorldStatement = conn.prepareStatement(
+                PreparedStatement insertWorldStatement = closer.register(conn.prepareStatement(
                         "INSERT INTO " +
                                 "`" + config.sqlTablePrefix + "world` " +
                                 "(`id`, `name`) VALUES (null, ?)",
                         Statement.RETURN_GENERATED_KEYS
-                );
+                ));
 
                 insertWorldStatement.setString(1, worldName);
                 insertWorldStatement.execute();
@@ -223,9 +220,7 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
                 }
             }
         } finally {
-            AbstractJob.closeQuietly(worldResult);
-            AbstractJob.closeQuietly(worldStmt);
-            AbstractJob.closeQuietly(insertWorldStatement);
+            closer.closeQuietly();
         }
     }
 
