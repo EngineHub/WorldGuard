@@ -48,6 +48,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -220,15 +221,24 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
         region.setFlag(flag, val);
     }
     
+    @SuppressWarnings("deprecation")
     private DefaultDomain parseDomain(YAMLNode node) {
         if (node == null) {
             return new DefaultDomain();
         }
         
         DefaultDomain domain = new DefaultDomain();
-        
+
         for (String name : node.getStringList("players", null)) {
             domain.addPlayer(name);
+        }
+
+        for (String stringId : node.getStringList("uuids", null)) {
+            try {
+                domain.addPlayer(UUID.fromString(stringId));
+            } catch (IllegalArgumentException e) {
+                logger.log(Level.WARNING, "Failed to parse UUID '" + stringId +"'", e);
+            }
         }
         
         for (String name : node.getStringList("groups", null)) {
@@ -310,33 +320,34 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
     }
     
     @SuppressWarnings("unchecked")
-    private <V> void addMarshalledFlag(Map<String, Object> flagData,
-            Flag<V> flag, Object val) {
+    private <V> void addMarshalledFlag(Map<String, Object> flagData, Flag<V> flag, Object val) {
         if (val == null) {
             return;
         }
+
         flagData.put(flag.getName(), flag.marshal((V) val));
     }
     
+    @SuppressWarnings("deprecation")
     private Map<String, Object> getDomainData(DefaultDomain domain) {
         Map<String, Object> domainData = new HashMap<String, Object>();
 
         setDomainData(domainData, "players", domain.getPlayers());
+        setDomainData(domainData, "uuids", domain.getUniqueIds());
         setDomainData(domainData, "groups", domain.getGroups());
         
         return domainData;
     }
     
-    private void setDomainData(Map<String, Object> domainData,
-            String key, Set<String> domain) {
-        if (domain.size() == 0) {
+    private void setDomainData(Map<String, Object> domainData, String key, Set<?> domain) {
+        if (domain.isEmpty()) {
             return;
         }
         
         List<String> list = new ArrayList<String>();
         
-        for (String str : domain) {
-            list.add(str);
+        for (Object str : domain) {
+            list.add(String.valueOf(str));
         }
         
         domainData.put(key, list);
