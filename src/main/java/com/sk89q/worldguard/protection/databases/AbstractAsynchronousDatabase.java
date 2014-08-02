@@ -22,9 +22,9 @@ package com.sk89q.worldguard.protection.databases;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.sk89q.odeum.concurrency.EvenMoreExecutors;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.util.concurrency.EvenMoreExecutors;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
