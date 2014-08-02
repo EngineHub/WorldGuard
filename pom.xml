@@ -383,8 +383,23 @@
                   <include>org.khelekore:prtree</include>
                   <include>com.jolbox:bonecp</include>
                   <include>org.flywaydb:flyway-core</include>
+                  <include>com.sk89q:squirrelid</include>
                 </includes>
               </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>com.jolbox.bonecp</pattern>
+                  <shadedPattern>com.sk89q.worldguard.internal.bonecp</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.flywaydb</pattern>
+                  <shadedPattern>com.sk89q.worldguard.internal.flywaydb</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sk89q.squirrelid</pattern>
+                  <shadedPattern>com.sk89q.worldguard.util.profile</shadedPattern>
+                </relocation>
+              </relocations>
             </configuration>
           </execution>
         </executions>
