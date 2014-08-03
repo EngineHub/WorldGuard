@@ -87,13 +87,13 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
         }
     }
 
-    private YAMLProcessor createYamlProcessor() {
+    private YAMLProcessor createYamlProcessor(File file) {
         return new YAMLProcessor(file, false, YAMLFormat.COMPACT);
     }
 
     @Override
     public void performLoad() throws ProtectionDatabaseException {
-        YAMLProcessor config = createYamlProcessor();
+        YAMLProcessor config = createYamlProcessor(file);
 
         try {
             config.load();
@@ -260,8 +260,9 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
     }
 
     @Override
-    protected void performSave() {
-        YAMLProcessor config = createYamlProcessor();
+    protected void performSave() throws ProtectionDatabaseException {
+        File tempFile = new File(file.getParentFile(), file.getName() + ".tmp");
+        YAMLProcessor config = createYamlProcessor(tempFile);
 
         config.clear();
 
@@ -317,6 +318,11 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
                 "# REMEMBER TO KEEP PERIODICAL BACKUPS.\r\n" +
                 "#");
         config.save();
+
+        file.delete();
+        if (!tempFile.renameTo(file)) {
+            throw new ProtectionDatabaseException("Failed to rename temporary regions file to " + file.getAbsolutePath());
+        }
     }
 
     private Map<String, Object> getFlagData(ProtectedRegion region) {
