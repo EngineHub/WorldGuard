@@ -62,7 +62,7 @@ public class WorldGuardCommands {
         // TODO: This is subject to a race condition, but at least other commands are not being processed concurrently
         List<Task<?>> tasks = plugin.getSupervisor().getTasks();
         if (!tasks.isEmpty()) {
-            throw new CommandException("There are currently pending tasks. Use /wg running and /wg cancelall to monitor and cancel these tasks first.");
+            throw new CommandException("There are currently pending tasks. Use /wg running to monitor these tasks first.");
         }
         
         LoggerToChatHandler handler = null;
@@ -140,26 +140,6 @@ public class WorldGuardCommands {
                 plugin.getFlagStateManager().forget(player);
                 sender.sendMessage("Cleared states for player \"" + player.getName() + "\".");
             }
-        }
-    }
-
-    @Command(aliases = {"cancelall"}, flags = "f", desc = "Cancel all running tasks", max = 0)
-    @CommandPermissions("worldguard.cancel.all")
-    public void cancelAllTasks(CommandContext args, CommandSender sender) throws CommandException {
-        List<Task<?>> tasks = plugin.getSupervisor().getTasks();
-
-        boolean force = args.hasFlag('f');
-        if (force && !plugin.hasPermission(sender, "worldguard.cancel.force")) {
-            throw new CommandException("You are not permitted to force cancel.");
-        }
-
-        if (!tasks.isEmpty()) {
-            for (Task<?> task : tasks) {
-                task.cancel(force);
-                sender.sendMessage(ChatColor.YELLOW + "Cancelled: " + ChatColor.WHITE + task.getName());
-            }
-        } else {
-            sender.sendMessage(ChatColor.YELLOW + "There are currently no running tasks.");
         }
     }
 
