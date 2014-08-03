@@ -35,8 +35,6 @@ import java.util.regex.Pattern;
 
 /**
  * Represents a region of any shape and size that can be protected.
- *
- * @author sk89q
  */
 public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
@@ -45,34 +43,11 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
 
     private static final Pattern idPattern = Pattern.compile("^[A-Za-z0-9_,'\\-\\+/]{1,}$");
 
-    /**
-     * Holds the region's ID.
-     */
     private String id;
-
-    /**
-     * Priority.
-     */
     private int priority = 0;
-
-    /**
-     * Holds the curParent.
-     */
     private ProtectedRegion parent;
-
-    /**
-     * List of owners.
-     */
     private DefaultDomain owners = new DefaultDomain();
-
-    /**
-     * List of members.
-     */
     private DefaultDomain members = new DefaultDomain();
-
-    /**
-     * List of flags.
-     */
     private Map<Flag<?>, Object> flags = new ConcurrentHashMap<Flag<?>, Object>();
 
     /**
@@ -457,8 +432,8 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
     /**
      * Check to see if any of the 2D points are inside this region.
      *
-     * @param pts
-     * @return
+     * @param pts a list positions
+     * @return true if contained
      */
     public boolean containsAny(List<BlockVector2D> pts) {
         for (BlockVector2D pt : pts) {
@@ -477,6 +452,7 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      *
      * @param other The region to compare to
      */
+    @Override
     public int compareTo(ProtectedRegion other) {
         if (priority > other.priority) {
             return -1;
@@ -598,6 +574,6 @@ public abstract class ProtectedRegion implements Comparable<ProtectedRegion> {
      * situation.
      */
     public static class CircularInheritanceException extends Exception {
-        private static final long serialVersionUID = 7479613488496776022L;
     }
+
 }

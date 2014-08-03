@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.internal.protection.database.mysql;
+package com.sk89q.worldguard.protection.databases.mysql;
 
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import org.yaml.snakeyaml.error.YAMLException;

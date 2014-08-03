@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.internal.protection.database.mysql;
+package com.sk89q.worldguard.protection.databases.mysql;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
@@ -40,9 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
-class RegionLoader extends AbstractJob implements Callable<Map<String, ProtectedRegion>> {
+class RegionLoader extends AbstractJob {
 
     /*
         ========= Everything below is a nightmare. =========
@@ -60,8 +59,7 @@ class RegionLoader extends AbstractJob implements Callable<Map<String, Protected
         this.worldId = database.getWorldId();
     }
 
-    @Override
-    public Map<String, ProtectedRegion> call() {
+    public Map<String, ProtectedRegion> load() {
         parentSets = new HashMap<ProtectedRegion, String>();
 
         // We load the cuboid regions first, as this is likely to be the

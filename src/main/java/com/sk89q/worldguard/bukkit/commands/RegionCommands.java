@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.minecraft.util.commands.Command;
@@ -40,9 +39,9 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.databases.RegionDBUtil;
-import com.sk89q.worldguard.protection.databases.migrators.AbstractDatabaseMigrator;
-import com.sk89q.worldguard.protection.databases.migrators.MigrationException;
-import com.sk89q.worldguard.protection.databases.migrators.MigratorKey;
+import com.sk89q.worldguard.protection.databases.migrator.AbstractDatabaseMigrator;
+import com.sk89q.worldguard.protection.databases.migrator.MigrationException;
+import com.sk89q.worldguard.protection.databases.migrator.MigratorKey;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
@@ -54,6 +53,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -65,8 +65,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.logging.Level;
 
 /**
  * Implements the /region commands for WorldGuard.
@@ -91,7 +89,18 @@ public final class RegionCommands {
     private static RegionPermissionModel getPermissionModel(CommandSender sender) {
         return new RegionPermissionModel(WorldGuardPlugin.inst(), sender);
     }
-    
+
+    /**
+     * Save the regions asynchronously and alert the sender if any errors
+     * occur during save.
+     *
+     * @param manager the manager to save
+     * @param sender the sender
+     */
+    private void saveRegionsSilently(RegionManager manager, World world, CommandSender sender) {
+        AsyncCommandHelper.wrap(Futures.immediateFuture(null), plugin, sender).thenSaveRegionData(manager, world);
+    }
+
     /**
      * Gets the world from the given flag, or falling back to the the current player
      * if the sender is a player, otherwise reporting an error.
@@ -102,8 +111,7 @@ public final class RegionCommands {
      * @return a world
      * @throws CommandException on error
      */
-    private static World getWorld(CommandContext args, CommandSender sender, char flag)
-            throws CommandException {
+    private static World getWorld(CommandContext args, CommandSender sender, char flag) throws CommandException {
         if (args.hasFlag(flag)) {
             return WorldGuardPlugin.inst().matchWorld(sender, args.getFlag(flag));
         } else {
@@ -150,9 +158,7 @@ public final class RegionCommands {
      * @param allowGlobal true to allow selecting __global__
      * @throws CommandException thrown if no region is found by the given name
      */
-    private static ProtectedRegion findExistingRegion(
-            RegionManager regionManager, String id, boolean allowGlobal)
-            throws CommandException {
+    private static ProtectedRegion findExistingRegion(RegionManager regionManager, String id, boolean allowGlobal) throws CommandException {
         // Validate the id
         validateRegionId(id, allowGlobal);
         
@@ -186,8 +192,7 @@ public final class RegionCommands {
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    private static ProtectedRegion findRegionStandingIn(
-            RegionManager regionManager, Player player) throws CommandException {
+    private static ProtectedRegion findRegionStandingIn(RegionManager regionManager, Player player) throws CommandException {
         return findRegionStandingIn(regionManager, player, false);
     }
 
@@ -206,8 +211,7 @@ public final class RegionCommands {
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    private static ProtectedRegion findRegionStandingIn(
-            RegionManager regionManager, Player player, boolean allowGlobal) throws CommandException {
+    private static ProtectedRegion findRegionStandingIn(RegionManager regionManager, Player player, boolean allowGlobal) throws CommandException {
         ApplicableRegionSet set = regionManager.getApplicableRegions(
                 player.getLocation());
         
@@ -272,9 +276,7 @@ public final class RegionCommands {
      * @return a new region
      * @throws CommandException thrown on an error
      */
-    private static ProtectedRegion createRegionFromSelection(Player player, String id)
-            throws CommandException {
-        
+    private static ProtectedRegion createRegionFromSelection(Player player, String id) throws CommandException {
         Selection selection = getSelection(player);
         
         // Detect the type of region from WorldEdit
@@ -291,84 +293,6 @@ public final class RegionCommands {
             throw new CommandException(
                     "Sorry, you can only use cuboids and polygons for WorldGuard regions.");
         }
-    }
-
-    /**
-     * Save the region database.
-     * 
-     * @param sender the sender
-     * @param regionManager the region manager
-     * @param silent whether to suppress messages sent to the player
-     * @throws CommandException throw on an error
-     */
-    private ListenableFuture<?> commitChanges(final CommandSender sender, RegionManager regionManager, final World world, final boolean silent) throws CommandException {
-        ListenableFuture<?> future;
-
-        try {
-            future = regionManager.save(true);
-        } catch (RejectedExecutionException e) {
-            throw new CommandException("There are too many interleaved load and save tasks currently queued. Please try again later.");
-        }
-
-        if (!silent) {
-            sender.sendMessage(ChatColor.GRAY + "(A save of the region data has been queued.)");
-        }
-
-        Futures.addCallback(future, new FutureCallback<Object>() {
-            @Override
-            public void onSuccess(Object o) {
-                if (!silent) {
-                    sender.sendMessage(ChatColor.YELLOW + "Successfully saved the region data for the '" + world.getName() + "' world.");
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                sender.sendMessage(ChatColor.RED + "Failed to save region data for the '" + world.getName() + "' world: " + throwable.getMessage());
-                plugin.getLogger().log(Level.WARNING, "Failed to save region data", throwable);
-            }
-        });
-
-        return future;
-    }
-
-    /**
-     * Load the region database.
-     * 
-     * @param sender the sender
-     * @param regionManager the region manager
-     * @param silent whether to suppress messages sent to the player
-     * @throws CommandException throw on an error
-     */
-    private ListenableFuture<?> reloadChanges(final CommandSender sender, RegionManager regionManager, final World world, final boolean silent) throws CommandException {
-        ListenableFuture<?> future;
-
-        try {
-            future = regionManager.load(true);
-        } catch (RejectedExecutionException e) {
-            throw new CommandException("There are too many interleaved load and save tasks currently queued. Please try again later.");
-        }
-
-        if (!silent) {
-            sender.sendMessage(ChatColor.GRAY + "(A load of the region data has been queued.)");
-        }
-
-        Futures.addCallback(future, new FutureCallback<Object>() {
-            @Override
-            public void onSuccess(Object o) {
-                if (!silent) {
-                    sender.sendMessage(ChatColor.YELLOW + "Successfully loaded the region data for the '" + world.getName() + "' world.");
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                sender.sendMessage(ChatColor.RED + "Failed to load region data for the '" + world.getName() + "' world: " + throwable.getMessage());
-                plugin.getLogger().log(Level.WARNING, "Failed to load region data", throwable);
-            }
-        });
-
-        return future;
     }
 
     /**
@@ -422,9 +346,7 @@ public final class RegionCommands {
      * @param value the value
      * @throws InvalidFlagFormat thrown if the value is invalid
      */
-    private static <V> void setFlag(ProtectedRegion region,
-            Flag<V> flag, CommandSender sender, String value)
-                    throws InvalidFlagFormat {
+    private static <V> void setFlag(ProtectedRegion region, Flag<V> flag, CommandSender sender, String value) throws InvalidFlagFormat {
         region.setFlag(flag, flag.parseInput(WorldGuardPlugin.inst(), sender, value));
     }
     
@@ -439,8 +361,7 @@ public final class RegionCommands {
              usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
              desc = "Defines a region",
              min = 1)
-    public void define(CommandContext args, CommandSender sender)
-            throws CommandException {
+    public void define(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
 
         // Check permissions
@@ -466,9 +387,6 @@ public final class RegionCommands {
         if (args.argsLength() > 1) {
             region.setOwners(RegionDBUtil.parseDomainString(args.getSlice(1), 1));
         }
-
-        regionManager.addRegion(region);
-        commitChanges(sender, regionManager, player.getWorld(), true); // Save to disk
         
         // Issue a warning about height
         int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
@@ -488,6 +406,12 @@ public final class RegionCommands {
         
         // Tell the user
         sender.sendMessage(ChatColor.YELLOW + "A new region has been made named '" + id + "'.");
+
+        // Add region
+        regionManager.addRegion(region);
+
+        // Save regions
+        saveRegionsSilently(regionManager, player.getWorld(), sender);
     }
 
     /**
@@ -501,8 +425,7 @@ public final class RegionCommands {
              usage = "<id>",
              desc = "Re-defines the shape of a region",
              min = 1, max = 1)
-    public void redefine(CommandContext args, CommandSender sender)
-            throws CommandException {
+    public void redefine(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         
@@ -532,9 +455,6 @@ public final class RegionCommands {
             // This should not be thrown
         }
 
-        regionManager.addRegion(region); // Replace region
-        commitChanges(sender, regionManager, player.getWorld(), true); // Save to disk
-
         // Issue a warning about height
         int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
         if (height <= 2) {
@@ -543,6 +463,11 @@ public final class RegionCommands {
         }
         
         sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated with new area.");
+
+        regionManager.addRegion(region); // Replace region
+
+        // Save regions
+        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -573,8 +498,8 @@ public final class RegionCommands {
         String id = validateRegionId(args.getString(0), false);
 
         // Can't replace existing regions
-        RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
-        if (mgr.hasRegion(id)) {
+        RegionManager regionManager = plugin.getGlobalRegionManager().get(player.getWorld());
+        if (regionManager.hasRegion(id)) {
             throw new CommandException(
                     "That region already exists. Please choose a different name.");
         }
@@ -593,13 +518,13 @@ public final class RegionCommands {
         if (!permModel.mayClaimRegionsUnbounded()) {
             int maxRegionCount = wcfg.getMaxRegionCount(player);
             if (maxRegionCount >= 0
-                    && mgr.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
+                    && regionManager.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
                 throw new CommandException(
                         "You own too many regions, delete one first to claim a new one.");
             }
         }
 
-        ProtectedRegion existing = mgr.getRegionExact(id);
+        ProtectedRegion existing = regionManager.getRegionExact(id);
 
         // Check for an existing region
         if (existing != null) {
@@ -610,7 +535,7 @@ public final class RegionCommands {
         }
 
         // We have to check whether this region violates the space of any other reion
-        ApplicableRegionSet regions = mgr.getApplicableRegions(region);
+        ApplicableRegionSet regions = regionManager.getApplicableRegions(region);
 
         // Check if this region overlaps any other region
         if (regions.size() > 0) {
@@ -634,34 +559,15 @@ public final class RegionCommands {
             }
         }
 
-        /*if (plugin.getGlobalConfiguration().getiConomy() != null && wcfg.useiConomy && wcfg.buyOnClaim) {
-            if (iConomy.getBank().hasAccount(player.getName())) {
-                Account account = iConomy.getBank().getAccount(player.getName());
-                double balance = account.getBalance();
-                double regionCosts = region.countBlocks() * wcfg.buyOnClaimPrice;
-                if (balance >= regionCosts) {
-                    account.subtract(regionCosts);
-                    player.sendMessage(ChatColor.YELLOW + "You have bought that region for "
-                            + iConomy.getBank().format(regionCosts));
-                    account.save();
-                } else {
-                    player.sendMessage(ChatColor.RED + "You have not enough money.");
-                    player.sendMessage(ChatColor.RED + "The region you want to claim costs "
-                            + iConomy.getBank().format(regionCosts));
-                    player.sendMessage(ChatColor.RED + "You have " + iConomy.getBank().format(balance));
-                    return;
-                }
-            } else {
-                player.sendMessage(ChatColor.YELLOW + "You have not enough money.");
-                return;
-            }
-        }*/
-
         region.getOwners().addPlayer(player.getName());
-        
-        mgr.addRegion(region);
-        commitChanges(sender, mgr, player.getWorld(), true); // Save to disk
+
         sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated with new area.");
+
+        // Replace region
+        regionManager.addRegion(region);
+
+        // Save regions
+        saveRegionsSilently(regionManager, player.getWorld(), sender);
     }
 
     /**
@@ -733,22 +639,31 @@ public final class RegionCommands {
             throw new CommandPermissionsException();
         }
 
-        // Print region information
-        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, args.hasFlag('u') ? null : plugin.getProfileCache());
-        ListenableFuture<?> future = Futures.transform(
-                plugin.getExecutorService().submit(printout),
-                CommandUtils.messageFunction(sender));
-        Futures.addCallback(future, CommandUtils.messageCallback(sender, null, "Failed to retrieve region info"));
-
-        // Let the player also select the region
+        // Let the player select the region
         if (args.hasFlag('s')) {
             // Check permissions
             if (!permModel.maySelect(existing)) {
                 throw new CommandPermissionsException();
             }
-            
+
             setPlayerSelection(plugin.checkPlayer(sender), existing);
         }
+
+        // Print region information
+        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, args.hasFlag('u') ? null : plugin.getProfileCache());
+        ListenableFuture<?> future = Futures.transform(
+                plugin.getExecutorService().submit(printout),
+                CommandUtils.messageFunction(sender));
+
+        // If it takes too long...
+        FutureProgressListener.addProgressListener(
+                future, sender, "(Please wait... fetching region information...)");
+
+        // Send a response message
+        Futures.addCallback(future,
+                new MessageFutureCallback.Builder(plugin, sender)
+                        .onFailure("Failed to fetch region information")
+                        .build());
     }
 
     /**
@@ -963,8 +878,6 @@ public final class RegionCommands {
             }
         }
 
-        commitChanges(sender, regionManager, world, true); // Save to disk
-
         // Print region information
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, null);
         printout.append(ChatColor.GRAY);
@@ -972,6 +885,9 @@ public final class RegionCommands {
         printout.appendFlagsList(false);
         printout.append(")");
         printout.send(sender);
+
+        // Save regions
+        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -1002,11 +918,13 @@ public final class RegionCommands {
         }
 
         existing.setPriority(priority);
-        commitChanges(sender, regionManager, world, true); // Save to disk
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Priority of '" + existing.getId() + "' set to "
                 + priority + " (higher numbers override).");
+
+        // Save regions
+        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -1058,8 +976,6 @@ public final class RegionCommands {
             printout.send(sender);
             return;
         }
-
-        commitChanges(sender, regionManager, world, true); // Save to disk
         
         // Tell the user the current inheritance
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(child, null);
@@ -1073,6 +989,9 @@ public final class RegionCommands {
             printout.append(")");
         }
         printout.send(sender);
+
+        // Save regions
+        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -1101,10 +1020,11 @@ public final class RegionCommands {
         }
 
         regionManager.removeRegion(existing.getId());
-        commitChanges(sender, regionManager, world, true); // Save to disk
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + existing.getId() + "' removed.");
+        sender.sendMessage(ChatColor.YELLOW + "Region '" + existing.getId() + "' removed.");
+
+        // Save regions
+        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -1132,33 +1052,33 @@ public final class RegionCommands {
         }
 
         if (world != null) {
-            RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
-            if (regionManager == null) {
+            RegionManager manager = plugin.getGlobalRegionManager().get(world);
+
+            if (manager == null) {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
             }
-            reloadChanges(sender, regionManager, world, false);
+
+            ListenableFuture<?> future = manager.load(true);
+
+            AsyncCommandHelper.wrap(future, plugin, sender)
+                    .forRegionDataLoad(world, false);
         } else {
+            // Load regions for all worlds
             List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>();
-            for (World w : plugin.getServer().getWorlds()) {
-                RegionManager regionManager = plugin.getGlobalRegionManager().get(w);
-                if (regionManager == null) {
-                    continue;
+            for (World w : Bukkit.getServer().getWorlds()) {
+                RegionManager manager = plugin.getGlobalRegionManager().get(w);
+                if (manager != null) {
+                    futures.add(manager.load(true));
                 }
-                futures.add(reloadChanges(sender, regionManager, world, true));
             }
+            ListenableFuture<?> future = Futures.successfulAsList(futures);
 
-            Futures.addCallback(Futures.allAsList(futures), new FutureCallback<Object>() {
-                @Override
-                public void onSuccess(Object o) {
-                    sender.sendMessage(ChatColor.YELLOW + "Successfully loaded region data for all worlds.");
-                }
-
-                @Override
-                public void onFailure(Throwable throwable) {
-                    sender.sendMessage(ChatColor.RED + "Failed to load region data for all worlds: " + throwable.getMessage());
-                    plugin.getLogger().log(Level.WARNING, "Failed to load region data", throwable);
-                }
-            });
+            AsyncCommandHelper.wrap(future, plugin, sender)
+                    .registerWithSupervisor("Loading regions for all worlds")
+                    .sendMessageAfterDelay("(Please wait... loading region data for all worlds...)")
+                    .thenRespondWith(
+                            "Successfully load the region data for all worlds.",
+                            "Failed to load regions for all worlds");
         }
     }
 
@@ -1187,34 +1107,33 @@ public final class RegionCommands {
         }
 
         if (world != null) {
-            RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
-            if (regionManager == null) {
+            RegionManager manager = plugin.getGlobalRegionManager().get(world);
+
+            if (manager == null) {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
             }
-            commitChanges(sender, regionManager, world, false);
+
+            ListenableFuture<?> future = manager.save(true);
+
+            AsyncCommandHelper.wrap(future, plugin, sender)
+                    .forRegionDataSave(world, false);
         } else {
-            sender.sendMessage(ChatColor.YELLOW + "Saving all region databases... This might take a bit.");
+            // Save for all worlds
             List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>();
-            for (World w : plugin.getServer().getWorlds()) {
-                RegionManager regionManager = plugin.getGlobalRegionManager().get(w);
-                if (regionManager == null) {
-                    continue;
+            for (World w : Bukkit.getServer().getWorlds()) {
+                RegionManager manager = plugin.getGlobalRegionManager().get(w);
+                if (manager != null) {
+                    futures.add(manager.save(true));
                 }
-                futures.add(commitChanges(sender, regionManager, world, true));
             }
+            ListenableFuture<?> future = Futures.successfulAsList(futures);
 
-            Futures.addCallback(Futures.allAsList(futures), new FutureCallback<Object>() {
-                @Override
-                public void onSuccess(Object o) {
-                    sender.sendMessage(ChatColor.YELLOW + "Successfully saved region data for all worlds.");
-                }
-
-                @Override
-                public void onFailure(Throwable throwable) {
-                    sender.sendMessage(ChatColor.RED + "Failed to save region data for all worlds: " + throwable.getMessage());
-                    plugin.getLogger().log(Level.WARNING, "Failed to save region data", throwable);
-                }
-            });
+            AsyncCommandHelper.wrap(future, plugin, sender)
+                    .registerWithSupervisor("Saving regions for all worlds")
+                    .sendMessageAfterDelay("(Please wait... saving region data for all worlds...)")
+                    .thenRespondWith(
+                            "Successfully saved the region data for all worlds.",
+                            "Failed to save regions for all worlds");
         }
     }
 

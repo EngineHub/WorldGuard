@@ -19,18 +19,7 @@
 
 package com.sk89q.worldguard.protection.databases;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import au.com.bytecode.opencsv.CSVReader;
-
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -42,11 +31,22 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.util.ArrayReader;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Represents a protected area database that uses CSV files.
  *
- * @author sk89q
+ * @deprecated no longer maintained - use {@link YAMLDatabase}
  */
+@Deprecated
 public class CSVDatabase extends AbstractProtectionDatabase {
     
     private static final Map<String, StateFlag> legacyFlagCodes = new HashMap<String, StateFlag>();

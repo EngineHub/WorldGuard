@@ -17,15 +17,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.internal.protection.database.mysql;
+package com.sk89q.worldguard.protection.databases.mysql;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.internal.protection.database.mysql.UserToIdCache.NameToIdCache;
-import com.sk89q.worldguard.internal.protection.database.mysql.UserToIdCache.UUIDToIdCache;
+import com.sk89q.worldguard.internal.util.sql.StatementUtils;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -43,33 +41,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldguard.protection.databases.mysql.UserRowCache.NameRowCache;
+import static com.sk89q.worldguard.protection.databases.mysql.UserRowCache.UUIDRowCache;
 
-class RegionCommitter extends AbstractJob implements Callable<Object> {
+class RegionWriter extends AbstractJob {
 
     /*
         ========= Everything below is a nightmare. =========
      */
 
     private final Map<String, ProtectedRegion> regions;
-    private final NameToIdCache usernameCache;
-    private final UUIDToIdCache uuidCache;
+    private final NameRowCache usernameCache;
+    private final UUIDRowCache uuidCache;
     private final int worldId;
 
-    RegionCommitter(MySQLDatabaseImpl database, Connection conn, Map<String, ProtectedRegion> regions) {
+    RegionWriter(MySQLDatabaseImpl database, Connection conn, Map<String, ProtectedRegion> regions) {
         super(database, conn);
         checkNotNull(regions);
         this.regions = regions;
         this.worldId = database.getWorldId();
-        usernameCache = new NameToIdCache(database, conn);
-        uuidCache = new UUIDToIdCache(database, conn);
+        usernameCache = new NameRowCache(database, conn);
+        uuidCache = new UUIDRowCache(database, conn);
     }
 
-    @Override
-    public Object call() throws SQLException, ProtectionDatabaseException {
+    public void save() throws SQLException, ProtectionDatabaseException {
 
         /*
         * As we don't get notified on the creation/removal of regions:
@@ -183,8 +181,6 @@ class RegionCommitter extends AbstractJob implements Callable<Object> {
                 closeQuietly(removeRegion);
             }
         }
-
-        return null;
     }
 
     /*
@@ -207,11 +203,11 @@ class RegionCommitter extends AbstractJob implements Callable<Object> {
                                     "`group`.`name` " +
                                     "FROM `" + config.sqlTablePrefix + "group` AS `group` " +
                                     "WHERE `name` IN (%s)",
-                            RegionDBUtil.preparePlaceHolders(groupnames.length)
+                            StatementUtils.preparePlaceHolders(groupnames.length)
                     )
             );
 
-            RegionDBUtil.setValues(findGroupsStatement, groupnames);
+            StatementUtils.setValues(findGroupsStatement, groupnames);
 
             findGroupsResults = findGroupsStatement.executeQuery();
 

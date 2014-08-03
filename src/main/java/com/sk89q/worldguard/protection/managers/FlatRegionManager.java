@@ -26,21 +26,24 @@ import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A very simple implementation of the region manager that uses a flat list
  * and iterates through the list to identify applicable regions. This method
  * is not very efficient.
- *
- * @author sk89q
  */
 public class FlatRegionManager extends RegionManager {
 
     /**
      * List of protected regions.
      */
-    private Map<String, ProtectedRegion> regions;
+    private ConcurrentMap<String, ProtectedRegion> regions = new ConcurrentHashMap<String, ProtectedRegion>();
 
     /**
      * Construct the manager.
@@ -49,7 +52,6 @@ public class FlatRegionManager extends RegionManager {
      */
     public FlatRegionManager(ProtectionDatabase regionLoader) {
         super(regionLoader);
-        regions = new TreeMap<String, ProtectedRegion>();
     }
 
     @Override
@@ -59,7 +61,7 @@ public class FlatRegionManager extends RegionManager {
 
     @Override
     public void setRegions(Map<String, ProtectedRegion> regions) {
-        this.regions = new TreeMap<String, ProtectedRegion>(regions);
+        this.regions = new ConcurrentHashMap<String, ProtectedRegion>(regions);
     }
 
     @Override
@@ -185,7 +187,7 @@ public class FlatRegionManager extends RegionManager {
             intersectRegions = new ArrayList<ProtectedRegion>();
         }
 
-        return intersectRegions.size() > 0;
+        return !intersectRegions.isEmpty();
     }
 
     @Override

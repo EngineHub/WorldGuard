@@ -17,8 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.internal.protection.database.mysql;
+package com.sk89q.worldguard.protection.databases.mysql;
 
+import com.google.common.util.concurrent.ListeningExecutorService;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
@@ -270,7 +271,7 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
         Connection connection = null;
         try {
             connection = getConnection();
-            setRegions(new RegionLoader(this, connection).call());
+            setRegions(new RegionLoader(this, connection).load());
         } catch (SQLException e) {
             throw new ProtectionDatabaseException("Failed to load regions database", e);
         } finally {
@@ -288,7 +289,7 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
         Connection connection = null;
         try {
             connection = getConnection();
-            new RegionCommitter(this, connection, getRegions()).call();
+            new RegionWriter(this, connection, getRegions()).save();
         } catch (SQLException e) {
             throw new ProtectionDatabaseException("Failed to save regions database", e);
         } finally {

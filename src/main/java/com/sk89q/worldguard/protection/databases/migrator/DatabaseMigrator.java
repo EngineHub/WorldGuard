@@ -17,23 +17,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.databases;
+package com.sk89q.worldguard.protection.databases.migrator;
 
-import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
+/**
+ * Represents a method of converting from one database to another.
+ *
+ * @author Nicholas Steicke
+ */
+public interface DatabaseMigrator {
 
-public class InvalidTableFormatException extends FatalConfigurationLoadingException {
-    private static final long serialVersionUID = 1L;
-
-    protected String updateFile;
-
-    public InvalidTableFormatException(String updateFile) {
-        super();
-        
-        this.updateFile = updateFile;
-    }
-    
-    public String toString() {
-        return "You need to update your database to the latest version.\n" +
-                "\t\tPlease see " + this.updateFile;
-    }
+    public void migrate() throws MigrationException;
 }
+

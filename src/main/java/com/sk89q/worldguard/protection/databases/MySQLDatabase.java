@@ -19,14 +19,26 @@
 
 package com.sk89q.worldguard.protection.databases;
 
-
+import com.google.common.util.concurrent.ListeningExecutorService;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.internal.protection.database.mysql.MySQLDatabaseImpl;
+import com.sk89q.worldguard.protection.databases.mysql.MySQLDatabaseImpl;
 
 import java.util.logging.Logger;
 
+/**
+ * A store that persists regions in a MySQL database.
+ */
 public class MySQLDatabase extends MySQLDatabaseImpl {
 
+    /**
+     * Create a new instance.
+     *
+     * @param executor the executor to perform loads and saves in
+     * @param config the configuration
+     * @param worldName the world name
+     * @param logger a logger
+     * @throws ProtectionDatabaseException thrown on error
+     */
     public MySQLDatabase(ConfigurationManager config, String worldName, Logger logger) throws ProtectionDatabaseException {
         super(config, worldName, logger);
     }
