@@ -102,6 +102,8 @@ public class ConfigurationManager {
     public boolean usePlayerTeleports;
     public boolean deopOnJoin;
     public boolean blockInGameOp;
+    public boolean migrateRegionsToUuid;
+    public boolean keepUnresolvedNames;
     public Map<String, String> hostKeys = new HashMap<String, String>();
 
     /**
@@ -142,6 +144,8 @@ public class ConfigurationManager {
 
         config.removeProperty("suppress-tick-sync-warnings");
         useRegionsScheduler = config.getBoolean("regions.use-scheduler", true);
+        migrateRegionsToUuid = config.getBoolean("regions.uuid-migration.perform-on-next-start", true);
+        keepUnresolvedNames = config.getBoolean("regions.uuid-migration.keep-names-that-lack-uuids", true);
         useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
         autoGodMode = config.getBoolean("auto-invincible", config.getBoolean("auto-invincible-permission", false));
         config.removeProperty("auto-invincible-permission");
@@ -177,10 +181,6 @@ public class ConfigurationManager {
         }
 
         config.setHeader(CONFIG_HEADER);
-
-        if (!config.save()) {
-            plugin.getLogger().severe("Error saving configuration!");
-        }
     }
 
     /**
@@ -188,6 +188,13 @@ public class ConfigurationManager {
      */
     public void unload() {
         worlds.clear();
+    }
+
+    public void disableUuidMigration() {
+        config.setProperty("regions.uuid-migration.perform-on-next-start", false);
+        if (!config.save()) {
+            plugin.getLogger().severe("Error saving configuration!");
+        }
     }
 
     /**

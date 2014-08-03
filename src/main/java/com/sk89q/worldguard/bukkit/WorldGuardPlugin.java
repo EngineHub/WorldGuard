@@ -52,6 +52,9 @@ import com.sk89q.worldguard.internal.listener.BlockedPotionsListener;
 import com.sk89q.worldguard.internal.listener.ChestProtectionListener;
 import com.sk89q.worldguard.internal.listener.RegionProtectionListener;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.databases.migrator.MigrationException;
+import com.sk89q.worldguard.protection.databases.migrator.UUIDMigrator;
 import com.sk89q.worldguard.protection.databases.util.UnresolvedNamesException;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
@@ -154,6 +157,21 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Need to create the plugins/WorldGuard folder
         getDataFolder().mkdirs();
 
+        File cacheDir = new File(getDataFolder(), "cache");
+        cacheDir.mkdirs();
+        try {
+            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Failed to initialize SQLite profile cache");
+            profileCache = new HashMapCache();
+        }
+
+        profileService = new CacheForwardingService(
+                new CombinedProfileService(
+                        BukkitPlayerService.getInstance(),
+                        HttpRepositoryService.forMinecraft()),
+                profileCache);
+
         PermissionsResolverManager.initialize(this);
 
         // This must be done before configuration is loaded
@@ -162,10 +180,24 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             // Load the configuration
             configuration.load();
+
+            getLogger().info("Loading region data...");
             globalRegionManager.preload();
+
+            migrateRegionUniqueIds(); // Migrate to UUIDs
         } catch (FatalConfigurationLoadingException e) {
-            e.printStackTrace();
+            getLogger().log(Level.WARNING, "Encountered fatal error while loading configuration", e);
             getServer().shutdown();
+            getLogger().log(Level.WARNING, "\n" +
+                    "******************************************************\n" +
+                    "* Failed to load WorldGuard configuration!\n" +
+                    "* \n" +
+                    "* Shutting down the server just in case...\n" +
+                    "* \n" +
+                    "* The error should be printed above this message. If you can't\n" +
+                    "* figure out the problem, ask us on our forums:\n" +
+                    "* http://forum.enginehub.org\n" +
+                    "******************************************************\n");
         }
 
         // Migrate regions after the regions were loaded because
@@ -207,21 +239,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        File cacheDir = new File(getDataFolder(), "cache");
-        cacheDir.mkdirs();
-        try {
-            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
-        } catch (IOException e) {
-            getLogger().log(Level.WARNING, "Failed to initialize SQLite profile cache");
-            profileCache = new HashMapCache();
-        }
-
-        profileService = new CacheForwardingService(
-                new CombinedProfileService(
-                        BukkitPlayerService.getInstance(),
-                        HttpRepositoryService.forMinecraft()),
-                profileCache);
-
         if (!configuration.hasCommandBookGodMode()) {
             // Check god mode for existing players, if any
             for (Player player : getServer().getOnlinePlayers()) {
@@ -258,6 +275,35 @@ public class WorldGuardPlugin extends JavaPlugin {
         globalRegionManager.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
+    }
+
+    private void migrateRegionUniqueIds() {
+        try {
+            if (configuration.migrateRegionsToUuid) {
+                UUIDMigrator migrator = new UUIDMigrator(profileService, getLogger());
+                migrator.readConfiguration(configuration);
+                List<RegionManager> managers = globalRegionManager.getLoaded();
+
+                // Try migration
+                if (migrator.migrate(managers)) {
+                    getLogger().info("Now saving regions... this may take a while.");
+
+                    for (RegionManager manager : managers) {
+                        manager.save();
+                    }
+
+                    getLogger().info(
+                            "Regions saved after UUID migration! This won't happen again unless " +
+                                    "you change the relevant configuration option in WorldGuard's config.");
+
+                    configuration.disableUuidMigration();
+                }
+            }
+        } catch (MigrationException e) {
+            getLogger().log(Level.WARNING, "Failed to migrate regions to use UUIDs instead of player names", e);
+        } catch (ProtectionDatabaseException e) {
+            getLogger().log(Level.WARNING, "Failed to save regions after UUID conversion", e);
+        }
     }
 
     @Override

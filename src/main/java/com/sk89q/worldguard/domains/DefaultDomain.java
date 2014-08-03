@@ -39,8 +39,46 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class DefaultDomain implements Domain {
 
-    private final PlayerDomain playerDomain = new PlayerDomain();
-    private final GroupDomain groupDomain = new GroupDomain();
+    private PlayerDomain playerDomain = new PlayerDomain();
+    private GroupDomain groupDomain = new GroupDomain();
+
+    /**
+     * Get the domain that holds the players.
+     *
+     * @return a domain
+     */
+    public PlayerDomain getPlayerDomain() {
+        return playerDomain;
+    }
+
+    /**
+     * Set a new player domain.
+     *
+     * @param playerDomain a domain
+     */
+    public void setPlayerDomain(PlayerDomain playerDomain) {
+        checkNotNull(playerDomain);
+        this.playerDomain = playerDomain;
+    }
+
+    /**
+     * Set the domain that holds the groups.
+     *
+     * @return a domain
+     */
+    public GroupDomain getGroupDomain() {
+        return groupDomain;
+    }
+
+    /**
+     * Set a new group domain.
+     *
+     * @param groupDomain a domain
+     */
+    public void setGroupDomain(GroupDomain groupDomain) {
+        checkNotNull(groupDomain);
+        this.groupDomain = groupDomain;
+    }
 
     /**
      * Add the given player to the domain, identified by the player's name.
