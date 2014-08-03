@@ -36,9 +36,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import static com.google.common.util.concurrent.Futures.addCallback;
-import static com.sk89q.worldguard.bukkit.commands.CommandUtils.*;
-
 // @TODO: A lot of code duplication here! Need to fix.
 
 public class RegionMemberCommands {
@@ -74,8 +71,8 @@ public class RegionMemberCommands {
 
         String id = args.getString(0);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        RegionManager manager = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = manager.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -103,9 +100,12 @@ public class RegionMemberCommands {
                 plugin.getExecutorService().submit(resolver),
                 resolver.createAddAllFunction(region.getMembers()));
 
-        progressCallback(future, sender, "(Please wait... resolving names into UUIDs...)");
-        addCallback(future, messageCallback(sender, "Region '" + id + "' updated.", "Failed to add members"));
-        addCallback(future, saveRegionsCallback(sender, mgr, world, true));
+        AsyncCommandHelper.wrap(future, plugin, sender)
+                .formatUsing(region.getId(), world.getName())
+                .registerWithSupervisor("Adding members to the region '%s' on '%s'")
+                .sendMessageAfterDelay("(Please wait... querying player names...)")
+                .thenRespondWith("Region '%s' updated with new members.", "Failed to add new members")
+                .thenSaveRegionData(manager, world);
     }
 
     @Command(aliases = {"addowner", "addowner", "ao"},
@@ -133,8 +133,8 @@ public class RegionMemberCommands {
 
         String id = args.getString(0);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        RegionManager manager = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = manager.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -148,7 +148,7 @@ public class RegionMemberCommands {
             if (flag != null && flag && owners != null && owners.size() == 0) {
                 if (!plugin.hasPermission(player, "worldguard.region.unlimited")) {
                     int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
-                    if (maxRegionCount >= 0 && mgr.getRegionCountOfPlayer(localPlayer)
+                    if (maxRegionCount >= 0 && manager.getRegionCountOfPlayer(localPlayer)
                             >= maxRegionCount) {
                         throw new CommandException("You already own the maximum allowed amount of regions.");
                     }
@@ -175,9 +175,12 @@ public class RegionMemberCommands {
                 plugin.getExecutorService().submit(resolver),
                 resolver.createAddAllFunction(region.getOwners()));
 
-        progressCallback(future, sender, "(Please wait... resolving names into UUIDs...)");
-        addCallback(future, messageCallback(sender, "Region '" + id + "' updated.", "Failed to add owners"));
-        addCallback(future, saveRegionsCallback(sender, mgr, world, true));
+        AsyncCommandHelper.wrap(future, plugin, sender)
+                .formatUsing(region.getId(), world.getName())
+                .registerWithSupervisor("Adding owners to the region '%s' on '%s'")
+                .sendMessageAfterDelay("(Please wait... querying player names...)")
+                .thenRespondWith("Region '%s' updated with new owners.", "Failed to add new owners")
+                .thenSaveRegionData(manager, world);
     }
 
     @Command(aliases = {"removemember", "remmember", "removemem", "remmem", "rm"},
@@ -205,8 +208,8 @@ public class RegionMemberCommands {
 
         String id = args.getString(0);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        RegionManager manager = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = manager.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -246,9 +249,12 @@ public class RegionMemberCommands {
                     resolver.createRemoveAllFunction(region.getMembers()));
         }
 
-        progressCallback(future, sender, "(Please wait... resolving names into UUIDs...)");
-        addCallback(future, messageCallback(sender, "Region '" + id + "' updated.", "Failed to remove members"));
-        addCallback(future, saveRegionsCallback(sender, mgr, world, true));
+        AsyncCommandHelper.wrap(future, plugin, sender)
+                .formatUsing(region.getId(), world.getName())
+                .registerWithSupervisor("Removing members from the region '%s' on '%s'")
+                .sendMessageAfterDelay("(Please wait... querying player names...)")
+                .thenRespondWith("Region '%s' updated with members removed.", "Failed to remove members")
+                .thenSaveRegionData(manager, world);
     }
 
     @Command(aliases = {"removeowner", "remowner", "ro"},
@@ -277,8 +283,8 @@ public class RegionMemberCommands {
 
         String id = args.getString(0);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = mgr.getRegion(id);
+        RegionManager manager = plugin.getGlobalRegionManager().get(world);
+        ProtectedRegion region = manager.getRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -318,8 +324,11 @@ public class RegionMemberCommands {
                     resolver.createRemoveAllFunction(region.getOwners()));
         }
 
-        progressCallback(future, sender, "(Please wait... resolving names into UUIDs...)");
-        addCallback(future, messageCallback(sender, "Region '" + id + "' updated.", "Failed to remove owners"));
-        addCallback(future, saveRegionsCallback(sender, mgr, world, true));
+        AsyncCommandHelper.wrap(future, plugin, sender)
+                .formatUsing(region.getId(), world.getName())
+                .registerWithSupervisor("Removing owners from the region '%s' on '%s'")
+                .sendMessageAfterDelay("(Please wait... querying player names...)")
+                .thenRespondWith("Region '%s' updated with owners removed.", "Failed to remove owners")
+                .thenSaveRegionData(manager, world);
     }
 }

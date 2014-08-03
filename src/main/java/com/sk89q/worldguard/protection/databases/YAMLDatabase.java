@@ -52,6 +52,9 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * A store that persists regions in a YAML-encoded file.
+ */
 public class YAMLDatabase extends AbstractAsynchronousDatabase {
 
     /**
@@ -62,7 +65,15 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
     private Map<String, ProtectedRegion> regions;
     private final File file;
     private final Logger logger;
-    
+
+    /**
+     * Create a new instance.
+     *
+     * @param file the file
+     * @param logger a logger
+     * @throws ProtectionDatabaseException
+     * @throws FileNotFoundException
+     */
     public YAMLDatabase(File file, Logger logger) throws ProtectionDatabaseException, FileNotFoundException {
         this.logger = logger;
         this.file = file;
@@ -89,9 +100,9 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
         } catch (IOException e) {
             throw new ProtectionDatabaseException(e);
         }
-        
+
         Map<String, YAMLNode> regionData = config.getNodes("regions");
-        
+
         // No regions are even configured
         if (regionData == null) {
             this.regions = new HashMap<String, ProtectedRegion>();
@@ -108,14 +119,14 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
 
         Map<String,ProtectedRegion> regions = new HashMap<String,ProtectedRegion>();
         Map<ProtectedRegion,String> parentSets = new LinkedHashMap<ProtectedRegion, String>();
-        
+
         for (Map.Entry<String, YAMLNode> entry : regionData.entrySet()) {
             String id = entry.getKey().toLowerCase().replace(".", "");
             YAMLNode node = entry.getValue();
 
             String type = node.getString("type");
             ProtectedRegion region;
-            
+
             try {
                 if (type == null) {
                     logger.warning("Undefined region type for region '" + id + "'!\n" +
@@ -139,14 +150,14 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
                             "Here is what the region data looks like:\n\n" + dumpAsYaml(entry.getValue().getMap()) + "\n");
                     continue;
                 }
-                
+
                 Integer priority = checkNonNull(node.getInt("priority"));
                 region.setPriority(priority);
                 setFlags(region, node.getNode("flags"));
                 region.setOwners(parseDomain(node.getNode("owners")));
                 region.setMembers(parseDomain(node.getNode("members")));
                 regions.put(id, region);
-                
+
                 String parentId = node.getString("parent");
                 if (parentId != null) {
                     parentSets.put(region, parentId);
@@ -154,11 +165,11 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
             } catch (NullPointerException e) {
                 logger.log(Level.WARNING,
                         "Unexpected NullPointerException encountered during parsing for the region '" + id + "'!\n" +
-                        "Here is what the region data looks like:\n\n" + dumpAsYaml(entry.getValue().getMap()) +
-                        "\n\nNote: This region will disappear as a result!", e);
+                                "Here is what the region data looks like:\n\n" + dumpAsYaml(entry.getValue().getMap()) +
+                                "\n\nNote: This region will disappear as a result!", e);
             }
         }
-        
+
         // Relink parents
         for (Map.Entry<ProtectedRegion, String> entry : parentSets.entrySet()) {
             ProtectedRegion parent = regions.get(entry.getValue());
@@ -172,23 +183,23 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
                 logger.warning("Unknown region parent: " + entry.getValue());
             }
         }
-        
+
         this.regions = regions;
     }
-    
+
     private <V> V checkNonNull(V val) throws NullPointerException {
         if (val == null) {
             throw new NullPointerException();
         }
-        
+
         return val;
     }
-    
+
     private void setFlags(ProtectedRegion region, YAMLNode flagsData) {
         if (flagsData == null) {
             return;
         }
-        
+
         // @TODO: Make this better
         for (Flag<?> flag : DefaultFlag.getFlags()) {
             if (flag == null) {
@@ -201,16 +212,16 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
             if (o != null) {
                 setFlag(region, flag, o);
             }
-            
+
             if (flag.getRegionGroupFlag() != null) {
-            Object o2 = flagsData.getProperty(flag.getRegionGroupFlag().getName());
+                Object o2 = flagsData.getProperty(flag.getRegionGroupFlag().getName());
                 if (o2 != null) {
                     setFlag(region, flag.getRegionGroupFlag(), o2);
                 }
             }
         }
     }
-    
+
     private <T> void setFlag(ProtectedRegion region, Flag<T> flag, Object rawValue) {
         T val = flag.unmarshal(rawValue);
         if (val == null) {
@@ -220,13 +231,13 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
         }
         region.setFlag(flag, val);
     }
-    
+
     @SuppressWarnings("deprecation")
     private DefaultDomain parseDomain(YAMLNode node) {
         if (node == null) {
             return new DefaultDomain();
         }
-        
+
         DefaultDomain domain = new DefaultDomain();
 
         for (String name : node.getStringList("players", null)) {
@@ -240,11 +251,11 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
                 logger.log(Level.WARNING, "Failed to parse UUID '" + stringId +"'", e);
             }
         }
-        
+
         for (String name : node.getStringList("groups", null)) {
             domain.addGroup(name);
         }
-        
+
         return domain;
     }
 
@@ -307,18 +318,18 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
                 "#");
         config.save();
     }
-    
+
     private Map<String, Object> getFlagData(ProtectedRegion region) {
         Map<String, Object> flagData = new HashMap<String, Object>();
-        
+
         for (Map.Entry<Flag<?>, Object> entry : region.getFlags().entrySet()) {
             Flag<?> flag = entry.getKey();
             addMarshalledFlag(flagData, flag, entry.getValue());
         }
-        
+
         return flagData;
     }
-    
+
     @SuppressWarnings("unchecked")
     private <V> void addMarshalledFlag(Map<String, Object> flagData, Flag<V> flag, Object val) {
         if (val == null) {
@@ -327,7 +338,7 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
 
         flagData.put(flag.getName(), flag.marshal((V) val));
     }
-    
+
     @SuppressWarnings("deprecation")
     private Map<String, Object> getDomainData(DefaultDomain domain) {
         Map<String, Object> domainData = new HashMap<String, Object>();
@@ -335,21 +346,21 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
         setDomainData(domainData, "players", domain.getPlayers());
         setDomainData(domainData, "unique-ids", domain.getUniqueIds());
         setDomainData(domainData, "groups", domain.getGroups());
-        
+
         return domainData;
     }
-    
+
     private void setDomainData(Map<String, Object> domainData, String key, Set<?> domain) {
         if (domain.isEmpty()) {
             return;
         }
-        
+
         List<String> list = new ArrayList<String>();
-        
+
         for (Object str : domain) {
             list.add(String.valueOf(str));
         }
-        
+
         domainData.put(key, list);
     }
 
@@ -384,5 +395,5 @@ public class YAMLDatabase extends AbstractAsynchronousDatabase {
             return "<error while dumping object>";
         }
     }
-    
+
 }

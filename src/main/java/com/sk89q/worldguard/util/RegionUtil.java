@@ -24,11 +24,9 @@ import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 
 /**
  * Various utility functions for regions.
- * 
- * @author sk89q
  */
 @Deprecated
-public class RegionUtil {
+public final class RegionUtil {
     
     private RegionUtil() {
     }

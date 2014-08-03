@@ -42,7 +42,7 @@ public interface ProtectionDatabase {
     /**
      * Load the list of regions into a region manager.
      *
-     * <p>This call will block and it must be run from the main server thread.</p>
+     * <p>This call will block.</p>
      *
      * @param manager The manager to load regions into
      * @throws ProtectionDatabaseException when an error occurs
@@ -56,8 +56,6 @@ public interface ProtectionDatabase {
      *
      * <p>{@code async} is merely a suggestion and it may be ignored by
      * implementations if it is not supported.</p>
-     *
-     * <p>This method must be run from the main server thread.</p>
      *
      * @param manager The manager to load regions into
      * @param async true to attempt to save the data asynchronously if it is supported
@@ -74,7 +72,7 @@ public interface ProtectionDatabase {
     /**
      * Save the list of regions from a region manager.
      *
-     * <p>This call will block and it must be run from the main server thread.</p>
+     * <p>This call will block.</p>
      *
      * @param manager The manager to load regions into
      * @throws ProtectionDatabaseException when an error occurs
@@ -89,11 +87,9 @@ public interface ProtectionDatabase {
      * <p>{@code async} is merely a suggestion and it may be ignored by
      * implementations if it is not supported.</p>
      *
-     * <p>This method must be run from the main server thread.</p>
-     *
      * @param manager The manager to load regions into
      * @param async true to attempt to save the data asynchronously if it is supported
-     * @throws ProtectionDatabaseException when an error occurs
+     * @throws RejectedExecutionException on rejection
      */
     public ListenableFuture<?> save(RegionManager manager, boolean async) throws RejectedExecutionException;
 

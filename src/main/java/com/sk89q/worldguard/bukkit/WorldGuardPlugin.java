@@ -30,6 +30,9 @@ import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
 import com.sk89q.odeum.concurrency.EvenMoreExecutors;
+import com.sk89q.odeum.task.SimpleSupervisor;
+import com.sk89q.odeum.task.Supervisor;
+import com.sk89q.odeum.task.Task;
 import com.sk89q.squirrelid.cache.HashMapCache;
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.squirrelid.cache.SQLiteCache;
@@ -49,6 +52,7 @@ import com.sk89q.worldguard.internal.listener.BlockedPotionsListener;
 import com.sk89q.worldguard.internal.listener.ChestProtectionListener;
 import com.sk89q.worldguard.internal.listener.RegionProtectionListener;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.databases.util.UnresolvedNamesException;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 import org.bukkit.ChatColor;
@@ -64,6 +68,7 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -74,6 +79,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
@@ -88,8 +96,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     private final GlobalRegionManager globalRegionManager;
     private final ConfigurationManager configuration;
     private FlagStateManager flagStateManager;
-    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
-            EvenMoreExecutors.newBoundedCachedThreadPool(0, 4, 20));
+    private final Supervisor supervisor = new SimpleSupervisor();
+    private ListeningExecutorService executorService;
     private ProfileService profileService;
     private ProfileCache profileCache;
 
@@ -124,6 +132,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     @SuppressWarnings("deprecation")
     public void onEnable() {
+        executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
 
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(this));
@@ -226,14 +235,33 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        executorService.shutdownNow();
+
+        try {
+            getLogger().log(Level.INFO, "Shutting down executor and waiting for any pending tasks...");
+
+            List<Task<?>> tasks = supervisor.getTasks();
+            if (!tasks.isEmpty()) {
+                StringBuilder builder = new StringBuilder("Known tasks:");
+                for (Task<?> task : tasks) {
+                    builder.append("\n");
+                    builder.append(task.getName());
+                }
+                getLogger().log(Level.INFO, builder.toString());
+            }
+
+            executorService.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         globalRegionManager.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label,
-            String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         try {
             commands.execute(cmd.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
@@ -244,17 +272,37 @@ public class WorldGuardPlugin extends JavaPlugin {
             sender.sendMessage(ChatColor.RED + e.getMessage());
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (WrappedCommandException e) {
-            if (e.getCause() instanceof NumberFormatException) {
-                sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
-            } else {
-                sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
-                e.printStackTrace();
-            }
+            sender.sendMessage(ChatColor.RED + convertThrowable(e.getCause()));
         } catch (CommandException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }
 
         return true;
+    }
+
+    /**
+     * Convert the throwable into a somewhat friendly message.
+     *
+     * @param throwable the throwable
+     * @return a message
+     */
+    public String convertThrowable(@Nullable Throwable throwable) {
+        if (throwable instanceof NumberFormatException) {
+            return "Number expected, string received instead.";
+        } else if (throwable instanceof RejectedExecutionException) {
+            return "There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.";
+        } else if (throwable instanceof CancellationException) {
+            return "Task was cancelled";
+        } else if (throwable instanceof InterruptedException) {
+            return "Task was interrupted";
+        } else if (throwable instanceof UnresolvedNamesException) {
+            return throwable.getMessage();
+        } else if (throwable instanceof Exception) {
+            getLogger().log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
+            return "Unexpected error occurred: " + ((Exception) throwable).getMessage();
+        } else {
+            return "Unknown error";
+        }
     }
 
     /**
@@ -293,6 +341,15 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public ConfigurationManager getGlobalStateManager() {
         return configuration;
+    }
+
+    /**
+     * Get the supervisor.
+     *
+     * @return the supervisor
+     */
+    public Supervisor getSupervisor() {
+        return supervisor;
     }
 
     /**

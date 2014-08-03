@@ -30,7 +30,12 @@ import org.khelekore.prtree.MBRConverter;
 import org.khelekore.prtree.PRTree;
 import org.khelekore.prtree.SimpleMBR;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class PRTreeRegionManager extends RegionManager {
 
@@ -55,7 +60,7 @@ public class PRTreeRegionManager extends RegionManager {
 
     @Override
     public void setRegions(Map<String, ProtectedRegion> regions) {
-        Map<String, ProtectedRegion> newRegions = new TreeMap<String, ProtectedRegion>(regions);
+        ConcurrentMap<String, ProtectedRegion> newRegions = new ConcurrentHashMap<String, ProtectedRegion>(regions);
         PRTree<ProtectedRegion> tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
         tree.load(newRegions.values());
         this.data = new RegionsContainer(newRegions, tree);
@@ -65,8 +70,9 @@ public class PRTreeRegionManager extends RegionManager {
     public void addRegion(ProtectedRegion region) {
         RegionsContainer data = this.data;
         data.regions.put(region.getId().toLowerCase(), region);
-        data.tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
-        data.tree.load(data.regions.values());
+        PRTree<ProtectedRegion> tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+        tree.load(data.regions.values());
+        this.data = new RegionsContainer(data.regions, tree);
     }
 
     @Override
@@ -95,8 +101,9 @@ public class PRTreeRegionManager extends RegionManager {
             }
         }
 
-        data.tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
-        data.tree.load(data.regions.values());
+        PRTree<ProtectedRegion> tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
+        tree.load(data.regions.values());
+        this.data = new RegionsContainer(data.regions, tree);
     }
 
     @Override
@@ -197,7 +204,7 @@ public class PRTreeRegionManager extends RegionManager {
             intersectRegions = new ArrayList<ProtectedRegion>();
         }
 
-        return intersectRegions.size() > 0;
+        return !intersectRegions.isEmpty();
     }
 
     @Override
@@ -219,15 +226,15 @@ public class PRTreeRegionManager extends RegionManager {
     }
 
     private class RegionsContainer {
-        private final Map<String, ProtectedRegion> regions;
-        private PRTree<ProtectedRegion> tree;
+        private final ConcurrentMap<String, ProtectedRegion> regions;
+        private final PRTree<ProtectedRegion> tree;
 
         private RegionsContainer() {
-            regions = new TreeMap<String, ProtectedRegion>();
+            regions = new ConcurrentHashMap<String, ProtectedRegion>();
             tree = new PRTree<ProtectedRegion>(converter, BRANCH_FACTOR);
         }
 
-        private RegionsContainer(Map<String, ProtectedRegion> regions, PRTree<ProtectedRegion> tree) {
+        private RegionsContainer(ConcurrentMap<String, ProtectedRegion> regions, PRTree<ProtectedRegion> tree) {
             this.regions = regions;
             this.tree = tree;
         }

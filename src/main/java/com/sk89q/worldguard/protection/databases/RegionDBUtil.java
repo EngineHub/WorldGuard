@@ -20,18 +20,18 @@
 package com.sk89q.worldguard.protection.databases;
 
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.databases.util.DomainInputResolver;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Various utility functions for parsing region databases.
- * 
- * @author sk89q
+ *
+ * @deprecated use {@link DomainInputResolver}
  */
-public class RegionDBUtil {
+@Deprecated
+public final class RegionDBUtil {
 
     private static Pattern groupPattern = Pattern.compile("(?i)^[G]:(.+)$");
     
@@ -45,9 +45,10 @@ public class RegionDBUtil {
      * @param domain The domain to add to
      * @param split The {@link String[]} containing names to add to {@code domain}
      * @param startIndex The beginning index in the array
+     * @deprecated use {@link DomainInputResolver}
      */
-    public static void addToDomain(DefaultDomain domain, String[] split,
-            int startIndex) {
+    @Deprecated
+    public static void addToDomain(DefaultDomain domain, String[] split, int startIndex) {
         for (int i = startIndex; i < split.length; i++) {
             String s = split[i];
             Matcher m = groupPattern.matcher(s);
@@ -65,9 +66,10 @@ public class RegionDBUtil {
      * @param domain The domain to remove from
      * @param split The {@link String[]} containing names to remove from {@code domain}
      * @param startIndex The beginning index in the array
+     * @deprecated use {@link DomainInputResolver}
      */
-    public static void removeFromDomain(DefaultDomain domain, String[] split,
-            int startIndex) {
+    @Deprecated
+    public static void removeFromDomain(DefaultDomain domain, String[] split, int startIndex) {
         for (int i = startIndex; i < split.length; i++) {
             String s = split[i];
             Matcher m = groupPattern.matcher(s);
@@ -85,7 +87,9 @@ public class RegionDBUtil {
      * @param split The array of names to add
      * @param startIndex The beginning index in the array
      * @return The resulting DefaultDomain
+     * @deprecated use {@link DomainInputResolver}
      */
+    @Deprecated
     public static DefaultDomain parseDomainString(String[] split, int startIndex) {
         DefaultDomain domain = new DefaultDomain();
 
@@ -101,34 +105,5 @@ public class RegionDBUtil {
 
         return domain;
     }
-    
-    /**
-     * Creates a comma separated list of PreparedStatement place holders
-     * 
-     * @param length The number of wildcards to create
-     * @return A string with {@code length} wildcards for usage in a PreparedStatement
-     */
-    public static String preparePlaceHolders(int length) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < length;) {
-            builder.append("?");
-            if (++i < length) {
-                builder.append(",");
-            }
-        }
-        return builder.toString();
-    }
 
-    /**
-     * Adds all of the parsed values to the PreparedStatement
-     * 
-     * @param preparedStatement The preparedStanement to add to
-     * @param values The values to set
-     * @throws SQLException see {@link PreparedStatement#setString(int, String)}
-     */
-    public static void setValues(PreparedStatement preparedStatement, String... values) throws SQLException {
-        for (int i = 0; i < values.length; i++) {
-            preparedStatement.setString(i + 1, values[i]);
-        }
-    }
 }

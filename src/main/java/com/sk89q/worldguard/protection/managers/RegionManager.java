@@ -60,6 +60,7 @@ public abstract class RegionManager {
     public void load() throws ProtectionDatabaseException {
         loader.load(this);
     }
+
     /**
      * Load the list of regions. If the regions do not load properly, then
      * the existing list should be used (as stored previously).
