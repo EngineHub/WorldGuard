@@ -42,9 +42,13 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     public boolean mayForceSaveRegions() {
         return hasPluginPermission("region.save");
     }
-    
+
     public boolean mayMigrateRegionStore() {
         return hasPluginPermission("region.migratedb");
+    }
+
+    public boolean mayMigrateRegionNames() {
+        return hasPluginPermission("region.migrateuuid");
     }
     
     public boolean mayDefine() {

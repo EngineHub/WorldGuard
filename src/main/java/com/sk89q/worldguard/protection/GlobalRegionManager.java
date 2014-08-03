@@ -25,9 +25,9 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.databases.MySQLDatabase;
-import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.databases.YAMLDatabase;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.PRTreeRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -38,7 +38,10 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -245,6 +248,21 @@ public class GlobalRegionManager {
         }
 
         return manager;
+    }
+
+    /**
+     * Get a list of loaded region managers.
+     *
+     * @return an unmodifiable list
+     */
+    public List<RegionManager> getLoaded() {
+        List<RegionManager> list = new ArrayList<RegionManager>();
+        for (RegionManager manager : managers.values()) {
+            if (manager != null) {
+                list.add(manager);
+            }
+        }
+        return Collections.unmodifiableList(list);
     }
 
     /**

@@ -19,13 +19,13 @@
 
 package com.sk89q.worldguard.protection.databases.migrator;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
 import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class AbstractDatabaseMigrator implements DatabaseMigrator {
 

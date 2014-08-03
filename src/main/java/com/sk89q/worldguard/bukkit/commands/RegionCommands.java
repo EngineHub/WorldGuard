@@ -34,14 +34,17 @@ import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.LoggerToChatHandler;
 import com.sk89q.worldguard.bukkit.RegionPermissionModel;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 import com.sk89q.worldguard.protection.databases.migrator.AbstractDatabaseMigrator;
 import com.sk89q.worldguard.protection.databases.migrator.MigrationException;
 import com.sk89q.worldguard.protection.databases.migrator.MigratorKey;
+import com.sk89q.worldguard.protection.databases.migrator.UUIDMigrator;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
@@ -65,6 +68,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implements the /region commands for WorldGuard.
@@ -1197,6 +1202,61 @@ public final class RegionCommands {
 
         sender.sendMessage(ChatColor.YELLOW + "Regions have been migrated successfully.\n" +
                 "If you wish to use the destination format as your new backend, please update your config and reload WorldGuard.");
+    }
+
+    /**
+     * Migrate the region databases to use UUIDs rather than name.
+     *
+     * @param args the arguments
+     * @param sender the sender
+     * @throws CommandException any error
+     */
+    @Command(aliases = {"migrateuuid"},
+            desc = "Migrate loaded databases to use UUIDs", max = 0)
+    public void migrateUuid(CommandContext args, CommandSender sender) throws CommandException {
+        // Check permissions
+        if (!getPermissionModel(sender).mayMigrateRegionNames()) {
+            throw new CommandPermissionsException();
+        }
+
+        LoggerToChatHandler handler = null;
+        Logger minecraftLogger = null;
+
+        if (sender instanceof Player) {
+            handler = new LoggerToChatHandler(sender);
+            handler.setLevel(Level.ALL);
+            minecraftLogger = Logger.getLogger("Minecraft");
+            minecraftLogger.addHandler(handler);
+        }
+
+        try {
+            UUIDMigrator migrator = new UUIDMigrator(plugin.getProfileService(), plugin.getLogger());
+            migrator.readConfiguration(plugin.getGlobalStateManager());
+            List<RegionManager> managers = plugin.getGlobalRegionManager().getLoaded();
+
+            // Try migration
+            if (migrator.migrate(managers)) {
+                sender.sendMessage(ChatColor.YELLOW + "Now saving regions... this may take a while.");
+
+                for (RegionManager manager : managers) {
+                    manager.save();
+                }
+
+                sender.sendMessage(ChatColor.YELLOW + "Migration complete!");
+            } else {
+                sender.sendMessage(ChatColor.YELLOW + "There were no names to migrate.");
+            }
+        } catch (ProtectionDatabaseException e) {
+            plugin.getLogger().log(Level.WARNING, "Failed to save", e);
+            throw new CommandException("Error encountered while saving: " + e.getMessage());
+        } catch (MigrationException e) {
+            plugin.getLogger().log(Level.WARNING, "Failed to migrate", e);
+            throw new CommandException("Error encountered while migrating: " + e.getMessage());
+        } finally {
+            if (minecraftLogger != null) {
+                minecraftLogger.removeHandler(handler);
+            }
+        }
     }
 
     /**
