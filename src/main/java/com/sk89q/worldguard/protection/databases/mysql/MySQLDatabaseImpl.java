@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.protection.databases.mysql;
 
-import com.google.common.util.concurrent.ListeningExecutorService;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
@@ -178,6 +177,7 @@ public class MySQLDatabaseImpl extends AbstractAsynchronousDatabase {
         flyway.setDataSource(boneConfig.getJdbcUrl(), boneConfig.getUser(), boneConfig.getPassword());
         flyway.setTable(config.sqlTablePrefix + "migrations");
         flyway.setPlaceholders(placeHolders);
+        flyway.setValidateOnMigrate(false);
         flyway.migrate();
     }
 
