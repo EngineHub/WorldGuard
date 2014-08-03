@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
@@ -83,6 +84,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
@@ -252,7 +254,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        executorService.shutdownNow();
+        executorService.shutdown();
 
         try {
             getLogger().log(Level.INFO, "Shutting down executor and waiting for any pending tasks...");
@@ -267,9 +269,12 @@ public class WorldGuardPlugin extends JavaPlugin {
                 getLogger().log(Level.INFO, builder.toString());
             }
 
+            Futures.successfulAsList(tasks).get();
             executorService.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            getLogger().log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
         }
 
         globalRegionManager.unload();
