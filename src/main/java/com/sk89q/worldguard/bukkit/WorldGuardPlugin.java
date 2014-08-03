@@ -30,7 +30,7 @@ import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
-import com.sk89q.odeum.concurrency.EvenMoreExecutors;
+import com.sk89q.odeum.concurrent.EvenMoreExecutors;
 import com.sk89q.odeum.task.SimpleSupervisor;
 import com.sk89q.odeum.task.Supervisor;
 import com.sk89q.odeum.task.Task;
