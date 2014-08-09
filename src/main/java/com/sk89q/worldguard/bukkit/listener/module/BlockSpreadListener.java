@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.listener.module;
 
 import com.google.common.base.Predicate;
 import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockSpreadEvent;
 
@@ -32,6 +33,7 @@ public class BlockSpreadListener implements Listener {
         this.predicate = predicate;
     }
 
+    @EventHandler(ignoreCancelled = true)
     public void onBlockSpread(BlockSpreadEvent event) {
         if (predicate.apply(event.getSource())) {
             event.setCancelled(true);

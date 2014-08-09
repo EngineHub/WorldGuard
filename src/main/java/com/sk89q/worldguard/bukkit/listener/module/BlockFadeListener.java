@@ -22,7 +22,6 @@ package com.sk89q.worldguard.bukkit.listener.module;
 import com.google.common.base.Predicate;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFadeEvent;
 
@@ -34,7 +33,7 @@ public class BlockFadeListener implements Listener {
         this.predicate = predicate;
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent event) {
         Block block = event.getBlock();
 

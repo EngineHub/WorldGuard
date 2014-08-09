@@ -20,8 +20,6 @@
 package com.sk89q.worldguard.bukkit.listener.module;
 
 import com.google.common.base.Predicate;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.listener.Materials;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
