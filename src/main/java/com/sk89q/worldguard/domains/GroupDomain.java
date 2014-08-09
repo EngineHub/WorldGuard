@@ -20,19 +20,23 @@
 package com.sk89q.worldguard.domains;
 
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.util.ChangeTracked;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Contains groups in a domain.
  */
-public class GroupDomain implements Domain {
+public class GroupDomain implements Domain, ChangeTracked {
 
     private final Set<String> groups = new CopyOnWriteArraySet<String>();
+    private boolean dirty = true;
 
     /**
      * Create a new instance.
@@ -43,11 +47,11 @@ public class GroupDomain implements Domain {
     /**
      * Create a new instance.
      *
-     * @param groupsy an array of groups
+     * @param groups an array of groups
      */
-    public GroupDomain(String[] groupsy) {
-        checkNotNull(groupsy);
-        for (String group : groupsy) {
+    public GroupDomain(String[] groups) {
+        checkNotNull(groups);
+        for (String group : groups) {
             addGroup(group);
         }
     }
@@ -59,7 +63,9 @@ public class GroupDomain implements Domain {
      */
     public void addGroup(String name) {
         checkNotNull(name);
-        groups.add(name.toLowerCase());
+        checkArgument(!name.trim().isEmpty(), "Can't add empty group name");
+        setDirty(true);
+        groups.add(name.trim().toLowerCase());
     }
 
     /**
@@ -69,7 +75,8 @@ public class GroupDomain implements Domain {
      */
     public void removeGroup(String name) {
         checkNotNull(name);
-        groups.remove(name.toLowerCase());
+        setDirty(true);
+        groups.remove(name.trim().toLowerCase());
     }
 
     @Override
@@ -90,7 +97,7 @@ public class GroupDomain implements Domain {
      * @return the set of group names
      */
     public Set<String> getGroups() {
-        return groups;
+        return Collections.unmodifiableSet(groups);
     }
 
     @Override
@@ -111,6 +118,16 @@ public class GroupDomain implements Domain {
     @Override
     public void clear() {
         groups.clear();
+    }
+
+    @Override
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    @Override
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 
 }

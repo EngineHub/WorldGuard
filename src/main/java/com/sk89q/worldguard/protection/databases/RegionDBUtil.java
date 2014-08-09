@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.protection.databases;
 
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.databases.util.DomainInputResolver;
+import com.sk89q.worldguard.protection.util.DomainInputResolver;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

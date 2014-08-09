@@ -39,18 +39,15 @@ import com.sk89q.worldguard.bukkit.RegionPermissionModel;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.databases.RegionDBUtil;
-import com.sk89q.worldguard.protection.databases.migrator.AbstractDatabaseMigrator;
-import com.sk89q.worldguard.protection.databases.migrator.MigrationException;
-import com.sk89q.worldguard.protection.databases.migrator.MigratorKey;
-import com.sk89q.worldguard.protection.databases.migrator.UUIDMigrator;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.util.migrator.MigrationException;
+import com.sk89q.worldguard.protection.util.migrator.UUIDMigrator;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
@@ -62,10 +59,9 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -77,9 +73,6 @@ import java.util.logging.Logger;
 public final class RegionCommands {
     
     private final WorldGuardPlugin plugin;
-
-    private MigratorKey migrateDBRequest;
-    private Date migrateDBRequestDate;
 
     public RegionCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -93,17 +86,6 @@ public final class RegionCommands {
      */
     private static RegionPermissionModel getPermissionModel(CommandSender sender) {
         return new RegionPermissionModel(WorldGuardPlugin.inst(), sender);
-    }
-
-    /**
-     * Save the regions asynchronously and alert the sender if any errors
-     * occur during save.
-     *
-     * @param manager the manager to save
-     * @param sender the sender
-     */
-    private void saveRegionsSilently(RegionManager manager, World world, CommandSender sender) {
-        AsyncCommandHelper.wrap(Futures.immediateFuture(null), plugin, sender).thenSaveRegionData(manager, world);
     }
 
     /**
@@ -167,7 +149,7 @@ public final class RegionCommands {
         // Validate the id
         validateRegionId(id, allowGlobal);
         
-        ProtectedRegion region = regionManager.getRegionExact(id);
+        ProtectedRegion region = regionManager.getRegion(id);
 
         // No region found!
         if (region == null) {
@@ -414,9 +396,6 @@ public final class RegionCommands {
 
         // Add region
         regionManager.addRegion(region);
-
-        // Save regions
-        saveRegionsSilently(regionManager, player.getWorld(), sender);
     }
 
     /**
@@ -470,9 +449,6 @@ public final class RegionCommands {
         sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated with new area.");
 
         regionManager.addRegion(region); // Replace region
-
-        // Save regions
-        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -529,7 +505,7 @@ public final class RegionCommands {
             }
         }
 
-        ProtectedRegion existing = regionManager.getRegionExact(id);
+        ProtectedRegion existing = regionManager.getRegion(id);
 
         // Check for an existing region
         if (existing != null) {
@@ -570,9 +546,6 @@ public final class RegionCommands {
 
         // Replace region
         regionManager.addRegion(region);
-
-        // Save regions
-        saveRegionsSilently(regionManager, player.getWorld(), sender);
     }
 
     /**
@@ -890,9 +863,6 @@ public final class RegionCommands {
         printout.appendFlagsList(false);
         printout.append(")");
         printout.send(sender);
-
-        // Save regions
-        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -927,9 +897,6 @@ public final class RegionCommands {
         sender.sendMessage(ChatColor.YELLOW
                 + "Priority of '" + existing.getId() + "' set to "
                 + priority + " (higher numbers override).");
-
-        // Save regions
-        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -994,9 +961,6 @@ public final class RegionCommands {
             printout.append(")");
         }
         printout.send(sender);
-
-        // Save regions
-        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -1027,9 +991,6 @@ public final class RegionCommands {
         regionManager.removeRegion(existing.getId());
 
         sender.sendMessage(ChatColor.YELLOW + "Region '" + existing.getId() + "' removed.");
-
-        // Save regions
-        saveRegionsSilently(regionManager, world, sender);
     }
 
     /**
@@ -1063,20 +1024,22 @@ public final class RegionCommands {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
             }
 
-            ListenableFuture<?> future = manager.load(true);
+            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerLoad(manager));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .forRegionDataLoad(world, false);
         } else {
             // Load regions for all worlds
-            List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>();
+            List<RegionManager> managers = new ArrayList<RegionManager>();
+
             for (World w : Bukkit.getServer().getWorlds()) {
                 RegionManager manager = plugin.getGlobalRegionManager().get(w);
                 if (manager != null) {
-                    futures.add(manager.load(true));
+                    managers.add(manager);
                 }
             }
-            ListenableFuture<?> future = Futures.successfulAsList(futures);
+
+            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerLoad(managers));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .registerWithSupervisor("Loading regions for all worlds")
@@ -1118,20 +1081,22 @@ public final class RegionCommands {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
             }
 
-            ListenableFuture<?> future = manager.save(true);
+            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerSave(manager));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .forRegionDataSave(world, false);
         } else {
             // Save for all worlds
-            List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>();
+            List<RegionManager> managers = new ArrayList<RegionManager>();
+
             for (World w : Bukkit.getServer().getWorlds()) {
                 RegionManager manager = plugin.getGlobalRegionManager().get(w);
                 if (manager != null) {
-                    futures.add(manager.save(true));
+                    managers.add(manager);
                 }
             }
-            ListenableFuture<?> future = Futures.successfulAsList(futures);
+
+            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerSave(managers));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .registerWithSupervisor("Saving regions for all worlds")
@@ -1156,7 +1121,8 @@ public final class RegionCommands {
         if (!getPermissionModel(sender).mayMigrateRegionStore()) {
             throw new CommandPermissionsException();
         }
-        
+
+        /*
         String from = args.getString(0).toLowerCase().trim();
         String to = args.getString(1).toLowerCase().trim();
 
@@ -1202,6 +1168,7 @@ public final class RegionCommands {
 
         sender.sendMessage(ChatColor.YELLOW + "Regions have been migrated successfully.\n" +
                 "If you wish to use the destination format as your new backend, please update your config and reload WorldGuard.");
+                */
     }
 
     /**
@@ -1246,7 +1213,7 @@ public final class RegionCommands {
             } else {
                 sender.sendMessage(ChatColor.YELLOW + "There were no names to migrate.");
             }
-        } catch (ProtectionDatabaseException e) {
+        } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, "Failed to save", e);
             throw new CommandException("Error encountered while saving: " + e.getMessage());
         } catch (MigrationException e) {

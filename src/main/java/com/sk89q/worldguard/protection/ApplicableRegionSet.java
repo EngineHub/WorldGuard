@@ -20,65 +20,85 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.flags.*;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Represents a set of regions for a particular point or area and the rules
- * that are represented by that set. An instance of this can be used to
- * query the value of a flag or check if a player can build in the respective
- * region or point. This object contains the list of applicable regions and so
- * the expensive search of regions that are in the desired area has already
- * been completed.
- * 
- * @author sk89q
+ * Represents the effective set of flags, owners, and members for a given
+ * spatial query.
+ *
+ * <p>An instance of this can be created using the spatial query methods
+ * available on {@link RegionManager}.</p>
  */
 public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
 
-    private Collection<ProtectedRegion> applicable;
-    private ProtectedRegion globalRegion;
+    private final SortedSet<ProtectedRegion> applicable;
+    @Nullable
+    private final ProtectedRegion globalRegion;
+
+    /**
+     * Construct the object.
+     *
+     * <p>A sorted set will be created to include the collection of regions.</p>
+     *
+     * @param applicable the regions contained in this set
+     * @param globalRegion the global region, set aside for special handling.
+     */
+    public ApplicableRegionSet(Collection<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion) {
+        this(new TreeSet<ProtectedRegion>(checkNotNull(applicable)), globalRegion);
+    }
 
     /**
      * Construct the object.
      * 
-     * @param applicable The regions contained in this set
-     * @param globalRegion The global region, set aside for special handling.
+     * @param applicable the regions contained in this set
+     * @param globalRegion the global region, set aside for special handling.
      */
-    public ApplicableRegionSet(Collection<ProtectedRegion> applicable,
-            ProtectedRegion globalRegion) {
+    public ApplicableRegionSet(SortedSet<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion) {
+        checkNotNull(applicable);
         this.applicable = applicable;
         this.globalRegion = globalRegion;
     }
     
     /**
-     * Checks if a player can build in an area.
+     * Test whether a player can build in an area.
      * 
      * @param player The player to check
      * @return build ability
      */
     public boolean canBuild(LocalPlayer player) {
+        checkNotNull(player);
         return internalGetState(DefaultFlag.BUILD, player, null);
     }
 
+    /**
+     * Test whether the construct flag evaluates true for the given player.
+     *
+     * @param player the player
+     * @return true if true
+     */
     public boolean canConstruct(LocalPlayer player) {
+        checkNotNull(player);
         final RegionGroup flag = getFlag(DefaultFlag.CONSTRUCT, player);
         return RegionGroupFlag.isMember(this, flag, player);
-    }
-
-    /**
-     * Checks if a player can use buttons and such in an area.
-     * 
-     * @param player The player to check
-     * @return able to use items
-     * @deprecated This method seems to be the opposite of its name
-     */
-    @Deprecated
-    public boolean canUse(LocalPlayer player) {
-        return !allows(DefaultFlag.USE, player)
-                && !canBuild(player);
     }
 
     /**
@@ -89,9 +109,12 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @throws IllegalArgumentException if the build flag is given
      */
     public boolean allows(StateFlag flag) {
+        checkNotNull(flag);
+
         if (flag == DefaultFlag.BUILD) {
             throw new IllegalArgumentException("Can't use build flag with allows()");
         }
+
         return internalGetState(flag, null, null);
     }
     
@@ -103,7 +126,9 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return whether the state is allows for it
      * @throws IllegalArgumentException if the build flag is given
      */
-    public boolean allows(StateFlag flag, LocalPlayer player) {
+    public boolean allows(StateFlag flag, @Nullable LocalPlayer player) {
+        checkNotNull(flag);
+
         if (flag == DefaultFlag.BUILD) {
             throw new IllegalArgumentException("Can't use build flag with allows()");
         }
@@ -111,12 +136,14 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     }
     
     /**
-     * Indicates whether a player is an owner of all regions in this set.
+     * Test whether a player is an owner of all regions in this set.
      * 
-     * @param player player
+     * @param player the player
      * @return whether the player is an owner of all regions
      */
     public boolean isOwnerOfAll(LocalPlayer player) {
+        checkNotNull(player);
+
         for (ProtectedRegion region : applicable) {
             if (!region.isOwner(player)) {
                 return false;
@@ -127,13 +154,14 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     }
     
     /**
-     * Indicates whether a player is an owner or member of all regions in
-     * this set.
+     * Test whether a player is an owner or member of all regions in this set.
      * 
-     * @param player player
+     * @param player the player
      * @return whether the player is a member of all regions
      */
     public boolean isMemberOfAll(LocalPlayer player) {
+        checkNotNull(player);
+
         for (ProtectedRegion region : applicable) {
             if (!region.isMember(player)) {
                 return false;
@@ -144,15 +172,16 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     }
 
     /**
-     * Checks to see if a flag is permitted.
+     * Test whether a flag tests true.
      * 
-     * @param flag flag to check
-     * @param player null to not check owners and members
-     * @param groupPlayer player to use for the group flag check
+     * @param flag the flag to check
+     * @param player the player, or null to not check owners and members
+     * @param groupPlayer a player to use for the group flag check
      * @return the allow/deny state for the flag
      */
-    private boolean internalGetState(StateFlag flag, LocalPlayer player,
-                                     LocalPlayer groupPlayer) {
+    private boolean internalGetState(StateFlag flag, @Nullable LocalPlayer player, @Nullable LocalPlayer groupPlayer) {
+        checkNotNull(flag);
+
         boolean found = false;
         boolean hasFlagDefined = false;
         boolean allowed = false; // Used for ALLOW override
@@ -254,6 +283,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             if (player != null) {
                 hasFlagDefined = true;
 
+                //noinspection StatementWithEmptyBody
                 if (hasCleared.contains(region)) {
                     // Already cleared, so do nothing
                 } else {
@@ -269,19 +299,17 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             found = true;
         }
 
-        return !found ? def :
-                (allowed || (player != null && needsClear.size() == 0));
+        return !found ? def : (allowed || (player != null && needsClear.isEmpty()));
     }
 
     /**
      * Clear a region's parents for isFlagAllowed().
      * 
-     * @param needsClear The regions that should be cleared
-     * @param hasCleared The regions already cleared
-     * @param region The region to start from
+     * @param needsClear the regions that should be cleared
+     * @param hasCleared the regions already cleared
+     * @param region the region to start from
      */
-    private void clearParents(Set<ProtectedRegion> needsClear,
-            Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
+    private void clearParents(Set<ProtectedRegion> needsClear, Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
         ProtectedRegion parent = region.getParent();
 
         while (parent != null) {
@@ -294,10 +322,13 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     }
 
     /**
-     * @see #getFlag(com.sk89q.worldguard.protection.flags.Flag, com.sk89q.worldguard.LocalPlayer)
-     * @param flag flag to check
-     * @return value of the flag
+     * Gets the value of a flag. Do not use this for state flags
+     * (use {@link #allows(StateFlag, LocalPlayer)} for that).
+     *
+     * @param flag the flag to check
+     * @return value of the flag, which may be null
      */
+    @Nullable
     public <T extends Flag<V>, V> V getFlag(T flag) {
         return getFlag(flag, null);
     }
@@ -308,10 +339,13 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * 
      * @param flag flag to check
      * @param groupPlayer player to check {@link RegionGroup}s against
-     * @return value of the flag
+     * @return value of the flag, which may be null
      * @throws IllegalArgumentException if a StateFlag is given
      */
-    public <T extends Flag<V>, V> V getFlag(T flag, LocalPlayer groupPlayer) {
+    @Nullable
+    public <T extends Flag<V>, V> V getFlag(T flag, @Nullable LocalPlayer groupPlayer) {
+        checkNotNull(flag);
+
         /*
         if (flag instanceof StateFlag) {
             throw new IllegalArgumentException("Cannot use StateFlag with getFlag()");
@@ -341,6 +375,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
                 }
             }
 
+            //noinspection StatementWithEmptyBody
             if (hasCleared.contains(region)) {
                 // Already cleared, so do nothing
             } else if (region.getFlag(flag) != null) {
@@ -388,16 +423,15 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     /**
      * Get the number of regions that are included.
      * 
-     * @return the size of this ApplicbleRegionSet
+     * @return the number of contained regions
      */
     public int size() {
         return applicable.size();
     }
-    
-    /**
-     * Get an iterator of affected regions.
-     */
+
+    @Override
     public Iterator<ProtectedRegion> iterator() {
         return applicable.iterator();
     }
+
 }

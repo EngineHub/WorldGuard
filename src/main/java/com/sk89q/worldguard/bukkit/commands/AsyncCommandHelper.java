@@ -23,7 +23,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.odeum.task.FutureForwardingTask;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
@@ -125,17 +124,6 @@ class AsyncCommandHelper {
                     "Saved region data for '%s'",
                     "Failed to load regions '%s'");
         }
-
-        return this;
-    }
-
-    public AsyncCommandHelper thenSaveRegionData(RegionManager manager, World world) {
-        checkNotNull(manager);
-        checkNotNull(world);
-
-        ListenableFuture<?> future = manager.save(true);
-
-        AsyncCommandHelper.wrap(future, plugin, sender).forRegionDataSave(world, true);
 
         return this;
     }

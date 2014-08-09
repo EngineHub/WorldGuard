@@ -79,7 +79,7 @@ public class MockApplicableRegionSet {
 
     private String getNextId() {
         id++;
-        return "#REGION_" + id;
+        return "REGION_" + id;
     }
 
 }

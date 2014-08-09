@@ -53,10 +53,9 @@ import com.sk89q.worldguard.internal.listener.BlockedPotionsListener;
 import com.sk89q.worldguard.internal.listener.ChestProtectionListener;
 import com.sk89q.worldguard.internal.listener.RegionProtectionListener;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.migrator.MigrationException;
-import com.sk89q.worldguard.protection.databases.migrator.UUIDMigrator;
-import com.sk89q.worldguard.protection.databases.util.UnresolvedNamesException;
+import com.sk89q.worldguard.protection.util.migrator.MigrationException;
+import com.sk89q.worldguard.protection.util.migrator.UUIDMigrator;
+import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 import org.bukkit.ChatColor;
@@ -98,8 +97,8 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     private static WorldGuardPlugin inst;
     private final CommandsManager<CommandSender> commands;
-    private final GlobalRegionManager globalRegionManager;
-    private final ConfigurationManager configuration;
+    private GlobalRegionManager globalRegionManager;
+    private ConfigurationManager configuration;
     private FlagStateManager flagStateManager;
     private final Supervisor supervisor = new SimpleSupervisor();
     private ListeningExecutorService executorService;
@@ -111,9 +110,6 @@ public class WorldGuardPlugin extends JavaPlugin {
      * this merely instantiates the objects.
      */
     public WorldGuardPlugin() {
-        configuration = new ConfigurationManager(this);
-        globalRegionManager = new GlobalRegionManager(this);
-
         final WorldGuardPlugin plugin = inst = this;
         commands = new CommandsManager<CommandSender>() {
             @Override
@@ -137,6 +133,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     @SuppressWarnings("deprecation")
     public void onEnable() {
+        configuration = new ConfigurationManager(this);
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
 
         // Set the proper command injector
@@ -176,14 +173,12 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         PermissionsResolverManager.initialize(this);
 
-        // This must be done before configuration is loaded
-        LegacyWorldGuardMigration.migrateBlacklist(this);
-
         try {
             // Load the configuration
             configuration.load();
 
             getLogger().info("Loading region data...");
+            globalRegionManager = new GlobalRegionManager(this);
             globalRegionManager.preload();
 
             migrateRegionUniqueIds(); // Migrate to UUIDs
@@ -201,10 +196,6 @@ public class WorldGuardPlugin extends JavaPlugin {
                     "* http://forum.enginehub.org\n" +
                     "******************************************************\n");
         }
-
-        // Migrate regions after the regions were loaded because
-        // the migration code reuses the loaded region managers
-        LegacyWorldGuardMigration.migrateRegions(this);
 
         flagStateManager = new FlagStateManager(this);
 
@@ -306,8 +297,8 @@ public class WorldGuardPlugin extends JavaPlugin {
             }
         } catch (MigrationException e) {
             getLogger().log(Level.WARNING, "Failed to migrate regions to use UUIDs instead of player names", e);
-        } catch (ProtectionDatabaseException e) {
-            getLogger().log(Level.WARNING, "Failed to save regions after UUID conversion", e);
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Failed to save region data", e);
         }
     }
 
@@ -343,16 +334,14 @@ public class WorldGuardPlugin extends JavaPlugin {
         } else if (throwable instanceof RejectedExecutionException) {
             return "There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.";
         } else if (throwable instanceof CancellationException) {
-            return "Task was cancelled";
+            return "WorldGuard: Task was cancelled";
         } else if (throwable instanceof InterruptedException) {
-            return "Task was interrupted";
+            return "WorldGuard: Task was interrupted";
         } else if (throwable instanceof UnresolvedNamesException) {
             return throwable.getMessage();
-        } else if (throwable instanceof Exception) {
-            getLogger().log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
-            return "Unexpected error occurred: " + ((Exception) throwable).getMessage();
         } else {
-            return "Unknown error";
+            getLogger().log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
+            return "WorldGuard: An unexpected error occurred! Please see the server console.";
         }
     }
 

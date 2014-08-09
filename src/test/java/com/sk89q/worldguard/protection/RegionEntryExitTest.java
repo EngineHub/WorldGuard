@@ -37,6 +37,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public abstract class RegionEntryExitTest {
+
     static String ENTRY_ID = "entry_rg";
     static String EXIT_ID = "exit_rg";
     static String BUILDER_GROUP = "builder";
