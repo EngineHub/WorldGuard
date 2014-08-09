@@ -46,7 +46,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -336,25 +335,6 @@ public class WorldGuardPlayerListener implements Listener {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
-
-        if (cfg.activityHaltToggle) {
-            player.sendMessage(ChatColor.YELLOW
-                    + "Intensive server activity has been HALTED.");
-
-            int removed = 0;
-
-            for (Entity entity : world.getEntities()) {
-                if (BukkitUtil.isIntensiveEntity(entity)) {
-                    entity.remove();
-                    removed++;
-                }
-            }
-
-            if (removed > 10) {
-                plugin.getLogger().info("Halt-Act: " + removed + " entities (>10) auto-removed from "
-                        + player.getWorld().toString());
-            }
-        }
 
         if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW

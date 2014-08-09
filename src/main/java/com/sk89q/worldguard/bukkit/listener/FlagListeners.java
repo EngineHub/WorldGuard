@@ -24,6 +24,7 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFadeListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
+import com.sk89q.worldguard.bukkit.listener.module.TickHaltingListener;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -43,6 +44,10 @@ public class FlagListeners {
 
     public FlagListeners(WorldGuardPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    private ConfigurationManager getConfig() {
+        return plugin.getGlobalStateManager();
     }
 
     private WorldConfiguration getConfig(World world) {
@@ -67,6 +72,8 @@ public class FlagListeners {
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.GRASS && (getConfig(b).disableGrassGrowth || !testState(b, GRASS_SPREAD))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.MYCEL && (getConfig(b).disableMyceliumSpread || !testState(b, MYCELIUM_SPREAD))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.VINE && (getConfig(b).disableVineGrowth || !testState(b, VINE_GROWTH))));
+
+        registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));
     }
 
     private void registerEvents(Listener listener) {

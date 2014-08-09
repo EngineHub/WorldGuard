@@ -56,7 +56,6 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
@@ -160,11 +159,6 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (wcfg.simulateSponge && isWater) {
             int ox = blockTo.getX();
             int oy = blockTo.getY();
@@ -250,10 +244,6 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
-            return;
-        }
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
         if (wcfg.preventLightningFire && cause == IgniteCause.LIGHTNING) {
@@ -354,11 +344,6 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (wcfg.disableFireSpread) {
             event.setCancelled(true);
             return;
@@ -426,11 +411,6 @@ public class WorldGuardBlockListener implements Listener {
     public void onBlockPhysics(BlockPhysicsEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
-            return;
-        }
 
         int id = event.getChangedTypeId();
 
@@ -592,11 +572,6 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (wcfg.disableLeafDecay) {
             event.setCancelled(true);
             return;
@@ -617,11 +592,6 @@ public class WorldGuardBlockListener implements Listener {
     public void onBlockForm(BlockFormEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
-            return;
-        }
 
         int type = event.getNewState().getTypeId();
 
@@ -665,18 +635,6 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        }
-    }
-
-    /*
-     * Called when a block spreads based on world conditions.
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockSpread(BlockSpreadEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
         }
     }
 

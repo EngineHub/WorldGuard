@@ -20,10 +20,8 @@
 package com.sk89q.worldguard.bukkit;
 
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
 public class WorldGuardWorldListener implements Listener {
@@ -44,27 +42,6 @@ public class WorldGuardWorldListener implements Listener {
      */
     public void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    }
-
-    @EventHandler
-    public void onChunkLoad(ChunkLoadEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-
-        if (cfg.activityHaltToggle) {
-            int removed = 0;
-
-            for (Entity entity : event.getChunk().getEntities()) {
-                if (BukkitUtil.isIntensiveEntity(entity)) {
-                    entity.remove();
-                    removed++;
-                }
-            }
-
-            if (removed > 50) {
-                plugin.getLogger().info("Halt-Act: " + removed + " entities (>50) auto-removed from "
-                        + event.getChunk().toString());
-            }
-        }
     }
 
     @EventHandler

@@ -592,14 +592,6 @@ public class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
         Entity ent = event.getEntity();
 
-        if (cfg.activityHaltToggle) {
-            if (ent != null) {
-                ent.remove();
-            }
-            event.setCancelled(true);
-            return;
-        }
-
         if (ent instanceof Creeper) {
             if (wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
@@ -739,12 +731,6 @@ public class WorldGuardEntityListener implements Listener {
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
         Entity ent = event.getEntity();
 
-        if (cfg.activityHaltToggle) {
-            ent.remove();
-            event.setCancelled(true);
-            return;
-        }
-
         if (event.getEntityType() == EntityType.WITHER) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
@@ -777,11 +763,6 @@ public class WorldGuardEntityListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-
-        if (cfg.activityHaltToggle) {
-            event.setCancelled(true);
-            return;
-        }
 
         WorldConfiguration wcfg = cfg.get(event.getEntity().getWorld());
 
