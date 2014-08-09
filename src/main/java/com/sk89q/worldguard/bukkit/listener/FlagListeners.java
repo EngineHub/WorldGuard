@@ -116,12 +116,13 @@ public class FlagListeners {
         registerEvents(new BlockFlowListener(b -> Materials.isLava(b.getType()) && getConfig(b).highFreqFlags && !testState(b, LAVA_FLOW)));
 
         // Ignite
-        registerEvents(new BlockIgniteListener(b -> getConfig(b).preventLightningFire, IgniteCause.LIGHTNING));
-        registerEvents(new BlockIgniteListener(b -> getConfig(b).preventLavaFire, IgniteCause.LAVA));
+        registerEvents(new BlockIgniteListener(b -> getConfig(b).preventLightningFire || (getConfig(b).highFreqFlags && !testState(b, LIGHTNING)), IgniteCause.LIGHTNING));
+        registerEvents(new BlockIgniteListener(b -> getConfig(b).preventLavaFire || (getConfig(b).highFreqFlags && !testState(b, LAVA_FIRE)), IgniteCause.LAVA));
+        registerEvents(new BlockIgniteListener(b -> getConfig(b).highFreqFlags && !testState(b, GHAST_FIREBALL), IgniteCause.FIREBALL));
 
         // Fire spread
         registerEvents(new FireSpreadListener(b -> getConfig(b).disableFireSpread, 0));
-        registerEvents(new FireSpreadListener(b -> getConfig(b).fireSpreadDisableToggle, VISIT_ADJACENT));
+        registerEvents(new FireSpreadListener(b -> getConfig(b).fireSpreadDisableToggle || (getConfig(b).highFreqFlags && !testState(b, FIRE_SPREAD)), VISIT_ADJACENT));
         registerEvents(new FireSpreadListener(b -> isNonEmptyAndContains(getConfig(b).disableFireSpreadBlocks, b.getType()), VISIT_ADJACENT | INDIRECT_IGNITE_CHECK));
 
         // Flint and steel

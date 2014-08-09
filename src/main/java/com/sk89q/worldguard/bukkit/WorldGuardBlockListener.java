@@ -128,53 +128,6 @@ public class WorldGuardBlockListener implements Listener {
     }
 
     /*
-     * Called when a block gets ignited.
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockIgnite(BlockIgniteEvent event) {
-        IgniteCause cause = event.getCause();
-        Block block = event.getBlock();
-        World world = block.getWorld();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        boolean isFireSpread = cause == IgniteCause.SPREAD;
-
-        if (wcfg.useRegions) {
-            Vector pt = toVector(block);
-            Player player = event.getPlayer();
-            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-            if (wcfg.highFreqFlags && isFireSpread
-                    && !set.allows(DefaultFlag.FIRE_SPREAD)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.highFreqFlags && cause == IgniteCause.LAVA
-                    && !set.allows(DefaultFlag.LAVA_FIRE)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (cause == IgniteCause.FIREBALL && event.getPlayer() == null) {
-                // wtf bukkit, FIREBALL is supposed to be reserved to players
-                if (!set.allows(DefaultFlag.GHAST_FIREBALL)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (cause == IgniteCause.LIGHTNING && !set.allows(DefaultFlag.LIGHTNING)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
-
-    /*
      * Called when a block is destroyed from burning.
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -185,38 +138,6 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.isChestProtected(event.getBlock())) {
             event.setCancelled(true);
             return;
-        }
-
-        if (wcfg.useRegions) {
-            Block block = event.getBlock();
-            int x = block.getX();
-            int y = block.getY();
-            int z = block.getZ();
-            Vector pt = toVector(block);
-            RegionManager mgr = plugin.getGlobalRegionManager().get(block.getWorld());
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-            if (!set.allows(DefaultFlag.FIRE_SPREAD)) {
-                checkAndDestroyAround(block.getWorld(), x, y, z, BlockID.FIRE);
-                event.setCancelled(true);
-                return;
-            }
-
-        }
-    }
-
-    private void checkAndDestroyAround(World world, int x, int y, int z, int required) {
-        checkAndDestroy(world, x, y, z + 1, required);
-        checkAndDestroy(world, x, y, z - 1, required);
-        checkAndDestroy(world, x, y + 1, z, required);
-        checkAndDestroy(world, x, y - 1, z, required);
-        checkAndDestroy(world, x + 1, y, z, required);
-        checkAndDestroy(world, x - 1, y, z, required);
-    }
-
-    private void checkAndDestroy(World world, int x, int y, int z, int required) {
-        if (world.getBlockTypeIdAt(x, y, z) == required) {
-            world.getBlockAt(x, y, z).setTypeId(BlockID.AIR);
         }
     }
 
