@@ -21,7 +21,6 @@ package com.sk89q.worldguard.bukkit.listener.module;
 
 import com.google.common.base.Predicate;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -27,6 +27,7 @@ import com.sk89q.worldguard.bukkit.listener.module.BlockFlowListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockIgniteListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener;
+import com.sk89q.worldguard.bukkit.listener.module.FlintAndSteelListener;
 import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
 import com.sk89q.worldguard.bukkit.listener.module.LavaSpreadLimiterListener;
 import com.sk89q.worldguard.bukkit.listener.module.ObsidianGeneratorListener;
@@ -38,9 +39,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 
 import static com.sk89q.worldguard.bukkit.listener.Materials.isMushroom;
@@ -76,6 +79,10 @@ public class FlagListeners {
         return plugin.getGlobalRegionManager().allows(flag, block.getLocation());
     }
 
+    private boolean testCanBuild(Player player, Block block) {
+        return plugin.getGlobalRegionManager().canBuild(player, block);
+    }
+
     private boolean isNonEmptyAndContains(Set<Integer> blocks, Material material) {
         return !blocks.isEmpty() && blocks.contains(material.getId());
     }
@@ -84,27 +91,46 @@ public class FlagListeners {
         return !blocks.isEmpty() || blocks.contains(material.getId());
     }
 
+    private boolean testPermission(@Nullable Player player, String permission, boolean nonPlayerPermitted) {
+        if (player == null) {
+            return nonPlayerPermitted;
+        }
+
+        return plugin.hasPermission(player, permission);
+    }
+
     public void registerEvents() {
+        // Block decay
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.ICE && (getConfig(b).disableIceMelting || !testState(b, ICE_MELT))));
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.SNOW && (getConfig(b).disableSnowMelting || !testState(b, SNOW_MELT))));
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.SOIL && (getConfig(b).disableSoilDehydration || !testState(b, SOIL_DRY))));
 
+        // Block spread
         registerEvents(new BlockSpreadListener(b -> isMushroom(b.getType()) && (getConfig(b).disableMushroomSpread || !testState(b, MUSHROOMS))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.GRASS && (getConfig(b).disableGrassGrowth || !testState(b, GRASS_SPREAD))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.MYCEL && (getConfig(b).disableMyceliumSpread || !testState(b, MYCELIUM_SPREAD))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.VINE && (getConfig(b).disableVineGrowth || !testState(b, VINE_GROWTH))));
 
+        // Block flow
         registerEvents(new BlockFlowListener(b -> Materials.isWater(b.getType()) && getConfig(b).highFreqFlags && !testState(b, WATER_FLOW)));
         registerEvents(new BlockFlowListener(b -> Materials.isLava(b.getType()) && getConfig(b).highFreqFlags && !testState(b, LAVA_FLOW)));
 
+        // Ignite
         registerEvents(new BlockIgniteListener(b -> getConfig(b).preventLightningFire, IgniteCause.LIGHTNING));
         registerEvents(new BlockIgniteListener(b -> getConfig(b).preventLavaFire, IgniteCause.LAVA));
+
+        // Fire spread
         registerEvents(new FireSpreadListener(b -> getConfig(b).disableFireSpread, 0));
         registerEvents(new FireSpreadListener(b -> getConfig(b).fireSpreadDisableToggle, VISIT_ADJACENT));
         registerEvents(new FireSpreadListener(b -> isNonEmptyAndContains(getConfig(b).disableFireSpreadBlocks, b.getType()), VISIT_ADJACENT | INDIRECT_IGNITE_CHECK));
 
-        registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));
+        // Flint and steel
+        registerEvents(new FlintAndSteelListener((p, b) -> (
+                getConfig(b).blockLighter || (!testState(b, LIGHTER) && !testCanBuild(p, b)))
+                && !testPermission(p, "worldguard.override.lighter", true)));
 
+        // Other options
+        registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));
         registerEvents(new SpongeListener(w -> getConfig(w).spongeBehavior));
         registerEvents(new ItemDurabilityListener(w -> getConfig(w).itemDurability));
         registerEvents(new WaterProtectionListener(b -> isNonEmptyAndContains(getConfig(b).preventWaterDamage, b.getType())));

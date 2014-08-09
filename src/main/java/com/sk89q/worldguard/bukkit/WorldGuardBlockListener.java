@@ -21,7 +21,6 @@ package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
 import com.sk89q.worldguard.internal.Events;
 import com.sk89q.worldguard.internal.cause.Causes;
@@ -142,33 +141,11 @@ public class WorldGuardBlockListener implements Listener {
 
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
-        if (wcfg.blockLighter && (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL)
-                && event.getPlayer() != null
-                && !plugin.hasPermission(event.getPlayer(), "worldguard.override.lighter")) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (wcfg.useRegions) {
             Vector pt = toVector(block);
             Player player = event.getPlayer();
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-            if (player != null && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-                // this is preliminarily handled in the player listener under handleBlockRightClick
-                // why it's handled here too, no one knows
-                if (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL) {
-                    if (!set.allows(DefaultFlag.LIGHTER)
-                            && !set.canBuild(localPlayer)
-                            && !plugin.hasPermission(player, "worldguard.override.lighter")) {
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
 
             if (wcfg.highFreqFlags && isFireSpread
                     && !set.allows(DefaultFlag.FIRE_SPREAD)) {

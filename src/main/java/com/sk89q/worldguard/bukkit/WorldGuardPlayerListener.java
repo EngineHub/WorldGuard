@@ -764,17 +764,6 @@ public class WorldGuardPlayerListener implements Listener {
                 }
             }
 
-            if (item.getTypeId() == ItemID.FIRE_CHARGE || item.getTypeId() == ItemID.FLINT_AND_TINDER) {
-                if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
-                        && !plugin.canBuild(player, placedIn)
-                        && !placedInSet.allows(DefaultFlag.LIGHTER)) {
-                    event.setCancelled(true);
-                    event.setUseItemInHand(Result.DENY);
-                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to use that here.");
-                    return;
-                }
-            }
-
             if (item.getTypeId() == ItemID.EYE_OF_ENDER && block.getTypeId() == BlockID.END_PORTAL_FRAME) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)) {
