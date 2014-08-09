@@ -47,7 +47,6 @@ import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
-import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
@@ -675,117 +674,10 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockSpread(BlockSpreadEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
-            return;
         }
-
-        int fromType = event.getSource().getTypeId();
-
-        if (fromType == BlockID.RED_MUSHROOM || fromType == BlockID.BROWN_MUSHROOM) {
-            if (wcfg.disableMushroomSpread) {
-                event.setCancelled(true);
-                return;
-            }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    DefaultFlag.MUSHROOMS, event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (fromType == BlockID.GRASS) {
-            if (wcfg.disableGrassGrowth) {
-                event.setCancelled(true);
-                return;
-            }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    DefaultFlag.GRASS_SPREAD, event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (fromType == BlockID.MYCELIUM) {
-            if (wcfg.disableMyceliumSpread) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.useRegions
-                    && !plugin.getGlobalRegionManager().allows(
-                            DefaultFlag.MYCELIUM_SPREAD, event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (fromType == BlockID.VINE) {
-            if (wcfg.disableVineGrowth) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.useRegions
-                    && !plugin.getGlobalRegionManager().allows(
-                            DefaultFlag.VINE_GROWTH, event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
-
-    /*
-     * Called when a block fades.
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockFade(BlockFadeEvent event) {
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        switch (event.getBlock().getTypeId()) {
-        case BlockID.ICE:
-            if (wcfg.disableIceMelting) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    DefaultFlag.ICE_MELT, event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-            break;
-
-        case BlockID.SNOW:
-            if (wcfg.disableSnowMelting) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    DefaultFlag.SNOW_MELT, event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-            break;
-
-        case BlockID.SOIL:
-            if (wcfg.disableSoilDehydration) {
-                event.setCancelled(true);
-                return;
-            }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    DefaultFlag.SOIL_DRY, event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-            break;
-        }
-
     }
 
     /*
