@@ -23,6 +23,7 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFadeListener;
+import com.sk89q.worldguard.bukkit.listener.module.BlockFlowListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
 import com.sk89q.worldguard.bukkit.listener.module.LavaSpreadLimiterListener;
@@ -86,6 +87,9 @@ public class FlagListeners {
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.GRASS && (getConfig(b).disableGrassGrowth || !testState(b, GRASS_SPREAD))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.MYCEL && (getConfig(b).disableMyceliumSpread || !testState(b, MYCELIUM_SPREAD))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.VINE && (getConfig(b).disableVineGrowth || !testState(b, VINE_GROWTH))));
+
+        registerEvents(new BlockFlowListener(b -> Materials.isWater(b.getType()) && getConfig(b).highFreqFlags && testState(b, WATER_FLOW)));
+        registerEvents(new BlockFlowListener(b -> Materials.isLava(b.getType()) && getConfig(b).highFreqFlags && testState(b, LAVA_FLOW)));
 
         registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));
 

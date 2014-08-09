@@ -145,20 +145,6 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
-        if (wcfg.highFreqFlags && isWater
-                && !plugin.getGlobalRegionManager().allows(DefaultFlag.WATER_FLOW,
-                blockFrom.getLocation())) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.highFreqFlags && isLava
-                && !plugin.getGlobalRegionManager().allows(DefaultFlag.LAVA_FLOW,
-                blockFrom.getLocation())) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (wcfg.disableObsidianGenerators && (isAir || isLava)
                 && (blockTo.getTypeId() == BlockID.REDSTONE_WIRE
                     || blockTo.getTypeId() == BlockID.TRIPWIRE)) {
