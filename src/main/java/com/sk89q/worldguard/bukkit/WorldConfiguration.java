@@ -26,6 +26,8 @@ import com.sk89q.worldguard.blacklist.BlacklistLoggerHandler;
 import com.sk89q.worldguard.blacklist.logger.ConsoleHandler;
 import com.sk89q.worldguard.blacklist.logger.DatabaseHandler;
 import com.sk89q.worldguard.blacklist.logger.FileHandler;
+import com.sk89q.worldguard.bukkit.listener.module.SpongeListener;
+import com.sk89q.worldguard.bukkit.listener.module.SpongeListener.SpongeBehavior;
 import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.chest.SignChestProtection;
 import org.bukkit.block.Block;
@@ -78,13 +80,11 @@ public class WorldConfiguration {
     public boolean opPermissions;
     public boolean fireSpreadDisableToggle;
     public boolean itemDurability;
-    public boolean simulateSponge;
-    public int spongeRadius;
+    public SpongeBehavior spongeBehavior;
     public boolean disableExpDrops;
     public Set<PotionEffectType> blockPotions;
     public boolean blockPotionsAlways;
     public boolean pumpkinScuba;
-    public boolean redstoneSponges;
     public boolean noPhysicsGravel;
     public boolean noPhysicsSand;
     public boolean ropeLadders;
@@ -324,9 +324,10 @@ public class WorldConfiguration {
         }
         blockPotionsAlways = getBoolean("gameplay.block-potions-overly-reliably", false);
 
-        simulateSponge = getBoolean("simulation.sponge.enable", true);
-        spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
-        redstoneSponges = getBoolean("simulation.sponge.redstone", false);
+        spongeBehavior = new SpongeBehavior(
+                getBoolean("simulation.sponge.enable", true),
+                Math.max(1, getInt("simulation.sponge.radius", 3)) - 1,
+                getBoolean("simulation.sponge.redstone", false));
 
         pumpkinScuba = getBoolean("default.pumpkin-scuba", false);
         disableHealthRegain = getBoolean("default.disable-health-regain", false);

@@ -24,7 +24,7 @@ import org.bukkit.Material;
 /**
  * Material utility class.
  */
-final class Materials {
+public final class Materials {
 
     private Materials() {
     }
@@ -37,6 +37,16 @@ final class Materials {
      */
     public static boolean isMushroom(Material material) {
         return material == Material.RED_MUSHROOM || material == Material.BROWN_MUSHROOM;
+    }
+
+    /**
+     * Test whether the given material is water.
+     *
+     * @param material the material
+     * @return true if a water block
+     */
+    public static boolean isWater(Material material) {
+        return material == Material.WATER || material == Material.STATIONARY_WATER;
     }
 
 }

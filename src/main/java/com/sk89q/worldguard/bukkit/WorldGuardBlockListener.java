@@ -55,7 +55,6 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
@@ -158,36 +157,6 @@ public class WorldGuardBlockListener implements Listener {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (wcfg.simulateSponge && isWater) {
-            int ox = blockTo.getX();
-            int oy = blockTo.getY();
-            int oz = blockTo.getZ();
-
-            for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
-                for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
-                    for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
-                        Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
-                        if (sponge.getTypeId() == 19
-                                && (!wcfg.redstoneSponges || !sponge.isBlockIndirectlyPowered())) {
-                            event.setCancelled(true);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        /*if (plugin.classicWater && isWater) {
-        int blockBelow = blockFrom.getRelative(0, -1, 0).getTypeId();
-        if (blockBelow != 0 && blockBelow != 8 && blockBelow != 9) {
-        blockFrom.setTypeId(9);
-        if (blockTo.getTypeId() == 0) {
-        blockTo.setTypeId(9);
-        }
-        return;
-        }
-        }*/
 
         // Check the fluid block (from) whether it is air.
         // If so and the target block is protected, cancel the event
@@ -449,53 +418,6 @@ public class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.PLACE, target));
-
-        if (wcfg.simulateSponge && target.getType() == Material.SPONGE) {
-            if (wcfg.redstoneSponges && target.isBlockIndirectlyPowered()) {
-                return;
-            }
-
-            int ox = target.getX();
-            int oy = target.getY();
-            int oz = target.getZ();
-
-            SpongeUtil.clearSpongeWater(plugin, world, ox, oy, oz);
-        }
-    }
-
-    /*
-     * Called when redstone changes.
-     */
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onBlockRedstoneChange(BlockRedstoneEvent event) {
-        Block blockTo = event.getBlock();
-        World world = blockTo.getWorld();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        if (wcfg.simulateSponge && wcfg.redstoneSponges) {
-            int ox = blockTo.getX();
-            int oy = blockTo.getY();
-            int oz = blockTo.getZ();
-
-            for (int cx = -1; cx <= 1; cx++) {
-                for (int cy = -1; cy <= 1; cy++) {
-                    for (int cz = -1; cz <= 1; cz++) {
-                        Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
-                        if (sponge.getTypeId() == 19
-                                && sponge.isBlockIndirectlyPowered()) {
-                            SpongeUtil.clearSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
-                        } else if (sponge.getTypeId() == 19
-                                && !sponge.isBlockIndirectlyPowered()) {
-                            SpongeUtil.addSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
-                        }
-                    }
-                }
-            }
-
-            return;
-        }
     }
 
     /*
