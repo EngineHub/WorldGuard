@@ -27,6 +27,7 @@ import com.sk89q.worldguard.bukkit.listener.module.BlockFlowListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
 import com.sk89q.worldguard.bukkit.listener.module.LavaSpreadLimiterListener;
+import com.sk89q.worldguard.bukkit.listener.module.ObsidianGeneratorListener;
 import com.sk89q.worldguard.bukkit.listener.module.SpongeListener;
 import com.sk89q.worldguard.bukkit.listener.module.TickHaltingListener;
 import com.sk89q.worldguard.bukkit.listener.module.WaterProtectionListener;
@@ -97,6 +98,7 @@ public class FlagListeners {
         registerEvents(new ItemDurabilityListener(w -> getConfig(w).itemDurability));
         registerEvents(new WaterProtectionListener(b -> isNonEmptyAndContains(getConfig(b).preventWaterDamage, b.getType())));
         registerEvents(new LavaSpreadLimiterListener(b -> isNonEmptyOrContains(getConfig(b).allowedLavaSpreadOver, b.getType())));
+        registerEvents(new ObsidianGeneratorListener(b -> getConfig(b).disableObsidianGenerators));
     }
 
     private void registerEvents(Listener listener) {

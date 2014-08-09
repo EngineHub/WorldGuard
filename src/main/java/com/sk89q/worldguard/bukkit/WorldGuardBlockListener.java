@@ -46,7 +46,6 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -127,30 +126,6 @@ public class WorldGuardBlockListener implements Listener {
         Block target = event.getBlock();
 
         Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, target));
-    }
-
-    /*
-     * Called when fluids flow.
-     */
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockFromTo(BlockFromToEvent event) {
-        World world = event.getBlock().getWorld();
-        Block blockFrom = event.getBlock();
-        Block blockTo = event.getToBlock();
-
-        boolean isWater = blockFrom.getTypeId() == 8 || blockFrom.getTypeId() == 9;
-        boolean isLava = blockFrom.getTypeId() == 10 || blockFrom.getTypeId() == 11;
-        boolean isAir = blockFrom.getTypeId() == 0;
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (wcfg.disableObsidianGenerators && (isAir || isLava)
-                && (blockTo.getTypeId() == BlockID.REDSTONE_WIRE
-                    || blockTo.getTypeId() == BlockID.TRIPWIRE)) {
-            blockTo.setTypeId(BlockID.AIR);
-            return;
-        }
     }
 
     /*
