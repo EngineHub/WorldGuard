@@ -71,7 +71,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
@@ -108,15 +107,6 @@ public class WorldGuardEntityListener implements Listener {
      */
     public void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onEntityDeath(EntityDeathEvent event) {
-        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
-
-        if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
-            ((PlayerDeathEvent) event).setDeathMessage("");
-        }
     }
 
     private void onEntityDamageByBlock(EntityDamageByBlockEvent event) {

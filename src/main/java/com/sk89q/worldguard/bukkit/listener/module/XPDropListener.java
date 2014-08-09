@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.listener.module;
 
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

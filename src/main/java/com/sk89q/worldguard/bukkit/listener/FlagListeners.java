@@ -29,6 +29,7 @@ import com.sk89q.worldguard.bukkit.listener.module.BlockIgniteListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockInteractListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockPhysicsListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
+import com.sk89q.worldguard.bukkit.listener.module.DeathMessageListener;
 import com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.FlintAndSteelListener;
 import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
@@ -83,6 +84,10 @@ public class FlagListeners {
 
     private WorldConfiguration getConfig(Location location) {
         return getConfig(location.getWorld());
+    }
+
+    private WorldConfiguration getConfig(Entity entity) {
+        return getConfig(entity.getWorld());
     }
 
     private WorldConfiguration getConfig(Block block) {
@@ -178,6 +183,7 @@ public class FlagListeners {
         registerEvents(new XPDropListener((l, amt) -> getConfig(l).disableExpDrops || !testState(l, EXP_DROPS)));
         registerEvents(new BlockInteractListener((b, e) -> b.getType() == Material.SOIL && !isPlayer(e) && getConfig(b).disableCreatureCropTrampling));
         registerEvents(new BlockInteractListener((b, e) -> b.getType() == Material.SOIL && isPlayer(e) && getConfig(b).disablePlayerCropTrampling));
+        registerEvents(new DeathMessageListener((e, m) -> (isPlayer(e) && getConfig(e).disableDeathMessages) ? "" : m));
 
         // Other options
         registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));
