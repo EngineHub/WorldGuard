@@ -24,6 +24,7 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFadeListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFlowListener;
+import com.sk89q.worldguard.bukkit.listener.module.BlockFormListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockIgniteListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockPhysicsListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
@@ -41,7 +42,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowman;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 
@@ -77,8 +80,16 @@ public class FlagListeners {
         return getConfig(block.getWorld());
     }
 
+    private WorldConfiguration getConfig(BlockState state) {
+        return getConfig(state.getWorld());
+    }
+
     private boolean testState(Block block, StateFlag flag) {
         return plugin.getGlobalRegionManager().allows(flag, block.getLocation());
+    }
+
+    private boolean testState(BlockState state, StateFlag flag) {
+        return plugin.getGlobalRegionManager().allows(flag, state.getLocation());
     }
 
     private boolean testCanBuild(Player player, Block block) {
@@ -113,6 +124,12 @@ public class FlagListeners {
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.GRASS && (getConfig(b).disableGrassGrowth || !testState(b, GRASS_SPREAD))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.MYCEL && (getConfig(b).disableMyceliumSpread || !testState(b, MYCELIUM_SPREAD))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.VINE && (getConfig(b).disableVineGrowth || !testState(b, VINE_GROWTH))));
+
+        // Block form
+        registerEvents(new BlockFormListener((b, e) -> e instanceof Snowman && getConfig(b).disableSnowmanTrails));
+        registerEvents(new BlockFormListener((b, e) -> b.getType() == Material.ICE && (getConfig(b).disableIceFormation || !testState(b, ICE_FORM))));
+        registerEvents(new BlockFormListener((b, e) -> b.getType() == Material.SNOW && (getConfig(b).disableSnowFormation || !testState(b, SNOW_FALL))));
+        registerEvents(new BlockFormListener((b, e) -> isNonEmptyAndContains(getConfig(b).allowedSnowFallOver, b.getBlock().getRelative(0, -1, 0).getType())));
 
         // Block flow
         registerEvents(new BlockFlowListener(b -> Materials.isWater(b.getType()) && getConfig(b).highFreqFlags && !testState(b, WATER_FLOW)));

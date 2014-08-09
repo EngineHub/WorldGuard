@@ -30,7 +30,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowman;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -40,8 +39,6 @@ import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.EntityBlockFormEvent;
-import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
@@ -160,59 +157,6 @@ public class WorldGuardBlockListener implements Listener {
                         + "WorldGuard's sign chest protection is disabled.");
 
                 event.getBlock().breakNaturally();
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
-
-    /*
-     * Called when a block is formed based on world conditions.
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockForm(BlockFormEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        int type = event.getNewState().getTypeId();
-
-        if (event instanceof EntityBlockFormEvent) {
-            if (((EntityBlockFormEvent) event).getEntity() instanceof Snowman) {
-                if (wcfg.disableSnowmanTrails) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-            return;
-        }
-
-        if (type == BlockID.ICE) {
-            if (wcfg.disableIceFormation) {
-                event.setCancelled(true);
-                return;
-            }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    DefaultFlag.ICE_FORM, event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (type == BlockID.SNOW) {
-            if (wcfg.disableSnowFormation) {
-                event.setCancelled(true);
-                return;
-            }
-            if (wcfg.allowedSnowFallOver.size() > 0) {
-                int targetId = event.getBlock().getRelative(0, -1, 0).getTypeId();
-
-                if (!wcfg.allowedSnowFallOver.contains(targetId)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    DefaultFlag.SNOW_FALL, event.getBlock().getLocation())) {
                 event.setCancelled(true);
                 return;
             }
