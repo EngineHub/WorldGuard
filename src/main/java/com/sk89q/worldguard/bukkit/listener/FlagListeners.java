@@ -157,7 +157,7 @@ public class FlagListeners {
                 getConfig(b).blockLighter || (!testState(b, LIGHTER) && !testCanBuild(p, b)))
                 && !testPermission(p, "worldguard.override.lighter", true)));
 
-        // Pistons
+        // Miscellaneous
         registerEvents(new PistonMoveListener((b, sticky) -> sticky && testState(b, PISTONS)));
         registerEvents(new BlockXPDropListener((b, amt) -> getConfig(b).disableExpDrops || !testState(b, EXP_DROPS)));
 

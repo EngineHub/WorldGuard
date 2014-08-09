@@ -21,7 +21,6 @@ package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -30,7 +29,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
