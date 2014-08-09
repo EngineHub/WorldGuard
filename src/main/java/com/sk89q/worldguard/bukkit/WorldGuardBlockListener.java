@@ -23,12 +23,10 @@ import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
 import com.sk89q.worldguard.internal.Events;
 import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.BlockInteractEvent;
 import com.sk89q.worldguard.internal.event.Interaction;
 import com.sk89q.worldguard.internal.event.ItemInteractEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -36,15 +34,12 @@ import org.bukkit.entity.Snowman;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
@@ -97,33 +92,6 @@ public class WorldGuardBlockListener implements Listener {
         return getWorldConfig(player.getWorld());
     }
 
-    /*
-     * Called when a block is damaged.
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockDamage(BlockDamageEvent event) {
-        Block target = event.getBlock();
-
-        // Cake are damaged and not broken when they are eaten, so we must
-        // handle them a bit separately
-        if (target.getType() == Material.CAKE_BLOCK) {
-            Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.INTERACT, target));
-        }
-    }
-
-    /*
-     * Called when a block is broken.
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockBreak(BlockBreakEvent event) {
-        Block target = event.getBlock();
-
-        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, target));
-    }
-
-    /*
-     * Called when a block is destroyed from burning.
-     */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBurn(BlockBurnEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
@@ -131,23 +99,9 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.isChestProtected(event.getBlock())) {
             event.setCancelled(true);
-            return;
         }
     }
 
-    /*
-     * Called when a player places a block.
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockPlace(BlockPlaceEvent event) {
-        Block target = event.getBlock();
-        World world = target.getWorld();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.PLACE, target));
-    }
 
     /*
      * Called when a sign is changed.
@@ -209,12 +163,6 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        }
-
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-            event.setCancelled(true);
-            return;
         }
     }
 
