@@ -24,7 +24,9 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFadeListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFlowListener;
+import com.sk89q.worldguard.bukkit.listener.module.BlockIgniteListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
+import com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
 import com.sk89q.worldguard.bukkit.listener.module.LavaSpreadLimiterListener;
 import com.sk89q.worldguard.bukkit.listener.module.ObsidianGeneratorListener;
@@ -37,10 +39,13 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 
 import java.util.Set;
 
 import static com.sk89q.worldguard.bukkit.listener.Materials.isMushroom;
+import static com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener.INDIRECT_IGNITE_CHECK;
+import static com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener.VISIT_ADJACENT;
 import static com.sk89q.worldguard.protection.flags.DefaultFlag.*;
 
 /**
@@ -91,6 +96,12 @@ public class FlagListeners {
 
         registerEvents(new BlockFlowListener(b -> Materials.isWater(b.getType()) && getConfig(b).highFreqFlags && !testState(b, WATER_FLOW)));
         registerEvents(new BlockFlowListener(b -> Materials.isLava(b.getType()) && getConfig(b).highFreqFlags && !testState(b, LAVA_FLOW)));
+
+        registerEvents(new BlockIgniteListener(b -> getConfig(b).preventLightningFire, IgniteCause.LIGHTNING));
+        registerEvents(new BlockIgniteListener(b -> getConfig(b).preventLavaFire, IgniteCause.LAVA));
+        registerEvents(new FireSpreadListener(b -> getConfig(b).disableFireSpread, 0));
+        registerEvents(new FireSpreadListener(b -> getConfig(b).fireSpreadDisableToggle, VISIT_ADJACENT));
+        registerEvents(new FireSpreadListener(b -> isNonEmptyAndContains(getConfig(b).disableFireSpreadBlocks, b.getType()), VISIT_ADJACENT | INDIRECT_IGNITE_CHECK));
 
         registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));
 

@@ -142,46 +142,11 @@ public class WorldGuardBlockListener implements Listener {
 
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
-        if (wcfg.preventLightningFire && cause == IgniteCause.LIGHTNING) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.preventLavaFire && cause == IgniteCause.LAVA) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.disableFireSpread && isFireSpread) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (wcfg.blockLighter && (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL)
                 && event.getPlayer() != null
                 && !plugin.hasPermission(event.getPlayer(), "worldguard.override.lighter")) {
             event.setCancelled(true);
             return;
-        }
-
-        if (wcfg.fireSpreadDisableToggle && isFireSpread) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.disableFireSpreadBlocks.size() > 0 && isFireSpread) {
-            int x = block.getX();
-            int y = block.getY();
-            int z = block.getZ();
-
-            if (wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x, y - 1, z))
-                    || wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x + 1, y, z))
-                    || wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x - 1, y, z))
-                    || wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x, y, z - 1))
-                    || wcfg.disableFireSpreadBlocks.contains(world.getBlockTypeIdAt(x, y, z + 1))) {
-                event.setCancelled(true);
-                return;
-            }
         }
 
         if (wcfg.useRegions) {
@@ -239,28 +204,6 @@ public class WorldGuardBlockListener implements Listener {
     public void onBlockBurn(BlockBurnEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (wcfg.disableFireSpread) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.fireSpreadDisableToggle) {
-            Block block = event.getBlock();
-            event.setCancelled(true);
-            checkAndDestroyAround(block.getWorld(), block.getX(), block.getY(), block.getZ(), BlockID.FIRE);
-            return;
-        }
-
-        if (wcfg.disableFireSpreadBlocks.size() > 0) {
-            Block block = event.getBlock();
-
-            if (wcfg.disableFireSpreadBlocks.contains(block.getTypeId())) {
-                event.setCancelled(true);
-                checkAndDestroyAround(block.getWorld(), block.getX(), block.getY(), block.getZ(), BlockID.FIRE);
-                return;
-            }
-        }
 
         if (wcfg.isChestProtected(event.getBlock())) {
             event.setCancelled(true);
