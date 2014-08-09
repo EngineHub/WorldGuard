@@ -34,7 +34,7 @@ import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
 import com.sk89q.worldguard.bukkit.listener.module.LavaSpreadLimiterListener;
 import com.sk89q.worldguard.bukkit.listener.module.LeafDecayListener;
 import com.sk89q.worldguard.bukkit.listener.module.ObsidianGeneratorListener;
-import com.sk89q.worldguard.bukkit.listener.module.PistonExtendListener;
+import com.sk89q.worldguard.bukkit.listener.module.PistonMoveListener;
 import com.sk89q.worldguard.bukkit.listener.module.SpongeListener;
 import com.sk89q.worldguard.bukkit.listener.module.TickHaltingListener;
 import com.sk89q.worldguard.bukkit.listener.module.WaterProtectionListener;
@@ -158,7 +158,7 @@ public class FlagListeners {
                 && !testPermission(p, "worldguard.override.lighter", true)));
 
         // Pistons
-        registerEvents(new PistonExtendListener((b, sticky) -> sticky && testState(b, PISTONS)));
+        registerEvents(new PistonMoveListener((b, sticky) -> sticky && testState(b, PISTONS)));
 
         // Other options
         registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));

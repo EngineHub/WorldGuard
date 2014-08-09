@@ -28,7 +28,6 @@ import com.sk89q.worldguard.internal.event.ItemInteractEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,8 +35,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
@@ -158,28 +155,6 @@ public class WorldGuardBlockListener implements Listener {
                 event.getBlock().breakNaturally();
                 event.setCancelled(true);
                 return;
-            }
-        }
-    }
-
-    /*
-     * Called when a piston extends
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-            for (Block block : event.getBlocks()) {
-                if (!plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, block.getLocation())) {
-                    event.setCancelled(true);
-                    return;
-                }
             }
         }
     }
