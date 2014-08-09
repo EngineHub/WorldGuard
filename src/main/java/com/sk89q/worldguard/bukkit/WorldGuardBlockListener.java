@@ -36,7 +36,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
-import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.SignChangeEvent;
@@ -181,23 +180,6 @@ public class WorldGuardBlockListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-            }
-        }
-    }
-
-    /*
-     * Called when a piston retracts
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockPistonRetract(BlockPistonRetractEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (wcfg.useRegions && event.isSticky()) {
-            if (!(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getRetractLocation()))
-                    || !(plugin.getGlobalRegionManager().allows(DefaultFlag.PISTONS, event.getBlock().getLocation()))) {
-                event.setCancelled(true);
-                return;
             }
         }
     }
