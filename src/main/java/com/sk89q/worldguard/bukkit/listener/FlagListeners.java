@@ -39,8 +39,10 @@ import com.sk89q.worldguard.bukkit.listener.module.PistonMoveListener;
 import com.sk89q.worldguard.bukkit.listener.module.SpongeListener;
 import com.sk89q.worldguard.bukkit.listener.module.TickHaltingListener;
 import com.sk89q.worldguard.bukkit.listener.module.WaterProtectionListener;
+import com.sk89q.worldguard.bukkit.listener.module.XPDropListener;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -79,12 +81,20 @@ public class FlagListeners {
         return cfg.get(world);
     }
 
+    private WorldConfiguration getConfig(Location location) {
+        return getConfig(location.getWorld());
+    }
+
     private WorldConfiguration getConfig(Block block) {
         return getConfig(block.getWorld());
     }
 
     private WorldConfiguration getConfig(BlockState state) {
         return getConfig(state.getWorld());
+    }
+
+    private boolean testState(Location location, StateFlag flag) {
+        return plugin.getGlobalRegionManager().allows(flag, location);
     }
 
     private boolean testState(Block block, StateFlag flag) {
@@ -165,7 +175,7 @@ public class FlagListeners {
 
         // Miscellaneous
         registerEvents(new PistonMoveListener((b, sticky) -> sticky && testState(b, PISTONS)));
-        registerEvents(new BlockXPDropListener((b, amt) -> getConfig(b).disableExpDrops || !testState(b, EXP_DROPS)));
+        registerEvents(new XPDropListener((l, amt) -> getConfig(l).disableExpDrops || !testState(l, EXP_DROPS)));
         registerEvents(new BlockInteractListener((b, e) -> b.getType() == Material.SOIL && !isPlayer(e) && getConfig(b).disableCreatureCropTrampling));
         registerEvents(new BlockInteractListener((b, e) -> b.getType() == Material.SOIL && isPlayer(e) && getConfig(b).disablePlayerCropTrampling));
 
