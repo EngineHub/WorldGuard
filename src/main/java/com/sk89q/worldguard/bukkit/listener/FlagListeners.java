@@ -24,6 +24,7 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFadeListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
+import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
 import com.sk89q.worldguard.bukkit.listener.module.SpongeListener;
 import com.sk89q.worldguard.bukkit.listener.module.TickHaltingListener;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -77,6 +78,7 @@ public class FlagListeners {
         registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));
 
         registerEvents(new SpongeListener(w -> getConfig(w).spongeBehavior));
+        registerEvents(new ItemDurabilityListener(w -> getConfig(w).itemDurability));
     }
 
     private void registerEvents(Listener listener) {
