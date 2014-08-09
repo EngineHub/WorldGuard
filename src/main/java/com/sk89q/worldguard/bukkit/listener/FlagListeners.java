@@ -31,6 +31,7 @@ import com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.FlintAndSteelListener;
 import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
 import com.sk89q.worldguard.bukkit.listener.module.LavaSpreadLimiterListener;
+import com.sk89q.worldguard.bukkit.listener.module.LeafDecayListener;
 import com.sk89q.worldguard.bukkit.listener.module.ObsidianGeneratorListener;
 import com.sk89q.worldguard.bukkit.listener.module.SpongeListener;
 import com.sk89q.worldguard.bukkit.listener.module.TickHaltingListener;
@@ -105,6 +106,7 @@ public class FlagListeners {
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.ICE && (getConfig(b).disableIceMelting || !testState(b, ICE_MELT))));
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.SNOW && (getConfig(b).disableSnowMelting || !testState(b, SNOW_MELT))));
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.SOIL && (getConfig(b).disableSoilDehydration || !testState(b, SOIL_DRY))));
+        registerEvents(new LeafDecayListener(b -> getConfig(b).disableLeafDecay || !testState(b, LEAF_DECAY)));
 
         // Block spread
         registerEvents(new BlockSpreadListener(b -> isMushroom(b.getType()) && (getConfig(b).disableMushroomSpread || !testState(b, MUSHROOMS))));

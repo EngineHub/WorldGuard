@@ -166,24 +166,6 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onLeavesDecay(LeavesDecayEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (wcfg.disableLeafDecay) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.LEAF_DECAY,
-                    event.getBlock().getLocation())) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
     /*
      * Called when a block is formed based on world conditions.
      */
