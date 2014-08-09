@@ -89,8 +89,8 @@ public class FlagListeners {
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.MYCEL && (getConfig(b).disableMyceliumSpread || !testState(b, MYCELIUM_SPREAD))));
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.VINE && (getConfig(b).disableVineGrowth || !testState(b, VINE_GROWTH))));
 
-        registerEvents(new BlockFlowListener(b -> Materials.isWater(b.getType()) && getConfig(b).highFreqFlags && testState(b, WATER_FLOW)));
-        registerEvents(new BlockFlowListener(b -> Materials.isLava(b.getType()) && getConfig(b).highFreqFlags && testState(b, LAVA_FLOW)));
+        registerEvents(new BlockFlowListener(b -> Materials.isWater(b.getType()) && getConfig(b).highFreqFlags && !testState(b, WATER_FLOW)));
+        registerEvents(new BlockFlowListener(b -> Materials.isLava(b.getType()) && getConfig(b).highFreqFlags && !testState(b, LAVA_FLOW)));
 
         registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));
 
