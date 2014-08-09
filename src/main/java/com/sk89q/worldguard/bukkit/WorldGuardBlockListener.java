@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
 import com.sk89q.worldguard.internal.Events;
@@ -27,9 +26,7 @@ import com.sk89q.worldguard.internal.cause.Causes;
 import com.sk89q.worldguard.internal.event.BlockInteractEvent;
 import com.sk89q.worldguard.internal.event.Interaction;
 import com.sk89q.worldguard.internal.event.ItemInteractEvent;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -45,9 +42,6 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -138,39 +132,6 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.isChestProtected(event.getBlock())) {
             event.setCancelled(true);
             return;
-        }
-    }
-
-    /*
-     * Called when block physics occurs.
-     */
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockPhysics(BlockPhysicsEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        int id = event.getChangedTypeId();
-
-        if (id == 13 && wcfg.noPhysicsGravel) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (id == 12 && wcfg.noPhysicsSand) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (id == 90 && wcfg.allowPortalAnywhere) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.ropeLadders && event.getBlock().getType() == Material.LADDER) {
-            if (event.getBlock().getRelative(0, 1, 0).getType() == Material.LADDER) {
-                event.setCancelled(true);
-                return;
-            }
         }
     }
 

@@ -25,6 +25,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFadeListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFlowListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockIgniteListener;
+import com.sk89q.worldguard.bukkit.listener.module.BlockPhysicsListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.FlintAndSteelListener;
@@ -124,6 +125,12 @@ public class FlagListeners {
         registerEvents(new FireSpreadListener(b -> getConfig(b).disableFireSpread, 0));
         registerEvents(new FireSpreadListener(b -> getConfig(b).fireSpreadDisableToggle || (getConfig(b).highFreqFlags && !testState(b, FIRE_SPREAD)), VISIT_ADJACENT));
         registerEvents(new FireSpreadListener(b -> isNonEmptyAndContains(getConfig(b).disableFireSpreadBlocks, b.getType()), VISIT_ADJACENT | INDIRECT_IGNITE_CHECK));
+
+        // Physics
+        registerEvents(new BlockPhysicsListener((b, m) -> m == Material.GRAVEL && getConfig(b).noPhysicsGravel));
+        registerEvents(new BlockPhysicsListener((b, m) -> m == Material.SAND && getConfig(b).noPhysicsSand));
+        registerEvents(new BlockPhysicsListener((b, m) -> Materials.isPortal(m) && getConfig(b).allowPortalAnywhere));
+        registerEvents(new BlockPhysicsListener((b, m) -> m == Material.LADDER && getConfig(b).ropeLadders && b.getRelative(0, 1, 0).getType() == Material.LADDER));
 
         // Flint and steel
         registerEvents(new FlintAndSteelListener((p, b) -> (

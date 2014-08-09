@@ -59,4 +59,14 @@ public final class Materials {
         return material == Material.LAVA || material == Material.STATIONARY_LAVA;
     }
 
+    /**
+     * Test whether the given material is a portal material.
+     *
+     * @param material the material
+     * @return true if a portal block
+     */
+    public static boolean isPortal(Material material) {
+        return material == Material.PORTAL || material == Material.ENDER_PORTAL;
+    }
+
 }
