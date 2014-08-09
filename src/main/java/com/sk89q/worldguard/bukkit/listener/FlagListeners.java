@@ -26,6 +26,7 @@ import com.sk89q.worldguard.bukkit.listener.module.BlockFadeListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFlowListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFormListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockIgniteListener;
+import com.sk89q.worldguard.bukkit.listener.module.BlockInteractListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockPhysicsListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener;
@@ -44,6 +45,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.Listener;
@@ -105,6 +107,10 @@ public class FlagListeners {
         return !blocks.isEmpty() || blocks.contains(material.getId());
     }
 
+    private boolean isPlayer(Entity entity) {
+        return entity instanceof Player;
+    }
+
     private boolean testPermission(@Nullable Player player, String permission, boolean nonPlayerPermitted) {
         if (player == null) {
             return nonPlayerPermitted;
@@ -160,6 +166,8 @@ public class FlagListeners {
         // Miscellaneous
         registerEvents(new PistonMoveListener((b, sticky) -> sticky && testState(b, PISTONS)));
         registerEvents(new BlockXPDropListener((b, amt) -> getConfig(b).disableExpDrops || !testState(b, EXP_DROPS)));
+        registerEvents(new BlockInteractListener((b, e) -> b.getType() == Material.SOIL && !isPlayer(e) && getConfig(b).disableCreatureCropTrampling));
+        registerEvents(new BlockInteractListener((b, e) -> b.getType() == Material.SOIL && isPlayer(e) && getConfig(b).disablePlayerCropTrampling));
 
         // Other options
         registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));

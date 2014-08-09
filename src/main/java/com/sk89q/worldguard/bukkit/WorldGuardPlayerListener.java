@@ -1076,11 +1076,6 @@ public class WorldGuardPlayerListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
-        if (block.getTypeId() == BlockID.SOIL && wcfg.disablePlayerCropTrampling) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (wcfg.useRegions) {
             Vector pt = toVector(block);
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);

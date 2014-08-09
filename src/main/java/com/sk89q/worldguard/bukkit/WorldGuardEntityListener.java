@@ -112,22 +112,6 @@ public class WorldGuardEntityListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEntityInteract(EntityInteractEvent event) {
-        Entity entity = event.getEntity();
-        Block block = event.getBlock();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(entity.getWorld());
-
-        if (block.getTypeId() == BlockID.SOIL) {
-            if (/* entity instanceof Creature && // catch for any entity (not thrown for players) */
-                wcfg.disableCreatureCropTrampling) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onExpBottle(ExpBottleEvent event) {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
 
