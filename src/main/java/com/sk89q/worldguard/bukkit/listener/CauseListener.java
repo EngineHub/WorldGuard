@@ -19,9 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.Events;
 import com.sk89q.worldguard.internal.cause.Causes;
@@ -41,9 +38,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.Collections;
-
-import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 public class CauseListener implements Listener {
 

@@ -159,6 +159,7 @@ public class FlagListeners {
 
         // Pistons
         registerEvents(new PistonMoveListener((b, sticky) -> sticky && testState(b, PISTONS)));
+        registerEvents(new BlockXPDropListener((b, amt) -> getConfig(b).disableExpDrops || !testState(b, EXP_DROPS)));
 
         // Other options
         registerEvents(new TickHaltingListener(c -> getConfig().activityHaltToggle));

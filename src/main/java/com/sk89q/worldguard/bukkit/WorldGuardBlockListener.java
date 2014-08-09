@@ -91,10 +91,6 @@ public class WorldGuardBlockListener implements Listener {
         }
     }
 
-
-    /*
-     * Called when a sign is changed.
-     */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
@@ -164,19 +160,6 @@ public class WorldGuardBlockListener implements Listener {
             if (!wcfg.getBlacklist().check(new BlockDispenseBlacklistEvent(null, toVector(event.getBlock()), createTarget(event.getItem())), false, false)) {
                 event.setCancelled(true);
             }
-        }
-    }
-
-    /*
-     * Called when a block yields exp
-     */
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onBlockExp(BlockExpEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-        if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
-                event.getBlock().getLocation())) {
-            event.setExpToDrop(0);
         }
     }
 
