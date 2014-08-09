@@ -25,6 +25,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.module.BlockFadeListener;
 import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
+import com.sk89q.worldguard.bukkit.listener.module.LavaSpreadLimiterListener;
 import com.sk89q.worldguard.bukkit.listener.module.SpongeListener;
 import com.sk89q.worldguard.bukkit.listener.module.TickHaltingListener;
 import com.sk89q.worldguard.bukkit.listener.module.WaterProtectionListener;
@@ -72,6 +73,10 @@ public class FlagListeners {
         return !blocks.isEmpty() && blocks.contains(material.getId());
     }
 
+    private boolean isNonEmptyOrContains(Set<Integer> blocks, Material material) {
+        return !blocks.isEmpty() || blocks.contains(material.getId());
+    }
+
     public void registerEvents() {
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.ICE && (getConfig(b).disableIceMelting || !testState(b, ICE_MELT))));
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.SNOW && (getConfig(b).disableSnowMelting || !testState(b, SNOW_MELT))));
@@ -87,6 +92,7 @@ public class FlagListeners {
         registerEvents(new SpongeListener(w -> getConfig(w).spongeBehavior));
         registerEvents(new ItemDurabilityListener(w -> getConfig(w).itemDurability));
         registerEvents(new WaterProtectionListener(b -> isNonEmptyAndContains(getConfig(b).preventWaterDamage, b.getType())));
+        registerEvents(new LavaSpreadLimiterListener(b -> isNonEmptyOrContains(getConfig(b).allowedLavaSpreadOver, b.getType())));
     }
 
     private void registerEvents(Listener listener) {

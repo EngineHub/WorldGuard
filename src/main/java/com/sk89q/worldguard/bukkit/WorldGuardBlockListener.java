@@ -145,15 +145,6 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
-        if (wcfg.allowedLavaSpreadOver.size() > 0 && isLava) {
-            int targetId = blockTo.getRelative(0, -1, 0).getTypeId();
-
-            if (!wcfg.allowedLavaSpreadOver.contains(targetId)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
         if (wcfg.highFreqFlags && isWater
                 && !plugin.getGlobalRegionManager().allows(DefaultFlag.WATER_FLOW,
                 blockFrom.getLocation())) {

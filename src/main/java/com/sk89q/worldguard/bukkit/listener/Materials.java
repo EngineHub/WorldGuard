@@ -49,4 +49,14 @@ public final class Materials {
         return material == Material.WATER || material == Material.STATIONARY_WATER;
     }
 
+    /**
+     * Test whether the given material is lava.
+     *
+     * @param material the material
+     * @return true if a lava block
+     */
+    public static boolean isLava(Material material) {
+        return material == Material.LAVA || material == Material.STATIONARY_LAVA;
+    }
+
 }
