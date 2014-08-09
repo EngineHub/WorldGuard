@@ -27,8 +27,8 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.databases.util.DomainInputResolver;
-import com.sk89q.worldguard.protection.databases.util.DomainInputResolver.UserLocatorPolicy;
+import com.sk89q.worldguard.protection.util.DomainInputResolver;
+import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -72,7 +72,7 @@ public class RegionMemberCommands {
         String id = args.getString(0);
 
         RegionManager manager = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = manager.getRegion(id);
+        ProtectedRegion region = manager.matchRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -104,8 +104,7 @@ public class RegionMemberCommands {
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Adding members to the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with new members.", "Failed to add new members")
-                .thenSaveRegionData(manager, world);
+                .thenRespondWith("Region '%s' updated with new members.", "Failed to add new members");
     }
 
     @Command(aliases = {"addowner", "addowner", "ao"},
@@ -134,7 +133,7 @@ public class RegionMemberCommands {
         String id = args.getString(0);
 
         RegionManager manager = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = manager.getRegion(id);
+        ProtectedRegion region = manager.matchRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -179,8 +178,7 @@ public class RegionMemberCommands {
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Adding owners to the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with new owners.", "Failed to add new owners")
-                .thenSaveRegionData(manager, world);
+                .thenRespondWith("Region '%s' updated with new owners.", "Failed to add new owners");
     }
 
     @Command(aliases = {"removemember", "remmember", "removemem", "remmem", "rm"},
@@ -209,7 +207,7 @@ public class RegionMemberCommands {
         String id = args.getString(0);
 
         RegionManager manager = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = manager.getRegion(id);
+        ProtectedRegion region = manager.matchRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -253,8 +251,7 @@ public class RegionMemberCommands {
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Removing members from the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with members removed.", "Failed to remove members")
-                .thenSaveRegionData(manager, world);
+                .thenRespondWith("Region '%s' updated with members removed.", "Failed to remove members");
     }
 
     @Command(aliases = {"removeowner", "remowner", "ro"},
@@ -284,7 +281,7 @@ public class RegionMemberCommands {
         String id = args.getString(0);
 
         RegionManager manager = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion region = manager.getRegion(id);
+        ProtectedRegion region = manager.matchRegion(id);
 
         if (region == null) {
             throw new CommandException("Could not find a region by that ID.");
@@ -328,7 +325,6 @@ public class RegionMemberCommands {
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Removing owners from the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with owners removed.", "Failed to remove owners")
-                .thenSaveRegionData(manager, world);
+                .thenRespondWith("Region '%s' updated with owners removed.", "Failed to remove owners");
     }
 }

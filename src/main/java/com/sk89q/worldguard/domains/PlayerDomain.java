@@ -20,20 +20,24 @@
 package com.sk89q.worldguard.domains;
 
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.util.ChangeTracked;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores players (only) in a domain.
  */
-public class PlayerDomain implements Domain {
+public class PlayerDomain implements Domain, ChangeTracked {
 
     private final Set<UUID> uniqueIds = new CopyOnWriteArraySet<UUID>();
     private final Set<String> names = new CopyOnWriteArraySet<String>();
+    private boolean dirty = true;
 
     /**
      * Create a new instance.
@@ -58,12 +62,15 @@ public class PlayerDomain implements Domain {
      * Add the given player to the domain, identified by the player's name.
      *
      * @param name the name of the player
-     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
      */
-    @Deprecated
     public void addPlayer(String name) {
         checkNotNull(name);
-        names.add(name.toLowerCase());
+        checkArgument(!name.trim().isEmpty(), "Can't add empty player name");
+        setDirty(true);
+        names.add(name.trim().toLowerCase());
+        // Trim because some names contain spaces (previously valid Minecraft
+        // names) and we cannot store these correctly in the SQL storage
+        // implementations
     }
 
     /**
@@ -73,6 +80,7 @@ public class PlayerDomain implements Domain {
      */
     public void addPlayer(UUID uniqueId) {
         checkNotNull(uniqueId);
+        setDirty(true);
         uniqueIds.add(uniqueId);
     }
 
@@ -83,6 +91,7 @@ public class PlayerDomain implements Domain {
      */
     public void addPlayer(LocalPlayer player) {
         checkNotNull(player);
+        setDirty(true);
         addPlayer(player.getUniqueId());
     }
 
@@ -90,12 +99,11 @@ public class PlayerDomain implements Domain {
      * Remove the given player from the domain, identified by the player's name.
      *
      * @param name the name of the player
-     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
      */
-    @Deprecated
     public void removePlayer(String name) {
         checkNotNull(name);
-        names.remove(name.toLowerCase());
+        setDirty(true);
+        names.remove(name.trim().toLowerCase());
     }
 
     /**
@@ -116,8 +124,8 @@ public class PlayerDomain implements Domain {
      */
     public void removePlayer(LocalPlayer player) {
         checkNotNull(player);
-        names.remove(player.getName().toLowerCase());
-        uniqueIds.remove(player.getUniqueId());
+        removePlayer(player.getName());
+        removePlayer(player.getUniqueId());
     }
 
     @Override
@@ -130,11 +138,9 @@ public class PlayerDomain implements Domain {
      * Get the set of player names.
      *
      * @return the set of player names
-     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
      */
-    @Deprecated
     public Set<String> getPlayers() {
-        return names;
+        return Collections.unmodifiableSet(names);
     }
 
     /**
@@ -143,7 +149,7 @@ public class PlayerDomain implements Domain {
      * @return the set of player UUIDs
      */
     public Set<UUID> getUniqueIds() {
-        return uniqueIds;
+        return Collections.unmodifiableSet(uniqueIds);
     }
 
     @Override
@@ -155,7 +161,7 @@ public class PlayerDomain implements Domain {
     @Override
     public boolean contains(String playerName) {
         checkNotNull(playerName);
-        return names.contains(playerName.toLowerCase());
+        return names.contains(playerName.trim().toLowerCase());
     }
 
     @Override
@@ -167,6 +173,16 @@ public class PlayerDomain implements Domain {
     public void clear() {
         uniqueIds.clear();
         names.clear();
+    }
+
+    @Override
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    @Override
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 
 }

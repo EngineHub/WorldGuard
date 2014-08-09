@@ -41,6 +41,15 @@ public class EnumFlag<T extends Enum<T>> extends Flag<T> {
         this.enumClass = enumClass;
     }
 
+    /**
+     * Get the enum class.
+     *
+     * @return the enum class
+     */
+    public Class<T> getEnumClass() {
+        return enumClass;
+    }
+
     private T findValue(String input) throws IllegalArgumentException {
         if (input != null) {
             input = input.toUpperCase();

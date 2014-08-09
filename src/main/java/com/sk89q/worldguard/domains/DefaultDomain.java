@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.sk89q.squirrelid.Profile;
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.util.ChangeTracked;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A combination of a {@link PlayerDomain} and a {@link GroupDomain}.
  */
-public class DefaultDomain implements Domain {
+public class DefaultDomain implements Domain, ChangeTracked {
 
     private PlayerDomain playerDomain = new PlayerDomain();
     private GroupDomain groupDomain = new GroupDomain();
@@ -84,9 +85,7 @@ public class DefaultDomain implements Domain {
      * Add the given player to the domain, identified by the player's name.
      *
      * @param name the name of the player
-     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
      */
-    @Deprecated
     public void addPlayer(String name) {
         playerDomain.addPlayer(name);
     }
@@ -95,9 +94,7 @@ public class DefaultDomain implements Domain {
      * Remove the given player from the domain, identified by the player's name.
      *
      * @param name the name of the player
-     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
      */
-    @Deprecated
     public void removePlayer(String name) {
         playerDomain.removePlayer(name);
     }
@@ -179,9 +176,7 @@ public class DefaultDomain implements Domain {
      * Get the set of player names.
      *
      * @return the set of player names
-     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
      */
-    @Deprecated
     public Set<String> getPlayers() {
         return playerDomain.getPlayers();
     }
@@ -252,7 +247,6 @@ public class DefaultDomain implements Domain {
         clear();
     }
 
-    @SuppressWarnings("deprecation")
     public String toPlayersString() {
         return toPlayersString(null);
     }
@@ -340,4 +334,14 @@ public class DefaultDomain implements Domain {
         return str.toString();
     }
 
+    @Override
+    public boolean isDirty() {
+        return playerDomain.isDirty() || groupDomain.isDirty();
+    }
+
+    @Override
+    public void setDirty(boolean dirty) {
+        playerDomain.setDirty(dirty);
+        groupDomain.setDirty(dirty);
+    }
 }

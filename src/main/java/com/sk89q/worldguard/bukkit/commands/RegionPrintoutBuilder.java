@@ -75,7 +75,7 @@ class RegionPrintoutBuilder implements Callable<String> {
         
         builder.append(ChatColor.GRAY);
         builder.append(" (type=");
-        builder.append(region.getTypeName());
+        builder.append(region.getType().getName());
         
         builder.append(ChatColor.GRAY);
         builder.append(", priority=");

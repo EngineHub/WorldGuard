@@ -300,7 +300,7 @@ public class ReportWriter {
             regionsLog.put("Number of regions", worldRegions.getRegions().size());
             LogListBlock globalRegionLog = regionsLog.putChild("Global region");
             
-            ProtectedRegion globalRegion = worldRegions.getRegion("__global__");
+            ProtectedRegion globalRegion = worldRegions.matchRegion("__global__");
             if (globalRegion == null) {
                 globalRegionLog.put("Status", "UNDEFINED");
             } else {

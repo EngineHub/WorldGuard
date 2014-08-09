@@ -19,25 +19,39 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * A special region that is not quite "anywhere" (its volume is 0, it
+ * contains no positions, and it does not intersect with any other region).
+ *
+ * <p>Global regions, however, are used to specify a region with flags that
+ * are applied with the lowest priority.</p>
+ */
 public class GlobalProtectedRegion extends ProtectedRegion {
 
+    /**
+     * Create a new instance.
+     *
+     * @param id the ID
+     */
     public GlobalProtectedRegion(String id) {
         super(id);
         min = new BlockVector(0, 0, 0);
         max = new BlockVector(0, 0, 0);
     }
 
+    @Override
     public List<BlockVector2D> getPoints() {
+        // This doesn't make sense
         List<BlockVector2D> pts = new ArrayList<BlockVector2D>();
-        pts.add(new BlockVector2D(min.getBlockX(),min.getBlockZ()));
+        pts.add(new BlockVector2D(min.getBlockX(), min.getBlockZ()));
         return pts;
     }
 
@@ -48,18 +62,18 @@ public class GlobalProtectedRegion extends ProtectedRegion {
 
     @Override
     public boolean contains(Vector pt) {
+        // Global regions are handled separately so it must not contain any positions
         return false;
     }
 
     @Override
-    public String getTypeName() {
-        return "global";
+    public RegionType getType() {
+        return RegionType.GLOBAL;
     }
 
     @Override
-    public List<ProtectedRegion> getIntersectingRegions(
-            List<ProtectedRegion> regions)
-            throws UnsupportedIntersectionException {
+    public List<ProtectedRegion> getIntersectingRegions(Collection<ProtectedRegion> regions) {
+        // Global regions are handled separately so it must not contain any positions
         return new ArrayList<ProtectedRegion>();
     }
 

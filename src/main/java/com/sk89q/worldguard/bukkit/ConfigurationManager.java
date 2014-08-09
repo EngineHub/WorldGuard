@@ -66,30 +66,11 @@ public class ConfigurationManager {
             "# - Lines starting with # are comments and so they are ignored.\r\n" +
             "#\r\n";
 
-    /**
-     * Reference to the plugin.
-     */
     private WorldGuardPlugin plugin;
-
-    /**
-     * Holds configurations for different worlds.
-     */
     private ConcurrentMap<String, WorldConfiguration> worlds;
-
-    /**
-     * The global configuration for use when loading worlds
-     */
     private YAMLProcessor config;
-
-    /**
-     * List of people with god mode.
-     */
     @Deprecated
     private Set<String> hasGodMode = new HashSet<String>();
-
-    /**
-     * List of people who can breathe underwater.
-     */
     private Set<String> hasAmphibious = new HashSet<String>();
 
     private boolean hasCommandBookGodMode = false;
@@ -123,6 +104,25 @@ public class ConfigurationManager {
     public ConfigurationManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
         this.worlds = new ConcurrentHashMap<String, WorldConfiguration>();
+    }
+
+    /**
+     * Get the folder for storing data files and configuration.
+     *
+     * @return the data folder
+     */
+    public File getDataFolder() {
+        return plugin.getDataFolder();
+    }
+
+    /**
+     * Get the folder for storing data files and configuration for each
+     * world.
+     *
+     * @return the data folder
+     */
+    public File getWorldsDataFolder() {
+        return new File(getDataFolder(), "worlds");
     }
 
     /**
@@ -167,8 +167,7 @@ public class ConfigurationManager {
             }
         }
 
-        useSqlDatabase = config.getBoolean(
-                "regions.sql.use", false);
+        useSqlDatabase = config.getBoolean("regions.sql.use", false);
 
         sqlDsn = config.getString("regions.sql.dsn", "jdbc:mysql://localhost/worldguard");
         sqlUsername = config.getString("regions.sql.username", "worldguard");

@@ -23,6 +23,8 @@ import org.bukkit.command.CommandSender;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
+import javax.annotation.Nullable;
+
 /**
  *
  * @author sk89q
@@ -56,7 +58,14 @@ public abstract class Flag<T> {
     public abstract T parseInput(WorldGuardPlugin plugin, CommandSender sender,
             String input) throws InvalidFlagFormat;
 
-    public abstract T unmarshal(Object o);
+    public abstract T unmarshal(@Nullable Object o);
 
     public abstract Object marshal(T o);
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
