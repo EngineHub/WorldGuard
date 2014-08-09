@@ -21,10 +21,6 @@ package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
-import com.sk89q.worldguard.internal.Events;
-import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.Interaction;
-import com.sk89q.worldguard.internal.event.ItemInteractEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -167,11 +163,8 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(new BlockDispenseBlacklistEvent(null, toVector(event.getBlock()), createTarget(event.getItem())), false, false)) {
                 event.setCancelled(true);
-                return;
             }
         }
-
-        Events.fireToCancel(event, new ItemInteractEvent(event, Causes.create(event.getBlock()), Interaction.INTERACT, event.getBlock().getWorld(), event.getItem()));
     }
 
     /*

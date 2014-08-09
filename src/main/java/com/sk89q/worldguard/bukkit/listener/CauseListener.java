@@ -19,22 +19,31 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
+import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.Events;
 import com.sk89q.worldguard.internal.cause.Causes;
 import com.sk89q.worldguard.internal.event.BlockInteractEvent;
 import com.sk89q.worldguard.internal.event.Interaction;
+import com.sk89q.worldguard.internal.event.ItemInteractEvent;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.Collections;
+
+import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
+import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 public class CauseListener implements Listener {
 
@@ -77,6 +86,11 @@ public class CauseListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onSignChange(SignChangeEvent event) {
         Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.INTERACT, event.getBlock()));
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockDispense(BlockDispenseEvent event) {
+        Events.fireToCancel(event, new ItemInteractEvent(event, Causes.create(event.getBlock()), Interaction.INTERACT, event.getBlock().getWorld(), event.getItem()));
     }
 
 }
