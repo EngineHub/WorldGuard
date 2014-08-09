@@ -145,18 +145,6 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
 
-        // Check the fluid block (from) whether it is air.
-        // If so and the target block is protected, cancel the event
-        if (wcfg.preventWaterDamage.size() > 0) {
-            int targetId = blockTo.getTypeId();
-
-            if ((isAir || isWater) &&
-                    wcfg.preventWaterDamage.contains(targetId)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
         if (wcfg.allowedLavaSpreadOver.size() > 0 && isLava) {
             int targetId = blockTo.getRelative(0, -1, 0).getTypeId();
 

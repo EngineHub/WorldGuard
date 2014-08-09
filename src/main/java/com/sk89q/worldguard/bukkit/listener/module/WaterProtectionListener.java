@@ -20,34 +20,28 @@
 package com.sk89q.worldguard.bukkit.listener.module;
 
 import com.google.common.base.Predicate;
-import com.sk89q.worldedit.blocks.BlockType;
-import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldguard.bukkit.listener.Materials;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.block.BlockFromToEvent;
 
-public class ItemDurabilityListener implements Listener {
+public class WaterProtectionListener implements Listener {
 
-    private final Predicate<World> predicate;
+    private final Predicate<Block> predicate;
 
-    public ItemDurabilityListener(Predicate<World> predicate) {
+    public WaterProtectionListener(Predicate<Block> predicate) {
         this.predicate = predicate;
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockBreak(BlockBreakEvent event) {
-        Player player = event.getPlayer();
+    public void onBlockFromTo(BlockFromToEvent event) {
+        Block from = event.getBlock();
+        Block to = event.getToBlock();
 
-        if (!predicate.apply(player.getWorld())) {
-            ItemStack held = player.getItemInHand();
-            if (held.getType() != Material.AIR && !(ItemType.usesDamageValue(held.getTypeId()) || BlockType.usesData(held.getTypeId()))) {
-                held.setDurability((short) 0);
-                player.setItemInHand(held);
-            }
+        if ((from.getType() == Material.AIR || Materials.isWater(from.getType())) && predicate.apply(to)) {
+            event.setCancelled(true);
         }
     }
 

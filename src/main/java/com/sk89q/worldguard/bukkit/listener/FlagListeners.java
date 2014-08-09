@@ -27,12 +27,15 @@ import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
 import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
 import com.sk89q.worldguard.bukkit.listener.module.SpongeListener;
 import com.sk89q.worldguard.bukkit.listener.module.TickHaltingListener;
+import com.sk89q.worldguard.bukkit.listener.module.WaterProtectionListener;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.Listener;
+
+import java.util.Set;
 
 import static com.sk89q.worldguard.bukkit.listener.Materials.isMushroom;
 import static com.sk89q.worldguard.protection.flags.DefaultFlag.*;
@@ -65,6 +68,10 @@ public class FlagListeners {
         return plugin.getGlobalRegionManager().allows(flag, block.getLocation());
     }
 
+    private boolean isNonEmptyAndContains(Set<Integer> blocks, Material material) {
+        return !blocks.isEmpty() && blocks.contains(material.getId());
+    }
+
     public void registerEvents() {
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.ICE && (getConfig(b).disableIceMelting || !testState(b, ICE_MELT))));
         registerEvents(new BlockFadeListener(b -> b.getType() == Material.SNOW && (getConfig(b).disableSnowMelting || !testState(b, SNOW_MELT))));
@@ -79,6 +86,7 @@ public class FlagListeners {
 
         registerEvents(new SpongeListener(w -> getConfig(w).spongeBehavior));
         registerEvents(new ItemDurabilityListener(w -> getConfig(w).itemDurability));
+        registerEvents(new WaterProtectionListener(b -> isNonEmptyAndContains(getConfig(b).preventWaterDamage, b.getType())));
     }
 
     private void registerEvents(Listener listener) {
