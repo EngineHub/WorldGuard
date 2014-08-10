@@ -17,32 +17,28 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.module;
+package com.sk89q.worldguard.bukkit.listener.function;
 
-import com.google.common.base.Predicate;
-import com.sk89q.worldguard.bukkit.listener.Materials;
-import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
-public class LavaSpreadLimiterListener implements Listener {
+import java.util.function.BiFunction;
 
-    private final Predicate<Block> predicate;
+public class DeathMessageListener implements Listener {
 
-    public LavaSpreadLimiterListener(Predicate<Block> predicate) {
-        this.predicate = predicate;
+    private final BiFunction<Entity, String, String> function;
+
+    public DeathMessageListener(BiFunction<Entity, String, String> function) {
+        this.function = function;
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockFromTo(BlockFromToEvent event) {
-        Block from = event.getBlock();
-        Block to = event.getToBlock();
-
-        if (Materials.isLava(from.getType())) {
-            if (predicate.apply(to.getRelative(0, -1, 0))) {
-                event.setCancelled(true);
-            }
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (event instanceof PlayerDeathEvent) {
+            ((PlayerDeathEvent) event).setDeathMessage(function.apply(event.getEntity(), ((PlayerDeathEvent) event).getDeathMessage()));
         }
     }
 

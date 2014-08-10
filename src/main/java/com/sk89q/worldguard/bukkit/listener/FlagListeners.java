@@ -19,28 +19,33 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.RegionQueryUtil;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.listener.module.BlockFadeListener;
-import com.sk89q.worldguard.bukkit.listener.module.BlockFlowListener;
-import com.sk89q.worldguard.bukkit.listener.module.BlockFormListener;
-import com.sk89q.worldguard.bukkit.listener.module.BlockIgniteListener;
-import com.sk89q.worldguard.bukkit.listener.module.BlockInteractListener;
-import com.sk89q.worldguard.bukkit.listener.module.BlockPhysicsListener;
-import com.sk89q.worldguard.bukkit.listener.module.BlockSpreadListener;
-import com.sk89q.worldguard.bukkit.listener.module.DeathMessageListener;
-import com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener;
-import com.sk89q.worldguard.bukkit.listener.module.FlintAndSteelListener;
-import com.sk89q.worldguard.bukkit.listener.module.ItemDurabilityListener;
-import com.sk89q.worldguard.bukkit.listener.module.LavaSpreadLimiterListener;
-import com.sk89q.worldguard.bukkit.listener.module.LeafDecayListener;
-import com.sk89q.worldguard.bukkit.listener.module.ObsidianGeneratorListener;
-import com.sk89q.worldguard.bukkit.listener.module.PistonMoveListener;
-import com.sk89q.worldguard.bukkit.listener.module.SpongeListener;
-import com.sk89q.worldguard.bukkit.listener.module.TickHaltingListener;
-import com.sk89q.worldguard.bukkit.listener.module.WaterProtectionListener;
-import com.sk89q.worldguard.bukkit.listener.module.XPDropListener;
+import com.sk89q.worldguard.bukkit.listener.function.BlockFadeListener;
+import com.sk89q.worldguard.bukkit.listener.function.BlockFlowListener;
+import com.sk89q.worldguard.bukkit.listener.function.BlockFormListener;
+import com.sk89q.worldguard.bukkit.listener.function.BlockIgniteListener;
+import com.sk89q.worldguard.bukkit.listener.function.BlockInteractListener;
+import com.sk89q.worldguard.bukkit.listener.function.BlockPhysicsListener;
+import com.sk89q.worldguard.bukkit.listener.function.BlockSpreadListener;
+import com.sk89q.worldguard.bukkit.listener.function.DeathMessageListener;
+import com.sk89q.worldguard.bukkit.listener.feature.DumbFollowerListener;
+import com.sk89q.worldguard.bukkit.listener.function.EntityDamageCauseListener;
+import com.sk89q.worldguard.bukkit.listener.function.FireSpreadListener;
+import com.sk89q.worldguard.bukkit.listener.feature.FlintAndSteelListener;
+import com.sk89q.worldguard.bukkit.listener.feature.InvicibilityListener;
+import com.sk89q.worldguard.bukkit.listener.feature.ItemDurabilityListener;
+import com.sk89q.worldguard.bukkit.listener.function.LavaSpreadLimiterListener;
+import com.sk89q.worldguard.bukkit.listener.function.LeafDecayListener;
+import com.sk89q.worldguard.bukkit.listener.feature.ObsidianGeneratorListener;
+import com.sk89q.worldguard.bukkit.listener.function.PistonMoveListener;
+import com.sk89q.worldguard.bukkit.listener.feature.SpongeListener;
+import com.sk89q.worldguard.bukkit.listener.feature.TickHaltingListener;
+import com.sk89q.worldguard.bukkit.listener.feature.WaterProtectionListener;
+import com.sk89q.worldguard.bukkit.listener.feature.XPDropListener;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -49,17 +54,21 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowman;
+import org.bukkit.entity.Tameable;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Set;
 
 import static com.sk89q.worldguard.bukkit.listener.Materials.isMushroom;
-import static com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener.INDIRECT_IGNITE_CHECK;
-import static com.sk89q.worldguard.bukkit.listener.module.FireSpreadListener.VISIT_ADJACENT;
+import static com.sk89q.worldguard.bukkit.listener.function.FireSpreadListener.INDIRECT_IGNITE_CHECK;
+import static com.sk89q.worldguard.bukkit.listener.function.FireSpreadListener.VISIT_ADJACENT;
 import static com.sk89q.worldguard.protection.flags.DefaultFlag.*;
 
 /**
@@ -98,8 +107,20 @@ public class FlagListeners {
         return getConfig(state.getWorld());
     }
 
+    private boolean testPermission(@Nullable Player player, String permission, boolean nonPlayerPermitted) {
+        if (player == null) {
+            return nonPlayerPermitted;
+        }
+
+        return plugin.hasPermission(player, permission);
+    }
+
     private boolean testState(Location location, StateFlag flag) {
         return plugin.getGlobalRegionManager().allows(flag, location);
+    }
+
+    private boolean testState(Entity entity, StateFlag flag) {
+        return plugin.getGlobalRegionManager().allows(flag, entity.getLocation());
     }
 
     private boolean testState(Block block, StateFlag flag) {
@@ -126,12 +147,33 @@ public class FlagListeners {
         return entity instanceof Player;
     }
 
-    private boolean testPermission(@Nullable Player player, String permission, boolean nonPlayerPermitted) {
-        if (player == null) {
-            return nonPlayerPermitted;
-        }
+    private boolean isTamed(Entity entity) {
+        return entity instanceof Tameable && (((Tameable) entity).isTamed());
+    }
 
-        return plugin.hasPermission(player, permission);
+    private boolean isWearingPumpkin(HumanEntity entity) {
+        ItemStack helmet = entity.getInventory().getHelmet();
+        return helmet != null && (helmet.getType() == Material.PUMPKIN || helmet.getType() == Material.JACK_O_LANTERN);
+    }
+
+    private boolean isInvincible(Player player) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
+
+        boolean god = cfg.hasGodMode(player);
+        if (wcfg.useRegions) {
+            Boolean flag = RegionQueryUtil.isAllowedInvinciblity(plugin, player);
+            boolean allowed = flag == null || flag;
+            boolean invincible = RegionQueryUtil.isInvincible(plugin, player);
+
+            if (allowed) {
+                return god || invincible;
+            } else {
+                return (god && plugin.hasPermission(player, "worldguard.god.override-regions")) || invincible;
+            }
+        } else {
+            return god;
+        }
     }
 
     public void registerEvents() {
@@ -148,7 +190,7 @@ public class FlagListeners {
         registerEvents(new BlockSpreadListener(b -> b.getType() == Material.VINE && (getConfig(b).disableVineGrowth || !testState(b, VINE_GROWTH))));
 
         // Block form
-        registerEvents(new BlockFormListener((b, e) -> e instanceof Snowman && getConfig(b).disableSnowmanTrails));
+        registerEvents(new BlockFormListener((b, e) -> e.getType() == EntityType.SNOWMAN && getConfig(b).disableSnowmanTrails));
         registerEvents(new BlockFormListener((b, e) -> b.getType() == Material.ICE && (getConfig(b).disableIceFormation || !testState(b, ICE_FORM))));
         registerEvents(new BlockFormListener((b, e) -> b.getType() == Material.SNOW && (getConfig(b).disableSnowFormation || !testState(b, SNOW_FALL))));
         registerEvents(new BlockFormListener((b, e) -> isNonEmptyAndContains(getConfig(b).allowedSnowFallOver, b.getBlock().getRelative(0, -1, 0).getType())));
@@ -167,16 +209,65 @@ public class FlagListeners {
         registerEvents(new FireSpreadListener(b -> getConfig(b).fireSpreadDisableToggle || (getConfig(b).highFreqFlags && !testState(b, FIRE_SPREAD)), VISIT_ADJACENT));
         registerEvents(new FireSpreadListener(b -> isNonEmptyAndContains(getConfig(b).disableFireSpreadBlocks, b.getType()), VISIT_ADJACENT | INDIRECT_IGNITE_CHECK));
 
+        // Flint and steel
+        registerEvents(new FlintAndSteelListener((p, b) -> (
+                getConfig(b).blockLighter || (!testState(b, LIGHTER) && !testCanBuild(p, b)))
+                && !testPermission(p, "worldguard.override.lighter", true)));
+
         // Physics
         registerEvents(new BlockPhysicsListener((b, m) -> m == Material.GRAVEL && getConfig(b).noPhysicsGravel));
         registerEvents(new BlockPhysicsListener((b, m) -> m == Material.SAND && getConfig(b).noPhysicsSand));
         registerEvents(new BlockPhysicsListener((b, m) -> Materials.isPortal(m) && getConfig(b).allowPortalAnywhere));
         registerEvents(new BlockPhysicsListener((b, m) -> m == Material.LADDER && getConfig(b).ropeLadders && b.getRelative(0, 1, 0).getType() == Material.LADDER));
 
-        // Flint and steel
-        registerEvents(new FlintAndSteelListener((p, b) -> (
-                getConfig(b).blockLighter || (!testState(b, LIGHTER) && !testCanBuild(p, b)))
-                && !testPermission(p, "worldguard.override.lighter", true)));
+        // Invicibility
+        registerEvents(new InvicibilityListener(e -> isPlayer(e) && isInvincible((Player) e)));
+
+        // Entity damage
+        registerEvents(new EntityDamageCauseListener((e, c) -> c == DamageCause.LAVA && isPlayer(e) && getConfig(e).disableLavaDamage));
+        registerEvents(new EntityDamageCauseListener((e, c) -> c == DamageCause.CONTACT && isPlayer(e) && getConfig(e).disableContactDamage));
+        registerEvents(new EntityDamageCauseListener((e, c) -> c == DamageCause.LIGHTNING && isPlayer(e) && getConfig(e).disableLightningDamage));
+        registerEvents(new EntityDamageCauseListener((e, c) -> c == DamageCause.FALL && isPlayer(e) && getConfig(e).disableFallDamage));
+        registerEvents(new EntityDamageCauseListener((e, c) -> c == DamageCause.DROWNING && isPlayer(e) && getConfig(e).disableDrowningDamage));
+        registerEvents(new EntityDamageCauseListener((e, c) -> c == DamageCause.VOID && isPlayer(e) && getConfig(e).disableVoidDamage));
+        registerEvents(new EntityDamageCauseListener((e, c) -> c == DamageCause.SUFFOCATION && isPlayer(e) && getConfig(e).disableSuffocationDamage));
+        registerEvents(new EntityDamageCauseListener((e, c) -> DamageCauses.isFire(c) && isPlayer(e) && getConfig(e).disableFireDamage));
+
+        // Scuba pumpkin / amphibious mode
+        registerEvents(new EntityDamageCauseListener((e, c) -> c == DamageCause.DROWNING && isPlayer(e) && getConfig(e).pumpkinScuba && isWearingPumpkin((Player) e)));
+        registerEvents(new EntityDamageCauseListener((e, c) -> c == DamageCause.DROWNING && isPlayer(e) && getConfig().hasAmphibiousMode((Player) e)));
+
+        // Explosion damage
+        registerEvents(new EntityDamageCauseListener((e, c) -> {
+            if (!DamageCauses.isExplosion(c)) {
+                return false;
+            }
+            WorldConfiguration config = getConfig(e);
+            return config.disableExplosionDamage || config.blockOtherExplosions || (config.explosionFlagCancellation && !testState(e, OTHER_EXPLOSION));
+        }));
+
+        // Teleport on suffocation
+        registerEvents(new EntityDamageCauseListener((e, c) -> {
+            if (c == DamageCause.SUFFOCATION && isPlayer(e) && getConfig(e).teleportOnSuffocation) {
+                BukkitUtil.findFreePosition(e);
+                return true;
+            } else {
+                return false;
+            }
+        }));
+
+        // Teleport on void
+        registerEvents(new EntityDamageCauseListener((e, c) -> {
+            if (c == DamageCause.VOID && isPlayer(e) && getConfig(e).teleportOnVoid) {
+                BukkitUtil.findFreePosition(e);
+                return true;
+            } else {
+                return false;
+            }
+        }));
+
+        // Anti-wolf dumbness
+        registerEvents(new DumbFollowerListener(e -> getConfig(e).antiWolfDumbness && e.getType() == EntityType.WOLF && isTamed(e)));
 
         // Miscellaneous
         registerEvents(new PistonMoveListener((b, sticky) -> sticky && testState(b, PISTONS)));

@@ -17,36 +17,37 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.module;
+package com.sk89q.worldguard.bukkit.listener.feature;
 
 import com.google.common.base.Predicate;
-import org.bukkit.block.Block;
+import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.blocks.ItemType;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+public class ItemDurabilityListener implements Listener {
 
-public class BlockIgniteListener implements Listener {
+    private final Predicate<World> predicate;
 
-    private final Predicate<Block> predicate;
-    private final Set<IgniteCause> igniteCauses;
-
-    public BlockIgniteListener(Predicate<Block> predicate, IgniteCause... igniteCauses) {
+    public ItemDurabilityListener(Predicate<World> predicate) {
         this.predicate = predicate;
-        this.igniteCauses = new HashSet<IgniteCause>(Arrays.asList(igniteCauses));
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockIgnite(BlockIgniteEvent event) {
-        IgniteCause cause = event.getCause();
-        Block block = event.getBlock();
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
 
-        if (igniteCauses.contains(cause) && predicate.apply(block)) {
-            event.setCancelled(true);
+        if (!predicate.apply(player.getWorld())) {
+            ItemStack held = player.getItemInHand();
+            if (held.getType() != Material.AIR && !(ItemType.usesDamageValue(held.getTypeId()) || BlockType.usesData(held.getTypeId()))) {
+                held.setDurability((short) 0);
+                player.setItemInHand(held);
+            }
         }
     }
 

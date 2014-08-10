@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.internal.Events;
@@ -52,7 +51,6 @@ import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
-import org.bukkit.entity.Wolf;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -62,19 +60,16 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityCreatePortalEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
@@ -109,71 +104,7 @@ public class WorldGuardEntityListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    private void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
-        Entity defender = event.getEntity();
-        DamageCause type = event.getCause();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(defender.getWorld());
-
-        if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
-            if (wcfg.antiWolfDumbness && !(type == DamageCause.VOID)) {
-                event.setCancelled(true);
-                return;
-            }
-        } else if (defender instanceof Player) {
-            Player player = (Player) defender;
-
-            if (isInvincible(player)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableLavaDamage && type == DamageCause.LAVA) {
-                event.setCancelled(true);
-                player.setFireTicks(0);
-                return;
-            }
-
-            if (wcfg.disableContactDamage && type == DamageCause.CONTACT) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.teleportOnVoid && type == DamageCause.VOID) {
-                BukkitUtil.findFreePosition(player);
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableVoidDamage && type == DamageCause.VOID) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (type == DamageCause.BLOCK_EXPLOSION
-                    && (wcfg.disableExplosionDamage || wcfg.blockOtherExplosions
-                            || (wcfg.explosionFlagCancellation
-                                && !plugin.getGlobalRegionManager().allows(DefaultFlag.OTHER_EXPLOSION, player.getLocation())))) {
-                event.setCancelled(true);
-                return;
-            }
-        } else {
-
-            // for whatever reason, plugin-caused explosions with a null entity count as block explosions and aren't
-            // handled anywhere else
-            if (type == DamageCause.BLOCK_EXPLOSION
-                    && (wcfg.blockOtherExplosions
-                            || (wcfg.explosionFlagCancellation
-                                && !plugin.getGlobalRegionManager().allows(DefaultFlag.OTHER_EXPLOSION, defender.getLocation())))) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
-
     private void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-
         if (event.getDamager() instanceof Projectile) {
             onEntityDamageByProjectile(event);
             return;
@@ -225,20 +156,6 @@ public class WorldGuardEntityListener implements Listener {
 
                 event.setCancelled(true);
                 return;
-            }
-
-            if (wcfg.disableLightningDamage && event.getCause() == DamageCause.LIGHTNING) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableExplosionDamage) {
-                switch (event.getCause()) {
-                    case BLOCK_EXPLOSION:
-                    case ENTITY_EXPLOSION:
-                        event.setCancelled(true);
-                        return;
-                }
             }
 
             if (attacker != null) {
@@ -376,12 +293,6 @@ public class WorldGuardEntityListener implements Listener {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
 
-            // Check Invincible
-            if (isInvincible(player)) {
-                event.setCancelled(true);
-                return;
-            }
-
             // Check Mob
             if (attacker != null && !(attacker instanceof Player)) {
                 if (wcfg.disableMobDamage) {
@@ -431,7 +342,6 @@ public class WorldGuardEntityListener implements Listener {
             this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
             return;
         } else if (event instanceof EntityDamageByBlockEvent) {
-            this.onEntityDamageByBlock((EntityDamageByBlockEvent) event);
             return;
         }
 
@@ -441,19 +351,8 @@ public class WorldGuardEntityListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(defender.getWorld());
 
-        if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
-            if (wcfg.antiWolfDumbness) {
-                event.setCancelled(true);
-                return;
-            }
-        } else if (defender instanceof Player) {
+        if (defender instanceof Player) {
             Player player = (Player) defender;
-
-            if (isInvincible(player)) {
-                event.setCancelled(true);
-                player.setFireTicks(0);
-                return;
-            }
 
             if (type == DamageCause.WITHER) {
                 // wither boss DoT tick
@@ -472,68 +371,6 @@ public class WorldGuardEntityListener implements Listener {
                         return;
                     }
                 }
-            }
-
-            if (type == DamageCause.DROWNING && cfg.hasAmphibiousMode(player)) {
-                player.setRemainingAir(player.getMaximumAir());
-                event.setCancelled(true);
-                return;
-            }
-
-            ItemStack helmet = player.getInventory().getHelmet();
-
-            if (type == DamageCause.DROWNING && wcfg.pumpkinScuba
-                    && helmet != null
-                    && (helmet.getTypeId() == BlockID.PUMPKIN
-                    || helmet.getTypeId() == BlockID.JACKOLANTERN)) {
-                player.setRemainingAir(player.getMaximumAir());
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableFallDamage && type == DamageCause.FALL) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableFireDamage && (type == DamageCause.FIRE
-                    || type == DamageCause.FIRE_TICK)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableDrowningDamage && type == DamageCause.DROWNING) {
-                player.setRemainingAir(player.getMaximumAir());
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.teleportOnSuffocation && type == DamageCause.SUFFOCATION) {
-                BukkitUtil.findFreePosition(player);
-                event.setCancelled(true);
-                return;
-            }
-
-            if (wcfg.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEntityCombust(EntityCombustEvent event) {
-        Entity entity = event.getEntity();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(entity.getWorld());
-
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
-
-            if (cfg.hasGodMode(player) || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
-                event.setCancelled(true);
-                return;
             }
         }
     }

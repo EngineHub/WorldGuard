@@ -17,30 +17,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.module;
+package com.sk89q.worldguard.bukkit.listener.feature;
 
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
-import org.bukkit.entity.Entity;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
-public class DeathMessageListener implements Listener {
+public class FlintAndSteelListener implements Listener {
 
-    private final BiFunction<Entity, String, String> function;
+    private final BiPredicate<Player, Block> predicate;
 
-    public DeathMessageListener(BiFunction<Entity, String, String> function) {
-        this.function = function;
+    public FlintAndSteelListener(BiPredicate<Player, Block> predicate) {
+        this.predicate = predicate;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onEntityDeath(EntityDeathEvent event) {
-        if (event instanceof PlayerDeathEvent) {
-            ((PlayerDeathEvent) event).setDeathMessage(function.apply(event.getEntity(), ((PlayerDeathEvent) event).getDeathMessage()));
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockIgnite(BlockIgniteEvent event) {
+        IgniteCause cause = event.getCause();
+        Block block = event.getBlock();
+
+        boolean lighterCause = cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL;
+
+        if (lighterCause && predicate.test(event.getPlayer(), block)) {
+            event.setCancelled(true);
         }
     }
 

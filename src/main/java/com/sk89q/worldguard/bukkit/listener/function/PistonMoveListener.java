@@ -17,47 +17,43 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.module;
+package com.sk89q.worldguard.bukkit.listener.function;
 
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 
 import java.util.function.BiPredicate;
 
-public class BlockInteractListener implements Listener {
+public class PistonMoveListener implements Listener {
 
-    private final BiPredicate<Block, Entity> predicate;
+    private final BiPredicate<Block, Boolean> predicate;
 
-    public BlockInteractListener(BiPredicate<Block, Entity> predicate) {
+    public PistonMoveListener(BiPredicate<Block, Boolean> predicate) {
         this.predicate = predicate;
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onEntityInteract(EntityInteractEvent event) {
-        Entity entity = event.getEntity();
-        Block block = event.getBlock();
-
-        if (predicate.test(block, entity)) {
+    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+        if (predicate.test(event.getBlock(), event.isSticky())) {
             event.setCancelled(true);
+            return;
+        }
+
+        for (Block block : event.getBlocks()) {
+            if (predicate.test(block, event.isSticky())) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        Action action = event.getAction();
-        Player entity = event.getPlayer();
-        Block block = event.getClickedBlock();
-
-        if (action == Action.PHYSICAL) {
-            if (predicate.test(block, entity)) {
-                event.setCancelled(true);
-            }
+    public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+        if (predicate.test(event.getBlock(), event.isSticky()) || predicate.test(event.getRetractLocation().getBlock(), event.isSticky())) {
+            event.setCancelled(true);
         }
     }
 

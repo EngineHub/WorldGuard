@@ -17,27 +17,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.module;
+package com.sk89q.worldguard.bukkit.listener.function;
 
-import org.bukkit.Material;
-import org.bukkit.block.Block;
+import com.sk89q.worldguard.bukkit.listener.DamageCauses;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.function.BiPredicate;
 
-public class BlockPhysicsListener implements Listener {
+public class EntityDamageCauseListener implements Listener {
 
-    private final BiPredicate<Block, Material> predicate;
+    private final BiPredicate<Entity, DamageCause> predicate;
 
-    public BlockPhysicsListener(BiPredicate<Block,  Material> predicate) {
+    public EntityDamageCauseListener(BiPredicate<Entity, DamageCause> predicate) {
         this.predicate = predicate;
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockPhysics(BlockPhysicsEvent event) {
-        if (predicate.test(event.getBlock(), event.getChangedType())) {
+    public void onEntityDamage(EntityDamageEvent event) {
+        Entity defender = event.getEntity();
+        DamageCause type = event.getCause();
+
+        if (predicate.test(defender, type)) {
+            DamageCauses.restoreStatistic(defender, type);
             event.setCancelled(true);
         }
     }

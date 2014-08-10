@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.module;
+package com.sk89q.worldguard.bukkit.listener.feature;
 
 import com.google.common.base.Predicate;
 import com.sk89q.worldguard.bukkit.BukkitUtil;

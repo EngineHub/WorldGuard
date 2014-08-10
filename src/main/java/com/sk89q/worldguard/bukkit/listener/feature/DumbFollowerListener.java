@@ -17,32 +17,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.module;
+package com.sk89q.worldguard.bukkit.listener.feature;
 
 import com.google.common.base.Predicate;
-import com.sk89q.worldguard.bukkit.listener.Materials;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-public class ObsidianGeneratorListener implements Listener {
+public class DumbFollowerListener implements Listener {
 
-    private final Predicate<Block> predicate;
+    private final Predicate<Entity> predicate;
 
-    public ObsidianGeneratorListener(Predicate<Block> predicate) {
+    public DumbFollowerListener(Predicate<Entity> predicate) {
         this.predicate = predicate;
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockFromTo(BlockFromToEvent event) {
-        Block blockFrom = event.getBlock();
-        Block blockTo = event.getToBlock();
+    private void onEntityDamage(EntityDamageEvent event) {
+        Entity defender = event.getEntity();
+        DamageCause type = event.getCause();
 
-        if (predicate.apply(blockTo) && (blockFrom.getType() == Material.AIR || Materials.isLava(blockFrom.getType()))
-                && (blockTo.getType() == Material.REDSTONE_WIRE || blockTo.getType() == Material.TRIPWIRE)) {
-            blockTo.setType(Material.AIR);
+        if (predicate.apply(defender)) {
+            if (type != DamageCause.VOID) {
+                event.setCancelled(true);
+            }
         }
     }
 

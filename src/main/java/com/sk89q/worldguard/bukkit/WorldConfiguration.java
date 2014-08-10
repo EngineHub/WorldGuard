@@ -26,7 +26,7 @@ import com.sk89q.worldguard.blacklist.BlacklistLoggerHandler;
 import com.sk89q.worldguard.blacklist.logger.ConsoleHandler;
 import com.sk89q.worldguard.blacklist.logger.DatabaseHandler;
 import com.sk89q.worldguard.blacklist.logger.FileHandler;
-import com.sk89q.worldguard.bukkit.listener.module.SpongeListener.SpongeBehavior;
+import com.sk89q.worldguard.bukkit.listener.feature.SpongeListener.SpongeBehavior;
 import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.chest.SignChestProtection;
 import org.bukkit.block.Block;

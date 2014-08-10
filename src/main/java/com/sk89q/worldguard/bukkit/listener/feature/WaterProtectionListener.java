@@ -17,25 +17,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.module;
+package com.sk89q.worldguard.bukkit.listener.feature;
 
 import com.google.common.base.Predicate;
+import com.sk89q.worldguard.bukkit.listener.Materials;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.LeavesDecayEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 
-public class LeafDecayListener implements Listener {
+public class WaterProtectionListener implements Listener {
 
     private final Predicate<Block> predicate;
 
-    public LeafDecayListener(Predicate<Block> predicate) {
+    public WaterProtectionListener(Predicate<Block> predicate) {
         this.predicate = predicate;
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onLeavesDecay(LeavesDecayEvent event) {
-        if (predicate.apply(event.getBlock())) {
+    public void onBlockFromTo(BlockFromToEvent event) {
+        Block from = event.getBlock();
+        Block to = event.getToBlock();
+
+        if ((from.getType() == Material.AIR || Materials.isWater(from.getType())) && predicate.apply(to)) {
             event.setCancelled(true);
         }
     }

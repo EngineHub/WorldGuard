@@ -177,20 +177,32 @@ public class BukkitUtil {
     }
 
     /**
-     * Find a position for the player to stand that is not inside a block.
-     * Blocks above the player will be iteratively tested until there is
-     * a series of two free blocks. The player will be teleported to
+     * Find a position for the entity to stand that is not inside a block.
+     * Blocks above the entity will be iteratively tested until there is
+     * a series of two free blocks. The entity will be teleported to
      * that free position.
      *
-     * @param player
+     * @param player the player
      */
     public static void findFreePosition(Player player) {
-        Location loc = player.getLocation();
+        findFreePosition((Entity) player);
+    }
+
+    /**
+     * Find a position for the entity to stand that is not inside a block.
+     * Blocks above the entity will be iteratively tested until there is
+     * a series of two free blocks. The entity will be teleported to
+     * that free position.
+     *
+     * @param entity the entity
+     */
+    public static void findFreePosition(Entity entity) {
+        Location loc = entity.getLocation();
         int x = loc.getBlockX();
         int y = Math.max(0, loc.getBlockY());
         int origY = y;
         int z = loc.getBlockZ();
-        World world = player.getWorld();
+        World world = entity.getWorld();
 
         byte free = 0;
 
@@ -210,8 +222,8 @@ public class BukkitUtil {
                         world.getBlockAt(x,0,z).setTypeId(20);
                         loc.setY(2);
                     }
-                    player.setFallDistance(0F);
-                    player.teleport(loc);
+                    entity.setFallDistance(0F);
+                    entity.teleport(loc);
                 }
                 return;
             }

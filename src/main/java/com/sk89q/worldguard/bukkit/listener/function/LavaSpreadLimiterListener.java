@@ -17,43 +17,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.module;
+package com.sk89q.worldguard.bukkit.listener.function;
 
+import com.google.common.base.Predicate;
+import com.sk89q.worldguard.bukkit.listener.Materials;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 
-import java.util.function.BiPredicate;
+public class LavaSpreadLimiterListener implements Listener {
 
-public class PistonMoveListener implements Listener {
+    private final Predicate<Block> predicate;
 
-    private final BiPredicate<Block, Boolean> predicate;
-
-    public PistonMoveListener(BiPredicate<Block, Boolean> predicate) {
+    public LavaSpreadLimiterListener(Predicate<Block> predicate) {
         this.predicate = predicate;
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
-        if (predicate.test(event.getBlock(), event.isSticky())) {
-            event.setCancelled(true);
-            return;
-        }
+    public void onBlockFromTo(BlockFromToEvent event) {
+        Block from = event.getBlock();
+        Block to = event.getToBlock();
 
-        for (Block block : event.getBlocks()) {
-            if (predicate.test(block, event.isSticky())) {
+        if (Materials.isLava(from.getType())) {
+            if (predicate.apply(to.getRelative(0, -1, 0))) {
                 event.setCancelled(true);
-                return;
             }
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockPistonRetract(BlockPistonRetractEvent event) {
-        if (predicate.test(event.getBlock(), event.isSticky()) || predicate.test(event.getRetractLocation().getBlock(), event.isSticky())) {
-            event.setCancelled(true);
         }
     }
 
