@@ -159,41 +159,17 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     @Override
     public int volume() {
-        int volume = 0;
-        // TODO: Fix this
-        /*int numPoints = points.size();
-        if (numPoints < 3) {
-            return 0;
-        }
-
-        double area = 0;
-        int xa, z1, z2;
-
-        for (int i = 0; i < numPoints; i++) {
-            xa = points.get(i).getBlockX();
-            //za = points.get(i).getBlockZ();
-
-            if (points.get(i + 1) == null) {
-                z1 = points.get(0).getBlockZ();
-            } else {
-                z1 = points.get(i + 1).getBlockZ();
+        int surface = 0;
+        for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
+            for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
+                if (this.contains(x, minY, z)) {
+                    surface++;
+                }
             }
-            if (points.get(i - 1) == null) {
-                z2 = points.get(numPoints - 1).getBlockZ();
-            } else {
-                z2 = points.get(i - 1).getBlockZ();
-            }
-
-            area = area + (xa * (z1 - z2));
         }
+        
+        int height = maxY - minY + 1;
 
-        xa = points.get(0).getBlockX();
-        //za = points.get(0).getBlockZ();
-
-        area = area + (xa * (points.get(1).getBlockZ() - points.get(numPoints - 1).getBlockZ()));
-
-        volume = (Math.abs(maxY - minY) + 1) * (int) Math.ceil((Math.abs(area) / 2));*/
-
-        return volume;
+        return surface * height;
     }
 }
