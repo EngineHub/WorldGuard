@@ -35,6 +35,15 @@ import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.bukkit.listener.CauseListener;
 import com.sk89q.worldguard.bukkit.listener.FlagListeners;
+import com.sk89q.worldguard.bukkit.listener.interop.CommandBookListener;
+import com.sk89q.worldguard.bukkit.listener.legacy.LegacyBlockListener;
+import com.sk89q.worldguard.bukkit.listener.legacy.LegacyEntityListener;
+import com.sk89q.worldguard.bukkit.listener.legacy.LegacyHangingListener;
+import com.sk89q.worldguard.bukkit.listener.legacy.LegacyPlayerListener;
+import com.sk89q.worldguard.bukkit.listener.legacy.LegacyServerListener;
+import com.sk89q.worldguard.bukkit.listener.legacy.LegacyVehicleListener;
+import com.sk89q.worldguard.bukkit.listener.legacy.LegacyWeatherListener;
+import com.sk89q.worldguard.bukkit.listener.legacy.LegacyWorldListener;
 import com.sk89q.worldguard.internal.listener.BlacklistListener;
 import com.sk89q.worldguard.internal.listener.BlockedPotionsListener;
 import com.sk89q.worldguard.internal.listener.ChestProtectionListener;
@@ -180,13 +189,13 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         // Register events
-        (new WorldGuardPlayerListener(this)).registerEvents();
-        (new WorldGuardBlockListener(this)).registerEvents();
-        (new WorldGuardEntityListener(this)).registerEvents();
-        (new WorldGuardWeatherListener(this)).registerEvents();
-        (new WorldGuardVehicleListener(this)).registerEvents();
-        (new WorldGuardServerListener(this)).registerEvents();
-        (new WorldGuardHangingListener(this)).registerEvents();
+        (new LegacyPlayerListener(this)).registerEvents();
+        (new LegacyBlockListener(this)).registerEvents();
+        (new LegacyEntityListener(this)).registerEvents();
+        (new LegacyWeatherListener(this)).registerEvents();
+        (new LegacyVehicleListener(this)).registerEvents();
+        (new LegacyServerListener(this)).registerEvents();
+        (new LegacyHangingListener(this)).registerEvents();
 
         // Modules
         (new CauseListener(this)).registerEvents();
@@ -199,11 +208,11 @@ public class WorldGuardPlugin extends JavaPlugin {
         configuration.updateCommandBookGodMode();
 
         if (getServer().getPluginManager().isPluginEnabled("CommandBook")) {
-            getServer().getPluginManager().registerEvents(new WorldGuardCommandBookListener(this), this);
+            getServer().getPluginManager().registerEvents(new CommandBookListener(this), this);
         }
 
         // handle worlds separately to initialize already loaded worlds
-        WorldGuardWorldListener worldListener = (new WorldGuardWorldListener(this));
+        LegacyWorldListener worldListener = (new LegacyWorldListener(this));
         for (World world : getServer().getWorlds()) {
             worldListener.initWorld(world);
         }

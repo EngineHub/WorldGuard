@@ -17,10 +17,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit;
+package com.sk89q.worldguard.bukkit.listener.interop;
 
 import com.sk89q.commandbook.InfoComponent;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.entity.Player;
@@ -30,10 +31,10 @@ import org.bukkit.event.Listener;
 /**
  * @author zml2008
  */
-public class WorldGuardCommandBookListener implements Listener {
+public class CommandBookListener implements Listener {
     private final WorldGuardPlugin plugin;
     
-    public WorldGuardCommandBookListener(WorldGuardPlugin plugin) {
+    public CommandBookListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
     

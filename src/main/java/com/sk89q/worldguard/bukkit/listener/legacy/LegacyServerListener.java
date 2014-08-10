@@ -17,8 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit;
+package com.sk89q.worldguard.bukkit.listener.legacy;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
@@ -28,11 +29,11 @@ import org.bukkit.plugin.PluginManager;
 /**
  * @author zml2008
  */
-public class WorldGuardServerListener implements Listener {
+public class LegacyServerListener implements Listener {
 
     private final WorldGuardPlugin plugin;
 
-    public WorldGuardServerListener(WorldGuardPlugin plugin) {
+    public LegacyServerListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
 
