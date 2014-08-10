@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener;
+package com.sk89q.worldguard.bukkit.util;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;

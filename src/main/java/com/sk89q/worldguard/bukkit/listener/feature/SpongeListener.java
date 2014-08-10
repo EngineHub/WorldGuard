@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener.feature;
 
 import com.google.common.base.Function;
-import com.sk89q.worldguard.bukkit.listener.Materials;
+import com.sk89q.worldguard.bukkit.util.Materials;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener.function;
 
-import com.sk89q.worldguard.bukkit.listener.DamageCauses;
+import com.sk89q.worldguard.bukkit.util.DamageCauses;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

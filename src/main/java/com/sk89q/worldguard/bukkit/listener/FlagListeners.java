@@ -46,6 +46,8 @@ import com.sk89q.worldguard.bukkit.listener.feature.SpongeListener;
 import com.sk89q.worldguard.bukkit.listener.feature.TickHaltingListener;
 import com.sk89q.worldguard.bukkit.listener.feature.WaterProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.feature.XPDropListener;
+import com.sk89q.worldguard.bukkit.util.DamageCauses;
+import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -66,7 +68,7 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nullable;
 import java.util.Set;
 
-import static com.sk89q.worldguard.bukkit.listener.Materials.isMushroom;
+import static com.sk89q.worldguard.bukkit.util.Materials.isMushroom;
 import static com.sk89q.worldguard.bukkit.listener.function.FireSpreadListener.INDIRECT_IGNITE_CHECK;
 import static com.sk89q.worldguard.bukkit.listener.function.FireSpreadListener.VISIT_ADJACENT;
 import static com.sk89q.worldguard.protection.flags.DefaultFlag.*;
