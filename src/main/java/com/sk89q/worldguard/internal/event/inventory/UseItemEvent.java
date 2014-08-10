@@ -17,9 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.internal.event;
+package com.sk89q.worldguard.internal.event.inventory;
 
 import com.sk89q.worldguard.internal.cause.Cause;
+import com.sk89q.worldguard.internal.event.AbstractInteractEvent;
 import org.bukkit.World;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -32,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Fired when an item is interacted with.
  */
-public class ItemInteractEvent extends AbstractInteractEvent {
+public class UseItemEvent extends AbstractInteractEvent {
 
     private static final HandlerList handlers = new HandlerList();
     private final World world;
@@ -43,12 +44,11 @@ public class ItemInteractEvent extends AbstractInteractEvent {
      *
      * @param originalEvent the original event
      * @param causes a list of causes, where the originating causes are at the beginning
-     * @param interaction the action that is being taken
      * @param world the world
      * @param itemStack the item
      */
-    public ItemInteractEvent(Event originalEvent, List<? extends Cause<?>> causes, Interaction interaction, World world, ItemStack itemStack) {
-        super(originalEvent, causes, interaction);
+    public UseItemEvent(Event originalEvent, List<? extends Cause<?>> causes, World world, ItemStack itemStack) {
+        super(originalEvent, causes);
         checkNotNull(world);
         checkNotNull(itemStack);
         this.world = world;

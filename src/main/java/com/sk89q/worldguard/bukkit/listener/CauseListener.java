@@ -20,24 +20,71 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.util.Blocks;
+import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.internal.Events;
+import com.sk89q.worldguard.internal.cause.Cause;
 import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.BlockInteractEvent;
-import com.sk89q.worldguard.internal.event.Interaction;
-import com.sk89q.worldguard.internal.event.ItemInteractEvent;
+import com.sk89q.worldguard.internal.event.block.BreakBlockEvent;
+import com.sk89q.worldguard.internal.event.block.PlaceBlockEvent;
+import com.sk89q.worldguard.internal.event.block.UseBlockEvent;
+import com.sk89q.worldguard.internal.event.entity.DestroyEntityEvent;
+import com.sk89q.worldguard.internal.event.entity.SpawnEntityEvent;
+import com.sk89q.worldguard.internal.event.entity.UseEntityEvent;
+import com.sk89q.worldguard.internal.event.inventory.UseItemEvent;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityCombustByBlockEvent;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.EntityUnleashEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerUnleashEntityEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
+
+import static com.sk89q.worldguard.bukkit.util.Materials.isBlockModifiedOnClick;
+import static com.sk89q.worldguard.bukkit.util.Materials.isItemAppliedToBlock;
+import static com.sk89q.worldguard.internal.cause.Causes.create;
 
 public class CauseListener implements Listener {
 
@@ -51,40 +98,351 @@ public class CauseListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    //-------------------------------------------------------------------------
+    // Block break / place
+    //-------------------------------------------------------------------------
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getPlayer()), event.getBlock()));
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getBlock()));
+    }
+
+    // TODO: Handle EntityCreatePortalEvent?
+
+    @EventHandler
+    public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        // Fire two events: one as BREAK and one as PLACE
+        if (event.getTo() != Material.AIR && event.getBlock().getType() != Material.AIR) {
+            Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getEntity()), event.getBlock()));
+            Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getEntity()), event.getBlock()));
+        } else {
+            if (event.getTo() == Material.AIR) {
+                Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getEntity()), event.getBlock()));
+            } else {
+                Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getEntity()), event.getBlock()));
+            }
+        }
+    }
+
+    // TODO: Handle pistons
+    // TODO: Handle EntityExplodeEvent
+
+    //-------------------------------------------------------------------------
+    // Block external interaction
+    //-------------------------------------------------------------------------
+
+    @EventHandler
     public void onBlockDamage(BlockDamageEvent event) {
         Block target = event.getBlock();
 
         // Previously, and perhaps still, the only way to catch cake eating
         // events was through here
         if (target.getType() == Material.CAKE_BLOCK) {
-            Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.INTERACT, target));
+            Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), target));
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockBurn(BlockBurnEvent event) {
-        Events.fireToCancel(event, new BlockInteractEvent(event, Collections.emptyList(), Interaction.BREAK, event.getBlock()));
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        @Nullable ItemStack item = player.getItemInHand();
+        Block block = event.getClickedBlock();
+        List<? extends Cause<?>> causes = create(player);
+
+        switch (event.getAction()) {
+            case PHYSICAL:
+                // TODO: Don't fire events for blocks that can't be interacted with using PHYSICAL
+                if (Events.fireAndTestCancel(new UseBlockEvent(event, causes, block))) {
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                }
+                break;
+
+            case RIGHT_CLICK_BLOCK:
+                if (item != null && item.getType() == Material.TNT) {
+                    // Workaround for a bug that allowed tnt to trigger instantly if placed
+                    // next to redstone, without plugins getting the block place event
+                    // (not sure if this actually still happens)
+                    Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), block.getLocation(), Material.TNT));
+                }
+
+                // Handle created minecarts
+                if (item != null && Materials.isMinecart(item.getType())) {
+                    // TODO: Give a more specific minecart type
+                    Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), block.getLocation().add(0.5, 1, 0.5), EntityType.MINECART));
+                }
+
+                // Handle cocoa beans
+                if (item != null && item.getType() == Material.INK_SACK && Materials.isDyeColor(item.getData(), DyeColor.BROWN)) {
+                    // CraftBukkit doesn't or didn't throw a block place for this
+                    if (!(event.getBlockFace() == BlockFace.DOWN || event.getBlockFace() == BlockFace.UP)) {
+                        Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), block.getLocation(), Material.COCOA));
+                    }
+                }
+
+                // Workaround for http://leaky.bukkit.org/issues/1034
+                if (item != null && item.getType() == Material.TNT) {
+                    Block placedOn = block.getRelative(event.getBlockFace());
+                    Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), placedOn.getLocation(), Material.TNT));
+                }
+
+            case LEFT_CLICK_BLOCK:
+                // TODO: Don't fire events for blocks that can't be interacted with using clicks
+
+                // As of MC ~1.6, sneaking blocks the use of blocks with right click
+                if (!player.isSneaking() || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                    // Only fire events for blocks that are modified when right clicked
+                    if (isBlockModifiedOnClick(block.getType()) || (item != null && isItemAppliedToBlock(item.getType(), block.getType()))) {
+                        if (Events.fireAndTestCancel(new UseBlockEvent(event, causes, block))) {
+                            event.setUseInteractedBlock(Result.DENY);
+                        }
+
+                        // Handle connected blocks (i.e. beds, chests)
+                        for (Block connected : Blocks.getConnected(block)) {
+                            if (Events.fireAndTestCancel(new UseBlockEvent(event, create(event.getPlayer()), connected))) {
+                                event.setUseInteractedBlock(Result.DENY);
+                                break;
+                            }
+                        }
+                    }
+
+                    // Special handling of flint and steel on TNT
+                    if (block.getType() == Material.TNT && item != null && item.getType() == Material.FLINT_AND_STEEL) {
+                        if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), block))) {
+                            event.setUseInteractedBlock(Result.DENY);
+                            break;
+                        }
+                    }
+                }
+
+                // Special handling of putting out fires
+                if (event.getAction() == Action.LEFT_CLICK_BLOCK && block.getType() == Material.FIRE) {
+                    if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), block))) {
+                        event.setUseInteractedBlock(Result.DENY);
+                        break;
+                    }
+                }
+
+            case LEFT_CLICK_AIR:
+            case RIGHT_CLICK_AIR:
+                if (item != null && Events.fireAndTestCancel(new UseItemEvent(event, causes, player.getWorld(), item))) {
+                    event.setUseItemInHand(Result.DENY);
+                }
+
+                break;
+        }
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockBreak(BlockBreakEvent event) {
-        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, event.getBlock()));
+    @EventHandler
+    public void onEntityInteract(org.bukkit.event.entity.EntityInteractEvent event) {
+        Events.fireToCancel(event, new UseBlockEvent(event, create(event.getEntity()), event.getBlock()));
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockPlace(BlockPlaceEvent event) {
-        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.PLACE, event.getBlock()));
+    @EventHandler
+    public void onBlockIgnite(BlockIgniteEvent event) {
+        List<? extends Cause<?>> causes;
+
+        // Find the cause
+        if (event.getPlayer() != null) {
+            causes = create(event.getPlayer());
+        } else if (event.getIgnitingEntity() != null) {
+            causes = create(event.getIgnitingEntity());
+        } else if (event.getIgnitingBlock() != null) {
+            causes = create(event.getIgnitingBlock());
+        } else {
+            causes = Collections.emptyList();
+        }
+
+        Events.fireToCancel(event, new BreakBlockEvent(event, causes, event.getBlock()));
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.INTERACT, event.getBlock()));
+        Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getBlock()));
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockDispense(BlockDispenseEvent event) {
-        Events.fireToCancel(event, new ItemInteractEvent(event, Causes.create(event.getBlock()), Interaction.INTERACT, event.getBlock().getWorld(), event.getItem()));
+    @EventHandler
+    public void onBedEnter(PlayerBedEnterEvent event) {
+        Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getBed()));
     }
+
+    @EventHandler
+    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        Player player = event.getPlayer();
+        Block blockAffected = event.getBlockClicked().getRelative(event.getBlockFace());
+
+        // Milk buckets can't be emptied as of writing
+        if (event.getBucket() != Material.MILK_BUCKET) {
+            ItemStack item = new ItemStack(event.getBucket(), 1);
+            Events.fireToCancel(event, new PlaceBlockEvent(event, create(player), blockAffected));
+            Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item));
+        }
+    }
+
+    @EventHandler
+    public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+        Player player = event.getPlayer();
+        Block blockAffected = event.getBlockClicked().getRelative(event.getBlockFace());
+
+        // Milk buckets can't be filled by right clicking the ground as of writing
+        if (event.getBucket() != Material.MILK_BUCKET) {
+            ItemStack item = new ItemStack(event.getBucket(), 1);
+            Events.fireToCancel(event, new BreakBlockEvent(event, create(player), blockAffected));
+            Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item));
+        }
+    }
+
+    // TODO: Handle EntityPortalEnterEvent
+
+    //-------------------------------------------------------------------------
+    // Block self-interaction
+    //-------------------------------------------------------------------------
+
+    @EventHandler
+    public void onBlockFromTo(BlockFromToEvent event) {
+        Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getBlock()), event.getToBlock()));
+    }
+
+    //-------------------------------------------------------------------------
+    // Entity break / place
+    //-------------------------------------------------------------------------
+
+    @EventHandler
+    public void onHangingPlace(HangingPlaceEvent event) {
+        Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), event.getEntity()));
+    }
+
+    @EventHandler
+    public void onHangingBreak(HangingBreakEvent event) {
+        if (event instanceof HangingBreakByEntityEvent) {
+            Events.fireToCancel(event,  new DestroyEntityEvent(event, create(((HangingBreakByEntityEvent) event).getRemover()), event.getEntity()));
+        } else {
+            Events.fireToCancel(event, new DestroyEntityEvent(event, Collections.emptyList(), event.getEntity()));
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    // Entity external interaction
+    //-------------------------------------------------------------------------
+
+    @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        World world = player.getWorld();
+        ItemStack item = player.getItemInHand();
+        Entity entity = event.getRightClicked();
+
+        Events.fireToCancel(event, new UseItemEvent(event, create(player), world, item));
+        Events.fireToCancel(event, new UseEntityEvent(event, create(player), entity));
+    }
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event instanceof EntityDamageByBlockEvent) {
+            Events.fireToCancel(event, new UseEntityEvent(event, create(((EntityDamageByBlockEvent) event).getDamager()), event.getEntity()));
+
+        } else if (event instanceof EntityDamageByEntityEvent) {
+            Events.fireToCancel(event, new UseEntityEvent(event, create(((EntityDamageByEntityEvent) event).getDamager()), event.getEntity()));
+
+        } else {
+            Events.fireToCancel(event, new UseEntityEvent(event, Collections.emptyList(), event.getEntity()));
+        }
+    }
+
+    @EventHandler
+    public void onEntityCombust(EntityCombustEvent event) {
+        if (event instanceof EntityCombustByBlockEvent) {
+            Events.fireToCancel(event, new UseEntityEvent(event, create(((EntityCombustByBlockEvent) event).getCombuster()), event.getEntity()));
+
+        } else if (event instanceof EntityCombustByEntityEvent) {
+            Events.fireToCancel(event, new UseEntityEvent(event, create(((EntityCombustByEntityEvent) event).getCombuster()), event.getEntity()));
+
+        } else {
+            Events.fireToCancel(event, new UseEntityEvent(event, Collections.emptyList(), event.getEntity()));
+        }
+    }
+
+    @EventHandler
+    public void onEntityUnleash(EntityUnleashEvent event) {
+        if (event instanceof PlayerUnleashEntityEvent) {
+            PlayerUnleashEntityEvent playerEvent = (PlayerUnleashEntityEvent) event;
+            Events.fireToCancel(playerEvent, new UseEntityEvent(playerEvent, create(playerEvent.getPlayer()), event.getEntity()));
+        } else {
+            // TODO: Raise anyway?
+        }
+    }
+
+    @EventHandler
+    public void onEntityTame(EntityTameEvent event) {
+        Events.fireToCancel(event, new UseEntityEvent(event, create(event.getOwner()), event.getEntity()));
+    }
+
+    @EventHandler
+    public void onPlayerShearEntity(PlayerShearEntityEvent event) {
+        Events.fireToCancel(event, new UseEntityEvent(event, create(event.getPlayer()), event.getEntity()));
+    }
+
+    @EventHandler
+    public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+        Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getPlayer()), event.getItem()));
+    }
+
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+        Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), event.getItemDrop()));
+    }
+
+    @EventHandler
+    public void onVehicleDamage(VehicleDamageEvent event) {
+        Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getAttacker()), event.getVehicle()));
+    }
+
+    @EventHandler
+    public void onVehicleEnter(VehicleDamageEvent event) {
+        Events.fireToCancel(event, new UseEntityEvent(event, create(event.getAttacker()), event.getVehicle()));
+    }
+
+    //-------------------------------------------------------------------------
+    // Composite events
+    //-------------------------------------------------------------------------
+
+    @EventHandler
+    public void onPotionSplash(PotionSplashEvent event) {
+        Entity entity = event.getEntity();
+        ThrownPotion potion = event.getPotion();
+        World world = entity.getWorld();
+        List<? extends Cause<?>> causes = Causes.create(potion.getShooter());
+
+        // Fire item interaction event
+        Events.fireToCancel(event, new UseItemEvent(event, causes, world, potion.getItem()));
+
+        // Fire entity interaction event
+        if (!event.isCancelled()) {
+            int blocked = 0;
+
+            for (LivingEntity affected : event.getAffectedEntities()) {
+                if (Events.fireAndTestCancel(new UseEntityEvent(event, causes, affected))) {
+                    event.setIntensity(affected, 0);
+                    blocked++;
+                }
+            }
+
+            if (blocked == event.getAffectedEntities().size()) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockDispense(BlockDispenseEvent event) {
+        Events.fireToCancel(event, new UseItemEvent(event, create(event.getBlock()), event.getBlock().getWorld(), event.getItem()));
+    }
+
+    // TODO: Inventory events?
 
 }

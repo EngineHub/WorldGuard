@@ -17,15 +17,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.internal.event;
+package com.sk89q.worldguard.bukkit.util;
 
-/**
- * Represents a possible act upon an object.
- */
-public enum Interaction {
+import org.bukkit.block.Block;
+import org.bukkit.material.Bed;
+import org.bukkit.material.MaterialData;
 
-    PLACE,
-    BREAK,
-    INTERACT
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public final class Blocks {
+
+    private Blocks() {
+    }
+
+    public static List<Block> getConnected(Block block) {
+        MaterialData data = block.getState().getData();
+
+        if (data instanceof Bed) {
+            Bed bed = (Bed) data;
+            if (bed.isHeadOfBed()) {
+                return Arrays.asList(block.getRelative(bed.getFacing().getOppositeFace()));
+            } else {
+                return Arrays.asList(block.getRelative(bed.getFacing()));
+            }
+        } else {
+            return Collections.emptyList();
+        }
+    }
 
 }

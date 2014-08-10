@@ -26,10 +26,6 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.RegionQueryUtil;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.internal.Events;
-import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.Interaction;
-import com.sk89q.worldguard.internal.event.ItemInteractEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
@@ -714,8 +710,6 @@ public class LegacyEntityListener implements Listener {
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
-
-        Events.fireToCancel(event, new ItemInteractEvent(event, Causes.create(potion.getShooter()), Interaction.INTERACT, world, potion.getItem()));
 
         GlobalRegionManager regionMan = plugin.getGlobalRegionManager();
 

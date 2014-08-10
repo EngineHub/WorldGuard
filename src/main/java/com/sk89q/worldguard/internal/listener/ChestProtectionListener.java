@@ -22,10 +22,11 @@ package com.sk89q.worldguard.internal.listener;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.Interaction;
-import com.sk89q.worldguard.internal.event.BlockInteractEvent;
+import com.sk89q.worldguard.internal.event.block.BreakBlockEvent;
+import com.sk89q.worldguard.internal.event.block.PlaceBlockEvent;
+import com.sk89q.worldguard.internal.event.block.UseBlockEvent;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Block;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -44,31 +45,61 @@ public class ChestProtectionListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void handleBlockInteract(BlockInteractEvent event) {
+    public void onPlaceBlock(PlaceBlockEvent event) {
         Player player = Causes.getInvolvedPlayer(event.getCauses());
-        Block target = event.getTarget();
-        WorldConfiguration wcfg = getWorldConfig(player);
-
-        // Early guard
-        if (!wcfg.signChestProtection) {
-            return;
-        }
+        Location target = event.getTarget();
 
         if (player != null) {
-            if (wcfg.isChestProtected(target, player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
-                event.setCancelled(true);
+            WorldConfiguration wcfg = getWorldConfig(player);
+
+            // Early guard
+            if (!wcfg.signChestProtection) {
                 return;
             }
 
-            if (event.getInteraction() == Interaction.PLACE) {
-                if (wcfg.getChestProtection().isChest(target.getTypeId())) {
-                    if (wcfg.isAdjacentChestProtected(target, player)) {
-                        player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
+            if (wcfg.getChestProtection().isChest(event.getEffectiveMaterial().getId()) && wcfg.isChestProtected(target.getBlock(), player)) {
+                player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBreakBlock(BreakBlockEvent event) {
+        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Location target = event.getTarget();
+
+        if (player != null) {
+            WorldConfiguration wcfg = getWorldConfig(player);
+
+            // Early guard
+            if (!wcfg.signChestProtection) {
+                return;
+            }
+
+            if (wcfg.isChestProtected(target.getBlock(), player)) {
+                player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onUseBlock(UseBlockEvent event) {
+        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Location target = event.getTarget();
+
+        if (player != null) {
+            WorldConfiguration wcfg = getWorldConfig(player);
+
+            // Early guard
+            if (!wcfg.signChestProtection) {
+                return;
+            }
+
+            if (wcfg.isChestProtected(target.getBlock(), player)) {
+                player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
+                event.setCancelled(true);
             }
         }
     }

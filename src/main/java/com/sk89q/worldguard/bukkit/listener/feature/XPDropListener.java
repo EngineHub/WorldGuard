@@ -25,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ExpBottleEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 
 import java.util.function.BiPredicate;
 
@@ -55,6 +56,13 @@ public class XPDropListener implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         if (predicate.test(event.getEntity().getLocation(), event.getDroppedExp())) {
             event.setDroppedExp(0);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerFish(PlayerFishEvent event) {
+        if (predicate.test(event.getPlayer().getLocation(), event.getExpToDrop())) {
+            event.setExpToDrop(0);
         }
     }
 

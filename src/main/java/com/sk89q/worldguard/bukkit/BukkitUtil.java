@@ -63,6 +63,16 @@ public class BukkitUtil {
     }
 
     /**
+     * Converts the location of a Bukkit entity to a WorldEdit vector.
+     *
+     * @param entity The entity to convert
+     * @return The block's location as a BlockVector
+     */
+    public static BlockVector toVector(Entity entity) {
+        return toVector(entity.getLocation()).toBlockVector();
+    }
+
+    /**
      * Converts a Bukkit location to a WorldEdit vector.
      *
      * @param loc A Bukkit Location

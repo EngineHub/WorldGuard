@@ -17,54 +17,71 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.internal.event;
+package com.sk89q.worldguard.internal.event.entity;
 
 import com.sk89q.worldguard.internal.cause.Cause;
+import com.sk89q.worldguard.internal.event.AbstractInteractEvent;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * Fired when an entity is interacted with.
- */
-public class EntityInteractEvent extends AbstractInteractEvent {
+abstract class AbstractEntityEvent extends AbstractInteractEvent {
 
-    private static final HandlerList handlers = new HandlerList();
-    private final Entity target;
+    private final Location target;
+    @Nullable
+    private final Entity entity;
 
     /**
-     * Create a new instance.
+     * Create a new instance
      *
      * @param originalEvent the original event
      * @param causes a list of causes, where the originating causes are at the beginning
-     * @param interaction the action that is being taken
-     * @param target the target entity being affected
+     * @param entity the target
      */
-    public EntityInteractEvent(Event originalEvent, List<? extends Cause<?>> causes, Interaction interaction, Entity target) {
-        super(originalEvent, causes, interaction);
-        checkNotNull(target);
-        this.target = target;
+    protected AbstractEntityEvent(Event originalEvent, List<? extends Cause<?>> causes, Entity entity) {
+        super(originalEvent, causes);
+        checkNotNull(entity);
+        this.target = entity.getLocation();
+        this.entity = entity;
     }
 
     /**
-     * Get the target entity.
+     * Create a new instance
      *
-     * @return the target entity
+     * @param originalEvent the original event
+     * @param causes a list of causes, where the originating causes are at the beginning
+     * @param target the target
      */
-    public Entity getTarget() {
+    protected AbstractEntityEvent(Event originalEvent, List<? extends Cause<?>> causes, Location target) {
+        super(originalEvent, causes);
+        checkNotNull(target);
+        this.target = target;
+        this.entity = null;
+    }
+
+    /**
+     * Get the target location being affected.
+     *
+     * @return a location
+     */
+    public Location getTarget() {
         return target;
     }
 
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
+
+    /**
+     * Get the target entity being affected.
+     *
+     * @return a entity
+     */
+    @Nullable
+    public Entity getEntity() {
+        return entity;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
 }

@@ -17,63 +17,46 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.internal.event;
+package com.sk89q.worldguard.internal.event.entity;
 
 import com.sk89q.worldguard.internal.cause.Cause;
-import org.bukkit.event.Cancellable;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-import java.util.Collections;
+import javax.annotation.Nonnull;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractInteractEvent extends Event implements Cancellable {
+public class DestroyEntityEvent extends AbstractEntityEvent {
 
-    private final Event originalEvent;
-    private final List<? extends Cause<?>> causes;
-    private boolean cancelled;
+    private static final HandlerList handlers = new HandlerList();
 
     /**
-     * Create a new instance
+     * Create a new instance.
      *
      * @param originalEvent the original event
      * @param causes a list of causes, where the originating causes are at the beginning
+     * @param target the target entity being affected
      */
-    protected AbstractInteractEvent(Event originalEvent, List<? extends Cause<?>> causes) {
-        checkNotNull(originalEvent);
-        checkNotNull(causes);
-        this.originalEvent = originalEvent;
-        this.causes = causes;
-    }
-
-    /**
-     * Get the original event.
-     *
-     * @return the original event
-     */
-    public Event getOriginalEvent() {
-        return originalEvent;
-    }
-
-    /**
-     * Return an unmodifiable list of causes, where the originating causes are
-     * at the beginning of the list.
-     *
-     * @return a list of causes
-     */
-    public List<? extends Cause<?>> getCauses() {
-        return Collections.unmodifiableList(causes);
+    public DestroyEntityEvent(Event originalEvent, List<? extends Cause<?>> causes, Entity target) {
+        super(originalEvent, causes, checkNotNull(target));
     }
 
     @Override
-    public boolean isCancelled() {
-        return cancelled;
+    @Nonnull
+    public Entity getEntity() {
+        return super.getEntity();
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
-        this.cancelled = cancel;
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
 }
