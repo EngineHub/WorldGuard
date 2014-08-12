@@ -45,4 +45,8 @@ public class EntityCause implements Cause<Entity> {
         return entity;
     }
 
+    @Override
+    public String toString() {
+        return entity.toString();
+    }
 }

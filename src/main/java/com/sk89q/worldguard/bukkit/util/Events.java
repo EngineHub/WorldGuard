@@ -38,7 +38,7 @@ public final class Events {
      *
      * @param eventToFire the event to fire
      * @param <T> an event that can be fired and is cancellable
-     * @return true if the event was fired
+     * @return true if the event was cancelled
      */
     public static <T extends Event & Cancellable> boolean fireAndTestCancel( T eventToFire) {
         Bukkit.getServer().getPluginManager().callEvent(eventToFire);

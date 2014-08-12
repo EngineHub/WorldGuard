@@ -45,4 +45,9 @@ public class PlayerCause implements Cause<Player> {
         return player;
     }
 
+    @Override
+    public String toString() {
+        return player.getName();
+    }
+
 }

@@ -45,4 +45,9 @@ public class BlockCause implements Cause<Block> {
         return block;
     }
 
+    @Override
+    public String toString() {
+        return block.toString();
+    }
+
 }

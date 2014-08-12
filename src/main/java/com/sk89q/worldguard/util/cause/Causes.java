@@ -90,7 +90,7 @@ public final class Causes {
             } else if (o instanceof Block) {
                 causes.add(new BlockCause((Block) o));
             } else if (o instanceof Projectile) {
-                causes.addAll(create(o));
+                causes.addAll(create(((Projectile) o).getShooter()));
                 causes.add(new EntityCause((Entity) o));
             } else if (o instanceof Entity) {
                 causes.add(new EntityCause((Entity) o));
