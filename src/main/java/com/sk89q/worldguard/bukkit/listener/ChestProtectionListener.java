@@ -71,21 +71,23 @@ public class ChestProtectionListener extends AbstractListener {
         Player player = Causes.getInvolvedPlayer(event.getCauses());
         Location target = event.getTarget();
 
+        WorldConfiguration wcfg = getWorldConfig(target.getWorld());
+
+        // Early guard
+        if (!wcfg.signChestProtection) {
+            return;
+        }
+
         if (player != null) {
-            WorldConfiguration wcfg = getWorldConfig(player);
-
-            // Early guard
-            if (!wcfg.signChestProtection) {
-                return;
-            }
-
             if (wcfg.isChestProtected(target.getBlock(), player)) {
                 player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
                 event.setCancelled(true);
             }
         } else {
-            // No player? Deny anyway
-            event.setCancelled(true);
+            if (wcfg.isChestProtected(target.getBlock())) {
+                // No player? Deny anyway
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -94,21 +96,23 @@ public class ChestProtectionListener extends AbstractListener {
         Player player = Causes.getInvolvedPlayer(event.getCauses());
         Location target = event.getTarget();
 
+        WorldConfiguration wcfg = getWorldConfig(target.getWorld());
+
+        // Early guard
+        if (!wcfg.signChestProtection) {
+            return;
+        }
+
         if (player != null) {
-            WorldConfiguration wcfg = getWorldConfig(player);
-
-            // Early guard
-            if (!wcfg.signChestProtection) {
-                return;
-            }
-
             if (wcfg.isChestProtected(target.getBlock(), player)) {
                 player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
                 event.setCancelled(true);
             }
         } else {
-            // No player? Deny anyway
-            event.setCancelled(true);
+            if (wcfg.isChestProtected(target.getBlock())) {
+                // No player? Deny anyway
+                event.setCancelled(true);
+            }
         }
     }
 

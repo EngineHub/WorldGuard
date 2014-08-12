@@ -43,4 +43,8 @@ public class UnknownCause implements Cause<Object> {
         return cause;
     }
 
+    @Override
+    public String toString() {
+        return "unknown(" + cause + ")";
+    }
 }

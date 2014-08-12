@@ -20,11 +20,6 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.util.Blocks;
-import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.bukkit.util.Events;
-import com.sk89q.worldguard.util.cause.Cause;
-import com.sk89q.worldguard.util.cause.Causes;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
@@ -32,16 +27,26 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
+import com.sk89q.worldguard.bukkit.util.Blocks;
+import com.sk89q.worldguard.bukkit.util.Events;
+import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.bukkit.util.WGMetadata;
+import com.sk89q.worldguard.util.cause.Cause;
+import com.sk89q.worldguard.util.cause.Causes;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -55,6 +60,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustByBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
@@ -80,6 +86,8 @@ import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Dispenser;
+import org.bukkit.material.MaterialData;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -90,6 +98,13 @@ import static com.sk89q.worldguard.bukkit.util.Materials.isItemAppliedToBlock;
 import static com.sk89q.worldguard.util.cause.Causes.create;
 
 public class EventAbstractionListener implements Listener {
+
+    /**
+     * Abstract {@link BlockFromToEvent}s into break and place events.
+     * Currently disabled as it creates a lot of new events.
+     */
+    public static final boolean ABSTRACT_FROM_TO_EVENTS = false;
+    private static final String FALLING_SOURCE_KEY = "worldguard.fallingSource";
 
     private final WorldGuardPlugin plugin;
 
@@ -112,7 +127,14 @@ public class EventAbstractionListener implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getBlock()));
+        BlockState previousState = event.getBlockReplacedState();
+
+        // Some blocks, like tall grass and fire, get replaced
+        if (previousState.getType() != Material.AIR) {
+            Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getPlayer()), previousState.getLocation(), previousState.getType()));
+        }
+
+        Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), event.getBlock()));
     }
 
     @EventHandler
@@ -124,15 +146,37 @@ public class EventAbstractionListener implements Listener {
 
     @EventHandler
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        Block block = event.getBlock();
+        Entity entity = event.getEntity();
+        Material to = event.getTo();
+
         // Fire two events: one as BREAK and one as PLACE
         if (event.getTo() != Material.AIR && event.getBlock().getType() != Material.AIR) {
-            Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getEntity()), event.getBlock()));
-            Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getEntity()), event.getBlock()));
+            Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), block));
+            Events.fireToCancel(event, new PlaceBlockEvent(event, create(entity), block.getLocation(), to));
         } else {
             if (event.getTo() == Material.AIR) {
-                Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getEntity()), event.getBlock()));
+                // Track the source so later we can create a proper chain of causes
+                if (entity instanceof FallingBlock) {
+                    WGMetadata.put(entity, FALLING_SOURCE_KEY, block);
+
+                    // Switch around the event
+                    Events.fireToCancel(event, new SpawnEntityEvent(event, create(block), entity));
+                } else {
+                    Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), event.getBlock()));
+                }
             } else {
-                Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getEntity()), event.getBlock()));
+                List<? extends Cause<?>> causes;
+
+                // Return the source for falling blocks
+                if (entity instanceof FallingBlock) {
+                    Block source = WGMetadata.getIfPresent(entity, FALLING_SOURCE_KEY, Block.class);
+                    causes = create(source, entity);
+                } else {
+                    causes = create(entity);
+                }
+
+                Events.fireToCancel(event, new PlaceBlockEvent(event, causes, event.getBlock().getLocation(), to));
             }
         }
     }
@@ -159,69 +203,37 @@ public class EventAbstractionListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         @Nullable ItemStack item = player.getItemInHand();
-        Block block = event.getClickedBlock();
+        Block clicked = event.getClickedBlock();
+        Block placed;
         List<? extends Cause<?>> causes = create(player);
 
         switch (event.getAction()) {
             case PHYSICAL:
-                // TODO: Don't fire events for blocks that can't be interacted with using PHYSICAL
-                if (Events.fireAndTestCancel(new UseBlockEvent(event, causes, block))) {
+                if (Events.fireAndTestCancel(new UseBlockEvent(event, causes, clicked))) {
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                 }
                 break;
 
             case RIGHT_CLICK_BLOCK:
-                if (item != null && item.getType() == Material.TNT) {
-                    // Workaround for a bug that allowed tnt to trigger instantly if placed
-                    // next to redstone, without plugins getting the block place event
-                    // (not sure if this actually still happens)
-                    Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), block.getLocation(), Material.TNT));
-                }
+                placed = clicked.getRelative(event.getBlockFace());
 
-                // Handle created Minecarts
-                if (item != null && Materials.isMinecart(item.getType())) {
-                    // TODO: Give a more specific minecart type
-                    Block placedBlock = block.getRelative(event.getBlockFace());
-                    Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), placedBlock.getLocation().add(0.5, 0, 0.5), EntityType.MINECART));
-                }
-
-                // Handle cocoa beans
-                if (item != null && item.getType() == Material.INK_SACK && Materials.isDyeColor(item.getData(), DyeColor.BROWN)) {
-                    // CraftBukkit doesn't or didn't throw a block place for this
-                    if (!(event.getBlockFace() == BlockFace.DOWN || event.getBlockFace() == BlockFace.UP)) {
-                        Block placedBlock = block.getRelative(event.getBlockFace());
-                        Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), placedBlock.getLocation(), Material.COCOA));
-                    }
-                }
-
-                // Workaround for http://leaky.bukkit.org/issues/1034
-                if (item != null && item.getType() == Material.TNT) {
-                    Block placedBlock = block.getRelative(event.getBlockFace());
-                    Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), placedBlock.getLocation(), Material.TNT));
-                }
-
-                // Handle flint and steel and fire charge as fire place
-                if (item != null && (item.getType() == Material.FIREBALL || item.getType() == Material.FLINT_AND_STEEL)) {
-                    Block placedBlock = block.getRelative(event.getBlockFace());
-                    if (!Events.fireAndTestCancel(new PlaceBlockEvent(event, create(event.getPlayer()), placedBlock.getLocation(), Material.FIRE))) {
-                        event.setUseItemInHand(Result.DENY);
-                    }
-                }
+                // Re-used for dispensers
+                handleBlockRightClick(event, create(event.getPlayer()), item, clicked, event.getBlockFace(), placed);
 
             case LEFT_CLICK_BLOCK:
-                // TODO: Don't fire events for blocks that can't be interacted with using clicks
+                placed = clicked.getRelative(event.getBlockFace());
 
                 // As of MC ~1.6, sneaking blocks the use of blocks with right click
                 if (!player.isSneaking() || event.getAction() == Action.LEFT_CLICK_BLOCK) {
                     // Only fire events for blocks that are modified when right clicked
-                    if (isBlockModifiedOnClick(block.getType()) || (item != null && isItemAppliedToBlock(item.getType(), block.getType()))) {
-                        if (Events.fireAndTestCancel(new UseBlockEvent(event, causes, block))) {
+                    if (isBlockModifiedOnClick(clicked.getType()) || (item != null && isItemAppliedToBlock(item.getType(), clicked.getType()))) {
+                        if (Events.fireAndTestCancel(new UseBlockEvent(event, causes, clicked))) {
                             event.setUseInteractedBlock(Result.DENY);
                         }
 
                         // Handle connected blocks (i.e. beds, chests)
-                        for (Block connected : Blocks.getConnected(block)) {
+                        for (Block connected : Blocks.getConnected(clicked)) {
                             if (Events.fireAndTestCancel(new UseBlockEvent(event, create(event.getPlayer()), connected))) {
                                 event.setUseInteractedBlock(Result.DENY);
                                 break;
@@ -230,8 +242,8 @@ public class EventAbstractionListener implements Listener {
                     }
 
                     // Special handling of flint and steel on TNT
-                    if (block.getType() == Material.TNT && item != null && item.getType() == Material.FLINT_AND_STEEL) {
-                        if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), block))) {
+                    if (clicked.getType() == Material.TNT && item != null && item.getType() == Material.FLINT_AND_STEEL) {
+                        if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), clicked))) {
                             event.setUseInteractedBlock(Result.DENY);
                             break;
                         }
@@ -239,8 +251,8 @@ public class EventAbstractionListener implements Listener {
                 }
 
                 // Special handling of putting out fires
-                if (event.getAction() == Action.LEFT_CLICK_BLOCK && block.getType() == Material.FIRE) {
-                    if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), block))) {
+                if (event.getAction() == Action.LEFT_CLICK_BLOCK && placed.getType() == Material.FIRE) {
+                    if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), placed))) {
                         event.setUseInteractedBlock(Result.DENY);
                         break;
                     }
@@ -248,7 +260,7 @@ public class EventAbstractionListener implements Listener {
 
             case LEFT_CLICK_AIR:
             case RIGHT_CLICK_AIR:
-                if (item != null && Events.fireAndTestCancel(new UseItemEvent(event, causes, player.getWorld(), item))) {
+                if (item != null && !item.getType().isBlock() && Events.fireAndTestCancel(new UseItemEvent(event, causes, player.getWorld(), item))) {
                     event.setUseItemInHand(Result.DENY);
                 }
 
@@ -263,6 +275,7 @@ public class EventAbstractionListener implements Listener {
 
     @EventHandler
     public void onBlockIgnite(BlockIgniteEvent event) {
+        Block block = event.getBlock();
         List<? extends Cause<?>> causes;
 
         // Find the cause
@@ -276,7 +289,9 @@ public class EventAbstractionListener implements Listener {
             causes = Collections.emptyList();
         }
 
-        Events.fireToCancel(event, new BreakBlockEvent(event, causes, event.getBlock()));
+        if (block.getType() != Material.AIR) {
+            Events.fireToCancel(event, new BreakBlockEvent(event, causes, event.getBlock()));
+        }
 
         // This is also handled in the PlayerInteractEvent listener
         if (event.getCause() == IgniteCause.FLINT_AND_STEEL || event.getCause() == IgniteCause.FIREBALL) {
@@ -303,7 +318,8 @@ public class EventAbstractionListener implements Listener {
         // Milk buckets can't be emptied as of writing
         if (event.getBucket() != Material.MILK_BUCKET) {
             ItemStack item = new ItemStack(event.getBucket(), 1);
-            Events.fireToCancel(event, new PlaceBlockEvent(event, create(player), blockAffected));
+            Material blockMaterial = Materials.getBucketBlockMaterial(event.getBucket());
+            Events.fireToCancel(event, new PlaceBlockEvent(event, create(player), blockAffected.getLocation(), blockMaterial));
             Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item));
         }
     }
@@ -329,12 +345,33 @@ public class EventAbstractionListener implements Listener {
 
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
-        Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getBlock()), event.getToBlock()));
+        if (ABSTRACT_FROM_TO_EVENTS) {
+            Block from = event.getBlock();
+            Block to = event.getToBlock();
+
+            // Liquids pass this event when flowing to solid blocks
+            if (to.getType().isSolid() && Materials.isLiquid(from.getType())) {
+                return;
+            }
+
+            List<? extends Cause<?>> causes = create(from);
+
+            if (from.getType() != Material.AIR) {
+                Events.fireToCancel(event, new BreakBlockEvent(event, causes, to));
+            }
+
+            Events.fireToCancel(event, new PlaceBlockEvent(event, causes, to.getLocation(), from.getType()));
+        }
     }
 
     //-------------------------------------------------------------------------
     // Entity break / place
     //-------------------------------------------------------------------------
+
+    @EventHandler
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
+        Events.fireToCancel(event, new SpawnEntityEvent(event, Collections.<Cause<?>>emptyList(), event.getEntity()));
+    }
 
     @EventHandler
     public void onHangingPlace(HangingPlaceEvent event) {
@@ -354,6 +391,8 @@ public class EventAbstractionListener implements Listener {
     public void onVehicleDestroy(VehicleDestroyEvent event) {
         Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getAttacker()), event.getVehicle()));
     }
+
+    // TODO: XP pickup is an entity destroy event
 
     //-------------------------------------------------------------------------
     // Entity external interaction
@@ -482,7 +521,59 @@ public class EventAbstractionListener implements Listener {
 
     @EventHandler
     public void onBlockDispense(BlockDispenseEvent event) {
-        Events.fireToCancel(event, new UseItemEvent(event, create(event.getBlock()), event.getBlock().getWorld(), event.getItem()));
+        List<? extends Cause<?>> causes = create(event.getBlock());
+        Block dispenserBlock = event.getBlock();
+        ItemStack item = event.getItem();
+        MaterialData materialData = dispenserBlock.getState().getData();
+
+        Events.fireToCancel(event, new UseItemEvent(event, causes, dispenserBlock.getWorld(), item));
+
+        // Simulate right click event as players have it
+        if (materialData instanceof Dispenser) {
+            Dispenser dispenser = (Dispenser) materialData;
+            Block placed = dispenserBlock.getRelative(dispenser.getFacing());
+            Block clicked = placed.getRelative(dispenser.getFacing());
+            handleBlockRightClick(event, causes, item, clicked, dispenser.getFacing().getOppositeFace(), placed);
+        }
+    }
+
+    /**
+     * Handle the right click of a block while an item is held.
+     *
+     * @param event the original event
+     * @param causes the list of causes
+     * @param item the item
+     * @param clicked the clicked block
+     * @param faceClicked the face of the clicked block
+     * @param placed the placed block
+     * @param <T> the event type
+     */
+    private static <T extends Event & Cancellable> void handleBlockRightClick(T event, List<? extends Cause<?>> causes, @Nullable ItemStack item, Block clicked, BlockFace faceClicked, Block placed) {
+        if (item != null && item.getType() == Material.TNT) {
+            // Workaround for a bug that allowed TNT to trigger instantly if placed
+            // next to redstone, without plugins getting the clicked place event
+            // (not sure if this actually still happens)
+            Events.fireToCancel(event, new UseBlockEvent(event, causes, clicked.getLocation(), Material.TNT));
+        }
+
+        // Handle created Minecarts
+        if (item != null && Materials.isMinecart(item.getType())) {
+            // TODO: Give a more specific Minecart type
+            Events.fireToCancel(event, new SpawnEntityEvent(event, causes, placed.getLocation().add(0.5, 0, 0.5), EntityType.MINECART));
+        }
+
+        // Handle cocoa beans
+        if (item != null && item.getType() == Material.INK_SACK && Materials.isDyeColor(item.getData(), DyeColor.BROWN)) {
+            // CraftBukkit doesn't or didn't throw a clicked place for this
+            if (!(faceClicked == BlockFace.DOWN || faceClicked == BlockFace.UP)) {
+                Events.fireToCancel(event, new PlaceBlockEvent(event, causes, placed.getLocation(), Material.COCOA));
+            }
+        }
+
+        // Workaround for http://leaky.bukkit.org/issues/1034
+        if (item != null && item.getType() == Material.TNT) {
+            Events.fireToCancel(event, new PlaceBlockEvent(event, causes, placed.getLocation(), Material.TNT));
+        }
     }
 
     // TODO: Inventory events?

@@ -36,8 +36,8 @@ import java.util.Map;
  */
 public final class Materials {
 
-    private static final int MODIFED_ON_CLICK = 1;
-    private static final int MODIFIES_BLOCKS = 1;
+    private static final int MODIFIED_ON_CLICK = 1;
+    private static final int MODIFIES_BLOCKS = 2;
 
     private static final BiMap<EntityType, Material> ENTITY_ITEMS = HashBiMap.create();
     private static final Map<Material, Integer> MATERIAL_FLAGS = new HashMap<Material, Integer>();
@@ -86,10 +86,10 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.GLASS, 0);
         MATERIAL_FLAGS.put(Material.LAPIS_ORE, 0);
         MATERIAL_FLAGS.put(Material.LAPIS_BLOCK, 0);
-        MATERIAL_FLAGS.put(Material.DISPENSER, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.DISPENSER, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.SANDSTONE, 0);
-        MATERIAL_FLAGS.put(Material.NOTE_BLOCK, MODIFED_ON_CLICK);
-        MATERIAL_FLAGS.put(Material.BED_BLOCK, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.NOTE_BLOCK, MODIFIED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.BED_BLOCK, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.POWERED_RAIL, 0);
         MATERIAL_FLAGS.put(Material.DETECTOR_RAIL, 0);
         MATERIAL_FLAGS.put(Material.PISTON_STICKY_BASE, 0);
@@ -109,7 +109,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.DOUBLE_STEP, 0);
         MATERIAL_FLAGS.put(Material.STEP, 0);
         MATERIAL_FLAGS.put(Material.BRICK, 0);
-        MATERIAL_FLAGS.put(Material.TNT, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.TNT, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.BOOKSHELF, 0);
         MATERIAL_FLAGS.put(Material.MOSSY_COBBLESTONE, 0);
         MATERIAL_FLAGS.put(Material.OBSIDIAN, 0);
@@ -117,37 +117,37 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.FIRE, 0);
         MATERIAL_FLAGS.put(Material.MOB_SPAWNER, 0);
         MATERIAL_FLAGS.put(Material.WOOD_STAIRS, 0);
-        MATERIAL_FLAGS.put(Material.CHEST, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.CHEST, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.REDSTONE_WIRE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_ORE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.WORKBENCH, 0);
         MATERIAL_FLAGS.put(Material.CROPS, 0);
         MATERIAL_FLAGS.put(Material.SOIL, 0);
-        MATERIAL_FLAGS.put(Material.FURNACE, MODIFED_ON_CLICK);
-        MATERIAL_FLAGS.put(Material.BURNING_FURNACE, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.FURNACE, MODIFIED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.BURNING_FURNACE, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.SIGN_POST, 0);
         MATERIAL_FLAGS.put(Material.WOODEN_DOOR, 0);
         MATERIAL_FLAGS.put(Material.LADDER, 0);
         MATERIAL_FLAGS.put(Material.RAILS, 0);
         MATERIAL_FLAGS.put(Material.COBBLESTONE_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.WALL_SIGN, 0);
-        MATERIAL_FLAGS.put(Material.LEVER, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.LEVER, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.STONE_PLATE, 0);
-        MATERIAL_FLAGS.put(Material.IRON_DOOR_BLOCK, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.IRON_DOOR_BLOCK, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.WOOD_PLATE, 0);
         MATERIAL_FLAGS.put(Material.REDSTONE_ORE, 0);
         MATERIAL_FLAGS.put(Material.GLOWING_REDSTONE_ORE, 0);
         MATERIAL_FLAGS.put(Material.REDSTONE_TORCH_OFF, 0);
         MATERIAL_FLAGS.put(Material.REDSTONE_TORCH_ON, 0);
-        MATERIAL_FLAGS.put(Material.STONE_BUTTON, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.STONE_BUTTON, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.SNOW, 0);
         MATERIAL_FLAGS.put(Material.ICE, 0);
         MATERIAL_FLAGS.put(Material.SNOW_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.CACTUS, 0);
         MATERIAL_FLAGS.put(Material.CLAY, 0);
         MATERIAL_FLAGS.put(Material.SUGAR_CANE_BLOCK, 0);
-        MATERIAL_FLAGS.put(Material.JUKEBOX, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.JUKEBOX, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.FENCE, 0);
         MATERIAL_FLAGS.put(Material.PUMPKIN, 0);
         MATERIAL_FLAGS.put(Material.NETHERRACK, 0);
@@ -155,11 +155,11 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.GLOWSTONE, 0);
         MATERIAL_FLAGS.put(Material.PORTAL, 0);
         MATERIAL_FLAGS.put(Material.JACK_O_LANTERN, 0);
-        MATERIAL_FLAGS.put(Material.CAKE_BLOCK, MODIFED_ON_CLICK);
-        MATERIAL_FLAGS.put(Material.DIODE_BLOCK_OFF, MODIFED_ON_CLICK);
-        MATERIAL_FLAGS.put(Material.DIODE_BLOCK_ON, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.CAKE_BLOCK, MODIFIED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.DIODE_BLOCK_OFF, MODIFIED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.DIODE_BLOCK_ON, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.STAINED_GLASS, 0);
-        MATERIAL_FLAGS.put(Material.TRAP_DOOR, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.TRAP_DOOR, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.MONSTER_EGGS, 0);
         MATERIAL_FLAGS.put(Material.SMOOTH_BRICK, 0);
         MATERIAL_FLAGS.put(Material.HUGE_MUSHROOM_1, 0);
@@ -170,7 +170,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.PUMPKIN_STEM, 0);
         MATERIAL_FLAGS.put(Material.MELON_STEM, 0);
         MATERIAL_FLAGS.put(Material.VINE, 0);
-        MATERIAL_FLAGS.put(Material.FENCE_GATE, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.FENCE_GATE, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.BRICK_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.SMOOTH_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.MYCEL, 0);
@@ -180,12 +180,12 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.NETHER_BRICK_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.NETHER_WARTS, 0);
         MATERIAL_FLAGS.put(Material.ENCHANTMENT_TABLE, 0);
-        MATERIAL_FLAGS.put(Material.BREWING_STAND, MODIFED_ON_CLICK);
-        MATERIAL_FLAGS.put(Material.CAULDRON, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.BREWING_STAND, MODIFIED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.CAULDRON, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.ENDER_PORTAL, 0);
         MATERIAL_FLAGS.put(Material.ENDER_PORTAL_FRAME, 0);
         MATERIAL_FLAGS.put(Material.ENDER_STONE, 0);
-        MATERIAL_FLAGS.put(Material.DRAGON_EGG, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.DRAGON_EGG, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.REDSTONE_LAMP_OFF, 0);
         MATERIAL_FLAGS.put(Material.REDSTONE_LAMP_ON, 0);
         MATERIAL_FLAGS.put(Material.WOOD_DOUBLE_STEP, 0);
@@ -200,28 +200,28 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.SPRUCE_WOOD_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.BIRCH_WOOD_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.JUNGLE_WOOD_STAIRS, 0);
-        MATERIAL_FLAGS.put(Material.COMMAND, MODIFED_ON_CLICK);
-        MATERIAL_FLAGS.put(Material.BEACON, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.COMMAND, MODIFIED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.BEACON, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.COBBLE_WALL, 0);
-        MATERIAL_FLAGS.put(Material.FLOWER_POT, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.FLOWER_POT, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.CARROT, 0);
         MATERIAL_FLAGS.put(Material.POTATO, 0);
-        MATERIAL_FLAGS.put(Material.WOOD_BUTTON, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.WOOD_BUTTON, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.SKULL, 0);
-        MATERIAL_FLAGS.put(Material.ANVIL, MODIFED_ON_CLICK);
-        MATERIAL_FLAGS.put(Material.TRAPPED_CHEST, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.ANVIL, MODIFIED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.TRAPPED_CHEST, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.GOLD_PLATE, 0);
         MATERIAL_FLAGS.put(Material.IRON_PLATE, 0);
-        MATERIAL_FLAGS.put(Material.REDSTONE_COMPARATOR_OFF, MODIFED_ON_CLICK);
-        MATERIAL_FLAGS.put(Material.REDSTONE_COMPARATOR_ON, MODIFED_ON_CLICK);
-        MATERIAL_FLAGS.put(Material.DAYLIGHT_DETECTOR, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.REDSTONE_COMPARATOR_OFF, MODIFIED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.REDSTONE_COMPARATOR_ON, MODIFIED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.DAYLIGHT_DETECTOR, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.REDSTONE_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.QUARTZ_ORE, 0);
-        MATERIAL_FLAGS.put(Material.HOPPER, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.HOPPER, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.QUARTZ_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.QUARTZ_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.ACTIVATOR_RAIL, 0);
-        MATERIAL_FLAGS.put(Material.DROPPER, MODIFED_ON_CLICK);
+        MATERIAL_FLAGS.put(Material.DROPPER, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.STAINED_CLAY, 0);
         MATERIAL_FLAGS.put(Material.STAINED_GLASS_PANE, 0);
         MATERIAL_FLAGS.put(Material.LEAVES_2, 0);
@@ -423,6 +423,30 @@ public final class Materials {
     }
 
     /**
+     * Get the material of the block placed by the given bucket, defaulting
+     * to water if the bucket type is not known.
+     *
+     * <p>If a non-bucket material is given, it will be assumed to be
+     * an unknown bucket type. If the given bucket doesn't have a block form
+     * (it can't be placed), then water will be returned (i.e. for milk).
+     * Be aware that either the stationary or non-stationary material may be
+     * returned.</p>
+     *
+     * @param type the bucket material
+     * @return the block material
+     */
+    public static Material getBucketBlockMaterial(Material type) {
+        switch (type) {
+            case LAVA_BUCKET:
+                return Material.LAVA;
+            case MILK_BUCKET:
+                return Material.WATER;
+            default:
+                return Material.WATER;
+        }
+    }
+
+    /**
      * Test whether the given material is a mushroom.
      *
      * @param material the material
@@ -440,6 +464,16 @@ public final class Materials {
      */
     public static boolean isLeaf(Material material) {
         return material == Material.LEAVES || material == Material.LEAVES_2;
+    }
+
+    /**
+     * Test whether the given material is a liquid block.
+     *
+     * @param material the material
+     * @return true if a liquid block
+     */
+    public static boolean isLiquid(Material material) {
+        return isWater(material) || isLava(material);
     }
 
     /**
@@ -542,13 +576,13 @@ public final class Materials {
      */
     public static boolean isBlockModifiedOnClick(Material material) {
         Integer flags = MATERIAL_FLAGS.get(material);
-        return flags == null || (flags & MODIFED_ON_CLICK) == MODIFED_ON_CLICK;
+        return flags == null || (flags & MODIFIED_ON_CLICK) == MODIFIED_ON_CLICK;
     }
 
     /**
      * Test whether the given item modifies a given block when right clicked.
      *
-     * <p>This test is conservative, returning true for blocks that it is not
+     * <p>This test is conservative, returning true for items that it is not
      * aware of or does not have the details for.</p>
      *
      * @param item the item
