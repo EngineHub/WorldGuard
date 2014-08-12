@@ -29,7 +29,6 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
@@ -38,21 +37,15 @@ import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 public class RegionQuery {
 
-    private final WorldGuardPlugin plugin;
     private final ConfigurationManager config;
     private final GlobalRegionManager globalManager;
     @Nullable
     private final LocalPlayer localPlayer;
 
     public RegionQuery(WorldGuardPlugin plugin, @Nullable Player player) {
-        this.plugin = plugin;
         this.config = plugin.getGlobalStateManager();
         this.globalManager = plugin.getGlobalRegionManager();
         this.localPlayer = player != null ? plugin.wrapPlayer(player) : null;
-    }
-
-    public boolean canBuild(Block block) {
-        return canBuild(block.getLocation());
     }
 
     public boolean canBuild(Location location) {
@@ -63,7 +56,7 @@ public class RegionQuery {
             return true;
         }
 
-        if (globalManager.hasBypass(localPlayer, world)) {
+        if (localPlayer != null && globalManager.hasBypass(localPlayer, world)) {
             return true;
         } else {
             RegionManager manager = globalManager.get(location.getWorld());
@@ -79,7 +72,7 @@ public class RegionQuery {
             return true;
         }
 
-        if (globalManager.hasBypass(localPlayer, world)) {
+        if (localPlayer != null && globalManager.hasBypass(localPlayer, world)) {
             return true;
         } else {
             RegionManager manager = globalManager.get(location.getWorld());

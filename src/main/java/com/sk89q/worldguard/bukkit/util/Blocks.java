@@ -27,11 +27,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Utility methods to deal with blocks.
+ */
 public final class Blocks {
 
     private Blocks() {
     }
 
+    /**
+     * Get a list of connected blocks to the given block, not including
+     * the given block.
+     *
+     * @param block the block
+     * @return a list of connected blocks, not including the given block
+     */
     public static List<Block> getConnected(Block block) {
         MaterialData data = block.getState().getData();
 
