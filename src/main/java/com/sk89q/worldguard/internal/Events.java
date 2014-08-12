@@ -34,8 +34,20 @@ public final class Events {
     }
 
     /**
-     * Fire the {@code eventToFire} if {@code original} has not been cancelled
-     * and cancel the original if the fired event is cancelled.
+     * Fire the {@code eventToFire} and return whether the event was cancelled.
+     *
+     * @param eventToFire the event to fire
+     * @param <T> an event that can be fired and is cancellable
+     * @return true if the event was fired
+     */
+    public static <T extends Event & Cancellable> boolean fireAndTestCancel( T eventToFire) {
+        Bukkit.getServer().getPluginManager().callEvent(eventToFire);
+        return eventToFire.isCancelled();
+    }
+
+    /**
+     * Fire the {@code eventToFire} and cancel the original if the fired event
+     * is cancelled.
      *
      * @param original the original event to potentially cancel
      * @param eventToFire the event to fire to consider cancelling the original event
@@ -43,20 +55,18 @@ public final class Events {
      * @return true if the event was fired and it caused the original event to be cancelled
      */
     public static <T extends Event & Cancellable> boolean fireToCancel(Cancellable original, T eventToFire) {
-        if (!original.isCancelled()) {
-            Bukkit.getServer().getPluginManager().callEvent(eventToFire);
-            if (eventToFire.isCancelled()) {
-                original.setCancelled(true);
-                return true;
-            }
+        Bukkit.getServer().getPluginManager().callEvent(eventToFire);
+        if (eventToFire.isCancelled()) {
+            original.setCancelled(true);
+            return true;
         }
 
         return false;
     }
 
     /**
-     * Fire the {@code eventToFire} if {@code original}
-     * and cancel the original if the fired event is cancelled.
+     * Fire the {@code eventToFire} and cancel the original if the fired event
+     * is cancelled.
      *
      * @param original the original event to potentially cancel
      * @param eventToFire the event to fire to consider cancelling the original event

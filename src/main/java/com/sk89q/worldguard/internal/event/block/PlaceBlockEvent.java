@@ -17,46 +17,27 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.internal.event;
+package com.sk89q.worldguard.internal.event.block;
 
 import com.sk89q.worldguard.internal.cause.Cause;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-/**
- * Fired when a block is interacted with.
- */
-public class BlockInteractEvent extends AbstractInteractEvent {
+public class PlaceBlockEvent extends AbstractBlockEvent {
 
     private static final HandlerList handlers = new HandlerList();
-    private final Block target;
 
-    /**
-     * Create a new instance.
-     *
-     * @param originalEvent the original event
-     * @param causes a list of causes, where the originating causes are at the beginning
-     * @param interaction the action that is being taken
-     * @param target the target block being affected
-     */
-    public BlockInteractEvent(Event originalEvent, List<? extends Cause<?>> causes, Interaction interaction, Block target) {
-        super(originalEvent, causes, interaction);
-        checkNotNull(target);
-        this.target = target;
+    public PlaceBlockEvent(Event originalEvent, List<? extends Cause<?>> causes, Block block) {
+        super(originalEvent, causes, block);
     }
 
-    /**
-     * Get the target block being affected.
-     *
-     * @return a block
-     */
-    public Block getTarget() {
-        return target;
+    public PlaceBlockEvent(Event originalEvent, List<? extends Cause<?>> causes, Location target, Material effectiveMaterial) {
+        super(originalEvent, causes, target, effectiveMaterial);
     }
 
     @Override
