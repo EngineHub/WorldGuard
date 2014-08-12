@@ -22,6 +22,7 @@ package com.sk89q.worldguard.internal.cause;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -88,6 +89,9 @@ public final class Causes {
                 causes.add(new PlayerCause((Player) o));
             } else if (o instanceof Block) {
                 causes.add(new BlockCause((Block) o));
+            } else if (o instanceof Projectile) {
+                causes.addAll(create(o));
+                causes.add(new EntityCause((Entity) o));
             } else if (o instanceof Entity) {
                 causes.add(new EntityCause((Entity) o));
             } else {

@@ -23,17 +23,9 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
-import com.sk89q.worldguard.internal.Events;
-import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.BlockInteractEvent;
-import com.sk89q.worldguard.internal.event.Interaction;
-import com.sk89q.worldguard.internal.event.ItemInteractEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -44,8 +36,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
@@ -60,10 +50,8 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
-import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
@@ -112,20 +100,6 @@ public class WorldGuardBlockListener implements Listener {
     }
 
     /*
-     * Called when a block is damaged.
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockDamage(BlockDamageEvent event) {
-        Block target = event.getBlock();
-
-        // Cake are damaged and not broken when they are eaten, so we must
-        // handle them a bit separately
-        if (target.getType() == Material.CAKE_BLOCK) {
-            Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.INTERACT, target));
-        }
-    }
-
-    /*
      * Called when a block is broken.
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -141,8 +115,6 @@ public class WorldGuardBlockListener implements Listener {
                 player.setItemInHand(held);
             }
         }
-
-        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.BREAK, target));
     }
 
     /*
@@ -301,24 +273,8 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.useRegions) {
             Vector pt = toVector(block);
-            Player player = event.getPlayer();
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-            if (player != null && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-                // this is preliminarily handled in the player listener under handleBlockRightClick
-                // why it's handled here too, no one knows
-                if (cause == IgniteCause.FLINT_AND_STEEL || cause == IgniteCause.FIREBALL) {
-                    if (!set.allows(DefaultFlag.LIGHTER)
-                            && !set.canBuild(localPlayer)
-                            && !plugin.hasPermission(player, "worldguard.override.lighter")) {
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
 
             if (wcfg.highFreqFlags && isFireSpread
                     && !set.allows(DefaultFlag.FIRE_SPREAD)) {
@@ -469,8 +425,6 @@ public class WorldGuardBlockListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
-        Events.fireToCancel(event, new BlockInteractEvent(event, Causes.create(event.getPlayer()), Interaction.PLACE, target));
-
         if (wcfg.simulateSponge && target.getType() == Material.SPONGE) {
             if (wcfg.redstoneSponges && target.isBlockIndirectlyPowered()) {
                 return;
@@ -515,75 +469,6 @@ public class WorldGuardBlockListener implements Listener {
                 }
             }
 
-            return;
-        }
-    }
-
-    /*
-     * Called when a sign is changed.
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onSignChange(SignChangeEvent event) {
-        Player player = event.getPlayer();
-        WorldConfiguration wcfg = getWorldConfig(player);
-
-        if (wcfg.signChestProtection) {
-            if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
-                if (wcfg.isChestProtectedPlacement(event.getBlock(), player)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You do not own the adjacent chest.");
-                    event.getBlock().breakNaturally();
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (event.getBlock().getTypeId() != BlockID.SIGN_POST) {
-                    player.sendMessage(ChatColor.RED
-                            + "The [Lock] sign must be a sign post, not a wall sign.");
-
-                    event.getBlock().breakNaturally();
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
-                    player.sendMessage(ChatColor.RED
-                            + "The first owner line must be your name.");
-
-                    event.getBlock().breakNaturally();
-                    event.setCancelled(true);
-                    return;
-                }
-
-                int below = event.getBlock().getRelative(0, -1, 0).getTypeId();
-
-                if (below == BlockID.TNT || below == BlockID.SAND
-                        || below == BlockID.GRAVEL || below == BlockID.SIGN_POST) {
-                    player.sendMessage(ChatColor.RED
-                            + "That is not a safe block that you're putting this sign on.");
-
-                    event.getBlock().breakNaturally();
-                    event.setCancelled(true);
-                    return;
-                }
-
-                event.setLine(0, "[Lock]");
-                player.sendMessage(ChatColor.YELLOW
-                        + "A chest or double chest above is now protected.");
-            }
-        } else if (!wcfg.disableSignChestProtectionCheck) {
-            if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
-                player.sendMessage(ChatColor.RED
-                        + "WorldGuard's sign chest protection is disabled.");
-
-                event.getBlock().breakNaturally();
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-            event.setCancelled(true);
             return;
         }
     }
@@ -825,21 +710,6 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
         }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockDispense(BlockDispenseEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-
-        if (wcfg.getBlacklist() != null) {
-            if (!wcfg.getBlacklist().check(new BlockDispenseBlacklistEvent(null, toVector(event.getBlock()), createTarget(event.getItem())), false, false)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        Events.fireToCancel(event, new ItemInteractEvent(event, Causes.create(event.getBlock()), Interaction.INTERACT, event.getBlock().getWorld(), event.getItem()));
     }
 
     /*

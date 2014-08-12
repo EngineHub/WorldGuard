@@ -19,15 +19,18 @@
 
 package com.sk89q.worldguard.internal.listener;
 
+import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.Interaction;
-import com.sk89q.worldguard.internal.event.BlockInteractEvent;
+import com.sk89q.worldguard.internal.event.block.BreakBlockEvent;
+import com.sk89q.worldguard.internal.event.block.PlaceBlockEvent;
+import com.sk89q.worldguard.internal.event.block.UseBlockEvent;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Block;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.SignChangeEvent;
 
 /**
  * Handle events that need to be processed by the chest protection.
@@ -44,31 +47,126 @@ public class ChestProtectionListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void handleBlockInteract(BlockInteractEvent event) {
+    public void onPlaceBlock(PlaceBlockEvent event) {
         Player player = Causes.getInvolvedPlayer(event.getCauses());
-        Block target = event.getTarget();
-        WorldConfiguration wcfg = getWorldConfig(player);
-
-        // Early guard
-        if (!wcfg.signChestProtection) {
-            return;
-        }
+        Location target = event.getTarget();
 
         if (player != null) {
-            if (wcfg.isChestProtected(target, player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
-                event.setCancelled(true);
+            WorldConfiguration wcfg = getWorldConfig(player);
+
+            // Early guard
+            if (!wcfg.signChestProtection) {
                 return;
             }
 
-            if (event.getInteraction() == Interaction.PLACE) {
-                if (wcfg.getChestProtection().isChest(target.getTypeId())) {
-                    if (wcfg.isAdjacentChestProtected(target, player)) {
-                        player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
-                        event.setCancelled(true);
-                        return;
-                    }
+            if (wcfg.getChestProtection().isChest(event.getEffectiveMaterial().getId()) && wcfg.isChestProtected(target.getBlock(), player)) {
+                player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBreakBlock(BreakBlockEvent event) {
+        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Location target = event.getTarget();
+
+        if (player != null) {
+            WorldConfiguration wcfg = getWorldConfig(player);
+
+            // Early guard
+            if (!wcfg.signChestProtection) {
+                return;
+            }
+
+            if (wcfg.isChestProtected(target.getBlock(), player)) {
+                player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
+                event.setCancelled(true);
+            }
+        } else {
+            // No player? Deny anyway
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onUseBlock(UseBlockEvent event) {
+        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Location target = event.getTarget();
+
+        if (player != null) {
+            WorldConfiguration wcfg = getWorldConfig(player);
+
+            // Early guard
+            if (!wcfg.signChestProtection) {
+                return;
+            }
+
+            if (wcfg.isChestProtected(target.getBlock(), player)) {
+                player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
+                event.setCancelled(true);
+            }
+        } else {
+            // No player? Deny anyway
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onSignChange(SignChangeEvent event) {
+        Player player = event.getPlayer();
+        WorldConfiguration wcfg = getWorldConfig(player);
+
+        if (wcfg.signChestProtection) {
+            if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
+                if (wcfg.isChestProtectedPlacement(event.getBlock(), player)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You do not own the adjacent chest.");
+                    event.getBlock().breakNaturally();
+                    event.setCancelled(true);
+                    return;
                 }
+
+                if (event.getBlock().getTypeId() != BlockID.SIGN_POST) {
+                    player.sendMessage(ChatColor.RED
+                            + "The [Lock] sign must be a sign post, not a wall sign.");
+
+                    event.getBlock().breakNaturally();
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
+                    player.sendMessage(ChatColor.RED
+                            + "The first owner line must be your name.");
+
+                    event.getBlock().breakNaturally();
+                    event.setCancelled(true);
+                    return;
+                }
+
+                int below = event.getBlock().getRelative(0, -1, 0).getTypeId();
+
+                if (below == BlockID.TNT || below == BlockID.SAND
+                        || below == BlockID.GRAVEL || below == BlockID.SIGN_POST) {
+                    player.sendMessage(ChatColor.RED
+                            + "That is not a safe block that you're putting this sign on.");
+
+                    event.getBlock().breakNaturally();
+                    event.setCancelled(true);
+                    return;
+                }
+
+                event.setLine(0, "[Lock]");
+                player.sendMessage(ChatColor.YELLOW
+                        + "A chest or double chest above is now protected.");
+            }
+        } else if (!wcfg.disableSignChestProtectionCheck) {
+            if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
+                player.sendMessage(ChatColor.RED
+                        + "WorldGuard's sign chest protection is disabled.");
+
+                event.getBlock().breakNaturally();
+                event.setCancelled(true);
             }
         }
     }

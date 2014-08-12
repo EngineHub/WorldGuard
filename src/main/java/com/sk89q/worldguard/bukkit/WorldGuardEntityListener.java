@@ -22,11 +22,6 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.event.ItemUseBlacklistEvent;
-import com.sk89q.worldguard.internal.Events;
-import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.Interaction;
-import com.sk89q.worldguard.internal.event.ItemInteractEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
@@ -83,7 +78,6 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Set;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
@@ -224,26 +218,6 @@ public class WorldGuardEntityListener implements Listener {
 
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
-
-        if (attacker instanceof Player) {
-            Player player = (Player) attacker;
-
-            ConfigurationManager cfg = plugin.getGlobalStateManager();
-            WorldConfiguration wcfg = cfg.get(player.getWorld());
-
-            ItemStack held = player.getInventory().getItemInHand();
-
-            if (held != null) {
-                if (wcfg.getBlacklist() != null) {
-                    if (!wcfg.getBlacklist().check(
-                            new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                                    toVector(player.getLocation()), createTarget(held)), false, false)) {
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
-        }
 
         if (defender instanceof ItemFrame) {
             if (checkItemFrameProtection(attacker, (ItemFrame) defender)) {
@@ -934,9 +908,6 @@ public class WorldGuardEntityListener implements Listener {
         World world = entity.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        Events.fireToCancel(event, new ItemInteractEvent(event, Causes.create(potion.getShooter()), Interaction.INTERACT, world, potion.getItem()));
 
         GlobalRegionManager regionMan = plugin.getGlobalRegionManager();
 
@@ -1017,16 +988,7 @@ public class WorldGuardEntityListener implements Listener {
         if (wcfg.useRegions) {
         // bukkit throws this event when a player attempts to remove an item from a frame
             RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-            if (attacker instanceof Player) {
-                Player player = (Player) attacker;
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
-                        && !mgr.getApplicableRegions(defender.getLocation())
-                                .canBuild(localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
-                    return true;
-                }
-            } else {
+            if (!(attacker instanceof Player)) {
                 if (!plugin.getGlobalRegionManager().allows(
                         DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, defender.getLocation())) {
                     return true;

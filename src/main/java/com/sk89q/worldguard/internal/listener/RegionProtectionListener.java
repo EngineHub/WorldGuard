@@ -20,12 +20,22 @@
 package com.sk89q.worldguard.internal.listener;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.util.Entities;
+import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.bukkit.util.RegionQuery;
 import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.Interaction;
-import com.sk89q.worldguard.internal.event.BlockInteractEvent;
+import com.sk89q.worldguard.internal.event.block.BreakBlockEvent;
+import com.sk89q.worldguard.internal.event.block.PlaceBlockEvent;
+import com.sk89q.worldguard.internal.event.block.UseBlockEvent;
+import com.sk89q.worldguard.internal.event.entity.DestroyEntityEvent;
+import com.sk89q.worldguard.internal.event.entity.SpawnEntityEvent;
+import com.sk89q.worldguard.internal.event.entity.UseEntityEvent;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Block;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -48,23 +58,144 @@ public class RegionProtectionListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void handleBlockInteract(BlockInteractEvent event) {
+    public void onPlaceBlock(PlaceBlockEvent event) {
         Player player = Causes.getInvolvedPlayer(event.getCauses());
-        Block target = event.getTarget();
+        Location target = event.getTarget();
+        Material type = event.getEffectiveMaterial();
+
+        if (player != null) {
+            RegionQuery query = new RegionQuery(getPlugin(), player);
+            boolean canPlace;
+
+            // Flint and steel, fire charge
+            if (type == Material.FIRE) {
+                canPlace = query.allows(DefaultFlag.LIGHTER, target) || (query.canBuild(target) && query.canConstruct(target));
+
+            } else {
+                canPlace = query.canBuild(target) && query.canConstruct(target);
+            }
+
+            if (!canPlace) {
+                tellErrorMessage(player, target);
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBreakBlock(BreakBlockEvent event) {
+        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Location target = event.getTarget();
 
         if (player != null) {
             if (!getPlugin().getGlobalRegionManager().canBuild(player, target)) {
                 tellErrorMessage(player, target);
                 event.setCancelled(true);
-                return;
+            } else if (!getPlugin().getGlobalRegionManager().canConstruct(player, target)) {
+                tellErrorMessage(player, target);
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onUseBlock(UseBlockEvent event) {
+        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Location target = event.getTarget();
+        Material type = event.getEffectiveMaterial();
+
+        if (player != null) {
+            RegionQuery query = new RegionQuery(getPlugin(), player);
+            boolean canUse;
+
+            // Inventory blocks (CHEST_ACCESS)
+            if (Materials.isInventoryBlock(type)) {
+                canUse = query.canBuild( target)
+                        || query.allows(DefaultFlag.CHEST_ACCESS, target)
+                        || query.allows(DefaultFlag.USE, target);
+
+            // Beds (SLEEP)
+            } else if (type == Material.BED) {
+                canUse = query.canBuild(target)
+                        || query.allows(DefaultFlag.SLEEP, target)
+                        || query.allows(DefaultFlag.USE, target);
+
+            // TNT (TNT)
+            } else if (type == Material.TNT) {
+                canUse = query.canBuild(target)
+                        || query.allows(DefaultFlag.TNT, target);
+
+            // Everything else
+            } else {
+                canUse = query.canBuild(target)
+                        || query.allows(DefaultFlag.USE, target);
             }
 
-            if (event.getInteraction() != Interaction.INTERACT) {
-                if (!getPlugin().getGlobalRegionManager().canConstruct(player, target)) {
-                    tellErrorMessage(player, target);
-                    event.setCancelled(true);
-                    return;
-                }
+            if (!canUse) {
+                tellErrorMessage(player, target);
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onSpawnEntity(SpawnEntityEvent event) {
+        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Location target = event.getTarget();
+        EntityType type = event.getEffectiveType();
+
+        if (player != null) {
+            RegionQuery query = new RegionQuery(getPlugin(), player);
+            boolean canSpawn;
+
+            if (Entities.isVehicle(type)) {
+                canSpawn = query.canBuild(target) || query.allows(DefaultFlag.PLACE_VEHICLE, target);
+            } else {
+                canSpawn = query.canBuild(target);
+            }
+
+            if (!canSpawn) {
+                tellErrorMessage(player, target);
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onDestroyEntity(DestroyEntityEvent event) {
+        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Location target = event.getTarget();
+        EntityType type = event.getEntity().getType();
+
+        if (player != null) {
+            RegionQuery query = new RegionQuery(getPlugin(), player);
+            boolean canDestroy;
+
+            if (Entities.isVehicle(type)) {
+                canDestroy = query.canBuild(target) || query.allows(DefaultFlag.DESTROY_VEHICLE, target);
+            } else {
+                canDestroy = query.canBuild(target);
+            }
+
+            if (!canDestroy) {
+                tellErrorMessage(player, target);
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onUseEntity(UseEntityEvent event) {
+        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Location target = event.getTarget();
+
+        if (player != null) {
+            RegionQuery query = new RegionQuery(getPlugin(), player);
+            boolean canUse = query.canBuild(target) || query.allows(DefaultFlag.USE, target);
+
+            if (!canUse) {
+                tellErrorMessage(player, target);
+                event.setCancelled(true);
             }
         }
     }

@@ -24,7 +24,7 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.cause.Causes;
-import com.sk89q.worldguard.internal.event.ItemInteractEvent;
+import com.sk89q.worldguard.internal.event.inventory.UseItemEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -49,7 +49,7 @@ public class BlockedPotionsListener extends AbstractListener {
     }
 
     @EventHandler
-    public void onItemInteract(ItemInteractEvent event) {
+    public void onItemInteract(UseItemEvent event) {
         // We only care about player caused events
         if (!Causes.mayInvolvePlayer(event.getCauses())) {
             return;
