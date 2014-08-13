@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection;
 import com.google.common.base.Supplier;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.index.ChunkHashTable;
 import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
 import com.sk89q.worldguard.protection.managers.index.PriorityRTreeIndex;
 import com.sk89q.worldguard.protection.managers.storage.RegionStore;
@@ -57,7 +58,7 @@ class ManagerContainer {
     private final Object lock = new Object();
     private final EnumMap<DriverType, RegionStoreDriver> drivers = new EnumMap<DriverType, RegionStoreDriver>(DriverType.class);
     private final RegionStoreDriver defaultDriver;
-    private final Supplier<? extends ConcurrentRegionIndex> indexFactory = new PriorityRTreeIndex.Factory();
+    private final Supplier<? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
     private final Timer timer = new Timer();
 
     ManagerContainer(ConfigurationManager config) {

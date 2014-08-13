@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.managers;
+package com.sk89q.worldguard.protection.util;
 
 import com.google.common.base.Predicate;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * to the collection, although it may result in duplicates in the collection
  * if the collection is not a set.</p>
  */
-class RegionCollectionConsumer implements Predicate<ProtectedRegion> {
+public class RegionCollectionConsumer implements Predicate<ProtectedRegion> {
 
     private final Collection<ProtectedRegion> collection;
     private final boolean addParents;
@@ -44,7 +44,7 @@ class RegionCollectionConsumer implements Predicate<ProtectedRegion> {
      * @param collection the collection to add regions to
      * @param addParents true to also add the parents to the collection
      */
-    RegionCollectionConsumer(Collection<ProtectedRegion> collection, boolean addParents) {
+    public RegionCollectionConsumer(Collection<ProtectedRegion> collection, boolean addParents) {
         checkNotNull(collection);
 
         this.collection = collection;
