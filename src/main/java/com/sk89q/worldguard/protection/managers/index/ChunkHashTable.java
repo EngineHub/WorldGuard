@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -130,6 +131,25 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
                 executor.submit(new EnumerateRegions(positions));
             }
         }
+    }
+
+    /**
+     * Waits until all currently executing background tasks complete.
+     *
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the timeout argument
+     * @return {@code true} if this executor terminated and
+     *         {@code false} if the timeout elapsed before termination
+     * @throws InterruptedException on interruption
+     */
+    public boolean awaitCompletion(long timeout, TimeUnit unit) throws InterruptedException {
+        ListeningExecutorService previousExecutor;
+        synchronized (lock) {
+            previousExecutor = executor;
+            executor = createExecutor();
+        }
+        previousExecutor.shutdown();
+        return previousExecutor.awaitTermination(timeout, unit);
     }
 
     @Override
