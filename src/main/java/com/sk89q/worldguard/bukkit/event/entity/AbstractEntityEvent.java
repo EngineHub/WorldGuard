@@ -19,14 +19,13 @@
 
 package com.sk89q.worldguard.bukkit.event.entity;
 
-import com.sk89q.worldguard.util.cause.Cause;
+import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.AbstractInteractEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,29 +35,15 @@ abstract class AbstractEntityEvent extends AbstractInteractEvent {
     @Nullable
     private final Entity entity;
 
-    /**
-     * Create a new instance
-     *
-     * @param originalEvent the original event
-     * @param causes a list of causes, where the originating causes are at the beginning
-     * @param entity the target
-     */
-    protected AbstractEntityEvent(Event originalEvent, List<? extends Cause<?>> causes, Entity entity) {
-        super(originalEvent, causes);
+    protected AbstractEntityEvent(Event originalEvent, Cause cause, Entity entity) {
+        super(originalEvent, cause);
         checkNotNull(entity);
         this.target = entity.getLocation();
         this.entity = entity;
     }
 
-    /**
-     * Create a new instance
-     *
-     * @param originalEvent the original event
-     * @param causes a list of causes, where the originating causes are at the beginning
-     * @param target the target
-     */
-    protected AbstractEntityEvent(Event originalEvent, List<? extends Cause<?>> causes, Location target) {
-        super(originalEvent, causes);
+    protected AbstractEntityEvent(Event originalEvent, Cause cause, Location target) {
+        super(originalEvent, cause);
         checkNotNull(target);
         this.target = target;
         this.entity = null;

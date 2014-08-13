@@ -19,13 +19,12 @@
 
 package com.sk89q.worldguard.bukkit.event.entity;
 
-import com.sk89q.worldguard.util.cause.Cause;
+import com.sk89q.worldguard.bukkit.cause.Cause;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,15 +35,8 @@ public class UseEntityEvent extends AbstractEntityEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    /**
-     * Create a new instance.
-     *
-     * @param originalEvent the original event
-     * @param causes a list of causes, where the originating causes are at the beginning
-     * @param target the target entity being affected
-     */
-    public UseEntityEvent(Event originalEvent, List<? extends Cause<?>> causes, Entity target) {
-        super(originalEvent, causes, checkNotNull(target));
+    public UseEntityEvent(Event originalEvent, Cause cause, Entity target) {
+        super(originalEvent, cause, checkNotNull(target));
     }
 
     @Override

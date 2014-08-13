@@ -19,14 +19,12 @@
 
 package com.sk89q.worldguard.bukkit.event.entity;
 
-import com.sk89q.worldguard.util.cause.Cause;
+import com.sk89q.worldguard.bukkit.cause.Cause;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,13 +33,13 @@ public class SpawnEntityEvent extends AbstractEntityEvent {
     private static final HandlerList handlers = new HandlerList();
     private final EntityType effectiveType;
 
-    public SpawnEntityEvent(Event originalEvent, List<? extends Cause<?>> causes, Entity target) {
-        super(originalEvent, causes, checkNotNull(target));
+    public SpawnEntityEvent(Event originalEvent, Cause cause, Entity target) {
+        super(originalEvent, cause, checkNotNull(target));
         this.effectiveType = target.getType();
     }
 
-    public SpawnEntityEvent(Event originalEvent, List<? extends Cause<?>> causes, Location location, EntityType type) {
-        super(originalEvent, causes, location);
+    public SpawnEntityEvent(Event originalEvent, Cause cause, Location location, EntityType type) {
+        super(originalEvent, cause, location);
         checkNotNull(type);
         this.effectiveType = type;
     }

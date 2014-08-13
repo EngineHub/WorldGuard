@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.event.block;
 
-import com.sk89q.worldguard.util.cause.Cause;
+import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.AbstractInteractEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,7 +27,6 @@ import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -38,16 +37,16 @@ abstract class AbstractBlockEvent extends AbstractInteractEvent {
     private final Block block;
     private final Material effectiveMaterial;
 
-    protected AbstractBlockEvent(Event originalEvent, List<? extends Cause<?>> causes, Block block) {
-        super(originalEvent, causes);
+    protected AbstractBlockEvent(Event originalEvent, Cause cause, Block block) {
+        super(originalEvent, cause);
         checkNotNull(block);
         this.target = block.getLocation();
         this.block = block;
         this.effectiveMaterial = block.getType();
     }
 
-    protected AbstractBlockEvent(Event originalEvent, List<? extends Cause<?>> causes, Location target, Material effectiveMaterial) {
-        super(originalEvent, causes);
+    protected AbstractBlockEvent(Event originalEvent, Cause cause, Location target, Material effectiveMaterial) {
+        super(originalEvent, cause);
         this.target = target;
         this.block = null;
         this.effectiveMaterial = effectiveMaterial;

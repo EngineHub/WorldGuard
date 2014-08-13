@@ -31,14 +31,13 @@ import com.sk89q.worldguard.blacklist.event.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.util.cause.Causes;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
 import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
+import com.sk89q.worldguard.bukkit.util.Materials;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -70,7 +69,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(BreakBlockEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
 
         if (player == null) {
             return;
@@ -96,7 +95,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(PlaceBlockEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
 
         if (player == null) {
             return;
@@ -119,7 +118,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(UseBlockEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
 
         if (player == null) {
             return;
@@ -142,7 +141,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
 
         if (player == null) {
             return;
@@ -166,7 +165,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
 
         if (player == null) {
             return;
@@ -192,7 +191,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseItem(UseItemEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
 
         if (player == null) {
             return;
