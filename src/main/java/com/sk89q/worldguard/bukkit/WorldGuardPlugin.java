@@ -64,11 +64,12 @@ import com.sk89q.worldguard.bukkit.listener.WorldGuardVehicleListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.protection.util.migrator.MigrationException;
 import com.sk89q.worldguard.protection.util.migrator.UUIDMigrator;
-import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -190,7 +191,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
             getLogger().info("Loading region data...");
             globalRegionManager = new GlobalRegionManager(this);
-            globalRegionManager.preload();
+            globalRegionManager.loadAll(Bukkit.getServer().getWorlds());
 
             migrateRegionUniqueIds(); // Migrate to UUIDs
         } catch (FatalConfigurationLoadingException e) {
@@ -281,7 +282,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             getLogger().log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
         }
 
-        globalRegionManager.unload();
+        globalRegionManager.unloadAll();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
     }

@@ -30,6 +30,7 @@ import com.sk89q.worldguard.bukkit.ReportWriter;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.util.PastebinPoster;
 import com.sk89q.worldguard.util.PastebinPoster.PasteCallback;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -77,9 +78,9 @@ public class WorldGuardCommands {
 
         try {
             plugin.getGlobalStateManager().unload();
-            plugin.getGlobalRegionManager().unload();
+            plugin.getGlobalRegionManager().unloadAll();
             plugin.getGlobalStateManager().load();
-            plugin.getGlobalRegionManager().preload();
+            plugin.getGlobalRegionManager().loadAll(Bukkit.getServer().getWorlds());
             // WGBukkit.cleanCache();
             sender.sendMessage("WorldGuard configuration reloaded.");
         } catch (Throwable t) {

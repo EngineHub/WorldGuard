@@ -24,6 +24,7 @@ import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -35,17 +36,21 @@ import javax.annotation.Nullable;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
-public class RegionQuery {
+public class ProtectedRegionQuery {
 
     private final ConfigurationManager config;
     private final GlobalRegionManager globalManager;
     @Nullable
     private final LocalPlayer localPlayer;
 
-    public RegionQuery(WorldGuardPlugin plugin, @Nullable Player player) {
+    public ProtectedRegionQuery(WorldGuardPlugin plugin, @Nullable Player player) {
+        this(plugin, player != null ? plugin.wrapPlayer(player) : null);
+    }
+
+    public ProtectedRegionQuery(WorldGuardPlugin plugin, @Nullable LocalPlayer player) {
         this.config = plugin.getGlobalStateManager();
         this.globalManager = plugin.getGlobalRegionManager();
-        this.localPlayer = player != null ? plugin.wrapPlayer(player) : null;
+        this.localPlayer = player;
     }
 
     public boolean canBuild(Location location) {
@@ -76,7 +81,8 @@ public class RegionQuery {
             return true;
         } else {
             RegionManager manager = globalManager.get(location.getWorld());
-            return manager.getApplicableRegions(BukkitUtil.toVector(location)).canConstruct(localPlayer);
+            ApplicableRegionSet result = manager.getApplicableRegions(BukkitUtil.toVector(location));
+            return result.canBuild(localPlayer) && result.canConstruct(localPlayer);
         }
     }
 

@@ -29,7 +29,7 @@ import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.bukkit.util.RegionQuery;
+import com.sk89q.worldguard.bukkit.util.ProtectedRegionQuery;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
@@ -98,7 +98,7 @@ public class RegionProtectionListener extends AbstractListener {
         Material type = event.getEffectiveMaterial();
 
         if (player != null) {
-            RegionQuery query = new RegionQuery(getPlugin(), player);
+            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
             boolean canPlace;
 
             // Flint and steel, fire charge
@@ -139,7 +139,7 @@ public class RegionProtectionListener extends AbstractListener {
         Material type = event.getEffectiveMaterial();
 
         if (player != null) {
-            RegionQuery query = new RegionQuery(getPlugin(), player);
+            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
             boolean canUse;
 
             // Inventory blocks (CHEST_ACCESS)
@@ -179,7 +179,7 @@ public class RegionProtectionListener extends AbstractListener {
         EntityType type = event.getEffectiveType();
 
         if (player != null) {
-            RegionQuery query = new RegionQuery(getPlugin(), player);
+            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
             boolean canSpawn;
 
             if (Entities.isVehicle(type)) {
@@ -202,7 +202,7 @@ public class RegionProtectionListener extends AbstractListener {
         EntityType type = event.getEntity().getType();
 
         if (player != null) {
-            RegionQuery query = new RegionQuery(getPlugin(), player);
+            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
             boolean canDestroy;
 
             if (Entities.isVehicle(type)) {
@@ -224,7 +224,7 @@ public class RegionProtectionListener extends AbstractListener {
         Location target = event.getTarget();
 
         if (player != null) {
-            RegionQuery query = new RegionQuery(getPlugin(), player);
+            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
             boolean canUse = query.canBuild(target) || query.allows(DefaultFlag.USE, target);
 
             if (!canUse) {

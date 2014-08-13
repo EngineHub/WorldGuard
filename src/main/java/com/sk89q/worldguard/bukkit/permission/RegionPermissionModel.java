@@ -17,14 +17,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+package com.sk89q.worldguard.bukkit.permission;
 
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * Used for querying region-related permissions.
@@ -33,6 +34,10 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     
     public RegionPermissionModel(WorldGuardPlugin plugin, CommandSender sender) {
         super(plugin, sender);
+    }
+
+    public boolean mayIgnoreRegionProtection(World world) {
+        return hasPluginPermission("region.bypass." + world.getName());
     }
     
     public boolean mayForceLoadRegions() {
