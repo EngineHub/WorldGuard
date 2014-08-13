@@ -19,14 +19,12 @@
 
 package com.sk89q.worldguard.bukkit.event.inventory;
 
-import com.sk89q.worldguard.util.cause.Cause;
+import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.AbstractInteractEvent;
 import org.bukkit.World;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,16 +37,8 @@ public class UseItemEvent extends AbstractInteractEvent {
     private final World world;
     private final ItemStack itemStack;
 
-    /**
-     * Create a new instance.
-     *
-     * @param originalEvent the original event
-     * @param causes a list of causes, where the originating causes are at the beginning
-     * @param world the world
-     * @param itemStack the item
-     */
-    public UseItemEvent(Event originalEvent, List<? extends Cause<?>> causes, World world, ItemStack itemStack) {
-        super(originalEvent, causes);
+    public UseItemEvent(Event originalEvent, Cause cause, World world, ItemStack itemStack) {
+        super(originalEvent, cause);
         checkNotNull(world);
         checkNotNull(itemStack);
         this.world = world;

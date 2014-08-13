@@ -20,16 +20,15 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.util.Entities;
-import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.bukkit.util.RegionQuery;
-import com.sk89q.worldguard.util.cause.Causes;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
 import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
+import com.sk89q.worldguard.bukkit.util.Entities;
+import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.bukkit.util.RegionQuery;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -59,7 +58,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(PlaceBlockEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
         Location target = event.getTarget();
         Material type = event.getEffectiveMaterial();
 
@@ -84,7 +83,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(BreakBlockEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
         Location target = event.getTarget();
 
         if (player != null) {
@@ -100,7 +99,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(UseBlockEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
         Location target = event.getTarget();
         Material type = event.getEffectiveMaterial();
 
@@ -140,7 +139,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
         Location target = event.getTarget();
         EntityType type = event.getEffectiveType();
 
@@ -163,7 +162,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
         Location target = event.getTarget();
         EntityType type = event.getEntity().getType();
 
@@ -186,7 +185,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
-        Player player = Causes.getInvolvedPlayer(event.getCauses());
+        Player player = event.getCause().getPlayerRootCause();
         Location target = event.getTarget();
 
         if (player != null) {

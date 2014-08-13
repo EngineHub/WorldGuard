@@ -19,25 +19,23 @@
 
 package com.sk89q.worldguard.bukkit.event.block;
 
-import com.sk89q.worldguard.util.cause.Cause;
+import com.sk89q.worldguard.bukkit.cause.Cause;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import java.util.List;
-
 public class BreakBlockEvent extends AbstractBlockEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public BreakBlockEvent(Event originalEvent, List<? extends Cause<?>> causes, Block block) {
-        super(originalEvent, causes, block);
+    public BreakBlockEvent(Event originalEvent, Cause cause, Block block) {
+        super(originalEvent, cause, block);
     }
 
-    public BreakBlockEvent(Event originalEvent, List<? extends Cause<?>> causes, Location target, Material effectiveMaterial) {
-        super(originalEvent, causes, target, effectiveMaterial);
+    public BreakBlockEvent(Event originalEvent, Cause cause, Location target, Material effectiveMaterial) {
+        super(originalEvent, cause, target, effectiveMaterial);
     }
 
     @Override

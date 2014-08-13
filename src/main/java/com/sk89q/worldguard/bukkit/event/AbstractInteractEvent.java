@@ -19,32 +19,29 @@
 
 package com.sk89q.worldguard.bukkit.event;
 
-import com.sk89q.worldguard.util.cause.Cause;
+import com.sk89q.worldguard.bukkit.cause.Cause;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
-
-import java.util.Collections;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractInteractEvent extends Event implements Cancellable {
 
     private final Event originalEvent;
-    private final List<? extends Cause<?>> causes;
+    private final Cause cause;
     private boolean cancelled;
 
     /**
      * Create a new instance
      *
      * @param originalEvent the original event
-     * @param causes a list of causes, where the originating causes are at the beginning
+     * @param cause the cause
      */
-    protected AbstractInteractEvent(Event originalEvent, List<? extends Cause<?>> causes) {
+    protected AbstractInteractEvent(Event originalEvent, Cause cause) {
         checkNotNull(originalEvent);
-        checkNotNull(causes);
+        checkNotNull(cause);
         this.originalEvent = originalEvent;
-        this.causes = causes;
+        this.cause = cause;
     }
 
     /**
@@ -57,13 +54,12 @@ public abstract class AbstractInteractEvent extends Event implements Cancellable
     }
 
     /**
-     * Return an unmodifiable list of causes, where the originating causes are
-     * at the beginning of the list.
+     * Return the cause.
      *
-     * @return a list of causes
+     * @return the cause
      */
-    public List<? extends Cause<?>> getCauses() {
-        return Collections.unmodifiableList(causes);
+    public Cause getCause() {
+        return cause;
     }
 
     @Override
