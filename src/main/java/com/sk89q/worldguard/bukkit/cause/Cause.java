@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit.cause;
 import com.google.common.base.Joiner;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
 
 import javax.annotation.Nullable;
@@ -98,6 +99,8 @@ public class Cause {
                     expand(list, ((Projectile) o).getShooter());
                 } else if (o instanceof Vehicle) {
                     expand(list, ((Vehicle) o).getPassenger());
+                } else if (o instanceof Tameable) {
+                    expand(list, ((Tameable) o).getOwner());
                 } else {
                     list.add(o);
                 }
