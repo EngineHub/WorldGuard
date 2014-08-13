@@ -36,6 +36,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Boat;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.EnderPearl;
@@ -913,6 +914,20 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.blockZombieDoorDestruction) {
                 event.setCancelled(true);
                 return;
+            }
+        } else if (ent instanceof Boat) {
+            if (wcfg.protectLilyPadsAgainstBoats) {
+                Boat boat = (Boat) ent;
+                Entity passenger = boat.getPassenger();
+                if (!wcfg.useRegions || !(passenger instanceof Player)) {
+                    event.setCancelled(true);
+                    return;
+                }
+                Player player = (Player) passenger;
+                if (!plugin.getGlobalRegionManager().canBuild(player, block.getLocation())) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
     }
