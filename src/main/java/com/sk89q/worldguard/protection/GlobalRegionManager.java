@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
@@ -26,14 +27,17 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 public class GlobalRegionManager {
@@ -50,13 +54,26 @@ public class GlobalRegionManager {
 
     @Nullable
     public RegionManager load(World world) {
-        return container.load(world.getName());
+        checkNotNull(world);
+        RegionManager manager = container.load(world.getName());
+        if (manager != null) {
+            List<Vector2D> positions = new ArrayList<Vector2D>();
+            for (Chunk chunk : world.getLoadedChunks()) {
+                positions.add(new Vector2D(chunk.getX(), chunk.getZ()));
+            }
+            manager.loadChunks(positions);
+        }
+        return manager;
     }
 
     public void preload() {
         for (World world : plugin.getServer().getWorlds()) {
             load(world);
         }
+    }
+
+    public void unload(World world) {
+        unload(world.getName());
     }
 
     public void unload(String name) {

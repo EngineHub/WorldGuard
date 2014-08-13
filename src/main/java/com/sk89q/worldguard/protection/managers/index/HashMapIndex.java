@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection.managers.index;
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -100,6 +101,26 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
 
             rebuildIndex();
         }
+    }
+
+    @Override
+    public void bias(Vector2D chunkPosition) {
+        // Nothing to do
+    }
+
+    @Override
+    public void biasAll(Collection<Vector2D> chunkPositions) {
+        // Nothing to do
+    }
+
+    @Override
+    public void forget(Vector2D chunkPosition) {
+        // Nothing to do
+    }
+
+    @Override
+    public void forgetAll() {
+        // Nothing to do
     }
 
     @Override

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
@@ -30,13 +31,19 @@ import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.bukkit.util.RegionQuery;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 
 /**
  * Handle events that need to be processed by region protection.
@@ -54,6 +61,34 @@ public class RegionProtectionListener extends AbstractListener {
 
     private void tellErrorMessage(CommandSender sender, Object subject) {
         sender.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+    }
+
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        getPlugin().getGlobalRegionManager().load(event.getWorld());
+    }
+
+    @EventHandler
+    public void onWorldUnload(WorldUnloadEvent event) {
+        getPlugin().getGlobalRegionManager().unload(event.getWorld());
+    }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
+        RegionManager manager = getPlugin().getGlobalRegionManager().get(event.getWorld());
+        if (manager != null) {
+            Chunk chunk = event.getChunk();
+            manager.loadChunk(new Vector2D(chunk.getX(), chunk.getZ()));
+        }
+    }
+
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        RegionManager manager = getPlugin().getGlobalRegionManager().get(event.getWorld());
+        if (manager != null) {
+            Chunk chunk = event.getChunk();
+            manager.unloadChunk(new Vector2D(chunk.getX(), chunk.getZ()));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)

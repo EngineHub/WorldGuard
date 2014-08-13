@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection.managers;
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
@@ -29,6 +30,7 @@ import com.sk89q.worldguard.protection.managers.index.RegionIndex;
 import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
 import com.sk89q.worldguard.protection.managers.storage.RegionStore;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.util.RegionCollectionConsumer;
 import com.sk89q.worldguard.util.Normal;
 
 import javax.annotation.Nullable;
@@ -111,6 +113,33 @@ public final class RegionManager {
                 save(); // Partial save is not supported
             }
         }
+    }
+
+    /**
+     * Load the regions for a chunk.
+     *
+     * @param position the position
+     */
+    public void loadChunk(Vector2D position) {
+        index.bias(position);
+    }
+
+    /**
+     * Load the regions for a chunk.
+     *
+     * @param positions a collection of positions
+     */
+    public void loadChunks(Collection<Vector2D> positions) {
+        index.biasAll(positions);
+    }
+
+    /**
+     * Unload the regions for a chunk.
+     *
+     * @param position the position
+     */
+    public void unloadChunk(Vector2D position) {
+        index.forget(position);
     }
 
     /**

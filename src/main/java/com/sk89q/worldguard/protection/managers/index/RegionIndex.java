@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.managers.index;
 
 import com.google.common.base.Predicate;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -38,6 +39,37 @@ import java.util.Set;
  * <p>Indexes may be thread-unsafe.</p>
  */
 public interface RegionIndex extends ChangeTracked {
+
+    /**
+     * Bias the given chunk for faster lookups (put it in a hash table, etc.).
+     *
+     * <p>Implementations may choose to do nothing.</p>
+     *
+     * @param chunkPosition the chunk position
+     */
+    void bias(Vector2D chunkPosition);
+
+    /**
+     * Bias the given chunk for faster lookups (put it in a hash table, etc.).
+     *
+     * <p>Implementations may choose to do nothing.</p>
+     *
+     * @param chunkPosition the chunk position
+     */
+    void biasAll(Collection<Vector2D> chunkPosition);
+
+    /**
+     * No longer bias the given chunk for faster lookup.
+     *
+     * @param chunkPosition the chunk position
+     */
+    void forget(Vector2D chunkPosition);
+
+    /**
+     * Clearly all extra cache data created by any calls to
+     * {@link #bias(Vector2D)}.
+     */
+    void forgetAll();
 
     /**
      * Add a region to this index, replacing any existing one with the same
