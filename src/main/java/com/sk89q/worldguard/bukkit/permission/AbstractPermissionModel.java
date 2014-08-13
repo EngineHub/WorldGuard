@@ -17,8 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit;
+package com.sk89q.worldguard.bukkit.permission;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.command.CommandSender;
 import com.sk89q.worldguard.internal.PermissionModel;
 
