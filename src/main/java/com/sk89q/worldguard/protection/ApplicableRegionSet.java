@@ -31,6 +31,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,6 +50,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * available on {@link RegionManager}.</p>
  */
 public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
+
+    /**
+     * A static instance of an empty set.
+     */
+    private static final ApplicableRegionSet EMPTY = new ApplicableRegionSet(Collections.<ProtectedRegion>emptyList(), null);
 
     private final SortedSet<ProtectedRegion> applicable;
     @Nullable
@@ -432,6 +438,13 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     @Override
     public Iterator<ProtectedRegion> iterator() {
         return applicable.iterator();
+    }
+
+    /**
+     * Return an instance that contains no regions and has no global region.
+     */
+    public static ApplicableRegionSet getEmpty() {
+        return EMPTY;
     }
 
 }

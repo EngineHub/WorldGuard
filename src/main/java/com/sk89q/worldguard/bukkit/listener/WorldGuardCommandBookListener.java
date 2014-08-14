@@ -44,8 +44,7 @@ public class WorldGuardCommandBookListener implements Listener {
             Player player = (Player) event.getPlayer();
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
             if (plugin.getGlobalStateManager().get(player.getWorld()).useRegions) {
-                ApplicableRegionSet regions = plugin.getGlobalRegionManager()
-                        .get(player.getWorld()).getApplicableRegions(player.getLocation());
+                ApplicableRegionSet regions = plugin.getRegionContainer().createQuery().queryContains(player.getLocation());
                 
                 // Current regions
                 StringBuilder regionStr = new StringBuilder();

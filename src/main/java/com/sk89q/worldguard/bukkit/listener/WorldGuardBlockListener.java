@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemType;
@@ -28,7 +27,6 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -54,8 +52,6 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.inventory.ItemStack;
-
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
 
 /**
  * The listener for block events.
@@ -275,9 +271,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.useRegions) {
-            Vector pt = toVector(block);
-            RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(block.getLocation());
 
             if (wcfg.highFreqFlags && isFireSpread
                     && !set.allows(DefaultFlag.FIRE_SPREAD)) {
@@ -351,14 +345,11 @@ public class WorldGuardBlockListener implements Listener {
             int x = block.getX();
             int y = block.getY();
             int z = block.getZ();
-            Vector pt = toVector(block);
-            RegionManager mgr = plugin.getGlobalRegionManager().get(block.getWorld());
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(block.getLocation());
 
             if (!set.allows(DefaultFlag.FIRE_SPREAD)) {
                 checkAndDestroyAround(block.getWorld(), x, y, z, BlockID.FIRE);
                 event.setCancelled(true);
-                return;
             }
 
         }

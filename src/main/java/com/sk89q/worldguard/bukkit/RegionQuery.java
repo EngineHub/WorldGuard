@@ -40,45 +40,61 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RegionQuery {
 
+    private final WorldGuardPlugin plugin;
     private final ConfigurationManager config;
     private final GlobalRegionManager globalManager;
     private final QueryCache cache;
-    @Nullable
-    private final LocalPlayer localPlayer;
 
     /**
      * Create a new instance.
      *
      * @param plugin the plugin
      * @param cache the query cache
-     * @param player an optional player
      */
-    RegionQuery(WorldGuardPlugin plugin, QueryCache cache, @Nullable Player player) {
-        this(plugin, cache, player != null ? plugin.wrapPlayer(player) : null);
-    }
-
-    /**
-     * Create a new instance.
-     *
-     * @param plugin the plugin
-     * @param cache the query cache
-     * @param player an optional player
-     */
-    RegionQuery(WorldGuardPlugin plugin, QueryCache cache, @Nullable LocalPlayer player) {
+    RegionQuery(WorldGuardPlugin plugin, QueryCache cache) {
         checkNotNull(plugin);
         checkNotNull(cache);
 
+        this.plugin = plugin;
         this.config = plugin.getGlobalStateManager();
         this.cache = cache;
         //noinspection deprecation
         this.globalManager = plugin.getGlobalRegionManager();
-        this.localPlayer = player;
     }
 
     /**
-     * Test whether the player (which must not be {@code null} can build at
-     * the given location, using only the membership information and the state
-     * of the {@link DefaultFlag#BUILD} flag to determine status.
+     * Query for regions containing the given location.
+     *
+     * <p>An instance of {@link ApplicableRegionSet} will always be returned,
+     * even if regions are disabled or region data failed to load. The most
+     * appropriate implementation will be returned in such a case
+     * (for example, if regions are disable, the returned implementation
+     * would permit all activities).</p>
+     *
+     * @param location the location
+     * @return a region set
+     */
+    public ApplicableRegionSet queryContains(Location location) {
+        checkNotNull(location);
+
+        World world = location.getWorld();
+        WorldConfiguration worldConfig = config.get(world);
+
+        if (!worldConfig.useRegions) {
+            return ApplicableRegionSet.getEmpty();
+        }
+
+        RegionManager manager = globalManager.get(location.getWorld());
+        if (manager != null) {
+            return cache.queryContains(manager, location);
+        } else {
+            return ApplicableRegionSet.getEmpty();
+        }
+    }
+
+    /**
+     * Test a the player can build at the given location, checking membership
+     * information and the state of the {@link DefaultFlag#BUILD} flag.
      *
      * <p>This method is used to check blocks and entities for which there
      * are no other related flags for (i.e. beds have the
@@ -89,13 +105,15 @@ public class RegionQuery {
      * depending on the configuration.</p>
      *
      * @param location the location
+     * @param player the player
      * @return true if building is permitted
      * @throws NullPointerException if there is no player for this query
      */
-    public boolean testPermission(Location location) {
+    public boolean testPermission(Location location, Player player) {
         checkNotNull(location);
-        checkNotNull(localPlayer, "testPermission() requires a player for the query");
-        
+        checkNotNull(player);
+
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
         World world = location.getWorld();
         WorldConfiguration worldConfig = config.get(world);
 
@@ -112,10 +130,9 @@ public class RegionQuery {
     }
 
     /**
-     * Test whether the player (which must not be {@code null} can build at
-     * the given location, using the membership information, state
-     * of the {@link DefaultFlag#BUILD} flag, and the state of any passed
-     * flags.
+     * Test a the player can build at the given location, checking membership
+     * information, state of the {@link DefaultFlag#BUILD} flag, and the state
+     * of any passed flags.
      *
      * <p>This method is used to check blocks and entities for which there
      * are other related flags for (i.e. beds have the
@@ -128,14 +145,16 @@ public class RegionQuery {
      * depending on the configuration.</p>
      *
      * @param location the location to test
+     * @param player the player
      * @param flags an array of flags
      * @return true if the flag tests true
      */
-    public boolean testPermission(Location location, StateFlag... flags) {
+    public boolean testPermission(Location location, Player player, StateFlag... flags) {
         checkNotNull(location);
         checkNotNull(flags);
-        checkNotNull(localPlayer, "testPermission() requires a player for the query");
+        checkNotNull(player);
 
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
         World world = location.getWorld();
         WorldConfiguration worldConfig = config.get(world);
 
@@ -176,13 +195,15 @@ public class RegionQuery {
      * depending on the configuration.</p>
      *
      * @param location the location
+     * @param player the player (or null)
      * @param flag the flag
      * @return true if the flag evaluates to {@code ALLOW}
      */
-    public boolean testState(Location location, StateFlag flag) {
+    public boolean testState(Location location, @Nullable Player player, StateFlag flag) {
         checkNotNull(location);
         checkNotNull(flag);
 
+        LocalPlayer localPlayer = player != null ? plugin.wrapPlayer(player) : null;
         World world = location.getWorld();
         WorldConfiguration worldConfig = config.get(world);
 

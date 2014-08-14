@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.RegionContainer;
 import com.sk89q.worldguard.bukkit.RegionQuery;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -85,32 +86,12 @@ public class GlobalRegionManager {
     }
 
     /**
-     * Create a new region query with no player.
-     *
-     * @return a new query
-     */
-    private RegionQuery createAnonymousQuery() {
-        return container.createAnonymousQuery();
-    }
-
-    /**
      * Create a new region query.
      *
-     * @param player a player, or {@code null}
      * @return a new query
      */
-    private RegionQuery createQuery(@Nullable Player player) {
-        return container.createQuery(player);
-    }
-
-    /**
-     * Create a new region query.
-     *
-     * @param player a player, or {@code null}
-     * @return a new query
-     */
-    private RegionQuery createQuery(@Nullable LocalPlayer player) {
-        return container.createQuery(player);
+    private RegionQuery createQuery() {
+        return container.createQuery();
     }
 
     /**
@@ -119,7 +100,7 @@ public class GlobalRegionManager {
      * @param player the player
      * @param world the world
      * @return true if a bypass is permitted
-     * @deprecated use {@link #createQuery(Player)}
+     * @deprecated use {@link RegionContainer#createQuery()}
      */
     @Deprecated
     public boolean hasBypass(LocalPlayer player, World world) {
@@ -132,7 +113,7 @@ public class GlobalRegionManager {
      * @param player the player
      * @param world the world
      * @return true if a bypass is permitted
-     * @deprecated use {@link #createQuery(Player)}
+     * @deprecated use {@link RegionContainer#createQuery()}
      */
     @Deprecated
     public boolean hasBypass(Player player, World world) {
@@ -152,7 +133,7 @@ public class GlobalRegionManager {
      * @param player the player
      * @param block the block
      * @return true if a bypass is permitted
-     * @deprecated use {@link #createQuery(Player)}
+     * @deprecated use {@link RegionContainer#createQuery()}
      */
     @SuppressWarnings("deprecation")
     @Deprecated
@@ -173,11 +154,11 @@ public class GlobalRegionManager {
      * @param player the player
      * @param location the location
      * @return true if a bypass is permitted
-     * @deprecated use {@link #createQuery(Player)}
+     * @deprecated use {@link RegionContainer#createQuery()}
      */
     @Deprecated
     public boolean canBuild(Player player, Location location) {
-        return createQuery(player).testPermission(location);
+        return createQuery().testPermission(location, player);
     }
 
     /**
@@ -213,7 +194,7 @@ public class GlobalRegionManager {
      * @param flag the flag
      * @param location the location
      * @return true if set to true
-     * @deprecated use {@link #createQuery(Player)}
+     * @deprecated use {@link RegionContainer#createQuery()}
      */
     @Deprecated
     @SuppressWarnings("deprecation")
@@ -229,11 +210,16 @@ public class GlobalRegionManager {
      * @param location the location
      * @param player the actor
      * @return true if set to true
-     * @deprecated use {@link #createQuery(Player)}
+     * @deprecated use {@link RegionContainer#createQuery()}
      */
     @Deprecated
     public boolean allows(StateFlag flag, Location location, @Nullable LocalPlayer player) {
-        return createQuery(player).testState(location, flag);
+        if (player instanceof BukkitPlayer) {
+            Player p = ((BukkitPlayer) player).getPlayer();
+            return createQuery().testState(location, p, flag);
+        } else {
+            throw new IllegalArgumentException("Can't take a non-Bukkit player");
+        }
     }
 
 }
