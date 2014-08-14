@@ -214,7 +214,9 @@ public class GlobalRegionManager {
      */
     @Deprecated
     public boolean allows(StateFlag flag, Location location, @Nullable LocalPlayer player) {
-        if (player instanceof BukkitPlayer) {
+        if (player == null) {
+            return createQuery().testState(location, null, flag);
+        } else if (player instanceof BukkitPlayer) {
             Player p = ((BukkitPlayer) player).getPlayer();
             return createQuery().testState(location, p, flag);
         } else {
