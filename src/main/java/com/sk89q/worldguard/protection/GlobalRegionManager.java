@@ -233,7 +233,7 @@ public class GlobalRegionManager {
      */
     @Deprecated
     public boolean allows(StateFlag flag, Location location, @Nullable LocalPlayer player) {
-        return createQuery(player).testEnabled(location, flag);
+        return createQuery(player).testState(location, flag);
     }
 
 }

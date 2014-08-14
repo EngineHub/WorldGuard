@@ -179,7 +179,7 @@ public class RegionQuery {
      * @param flag the flag
      * @return true if the flag evaluates to {@code ALLOW}
      */
-    public boolean testEnabled(Location location, StateFlag flag) {
+    public boolean testState(Location location, StateFlag flag) {
         checkNotNull(location);
         checkNotNull(flag);
 
