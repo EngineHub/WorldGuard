@@ -53,9 +53,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RegionContainer {
 
+    /**
+     * Invalidation frequency in ticks.
+     */
+    private static final int CACHE_INVALIDATION_INTERVAL = 2;
+
     private final Object lock = new Object();
     private final WorldGuardPlugin plugin;
     private final ManagerContainer container;
+    private final QueryCache cache = new QueryCache();
 
     /**
      * Create a new instance.
@@ -106,6 +112,13 @@ public class RegionContainer {
                 }
             }
         }, plugin);
+
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                cache.invalidateAll();
+            }
+        }, CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
     }
 
     /**
@@ -216,7 +229,7 @@ public class RegionContainer {
      * @return a new query
      */
     public RegionQuery createAnonymousQuery() {
-        return new RegionQuery(plugin, (Player) null);
+        return new RegionQuery(plugin, cache, (Player) null);
     }
 
     /**
@@ -226,7 +239,7 @@ public class RegionContainer {
      * @return a new query
      */
     public RegionQuery createQuery(@Nullable Player player) {
-        return new RegionQuery(plugin, player);
+        return new RegionQuery(plugin, cache, player);
     }
 
     /**
@@ -236,7 +249,7 @@ public class RegionContainer {
      * @return a new query
      */
     public RegionQuery createQuery(@Nullable LocalPlayer player) {
-        return new RegionQuery(plugin, player);
+        return new RegionQuery(plugin, cache, player);
     }
 
 }
