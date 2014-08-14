@@ -20,12 +20,10 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.Vector2D;
-import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
@@ -198,13 +196,12 @@ public class RegionContainer {
     /**
      * Get the region manager for a world if one exists.
      *
+     * <p>If you wish to make queries and performance is more important
+     * than accuracy, use {@link #createQuery()} instead.</p>
+     *
      * <p>This method may return {@code null} if region data for the given
      * world has not been loaded, has failed to load, or support for regions
-     * has been disabled. If you merely want to query flags or a list of
-     * regions in a position, using {@link #createQuery(Player)} is much
-     * simpler and it will handle the case of a {@code null}
-     * {@code RegionManager}. That said, if you wish to make changes to
-     * regions, then you will have to get a region manager.</p>
+     * has been disabled.</p>
      *
      * @param world the world
      * @return a region manager, or {@code null} if one is not available
