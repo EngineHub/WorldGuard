@@ -63,15 +63,15 @@ public class RegionProtectionListener extends AbstractListener {
         Material type = event.getEffectiveMaterial();
 
         if (player != null) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
             boolean canPlace;
 
             // Flint and steel, fire charge
             if (type == Material.FIRE) {
-                canPlace = query.testPermission(target, DefaultFlag.LIGHTER);
+                canPlace = query.testPermission(target, player, DefaultFlag.LIGHTER);
 
             } else {
-                canPlace = query.testPermission(target);
+                canPlace = query.testPermission(target, player);
             }
 
             if (!canPlace) {
@@ -87,8 +87,8 @@ public class RegionProtectionListener extends AbstractListener {
         Location target = event.getTarget();
 
         if (player != null) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
-            boolean canBreak = query.testPermission(target);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
+            boolean canBreak = query.testPermission(target, player);
 
             if (!canBreak) {
                 tellErrorMessage(player, target);
@@ -104,24 +104,24 @@ public class RegionProtectionListener extends AbstractListener {
         Material type = event.getEffectiveMaterial();
 
         if (player != null) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
             boolean canUse;
 
             // Inventory blocks (CHEST_ACCESS)
             if (Materials.isInventoryBlock(type)) {
-                canUse = query.testPermission(target, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
+                canUse = query.testPermission(target, player, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
 
             // Beds (SLEEP)
             } else if (type == Material.BED) {
-                canUse = query.testPermission(target, DefaultFlag.USE, DefaultFlag.SLEEP);
+                canUse = query.testPermission(target, player, DefaultFlag.USE, DefaultFlag.SLEEP);
 
             // TNT (TNT)
             } else if (type == Material.TNT) {
-                canUse = query.testPermission(target, DefaultFlag.TNT);
+                canUse = query.testPermission(target, player, DefaultFlag.TNT);
 
             // Everything else
             } else {
-                canUse = query.testPermission(target, DefaultFlag.USE);
+                canUse = query.testPermission(target, player, DefaultFlag.USE);
             }
 
             if (!canUse) {
@@ -138,13 +138,13 @@ public class RegionProtectionListener extends AbstractListener {
         EntityType type = event.getEffectiveType();
 
         if (player != null) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
             boolean canSpawn;
 
             if (Entities.isVehicle(type)) {
-                canSpawn = query.testPermission(target, DefaultFlag.PLACE_VEHICLE);
+                canSpawn = query.testPermission(target, player, DefaultFlag.PLACE_VEHICLE);
             } else {
-                canSpawn = query.testPermission(target);
+                canSpawn = query.testPermission(target, player);
             }
 
             if (!canSpawn) {
@@ -161,13 +161,13 @@ public class RegionProtectionListener extends AbstractListener {
         EntityType type = event.getEntity().getType();
 
         if (player != null) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
             boolean canDestroy;
 
             if (Entities.isVehicle(type)) {
-                canDestroy = query.testPermission(target, DefaultFlag.DESTROY_VEHICLE);
+                canDestroy = query.testPermission(target, player, DefaultFlag.DESTROY_VEHICLE);
             } else {
-                canDestroy = query.testPermission(target);
+                canDestroy = query.testPermission(target, player);
             }
 
             if (!canDestroy) {
@@ -183,8 +183,8 @@ public class RegionProtectionListener extends AbstractListener {
         Location target = event.getTarget();
 
         if (player != null) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
-            boolean canUse = query.testPermission(target, DefaultFlag.USE);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
+            boolean canUse = query.testPermission(target, player, DefaultFlag.USE);
 
             if (!canUse) {
                 tellErrorMessage(player, target);

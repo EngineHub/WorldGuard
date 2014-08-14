@@ -224,32 +224,12 @@ public class RegionContainer {
     }
 
     /**
-     * Create a new region query with no player.
-     *
-     * @return a new query
-     */
-    public RegionQuery createAnonymousQuery() {
-        return new RegionQuery(plugin, cache, (Player) null);
-    }
-
-    /**
      * Create a new region query.
      *
-     * @param player a player, or {@code null}
      * @return a new query
      */
-    public RegionQuery createQuery(@Nullable Player player) {
-        return new RegionQuery(plugin, cache, player);
-    }
-
-    /**
-     * Create a new region query.
-     *
-     * @param player a player, or {@code null}
-     * @return a new query
-     */
-    public RegionQuery createQuery(@Nullable LocalPlayer player) {
-        return new RegionQuery(plugin, cache, player);
+    public RegionQuery createQuery() {
+        return new RegionQuery(plugin, cache);
     }
 
 }

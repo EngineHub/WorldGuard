@@ -19,11 +19,11 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import static com.sk89q.worldguard.bukkit.BukkitUtil.toVector;
-
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,10 +31,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 
 public class WorldGuardWeatherListener implements Listener {
 
@@ -102,9 +98,7 @@ public class WorldGuardWeatherListener implements Listener {
 
         Location loc = event.getLightning().getLocation();
         if (wcfg.useRegions) {
-            Vector pt = toVector(loc);
-            RegionManager mgr = plugin.getGlobalRegionManager().get(loc.getWorld());
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(loc);
 
             if (!set.allows(DefaultFlag.LIGHTNING)) {
                 event.setCancelled(true);

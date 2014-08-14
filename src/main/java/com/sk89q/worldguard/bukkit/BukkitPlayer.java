@@ -89,4 +89,8 @@ public class BukkitPlayer extends LocalPlayer {
         return plugin.hasPermission(player, perm);
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
 }
