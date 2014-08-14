@@ -26,6 +26,8 @@ import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import javax.annotation.Nullable;
+
 /**
  * Fired when a block is interacted with.
  */
@@ -33,11 +35,11 @@ public class UseBlockEvent extends AbstractBlockEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public UseBlockEvent(Event originalEvent, Cause cause, Block block) {
+    public UseBlockEvent(@Nullable Event originalEvent, Cause cause, Block block) {
         super(originalEvent, cause, block);
     }
 
-    public UseBlockEvent(Event originalEvent, Cause cause, Location target, Material effectiveMaterial) {
+    public UseBlockEvent(@Nullable Event originalEvent, Cause cause, Location target, Material effectiveMaterial) {
         super(originalEvent, cause, target, effectiveMaterial);
     }
 

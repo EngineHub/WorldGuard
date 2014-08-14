@@ -17,10 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection;
+package com.sk89q.worldguard.bukkit;
 
 import com.google.common.base.Supplier;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.index.ChunkHashTable;
 import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
@@ -54,16 +53,29 @@ class ManagerContainer {
     private static final Logger log = Logger.getLogger(ManagerContainer.class.getCanonicalName());
     private static final int SAVE_INTERVAL = 1000 * 30;
 
+    private final ConfigurationManager config;
     private final ConcurrentMap<Normal, RegionManager> mapping = new ConcurrentHashMap<Normal, RegionManager>();
     private final Object lock = new Object();
     private final EnumMap<DriverType, RegionStoreDriver> drivers = new EnumMap<DriverType, RegionStoreDriver>(DriverType.class);
-    private final RegionStoreDriver defaultDriver;
+    private RegionStoreDriver defaultDriver;
     private final Supplier<? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
     private final Timer timer = new Timer();
 
+    /**
+     * Create a new instance.
+     *
+     * @param config the configuration
+     */
     ManagerContainer(ConfigurationManager config) {
         checkNotNull(config);
+        this.config = config;
+        timer.schedule(new BackgroundSaver(), SAVE_INTERVAL, SAVE_INTERVAL);
+    }
 
+    /**
+     * Create drivers from the configuration.
+     */
+    public void initialize() {
         for (DriverType type : DriverType.values()) {
             drivers.put(type, type.create(config));
         }
@@ -73,10 +85,15 @@ class ManagerContainer {
         } else {
             defaultDriver = drivers.get(DriverType.YAML);
         }
-
-        timer.schedule(new BackgroundSaver(), SAVE_INTERVAL, SAVE_INTERVAL);
     }
 
+    /**
+     * Load the {@code RegionManager} for the world with the given name,
+     * creating a new instance for the world if one does not exist yet.
+     *
+     * @param name the name of the world
+     * @return a region manager, or {@code null} if loading failed
+     */
     @Nullable
     public RegionManager load(String name) {
         checkNotNull(name);
@@ -100,6 +117,13 @@ class ManagerContainer {
         }
     }
 
+    /**
+     * Create a new region manager and load the data.
+     *
+     * @param name the name of the world
+     * @return a region manager
+     * @throws IOException thrown if loading fals
+     */
     private RegionManager createAndLoad(String name) throws IOException {
         RegionStore store = defaultDriver.get(name);
         RegionManager manager = new RegionManager(store, indexFactory);
@@ -107,6 +131,14 @@ class ManagerContainer {
         return manager;
     }
 
+    /**
+     * Unload the region manager associated with the given world name.
+     *
+     * <p>If no region manager has been loaded for the given name, then
+     * nothing will happen.</p>
+     *
+     * @param name the name of the world
+     */
     public void unload(String name) {
         checkNotNull(name);
 
@@ -120,11 +152,16 @@ class ManagerContainer {
                 } catch (IOException e) {
                     log.log(Level.WARNING, "Failed to save the region data for '" + name + "'", e);
                 }
+
+                mapping.remove(normal);
             }
-            mapping.remove(normal);
         }
     }
 
+    /**
+     * Unload all region managers and save their contents before returning.
+     * This message may block for an extended period of time.
+     */
     public void unloadAll() {
         synchronized (lock) {
             for (Map.Entry<Normal, RegionManager> entry : mapping.entrySet()) {
@@ -141,16 +178,30 @@ class ManagerContainer {
         }
     }
 
+    /**
+     * Get the region manager for the given world name.
+     *
+     * @param name the name of the world
+     * @return a region manager, or {@code null} if one was never loaded
+     */
     @Nullable
     public RegionManager get(String name) {
         checkNotNull(name);
         return mapping.get(Normal.normal(name));
     }
 
+    /**
+     * Get an immutable list of loaded region managers.
+     *
+     * @return an immutable list
+     */
     public List<RegionManager> getLoaded() {
         return Collections.unmodifiableList(new ArrayList<RegionManager>(mapping.values()));
     }
 
+    /**
+     * A task to save managers in the background.
+     */
     private class BackgroundSaver extends TimerTask {
         @Override
         public void run() {

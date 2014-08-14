@@ -23,10 +23,13 @@ import com.sk89q.worldguard.bukkit.cause.Cause;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
+import javax.annotation.Nullable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractInteractEvent extends Event implements Cancellable {
+public abstract class AbstractDelegateEvent extends Event implements Cancellable {
 
+    @Nullable
     private final Event originalEvent;
     private final Cause cause;
     private boolean cancelled;
@@ -37,8 +40,7 @@ public abstract class AbstractInteractEvent extends Event implements Cancellable
      * @param originalEvent the original event
      * @param cause the cause
      */
-    protected AbstractInteractEvent(Event originalEvent, Cause cause) {
-        checkNotNull(originalEvent);
+    protected AbstractDelegateEvent(@Nullable Event originalEvent, Cause cause) {
         checkNotNull(cause);
         this.originalEvent = originalEvent;
         this.cause = cause;
@@ -47,8 +49,9 @@ public abstract class AbstractInteractEvent extends Event implements Cancellable
     /**
      * Get the original event.
      *
-     * @return the original event
+     * @return the original event, which may be {@code null} if unavailable
      */
+    @Nullable
     public Event getOriginalEvent() {
         return originalEvent;
     }

@@ -21,7 +21,8 @@ package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.blacklist.Blacklist;
 
-public class BukkitBlacklist extends Blacklist {
+class BukkitBlacklist extends Blacklist {
+
     private WorldGuardPlugin plugin;
     
     public BukkitBlacklist(Boolean useAsWhitelist, WorldGuardPlugin plugin) {
@@ -33,4 +34,5 @@ public class BukkitBlacklist extends Blacklist {
     public void broadcastNotification(String msg) {
         plugin.broadcastNotification(msg);
     }
+
 }

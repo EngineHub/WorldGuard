@@ -26,15 +26,17 @@ import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import javax.annotation.Nullable;
+
 public class PlaceBlockEvent extends AbstractBlockEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public PlaceBlockEvent(Event originalEvent, Cause cause, Block block) {
+    public PlaceBlockEvent(@Nullable Event originalEvent, Cause cause, Block block) {
         super(originalEvent, cause, block);
     }
 
-    public PlaceBlockEvent(Event originalEvent, Cause cause, Location target, Material effectiveMaterial) {
+    public PlaceBlockEvent(@Nullable Event originalEvent, Cause cause, Location target, Material effectiveMaterial) {
         super(originalEvent, cause, target, effectiveMaterial);
     }
 

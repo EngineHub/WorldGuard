@@ -19,111 +19,45 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.RegionContainer;
+import com.sk89q.worldguard.bukkit.RegionQuery;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.util.ProtectedRegionQuery;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A global region manager loads, saves and caches region data for zero or
- * more worlds at a time.
+ * This is the legacy class for accessing region data.
  *
- * <p>This class is thread safe and its contents can be accessed from
- * multiple concurrent threads.</p>
+ * @deprecated use {@link WorldGuardPlugin#getRegionContainer()}
  */
+@Deprecated
 public class GlobalRegionManager {
 
     private final WorldGuardPlugin plugin;
-    private final ManagerContainer container;
+    private final RegionContainer container;
 
     /**
      * Create a new instance.
      *
      * @param plugin the plugin
+     * @param container the container
      */
-    public GlobalRegionManager(WorldGuardPlugin plugin) {
+    public GlobalRegionManager(WorldGuardPlugin plugin, RegionContainer container) {
+        checkNotNull(plugin);
+        checkNotNull(container);
         this.plugin = plugin;
-
-        ConfigurationManager config = plugin.getGlobalStateManager();
-        container = new ManagerContainer(config);
-    }
-
-    /**
-     * Load the region data for a world if it has not been loaded already.
-     *
-     * <p>This method is called by WorldGuard and should not be called
-     * by other plugins.</p>
-     *
-     * @param world the world
-     * @return a region manager, either returned from the cache or newly loaded
-     */
-    @Nullable
-    public RegionManager load(World world) {
-        checkNotNull(world);
-
-        RegionManager manager = container.load(world.getName());
-
-        if (manager != null) {
-            // Bias the region data for loaded chunks
-            List<Vector2D> positions = new ArrayList<Vector2D>();
-            for (Chunk chunk : world.getLoadedChunks()) {
-                positions.add(new Vector2D(chunk.getX(), chunk.getZ()));
-            }
-            manager.loadChunks(positions);
-        }
-
-        return manager;
-    }
-
-    /**
-     * Load the region data for a list of worlds.
-     *
-     * <p>This method is called by WorldGuard and should not be called
-     * by other plugins.</p>
-     *
-     * @param worlds a list of worlds
-     */
-    public void loadAll(Collection<? extends World> worlds) {
-        checkNotNull(worlds);
-
-        for (World world : worlds) {
-            load(world);
-        }
-    }
-
-    /**
-     * Unload the region data for a world.
-     *
-     * @param world a world
-     */
-    public void unload(World world) {
-        checkNotNull(world);
-
-        container.unload(world.getName());
-    }
-
-    /**
-     * Unload all region data for all worlds that region data has
-     * been loaded for.
-     */
-    public void unloadAll() {
-        container.unloadAll();
+        this.container = container;
     }
 
     /**
@@ -138,7 +72,7 @@ public class GlobalRegionManager {
      */
     @Nullable
     public RegionManager get(World world) {
-        return container.get(world.getName());
+        return container.get(world);
     }
 
     /**
@@ -155,8 +89,8 @@ public class GlobalRegionManager {
      *
      * @return a new query
      */
-    public ProtectedRegionQuery createAnonymousQuery() {
-        return new ProtectedRegionQuery(plugin, (Player) null);
+    private RegionQuery createAnonymousQuery() {
+        return container.createAnonymousQuery();
     }
 
     /**
@@ -165,8 +99,8 @@ public class GlobalRegionManager {
      * @param player a player, or {@code null}
      * @return a new query
      */
-    public ProtectedRegionQuery createQuery(@Nullable Player player) {
-        return new ProtectedRegionQuery(plugin, player);
+    private RegionQuery createQuery(@Nullable Player player) {
+        return container.createQuery(player);
     }
 
     /**
@@ -175,8 +109,8 @@ public class GlobalRegionManager {
      * @param player a player, or {@code null}
      * @return a new query
      */
-    private ProtectedRegionQuery createQuery(@Nullable LocalPlayer player) {
-        return new ProtectedRegionQuery(plugin, player);
+    private RegionQuery createQuery(@Nullable LocalPlayer player) {
+        return container.createQuery(player);
     }
 
     /**
@@ -243,7 +177,7 @@ public class GlobalRegionManager {
      */
     @Deprecated
     public boolean canBuild(Player player, Location location) {
-        return createQuery(player).canBuild(location);
+        return createQuery(player).testPermission(location);
     }
 
     /**
@@ -252,12 +186,12 @@ public class GlobalRegionManager {
      * @param player the player
      * @param block the block
      * @return true if permitted
-     * @deprecated use {@link #createQuery(Player)}
+     * @deprecated the construct flag is being removed
      */
     @Deprecated
     @SuppressWarnings("deprecation")
     public boolean canConstruct(Player player, Block block) {
-        return canConstruct(player, block.getLocation());
+        return canBuild(player, block.getLocation());
     }
 
     /**
@@ -266,11 +200,11 @@ public class GlobalRegionManager {
      * @param player the player
      * @param location the location
      * @return true if permitted
-     * @deprecated use {@link #createQuery(Player)}
+     * @deprecated the construct flag is being removed
      */
     @Deprecated
     public boolean canConstruct(Player player, Location location) {
-        return createQuery(player).canConstruct(location);
+        return canBuild(player, location);
     }
 
     /**
@@ -299,7 +233,7 @@ public class GlobalRegionManager {
      */
     @Deprecated
     public boolean allows(StateFlag flag, Location location, @Nullable LocalPlayer player) {
-        return createQuery(player).allows(flag, location);
+        return createQuery(player).testEnabled(location, flag);
     }
 
 }
