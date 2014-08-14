@@ -42,6 +42,7 @@ public class RegionQuery {
 
     private final ConfigurationManager config;
     private final GlobalRegionManager globalManager;
+    private final QueryCache cache;
     @Nullable
     private final LocalPlayer localPlayer;
 
@@ -49,22 +50,26 @@ public class RegionQuery {
      * Create a new instance.
      *
      * @param plugin the plugin
+     * @param cache the query cache
      * @param player an optional player
      */
-    RegionQuery(WorldGuardPlugin plugin, @Nullable Player player) {
-        this(plugin, player != null ? plugin.wrapPlayer(player) : null);
+    RegionQuery(WorldGuardPlugin plugin, QueryCache cache, @Nullable Player player) {
+        this(plugin, cache, player != null ? plugin.wrapPlayer(player) : null);
     }
 
     /**
      * Create a new instance.
      *
      * @param plugin the plugin
+     * @param cache the query cache
      * @param player an optional player
      */
-    RegionQuery(WorldGuardPlugin plugin, @Nullable LocalPlayer player) {
+    RegionQuery(WorldGuardPlugin plugin, QueryCache cache, @Nullable LocalPlayer player) {
         checkNotNull(plugin);
+        checkNotNull(cache);
 
         this.config = plugin.getGlobalStateManager();
+        this.cache = cache;
         //noinspection deprecation
         this.globalManager = plugin.getGlobalRegionManager();
         this.localPlayer = player;
@@ -102,7 +107,7 @@ public class RegionQuery {
             return true;
         } else {
             RegionManager manager = globalManager.get(location.getWorld());
-            return manager == null || manager.getApplicableRegions(BukkitUtil.toVector(location)).canBuild(localPlayer);
+            return manager == null || cache.queryContains(manager, location).canBuild(localPlayer);
         }
     }
 
@@ -141,7 +146,7 @@ public class RegionQuery {
         RegionManager manager = globalManager.get(location.getWorld());
 
         if (manager != null) {
-            ApplicableRegionSet result = manager.getApplicableRegions(BukkitUtil.toVector(location));
+            ApplicableRegionSet result = cache.queryContains(manager, location);
 
             if (result.canBuild(localPlayer)) {
                 return true;
@@ -185,11 +190,11 @@ public class RegionQuery {
             return true;
         }
 
-        if (globalManager.hasBypass(localPlayer, world)) {
+        if (localPlayer != null && globalManager.hasBypass(localPlayer, world)) {
             return true;
         } else {
             RegionManager manager = globalManager.get(location.getWorld());
-            return manager == null || manager.getApplicableRegions(BukkitUtil.toVector(location)).allows(flag, localPlayer);
+            return manager == null || cache.queryContains(manager, location).allows(flag, localPlayer);
         }
     }
 
