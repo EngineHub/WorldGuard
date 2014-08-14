@@ -53,7 +53,7 @@ public class RegionProtectionListener extends AbstractListener {
     }
 
     private void tellErrorMessage(CommandSender sender, Object subject) {
-        sender.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+        sender.sendMessage(ChatColor.DARK_RED + "Sorry, but you are not allowed to do that here.");
     }
 
     @EventHandler(ignoreCancelled = true)
