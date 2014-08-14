@@ -87,10 +87,10 @@ public class RegionProtectionListener extends AbstractListener {
         Location target = event.getTarget();
 
         if (player != null) {
-            if (!getPlugin().getGlobalRegionManager().canBuild(player, target)) {
-                tellErrorMessage(player, target);
-                event.setCancelled(true);
-            } else if (!getPlugin().getGlobalRegionManager().canConstruct(player, target)) {
+            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
+            boolean canBreak = query.testPermission(target);
+
+            if (!canBreak) {
                 tellErrorMessage(player, target);
                 event.setCancelled(true);
             }
