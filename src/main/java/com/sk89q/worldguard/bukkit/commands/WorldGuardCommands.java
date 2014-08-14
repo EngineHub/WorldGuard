@@ -25,8 +25,8 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.odeum.task.Task;
 import com.sk89q.odeum.task.TaskStateComparator;
-import com.sk89q.worldguard.bukkit.LoggerToChatHandler;
-import com.sk89q.worldguard.bukkit.ReportWriter;
+import com.sk89q.worldguard.bukkit.util.LoggerToChatHandler;
+import com.sk89q.worldguard.bukkit.util.ReportWriter;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.util.PastebinPoster;
 import com.sk89q.worldguard.util.PastebinPoster.PasteCallback;
@@ -78,9 +78,8 @@ public class WorldGuardCommands {
 
         try {
             plugin.getGlobalStateManager().unload();
-            plugin.getGlobalRegionManager().unloadAll();
+            plugin.getRegionContainer().reload();
             plugin.getGlobalStateManager().load();
-            plugin.getGlobalRegionManager().loadAll(Bukkit.getServer().getWorlds());
             // WGBukkit.cleanCache();
             sender.sendMessage("WorldGuard configuration reloaded.");
         } catch (Throwable t) {

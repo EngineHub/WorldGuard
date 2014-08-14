@@ -53,6 +53,7 @@ import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
 import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.DebuggingListener;
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
+import com.sk89q.worldguard.bukkit.listener.FlagStateManager;
 import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardCommandBookListener;
@@ -69,7 +70,6 @@ import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.protection.util.migrator.MigrationException;
 import com.sk89q.worldguard.protection.util.migrator.UUIDMigrator;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -109,8 +109,9 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     private static WorldGuardPlugin inst;
     private final CommandsManager<CommandSender> commands;
-    private GlobalRegionManager globalRegionManager;
-    private ConfigurationManager configuration;
+    private final ConfigurationManager configuration = new ConfigurationManager(this);
+    private final RegionContainer regionContainer = new RegionContainer(this);
+    private final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this, regionContainer);
     private FlagStateManager flagStateManager;
     private final Supervisor supervisor = new SimpleSupervisor();
     private ListeningExecutorService executorService;
@@ -145,7 +146,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     @SuppressWarnings("deprecation")
     public void onEnable() {
-        configuration = new ConfigurationManager(this);
+        getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
+
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
 
         // Set the proper command injector
@@ -164,9 +166,6 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
             }
         }, 0L);
-
-        // Need to create the plugins/WorldGuard folder
-        getDataFolder().mkdirs();
 
         File cacheDir = new File(getDataFolder(), "cache");
         cacheDir.mkdirs();
@@ -190,8 +189,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             configuration.load();
 
             getLogger().info("Loading region data...");
-            globalRegionManager = new GlobalRegionManager(this);
-            globalRegionManager.loadAll(Bukkit.getServer().getWorlds());
+            regionContainer.initialize();
 
             migrateRegionUniqueIds(); // Migrate to UUIDs
         } catch (FatalConfigurationLoadingException e) {
@@ -282,7 +280,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             getLogger().log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
         }
 
-        globalRegionManager.unloadAll();
+        regionContainer.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
     }
@@ -362,10 +360,21 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Get the GlobalRegionManager.
      *
-     * @return The plugin's global region manager
+     * @return the plugin's global region manager
+     * @deprecated use {@link #getRegionContainer()}
      */
+    @Deprecated
     public GlobalRegionManager getGlobalRegionManager() {
         return globalRegionManager;
+    }
+
+    /**
+     * Get the object that manages region data.
+     *
+     * @return the region container
+     */
+    public RegionContainer getRegionContainer() {
+        return regionContainer;
     }
 
     /**

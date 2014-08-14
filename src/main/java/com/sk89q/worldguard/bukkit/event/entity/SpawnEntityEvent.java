@@ -26,6 +26,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import javax.annotation.Nullable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SpawnEntityEvent extends AbstractEntityEvent {
@@ -33,12 +35,12 @@ public class SpawnEntityEvent extends AbstractEntityEvent {
     private static final HandlerList handlers = new HandlerList();
     private final EntityType effectiveType;
 
-    public SpawnEntityEvent(Event originalEvent, Cause cause, Entity target) {
+    public SpawnEntityEvent(@Nullable Event originalEvent, Cause cause, Entity target) {
         super(originalEvent, cause, checkNotNull(target));
         this.effectiveType = target.getType();
     }
 
-    public SpawnEntityEvent(Event originalEvent, Cause cause, Location location, EntityType type) {
+    public SpawnEntityEvent(@Nullable Event originalEvent, Cause cause, Location location, EntityType type) {
         super(originalEvent, cause, location);
         checkNotNull(type);
         this.effectiveType = type;

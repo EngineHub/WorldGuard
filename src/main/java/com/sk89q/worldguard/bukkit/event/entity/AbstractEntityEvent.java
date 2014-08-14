@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.event.entity;
 
 import com.sk89q.worldguard.bukkit.cause.Cause;
-import com.sk89q.worldguard.bukkit.event.AbstractInteractEvent;
+import com.sk89q.worldguard.bukkit.event.AbstractDelegateEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
@@ -29,20 +29,20 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-abstract class AbstractEntityEvent extends AbstractInteractEvent {
+abstract class AbstractEntityEvent extends AbstractDelegateEvent {
 
     private final Location target;
     @Nullable
     private final Entity entity;
 
-    protected AbstractEntityEvent(Event originalEvent, Cause cause, Entity entity) {
+    protected AbstractEntityEvent(@Nullable Event originalEvent, Cause cause, Entity entity) {
         super(originalEvent, cause);
         checkNotNull(entity);
         this.target = entity.getLocation();
         this.entity = entity;
     }
 
-    protected AbstractEntityEvent(Event originalEvent, Cause cause, Location target) {
+    protected AbstractEntityEvent(@Nullable Event originalEvent, Cause cause, Location target) {
         super(originalEvent, cause);
         checkNotNull(target);
         this.target = target;

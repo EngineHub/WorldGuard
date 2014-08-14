@@ -20,24 +20,26 @@
 package com.sk89q.worldguard.bukkit.event.inventory;
 
 import com.sk89q.worldguard.bukkit.cause.Cause;
-import com.sk89q.worldguard.bukkit.event.AbstractInteractEvent;
+import com.sk89q.worldguard.bukkit.event.AbstractDelegateEvent;
 import org.bukkit.World;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Fired when an item is interacted with.
  */
-public class UseItemEvent extends AbstractInteractEvent {
+public class UseItemEvent extends AbstractDelegateEvent {
 
     private static final HandlerList handlers = new HandlerList();
     private final World world;
     private final ItemStack itemStack;
 
-    public UseItemEvent(Event originalEvent, Cause cause, World world, ItemStack itemStack) {
+    public UseItemEvent(@Nullable Event originalEvent, Cause cause, World world, ItemStack itemStack) {
         super(originalEvent, cause);
         checkNotNull(world);
         checkNotNull(itemStack);

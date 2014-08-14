@@ -25,6 +25,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,7 +33,7 @@ public class DestroyEntityEvent extends AbstractEntityEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public DestroyEntityEvent(Event originalEvent, Cause cause, Entity target) {
+    public DestroyEntityEvent(@Nullable Event originalEvent, Cause cause, Entity target) {
         super(originalEvent, cause, checkNotNull(target));
     }
 

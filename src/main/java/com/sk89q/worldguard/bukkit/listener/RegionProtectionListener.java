@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldguard.bukkit.RegionQuery;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
@@ -29,21 +29,14 @@ import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.bukkit.util.ProtectedRegionQuery;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 
 /**
  * Handle events that need to be processed by region protection.
@@ -63,34 +56,6 @@ public class RegionProtectionListener extends AbstractListener {
         sender.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
     }
 
-    @EventHandler
-    public void onWorldLoad(WorldLoadEvent event) {
-        getPlugin().getGlobalRegionManager().load(event.getWorld());
-    }
-
-    @EventHandler
-    public void onWorldUnload(WorldUnloadEvent event) {
-        getPlugin().getGlobalRegionManager().unload(event.getWorld());
-    }
-
-    @EventHandler
-    public void onChunkLoad(ChunkLoadEvent event) {
-        RegionManager manager = getPlugin().getGlobalRegionManager().get(event.getWorld());
-        if (manager != null) {
-            Chunk chunk = event.getChunk();
-            manager.loadChunk(new Vector2D(chunk.getX(), chunk.getZ()));
-        }
-    }
-
-    @EventHandler
-    public void onChunkUnload(ChunkUnloadEvent event) {
-        RegionManager manager = getPlugin().getGlobalRegionManager().get(event.getWorld());
-        if (manager != null) {
-            Chunk chunk = event.getChunk();
-            manager.unloadChunk(new Vector2D(chunk.getX(), chunk.getZ()));
-        }
-    }
-
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(PlaceBlockEvent event) {
         Player player = event.getCause().getPlayerRootCause();
@@ -98,15 +63,15 @@ public class RegionProtectionListener extends AbstractListener {
         Material type = event.getEffectiveMaterial();
 
         if (player != null) {
-            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
             boolean canPlace;
 
             // Flint and steel, fire charge
             if (type == Material.FIRE) {
-                canPlace = query.allows(DefaultFlag.LIGHTER, target) || (query.canBuild(target) && query.canConstruct(target));
+                canPlace = query.testPermission(target, DefaultFlag.LIGHTER);
 
             } else {
-                canPlace = query.canBuild(target) && query.canConstruct(target);
+                canPlace = query.testPermission(target);
             }
 
             if (!canPlace) {
@@ -139,30 +104,24 @@ public class RegionProtectionListener extends AbstractListener {
         Material type = event.getEffectiveMaterial();
 
         if (player != null) {
-            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
             boolean canUse;
 
             // Inventory blocks (CHEST_ACCESS)
             if (Materials.isInventoryBlock(type)) {
-                canUse = query.canBuild( target)
-                        || query.allows(DefaultFlag.CHEST_ACCESS, target)
-                        || query.allows(DefaultFlag.USE, target);
+                canUse = query.testPermission(target, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
 
             // Beds (SLEEP)
             } else if (type == Material.BED) {
-                canUse = query.canBuild(target)
-                        || query.allows(DefaultFlag.SLEEP, target)
-                        || query.allows(DefaultFlag.USE, target);
+                canUse = query.testPermission(target, DefaultFlag.USE, DefaultFlag.SLEEP);
 
             // TNT (TNT)
             } else if (type == Material.TNT) {
-                canUse = query.canBuild(target)
-                        || query.allows(DefaultFlag.TNT, target);
+                canUse = query.testPermission(target, DefaultFlag.TNT);
 
             // Everything else
             } else {
-                canUse = query.canBuild(target)
-                        || query.allows(DefaultFlag.USE, target);
+                canUse = query.testPermission(target, DefaultFlag.USE);
             }
 
             if (!canUse) {
@@ -179,13 +138,13 @@ public class RegionProtectionListener extends AbstractListener {
         EntityType type = event.getEffectiveType();
 
         if (player != null) {
-            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
             boolean canSpawn;
 
             if (Entities.isVehicle(type)) {
-                canSpawn = query.canBuild(target) || query.allows(DefaultFlag.PLACE_VEHICLE, target);
+                canSpawn = query.testPermission(target, DefaultFlag.PLACE_VEHICLE);
             } else {
-                canSpawn = query.canBuild(target);
+                canSpawn = query.testPermission(target);
             }
 
             if (!canSpawn) {
@@ -202,13 +161,13 @@ public class RegionProtectionListener extends AbstractListener {
         EntityType type = event.getEntity().getType();
 
         if (player != null) {
-            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
             boolean canDestroy;
 
             if (Entities.isVehicle(type)) {
-                canDestroy = query.canBuild(target) || query.allows(DefaultFlag.DESTROY_VEHICLE, target);
+                canDestroy = query.testPermission(target, DefaultFlag.DESTROY_VEHICLE);
             } else {
-                canDestroy = query.canBuild(target);
+                canDestroy = query.testPermission(target);
             }
 
             if (!canDestroy) {
@@ -224,8 +183,8 @@ public class RegionProtectionListener extends AbstractListener {
         Location target = event.getTarget();
 
         if (player != null) {
-            ProtectedRegionQuery query = new ProtectedRegionQuery(getPlugin(), player);
-            boolean canUse = query.canBuild(target) || query.allows(DefaultFlag.USE, target);
+            RegionQuery query = getPlugin().getRegionContainer().createQuery(player);
+            boolean canUse = query.testPermission(target, DefaultFlag.USE);
 
             if (!canUse) {
                 tellErrorMessage(player, target);

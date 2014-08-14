@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.event.block;
 
 import com.sk89q.worldguard.bukkit.cause.Cause;
-import com.sk89q.worldguard.bukkit.event.AbstractInteractEvent;
+import com.sk89q.worldguard.bukkit.event.AbstractDelegateEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,14 +30,14 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-abstract class AbstractBlockEvent extends AbstractInteractEvent {
+abstract class AbstractBlockEvent extends AbstractDelegateEvent {
 
     private final Location target;
     @Nullable
     private final Block block;
     private final Material effectiveMaterial;
 
-    protected AbstractBlockEvent(Event originalEvent, Cause cause, Block block) {
+    protected AbstractBlockEvent(@Nullable Event originalEvent, Cause cause, Block block) {
         super(originalEvent, cause);
         checkNotNull(block);
         this.target = block.getLocation();
@@ -45,7 +45,7 @@ abstract class AbstractBlockEvent extends AbstractInteractEvent {
         this.effectiveMaterial = block.getType();
     }
 
-    protected AbstractBlockEvent(Event originalEvent, Cause cause, Location target, Material effectiveMaterial) {
+    protected AbstractBlockEvent(@Nullable Event originalEvent, Cause cause, Location target, Material effectiveMaterial) {
         super(originalEvent, cause);
         this.target = target;
         this.block = null;

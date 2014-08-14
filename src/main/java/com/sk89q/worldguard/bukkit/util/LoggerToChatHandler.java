@@ -17,13 +17,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit;
-
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
+package com.sk89q.worldguard.bukkit.util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 /**
  * Sends all logger messages to a player.
