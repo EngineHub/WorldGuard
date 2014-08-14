@@ -34,25 +34,28 @@ import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.util.LoggerToChatHandler;
-import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.commands.task.RegionAdd;
+import com.sk89q.worldguard.bukkit.commands.task.RegionManagerReload;
+import com.sk89q.worldguard.bukkit.commands.task.RegionmanagerSave;
+import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
+import com.sk89q.worldguard.bukkit.util.LoggerToChatHandler;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.util.migrator.MigrationException;
-import com.sk89q.worldguard.protection.util.migrator.UUIDMigrator;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
+import com.sk89q.worldguard.protection.util.migrator.MigrationException;
+import com.sk89q.worldguard.protection.util.migrator.UUIDMigrator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -346,6 +349,7 @@ public final class RegionCommands {
      */
     @Command(aliases = {"define", "def", "d", "create"},
              usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
+             flags = "n",
              desc = "Defines a region",
              min = 1)
     public void define(CommandContext args, CommandSender sender) throws CommandException {
@@ -355,47 +359,56 @@ public final class RegionCommands {
         if (!getPermissionModel(sender).mayDefine()) {
             throw new CommandPermissionsException();
         }
-        
+
         // Get and validate the region ID
         String id = validateRegionId(args.getString(0), false);
-        
+
         // Can't replace regions with this command
-        RegionManager regionManager = plugin.getGlobalRegionManager().get(player.getWorld());
-        if (regionManager.hasRegion(id)) {
-            throw new CommandException(
-                    "That region is already defined. To change the shape, use " +
-                    "/region redefine " + id);
-        }
+        final RegionManager manager = plugin.getRegionContainer().get(player.getWorld());
 
-        // Make a region from the user's selection
-        ProtectedRegion region = createRegionFromSelection(player, id);
+        if (manager != null) {
+            if (manager.hasRegion(id)) {
+                throw new CommandException("A region with that ID already exists. To change the shape, use /region redefine " + id);
+            }
 
-        // Get the list of region owners
-        if (args.argsLength() > 1) {
-            region.setOwners(RegionDBUtil.parseDomainString(args.getSlice(1), 1));
-        }
-        
-        // Issue a warning about height
-        int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
-        if (height <= 2) {
-            sender.sendMessage(ChatColor.GOLD +
-                    "(Warning: The height of the region was " + (height + 1) + " block(s).)");
-        }
+            // Make a region from the user's selection
+            final ProtectedRegion region = createRegionFromSelection(player, id);
 
-        // Hint
-        if (regionManager.getRegions().size() <= 2) {
-            sender.sendMessage(ChatColor.GRAY +
-                    "(This region is NOW PROTECTED from modification from others. " +
-                    "Don't want that? Use " +
-                    ChatColor.AQUA + "/rg flag " + id + " passthrough allow" +
-                    ChatColor.GRAY + ")");
-        }
-        
-        // Tell the user
-        sender.sendMessage(ChatColor.YELLOW + "A new region has been made named '" + id + "'.");
+            // Issue a warning about height
+            int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
+            if (height <= 2) {
+                sender.sendMessage(ChatColor.GRAY + "(Warning: The height of the region was " + (height + 1) + " block(s).)");
+            }
 
-        // Add region
-        regionManager.addRegion(region);
+            // Hint
+            if (manager.getRegions().size() <= 2) {
+                sender.sendMessage(ChatColor.GRAY +
+                        "(This region is NOW PROTECTED from modification from others. " +
+                        "Don't want that? Use " +
+                        ChatColor.AQUA + "/rg flag " + id + " passthrough allow" +
+                        ChatColor.GRAY + ")");
+            }
+
+            RegionAdd task = new RegionAdd(plugin, manager, region);
+
+            // Add the list of region owners
+            if (args.argsLength() > 1) {
+                task.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
+                task.setOwnersInput(args.getSlice(2));
+            }
+
+            ListenableFuture<?> future = plugin.getExecutorService().submit(task);
+
+            AsyncCommandHelper.wrap(future, plugin, player)
+                    .formatUsing(id)
+                    .registerWithSupervisor("Adding the region '%s'...")
+                    .sendMessageAfterDelay("(Please wait... adding '%s'...)")
+                    .thenRespondWith(
+                            "A new region has been made named '%s'.",
+                            "Failed to add the region '%s'");
+        } else {
+            throw new CommandException("Either region support is disabled or region data failed to load in the target world.");
+        }
     }
 
     /**
@@ -417,38 +430,51 @@ public final class RegionCommands {
         String id = validateRegionId(args.getString(0), false);
 
         // Lookup the existing region
-        RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
-        ProtectedRegion existing = findExistingRegion(regionManager, id, false);
+        RegionManager manager = plugin.getRegionContainer().get(world);
 
-        // Check permissions
-        if (!getPermissionModel(sender).mayRedefine(existing)) {
-            throw new CommandPermissionsException();
+        if (manager != null) {
+            ProtectedRegion existing = findExistingRegion(manager, id, false);
+
+            // Check permissions
+            if (!getPermissionModel(sender).mayRedefine(existing)) {
+                throw new CommandPermissionsException();
+            }
+
+            // Make a region from the user's selection
+            ProtectedRegion region = createRegionFromSelection(player, id);
+
+            // Copy details from the old region to the new one
+            region.setMembers(existing.getMembers());
+            region.setOwners(existing.getOwners());
+            region.setFlags(existing.getFlags());
+            region.setPriority(existing.getPriority());
+            try {
+                region.setParent(existing.getParent());
+            } catch (CircularInheritanceException ignore) {
+                // This should not be thrown
+            }
+
+            // Issue a warning about height
+            int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
+            if (height <= 2) {
+                sender.sendMessage(ChatColor.GOLD +
+                        "(Warning: The height of the region was " + (height + 1) + " block(s).)");
+            }
+
+            RegionAdd task = new RegionAdd(plugin, manager, region);
+
+            ListenableFuture<?> future = plugin.getExecutorService().submit(task);
+
+            AsyncCommandHelper.wrap(future, plugin, player)
+                    .formatUsing(id)
+                    .registerWithSupervisor("Updating the region '%s'...")
+                    .sendMessageAfterDelay("(Please wait... updating '%s'...)")
+                    .thenRespondWith(
+                            "Region '%s' has been updated with a new area.",
+                            "Failed to update the region '%s'");
+        } else {
+            throw new CommandException("Either region support is disabled or region data failed to load in the target world.");
         }
-
-        // Make a region from the user's selection
-        ProtectedRegion region = createRegionFromSelection(player, id);
-
-        // Copy details from the old region to the new one
-        region.setMembers(existing.getMembers());
-        region.setOwners(existing.getOwners());
-        region.setFlags(existing.getFlags());
-        region.setPriority(existing.getPriority());
-        try {
-            region.setParent(existing.getParent());
-        } catch (CircularInheritanceException ignore) {
-            // This should not be thrown
-        }
-
-        // Issue a warning about height
-        int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
-        if (height <= 2) {
-            sender.sendMessage(ChatColor.GOLD +
-                    "(Warning: The height of the region was " + (height + 1) + " block(s).)");
-        }
-        
-        sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated with new area.");
-
-        regionManager.addRegion(region); // Replace region
     }
 
     /**
@@ -479,73 +505,83 @@ public final class RegionCommands {
         String id = validateRegionId(args.getString(0), false);
 
         // Can't replace existing regions
-        RegionManager regionManager = plugin.getGlobalRegionManager().get(player.getWorld());
-        if (regionManager.hasRegion(id)) {
-            throw new CommandException(
-                    "That region already exists. Please choose a different name.");
-        }
+        RegionManager manager = plugin.getGlobalRegionManager().get(player.getWorld());
 
-        // Make a region from the user's selection
-        ProtectedRegion region = createRegionFromSelection(player, id);
-
-        // Get the list of region owners
-        if (args.argsLength() > 1) {
-            region.setOwners(RegionDBUtil.parseDomainString(args.getSlice(1), 1));
-        }
-
-        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
-
-        // Check whether the player has created too many regions
-        if (!permModel.mayClaimRegionsUnbounded()) {
-            int maxRegionCount = wcfg.getMaxRegionCount(player);
-            if (maxRegionCount >= 0
-                    && regionManager.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
-                throw new CommandException(
-                        "You own too many regions, delete one first to claim a new one.");
+        if (manager != null) {
+            if (manager.hasRegion(id)) {
+                throw new CommandException("That region already exists. Please choose a different name.");
             }
-        }
 
-        ProtectedRegion existing = regionManager.getRegion(id);
+            // Make a region from the user's selection
+            ProtectedRegion region = createRegionFromSelection(player, id);
 
-        // Check for an existing region
-        if (existing != null) {
-            if (!existing.getOwners().contains(localPlayer)) {
-                throw new CommandException(
-                        "This region already exists and you don't own it.");
+            // Get the list of region owners
+            /*if (args.argsLength() > 1) {
+                region.setOwners(RegionDBUtil.parseDomainString(args.getSlice(1), 1));
+            }*/
+
+            WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
+
+            // Check whether the player has created too many regions
+            if (!permModel.mayClaimRegionsUnbounded()) {
+                int maxRegionCount = wcfg.getMaxRegionCount(player);
+                if (maxRegionCount >= 0
+                        && manager.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
+                    throw new CommandException(
+                            "You own too many regions, delete one first to claim a new one.");
+                }
             }
-        }
 
-        // We have to check whether this region violates the space of any other reion
-        ApplicableRegionSet regions = regionManager.getApplicableRegions(region);
+            ProtectedRegion existing = manager.getRegion(id);
 
-        // Check if this region overlaps any other region
-        if (regions.size() > 0) {
-            if (!regions.isOwnerOfAll(localPlayer)) {
-                throw new CommandException("This region overlaps with someone else's region.");
+            // Check for an existing region
+            if (existing != null) {
+                if (!existing.getOwners().contains(localPlayer)) {
+                    throw new CommandException(
+                            "This region already exists and you don't own it.");
+                }
             }
+
+            // We have to check whether this region violates the space of any other reion
+            ApplicableRegionSet regions = manager.getApplicableRegions(region);
+
+            // Check if this region overlaps any other region
+            if (regions.size() > 0) {
+                if (!regions.isOwnerOfAll(localPlayer)) {
+                    throw new CommandException("This region overlaps with someone else's region.");
+                }
+            } else {
+                if (wcfg.claimOnlyInsideExistingRegions) {
+                    throw new CommandException("You may only claim regions inside " +
+                            "existing regions that you or your group own.");
+                }
+            }
+
+            // Check claim volume
+            if (!permModel.mayClaimRegionsUnbounded()) {
+                if (region.volume() > wcfg.maxClaimVolume) {
+                    player.sendMessage(ChatColor.RED + "This region is too large to claim.");
+                    player.sendMessage(ChatColor.RED +
+                            "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
+                    return;
+                }
+            }
+
+            region.getOwners().addPlayer(player.getName());
+
+            RegionAdd task = new RegionAdd(plugin, manager, region);
+            ListenableFuture<?> future = plugin.getExecutorService().submit(task);
+
+            AsyncCommandHelper.wrap(future, plugin, player)
+                    .formatUsing(id)
+                    .registerWithSupervisor("Claiming the region '%s'...")
+                    .sendMessageAfterDelay("(Please wait... claiming '%s'...)")
+                    .thenRespondWith(
+                            "A new region has been claimed named '%s'.",
+                            "Failed to claim the region '%s'");
         } else {
-            if (wcfg.claimOnlyInsideExistingRegions) {
-                throw new CommandException("You may only claim regions inside " +
-                        "existing regions that you or your group own.");
-            }
+            throw new CommandException("Either region support is disabled or region data failed to load in the target world.");
         }
-
-        // Check claim volume
-        if (!permModel.mayClaimRegionsUnbounded()) {
-            if (region.volume() > wcfg.maxClaimVolume) {
-                player.sendMessage(ChatColor.RED + "This region is too large to claim.");
-                player.sendMessage(ChatColor.RED +
-                        "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
-                return;
-            }
-        }
-
-        region.getOwners().addPlayer(player.getName());
-
-        sender.sendMessage(ChatColor.YELLOW + "Region '" + id + "' updated with new area.");
-
-        // Replace region
-        regionManager.addRegion(region);
     }
 
     /**
@@ -1024,7 +1060,7 @@ public final class RegionCommands {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
             }
 
-            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerLoad(manager));
+            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerReload(manager));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .forRegionDataLoad(world, false);
@@ -1039,7 +1075,7 @@ public final class RegionCommands {
                 }
             }
 
-            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerLoad(managers));
+            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerReload(managers));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .registerWithSupervisor("Loading regions for all worlds")
@@ -1081,7 +1117,7 @@ public final class RegionCommands {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
             }
 
-            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerSave(manager));
+            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionmanagerSave(manager));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .forRegionDataSave(world, false);
@@ -1096,7 +1132,7 @@ public final class RegionCommands {
                 }
             }
 
-            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerSave(managers));
+            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionmanagerSave(managers));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .registerWithSupervisor("Saving regions for all worlds")

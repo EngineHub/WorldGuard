@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.bukkit.commands.task;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
 
@@ -28,23 +28,23 @@ import java.util.concurrent.Callable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class RegionManagerLoad implements Callable<Collection<RegionManager>> {
+public class RegionmanagerSave implements Callable<Collection<RegionManager>> {
 
     private final Collection<RegionManager> managers;
 
-    RegionManagerLoad(Collection<RegionManager> managers) {
+    public RegionmanagerSave(Collection<RegionManager> managers) {
         checkNotNull(managers);
         this.managers = managers;
     }
 
-    RegionManagerLoad(RegionManager... manager) {
+    public RegionmanagerSave(RegionManager... manager) {
         this(Arrays.asList(manager));
     }
 
     @Override
     public Collection<RegionManager> call() throws IOException {
         for (RegionManager manager : managers) {
-            manager.load();
+            manager.save();
         }
 
         return managers;
