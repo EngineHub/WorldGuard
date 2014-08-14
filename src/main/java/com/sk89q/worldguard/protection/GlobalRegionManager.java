@@ -68,7 +68,7 @@ public class GlobalRegionManager {
      * has been disabled.</p>
      *
      * @param world the world
-     * @return a region manager, or {@code null} if one is not availale
+     * @return a region manager, or {@code null} if one is not available
      */
     @Nullable
     public RegionManager get(World world) {
