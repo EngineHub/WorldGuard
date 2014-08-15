@@ -19,13 +19,14 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.google.common.base.Predicate;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag.State;
+import com.sk89q.worldguard.protection.flags.StateFlag.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -93,7 +94,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      */
     public boolean canBuild(LocalPlayer player) {
         checkNotNull(player);
-        return test(calculateState(DefaultFlag.BUILD, player, null));
+        return test(calculateState(DefaultFlag.BUILD, new RegionMemberTest(player), null));
     }
 
     /**
@@ -184,12 +185,23 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * value of a flag {@link StateFlag#getDefault()}.
      * 
      * @param flag the flag to check
-     * @param player the player, or null to not check owners and members
+     * @param membershipTest null to perform a "wilderness check" or a predicate
+     *                       returns true if a the subject is a member of the
+     *                       region passed
      * @param groupPlayer a player to use for the group flag check
      * @return the allow/deny state for the flag
      */
-    private State calculateState(StateFlag flag, @Nullable LocalPlayer player, @Nullable LocalPlayer groupPlayer) {
+    private State calculateState(StateFlag flag, @Nullable Predicate<ProtectedRegion> membershipTest, @Nullable LocalPlayer groupPlayer) {
         checkNotNull(flag);
+
+        // This method works in two modes:
+        //
+        // 1) Membership mode (if membershipTest != null):
+        //    a) Regions in this set    -> Check membership + Check region flags
+        //    a) No regions             -> Use global region + default value
+        // 1) Flag mode:
+        //    a) Regions in this set    -> Use global region + default value
+        //    a) No regions             -> Use global region + default value
 
         int minimumPriority = Integer.MIN_VALUE;
         boolean regionsThatCountExistHere = false; // We can't do a application.isEmpty() because
@@ -237,7 +249,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
 
             // If PASSTHROUGH is set and we are checking to see if a player
             // is a member, then skip this region
-            if (player != null && getStateFlagIncludingParents(region, DefaultFlag.PASSTHROUGH) == State.ALLOW) {
+            if (membershipTest != null && getStateFlagIncludingParents(region, DefaultFlag.PASSTHROUGH) == State.ALLOW) {
                 continue;
             }
 
@@ -269,11 +281,11 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
                 minimumPriority = region.getPriority();
 
             } else {
-                if (player != null) {
+                if (membershipTest != null) {
                     minimumPriority = region.getPriority();
 
                     if (!hasCleared.contains(region)) {
-                        if (!region.isMember(player)) {
+                        if (!membershipTest.apply(region)) {
                             needsClear.add(region);
                         } else {
                             // Need to clear all parents
@@ -284,13 +296,13 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             }
         }
 
-        if (player != null) {
+        if (membershipTest != null) {
             State fallback;
 
             if (regionsThatCountExistHere) {
                 fallback = allowOrNone(needsClear.isEmpty());
             } else {
-                fallback = getDefault(flag, player);
+                fallback = getDefault(flag, membershipTest);
             }
 
             return combine(state, fallback);
@@ -300,7 +312,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     }
 
     @Nullable
-    private State getDefault(StateFlag flag, @Nullable LocalPlayer player) {
+    private State getDefault(StateFlag flag, @Nullable Predicate<ProtectedRegion> membershipTest) {
         boolean allowed = flag.getDefault();
 
         // Handle defaults
@@ -310,15 +322,15 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             // The global region has this flag set
             if (globalState != null) {
                 // Build flag is very special
-                if (player != null && globalRegion.hasMembersOrOwners()) {
-                    allowed = globalRegion.isMember(player) && (globalState == State.ALLOW);
+                if (membershipTest != null && globalRegion.hasMembersOrOwners()) {
+                    allowed = membershipTest.apply(globalRegion) && (globalState == State.ALLOW);
                 } else {
                     allowed = (globalState == State.ALLOW);
                 }
             } else {
                 // Build flag is very special
-                if (player != null && globalRegion.hasMembersOrOwners()) {
-                    allowed = globalRegion.isMember(player);
+                if (membershipTest != null && globalRegion.hasMembersOrOwners()) {
+                    allowed = membershipTest.apply(globalRegion);
                 }
             }
         }
@@ -485,6 +497,22 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      */
     public static ApplicableRegionSet getEmpty() {
         return EMPTY;
+    }
+
+    /**
+     * Returns true if a player is a member (or owner) of a region.
+     */
+    private static class RegionMemberTest implements Predicate<ProtectedRegion> {
+        private final LocalPlayer player;
+
+        private RegionMemberTest(LocalPlayer player) {
+            this.player = checkNotNull(player);
+        }
+
+        @Override
+        public boolean apply(ProtectedRegion region) {
+            return region.isMember(player);
+        }
     }
 
 }
