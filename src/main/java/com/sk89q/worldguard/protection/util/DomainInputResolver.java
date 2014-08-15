@@ -99,10 +99,11 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
             if (m.matches()) {
                 domain.addGroup(m.group(1));
             } else {
-                try {
+                UUID uuid = parseUUID(s);
+                if (uuid != null) {
                     // Try to add any UUIDs given
                     domain.addPlayer(UUID.fromString(UUIDs.addDashes(s.replaceAll("^uuid:", ""))));
-                } catch (IllegalArgumentException e) {
+                } else {
                     switch (locatorPolicy) {
                         case NAME_ONLY:
                             domain.addPlayer(s);
@@ -156,5 +157,22 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
                 return domain;
             }
         };
+    }
+
+    /**
+     * Try to parse a UUID locator from input.
+     *
+     * @param input the input
+     * @return a UUID or {@code null} if the input is not a UUID
+     */
+    @Nullable
+    public static UUID parseUUID(String input) {
+        checkNotNull(input);
+
+        try {
+            return UUID.fromString(UUIDs.addDashes(input.replaceAll("^uuid:", "")));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }
