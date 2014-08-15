@@ -41,6 +41,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldguard.protection.flags.StateFlag.*;
 
 /**
  * Represents the effective set of flags, owners, and members for a given
@@ -92,7 +93,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      */
     public boolean canBuild(LocalPlayer player) {
         checkNotNull(player);
-        return internalGetState(DefaultFlag.BUILD, player, null);
+        return test(calculateState(DefaultFlag.BUILD, player, null));
     }
 
     /**
@@ -121,7 +122,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             throw new IllegalArgumentException("Can't use build flag with allows()");
         }
 
-        return internalGetState(flag, null, null);
+        return test(calculateState(flag, null, null));
     }
     
     /**
@@ -138,7 +139,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         if (flag == DefaultFlag.BUILD) {
             throw new IllegalArgumentException("Can't use build flag with allows()");
         }
-        return internalGetState(flag, null, player);
+        return test(calculateState(flag, null, player));
     }
     
     /**
@@ -178,21 +179,126 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     }
 
     /**
-     * Test whether a flag tests true.
+     * Calculate the effective value of a flag based on the regions
+     * in this set, membership, the global region (if set), and the default
+     * value of a flag {@link StateFlag#getDefault()}.
      * 
      * @param flag the flag to check
      * @param player the player, or null to not check owners and members
      * @param groupPlayer a player to use for the group flag check
      * @return the allow/deny state for the flag
      */
-    private boolean internalGetState(StateFlag flag, @Nullable LocalPlayer player, @Nullable LocalPlayer groupPlayer) {
+    private State calculateState(StateFlag flag, @Nullable LocalPlayer player, @Nullable LocalPlayer groupPlayer) {
         checkNotNull(flag);
 
-        boolean found = false;
-        boolean hasFlagDefined = false;
-        boolean allowed = false; // Used for ALLOW override
-        boolean def = flag.getDefault();
-        
+        int minimumPriority = Integer.MIN_VALUE;
+        boolean regionsThatCountExistHere = false; // We can't do a application.isEmpty() because
+                                                   // PASSTHROUGH regions have to be skipped
+                                                   // (in some cases)
+        State state = null; // Start with NONE
+
+        // Say there are two regions in one location: CHILD and PARENT (CHILD
+        // is a child of PARENT). If there are two overlapping regions in WG, a
+        // player has to be a member of /both/ (or flags permit) in order to
+        // build in that location. However, inheritance is supposed
+        // to allow building if the player is a member of just CHILD. That
+        // presents a problem.
+        //
+        // To rectify this, we keep two sets. When we iterate over the list of
+        // regions, there are two scenarios that we may encounter:
+        //
+        // 1) PARENT first, CHILD later:
+        //    PARENT and its parents are added to needsClear.
+        //    When the loop reaches CHILD, all parents of CHILD (including
+        //    PARENT) are removed from needsClear. (Any parents not in
+        //    needsClear are added to hasCleared for the 2nd scenario.)
+        //
+        // 2) CHILD first, PARENT later:
+        //    CHILD's parents are added to hasCleared.
+        //    When the loop reaches PARENT, since PARENT is already in
+        //    hasCleared, it doe not add PARENT to needsClear.
+        //
+        // If there are any regions left over in needsClear, that means that
+        // there was at least one region that the player is not a member of
+        // (any of its children) and thus we can deny building.
+
+        Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
+        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
+
+        for (ProtectedRegion region : applicable) {
+            // Don't consider lower priorities below minimumPriority
+            // (which starts at Integer.MIN_VALUE). A region that "counts"
+            // (has the flag set OR has members) will raise minimumPriority
+            // its own priority.
+            if (region.getPriority() < minimumPriority) {
+                break;
+            }
+
+            // If PASSTHROUGH is set and we are checking to see if a player
+            // is a member, then skip this region
+            if (player != null && getStateFlagIncludingParents(region, DefaultFlag.PASSTHROUGH) == State.ALLOW) {
+                continue;
+            }
+
+            // If the flag has a group set on to it, skip this region if
+            // the group does not match our (group) player
+            if (groupPlayer != null && flag.getRegionGroupFlag() != null) {
+                RegionGroup group = region.getFlag(flag.getRegionGroupFlag());
+                if (group == null) {
+                    group = flag.getRegionGroupFlag().getDefault();
+                }
+
+                if (!RegionGroupFlag.isMember(region, group, groupPlayer)) {
+                    continue;
+                }
+            }
+
+            regionsThatCountExistHere = true;
+
+            State v = getStateFlagIncludingParents(region, flag);
+
+            // DENY overrides everything
+            if (v == State.DENY) {
+                state = State.DENY;
+                break; // No need to process any more regions
+
+            // ALLOW means we don't care about membership
+            } else if (v == State.ALLOW) {
+                state = State.ALLOW;
+                minimumPriority = region.getPriority();
+
+            } else {
+                if (player != null) {
+                    minimumPriority = region.getPriority();
+
+                    if (!hasCleared.contains(region)) {
+                        if (!region.isMember(player)) {
+                            needsClear.add(region);
+                        } else {
+                            // Need to clear all parents
+                            clearParents(needsClear, hasCleared, region);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (regionsThatCountExistHere) {
+            if (player != null) {
+                State membership = allowOrNone(needsClear.isEmpty());
+                return combine(state, membership);
+            } else {
+                return combine(state, getDefault(flag, null));
+            }
+        } else {
+            return combine(getDefault(flag, player));
+        }
+    }
+
+    @Nullable
+    private State getDefault(StateFlag flag, @Nullable LocalPlayer player) {
+        boolean allowed = flag.getDefault();
+
         // Handle defaults
         if (globalRegion != null) {
             State globalState = globalRegion.getFlag(flag);
@@ -201,110 +307,19 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             if (globalState != null) {
                 // Build flag is very special
                 if (player != null && globalRegion.hasMembersOrOwners()) {
-                    def = globalRegion.isMember(player) && (globalState == State.ALLOW);
+                    allowed = globalRegion.isMember(player) && (globalState == State.ALLOW);
                 } else {
-                    def = (globalState == State.ALLOW);
+                    allowed = (globalState == State.ALLOW);
                 }
             } else {
                 // Build flag is very special
                 if (player != null && globalRegion.hasMembersOrOwners()) {
-                    def = globalRegion.isMember(player);
+                    allowed = globalRegion.isMember(player);
                 }
             }
         }
-        
-        // The player argument is used if and only if the flag is the build
-        // flag -- in which case, if there are any regions in this area, we
-        // default to FALSE, otherwise true if there are no defined regions.
-        // However, other flags are different -- if there are regions defined,
-        // we default to the global region value. 
-        if (player == null) {
-            allowed = def; 
-        }
-        
-        int lastPriority = Integer.MIN_VALUE;
 
-        // The algorithm is as follows:
-        // While iterating through the list of regions, if an entry disallows
-        // the flag, then put it into the needsClear set. If an entry allows
-        // the flag and it has a parent, then its parent is put into hasCleared.
-        // In the situation that the child is reached before the parent, upon
-        // the parent being reached, even if the parent disallows, because the
-        // parent will be in hasCleared, permission will be allowed. In the
-        // other case, where the parent is reached first, if it does not allow
-        // permissions, it will be placed into needsClear. If a child of
-        // the parent is reached later, the parent will be removed from
-        // needsClear. At the end, if needsClear is not empty, that means that
-        // permission should not be given. If a parent has multiple children
-        // and one child does not allow permissions, then it will be placed into
-        // needsClear just like as if was a parent.
-
-        Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
-        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
-
-        for (ProtectedRegion region : applicable) {
-            // Ignore lower priority regions
-            if (hasFlagDefined && region.getPriority() < lastPriority) {
-                break;
-            }
-
-            lastPriority = region.getPriority();
-
-            // Ignore non-build regions
-            if (player != null && getStateFlagIncludingParents(region, DefaultFlag.PASSTHROUGH) == State.ALLOW) {
-                continue;
-            }
-
-            // Check group permissions
-            if (groupPlayer != null && flag.getRegionGroupFlag() != null) {
-                RegionGroup group = region.getFlag(flag.getRegionGroupFlag());
-                if (group == null) {
-                    group = flag.getRegionGroupFlag().getDefault();
-                }
-                if (!RegionGroupFlag.isMember(region, group, groupPlayer)) {
-                    continue;
-                }
-            }
-
-            State v = getStateFlagIncludingParents(region, flag);
-
-            // Allow DENY to override everything
-            if (v == State.DENY) {
-                return false;
-            }
-
-            // Forget about regions that allow it, although make sure the
-            // default state is now to allow
-            if (v == State.ALLOW) {
-                allowed = true;
-                found = true;
-                hasFlagDefined = true;
-                continue;
-            }
-
-            // For the build flag, the flags are conditional and are based
-            // on membership, so we have to check for parent-child
-            // relationships
-            if (player != null) {
-                hasFlagDefined = true;
-
-                //noinspection StatementWithEmptyBody
-                if (hasCleared.contains(region)) {
-                    // Already cleared, so do nothing
-                } else {
-                    if (!region.isMember(player)) {
-                        needsClear.add(region);
-                    } else {
-                        // Need to clear all parents
-                        clearParents(needsClear, hasCleared, region);
-                    }
-                }
-            }
-
-            found = true;
-        }
-
-        return !found ? def : (allowed || (player != null && needsClear.isEmpty()));
+        return allowed ? State.ALLOW : null;
     }
 
     /**
