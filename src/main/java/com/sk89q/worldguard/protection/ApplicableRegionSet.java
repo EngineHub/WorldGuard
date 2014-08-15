@@ -251,8 +251,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             lastPriority = region.getPriority();
 
             // Ignore non-build regions
-            if (player != null
-                    && region.getFlag(DefaultFlag.PASSTHROUGH) == State.ALLOW) {
+            if (player != null && getStateFlagIncludingParents(region, DefaultFlag.PASSTHROUGH) == State.ALLOW) {
                 continue;
             }
 
@@ -267,7 +266,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
                 }
             }
 
-            State v = region.getFlag(flag);
+            State v = getStateFlagIncludingParents(region, flag);
 
             // Allow DENY to override everything
             if (v == State.DENY) {
@@ -325,6 +324,28 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
 
             parent = parent.getParent();
         }
+    }
+
+    /**
+     * Get a region's state flag, checking parent regions until a value for the
+     * flag can be found (if one even exists).
+     *
+     * @param region the region
+     * @param flag the flag
+     * @return the value
+     */
+    private static State getStateFlagIncludingParents(ProtectedRegion region, StateFlag flag) {
+        while (region != null) {
+            State value = region.getFlag(flag);
+
+            if (value != null) {
+                return value;
+            }
+
+            region = region.getParent();
+        }
+
+        return null;
     }
 
     /**
