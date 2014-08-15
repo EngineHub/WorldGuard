@@ -351,6 +351,8 @@ public class WorldGuardPlugin extends JavaPlugin {
             return "WorldGuard: Task was interrupted";
         } else if (throwable instanceof UnresolvedNamesException) {
             return throwable.getMessage();
+        } else if (throwable instanceof CommandException) {
+            return throwable.getMessage();
         } else {
             getLogger().log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
             return "WorldGuard: An unexpected error occurred! Please see the server console.";
