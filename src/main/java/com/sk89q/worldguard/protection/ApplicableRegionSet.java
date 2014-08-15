@@ -284,15 +284,18 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             }
         }
 
-        if (regionsThatCountExistHere) {
-            if (player != null) {
-                State membership = allowOrNone(needsClear.isEmpty());
-                return combine(state, membership);
+        if (player != null) {
+            State fallback;
+
+            if (regionsThatCountExistHere) {
+                fallback = allowOrNone(needsClear.isEmpty());
             } else {
-                return combine(state, getDefault(flag, null));
+                fallback = getDefault(flag, player);
             }
+
+            return combine(state, fallback);
         } else {
-            return combine(getDefault(flag, player));
+            return combine(state, getDefault(flag, null));
         }
     }
 
