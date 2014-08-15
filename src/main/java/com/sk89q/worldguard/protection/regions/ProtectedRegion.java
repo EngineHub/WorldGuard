@@ -463,6 +463,24 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     }
 
     /**
+     * Copy attributes from another region.
+     *
+     * @param other the other region
+     */
+    public void copyFrom(ProtectedRegion other) {
+        checkNotNull(other);
+        setMembers(other.getMembers());
+        setOwners(other.getOwners());
+        setFlags(other.getFlags());
+        setPriority(other.getPriority());
+        try {
+            setParent(other.getParent());
+        } catch (CircularInheritanceException ignore) {
+            // This should not be thrown
+        }
+    }
+
+    /**
      * Get points of the region projected onto the X-Z plane.
      *
      * @return the points
