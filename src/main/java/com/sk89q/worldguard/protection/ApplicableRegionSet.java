@@ -208,19 +208,20 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
         // regions, there are two scenarios that we may encounter:
         //
         // 1) PARENT first, CHILD later:
-        //    PARENT and its parents are added to needsClear.
-        //    When the loop reaches CHILD, all parents of CHILD (including
-        //    PARENT) are removed from needsClear. (Any parents not in
-        //    needsClear are added to hasCleared for the 2nd scenario.)
+        //    a) When the loop reaches PARENT, PARENT is added to needsClear.
+        //    b) When the loop reaches CHILD, parents of CHILD (which includes
+        //       PARENT) are removed from needsClear.
+        //    c) needsClear is empty again.
         //
         // 2) CHILD first, PARENT later:
-        //    CHILD's parents are added to hasCleared.
-        //    When the loop reaches PARENT, since PARENT is already in
-        //    hasCleared, it doe not add PARENT to needsClear.
+        //    a) When the loop reaches CHILD, CHILD's parents (i.e. PARENT) are
+        //       added to hasCleared.
+        //    b) When the loop reaches PARENT, since PARENT is already in
+        //       hasCleared, it does not add PARENT to needsClear.
+        //    c) needsClear stays empty.
         //
-        // If there are any regions left over in needsClear, that means that
-        // there was at least one region that the player is not a member of
-        // (any of its children) and thus we can deny building.
+        // As long as the process ends with needsClear being empty, then
+        // we have satisfied all membership requirements.
 
         Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
         Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
@@ -229,7 +230,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             // Don't consider lower priorities below minimumPriority
             // (which starts at Integer.MIN_VALUE). A region that "counts"
             // (has the flag set OR has members) will raise minimumPriority
-            // its own priority.
+            // to its own priority.
             if (region.getPriority() < minimumPriority) {
                 break;
             }
