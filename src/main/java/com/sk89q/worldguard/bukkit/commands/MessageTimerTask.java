@@ -25,7 +25,7 @@ import java.util.TimerTask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-class MessageTimerTask extends TimerTask {
+public class MessageTimerTask extends TimerTask {
 
     private final CommandSender sender;
     private final String message;

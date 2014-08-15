@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-class AsyncCommandHelper {
+public class AsyncCommandHelper {
 
     private final ListenableFuture<?> future;
     private final WorldGuardPlugin plugin;

@@ -17,43 +17,37 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.bukkit.commands.task;
 
-/**
- * Used for /rg list.
- */
-class RegionListEntry implements Comparable<RegionListEntry> {
-    
-    private final String id;
-    private final int index;
-    boolean isOwner;
-    boolean isMember;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 
-    public RegionListEntry(String id, int index) {
-        this.id = id;
-        this.index = index;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.Callable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public class RegionManagerSaver implements Callable<Collection<RegionManager>> {
+
+    private final Collection<RegionManager> managers;
+
+    public RegionManagerSaver(Collection<RegionManager> managers) {
+        checkNotNull(managers);
+        this.managers = managers;
+    }
+
+    public RegionManagerSaver(RegionManager... manager) {
+        this(Arrays.asList(manager));
     }
 
     @Override
-    public int compareTo(RegionListEntry o) {
-        if (isOwner != o.isOwner) {
-            return isOwner ? 1 : -1;
+    public Collection<RegionManager> call() throws IOException {
+        for (RegionManager manager : managers) {
+            manager.save();
         }
-        if (isMember != o.isMember) {
-            return isMember ? 1 : -1;
-        }
-        return id.compareTo(o.id);
+
+        return managers;
     }
 
-    @Override
-    public String toString() {
-        if (isOwner) {
-            return (index + 1) + ". +" + id;
-        } else if (isMember) {
-            return (index + 1) + ". -" + id;
-        } else {
-            return (index + 1) + ". " + id;
-        }
-    }
-    
 }
