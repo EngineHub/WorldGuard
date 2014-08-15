@@ -48,6 +48,7 @@ import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.protection.util.migrator.MigrationException;
@@ -649,11 +650,13 @@ public final class RegionCommands extends RegionCommandsBase {
      */
     @Command(aliases = {"remove", "delete", "del", "rem"},
              usage = "<id>",
-             flags = "w:",
+             flags = "fuw:",
              desc = "Remove a region",
              min = 1, max = 1)
     public void remove(CommandContext args, CommandSender sender) throws CommandException {
         World world = checkWorld(args, sender, 'w'); // Get the world
+        boolean removeChildren = args.hasFlag('f');
+        boolean unsetParent = args.hasFlag('u');
 
         // Lookup the existing region
         RegionManager manager = checkRegionManager(plugin, world);
@@ -665,6 +668,14 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         RegionRemover task = new RegionRemover(manager, existing);
+
+        if (removeChildren && unsetParent) {
+            throw new CommandException("You cannot use both -u (unset parent) and -f (remove children) together.");
+        } else if (removeChildren) {
+            task.setRemovalStrategy(RemovalStrategy.REMOVE_CHILDREN);
+        } else if (unsetParent) {
+            task.setRemovalStrategy(RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
+        }
 
         AsyncCommandHelper.wrap(plugin.getExecutorService().submit(task), plugin, sender)
                 .formatUsing(existing.getId())
