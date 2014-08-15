@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.google.common.base.Predicate;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -46,31 +47,36 @@ public class ChestProtectionListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlaceBlock(PlaceBlockEvent event) {
-        Player player = event.getCause().getPlayerRootCause();
-        Location target = event.getTarget();
+    public void onPlaceBlock(final PlaceBlockEvent event) {
+        final Player player = event.getCause().getPlayerRootCause();
 
         if (player != null) {
-            WorldConfiguration wcfg = getWorldConfig(player);
+            final WorldConfiguration wcfg = getWorldConfig(player);
 
             // Early guard
             if (!wcfg.signChestProtection) {
                 return;
             }
 
-            if (wcfg.getChestProtection().isChest(event.getEffectiveMaterial().getId()) && wcfg.isChestProtected(target.getBlock(), player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
-                event.setCancelled(true);
-            }
+            event.filterBlocks(new Predicate<Location>() {
+                @Override
+                public boolean apply(Location target) {
+                    if (wcfg.getChestProtection().isChest(event.getEffectiveMaterial().getId()) && wcfg.isChestProtected(target.getBlock(), player)) {
+                        player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
+                        return false;
+                    }
+
+                    return true;
+                }
+            }, true);
         }
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBreakBlock(BreakBlockEvent event) {
-        Player player = event.getCause().getPlayerRootCause();
-        Location target = event.getTarget();
+    public void onBreakBlock(final BreakBlockEvent event) {
+        final Player player = event.getCause().getPlayerRootCause();
 
-        WorldConfiguration wcfg = getWorldConfig(target.getWorld());
+        final WorldConfiguration wcfg = getWorldConfig(event.getWorld());
 
         // Early guard
         if (!wcfg.signChestProtection) {
@@ -78,24 +84,33 @@ public class ChestProtectionListener extends AbstractListener {
         }
 
         if (player != null) {
-            if (wcfg.isChestProtected(target.getBlock(), player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
-                event.setCancelled(true);
-            }
+            event.filterBlocks(new Predicate<Location>() {
+                @Override
+                public boolean apply(Location target) {
+                    if (wcfg.isChestProtected(target.getBlock(), player)) {
+                        player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
+                        return false;
+                    }
+
+                    return true;
+                }
+            }, true);
         } else {
-            if (wcfg.isChestProtected(target.getBlock())) {
-                // No player? Deny anyway
-                event.setCancelled(true);
-            }
+            event.filterBlocks(new Predicate<Location>() {
+                @Override
+                public boolean apply(Location target) {
+                    return !wcfg.isChestProtected(target.getBlock());
+
+                }
+            });
         }
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onUseBlock(UseBlockEvent event) {
-        Player player = event.getCause().getPlayerRootCause();
-        Location target = event.getTarget();
+    public void onUseBlock(final UseBlockEvent event) {
+        final Player player = event.getCause().getPlayerRootCause();
 
-        WorldConfiguration wcfg = getWorldConfig(target.getWorld());
+        final WorldConfiguration wcfg = getWorldConfig(event.getWorld());
 
         // Early guard
         if (!wcfg.signChestProtection) {
@@ -103,15 +118,25 @@ public class ChestProtectionListener extends AbstractListener {
         }
 
         if (player != null) {
-            if (wcfg.isChestProtected(target.getBlock(), player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
-                event.setCancelled(true);
-            }
+            event.filterBlocks(new Predicate<Location>() {
+                @Override
+                public boolean apply(Location target) {
+                    if (wcfg.isChestProtected(target.getBlock(), player)) {
+                        player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
+                        return false;
+                    }
+
+                    return true;
+                }
+            }, true);
         } else {
-            if (wcfg.isChestProtected(target.getBlock())) {
-                // No player? Deny anyway
-                event.setCancelled(true);
-            }
+            event.filterBlocks(new Predicate<Location>() {
+                @Override
+                public boolean apply(Location target) {
+                    return !wcfg.isChestProtected(target.getBlock());
+
+                }
+            });
         }
     }
 

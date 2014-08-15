@@ -28,8 +28,13 @@ import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -50,22 +55,25 @@ public class DebuggingListener extends AbstractListener {
         this.logger = logger;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlaceBlock(PlaceBlockEvent event) {
         StringBuilder builder = new StringBuilder();
         builder.append("PLACE");
         builder.append(" ");
         builder.append("").append(event.getEffectiveMaterial());
         builder.append(" ");
-        builder.append("@").append(toBlockString(event.getTarget()));
+        builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
-        builder.append(":").append(event.getOriginalEvent().getEventName());
+        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        if (event.isCancelled()) {
+            builder.append(" [CANCELLED]");
+        }
         logger.info(builder.toString());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBreakBlock(BreakBlockEvent event) {
         StringBuilder builder = new StringBuilder();
         builder.append("DIG");
@@ -74,13 +82,16 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
-        builder.append("@").append(toBlockString(event.getTarget()));
+        builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
-        builder.append(":").append(event.getOriginalEvent().getEventName());
+        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        if (event.isCancelled()) {
+            builder.append(" [CANCELLED]");
+        }
         logger.info(builder.toString());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onUseBlock(UseBlockEvent event) {
         StringBuilder builder = new StringBuilder();
         builder.append("INTERACT");
@@ -89,13 +100,16 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
-        builder.append("@").append(toBlockString(event.getTarget()));
+        builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
-        builder.append(":").append(event.getOriginalEvent().getEventName());
+        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        if (event.isCancelled()) {
+            builder.append(" [CANCELLED]");
+        }
         logger.info(builder.toString());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onSpawnEntity(SpawnEntityEvent event) {
         StringBuilder builder = new StringBuilder();
         builder.append("SPAWN");
@@ -106,11 +120,14 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(event.getOriginalEvent().getEventName());
+        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        if (event.isCancelled()) {
+            builder.append(" [CANCELLED]");
+        }
         logger.info(builder.toString());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onDestroyEntity(DestroyEntityEvent event) {
         StringBuilder builder = new StringBuilder();
         builder.append("DESTROY");
@@ -121,11 +138,14 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(event.getOriginalEvent().getEventName());
+        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        if (event.isCancelled()) {
+            builder.append(" [CANCELLED]");
+        }
         logger.info(builder.toString());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onUseEntity(UseEntityEvent event) {
         StringBuilder builder = new StringBuilder();
         builder.append("INTERACT");
@@ -136,11 +156,14 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(event.getOriginalEvent().getEventName());
+        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        if (event.isCancelled()) {
+            builder.append(" [CANCELLED]");
+        }
         logger.info(builder.toString());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onUseItem(UseItemEvent event) {
         StringBuilder builder = new StringBuilder();
         builder.append("USE");
@@ -151,12 +174,32 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(event.getWorld().getName());
         builder.append(" ");
-        builder.append(":").append(event.getOriginalEvent().getEventName());
+        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        if (event.isCancelled()) {
+            builder.append(" [CANCELLED]");
+        }
         logger.info(builder.toString());
     }
     
     private static String toBlockString(Location location) {
         return location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
+    }
+
+    private static String toBlockString(List<Block> blocks) {
+        StringBuilder builder = new StringBuilder();
+        boolean first = true;
+        for (Block block : blocks) {
+            if (!first) {
+                builder.append("|");
+            }
+            builder.append(block.getX()).append(",").append(block.getY()).append(",").append(block.getZ());
+            first = false;
+        }
+        return builder.toString();
+    }
+
+    private String getEventName(@Nullable Event event) {
+        return event != null ? event.getEventName() : "?";
     }
 
 }

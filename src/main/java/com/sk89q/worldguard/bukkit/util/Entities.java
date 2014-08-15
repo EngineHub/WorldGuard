@@ -22,7 +22,9 @@ package com.sk89q.worldguard.bukkit.util;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.projectiles.ProjectileSource;
 
 import javax.annotation.Nullable;
@@ -45,11 +47,11 @@ public final class Entities {
     /**
      * Return if the given entity type is TNT-based.
      *
-     * @param type the type
+     * @param entity the entity
      * @return true if TNT based
      */
-    public static boolean isTNTBased(EntityType type) {
-        return type == EntityType.PRIMED_TNT || type == EntityType.MINECART_TNT;
+    public static boolean isTNTBased(Entity entity) {
+        return entity instanceof TNTPrimed || entity instanceof ExplosiveMinecart;
     }
 
     /**

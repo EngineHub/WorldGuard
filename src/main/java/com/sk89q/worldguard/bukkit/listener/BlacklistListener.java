@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.google.common.base.Predicate;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
@@ -38,8 +39,8 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -68,75 +69,86 @@ public class BlacklistListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBreakBlock(BreakBlockEvent event) {
-        Player player = event.getCause().getPlayerRootCause();
+    public void onBreakBlock(final BreakBlockEvent event) {
+        final Player player = event.getCause().getPlayerRootCause();
 
         if (player == null) {
             return;
         }
 
-        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
-        Block target = event.getBlock();
-        WorldConfiguration wcfg = getWorldConfig(player);
+        final LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+        final WorldConfiguration wcfg = getWorldConfig(player);
 
         // Blacklist guard
         if (wcfg.getBlacklist() == null) {
             return;
         }
 
-        if (!wcfg.getBlacklist().check(
-                new BlockBreakBlacklistEvent(localPlayer, toVector(event.getTarget()), createTarget(target, event.getEffectiveMaterial())), false, false)) {
-            event.setCancelled(true);
-        } else if (!wcfg.getBlacklist().check(
-                new ItemDestroyWithBlacklistEvent(localPlayer, toVector(event.getTarget()), createTarget(player.getItemInHand())), false, false)) {
-            event.setCancelled(true);
-        }
+        event.filterBlocks(new Predicate<Location>() {
+            @Override
+            public boolean apply(Location target) {
+                if (!wcfg.getBlacklist().check(
+                        new BlockBreakBlacklistEvent(localPlayer, toVector(target), createTarget(target.getBlock(), event.getEffectiveMaterial())), false, false)) {
+                    return false;
+                } else if (!wcfg.getBlacklist().check(
+                        new ItemDestroyWithBlacklistEvent(localPlayer, toVector(target), createTarget(player.getItemInHand())), false, false)) {
+                    return false;
+                }
+
+                return true;
+            }
+        });
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlaceBlock(PlaceBlockEvent event) {
+    public void onPlaceBlock(final PlaceBlockEvent event) {
         Player player = event.getCause().getPlayerRootCause();
 
         if (player == null) {
             return;
         }
 
-        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
-        Block target = event.getBlock();
-        WorldConfiguration wcfg = getWorldConfig(player);
+        final LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+        final WorldConfiguration wcfg = getWorldConfig(player);
 
         // Blacklist guard
         if (wcfg.getBlacklist() == null) {
             return;
         }
 
-        if (!wcfg.getBlacklist().check(new BlockPlaceBlacklistEvent(
-                localPlayer, toVector(event.getTarget()), createTarget(target, event.getEffectiveMaterial())), false, false)) {
-            event.setCancelled(true);
-        }
+        event.filterBlocks(new Predicate<Location>() {
+            @Override
+            public boolean apply(Location target) {
+                return wcfg.getBlacklist().check(new BlockPlaceBlacklistEvent(
+                        localPlayer, toVector(target), createTarget(target.getBlock(), event.getEffectiveMaterial())), false, false);
+
+            }
+        });
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onUseBlock(UseBlockEvent event) {
+    public void onUseBlock(final UseBlockEvent event) {
         Player player = event.getCause().getPlayerRootCause();
 
         if (player == null) {
             return;
         }
 
-        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
-        Block target = event.getBlock();
-        WorldConfiguration wcfg = getWorldConfig(player);
+        final LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+        final WorldConfiguration wcfg = getWorldConfig(player);
 
         // Blacklist guard
         if (wcfg.getBlacklist() == null) {
             return;
         }
 
-        if (!wcfg.getBlacklist().check(new BlockInteractBlacklistEvent(
-                localPlayer, toVector(event.getTarget()), createTarget(target, event.getEffectiveMaterial())), false, false)) {
-            event.setCancelled(true);
-        }
+        event.filterBlocks(new Predicate<Location>() {
+            @Override
+            public boolean apply(Location target) {
+                return wcfg.getBlacklist().check(new BlockInteractBlacklistEvent(
+                        localPlayer, toVector(target), createTarget(target.getBlock(), event.getEffectiveMaterial())), false, false);
+            }
+        });
     }
 
     @EventHandler(ignoreCancelled = true)

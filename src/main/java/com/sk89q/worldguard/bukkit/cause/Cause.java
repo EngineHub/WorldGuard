@@ -20,10 +20,14 @@
 package com.sk89q.worldguard.bukkit.cause;
 
 import com.google.common.base.Joiner;
+import com.sk89q.worldguard.bukkit.util.WGMetadata;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.metadata.Metadatable;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -43,6 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Cause {
 
+    private static final String CAUSE_KEY = "worldguard.cause";
     private static final Cause UNKNOWN = new Cause(Collections.emptyList());
 
     private final List<Object> causes;
@@ -77,6 +82,17 @@ public class Cause {
         return null;
     }
 
+    @Nullable
+    public Entity getEntityRootCause() {
+        for (Object object : causes) {
+            if (object instanceof Entity) {
+                return (Entity) object;
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public String toString() {
         return Joiner.on(" | ").join(causes);
@@ -95,12 +111,28 @@ public class Cause {
                     continue;
                 }
 
-                if (o instanceof Projectile) {
+                // Add manually tracked parent causes
+                Object source = o;
+                int index = list.size();
+                while (source instanceof Metadatable) {
+                    source = WGMetadata.getIfPresent((Metadatable) source, CAUSE_KEY, Object.class);
+                    if (source != null) {
+                        list.add(index, source);
+                    }
+                }
+
+                if (o instanceof TNTPrimed) {
+                    expand(list, ((TNTPrimed) o).getSource());
+                    list.add(o);
+                } else if (o instanceof Projectile) {
                     expand(list, ((Projectile) o).getShooter());
+                    list.add(o);
                 } else if (o instanceof Vehicle) {
                     expand(list, ((Vehicle) o).getPassenger());
+                    list.add(o);
                 } else if (o instanceof Tameable) {
                     expand(list, ((Tameable) o).getOwner());
+                    list.add(o);
                 } else {
                     list.add(o);
                 }
@@ -133,6 +165,16 @@ public class Cause {
      */
     public static Cause unknown() {
         return UNKNOWN;
+    }
+
+    /**
+     * Add a parent cause to a {@code Metadatable} object.
+     *
+     * @param target the target
+     * @param parent the parent cause
+     */
+    public static void trackParentCause(Metadatable target, Object parent) {
+        WGMetadata.put(target, CAUSE_KEY, parent);
     }
 
 }
