@@ -219,7 +219,6 @@ public final class RegionManager {
      *
      * @param id the name of the region
      * @return a region or {@code null}
-     * @deprecated use {@link #matchRegion(String)}
      */
     @Nullable
     public ProtectedRegion getRegion(String id) {
