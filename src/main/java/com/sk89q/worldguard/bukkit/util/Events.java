@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.util;
 
+import com.sk89q.worldguard.bukkit.event.BulkEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -77,6 +78,25 @@ public final class Events {
         Bukkit.getServer().getPluginManager().callEvent(eventToFire);
         if (eventToFire.isCancelled()) {
             original.setUseItemInHand(Result.DENY);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Fire the {@code eventToFire} and cancel the original if the fired event
+     * is <strong>explicitly</strong> cancelled.
+     *
+     * @param original the original event to potentially cancel
+     * @param eventToFire the event to fire to consider cancelling the original event
+     * @param <T> an event that can be fired and is cancellable
+     * @return true if the event was fired and it caused the original event to be cancelled
+     */
+    public static <T extends Event & Cancellable & BulkEvent> boolean fireBulkEventToCancel(Cancellable original, T eventToFire) {
+        Bukkit.getServer().getPluginManager().callEvent(eventToFire);
+        if (eventToFire.isExplicitlyCancelled()) {
+            original.setCancelled(true);
             return true;
         }
 

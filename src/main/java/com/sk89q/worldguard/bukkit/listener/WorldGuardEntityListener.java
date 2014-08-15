@@ -569,34 +569,10 @@ public class WorldGuardEntityListener implements Listener {
                 event.blockList().clear();
                 return;
             }
-
-            if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                for (Block block : event.blockList()) {
-                    if (!plugin.getRegionContainer().createQuery().queryContains(block.getLocation()).allows(DefaultFlag.CREEPER_EXPLOSION)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
         } else if (ent instanceof EnderDragon) {
             if (wcfg.blockEnderDragonBlockDamage) {
                 event.blockList().clear();
                 return;
-            }
-
-            if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                for (Block block : event.blockList()) {
-                    if (!plugin.getRegionContainer().createQuery().queryContains(block.getLocation()).allows(DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
             }
         } else if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
             if (wcfg.blockTNTExplosions) {
@@ -606,18 +582,6 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.blockTNTBlockDamage) {
                 event.blockList().clear();
                 return;
-            }
-
-            if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
-                for (Block block : event.blockList()) {
-                    if (!plugin.getRegionContainer().createQuery().queryContains(block.getLocation()).allows(DefaultFlag.TNT)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
             }
         } else if (ent instanceof Fireball) {
             if (ent instanceof WitherSkull) {

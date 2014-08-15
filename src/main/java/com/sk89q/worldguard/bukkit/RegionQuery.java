@@ -110,23 +110,7 @@ public class RegionQuery {
      * @throws NullPointerException if there is no player for this query
      */
     public boolean testPermission(Location location, Player player) {
-        checkNotNull(location);
-        checkNotNull(player);
-
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        World world = location.getWorld();
-        WorldConfiguration worldConfig = config.get(world);
-
-        if (!worldConfig.useRegions) {
-            return true;
-        }
-
-        if (globalManager.hasBypass(localPlayer, world)) {
-            return true;
-        } else {
-            RegionManager manager = globalManager.get(location.getWorld());
-            return manager == null || cache.queryContains(manager, location).canBuild(localPlayer);
-        }
+        return testPermission(location, player, new StateFlag[0]);
     }
 
     /**
@@ -151,14 +135,18 @@ public class RegionQuery {
      */
     public boolean testPermission(Location location, Player player, StateFlag... flags) {
         checkNotNull(location);
-        checkNotNull(flags);
         checkNotNull(player);
+        checkNotNull(flags);
 
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         World world = location.getWorld();
         WorldConfiguration worldConfig = config.get(world);
 
         if (!worldConfig.useRegions) {
+            return true;
+        }
+
+        if (player.hasPermission("worldguard.region.bypass." + world.getName())) {
             return true;
         }
 

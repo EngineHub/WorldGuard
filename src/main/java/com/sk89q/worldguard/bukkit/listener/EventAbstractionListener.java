@@ -31,7 +31,6 @@ import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.bukkit.util.WGMetadata;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -67,6 +66,7 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -101,7 +101,6 @@ public class EventAbstractionListener implements Listener {
      * Currently disabled as it creates a lot of new events.
      */
     public static final boolean ABSTRACT_FROM_TO_EVENTS = false;
-    private static final String FALLING_SOURCE_KEY = "worldguard.fallingSource";
 
     private final WorldGuardPlugin plugin;
 
@@ -155,7 +154,7 @@ public class EventAbstractionListener implements Listener {
             if (event.getTo() == Material.AIR) {
                 // Track the source so later we can create a proper chain of causes
                 if (entity instanceof FallingBlock) {
-                    WGMetadata.put(entity, FALLING_SOURCE_KEY, block);
+                    Cause.trackParentCause(entity, block);
 
                     // Switch around the event
                     Events.fireToCancel(event, new SpawnEntityEvent(event, create(block), entity));
@@ -163,23 +162,21 @@ public class EventAbstractionListener implements Listener {
                     Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), event.getBlock()));
                 }
             } else {
-                Cause cause;
-
-                // Return the source for falling blocks
-                if (entity instanceof FallingBlock) {
-                    Block source = WGMetadata.getIfPresent(entity, FALLING_SOURCE_KEY, Block.class);
-                    cause = create(source, entity);
-                } else {
-                    cause = create(entity);
-                }
+                Cause cause = create(entity);
 
                 Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getLocation(), to));
             }
         }
     }
 
+    @EventHandler
+    public void onEntityExplode(EntityExplodeEvent event) {
+        Entity entity = event.getEntity();
+
+        Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR));
+    }
+
     // TODO: Handle pistons
-    // TODO: Handle EntityExplodeEvent
 
     //-------------------------------------------------------------------------
     // Block external interaction

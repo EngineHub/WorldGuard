@@ -42,7 +42,6 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -320,9 +319,9 @@ public class BukkitUtil {
      * @param material a fallback material
      * @return a target
      */
-    public static Target createTarget(@Nullable Block block, Material material) {
+    public static Target createTarget(Block block, Material material) {
         checkNotNull(material);
-        if (block != null) {
+        if (block.getType() == material) {
             return new MaterialTarget(block.getTypeId(), block.getData());
         } else {
             return new MaterialTarget(material.getId(), (short) 0);
