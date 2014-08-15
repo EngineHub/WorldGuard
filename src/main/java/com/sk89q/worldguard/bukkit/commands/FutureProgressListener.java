@@ -28,14 +28,14 @@ import java.util.Timer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-class FutureProgressListener implements Runnable {
+public class FutureProgressListener implements Runnable {
 
     private static final Timer timer = new Timer();
     private static final int MESSAGE_DELAY = 1000;
 
     private final MessageTimerTask task;
 
-    FutureProgressListener(CommandSender sender, String message) {
+    public FutureProgressListener(CommandSender sender, String message) {
         checkNotNull(sender);
         checkNotNull(message);
 

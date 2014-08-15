@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.bukkit.commands.region;
 
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldedit.BlockVector;
@@ -39,7 +39,7 @@ import java.util.concurrent.Callable;
  * Create a region printout, as used in /region info to show information about
  * a region.
  */
-class RegionPrintoutBuilder implements Callable<String> {
+public class RegionPrintoutBuilder implements Callable<String> {
     
     private final ProtectedRegion region;
     @Nullable
@@ -52,7 +52,7 @@ class RegionPrintoutBuilder implements Callable<String> {
      * @param region the region
      * @param cache a profile cache, or {@code null}
      */
-    RegionPrintoutBuilder(ProtectedRegion region, @Nullable ProfileCache cache) {
+    public RegionPrintoutBuilder(ProtectedRegion region, @Nullable ProfileCache cache) {
         this.region = region;
         this.cache = cache;
     }

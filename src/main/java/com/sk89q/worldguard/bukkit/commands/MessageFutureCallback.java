@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-class MessageFutureCallback<V> implements FutureCallback<V> {
+public class MessageFutureCallback<V> implements FutureCallback<V> {
 
     private final WorldGuardPlugin plugin;
     private final CommandSender sender;
@@ -57,7 +57,7 @@ class MessageFutureCallback<V> implements FutureCallback<V> {
         sender.sendMessage(ChatColor.RED + failure + ": " + plugin.convertThrowable(throwable));
     }
 
-    static class Builder {
+    public static class Builder {
         private final WorldGuardPlugin plugin;
         private final CommandSender sender;
         @Nullable
@@ -65,7 +65,7 @@ class MessageFutureCallback<V> implements FutureCallback<V> {
         @Nullable
         private String failure;
 
-        Builder(WorldGuardPlugin plugin, CommandSender sender) {
+        public Builder(WorldGuardPlugin plugin, CommandSender sender) {
             checkNotNull(plugin);
             checkNotNull(sender);
 

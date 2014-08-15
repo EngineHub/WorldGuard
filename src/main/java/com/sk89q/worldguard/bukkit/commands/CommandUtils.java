@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 /**
  * Command-related utility methods.
  */
-final class CommandUtils {
+public final class CommandUtils {
 
     private CommandUtils() {
     }
@@ -41,7 +41,7 @@ final class CommandUtils {
      * @param owner the owner object
      * @return a name
      */
-    static String getOwnerName(@Nullable Object owner) {
+    public static String getOwnerName(@Nullable Object owner) {
         if (owner == null) {
             return "?";
         } else if (owner instanceof Player) {
@@ -62,7 +62,7 @@ final class CommandUtils {
      * @param sender the sender
      * @return a function
      */
-    static Function<String, ?> messageFunction(final CommandSender sender) {
+    public static Function<String, ?> messageFunction(final CommandSender sender) {
         return new Function<String, Object>() {
             @Override
             public Object apply(@Nullable String s) {

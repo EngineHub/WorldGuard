@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import com.sk89q.worldguard.bukkit.commands.region.MemberCommands;
+import com.sk89q.worldguard.bukkit.commands.region.RegionCommands;
 import org.bukkit.command.CommandSender;
 
 import com.sk89q.minecraft.util.commands.Command;
@@ -35,7 +37,7 @@ public class ProtectionCommands {
     }
 
     @Command(aliases = {"region", "regions", "rg"}, desc = "Region management commands")
-    @NestedCommand({RegionCommands.class, RegionMemberCommands.class})
+    @NestedCommand({RegionCommands.class, MemberCommands.class})
     public void region(CommandContext args, CommandSender sender) {}
 
     @Command(aliases = {"worldguard", "wg"}, desc = "WorldGuard commands")

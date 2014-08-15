@@ -123,6 +123,22 @@ public class RegionPermissionModel extends AbstractPermissionModel {
         return hasPatternPermission(
                 "flag.flags." + flag.getName().toLowerCase(), region);
     }
+
+    public boolean mayAddMembers(ProtectedRegion region) {
+        return hasPatternPermission("addmember", region);
+    }
+
+    public boolean mayAddOwners(ProtectedRegion region) {
+        return hasPatternPermission("addowner", region);
+    }
+
+    public boolean mayRemoveMembers(ProtectedRegion region) {
+        return hasPatternPermission("removemember", region);
+    }
+
+    public boolean mayRemoveOwners(ProtectedRegion region) {
+        return hasPatternPermission("removeowner", region);
+    }
     
     /**
      * Checks to see if the given sender has permission to modify the given region

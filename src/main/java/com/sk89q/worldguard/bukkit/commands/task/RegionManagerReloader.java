@@ -28,16 +28,16 @@ import java.util.concurrent.Callable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class RegionManagerReload implements Callable<Collection<RegionManager>> {
+public class RegionManagerReloader implements Callable<Collection<RegionManager>> {
 
     private final Collection<RegionManager> managers;
 
-    public RegionManagerReload(Collection<RegionManager> managers) {
+    public RegionManagerReloader(Collection<RegionManager> managers) {
         checkNotNull(managers);
         this.managers = managers;
     }
 
-    public RegionManagerReload(RegionManager... manager) {
+    public RegionManagerReloader(RegionManager... manager) {
         this(Arrays.asList(manager));
     }
 
