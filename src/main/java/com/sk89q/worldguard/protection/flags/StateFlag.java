@@ -23,6 +23,8 @@ import org.bukkit.command.CommandSender;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
+import javax.annotation.Nullable;
+
 /**
  *
  * @author sk89q
@@ -87,6 +89,61 @@ public class StateFlag extends Flag<StateFlag.State> {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Test whether at least one of the given states is {@code ALLOW}
+     * but none are set to {@code DENY}.
+     *
+     * @param states zero or more states
+     * @return true if the condition is matched
+     */
+    public static boolean test(State... states) {
+        boolean allowed = false;
+
+        for (State state : states) {
+            if (state == State.DENY) {
+                return false;
+            } else if (state == State.ALLOW) {
+                allowed = true;
+            }
+        }
+
+        return allowed;
+    }
+
+    /**
+     * Combine states, letting {@code DENY} override {@code ALLOW} and
+     * {@code ALLOW} override {@code NONE} (or null).
+     *
+     * @param states zero or more states
+     * @return the new state
+     */
+    @Nullable
+    public static State combine(State... states) {
+        boolean allowed = false;
+
+        for (State state : states) {
+            if (state == State.DENY) {
+                return State.DENY;
+            } else if (state == State.ALLOW) {
+                allowed = true;
+            }
+        }
+
+        return allowed ? State.ALLOW : null;
+    }
+
+    /**
+     * Turn a boolean into either {@code NONE} (null) or {@code ALLOW} if
+     * the boolean is false or true, respectively.
+     *
+     * @param flag a boolean value
+     * @return a state
+     */
+    @Nullable
+    public static State allowOrNone(boolean flag) {
+        return flag ? State.ALLOW : null;
     }
 
 }
