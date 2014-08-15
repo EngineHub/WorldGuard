@@ -229,7 +229,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new RegionProtectionListener(this)).registerEvents();
         (new BlockedPotionsListener(this)).registerEvents();
         (new EventAbstractionListener(this)).registerEvents();
-        (new DebuggingListener(this, getLogger())).registerEvents();
+        if ("true".equalsIgnoreCase(System.getProperty("worldguard.debug.listener"))) {
+            (new DebuggingListener(this, getLogger())).registerEvents();
+        }
 
         configuration.updateCommandBookGodMode();
 
