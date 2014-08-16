@@ -1959,4 +1959,38 @@ public class FlagValueCalculatorTest {
         assertThat(result.getEffectiveFlag(region, DefaultFlag.FAREWELL_MESSAGE, null), equalTo("everyone"));
         assertThat(result.getEffectiveFlag(region, DefaultFlag.GREET_MESSAGE, null), equalTo(null));
     }
+
+    @Test
+    public void testGetEffectiveFlagGlobalRegionBuild() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        ProtectedRegion global = mock.global();
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.getEffectiveFlag(global, DefaultFlag.BUILD, null), equalTo(null));
+    }
+
+    @Test
+    public void testGetEffectiveFlagGlobalRegionBuildDeny() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(DefaultFlag.BUILD, State.DENY);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        // Cannot let users override BUILD on GLOBAL
+        assertThat(result.getEffectiveFlag(global, DefaultFlag.BUILD, null), equalTo(null));
+    }
+
+    @Test
+    public void testGetEffectiveFlagGlobalRegionBuildAllow() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(DefaultFlag.BUILD, State.ALLOW);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        // Cannot let users override BUILD on GLOBAL
+        assertThat(result.getEffectiveFlag(global, DefaultFlag.BUILD, null), equalTo(null));
+    }
 }

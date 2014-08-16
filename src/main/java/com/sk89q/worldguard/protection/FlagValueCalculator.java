@@ -407,14 +407,20 @@ public class FlagValueCalculator {
      */
     @SuppressWarnings("unchecked")
     public <V> V getEffectiveFlag(final ProtectedRegion region, Flag<V> flag, @Nullable LocalPlayer player) {
-        // The global region normally does not prevent building so
-        // PASSTHROUGH has to be ALLOW, except when people use the global
-        // region as a whitelist
-        if (region == globalRegion && flag == DefaultFlag.PASSTHROUGH) {
-            if (region.hasMembersOrOwners()) {
+        if (region == globalRegion) {
+            if (flag == DefaultFlag.PASSTHROUGH) {
+                // Has members/owners -> the global region acts like
+                // a regular region without PASSTHROUGH
+                if (region.hasMembersOrOwners()) {
+                    return null;
+                } else {
+                    return (V) State.ALLOW;
+                }
+
+            } else if (flag == DefaultFlag.BUILD) {
+                // Legacy behavior -> we can't let people change BUILD on
+                // the global region
                 return null;
-            } else {
-                return (V) State.ALLOW;
             }
         }
 
