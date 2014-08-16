@@ -19,11 +19,11 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.command.CommandSender;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
  *
@@ -44,19 +44,45 @@ public abstract class Flag<T> {
     }
 
     public Flag(String name) {
-        this(name, RegionGroup.NON_MEMBERS);
+        this(name, RegionGroup.ALL);
     }
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * Suppress the value of the flag that came from the global region, reducing
+     * its severity (i.e. DENY -> NONE).
+     *
+     * <p>This is really only used for the {@link StateFlag}.</p>
+     *
+     * @param current the value to suppress
+     * @return a new value
+     */
+    public T validateDefaultValue(T current) {
+        return current;
+    }
+
+    @Nullable
+    public T getDefault() {
+        return null;
+    }
+
+    @Nullable
+    public T chooseValue(Collection<T> values) {
+        if (!values.isEmpty()) {
+            return values.iterator().next();
+        } else {
+            return null;
+        }
     }
     
     public RegionGroupFlag getRegionGroupFlag() {
         return regionGroup;
     }
 
-    public abstract T parseInput(WorldGuardPlugin plugin, CommandSender sender,
-            String input) throws InvalidFlagFormat;
+    public abstract T parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat;
 
     public abstract T unmarshal(@Nullable Object o);
 
