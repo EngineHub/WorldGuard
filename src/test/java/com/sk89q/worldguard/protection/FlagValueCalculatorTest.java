@@ -39,7 +39,7 @@ import static org.hamcrest.Matchers.*;
 public class FlagValueCalculatorTest {
 
     @Test
-    public void testGetSingleFallbackMembershipWilderness() throws Exception {
+    public void testGetMembershipWilderness() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         LocalPlayer player = mock.createPlayer();
@@ -58,6 +58,32 @@ public class FlagValueCalculatorTest {
 
         FlagValueCalculator result = mock.getFlagCalculator();
         assertThat(result.getMembership(player), is(Result.NO_REGIONS));
+    }
+
+    @Test
+    public void testGetMembershipGlobalRegion() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        ProtectedRegion global = mock.global();
+
+        LocalPlayer player = mock.createPlayer();
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.getMembership(player), is(Result.NO_REGIONS));
+    }
+
+    @Test
+    public void testGetMembershipGlobalRegionAndRegion() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        ProtectedRegion global = mock.global();
+
+        ProtectedRegion region = mock.add(0);
+
+        LocalPlayer player = mock.createPlayer();
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.getMembership(player), is(Result.FAIL));
     }
 
     @Test
@@ -296,7 +322,8 @@ public class FlagValueCalculatorTest {
 
         FlagValueCalculator result = mock.getFlagCalculator();
         assertThat(result.testPermission(player, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(player, flag2), is((State) null));
+        assertThat(result.testPermission(player, flag2), is(State.DENY));
+        assertThat(result.testPermission(player, flag1, flag2), is(State.DENY));
     }
 
     @Test
@@ -345,6 +372,110 @@ public class FlagValueCalculatorTest {
         assertThat(result.testPermission(nonMember, flag1), is((State) null));
         assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
         assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember), is((State) null));
+    }
+
+    @Test
+    public void testTestPermissionWithPassthroughRegion() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is((State) null));
+        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1), is((State) null));
+        assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember), is((State) null));
+    }
+
+    @Test
+    public void testTestPermissionWithPassthroughRegionAndFlagAllow() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag1, State.ALLOW);
+        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember), is((State) null));
+    }
+
+    @Test
+    public void testTestPermissionWithPassthroughRegionAndFlagDeny() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", false);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag1, State.DENY);
+        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.DENY));
+        assertThat(result.testPermission(member, flag2), is((State) null));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(member), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(nonMember), is((State) null));
+    }
+
+    @Test
+    public void testTestPermissionWithPassthroughRegionAndFlagDenyAndRegionGroups() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", false);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag1, State.DENY);
+        region.setFlag(flag1.getRegionGroupFlag(), RegionGroup.MEMBERS);
+        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.DENY));
+        assertThat(result.testPermission(member, flag2), is((State) null));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(member), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1), is((State) null));
+        assertThat(result.testPermission(nonMember, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
         assertThat(result.testPermission(nonMember), is((State) null));
     }
 
@@ -483,18 +614,18 @@ public class FlagValueCalculatorTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         ProtectedRegion global = mock.global();
-        global.setFlag(flag1, State.DENY); // No effect
+        global.setFlag(flag1, State.DENY);
 
         ProtectedRegion region = mock.add(0);
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag1), is(State.DENY));
         assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
         assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
     }
 
     @Test
@@ -508,7 +639,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         ProtectedRegion global = mock.global();
-        global.setFlag(flag1, State.ALLOW); // No effect
+        global.setFlag(flag1, State.ALLOW);
 
         ProtectedRegion region = mock.add(0);
         region.getMembers().addPlayer(member);
@@ -518,13 +649,13 @@ public class FlagValueCalculatorTest {
         assertThat(result.testPermission(member, flag2), is(State.ALLOW));
         assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
         assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
         assertThat(result.testPermission(nonMember, flag2), is((State) null));
         assertThat(result.testPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithRegionAndGlobalRegionMembership() throws Exception {
+    public void testTestPermissionWithRegionAllowAndGlobalRegionDeny() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -534,7 +665,166 @@ public class FlagValueCalculatorTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         ProtectedRegion global = mock.global();
-        global.getMembers().addPlayer(nonMember);
+        global.setFlag(flag1, State.DENY);
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag1, State.ALLOW);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+    }
+
+    @Test
+    public void testTestPermissionWithRegionAllowAndGlobalRegionDenyDifferentFlags() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag1, State.DENY);
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag2, State.ALLOW);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.DENY));
+        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
+    }
+
+    @Test
+    public void testTestPermissionWithPassthroughRegionAllowAndGlobalRegionDenyWithRegionGroup() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", false);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag1, State.DENY);
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.setFlag(flag1, State.ALLOW);
+        region.setFlag(flag1.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.DENY));
+        assertThat(result.testPermission(member, flag2), is((State) null));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+    }
+
+    @Test
+    public void testTestPermissionWithRegionAllowAndGlobalRegionDenyWithRegionGroup() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag1, State.DENY);
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag1, State.ALLOW);
+        region.setFlag(flag1.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.DENY));
+        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+    }
+
+    @Test
+    public void testTestPermissionWithRegionAllowAndGlobalRegionDenyDifferentFlagsWithRegionGroup() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag1, State.DENY);
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag2, State.ALLOW);
+        region.setFlag(flag2.getRegionGroupFlag(), RegionGroup.MEMBERS);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.DENY));
+        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
+    }
+
+    @Test
+    public void testTestPermissionWithGlobalRegionMembership() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer nonMember = mock.createPlayer();
+        LocalPlayer globalMember = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+        global.getMembers().addPlayer(globalMember);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(globalMember, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(globalMember, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(globalMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(globalMember), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag1), is((State) null));
+        assertThat(result.testPermission(nonMember, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember), is((State) null));
+    }
+
+    @Test
+    public void testTestPermissionWithGlobalRegionMembershipAndRegion() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer nonMember = mock.createPlayer();
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer globalMember = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+        global.getMembers().addPlayer(globalMember);
 
         ProtectedRegion region = mock.add(0);
         region.getMembers().addPlayer(member);
@@ -544,8 +834,115 @@ public class FlagValueCalculatorTest {
         assertThat(result.testPermission(member, flag2), is(State.ALLOW));
         assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
         assertThat(result.testPermission(member), is(State.ALLOW));
+        assertThat(result.testPermission(globalMember, flag1), is((State) null));
+        assertThat(result.testPermission(globalMember, flag2), is((State) null));
+        assertThat(result.testPermission(globalMember, flag1, flag2), is((State) null));
+        assertThat(result.testPermission(globalMember), is((State) null));
         assertThat(result.testPermission(nonMember, flag1), is((State) null));
         assertThat(result.testPermission(nonMember, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
+        assertThat(result.testPermission(nonMember), is((State) null));
+    }
+
+    @Test
+    public void testTestPermissionWithGlobalRegionMembershipAndRegionGlobalFlag() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer nonMember = mock.createPlayer();
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer globalMember = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag2, State.DENY);
+        global.getMembers().addPlayer(globalMember);
+
+        ProtectedRegion region = mock.add(0);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag2), is(State.DENY));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(member), is(State.ALLOW));
+        assertThat(result.testPermission(globalMember, flag1), is((State) null));
+        assertThat(result.testPermission(globalMember, flag2), is(State.DENY));
+        assertThat(result.testPermission(globalMember, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(globalMember), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1), is((State) null));
+        assertThat(result.testPermission(nonMember, flag2), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(nonMember), is((State) null));
+    }
+
+    @Test
+    public void testTestPermissionWithGlobalRegionMembershipAndRegionGlobalFlagRegionOverride() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer nonMember = mock.createPlayer();
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer globalMember = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag2, State.DENY);
+        global.getMembers().addPlayer(globalMember);
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag2, State.ALLOW);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member), is(State.ALLOW));
+        assertThat(result.testPermission(globalMember, flag1), is((State) null));
+        assertThat(result.testPermission(globalMember, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(globalMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(globalMember), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1), is((State) null));
+        assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(nonMember), is((State) null));
+    }
+
+    @Test
+    public void testTestPermissionWithGlobalRegionMembershipAndRegionGlobalFlagRegionOverrideAndRegionGroups() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+        StateFlag flag2 = new StateFlag("test2", true);
+
+        LocalPlayer nonMember = mock.createPlayer();
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer globalMember = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag2, State.DENY);
+        global.getMembers().addPlayer(globalMember);
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag2, State.ALLOW);
+        region.setFlag(flag2.getRegionGroupFlag(), RegionGroup.MEMBERS);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.testPermission(member), is(State.ALLOW));
+        assertThat(result.testPermission(globalMember, flag1), is((State) null));
+        assertThat(result.testPermission(globalMember, flag2), is(State.DENY));
+        assertThat(result.testPermission(globalMember, flag1, flag2), is(State.DENY));
+        assertThat(result.testPermission(globalMember), is((State) null));
+        assertThat(result.testPermission(nonMember, flag1), is((State) null));
+        assertThat(result.testPermission(nonMember, flag2), is(State.DENY));
+        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
         assertThat(result.testPermission(nonMember), is((State) null));
     }
 
@@ -553,192 +950,96 @@ public class FlagValueCalculatorTest {
     // ========================================================================
 
     @Test
-    public void testGetStateWithFallbackSingle() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag = new StateFlag("test", false);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is((State) null));
-    }
-
-    @Test
-    public void testGetStateWithFallbackSeveralNoneAreDenyNoneAreTrue() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag1 = new StateFlag("test1", false);
-        StateFlag flag2 = new StateFlag("test2", false);
-        StateFlag flag3 = new StateFlag("test3", false);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getStateWithFallback(null, flag1, flag2, flag3), is((State) null));
-    }
-
-    @Test
-    public void testGetStateWithFallbackSeveralNoneAreDenyOneIsTrue() throws Exception {
+    public void testQueryStateWilderness() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
         StateFlag flag2 = new StateFlag("test2", true);
-        StateFlag flag3 = new StateFlag("test3", false);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getStateWithFallback(null, flag1, flag2, flag3), is(State.ALLOW));
-    }
-
-    @Test
-    public void testGetStateWithFallbackSeveralNoneAreDenyNoneAreTrueWithEmptyGlobalRegion() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag1 = new StateFlag("test1", false);
-        StateFlag flag2 = new StateFlag("test2", false);
-        StateFlag flag3 = new StateFlag("test3", false);
-
-        ProtectedRegion global = mock.global();
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getStateWithFallback(null, flag1, flag2, flag3), is((State) null));
-    }
-
-    @Test
-    public void testGetStateWithFallbackSeveralNoneAreDenyNoneAreTrueWithGlobalRegionValueSetAllow() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag1 = new StateFlag("test1", false);
-        StateFlag flag2 = new StateFlag("test2", false);
-        StateFlag flag3 = new StateFlag("test3", false);
-
-        ProtectedRegion global = mock.global();
-        global.setFlag(flag1, State.ALLOW);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getStateWithFallback(null, flag1, flag2, flag3), is(State.ALLOW));
-    }
-
-    @Test
-    public void testGetStateWithFallbackSeveralNoneAreDenySomeAreTrueWithGlobalRegionValueSetDeny() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag1 = new StateFlag("test1", true);
-        StateFlag flag2 = new StateFlag("test2", false);
-        StateFlag flag3 = new StateFlag("test3", false);
-
-        ProtectedRegion global = mock.global();
-        global.setFlag(flag1, State.DENY);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getStateWithFallback(null, flag1, flag2, flag3), is((State) null));
-    }
-
-    @Test
-    public void testGetStateWithFallbackWithGlobalRegionAllowAndRegionDeny() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag1 = new StateFlag("test1", false);
-        StateFlag flag2 = new StateFlag("test2", false);
-        StateFlag flag3 = new StateFlag("test3", false);
-
-        ProtectedRegion global = mock.global();
-        global.setFlag(flag1, State.ALLOW);
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(flag1, State.DENY);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getStateWithFallback(null, flag1, flag2, flag3), is(State.DENY));
-    }
-
-    @Test
-    public void testGetStateWithFallbackWithGlobalRegionAllowAndRegionDenyOnDifferentFlag() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag1 = new StateFlag("test1", false);
-        StateFlag flag2 = new StateFlag("test2", false);
-        StateFlag flag3 = new StateFlag("test3", false);
-
-        ProtectedRegion global = mock.global();
-        global.setFlag(flag1, State.ALLOW);
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(flag2, State.DENY);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getStateWithFallback(null, flag1, flag2, flag3), is(State.DENY));
-    }
-
-    @Test
-    public void testGetStateWithFallbackWithGlobalRegionDenyAndRegionAllow() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag1 = new StateFlag("test1", false);
-        StateFlag flag2 = new StateFlag("test2", false);
-        StateFlag flag3 = new StateFlag("test3", false);
-
-        ProtectedRegion global = mock.global();
-        global.setFlag(flag1, State.DENY);
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(flag1, State.ALLOW);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getStateWithFallback(null, flag1, flag2, flag3), is(State.ALLOW));
-    }
-
-    @Test
-    public void testGetStateWithFallbackWithGlobalRegionDenyOnDifferentAndRegionAllow() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag1 = new StateFlag("test1", false);
-        StateFlag flag2 = new StateFlag("test2", false);
-        StateFlag flag3 = new StateFlag("test3", false);
-
-        ProtectedRegion global = mock.global();
-        global.setFlag(flag2, State.DENY);
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(flag1, State.ALLOW);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getStateWithFallback(null, flag1, flag2, flag3), is(State.ALLOW));
+        assertThat(result.queryState(null, flag1), is((State) null));
+        assertThat(result.queryState(null, flag2), is((State) null));
     }
 
     // ========================================================================
     // ========================================================================
 
     @Test
-    public void testGetSingleValueWithFallbackWithFalseDefaultValue() throws Exception {
+    public void testQueryValueSingleRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
-        StateFlag flag = new StateFlag("test", false);
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(DefaultFlag.PVP, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is((State) null));
+        assertThat(result.queryValue(null, DefaultFlag.LIGHTER), is((State) null));
+        assertThat(result.queryValue(null, DefaultFlag.PVP), is(State.DENY));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithTrueDefaultValue() throws Exception {
+    public void testQueryValueDenyOverridesAllow() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
-        StateFlag flag = new StateFlag("test", true);
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(DefaultFlag.PVP, State.DENY);
+
+        region = mock.add(0);
+        region.setFlag(DefaultFlag.PVP, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is(State.ALLOW));
+        assertThat(result.queryValue(null, DefaultFlag.LIGHTER), is((State) null));
+        assertThat(result.queryValue(null, DefaultFlag.PVP), is(State.DENY));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithFalseDefaultValueEmptyGlobalRegion() throws Exception {
+    public void testQueryValueAllowOverridesNone() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
-        StateFlag flag = new StateFlag("test", false);
+        ProtectedRegion region = mock.add(0);
 
-        ProtectedRegion global = mock.global();
+        region = mock.add(0);
+        region.setFlag(DefaultFlag.PVP, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is((State) null));
+        assertThat(result.queryValue(null, DefaultFlag.LIGHTER), is((State) null));
+        assertThat(result.queryValue(null, DefaultFlag.PVP), is(State.ALLOW));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithTrueDefaultValueEmptyGlobalRegion() throws Exception {
+    public void testQueryValueMultipleFlags() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(DefaultFlag.LIGHTER, State.DENY);
+        region.setFlag(DefaultFlag.PVP, State.ALLOW);
+
+        region = mock.add(0);
+        region.setFlag(DefaultFlag.PVP, State.DENY);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.queryValue(null, DefaultFlag.LIGHTER), is(State.DENY));
+        assertThat(result.queryValue(null, DefaultFlag.PVP), is(State.DENY));
+        assertThat(result.queryValue(null, DefaultFlag.LAVA_FIRE), is((State) null));
+    }
+
+    @Test
+    public void testQueryValueStringFlag() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test1");
+
+        region = mock.add(0);
+        region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test2");
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.queryValue(null, DefaultFlag.FAREWELL_MESSAGE), isOneOf("test1", "test2"));
+        assertThat(result.queryValue(null, DefaultFlag.GREET_MESSAGE), is((String) null));
+        assertThat(result.queryValue(null, DefaultFlag.LAVA_FIRE), is((State) null));
+    }
+
+    @Test
+    public void testQueryValueEmptyGlobalRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag = new StateFlag("test", true);
@@ -746,11 +1047,11 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is(State.ALLOW));
+        assertThat(result.queryValue(null, flag), is((State) null));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithDefaultValueSameGlobalRegion() throws Exception {
+    public void testQueryValueGlobalRegionAllow() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag = new StateFlag("test", true);
@@ -759,11 +1060,11 @@ public class FlagValueCalculatorTest {
         global.setFlag(flag, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is(State.ALLOW));
+        assertThat(result.queryValue(null, flag), is(State.ALLOW));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithTrueDefaultValueDenyGlobalRegion() throws Exception {
+    public void testQueryValueGlobalRegionDeny() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag = new StateFlag("test", true);
@@ -772,34 +1073,11 @@ public class FlagValueCalculatorTest {
         global.setFlag(flag, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is((State) null));
+        assertThat(result.queryValue(null, flag), is(State.DENY));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithFalseDefaultValueAllowGlobalRegion() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag = new StateFlag("test", false);
-
-        ProtectedRegion global = mock.global();
-        global.setFlag(flag, State.ALLOW);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is(State.ALLOW));
-    }
-
-    @Test
-    public void testGetSingleValueWithFallbackWithStringFlag() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StringFlag flag = new StringFlag("test");
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is((String) null));
-    }
-
-    @Test
-    public void testGetSingleValueWithFallbackWithStringFlagEmptyGlobalRegion() throws Exception {
+    public void testQueryValueStringFlagWithGlobalRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StringFlag flag = new StringFlag("test");
@@ -807,144 +1085,61 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is((String) null));
+        assertThat(result.queryValue(null, flag), is((String) null));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithStringFlagGlobalRegionValueSet() throws Exception {
+    public void testQueryValueStringFlagWithGlobalRegionValueSet() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StringFlag flag = new StringFlag("test");
 
         ProtectedRegion global = mock.global();
-        global.setFlag(flag, "hello there");
+        global.setFlag(flag, "hello");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is("hello there"));
+        assertThat(result.queryValue(null, flag), is("hello"));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithFalseDefaultValueAndEmptyRegion() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag = new StateFlag("test", false);
-
-        ProtectedRegion region = mock.add(0);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is((State) null));
-    }
-
-    @Test
-    public void testGetSingleValueWithFallbackWithTrueDefaultValueAndEmptyRegion() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag = new StateFlag("test", true);
-
-        ProtectedRegion region = mock.add(0);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is(State.ALLOW));
-    }
-
-    @Test
-    public void testGetSingleValueWithFallbackWithTrueDefaultValueAndRegionDeny() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag = new StateFlag("test", true);
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(flag, State.DENY);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is(State.DENY));
-    }
-
-    @Test
-    public void testGetSingleValueWithFallbackWithTrueDefaultValueAndRegionAllow() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag = new StateFlag("test", true);
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(flag, State.ALLOW);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is(State.ALLOW));
-    }
-
-    @Test
-    public void testGetSingleValueWithFallbackWithFalseDefaultValueAndRegionAllow() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag = new StateFlag("test", false);
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(flag, State.ALLOW);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is(State.ALLOW));
-    }
-
-    @Test
-    public void testGetSingleValueWithFallbackWithFalseDefaultValueAndRegionDeny() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StateFlag flag = new StateFlag("test", false);
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(flag, State.DENY);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is(State.DENY));
-    }
-
-    @Test
-    public void testGetSingleValueWithFallbackWithStringFlagAndEmptyRegion() throws Exception {
+    public void testQueryValueStringFlagWithGlobalRegionAndRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StringFlag flag = new StringFlag("test");
 
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag, "hello");
+
         ProtectedRegion region = mock.add(0);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is((String) null));
+        assertThat(result.queryValue(null, flag), is("hello"));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithStringFlagAndRegionValueSet() throws Exception {
+    public void testQueryValueStringFlagWithGlobalRegionAndRegionOverride() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StringFlag flag = new StringFlag("test");
 
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag, "hello");
+
         ProtectedRegion region = mock.add(0);
-        region.setFlag(flag, "beep beep");
+        region.setFlag(flag, "beep");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is("beep beep"));
+        assertThat(result.queryValue(null, flag), is("beep"));
     }
 
     @Test
-    public void testGetSingleValueWithFallbackWithStringFlagAndRegionValueSetAndPriority() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        StringFlag flag = new StringFlag("test");
-
-        ProtectedRegion region = mock.add(10);
-        region.setFlag(flag, "ello there");
-
-        region = mock.add(0);
-        region.setFlag(flag, "beep beep");
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is("ello there"));
-    }
-
-    @Test
-    public void testGetSingleValueWithFallbackWithStringFlagAndRegionValueSetAndInheritanceAndRegionGroup() throws Exception {
+    public void testQueryValueStringFlagWithEverything() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StringFlag flag = new StringFlag("test", RegionGroup.ALL);
+
+        ProtectedRegion global = mock.global();
+        global.setFlag(flag, "hello");
 
         ProtectedRegion parent = mock.add(0);
         parent.setFlag(flag, "ello there");
@@ -960,93 +1155,16 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValueWithFallback(null, flag), is("ello there"));
-        assertThat(result.getSingleValueWithFallback(nonMember, flag), is("ello there"));
-        assertThat(result.getSingleValueWithFallback(member, flag), is("beep beep"));
+        assertThat(result.queryValue(null, flag), is("ello there"));
+        assertThat(result.queryValue(nonMember, flag), is("ello there"));
+        assertThat(result.queryValue(member, flag), is("beep beep"));
     }
 
     // ========================================================================
     // ========================================================================
 
     @Test
-    public void testGetSingleValueSingleRegion() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.PVP, State.DENY);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValue(null, DefaultFlag.LIGHTER), is((State) null));
-        assertThat(result.getSingleValue(null, DefaultFlag.PVP), is(State.DENY));
-    }
-
-    @Test
-    public void testGetSingleValueDenyOverridesAllow() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.PVP, State.DENY);
-
-        region = mock.add(0);
-        region.setFlag(DefaultFlag.PVP, State.ALLOW);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValue(null, DefaultFlag.LIGHTER), is((State) null));
-        assertThat(result.getSingleValue(null, DefaultFlag.PVP), is(State.DENY));
-    }
-
-    @Test
-    public void testGetSingleValueAllowOverridesNone() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        ProtectedRegion region = mock.add(0);
-
-        region = mock.add(0);
-        region.setFlag(DefaultFlag.PVP, State.ALLOW);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValue(null, DefaultFlag.LIGHTER), is((State) null));
-        assertThat(result.getSingleValue(null, DefaultFlag.PVP), is(State.ALLOW));
-    }
-
-    @Test
-    public void testGetSingleValueMultipleFlags() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.LIGHTER, State.DENY);
-        region.setFlag(DefaultFlag.PVP, State.ALLOW);
-
-        region = mock.add(0);
-        region.setFlag(DefaultFlag.PVP, State.DENY);
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValue(null, DefaultFlag.LIGHTER), is(State.DENY));
-        assertThat(result.getSingleValue(null, DefaultFlag.PVP), is(State.DENY));
-        assertThat(result.getSingleValue(null, DefaultFlag.LAVA_FIRE), is((State) null));
-    }
-
-    @Test
-    public void testGetSingleValueStringFlag() throws Exception {
-        MockApplicableRegionSet mock = new MockApplicableRegionSet();
-
-        ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test1");
-
-        region = mock.add(0);
-        region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test2");
-
-        FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getSingleValue(null, DefaultFlag.FAREWELL_MESSAGE), isOneOf("test1", "test2"));
-        assertThat(result.getSingleValue(null, DefaultFlag.GREET_MESSAGE), is((String) null));
-        assertThat(result.getSingleValue(null, DefaultFlag.LAVA_FIRE), is((State) null));
-    }
-
-    // ========================================================================
-    // ========================================================================
-
-    @Test
-    public void testGetValuesTwoWithSamePriority() throws Exception {
+    public void testQueryAllValuesTwoWithSamePriority() throws Exception {
         // ====================================================================
         // Two regions with the same priority
         // ====================================================================
@@ -1060,12 +1178,12 @@ public class FlagValueCalculatorTest {
         region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1", "test2")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1", "test2")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesTwoWithDuplicateFlagValues() throws Exception {
+    public void testQueryAllValuesTwoWithDuplicateFlagValues() throws Exception {
         // ====================================================================
         // Two regions with duplicate values
         // ====================================================================
@@ -1079,12 +1197,12 @@ public class FlagValueCalculatorTest {
         region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test", "test")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test", "test")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesWithHigherPriority() throws Exception {
+    public void testQueryAllValuesWithHigherPriority() throws Exception {
         // ====================================================================
         // One of the regions has a higher priority (should override)
         // ====================================================================
@@ -1098,12 +1216,12 @@ public class FlagValueCalculatorTest {
         region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesWithTwoElevatedPriorities() throws Exception {
+    public void testQueryAllValuesWithTwoElevatedPriorities() throws Exception {
         // ====================================================================
         // Two regions with the same elevated priority
         // ====================================================================
@@ -1120,12 +1238,12 @@ public class FlagValueCalculatorTest {
         region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1", "test3")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1", "test3")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesParentChildWithSamePriority() throws Exception {
+    public void testQueryAllValuesParentChildWithSamePriority() throws Exception {
         // ====================================================================
         // Child region and parent region with the same priority
         // ====================================================================
@@ -1143,12 +1261,12 @@ public class FlagValueCalculatorTest {
         region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesParentWithHigherPriority() throws Exception {
+    public void testQueryAllValuesParentWithHigherPriority() throws Exception {
         // ====================================================================
         // Parent region with a higher priority than the child
         // ====================================================================
@@ -1166,12 +1284,12 @@ public class FlagValueCalculatorTest {
         region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test3")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test3")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesParentWithLowerPriority() throws Exception {
+    public void testQueryAllValuesParentWithLowerPriority() throws Exception {
         // ====================================================================
         // Parent region with a lower priority than the child
         // ====================================================================
@@ -1189,12 +1307,12 @@ public class FlagValueCalculatorTest {
         region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesThirdRegionWithHigherPriorityThanParentChild() throws Exception {
+    public void testQueryAllValuesThirdRegionWithHigherPriorityThanParentChild() throws Exception {
         // ====================================================================
         // Third region with higher priority than parent and child
         // ====================================================================
@@ -1212,12 +1330,12 @@ public class FlagValueCalculatorTest {
         region.setFlag(DefaultFlag.FAREWELL_MESSAGE, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test2")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test2")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesParentsAndInheritance() throws Exception {
+    public void testQueryAllValuesParentsAndInheritance() throws Exception {
         // ====================================================================
         // Multiple regions with parents, one region using flag from parent
         // ====================================================================
@@ -1238,12 +1356,12 @@ public class FlagValueCalculatorTest {
         region.setParent(parent2);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test2", "test3")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test2", "test3")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesParentsAndInheritanceHighPriorityAndNoFlag() throws Exception {
+    public void testQueryAllValuesParentsAndInheritanceHighPriorityAndNoFlag() throws Exception {
         // ====================================================================
         // Multiple regions with parents, one region with high priority but no flag
         // ====================================================================
@@ -1263,12 +1381,12 @@ public class FlagValueCalculatorTest {
         region = mock.add(30);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test2")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test2")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
     }
 
     @Test
-    public void testGetValuesParentWithSamePriorityAsHighest() throws Exception {
+    public void testQueryAllValuesParentWithSamePriorityAsHighest() throws Exception {
         // ====================================================================
         // As before, except a parent region has the same priority as the previous highest
         // ====================================================================
@@ -1288,8 +1406,31 @@ public class FlagValueCalculatorTest {
         region = mock.add(30);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.getValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1")));
-        assertThat(result.getValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+        assertThat(copyOf(result.queryAllValues(null, DefaultFlag.FAREWELL_MESSAGE)), equalTo(of("test1")));
+        assertThat(result.queryAllValues(null, DefaultFlag.GREET_MESSAGE), is(Matchers.<String>empty()));
+    }
+
+    // ========================================================================
+    // ========================================================================
+
+    @Test
+    public void testGetEffectivePriority() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        ProtectedRegion region = mock.add(30);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.getPriority(region), is(30));
+    }
+
+    @Test
+    public void testGetEffectivePriorityGlobalRegion() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        ProtectedRegion region = mock.global();
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.getPriority(region), is(Integer.MIN_VALUE));
     }
 
     // ========================================================================

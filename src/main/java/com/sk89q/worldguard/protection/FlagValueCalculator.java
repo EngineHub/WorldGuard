@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -50,21 +52,35 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FlagValueCalculator {
 
-    private final SortedSet<ProtectedRegion> applicable;
+    private final SortedSet<ProtectedRegion> regions;
     @Nullable
     private final ProtectedRegion globalRegion;
 
     /**
      * Create a new instance.
      *
-     * @param applicable a list of applicable regions
+     * @param regions a list of applicable regions
      * @param globalRegion an optional global region (null to not use one)
      */
-    public FlagValueCalculator(SortedSet<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion) {
-        checkNotNull(applicable);
+    public FlagValueCalculator(SortedSet<ProtectedRegion> regions, @Nullable ProtectedRegion globalRegion) {
+        checkNotNull(regions);
 
-        this.applicable = applicable;
+        this.regions = regions;
         this.globalRegion = globalRegion;
+    }
+
+    /**
+     * Returns an iterable of regions sorted by priority (descending), with
+     * the global region tacked on at the end if one exists.
+     *
+     * @return an iterable
+     */
+    private Iterable<ProtectedRegion> getApplicable() {
+        if (globalRegion != null) {
+            return Iterables.concat(regions, ImmutableList.of(globalRegion));
+        } else {
+            return regions;
+        }
     }
 
     /**
@@ -119,12 +135,12 @@ public class FlagValueCalculator {
         Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
         Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
 
-        for (ProtectedRegion region : applicable) {
+        for (ProtectedRegion region : getApplicable()) {
             // Don't consider lower priorities below minimumPriority
             // (which starts at Integer.MIN_VALUE). A region that "counts"
             // (has the flag set OR has members) will raise minimumPriority
             // to its own priority.
-            if (region.getPriority() < minimumPriority) {
+            if (getPriority(region) < minimumPriority) {
                 break;
             }
 
@@ -133,7 +149,7 @@ public class FlagValueCalculator {
                 continue;
             }
 
-            minimumPriority = region.getPriority();
+            minimumPriority = getPriority(region);
             foundApplicableRegion = true;
 
             if (!hasCleared.contains(region)) {
@@ -194,37 +210,27 @@ public class FlagValueCalculator {
 
         switch (getMembership(player)) {
             case SUCCESS:
-                return StateFlag.combine(getState(player, flags), State.ALLOW);
+                return StateFlag.combine(queryState(player, flags), State.ALLOW);
             case FAIL:
-                return getState(player, flags);
+                return queryState(player, flags);
             case NO_REGIONS:
-                if (globalRegion != null && globalRegion.hasMembersOrOwners()) {
-                    if (globalRegion.isMember(player)) {
-                        return StateFlag.combine(getState(player, flags), State.ALLOW);
-                    } else {
-                        State value = null;
-
-                        for (StateFlag flag : flags) {
-                            value = StateFlag.combine(value,globalRegion.getFlag(flag));
-                            if (value == State.DENY) {
-                                break;
-                            }
-                        }
-
-                        return value;
+            default:
+                State fallback = null;
+                for (StateFlag flag : flags) {
+                    if (flag.getDefault()) {
+                        fallback = State.ALLOW;
+                        break;
                     }
                 }
-            default:
-                return getStateWithFallback(player, flags);
+                return StateFlag.combine(queryState(player, flags), fallback);
         }
     }
+
 
     /**
      * Get the effective value for a list of state flags. The rules of
      * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}. This method will check
-     * the global region and {@link Flag#getDefault()} (in that order) if
-     * a value for the flag is not set in any region.
+     * and {@code ALLOW} overrides {@code NONE}.
      *
      * <p>This method does <strong>not</strong> properly process build
      * permissions. Instead, use {@link #testPermission(LocalPlayer, StateFlag...)}
@@ -245,50 +251,11 @@ public class FlagValueCalculator {
      * @return a state
      */
     @Nullable
-    public State getStateWithFallback(@Nullable LocalPlayer player, StateFlag... flags) {
+    public State queryState(@Nullable LocalPlayer player, StateFlag... flags) {
         State value = null;
 
         for (StateFlag flag : flags) {
-            value = StateFlag.combine(value, getSingleValueWithFallback(player, flag));
-            if (value == State.DENY) {
-                break;
-            }
-        }
-
-        return value;
-    }
-
-
-    /**
-     * Get the effective value for a list of state flags. The rules of
-     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}. This method does not check
-     * the global region and ignores a flag's default value.
-     *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testPermission(LocalPlayer, StateFlag...)}
-     * for that purpose. This method is ideal for testing non-build related
-     * state flags (although a rarity), an example of which would be whether
-     * to play a song to players that enter an area.</p>
-     *
-     * <p>A player can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * player is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the player, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param player an optional player, which would be used to determine the region group to apply
-     * @param flags a list of flags to check
-     * @return a state
-     */
-    @Nullable
-    public State getState(@Nullable LocalPlayer player, StateFlag... flags) {
-        State value = null;
-
-        for (StateFlag flag : flags) {
-            value = StateFlag.combine(value, getSingleValue(player, flag));
+            value = StateFlag.combine(value, queryValue(player, flag));
             if (value == State.DENY) {
                 break;
             }
@@ -302,8 +269,7 @@ public class FlagValueCalculator {
      * (for example, if there are multiple regions with the same priority
      * but with different farewell messages set, there would be multiple
      * completing values), then the selected (or "winning") value will depend
-     * on the flag type. This method will check the global region
-     * for a value as well as the flag's default value.
+     * on the flag type.
      *
      * <p>Only some flag types actually have a strategy for picking the
      * "best value." For most types, the actual value that is chosen to be
@@ -326,65 +292,10 @@ public class FlagValueCalculator {
      * @param player an optional player, which would be used to determine the region group to apply
      * @param flag the flag
      * @return a value, which could be {@code null}
-     * @see #getSingleValue(LocalPlayer, Flag) does not check global region, defaults
      */
     @Nullable
-    public <V> V getSingleValueWithFallback(@Nullable LocalPlayer player, Flag<V> flag) {
-        checkNotNull(flag);
-
-        V value = getSingleValue(player, flag);
-
-        if (value != null) {
-            return value;
-        }
-
-        // Get the value from the global region
-        if (globalRegion != null) {
-            value = globalRegion.getFlag(flag);
-        }
-
-        // Still no value? Check the default value for the flag
-        if (value == null) {
-            value = flag.getDefault();
-        }
-
-        return flag.validateDefaultValue(value);
-    }
-
-    /**
-     * Get the effective value for a flag. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will depend
-     * on the flag type. This method never checks the global region or
-     * the flag's default value.
-     *
-     * <p>Only some flag types actually have a strategy for picking the
-     * "best value." For most types, the actual value that is chosen to be
-     * returned is undefined (it could be any value). As of writing, the only
-     * type of flag that can consistently return the same 'best' value is
-     * {@link StateFlag}.</p>
-     *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testPermission(LocalPlayer, StateFlag...)}
-     * for that purpose.</p>
-     *
-     * <p>A player can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * player is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the player, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * @param player an optional player, which would be used to determine the region group to apply
-     * @param flag the flag
-     * @return a value, which could be {@code null}
-     * @see #getSingleValueWithFallback(LocalPlayer, Flag) checks global regions, defaults
-     */
-    @Nullable
-    public <V> V getSingleValue(@Nullable LocalPlayer player, Flag<V> flag) {
-        Collection<V> values = getValues(player, flag);
+    public <V> V queryValue(@Nullable LocalPlayer player, Flag<V> flag) {
+        Collection<V> values = queryAllValues(player, flag);
         return flag.chooseValue(values);
     }
 
@@ -405,7 +316,7 @@ public class FlagValueCalculator {
      * only flags that use {@link RegionGroup#ALL},
      * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
      */
-    public <V> Collection<V> getValues(@Nullable LocalPlayer player, Flag<V> flag) {
+    public <V> Collection<V> queryAllValues(@Nullable LocalPlayer player, Flag<V> flag) {
         checkNotNull(flag);
 
         int minimumPriority = Integer.MIN_VALUE;
@@ -441,12 +352,12 @@ public class FlagValueCalculator {
         Map<ProtectedRegion, V> consideredValues = new HashMap<ProtectedRegion, V>();
         Set<ProtectedRegion> ignoredRegions = new HashSet<ProtectedRegion>();
 
-        for (ProtectedRegion region : applicable) {
+        for (ProtectedRegion region : getApplicable()) {
             // Don't consider lower priorities below minimumPriority
             // (which starts at Integer.MIN_VALUE). A region that "counts"
             // (has the flag set) will raise minimumPriority to its own
             // priority.
-            if (region.getPriority() < minimumPriority) {
+            if (getPriority(region) < minimumPriority) {
                 break;
             }
 
@@ -454,7 +365,7 @@ public class FlagValueCalculator {
 
             if (value != null) {
                 if (!ignoredRegions.contains(region)) {
-                    minimumPriority = region.getPriority();
+                    minimumPriority = getPriority(region);
 
                     ignoreValuesOfParents(consideredValues, ignoredRegions, region);
                     consideredValues.put(region, value);
@@ -472,6 +383,21 @@ public class FlagValueCalculator {
     }
 
     /**
+     * Get the effective priority of a region, overriding a region's priority
+     * when appropriate (i.e. with the global region).
+     *
+     * @param region the region
+     * @return the priority
+     */
+    public int getPriority(final ProtectedRegion region) {
+        if (region == globalRegion) {
+            return Integer.MIN_VALUE;
+        } else {
+            return region.getPriority();
+        }
+    }
+
+    /**
      * Get a region's state flag, checking parent regions until a value for the
      * flag can be found (if one even exists).
      *
@@ -479,7 +405,19 @@ public class FlagValueCalculator {
      * @param flag the flag
      * @return the value
      */
+    @SuppressWarnings("unchecked")
     public <V> V getEffectiveFlag(final ProtectedRegion region, Flag<V> flag, @Nullable LocalPlayer player) {
+        // The global region normally does not prevent building so
+        // PASSTHROUGH has to be ALLOW, except when people use the global
+        // region as a whitelist
+        if (region == globalRegion && flag == DefaultFlag.PASSTHROUGH) {
+            if (region.hasMembersOrOwners()) {
+                return null;
+            } else {
+                return (V) State.ALLOW;
+            }
+        }
+
         ProtectedRegion current = region;
 
         while (current != null) {

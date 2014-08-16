@@ -51,24 +51,6 @@ public abstract class Flag<T> {
         return name;
     }
 
-    /**
-     * Suppress the value of the flag that came from the global region, reducing
-     * its severity (i.e. DENY -> NONE).
-     *
-     * <p>This is really only used for the {@link StateFlag}.</p>
-     *
-     * @param current the value to suppress
-     * @return a new value
-     */
-    public T validateDefaultValue(T current) {
-        return current;
-    }
-
-    @Nullable
-    public T getDefault() {
-        return null;
-    }
-
     @Nullable
     public T chooseValue(Collection<T> values) {
         if (!values.isEmpty()) {

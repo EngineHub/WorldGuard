@@ -38,7 +38,6 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
         this.def = def;
     }
 
-    @Override
     public RegionGroup getDefault() {
         return def;
     }
