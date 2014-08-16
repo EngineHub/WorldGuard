@@ -44,12 +44,12 @@ public final class DefaultFlag {
     public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", true);
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", true);
     public static final StateFlag LIGHTNING = new StateFlag("lightning", true);
-    public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", false);
+    public static final StateFlag CHEST_ACCESS = new StateFlag("chest-access", true);
     public static final StateFlag WATER_FLOW = new StateFlag("water-flow", true);
     public static final StateFlag LAVA_FLOW = new StateFlag("lava-flow", true);
     public static final StateFlag USE = new StateFlag("use", true);
-    public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
-    public static final StateFlag DESTROY_VEHICLE = new StateFlag("vehicle-destroy", false);
+    public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", true);
+    public static final StateFlag DESTROY_VEHICLE = new StateFlag("vehicle-destroy", true);
     public static final StateFlag PISTONS = new StateFlag("pistons", true);
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
     public static final StateFlag SNOW_MELT = new StateFlag("snow-melt", true);
