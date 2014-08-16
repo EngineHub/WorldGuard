@@ -28,18 +28,18 @@ import org.bukkit.entity.EntityType;
  */
 public final class DefaultFlag {
 
-    public static final StateFlag PASSTHROUGH = new StateFlag("passthrough", false, RegionGroup.ALL);
-    public static final StateFlag BUILD = new StateFlag("build", true, RegionGroup.NON_MEMBERS);
+    public static final StateFlag PASSTHROUGH = new StateFlag("passthrough", false);
+    public static final StateFlag BUILD = new StateFlag("build", true);
     public static final RegionGroupFlag CONSTRUCT = new RegionGroupFlag("construct", RegionGroup.MEMBERS);
-    public static final StateFlag PVP = new StateFlag("pvp", true, RegionGroup.ALL);
-    public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", true, RegionGroup.ALL);
-    public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true, RegionGroup.ALL);
-    public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", true, RegionGroup.ALL);
+    public static final StateFlag PVP = new StateFlag("pvp", true);
+    public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", true);
+    public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true);
+    public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", true);
     public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = new StateFlag("enderdragon-block-damage", true);
-    public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true, RegionGroup.ALL);
+    public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true);
     public static final StateFlag OTHER_EXPLOSION = new StateFlag("other-explosion", true);
     public static final StateFlag SLEEP = new StateFlag("sleep", true);
-    public static final StateFlag TNT = new StateFlag("tnt", true, RegionGroup.ALL);
+    public static final StateFlag TNT = new StateFlag("tnt", true);
     public static final StateFlag LIGHTER = new StateFlag("lighter", true);
     public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", true);
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", true);
@@ -62,8 +62,8 @@ public final class DefaultFlag {
     public static final StateFlag VINE_GROWTH = new StateFlag("vine-growth", true);
     public static final StateFlag SOIL_DRY = new StateFlag("soil-dry", true);
     public static final StateFlag ENDER_BUILD = new StateFlag("enderman-grief", true);
-    public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false, RegionGroup.ALL);
-    public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true, RegionGroup.ALL);
+    public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false);
+    public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true);
     public static final StateFlag SEND_CHAT = new StateFlag("send-chat", true);
     public static final StateFlag RECEIVE_CHAT = new StateFlag("receive-chat", true);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
@@ -73,29 +73,29 @@ public final class DefaultFlag {
     public static final StateFlag ENTITY_PAINTING_DESTROY = new StateFlag("entity-painting-destroy", true);
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = new StateFlag("entity-item-frame-destroy", true);
     public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
-    public static final StringFlag GREET_MESSAGE = new StringFlag("greeting", RegionGroup.ALL);
-    public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell", RegionGroup.ALL);
-    public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter", RegionGroup.ALL);
-    public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave", RegionGroup.ALL);
-    public static final SetFlag<EntityType> DENY_SPAWN = new SetFlag<EntityType>("deny-spawn", RegionGroup.ALL, new EntityTypeFlag(null));
-    public static final EnumFlag<GameMode> GAME_MODE = new EnumFlag<GameMode>("game-mode", GameMode.class, RegionGroup.ALL);
-    public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay", RegionGroup.ALL);
-    public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount", RegionGroup.ALL);
-    public static final DoubleFlag MIN_HEAL = new DoubleFlag("heal-min-health", RegionGroup.ALL);
-    public static final DoubleFlag MAX_HEAL = new DoubleFlag("heal-max-health", RegionGroup.ALL);
-    public static final IntegerFlag FEED_DELAY = new IntegerFlag("feed-delay", RegionGroup.ALL);
-    public static final IntegerFlag FEED_AMOUNT = new IntegerFlag("feed-amount", RegionGroup.ALL);
-    public static final IntegerFlag MIN_FOOD = new IntegerFlag("feed-min-hunger", RegionGroup.ALL);
-    public static final IntegerFlag MAX_FOOD = new IntegerFlag("feed-max-hunger", RegionGroup.ALL);
-    // public static final IntegerFlag MAX_PLAYERS = new IntegerFlag("max-players-allowed", RegionGroup.ALL);
-    // public static final StringFlag MAX_PLAYERS_MESSAGE = new StringFlag("max-players-reject-message", RegionGroup.ALL);
+    public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
+    public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
+    public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
+    public static final BooleanFlag NOTIFY_LEAVE = new BooleanFlag("notify-leave");
+    public static final SetFlag<EntityType> DENY_SPAWN = new SetFlag<EntityType>("deny-spawn", new EntityTypeFlag(null));
+    public static final EnumFlag<GameMode> GAME_MODE = new EnumFlag<GameMode>("game-mode", GameMode.class);
+    public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay");
+    public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount");
+    public static final DoubleFlag MIN_HEAL = new DoubleFlag("heal-min-health");
+    public static final DoubleFlag MAX_HEAL = new DoubleFlag("heal-max-health");
+    public static final IntegerFlag FEED_DELAY = new IntegerFlag("feed-delay");
+    public static final IntegerFlag FEED_AMOUNT = new IntegerFlag("feed-amount");
+    public static final IntegerFlag MIN_FOOD = new IntegerFlag("feed-min-hunger");
+    public static final IntegerFlag MAX_FOOD = new IntegerFlag("feed-max-hunger");
+    // public static final IntegerFlag MAX_PLAYERS = new IntegerFlag("max-players-allowed");
+    // public static final StringFlag MAX_PLAYERS_MESSAGE = new StringFlag("max-players-reject-message");
     public static final LocationFlag TELE_LOC = new LocationFlag("teleport", RegionGroup.MEMBERS);
     public static final LocationFlag SPAWN_LOC = new LocationFlag("spawn", RegionGroup.MEMBERS);
     public static final StateFlag ENABLE_SHOP = new StateFlag("allow-shop", false);
     public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
     public static final DoubleFlag PRICE = new DoubleFlag("price");
-    public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
-    public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
+    public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", new CommandStringFlag(null));
+    public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", new CommandStringFlag(null));
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
