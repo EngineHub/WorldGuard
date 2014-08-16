@@ -420,7 +420,8 @@ public class FlagValueCalculator {
             } else if (flag == DefaultFlag.BUILD) {
                 // Legacy behavior -> we can't let people change BUILD on
                 // the global region
-                return null;
+                State value = region.getFlag(DefaultFlag.BUILD);
+                return value != State.ALLOW ? (V) value : null;
             }
         }
 

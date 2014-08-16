@@ -1979,7 +1979,7 @@ public class FlagValueCalculatorTest {
 
         FlagValueCalculator result = mock.getFlagCalculator();
         // Cannot let users override BUILD on GLOBAL
-        assertThat(result.getEffectiveFlag(global, DefaultFlag.BUILD, null), equalTo(null));
+        assertThat(result.getEffectiveFlag(global, DefaultFlag.BUILD, null), equalTo(State.DENY));
     }
 
     @Test
