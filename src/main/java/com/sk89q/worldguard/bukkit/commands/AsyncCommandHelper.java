@@ -21,7 +21,7 @@ package com.sk89q.worldguard.bukkit.commands;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.sk89q.odeum.task.FutureForwardingTask;
+import com.sk89q.worldguard.util.task.FutureForwardingTask;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
