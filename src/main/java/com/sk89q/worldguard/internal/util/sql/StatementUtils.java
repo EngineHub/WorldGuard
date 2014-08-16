@@ -22,7 +22,11 @@ package com.sk89q.worldguard.internal.util.sql;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class StatementUtils {
+public final class StatementUtils {
+
+    private StatementUtils() {
+    }
+
     /**
      * Creates a comma separated list of PreparedStatement place holders
      *

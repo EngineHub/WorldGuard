@@ -44,6 +44,9 @@ import org.bukkit.entity.Player;
 
 class RegionCommandsBase {
 
+    protected RegionCommandsBase() {
+    }
+
     /**
      * Get the permission model to lookup permissions.
      *
