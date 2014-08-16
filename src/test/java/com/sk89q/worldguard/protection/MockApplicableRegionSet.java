@@ -51,6 +51,13 @@ public class MockApplicableRegionSet {
         return global;
     }
 
+    public ProtectedRegion createOutside(int priority) {
+        ProtectedRegion region = new ProtectedCuboidRegion(getNextId(),
+                new BlockVector(0, 0, 0), new BlockVector(1, 1, 1));
+        region.setPriority(priority);
+        return region;
+    }
+
     public ProtectedRegion add(int priority) {
         ProtectedRegion region = new ProtectedCuboidRegion(getNextId(),
                 new BlockVector(0, 0, 0), new BlockVector(1, 1, 1));
@@ -75,6 +82,10 @@ public class MockApplicableRegionSet {
 
     public ApplicableRegionSet getApplicableSet() {
         return new ApplicableRegionSet(regions, global);
+    }
+
+    public FlagValueCalculator getFlagCalculator() {
+        return new FlagValueCalculator(regions, global);
     }
 
     private String getNextId() {

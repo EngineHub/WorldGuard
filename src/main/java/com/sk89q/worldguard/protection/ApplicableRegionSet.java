@@ -313,7 +313,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
 
     @Nullable
     private State getDefault(StateFlag flag, @Nullable Predicate<ProtectedRegion> membershipTest) {
-        boolean allowed = flag.getDefault();
+        boolean allowed = flag.getDefault() == State.ALLOW;
 
         // Handle defaults
         if (globalRegion != null) {
@@ -425,9 +425,11 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
             // Check group permissions
             if (groupPlayer != null && flag.getRegionGroupFlag() != null) {
                 RegionGroup group = region.getFlag(flag.getRegionGroupFlag());
+
                 if (group == null) {
                     group = flag.getRegionGroupFlag().getDefault();
                 }
+
                 if (!RegionGroupFlag.isMember(region, group, groupPlayer)) {
                     continue;
                 }
