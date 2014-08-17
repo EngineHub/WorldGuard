@@ -234,14 +234,6 @@ public class EventAbstractionListener implements Listener {
                             }
                         }
                     }
-
-                    // Special handling of flint and steel on TNT
-                    if (clicked.getType() == Material.TNT && item != null && item.getType() == Material.FLINT_AND_STEEL) {
-                        if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), clicked))) {
-                            event.setUseInteractedBlock(Result.DENY);
-                            break;
-                        }
-                    }
                 }
 
                 // Special handling of putting out fires
