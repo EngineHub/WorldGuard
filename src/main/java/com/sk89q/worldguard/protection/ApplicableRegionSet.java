@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection;
 
 import com.google.common.collect.ObjectArrays;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
@@ -34,6 +35,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -88,11 +90,11 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * <p>If there are several relevant flags (i.e. in addition to
      * {@code BUILD}, such as {@link DefaultFlag#SLEEP} when the target
      * object is a bed), then
-     * {@link #testBuild(LocalPlayer, StateFlag...)} should be used.</p>
+     * {@link #testBuild(RegionAssociable, StateFlag...)} should be used.</p>
      *
      * @param player the player to check
      * @return true if permitted
-     * @deprecated use {@link #testBuild(LocalPlayer, StateFlag...)}
+     * @deprecated use {@link #testBuild(RegionAssociable, StateFlag...)}
      */
     @Deprecated
     public boolean canBuild(LocalPlayer player) {
@@ -105,36 +107,36 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * considering the {@link DefaultFlag#BUILD} flag.
      *
      * <p>This method is equivalent to calling
-     * {@link #testState(LocalPlayer, StateFlag...)} with {@code flags} plus
+     * {@link #testState(RegionAssociable, StateFlag...)} with {@code flags} plus
      * the {@code BUILD} flag.</p>
      *
-     * @param player the player
+     * @param subject the subject
      * @param flags zero or more flags
      * @return true if permission is granted
-     * @see #queryState(LocalPlayer, StateFlag...)
+     * @see #queryState(RegionAssociable, StateFlag...)
      */
-    public boolean testBuild(LocalPlayer player, StateFlag... flags) {
-        checkNotNull(player);
-        return test(flagValueCalculator.queryState(player, ObjectArrays.concat(flags, DefaultFlag.BUILD)));
+    public boolean testBuild(RegionAssociable subject, StateFlag... flags) {
+        checkNotNull(subject);
+        return test(flagValueCalculator.queryState(subject, ObjectArrays.concat(flags, DefaultFlag.BUILD)));
     }
 
     /**
      * Test whether the (effective) value for a list of state flags equals
      * {@code ALLOW}.
      *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * <p>{@code subject} can be non-null to satisfy region group requirements,
      * otherwise it will be assumed that the caller that is not a member of any
      * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
+     * to certain users.) The subject argument is required if the
      * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
      *
-     * @param player an optional player, which would be used to determine the region groups that apply
+     * @param subject an optional subject, which would be used to determine the region groups that apply
      * @param flags a list of flags to check
      * @return true if the result was {@code ALLOW}
-     * @see #queryState(LocalPlayer, StateFlag...)
+     * @see #queryState(RegionAssociable, StateFlag...)
      */
-    public boolean testState(@Nullable LocalPlayer player, StateFlag... flags) {
-        return test(flagValueCalculator.queryState(player, flags));
+    public boolean testState(@Nullable RegionAssociable subject, StateFlag... flags) {
+        return test(flagValueCalculator.queryState(subject, flags));
     }
 
     /**
@@ -142,19 +144,19 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
      * and {@code ALLOW} overrides {@code NONE}. One flag may override another.
      *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * <p>{@code subject} can be non-null to satisfy region group requirements,
      * otherwise it will be assumed that the caller that is not a member of any
      * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
+     * to certain users.) The subject argument is required if the
      * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
      *
-     * @param player an optional player, which would be used to determine the region groups that apply
+     * @param subject an optional subject, which would be used to determine the region groups that apply
      * @param flags a list of flags to check
      * @return a state
      */
     @Nullable
-    public State queryState(@Nullable LocalPlayer player, StateFlag... flags) {
-        return flagValueCalculator.queryState(player, flags);
+    public State queryState(@Nullable RegionAssociable subject, StateFlag... flags) {
+        return flagValueCalculator.queryState(subject, flags);
     }
 
     /**
@@ -169,19 +171,19 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * type of flag that actually has a strategy for picking a value is the
      * {@link StateFlag}.</p>
      *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * <p>{@code subject} can be non-null to satisfy region group requirements,
      * otherwise it will be assumed that the caller that is not a member of any
      * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
+     * to certain users.) The subject argument is required if the
      * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
      *
-     * @param player an optional player, which would be used to determine the region group to apply
+     * @param subject an optional subject, which would be used to determine the region group to apply
      * @param flag the flag
      * @return a value, which could be {@code null}
      */
     @Nullable
-    public <V> V queryValue(@Nullable LocalPlayer player, Flag<V> flag) {
-        return flagValueCalculator.queryValue(player, flag);
+    public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
+        return flagValueCalculator.queryValue(subject, flag);
     }
 
     /**
@@ -189,18 +191,18 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * values. It is up to the caller to determine which value, if any,
      * from the collection will be used.
      *
-     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * <p>{@code subject} can be non-null to satisfy region group requirements,
      * otherwise it will be assumed that the caller that is not a member of any
      * regions. (Flags on a region can be changed so that they only apply
-     * to certain users.) The player argument is required if the
+     * to certain users.) The subject argument is required if the
      * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
      *
-     * @param player an optional player, which would be used to determine the region group to apply
+     * @param subject an optional subject, which would be used to determine the region group to apply
      * @param flag the flag
      * @return a collection of values
      */
-    public <V> Collection<V> queryAllValues(@Nullable LocalPlayer player, Flag<V> flag) {
-        return flagValueCalculator.queryAllValues(player, flag);
+    public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
+        return flagValueCalculator.queryAllValues(subject, flag);
     }
 
     /**
@@ -224,7 +226,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param flag flag to check
      * @return whether it is allowed
      * @throws IllegalArgumentException if the build flag is given
-     * @deprecated use {@link #queryState(LocalPlayer, StateFlag...)} instead
+     * @deprecated use {@link #queryState(RegionAssociable, StateFlag...)} instead
      */
     @Deprecated
     public boolean allows(StateFlag flag) {
@@ -244,7 +246,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param player player (used by some flags)
      * @return whether the state is allows for it
      * @throws IllegalArgumentException if the build flag is given
-     * @deprecated use {@link #queryState(LocalPlayer, StateFlag...)} instead
+     * @deprecated use {@link #queryState(RegionAssociable, StateFlag...)} instead
      */
     @Deprecated
     public boolean allows(StateFlag flag, @Nullable LocalPlayer player) {
@@ -299,7 +301,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      *
      * @param flag the flag to check
      * @return value of the flag, which may be null
-     * @deprecated Use {@link #queryValue(LocalPlayer, Flag)} instead. There
+     * @deprecated Use {@link #queryValue(RegionAssociable, Flag)} instead. There
      *             is no difference in functionality.
      */
     @Deprecated
@@ -316,7 +318,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param groupPlayer player to check {@link RegionGroup}s against
      * @return value of the flag, which may be null
      * @throws IllegalArgumentException if a StateFlag is given
-     * @deprecated Use {@link #queryValue(LocalPlayer, Flag)} instead. There
+     * @deprecated Use {@link #queryValue(RegionAssociable, Flag)} instead. There
      *             is no difference in functionality.
      */
     @Deprecated
@@ -332,6 +334,15 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      */
     public int size() {
         return applicable.size();
+    }
+
+    /**
+     * Get an immutable set of regions that are included in this set.
+     *
+     * @return a set of regions
+     */
+    public Set<ProtectedRegion> getRegions() {
+        return Collections.unmodifiableSet(applicable);
     }
 
     @Override
