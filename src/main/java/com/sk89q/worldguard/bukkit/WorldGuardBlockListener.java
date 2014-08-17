@@ -148,7 +148,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when fluids flow.
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent event) {
         World world = event.getBlock().getWorld();
         Block blockFrom = event.getBlock();
@@ -423,7 +423,7 @@ public class WorldGuardBlockListener implements Listener {
     /*
      * Called when block physics occurs.
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPhysics(BlockPhysicsEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
