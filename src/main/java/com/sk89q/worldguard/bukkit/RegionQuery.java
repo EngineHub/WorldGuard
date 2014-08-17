@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
@@ -96,10 +97,12 @@ public class RegionQuery {
     }
 
     /**
-     * Test whether the given player is permitted to modify or interact with
-     * blocks at the given location. Additional flags to be considered can be
-     * provided. The {@code BUILD} flag is already included in the list of
-     * flags considered.
+     * Test whether the given flags evaluate to {@code ALLOW}, implicitly also
+     * considering the {@link DefaultFlag#BUILD} flag.
+     *
+     * <p>This method is equivalent to calling
+     * {@link #testState(Location, Player, StateFlag...)} with
+     * {@code flags} plus the {@code BUILD} flag.</p>
      *
      * @param location the location
      * @param player the player
@@ -128,19 +131,14 @@ public class RegionQuery {
     }
 
     /**
-     * Get the effective value for a flag. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will depend
-     * on the flag type.
+     * Test whether the (effective) value for a list of state flags equals
+     * {@code ALLOW}.
      *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testBuild(Location, Player, StateFlag...)}
-     * for that purpose.</p>
-     *
-     * <p>This method does the same as
-     * {@link #queryState(Location, Player, StateFlag...)} except that it
-     * returns a boolean when the result is {@code ALLOW}.</p>
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
      *
      * @param location the location
      * @param player an optional player, which would be used to determine the region group to apply
@@ -148,21 +146,20 @@ public class RegionQuery {
      * @return true if the result was {@code ALLOW}
      * @see ApplicableRegionSet#queryValue(LocalPlayer, Flag)
      */
-    public boolean testState(Location location, @Nullable Player player, StateFlag flag) {
+    public boolean testState(Location location, @Nullable Player player, StateFlag... flag) {
         return StateFlag.test(queryState(location, player, flag));
     }
 
     /**
-     * Get the effective value for a list of state flags. The rules of
+     * Get the (effective) value for a list of state flags. The rules of
      * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}.
+     * and {@code ALLOW} overrides {@code NONE}. One flag may override another.
      *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testBuild(Location, Player, StateFlag...)}
-     * for that purpose.</p>
-     *
-     * See {@link ApplicableRegionSet#queryState(LocalPlayer, StateFlag...)}
-     * for more information.
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
      *
      * @param location the location
      * @param player an optional player, which would be used to determine the region groups that apply
@@ -178,17 +175,21 @@ public class RegionQuery {
 
     /**
      * Get the effective value for a flag. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will depend
-     * on the flag type.
+     * (for example, multiple overlapping regions with
+     * the same priority may have the same flag set), then the selected
+     * (or "winning") value will depend on the flag type.
      *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testBuild(Location, Player, StateFlag...)}
-     * for that purpose.</p>
+     * <p>Only some flag types actually have a strategy for picking the
+     * "best value." For most types, the actual value that is chosen to be
+     * returned is undefined (it could be any value). As of writing, the only
+     * type of flag that actually has a strategy for picking a value is the
+     * {@link StateFlag}.</p>
      *
-     * <p>See {@link ApplicableRegionSet#queryValue(LocalPlayer, Flag)} for
-     * more information.</p>
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
      *
      * @param location the location
      * @param player an optional player, which would be used to determine the region group to apply
@@ -207,12 +208,11 @@ public class RegionQuery {
      * values. It is up to the caller to determine which value, if any,
      * from the collection will be used.
      *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testBuild(Location, Player, StateFlag...)}
-     * for that purpose.</p>
-     *
-     * <p>See {@link ApplicableRegionSet#queryAllValues(LocalPlayer, Flag)}
-     * for more information.</p>
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
      *
      * @param location the location
      * @param player an optional player, which would be used to determine the region group to apply
