@@ -169,74 +169,11 @@ public class FlagValueCalculator {
         }
     }
 
-    /**
-     * Test whether the given player is permitted to place, break, or
-     * modify any block, entity, or other object. A list of flags is to be
-     * provided (one of which should probably be {@link DefaultFlag#BUILD})
-     * so that the calculation can consider all of those flags.
-     *
-     * <p>For example, if we are checking for the ability to interact
-     * with a chest, we would want to give permission if (1) the player is
-     * a member of the region, (2) the {@code build} flag is set to
-     * {@code ALLOW}, or (3) the {@code chest-access} flag is set to
-     * {@code ALLOW}. However, if any of the two flags are set
-     * to {@code DENY}, that must override everything else and deny access.</p>
-     *
-     * <p>This method handles that example perfectly. To use the method for
-     * the example, the call would look like this:</p>
-     *
-     * <pre>queryPermission(player, DefaultFlag.BUILD, DefaultFlag.CHEST_ACCESS)</pre>
-     *
-     * @param player the player
-     * @param flags zero or more flags
-     * @return true if permission is granted
-     */
-    public State queryPermission(LocalPlayer player, StateFlag... flags) {
-        checkNotNull(player);
-        checkNotNull(flags);
-
-        // Legacy behavior dictates that the global region is really a
-        // "wilderness" region. It has no effect when there are one or more
-        // regions without the PASSTHROUGH flag set.
-        //
-        // In addition, the global region can never override any PASSTHROUGH
-        // region.
-        //
-        // Lastly, if the global region has members, then permission will
-        // be denied by default except to those members that are a part of
-        // the global region, turning the global region into a region itself
-        // that covers the entire world. Unfortunately, this is really a hack
-        // and we support it for legacy reasons.
-
-        switch (getMembership(player)) {
-            case SUCCESS:
-                return StateFlag.combine(queryState(player, flags), State.ALLOW);
-            case FAIL:
-                return queryState(player, flags);
-            case NO_REGIONS:
-            default:
-                State fallback = null;
-                for (StateFlag flag : flags) {
-                    if (flag.getDefault()) {
-                        fallback = State.ALLOW;
-                        break;
-                    }
-                }
-                return StateFlag.combine(queryState(player, flags), fallback);
-        }
-    }
-
 
     /**
      * Get the effective value for a list of state flags. The rules of
      * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
      * and {@code ALLOW} overrides {@code NONE}.
-     *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #queryPermission(LocalPlayer, StateFlag...)}
-     * for that purpose. This method is ideal for testing non-build related
-     * state flags (although a rarity), an example of which would be whether
-     * to play a song to players that enter an area.</p>
      *
      * <p>A player can be provided that is used to determine whether the value
      * of a flag on a particular region should be used. For example, if a
@@ -277,10 +214,6 @@ public class FlagValueCalculator {
      * type of flag that can consistently return the same 'best' value is
      * {@link StateFlag}.</p>
      *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #queryPermission(LocalPlayer, StateFlag...)}
-     * for that purpose.</p>
-     *
      * <p>A player can be provided that is used to determine whether the value
      * of a flag on a particular region should be used. For example, if a
      * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
@@ -304,10 +237,6 @@ public class FlagValueCalculator {
      * values. It is up to the caller to determine which value, if any,
      * from the collection will be used.
      *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #queryPermission(LocalPlayer, StateFlag...)}
-     * for that purpose.</p>
-     *
      * <p>A player can be provided that is used to determine whether the value
      * of a flag on a particular region should be used. For example, if a
      * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
@@ -320,6 +249,7 @@ public class FlagValueCalculator {
      * @param flag the flag
      * @return a collection of values
      */
+    @SuppressWarnings("unchecked")
     public <V> Collection<V> queryAllValues(@Nullable LocalPlayer player, Flag<V> flag) {
         checkNotNull(flag);
 
@@ -380,6 +310,28 @@ public class FlagValueCalculator {
                         break;
                     }
                 }
+            }
+        }
+
+        if (flag == DefaultFlag.BUILD && consideredValues.isEmpty()) {
+            if (player == null) {
+                throw new NullPointerException("The BUILD flag is handled in a special fashion and requires a non-null player parameter");
+            }
+
+            switch (getMembership(player)) {
+                case FAIL:
+                    return ImmutableList.of();
+                case SUCCESS:
+                    return (Collection<V>) ImmutableList.of(State.ALLOW);
+            }
+        }
+
+        if (consideredValues.isEmpty()) {
+            if (flag instanceof StateFlag) {
+                //noinspection unchecked
+                return (Collection<V>) (((StateFlag) flag).getDefault()
+                        ? ImmutableList.of(State.ALLOW)
+                        : ImmutableList.of());
             }
         }
 

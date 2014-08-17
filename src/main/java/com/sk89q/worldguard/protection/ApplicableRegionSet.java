@@ -97,43 +97,56 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     @Deprecated
     public boolean canBuild(LocalPlayer player) {
         checkNotNull(player);
-        return test(flagValueCalculator.queryPermission(player, DefaultFlag.BUILD));
+        return test(flagValueCalculator.queryState(player, DefaultFlag.BUILD));
     }
 
     /**
-     * Test whether the given player is permitted to modify or interact with
-     * blocks. Additional flags to be considered can be provided. The
-     * {@code BUILD} flag is already included in the list of flags considered.
+     * Test whether the given flags evaluate to {@code ALLOW}, implicitly also
+     * considering the {@link DefaultFlag#BUILD} flag.
+     *
+     * <p>This method is equivalent to calling
+     * {@link #testState(LocalPlayer, StateFlag...)} with {@code flags} plus
+     * the {@code BUILD} flag.</p>
      *
      * @param player the player
      * @param flags zero or more flags
      * @return true if permission is granted
+     * @see #queryState(LocalPlayer, StateFlag...)
      */
     public boolean testBuild(LocalPlayer player, StateFlag... flags) {
-        return test(flagValueCalculator.queryPermission(player, ObjectArrays.concat(flags, DefaultFlag.BUILD)));
+        checkNotNull(player);
+        return test(flagValueCalculator.queryState(player, ObjectArrays.concat(flags, DefaultFlag.BUILD)));
     }
 
     /**
-     * Get the effective value for a list of state flags. The rules of
+     * Test whether the (effective) value for a list of state flags equals
+     * {@code ALLOW}.
+     *
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
+     *
+     * @param player an optional player, which would be used to determine the region groups that apply
+     * @param flags a list of flags to check
+     * @return true if the result was {@code ALLOW}
+     * @see #queryState(LocalPlayer, StateFlag...)
+     */
+    public boolean testState(@Nullable LocalPlayer player, StateFlag... flags) {
+        return test(flagValueCalculator.queryState(player, flags));
+    }
+
+    /**
+     * Get the (effective) value for a list of state flags. The rules of
      * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}.
+     * and {@code ALLOW} overrides {@code NONE}. One flag may override another.
      *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testBuild(LocalPlayer, StateFlag...)}
-     * for that purpose. This method is ideal for testing non-build related
-     * state flags (although a rarity), an example of which would be whether
-     * to play a song to players that enter an area.</p>
-     *
-     * <p>A player can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * player is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the player, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * <p>This method does <strong>not</strong> use a {@link StateFlag}'s
-     * default value ({@link StateFlag#getDefault()}).</p>
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
      *
      * @param player an optional player, which would be used to determine the region groups that apply
      * @param flags a list of flags to check
@@ -145,50 +158,22 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
     }
 
     /**
-     * Get the effective value for a list of state flags. The rules of
-     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}.
-     *
-     * <p>This method is the same as
-     * {@link #queryState(LocalPlayer, StateFlag...)} except that it returns
-     * a boolean when the return value is {@code ALLOW}.</p>
-     *
-     * @param player an optional player, which would be used to determine the region groups that apply
-     * @param flags a list of flags to check
-     * @return true if the result was {@code ALLOW}
-     */
-    public boolean testState(@Nullable LocalPlayer player, StateFlag... flags) {
-        return test(flagValueCalculator.queryState(player, flags));
-    }
-
-    /**
      * Get the effective value for a flag. If there are multiple values
-     * (for example, if there are multiple regions with the same priority
-     * but with different farewell messages set, there would be multiple
-     * completing values), then the selected (or "winning") value will depend
-     * on the flag type.
+     * (for example, multiple overlapping regions with
+     * the same priority may have the same flag set), then the selected
+     * (or "winning") value will depend on the flag type.
      *
      * <p>Only some flag types actually have a strategy for picking the
      * "best value." For most types, the actual value that is chosen to be
      * returned is undefined (it could be any value). As of writing, the only
-     * type of flag that can consistently return the same 'best' value is
+     * type of flag that actually has a strategy for picking a value is the
      * {@link StateFlag}.</p>
      *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testBuild(LocalPlayer, StateFlag...)}
-     * for that purpose.</p>
-     *
-     * <p>A player can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * player is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the player, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * <p>This method does <strong>not</strong> use a {@link StateFlag}'s
-     * default value ({@link StateFlag#getDefault()}) if the provided flag is
-     * a {@code StateFlag}.</p>
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
      *
      * @param player an optional player, which would be used to determine the region group to apply
      * @param flag the flag
@@ -204,21 +189,11 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * values. It is up to the caller to determine which value, if any,
      * from the collection will be used.
      *
-     * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testBuild(LocalPlayer, StateFlag...)}
-     * for that purpose.</p>
-     *
-     * <p>A player can be provided that is used to determine whether the value
-     * of a flag on a particular region should be used. For example, if a
-     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * player is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the player, then
-     * only flags that use {@link RegionGroup#ALL},
-     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
-     *
-     * <p>This method does <strong>not</strong> include a {@link StateFlag}'s
-     * default value ({@link StateFlag#getDefault()}) if the provided flag is
-     * a {@code StateFlag}.</p>
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
      *
      * @param player an optional player, which would be used to determine the region group to apply
      * @param flag the flag
@@ -249,12 +224,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param flag flag to check
      * @return whether it is allowed
      * @throws IllegalArgumentException if the build flag is given
-     * @deprecated Use {@link #queryState(LocalPlayer, StateFlag...)} instead, although
-     *             be aware that the default value of the flag is <strong>not</strong>
-     *             considered in that method. Default values, however, are being
-     *             deprecated (except when using it in the context of testing
-     *             build permissions) because they have historically been applied
-     *             very inconsistently.
+     * @deprecated use {@link #queryState(LocalPlayer, StateFlag...)} instead
      */
     @Deprecated
     public boolean allows(StateFlag flag) {
@@ -274,12 +244,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param player player (used by some flags)
      * @return whether the state is allows for it
      * @throws IllegalArgumentException if the build flag is given
-     * @deprecated Use {@link #queryState(LocalPlayer, StateFlag...)} instead, although
-     *             be aware that the default value of the flag is <strong>not</strong>
-     *             considered in that method. Default values, however, are being
-     *             deprecated (except when using it in the context of testing
-     *             build permissions) because they have historically been applied
-     *             very inconsistently.
+     * @deprecated use {@link #queryState(LocalPlayer, StateFlag...)} instead
      */
     @Deprecated
     public boolean allows(StateFlag flag, @Nullable LocalPlayer player) {
