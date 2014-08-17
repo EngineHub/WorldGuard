@@ -185,13 +185,13 @@ public class FlagValueCalculator {
      * <p>This method handles that example perfectly. To use the method for
      * the example, the call would look like this:</p>
      *
-     * <pre>testPermission(player, DefaultFlag.BUILD, DefaultFlag.CHEST_ACCESS)</pre>
+     * <pre>queryPermission(player, DefaultFlag.BUILD, DefaultFlag.CHEST_ACCESS)</pre>
      *
      * @param player the player
      * @param flags zero or more flags
      * @return true if permission is granted
      */
-    public State testPermission(LocalPlayer player, StateFlag... flags) {
+    public State queryPermission(LocalPlayer player, StateFlag... flags) {
         checkNotNull(player);
         checkNotNull(flags);
 
@@ -233,7 +233,7 @@ public class FlagValueCalculator {
      * and {@code ALLOW} overrides {@code NONE}.
      *
      * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testPermission(LocalPlayer, StateFlag...)}
+     * permissions. Instead, use {@link #queryPermission(LocalPlayer, StateFlag...)}
      * for that purpose. This method is ideal for testing non-build related
      * state flags (although a rarity), an example of which would be whether
      * to play a song to players that enter an area.</p>
@@ -278,7 +278,7 @@ public class FlagValueCalculator {
      * {@link StateFlag}.</p>
      *
      * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testPermission(LocalPlayer, StateFlag...)}
+     * permissions. Instead, use {@link #queryPermission(LocalPlayer, StateFlag...)}
      * for that purpose.</p>
      *
      * <p>A player can be provided that is used to determine whether the value
@@ -305,7 +305,7 @@ public class FlagValueCalculator {
      * from the collection will be used.
      *
      * <p>This method does <strong>not</strong> properly process build
-     * permissions. Instead, use {@link #testPermission(LocalPlayer, StateFlag...)}
+     * permissions. Instead, use {@link #queryPermission(LocalPlayer, StateFlag...)}
      * for that purpose.</p>
      *
      * <p>A player can be provided that is used to determine whether the value
@@ -315,6 +315,10 @@ public class FlagValueCalculator {
      * querying that flag. If {@code null} is provided for the player, then
      * only flags that use {@link RegionGroup#ALL},
      * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
+     *
+     * @param player an optional player, which would be used to determine the region group to apply
+     * @param flag the flag
+     * @return a collection of values
      */
     public <V> Collection<V> queryAllValues(@Nullable LocalPlayer player, Flag<V> flag) {
         checkNotNull(flag);

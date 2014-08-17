@@ -89,7 +89,7 @@ public class RegionProtectionListener extends AbstractListener {
      * @param flag the flag
      * @return a predicate
      */
-    private Predicate<Location> createStateFlagPredicate(final RegionQuery query, final StateFlag flag) {
+    private Predicate<Location> createStateTest(final RegionQuery query, final StateFlag flag) {
         return new Predicate<Location>() {
             @Override
             public boolean apply(@Nullable Location location) {
@@ -118,10 +118,10 @@ public class RegionProtectionListener extends AbstractListener {
 
                     // Flint and steel, fire charge
                     if (type == Material.FIRE) {
-                        canPlace = query.testPermission(target, player, DefaultFlag.LIGHTER);
+                        canPlace = query.testBuild(target, player, DefaultFlag.LIGHTER);
 
                     } else {
-                        canPlace = query.testPermission(target, player);
+                        canPlace = query.testBuild(target, player);
                     }
 
                     if (!canPlace) {
@@ -158,7 +158,7 @@ public class RegionProtectionListener extends AbstractListener {
             event.filterBlocks(new Predicate<Location>() {
                 @Override
                 public boolean apply(Location target) {
-                    boolean canBreak = query.testPermission(target, player);
+                    boolean canBreak = query.testBuild(target, player);
 
                     if (!canBreak) {
                         tellErrorMessage(player, target);
@@ -176,15 +176,15 @@ public class RegionProtectionListener extends AbstractListener {
         } else if ((entity = event.getCause().getEntityRootCause()) != null) {
             // Creeper
             if (entity instanceof Creeper) {
-                event.filterBlocks(createStateFlagPredicate(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
+                event.filterBlocks(createStateTest(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
 
             // Enderdragon
             } else if (entity instanceof EnderDragon) {
-                event.filterBlocks(createStateFlagPredicate(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
+                event.filterBlocks(createStateTest(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
 
             // TNT + explosive TNT carts
             } else if (Entities.isTNTBased(entity)) {
-                event.filterBlocks(createStateFlagPredicate(query, DefaultFlag.TNT), config.explosionFlagCancellation);
+                event.filterBlocks(createStateTest(query, DefaultFlag.TNT), config.explosionFlagCancellation);
 
             }
         } else {
@@ -212,19 +212,19 @@ public class RegionProtectionListener extends AbstractListener {
 
                     // Inventory blocks (CHEST_ACCESS)
                     if (Materials.isInventoryBlock(type)) {
-                        canUse = query.testPermission(target, player, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
+                        canUse = query.testBuild(target, player, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
 
                     // Beds (SLEEP)
                     } else if (type == Material.BED) {
-                        canUse = query.testPermission(target, player, DefaultFlag.USE, DefaultFlag.SLEEP);
+                        canUse = query.testBuild(target, player, DefaultFlag.USE, DefaultFlag.SLEEP);
 
                     // TNT (TNT)
                     } else if (type == Material.TNT) {
-                        canUse = query.testPermission(target, player, DefaultFlag.TNT);
+                        canUse = query.testBuild(target, player, DefaultFlag.TNT);
 
                     // Everything else
                     } else {
-                        canUse = query.testPermission(target, player, DefaultFlag.USE);
+                        canUse = query.testBuild(target, player, DefaultFlag.USE);
                     }
 
                     if (!canUse) {
@@ -256,9 +256,9 @@ public class RegionProtectionListener extends AbstractListener {
             boolean canSpawn;
 
             if (Entities.isVehicle(type)) {
-                canSpawn = query.testPermission(target, player, DefaultFlag.PLACE_VEHICLE);
+                canSpawn = query.testBuild(target, player, DefaultFlag.PLACE_VEHICLE);
             } else {
-                canSpawn = query.testPermission(target, player);
+                canSpawn = query.testBuild(target, player);
             }
 
             if (!canSpawn) {
@@ -286,9 +286,9 @@ public class RegionProtectionListener extends AbstractListener {
             boolean canDestroy;
 
             if (Entities.isVehicle(type)) {
-                canDestroy = query.testPermission(target, player, DefaultFlag.DESTROY_VEHICLE);
+                canDestroy = query.testBuild(target, player, DefaultFlag.DESTROY_VEHICLE);
             } else {
-                canDestroy = query.testPermission(target, player);
+                canDestroy = query.testBuild(target, player);
             }
 
             if (!canDestroy) {
@@ -312,7 +312,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         if ((player = event.getCause().getPlayerRootCause()) != null) {
             RegionQuery query = getPlugin().getRegionContainer().createQuery();
-            boolean canUse = query.testPermission(target, player, DefaultFlag.USE);
+            boolean canUse = query.testBuild(target, player, DefaultFlag.USE);
 
             if (!canUse) {
                 tellErrorMessage(player, target);

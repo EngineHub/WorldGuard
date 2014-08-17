@@ -278,7 +278,7 @@ public class FlagValueCalculatorTest {
     // ========================================================================
 
     @Test
-    public void testTestPermissionWildernessDefaults() throws Exception {
+    public void testQueryPermissionWildernessDefaults() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -287,12 +287,12 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(player, flag1), is((State) null));
-        assertThat(result.testPermission(player, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(player, flag1), is((State) null));
+        assertThat(result.queryPermission(player, flag2), is(State.ALLOW));
     }
 
     @Test
-    public void testTestPermissionWildernessDefaultsWithGlobalRegion() throws Exception {
+    public void testQueryPermissionWildernessDefaultsWithGlobalRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -303,12 +303,12 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(player, flag1), is((State) null));
-        assertThat(result.testPermission(player, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(player, flag1), is((State) null));
+        assertThat(result.queryPermission(player, flag2), is(State.ALLOW));
     }
 
     @Test
-    public void testTestPermissionWildernessDefaultsWithGlobalRegionOverride() throws Exception {
+    public void testQueryPermissionWildernessDefaultsWithGlobalRegionOverride() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -321,13 +321,13 @@ public class FlagValueCalculatorTest {
         global.setFlag(flag2, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(player, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(player, flag2), is(State.DENY));
-        assertThat(result.testPermission(player, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(player, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(player, flag2), is(State.DENY));
+        assertThat(result.queryPermission(player, flag1, flag2), is(State.DENY));
     }
 
     @Test
-    public void testTestPermissionWildernessWithGlobalRegion() throws Exception {
+    public void testQueryPermissionWildernessWithGlobalRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -340,18 +340,18 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWildernessWithGlobalRegionOverride() throws Exception {
+    public void testQueryPermissionWildernessWithGlobalRegionOverride() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -365,18 +365,18 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithPassthroughRegion() throws Exception {
+    public void testQueryPermissionWithPassthroughRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -390,18 +390,18 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is((State) null));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is((State) null));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithPassthroughRegionAndFlagAllow() throws Exception {
+    public void testQueryPermissionWithPassthroughRegionAndFlagAllow() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -416,18 +416,18 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithPassthroughRegionAndFlagDeny() throws Exception {
+    public void testQueryPermissionWithPassthroughRegionAndFlagDeny() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -442,18 +442,18 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.DENY));
-        assertThat(result.testPermission(member, flag2), is((State) null));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(member), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.DENY));
+        assertThat(result.queryPermission(member, flag2), is((State) null));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(member), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithPassthroughRegionAndFlagDenyAndRegionGroups() throws Exception {
+    public void testQueryPermissionWithPassthroughRegionAndFlagDenyAndRegionGroups() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -469,18 +469,18 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.DENY));
-        assertThat(result.testPermission(member, flag2), is((State) null));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(member), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.DENY));
+        assertThat(result.queryPermission(member, flag2), is((State) null));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(member), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithRegion() throws Exception {
+    public void testQueryPermissionWithRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -493,18 +493,18 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithRegionAndFlagAllow() throws Exception {
+    public void testQueryPermissionWithRegionAndFlagAllow() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -518,18 +518,18 @@ public class FlagValueCalculatorTest {
         region.setFlag(flag1, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithRegionAndFlagDeny() throws Exception {
+    public void testQueryPermissionWithRegionAndFlagDeny() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -543,18 +543,18 @@ public class FlagValueCalculatorTest {
         region.setFlag(flag1, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.DENY));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.DENY));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithRegionAndFlagDenyAndRegionGroup() throws Exception {
+    public void testQueryPermissionWithRegionAndFlagDenyAndRegionGroup() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -569,16 +569,16 @@ public class FlagValueCalculatorTest {
         region.setFlag(flag1.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.DENY));
     }
 
     @Test
-    public void testTestPermissionWithRegionAndGlobalRegion() throws Exception {
+    public void testQueryPermissionWithRegionAndGlobalRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -593,18 +593,18 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithRegionAndGlobalRegionDeny() throws Exception {
+    public void testQueryPermissionWithRegionAndGlobalRegionDeny() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -620,16 +620,16 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.DENY));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(member, flag1), is(State.DENY));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.DENY));
     }
 
     @Test
-    public void testTestPermissionWithRegionAndGlobalRegionAllow() throws Exception {
+    public void testQueryPermissionWithRegionAndGlobalRegionAllow() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -645,17 +645,17 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithRegionAllowAndGlobalRegionDeny() throws Exception {
+    public void testQueryPermissionWithRegionAllowAndGlobalRegionDeny() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -672,16 +672,16 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.ALLOW));
     }
 
     @Test
-    public void testTestPermissionWithRegionAllowAndGlobalRegionDenyDifferentFlags() throws Exception {
+    public void testQueryPermissionWithRegionAllowAndGlobalRegionDenyDifferentFlags() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -698,16 +698,16 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.DENY));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(member, flag1), is(State.DENY));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.DENY));
     }
 
     @Test
-    public void testTestPermissionWithPassthroughRegionAllowAndGlobalRegionDenyWithRegionGroup() throws Exception {
+    public void testQueryPermissionWithPassthroughRegionAllowAndGlobalRegionDenyWithRegionGroup() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -726,16 +726,16 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.DENY));
-        assertThat(result.testPermission(member, flag2), is((State) null));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1), is(State.DENY));
+        assertThat(result.queryPermission(member, flag2), is((State) null));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.ALLOW));
     }
 
     @Test
-    public void testTestPermissionWithRegionAllowAndGlobalRegionDenyWithRegionGroup() throws Exception {
+    public void testQueryPermissionWithRegionAllowAndGlobalRegionDenyWithRegionGroup() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -753,16 +753,16 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.DENY));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1), is(State.DENY));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.ALLOW));
     }
 
     @Test
-    public void testTestPermissionWithRegionAllowAndGlobalRegionDenyDifferentFlagsWithRegionGroup() throws Exception {
+    public void testQueryPermissionWithRegionAllowAndGlobalRegionDenyDifferentFlagsWithRegionGroup() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -780,16 +780,16 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.DENY));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag1), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(member, flag1), is(State.DENY));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.DENY));
     }
 
     @Test
-    public void testTestPermissionWithGlobalRegionMembership() throws Exception {
+    public void testQueryPermissionWithGlobalRegionMembership() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -802,18 +802,18 @@ public class FlagValueCalculatorTest {
         global.getMembers().addPlayer(globalMember);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(globalMember, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(globalMember, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(globalMember, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(globalMember), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(globalMember, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(globalMember, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(globalMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(globalMember), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithGlobalRegionMembershipAndRegion() throws Exception {
+    public void testQueryPermissionWithGlobalRegionMembershipAndRegion() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -830,22 +830,22 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(globalMember, flag1), is((State) null));
-        assertThat(result.testPermission(globalMember, flag2), is((State) null));
-        assertThat(result.testPermission(globalMember, flag1, flag2), is((State) null));
-        assertThat(result.testPermission(globalMember), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is((State) null));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(globalMember, flag1), is((State) null));
+        assertThat(result.queryPermission(globalMember, flag2), is((State) null));
+        assertThat(result.queryPermission(globalMember, flag1, flag2), is((State) null));
+        assertThat(result.queryPermission(globalMember), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is((State) null));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithGlobalRegionMembershipAndRegionGlobalFlag() throws Exception {
+    public void testQueryPermissionWithGlobalRegionMembershipAndRegionGlobalFlag() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -863,22 +863,22 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.DENY));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(globalMember, flag1), is((State) null));
-        assertThat(result.testPermission(globalMember, flag2), is(State.DENY));
-        assertThat(result.testPermission(globalMember, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(globalMember), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.DENY));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(globalMember, flag1), is((State) null));
+        assertThat(result.queryPermission(globalMember, flag2), is(State.DENY));
+        assertThat(result.queryPermission(globalMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(globalMember), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithGlobalRegionMembershipAndRegionGlobalFlagRegionOverride() throws Exception {
+    public void testQueryPermissionWithGlobalRegionMembershipAndRegionGlobalFlagRegionOverride() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -897,22 +897,22 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(globalMember, flag1), is((State) null));
-        assertThat(result.testPermission(globalMember, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(globalMember, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(globalMember), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(globalMember, flag1), is((State) null));
+        assertThat(result.queryPermission(globalMember, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(globalMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(globalMember), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     @Test
-    public void testTestPermissionWithGlobalRegionMembershipAndRegionGlobalFlagRegionOverrideAndRegionGroups() throws Exception {
+    public void testQueryPermissionWithGlobalRegionMembershipAndRegionGlobalFlagRegionOverrideAndRegionGroups() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         StateFlag flag1 = new StateFlag("test1", false);
@@ -932,18 +932,18 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.testPermission(member, flag1), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member, flag1, flag2), is(State.ALLOW));
-        assertThat(result.testPermission(member), is(State.ALLOW));
-        assertThat(result.testPermission(globalMember, flag1), is((State) null));
-        assertThat(result.testPermission(globalMember, flag2), is(State.DENY));
-        assertThat(result.testPermission(globalMember, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(globalMember), is((State) null));
-        assertThat(result.testPermission(nonMember, flag1), is((State) null));
-        assertThat(result.testPermission(nonMember, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember, flag1, flag2), is(State.DENY));
-        assertThat(result.testPermission(nonMember), is((State) null));
+        assertThat(result.queryPermission(member, flag1), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member, flag1, flag2), is(State.ALLOW));
+        assertThat(result.queryPermission(member), is(State.ALLOW));
+        assertThat(result.queryPermission(globalMember, flag1), is((State) null));
+        assertThat(result.queryPermission(globalMember, flag2), is(State.DENY));
+        assertThat(result.queryPermission(globalMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(globalMember), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag1), is((State) null));
+        assertThat(result.queryPermission(nonMember, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember, flag1, flag2), is(State.DENY));
+        assertThat(result.queryPermission(nonMember), is((State) null));
     }
 
     // ========================================================================

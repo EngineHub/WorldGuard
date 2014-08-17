@@ -82,7 +82,7 @@ public class FlagStateManager implements Runnable {
                 }
             }
 
-            ApplicableRegionSet applicable = plugin.getRegionContainer().createQuery().queryContains(player.getLocation());
+            ApplicableRegionSet applicable = plugin.getRegionContainer().createQuery().getApplicableRegions(player.getLocation());
 
             if (!RegionQueryUtil.isInvincible(plugin, player, applicable)
                     && !plugin.getGlobalStateManager().hasGodMode(player)

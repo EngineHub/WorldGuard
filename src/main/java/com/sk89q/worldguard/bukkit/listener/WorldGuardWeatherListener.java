@@ -98,7 +98,7 @@ public class WorldGuardWeatherListener implements Listener {
 
         Location loc = event.getLightning().getLocation();
         if (wcfg.useRegions) {
-            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(loc);
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(loc);
 
             if (!set.allows(DefaultFlag.LIGHTNING)) {
                 event.setCancelled(true);

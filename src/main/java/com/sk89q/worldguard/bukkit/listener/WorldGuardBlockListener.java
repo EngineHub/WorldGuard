@@ -271,7 +271,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.useRegions) {
-            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(block.getLocation());
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(block.getLocation());
 
             if (wcfg.highFreqFlags && isFireSpread
                     && !set.allows(DefaultFlag.FIRE_SPREAD)) {
@@ -345,7 +345,7 @@ public class WorldGuardBlockListener implements Listener {
             int x = block.getX();
             int y = block.getY();
             int z = block.getZ();
-            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(block.getLocation());
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(block.getLocation());
 
             if (!set.allows(DefaultFlag.FIRE_SPREAD)) {
                 checkAndDestroyAround(block.getWorld(), x, y, z, BlockID.FIRE);
