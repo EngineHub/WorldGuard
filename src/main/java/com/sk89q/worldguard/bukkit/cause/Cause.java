@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.cause;
 
 import com.google.common.base.Joiner;
 import com.sk89q.worldguard.bukkit.util.WGMetadata;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -123,7 +124,7 @@ public class Cause {
                 // Add manually tracked parent causes
                 Object source = o;
                 int index = list.size();
-                while (source instanceof Metadatable) {
+                while (source instanceof Metadatable && !(source instanceof Block)) {
                     source = WGMetadata.getIfPresent((Metadatable) source, CAUSE_KEY, Object.class);
                     if (source != null) {
                         list.add(index, source);
