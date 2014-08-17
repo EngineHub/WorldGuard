@@ -158,7 +158,7 @@ public class GlobalRegionManager {
      */
     @Deprecated
     public boolean canBuild(Player player, Location location) {
-        return createQuery().testPermission(location, player);
+        return createQuery().testBuild(location, player);
     }
 
     /**
@@ -215,10 +215,10 @@ public class GlobalRegionManager {
     @Deprecated
     public boolean allows(StateFlag flag, Location location, @Nullable LocalPlayer player) {
         if (player == null) {
-            return createQuery().testState(location, null, flag);
+            return StateFlag.test(createQuery().queryState(location, null, flag));
         } else if (player instanceof BukkitPlayer) {
             Player p = ((BukkitPlayer) player).getPlayer();
-            return createQuery().testState(location, p, flag);
+            return StateFlag.test(createQuery().queryState(location, p, flag));
         } else {
             throw new IllegalArgumentException("Can't take a non-Bukkit player");
         }

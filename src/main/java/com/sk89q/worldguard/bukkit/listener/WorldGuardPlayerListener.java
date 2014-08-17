@@ -180,7 +180,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         // Have to set this state
         if (state.lastExitAllowed == null) {
-            state.lastExitAllowed = plugin.getRegionContainer().createQuery().queryContains(from)
+            state.lastExitAllowed = plugin.getRegionContainer().createQuery().getApplicableRegions(from)
                         .allows(DefaultFlag.EXIT, localPlayer);
         }
 
@@ -300,7 +300,7 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         if (wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())) {
-            GameMode gameMode = plugin.getRegionContainer().createQuery().queryContains(player.getLocation()).getFlag(DefaultFlag.GAME_MODE);
+            GameMode gameMode = plugin.getRegionContainer().createQuery().getApplicableRegions(player.getLocation()).getFlag(DefaultFlag.GAME_MODE);
             if (plugin.getFlagStateManager().getState(player).lastGameMode != null
                     && gameMode != null && event.getNewGameMode() != gameMode) {
                 event.setCancelled(true);
@@ -430,7 +430,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (state.lastWorld != null && !hasBypass) {
                 LocalPlayer localPlayer = plugin.wrapPlayer(player);
                 Location loc = player.getLocation();
-                ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(loc);
+                ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(loc);
 
                 if (state.lastExitAllowed == null) {
                     state.lastExitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
@@ -516,8 +516,8 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (wcfg.useRegions) {
             Block placedIn = block.getRelative(event.getBlockFace());
-            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(block.getLocation());
-            ApplicableRegionSet placedInSet = plugin.getRegionContainer().createQuery().queryContains(placedIn.getLocation());
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(block.getLocation());
+            ApplicableRegionSet placedInSet = plugin.getRegionContainer().createQuery().getApplicableRegions(placedIn.getLocation());
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
             if (item.getTypeId() == wcfg.regionWand && plugin.hasPermission(player, "worldguard.region.wand")) {
@@ -599,7 +599,7 @@ public class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(player.getWorld());
 
         if (wcfg.useRegions) {
-            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(location);
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(location);
 
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
             com.sk89q.worldedit.Location spawn = set.getFlag(DefaultFlag.SPAWN_LOC, localPlayer);
@@ -635,8 +635,8 @@ public class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
-            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(event.getTo());
-            ApplicableRegionSet setFrom = plugin.getRegionContainer().createQuery().queryContains(event.getFrom());
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(event.getTo());
+            ApplicableRegionSet setFrom = plugin.getRegionContainer().createQuery().getApplicableRegions(event.getFrom());
             LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
 
             if (cfg.usePlayerTeleports) {
@@ -668,7 +668,7 @@ public class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
-            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(player.getLocation());
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(player.getLocation());
 
             Set<String> allowedCommands = set.getFlag(DefaultFlag.ALLOWED_CMDS, localPlayer);
             Set<String> blockedCommands = set.getFlag(DefaultFlag.BLOCKED_CMDS, localPlayer);

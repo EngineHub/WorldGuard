@@ -266,9 +266,9 @@ public class WorldGuardEntityListener implements Listener {
                     if (wcfg.useRegions) {
                         RegionQuery query = plugin.getRegionContainer().createQuery();
 
-                        if (!query.testState(attacker.getLocation(), (Player) attacker, DefaultFlag.PVP)) {
+                        if (!query.testBuild(attacker.getLocation(), (Player) attacker, DefaultFlag.PVP)) {
                             tryCancelPVPEvent((Player) attacker, player, event, true);
-                        } else if (!query.testState(defender.getLocation(), (Player) defender, DefaultFlag.PVP)) {
+                        } else if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.PVP)) {
                             tryCancelPVPEvent((Player) attacker, player, event, false);
                         }
                     }
@@ -283,7 +283,7 @@ public class WorldGuardEntityListener implements Listener {
                     }
                     if (wcfg.useRegions && wcfg.explosionFlagCancellation) {
                         RegionQuery query = plugin.getRegionContainer().createQuery();
-                        if (!query.testState(defender.getLocation(), (Player) defender, DefaultFlag.TNT)) {
+                        if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.TNT)) {
                             event.setCancelled(true);
                             return;
                         }
@@ -307,13 +307,13 @@ public class WorldGuardEntityListener implements Listener {
                         RegionQuery query = plugin.getRegionContainer().createQuery();
                         if (fireball.getShooter() instanceof Player) {
                             Location pt2 = ((Player) fireball.getShooter()).getLocation();
-                            if (!query.testState(pt2, (Player) fireball.getShooter(), DefaultFlag.PVP)) {
+                            if (!query.testBuild(pt2, (Player) fireball.getShooter(), DefaultFlag.PVP)) {
                                 tryCancelPVPEvent((Player) fireball.getShooter(), player, event, true);
-                            } else if (!query.testState(defender.getLocation(), (Player) defender, DefaultFlag.PVP)) {
+                            } else if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.PVP)) {
                                 tryCancelPVPEvent((Player) fireball.getShooter(), player, event, false);
                             }
                         } else {
-                            if (!query.testState(defender.getLocation(), (Player) defender, DefaultFlag.GHAST_FIREBALL) && wcfg.explosionFlagCancellation) {
+                            if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.GHAST_FIREBALL) && wcfg.explosionFlagCancellation) {
                                 event.setCancelled(true);
                                 return;
                             }
@@ -335,7 +335,7 @@ public class WorldGuardEntityListener implements Listener {
 
                     if (wcfg.useRegions) {
                         RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
-                        ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(defender.getLocation());
+                        ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation());
 
                         if (!set.allows(DefaultFlag.MOB_DAMAGE, localPlayer) && !(attacker instanceof Tameable)) {
                             event.setCancelled(true);
@@ -359,7 +359,7 @@ public class WorldGuardEntityListener implements Listener {
                                 return;
                             }
                             Player beastMaster = (Player) ((Tameable) attacker).getOwner();
-                            if (!plugin.getRegionContainer().createQuery().queryContains(attacker.getLocation()).allows(DefaultFlag.PVP, plugin.wrapPlayer(beastMaster))) {
+                            if (!plugin.getRegionContainer().createQuery().getApplicableRegions(attacker.getLocation()).allows(DefaultFlag.PVP, plugin.wrapPlayer(beastMaster))) {
                                 tryCancelPVPEvent(beastMaster, player, event, true);
                             } else if (!set.allows(DefaultFlag.PVP, localPlayer)) {
                                 tryCancelPVPEvent(beastMaster, player, event, false);
@@ -401,7 +401,7 @@ public class WorldGuardEntityListener implements Listener {
                     return;
                 }
                 if (wcfg.useRegions) {
-                    if (!plugin.getRegionContainer().createQuery().queryContains(defender.getLocation()).allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
+                    if (!plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation()).allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
                         event.setCancelled(true);
                         return;
                     }
@@ -413,9 +413,9 @@ public class WorldGuardEntityListener implements Listener {
             if (attacker != null && attacker instanceof Player) {
                 if (event.getDamager() instanceof EnderPearl && attacker == player) return;
                 if (wcfg.useRegions) {
-                    if (!plugin.getRegionContainer().createQuery().queryContains(attacker.getLocation()).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
+                    if (!plugin.getRegionContainer().createQuery().getApplicableRegions(attacker.getLocation()).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
                         tryCancelPVPEvent((Player) attacker, player, event, true);
-                    } else if (!plugin.getRegionContainer().createQuery().queryContains(defender.getLocation()).allows(DefaultFlag.PVP, localPlayer)) {
+                    } else if (!plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation()).allows(DefaultFlag.PVP, localPlayer)) {
                         tryCancelPVPEvent((Player) attacker, player, event, false);
                     }
                 }
@@ -468,7 +468,7 @@ public class WorldGuardEntityListener implements Listener {
                 }
 
                 if (wcfg.useRegions) {
-                    ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(defender.getLocation());
+                    ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation());
 
                     if (!set.allows(DefaultFlag.MOB_DAMAGE, plugin.wrapPlayer(player))) {
                         event.setCancelled(true);
@@ -608,7 +608,7 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
 
                 for (Block block : event.blockList()) {
-                    if (!plugin.getRegionContainer().createQuery().queryContains(block.getLocation()).allows(DefaultFlag.GHAST_FIREBALL)) {
+                    if (!plugin.getRegionContainer().createQuery().getApplicableRegions(block.getLocation()).allows(DefaultFlag.GHAST_FIREBALL)) {
                         event.blockList().clear();
                         if (wcfg.explosionFlagCancellation) event.setCancelled(true);
                         return;
@@ -633,7 +633,7 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.useRegions) {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 for (Block block : event.blockList()) {
-                    if (!plugin.getRegionContainer().createQuery().queryContains(block.getLocation()).allows(DefaultFlag.OTHER_EXPLOSION)) {
+                    if (!plugin.getRegionContainer().createQuery().getApplicableRegions(block.getLocation()).allows(DefaultFlag.OTHER_EXPLOSION)) {
                         event.blockList().clear();
                         if (wcfg.explosionFlagCancellation) event.setCancelled(true);
                         return;
@@ -730,7 +730,7 @@ public class WorldGuardEntityListener implements Listener {
         Location eventLoc = event.getLocation();
 
         if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
-            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().queryContains(eventLoc);
+            ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(eventLoc);
 
             if (!set.allows(DefaultFlag.MOB_SPAWNING)) {
                 event.setCancelled(true);

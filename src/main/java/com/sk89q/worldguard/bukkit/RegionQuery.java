@@ -22,14 +22,16 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,6 +44,7 @@ public class RegionQuery {
 
     private final WorldGuardPlugin plugin;
     private final ConfigurationManager config;
+    @SuppressWarnings("deprecation")
     private final GlobalRegionManager globalManager;
     private final QueryCache cache;
 
@@ -66,15 +69,15 @@ public class RegionQuery {
      * Query for regions containing the given location.
      *
      * <p>An instance of {@link ApplicableRegionSet} will always be returned,
-     * even if regions are disabled or region data failed to load. The most
-     * appropriate implementation will be returned in such a case
-     * (for example, if regions are disable, the returned implementation
+     * even if regions are disabled or region data failed to load. An
+     * appropriate "virtual" set will be returned in such a case
+     * (for example, if regions are disabled, the returned set
      * would permit all activities).</p>
      *
      * @param location the location
      * @return a region set
      */
-    public ApplicableRegionSet queryContains(Location location) {
+    public ApplicableRegionSet getApplicableRegions(Location location) {
         checkNotNull(location);
 
         World world = location.getWorld();
@@ -93,52 +96,22 @@ public class RegionQuery {
     }
 
     /**
-     * Test a the player can build at the given location, checking membership
-     * information and the state of the {@link DefaultFlag#BUILD} flag.
-     *
-     * <p>This method is used to check blocks and entities for which there
-     * are no other related flags for (i.e. beds have the
-     * {@link DefaultFlag#SLEEP} flag).</p>
-     *
-     * <p>If region data is not available (it failed to load or region support
-     * is disabled), then either {@code true} or {@code false} may be returned
-     * depending on the configuration.</p>
+     * Test whether the given player is permitted to modify or interact with
+     * blocks at the given location. Additional flags to be considered can be
+     * provided. The {@code BUILD} flag is already included in the list of
+     * flags considered.
      *
      * @param location the location
      * @param player the player
-     * @return true if building is permitted
-     * @throws NullPointerException if there is no player for this query
+     * @param flags zero or more flags
+     * @return true if permission is granted
+     * @see ApplicableRegionSet#testBuild(LocalPlayer, StateFlag...)
      */
-    public boolean testPermission(Location location, Player player) {
-        return testPermission(location, player, new StateFlag[0]);
-    }
-
-    /**
-     * Test a the player can build at the given location, checking membership
-     * information, state of the {@link DefaultFlag#BUILD} flag, and the state
-     * of any passed flags.
-     *
-     * <p>This method is used to check blocks and entities for which there
-     * are other related flags for (i.e. beds have the
-     * {@link DefaultFlag#SLEEP} flag). The criteria under which this method
-     * returns true is subject to change (i.e. all flags must be true or
-     * one cannot be DENY, etc.).</p>
-     *
-     * <p>If region data is not available (it failed to load or region support
-     * is disabled), then either {@code true} or {@code false} may be returned
-     * depending on the configuration.</p>
-     *
-     * @param location the location to test
-     * @param player the player
-     * @param flags an array of flags
-     * @return true if the flag tests true
-     */
-    public boolean testPermission(Location location, Player player, StateFlag... flags) {
+    public boolean testBuild(Location location, Player player, StateFlag... flags) {
         checkNotNull(location);
         checkNotNull(player);
         checkNotNull(flags);
 
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
         World world = location.getWorld();
         WorldConfiguration worldConfig = config.get(world);
 
@@ -150,61 +123,106 @@ public class RegionQuery {
             return true;
         }
 
-        RegionManager manager = globalManager.get(location.getWorld());
-
-        if (manager != null) {
-            ApplicableRegionSet result = cache.queryContains(manager, location);
-
-            if (result.canBuild(localPlayer)) {
-                return true;
-            }
-
-            for (StateFlag flag : flags) {
-                if (result.allows(flag, localPlayer)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } else{
-            return true; // null manager -> return true for now
-        }
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        return getApplicableRegions(location).testBuild(localPlayer, flags);
     }
 
     /**
-     * Test whether a {@link StateFlag} is evaluates to {@code ALLOW}.
+     * Get the effective value for a flag. If there are multiple values
+     * (for example, if there are multiple regions with the same priority
+     * but with different farewell messages set, there would be multiple
+     * completing values), then the selected (or "winning") value will depend
+     * on the flag type.
      *
-     * <p>This method is to check whether certain functionality
-     * is enabled (i.e. water flow). The player, if provided, may be used
-     * in evaluation of the flag.</p>
+     * <p>This method does <strong>not</strong> properly process build
+     * permissions. Instead, use {@link #testBuild(Location, Player, StateFlag...)}
+     * for that purpose.</p>
      *
-     * <p>If region data is not available (it failed to load or region support
-     * is disabled), then either {@code true} or {@code false} may be returned
-     * depending on the configuration.</p>
+     * <p>This method does the same as
+     * {@link #queryState(Location, Player, StateFlag...)} except that it
+     * returns a boolean when the result is {@code ALLOW}.</p>
      *
      * @param location the location
-     * @param player the player (or null)
+     * @param player an optional player, which would be used to determine the region group to apply
      * @param flag the flag
-     * @return true if the flag evaluates to {@code ALLOW}
+     * @return true if the result was {@code ALLOW}
+     * @see ApplicableRegionSet#queryValue(LocalPlayer, Flag)
      */
     public boolean testState(Location location, @Nullable Player player, StateFlag flag) {
-        checkNotNull(location);
-        checkNotNull(flag);
+        return StateFlag.test(queryState(location, player, flag));
+    }
 
+    /**
+     * Get the effective value for a list of state flags. The rules of
+     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
+     * and {@code ALLOW} overrides {@code NONE}.
+     *
+     * <p>This method does <strong>not</strong> properly process build
+     * permissions. Instead, use {@link #testBuild(Location, Player, StateFlag...)}
+     * for that purpose.</p>
+     *
+     * See {@link ApplicableRegionSet#queryState(LocalPlayer, StateFlag...)}
+     * for more information.
+     *
+     * @param location the location
+     * @param player an optional player, which would be used to determine the region groups that apply
+     * @param flags a list of flags to check
+     * @return a state
+     * @see ApplicableRegionSet#queryState(LocalPlayer, StateFlag...)
+     */
+    @Nullable
+    public State queryState(Location location, @Nullable Player player, StateFlag... flags) {
         LocalPlayer localPlayer = player != null ? plugin.wrapPlayer(player) : null;
-        World world = location.getWorld();
-        WorldConfiguration worldConfig = config.get(world);
+        return getApplicableRegions(location).queryState(localPlayer, flags);
+    }
 
-        if (!worldConfig.useRegions) {
-            return true;
-        }
+    /**
+     * Get the effective value for a flag. If there are multiple values
+     * (for example, if there are multiple regions with the same priority
+     * but with different farewell messages set, there would be multiple
+     * completing values), then the selected (or "winning") value will depend
+     * on the flag type.
+     *
+     * <p>This method does <strong>not</strong> properly process build
+     * permissions. Instead, use {@link #testBuild(Location, Player, StateFlag...)}
+     * for that purpose.</p>
+     *
+     * <p>See {@link ApplicableRegionSet#queryValue(LocalPlayer, Flag)} for
+     * more information.</p>
+     *
+     * @param location the location
+     * @param player an optional player, which would be used to determine the region group to apply
+     * @param flag the flag
+     * @return a value, which could be {@code null}
+     * @see ApplicableRegionSet#queryValue(LocalPlayer, Flag)
+     */
+    @Nullable
+    public <V> V queryValue(Location location, @Nullable Player player, Flag<V> flag) {
+        LocalPlayer localPlayer = player != null ? plugin.wrapPlayer(player) : null;
+        return getApplicableRegions(location).queryValue(localPlayer, flag);
+    }
 
-        if (localPlayer != null && globalManager.hasBypass(localPlayer, world)) {
-            return true;
-        } else {
-            RegionManager manager = globalManager.get(location.getWorld());
-            return manager == null || cache.queryContains(manager, location).allows(flag, localPlayer);
-        }
+    /**
+     * Get the effective values for a flag, returning a collection of all
+     * values. It is up to the caller to determine which value, if any,
+     * from the collection will be used.
+     *
+     * <p>This method does <strong>not</strong> properly process build
+     * permissions. Instead, use {@link #testBuild(Location, Player, StateFlag...)}
+     * for that purpose.</p>
+     *
+     * <p>See {@link ApplicableRegionSet#queryAllValues(LocalPlayer, Flag)}
+     * for more information.</p>
+     *
+     * @param location the location
+     * @param player an optional player, which would be used to determine the region group to apply
+     * @param flag the flag
+     * @return a collection of values
+     * @see ApplicableRegionSet#queryAllValues(LocalPlayer, Flag)
+     */
+    public <V> Collection<V> queryAllValues(Location location, @Nullable Player player, Flag<V> flag) {
+        LocalPlayer localPlayer = player != null ? plugin.wrapPlayer(player) : null;
+        return getApplicableRegions(location).queryAllValues(localPlayer, flag);
     }
 
 }
