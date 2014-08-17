@@ -72,6 +72,15 @@ public class Cause {
     }
 
     @Nullable
+    public Object getRootCause() {
+        if (!causes.isEmpty()) {
+            return causes.get(0);
+        }
+
+        return null;
+    }
+
+    @Nullable
     public Player getPlayerRootCause() {
         for (Object object : causes) {
             if (object instanceof Player) {

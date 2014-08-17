@@ -33,12 +33,17 @@ import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.domains.Association;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.association.Associables;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
+import com.sk89q.worldguard.protection.association.RegionOverlapAssociation;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
@@ -65,11 +70,15 @@ public class RegionProtectionListener extends AbstractListener {
     /**
      * Tell a sender that s/he cannot do something 'here'.
      *
-     * @param sender the sender
+     * @param cause the cause
      * @param subject the subject that the sender was blocked from touching
      */
-    private void tellErrorMessage(CommandSender sender, Object subject) {
-        sender.sendMessage(ChatColor.DARK_RED + "Sorry, but you are not allowed to do that here.");
+    private void tellErrorMessage(Cause cause, Object subject) {
+        Object rootCause = cause.getRootCause();
+
+        if (rootCause instanceof Player) {
+            ((Player) rootCause).sendMessage(ChatColor.DARK_RED + "Sorry, but you are not allowed to do that here.");
+        }
     }
 
     /**
@@ -98,6 +107,24 @@ public class RegionProtectionListener extends AbstractListener {
         };
     }
 
+    private RegionAssociable createRegionAssociable(Cause cause) {
+        Object rootCause = cause.getRootCause();
+
+        if (rootCause instanceof Player) {
+            return getPlugin().wrapPlayer((Player) rootCause);
+        } else if (rootCause instanceof Entity) {
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
+            ApplicableRegionSet source = query.getApplicableRegions(((Entity) rootCause).getLocation());
+            return new RegionOverlapAssociation(source.getRegions());
+        } else if (rootCause instanceof Block) {
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
+            ApplicableRegionSet source = query.getApplicableRegions(((Block) rootCause).getLocation());
+            return new RegionOverlapAssociation(source.getRegions());
+        } else {
+            return Associables.constant(Association.NON_MEMBER);
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
         if (isWhitelisted(event.getCause())) {
@@ -105,36 +132,30 @@ public class RegionProtectionListener extends AbstractListener {
         }
 
         final Material type = event.getEffectiveMaterial();
+        final RegionQuery query = getPlugin().getRegionContainer().createQuery();
+        final RegionAssociable associable = createRegionAssociable(event.getCause());
 
-        final Player player;
+        event.filterBlocks(new Predicate<Location>() {
+            @Override
+            public boolean apply(Location target) {
+                boolean canPlace;
 
-        if ((player = event.getCause().getPlayerRootCause()) != null) {
-            final RegionQuery query = getPlugin().getRegionContainer().createQuery();
+                // Flint and steel, fire charge
+                if (type == Material.FIRE) {
+                    canPlace = query.testBuild(target, associable, DefaultFlag.LIGHTER);
 
-            event.filterBlocks(new Predicate<Location>() {
-                @Override
-                public boolean apply(Location target) {
-                    boolean canPlace;
-
-                    // Flint and steel, fire charge
-                    if (type == Material.FIRE) {
-                        canPlace = query.testBuild(target, player, DefaultFlag.LIGHTER);
-
-                    } else {
-                        canPlace = query.testBuild(target, player);
-                    }
-
-                    if (!canPlace) {
-                        tellErrorMessage(player, target);
-                        return false;
-                    }
-
-                    return true;
+                } else {
+                    canPlace = query.testBuild(target, associable);
                 }
-            });
-        } else {
-            event.setCancelled(true);
-        }
+
+                if (!canPlace) {
+                    tellErrorMessage(event.getCause(), target);
+                    return false;
+                }
+
+                return true;
+            }
+        });
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -143,37 +164,13 @@ public class RegionProtectionListener extends AbstractListener {
             return; // Whitelisted cause
         }
 
-        final RegionQuery query = getPlugin().getRegionContainer().createQuery();
         ConfigurationManager globalConfig = getPlugin().getGlobalStateManager();
         WorldConfiguration config = globalConfig.get(event.getWorld());
+        final RegionQuery query = getPlugin().getRegionContainer().createQuery();
 
-        final Player player;
-        final Entity entity;
-
-        // ====================================================================
-        // Player caused
-        // ====================================================================
-
-        if ((player = event.getCause().getPlayerRootCause()) != null) {
-            event.filterBlocks(new Predicate<Location>() {
-                @Override
-                public boolean apply(Location target) {
-                    boolean canBreak = query.testBuild(target, player);
-
-                    if (!canBreak) {
-                        tellErrorMessage(player, target);
-                        return false;
-                    }
-
-                    return true;
-                }
-            });
-
-        // ====================================================================
-        // Entity caused
-        // ====================================================================
-
-        } else if ((entity = event.getCause().getEntityRootCause()) != null) {
+        // TODO: Move this to another event handler
+        Entity entity;
+        if ((entity = event.getCause().getEntityRootCause()) != null) {
             // Creeper
             if (entity instanceof Creeper) {
                 event.filterBlocks(createStateTest(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
@@ -187,8 +184,24 @@ public class RegionProtectionListener extends AbstractListener {
                 event.filterBlocks(createStateTest(query, DefaultFlag.TNT), config.explosionFlagCancellation);
 
             }
-        } else {
-            event.setCancelled(true);
+        }
+
+        if (!event.isCancelled()) {
+            final RegionAssociable associable = createRegionAssociable(event.getCause());
+
+            event.filterBlocks(new Predicate<Location>() {
+                @Override
+                public boolean apply(Location target) {
+                    boolean canBreak = query.testBuild(target, associable);
+
+                    if (!canBreak) {
+                        tellErrorMessage(event.getCause(), target);
+                        return false;
+                    }
+
+                    return true;
+                }
+            });
         }
     }
 
@@ -199,45 +212,39 @@ public class RegionProtectionListener extends AbstractListener {
         }
 
         final Material type = event.getEffectiveMaterial();
+        final RegionQuery query = getPlugin().getRegionContainer().createQuery();
+        final RegionAssociable associable = createRegionAssociable(event.getCause());
 
-        final Player player;
+        event.filterBlocks(new Predicate<Location>() {
+            @Override
+            public boolean apply(Location target) {
+                boolean canUse;
 
-        if ((player = event.getCause().getPlayerRootCause()) != null) {
-            final RegionQuery query = getPlugin().getRegionContainer().createQuery();
+                // Inventory blocks (CHEST_ACCESS)
+                if (Materials.isInventoryBlock(type)) {
+                    canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
 
-            event.filterBlocks(new Predicate<Location>() {
-                @Override
-                public boolean apply(Location target) {
-                    boolean canUse;
+                // Beds (SLEEP)
+                } else if (type == Material.BED) {
+                    canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.SLEEP);
 
-                    // Inventory blocks (CHEST_ACCESS)
-                    if (Materials.isInventoryBlock(type)) {
-                        canUse = query.testBuild(target, player, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
+                // TNT (TNT)
+                } else if (type == Material.TNT) {
+                    canUse = query.testBuild(target, associable, DefaultFlag.TNT);
 
-                    // Beds (SLEEP)
-                    } else if (type == Material.BED) {
-                        canUse = query.testBuild(target, player, DefaultFlag.USE, DefaultFlag.SLEEP);
-
-                    // TNT (TNT)
-                    } else if (type == Material.TNT) {
-                        canUse = query.testBuild(target, player, DefaultFlag.TNT);
-
-                    // Everything else
-                    } else {
-                        canUse = query.testBuild(target, player, DefaultFlag.USE);
-                    }
-
-                    if (!canUse) {
-                        tellErrorMessage(player, target);
-                        return false;
-                    }
-
-                    return true;
+                // Everything else
+                } else {
+                    canUse = query.testBuild(target, associable, DefaultFlag.USE);
                 }
-            });
-        } else {
-            event.setCancelled(true);
-        }
+
+                if (!canUse) {
+                    tellErrorMessage(event.getCause(), target);
+                    return false;
+                }
+
+                return true;
+            }
+        });
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -249,23 +256,19 @@ public class RegionProtectionListener extends AbstractListener {
         Location target = event.getTarget();
         EntityType type = event.getEffectiveType();
 
-        Player player;
+        RegionQuery query = getPlugin().getRegionContainer().createQuery();
+        RegionAssociable associable = createRegionAssociable(event.getCause());
 
-        if ((player = event.getCause().getPlayerRootCause()) != null) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery();
-            boolean canSpawn;
+        boolean canSpawn;
 
-            if (Entities.isVehicle(type)) {
-                canSpawn = query.testBuild(target, player, DefaultFlag.PLACE_VEHICLE);
-            } else {
-                canSpawn = query.testBuild(target, player);
-            }
-
-            if (!canSpawn) {
-                tellErrorMessage(player, target);
-                event.setCancelled(true);
-            }
+        if (Entities.isVehicle(type)) {
+            canSpawn = query.testBuild(target, associable, DefaultFlag.PLACE_VEHICLE);
         } else {
+            canSpawn = query.testBuild(target, associable);
+        }
+
+        if (!canSpawn) {
+            tellErrorMessage(event.getCause(), target);
             event.setCancelled(true);
         }
     }
@@ -278,24 +281,19 @@ public class RegionProtectionListener extends AbstractListener {
 
         Location target = event.getTarget();
         EntityType type = event.getEntity().getType();
+        RegionAssociable associable = createRegionAssociable(event.getCause());
 
-        Player player;
+        RegionQuery query = getPlugin().getRegionContainer().createQuery();
+        boolean canDestroy;
 
-        if ((player = event.getCause().getPlayerRootCause()) != null) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery();
-            boolean canDestroy;
-
-            if (Entities.isVehicle(type)) {
-                canDestroy = query.testBuild(target, player, DefaultFlag.DESTROY_VEHICLE);
-            } else {
-                canDestroy = query.testBuild(target, player);
-            }
-
-            if (!canDestroy) {
-                tellErrorMessage(player, target);
-                event.setCancelled(true);
-            }
+        if (Entities.isVehicle(type)) {
+            canDestroy = query.testBuild(target, associable, DefaultFlag.DESTROY_VEHICLE);
         } else {
+            canDestroy = query.testBuild(target, associable);
+        }
+
+        if (!canDestroy) {
+            tellErrorMessage(event.getCause(), target);
             event.setCancelled(true);
         }
     }
@@ -307,18 +305,13 @@ public class RegionProtectionListener extends AbstractListener {
         }
 
         Location target = event.getTarget();
+        RegionAssociable associable = createRegionAssociable(event.getCause());
 
-        Player player;
+        RegionQuery query = getPlugin().getRegionContainer().createQuery();
+        boolean canUse = query.testBuild(target, associable, DefaultFlag.USE);
 
-        if ((player = event.getCause().getPlayerRootCause()) != null) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery();
-            boolean canUse = query.testBuild(target, player, DefaultFlag.USE);
-
-            if (!canUse) {
-                tellErrorMessage(player, target);
-                event.setCancelled(true);
-            }
-        } else {
+        if (!canUse) {
+            tellErrorMessage(event.getCause(), target);
             event.setCancelled(true);
         }
     }

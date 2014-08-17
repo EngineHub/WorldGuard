@@ -20,10 +20,13 @@
 package com.sk89q.worldguard;
 
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.domains.Association;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.util.UUID;
 
-public abstract class LocalPlayer {
+public abstract class LocalPlayer implements RegionAssociable {
 
     /**
      * Get this player's name.
@@ -89,7 +92,18 @@ public abstract class LocalPlayer {
      * @return Whether this player has {@code perm}
      */
     public abstract boolean hasPermission(String perm);
-    
+
+    @Override
+    public Association getAssociation(ProtectedRegion region) {
+        if (region.isOwner(this)) {
+            return Association.OWNER;
+        } else if (region.isMember(this)) {
+            return Association.MEMBER;
+        } else {
+            return Association.NON_MEMBER;
+        }
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj instanceof LocalPlayer && ((LocalPlayer) obj).getName().equals(getName());

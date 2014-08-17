@@ -17,42 +17,40 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.flags;
+package com.sk89q.worldguard.protection.association;
 
-import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldguard.domains.Association;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A grouping of region membership types.
+ * Determines that the association to a region is {@code OWNER} if the input
+ * region is in a set of source regions.
  */
-public enum RegionGroup {
+public class RegionOverlapAssociation implements RegionAssociable {
 
-    MEMBERS(Association.MEMBER, Association.OWNER),
-    OWNERS(Association.OWNER),
-    NON_MEMBERS(Association.NON_MEMBER),
-    NON_OWNERS(Association.MEMBER, Association.NON_MEMBER),
-    ALL(Association.OWNER, Association.MEMBER, Association.NON_MEMBER),
-    NONE();
-
-    private final Set<Association> contained;
-
-    RegionGroup(Association... association) {
-        this.contained = ImmutableSet.copyOf(association);
-    }
+    private final Set<ProtectedRegion> source;
 
     /**
-     * Test whether this group contains the given membership status.
+     * Create a new instance.
      *
-     * @param association membership status
-     * @return true if contained
+     * @param source set of regions that input regions must be contained within
      */
-    public boolean contains(Association association) {
-        checkNotNull(association);
-        return contained.contains(association);
+    public RegionOverlapAssociation(Set<ProtectedRegion> source) {
+        checkNotNull(source);
+        this.source = source;
+    }
+
+    @Override
+    public Association getAssociation(ProtectedRegion region) {
+        if (source.contains(region)) {
+            return Association.OWNER;
+        } else {
+            return Association.NON_MEMBER;
+        }
     }
 
 }

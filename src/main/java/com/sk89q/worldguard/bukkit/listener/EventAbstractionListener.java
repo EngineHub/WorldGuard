@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.google.common.collect.Lists;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
@@ -28,6 +29,7 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
+import com.sk89q.worldguard.bukkit.util.BlockStateAsBlockFunction;
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
@@ -40,6 +42,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -84,11 +87,14 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Dispenser;
 import org.bukkit.material.MaterialData;
+import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 import static com.sk89q.worldguard.bukkit.cause.Cause.create;
 import static com.sk89q.worldguard.bukkit.util.Materials.isBlockModifiedOnClick;
@@ -138,6 +144,12 @@ public class EventAbstractionListener implements Listener {
         Events.fireToCancel(event, new UseBlockEvent(event, Cause.unknown(), event.getBlock()));
     }
 
+    @EventHandler
+    public void onStructureGrowEvent(StructureGrowEvent event) {
+        List<Block> blockList = Lists.transform(event.getBlocks(), new BlockStateAsBlockFunction());
+        Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), event.getLocation().getWorld(), blockList, Material.AIR));
+    }
+
     // TODO: Handle EntityCreatePortalEvent?
 
     @EventHandler
@@ -162,9 +174,20 @@ public class EventAbstractionListener implements Listener {
                     Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), event.getBlock()));
                 }
             } else {
+                boolean wasCancelled = event.isCancelled();
                 Cause cause = create(entity);
 
                 Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getLocation(), to));
+
+                if (event.isCancelled() && !wasCancelled && entity instanceof FallingBlock) {
+                    FallingBlock fallingBlock = (FallingBlock) entity;
+                    ItemStack itemStack = new ItemStack(fallingBlock.getMaterial(), 1, fallingBlock.getBlockData());
+                    Item item = block.getWorld().dropItem(fallingBlock.getLocation(), itemStack);
+                    item.setVelocity(new Vector());
+                    if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(block, entity), item))) {
+                        item.remove();
+                    }
+                }
             }
         }
     }
@@ -331,23 +354,21 @@ public class EventAbstractionListener implements Listener {
 
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
-        if (ABSTRACT_FROM_TO_EVENTS) {
-            Block from = event.getBlock();
-            Block to = event.getToBlock();
+        Block from = event.getBlock();
+        Block to = event.getToBlock();
 
-            // Liquids pass this event when flowing to solid blocks
-            if (to.getType().isSolid() && Materials.isLiquid(from.getType())) {
-                return;
-            }
-
-            Cause cause = create(from);
-
-            if (from.getType() != Material.AIR) {
-                Events.fireToCancel(event, new BreakBlockEvent(event, cause, to));
-            }
-
-            Events.fireToCancel(event, new PlaceBlockEvent(event, cause, to.getLocation(), from.getType()));
+        // Liquids pass this event when flowing to solid blocks
+        if (to.getType().isSolid() && Materials.isLiquid(from.getType())) {
+            return;
         }
+
+        Cause cause = create(from);
+
+        if (from.getType() != Material.AIR) {
+            Events.fireToCancel(event, new BreakBlockEvent(event, cause, to));
+        }
+
+        Events.fireToCancel(event, new PlaceBlockEvent(event, cause, to.getLocation(), from.getType()));
     }
 
     //-------------------------------------------------------------------------

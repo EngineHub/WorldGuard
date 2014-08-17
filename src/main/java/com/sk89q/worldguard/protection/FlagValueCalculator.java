@@ -21,11 +21,11 @@ package com.sk89q.worldguard.protection;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.domains.Association;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -84,9 +84,9 @@ public class FlagValueCalculator {
     }
 
     /**
-     * Return the membership status of the given player, indicating
+     * Return the membership status of the given subject, indicating
      * whether there are no (counted) regions in the list of regions,
-     * whether the player is a member of all regions, or whether
+     * whether the subject is a member of all regions, or whether
      * the region is not a member of all regions.
      *
      * <p>A region is "counted" if it doesn't have the
@@ -97,20 +97,20 @@ public class FlagValueCalculator {
      * <p>This method is mostly for internal use. It's not particularly
      * useful.</p>
      *
-     * @param player the player
+     * @param subject the subject
      * @return the membership result
      */
-    public Result getMembership(LocalPlayer player) {
-        checkNotNull(player);
+    public Result getMembership(RegionAssociable subject) {
+        checkNotNull(subject);
 
         int minimumPriority = Integer.MIN_VALUE;
         boolean foundApplicableRegion = false;
 
         // Say there are two regions in one location: CHILD and PARENT (CHILD
         // is a child of PARENT). If there are two overlapping regions in WG, a
-        // player has to be a member of /both/ (or flags permit) in order to
+        // subject has to be a member of /both/ (or flags permit) in order to
         // build in that location. However, inheritance is supposed
-        // to allow building if the player is a member of just CHILD. That
+        // to allow building if the subject is a member of just CHILD. That
         // presents a problem.
         //
         // To rectify this, we keep two sets. When we iterate over the list of
@@ -145,7 +145,7 @@ public class FlagValueCalculator {
             }
 
             // If PASSTHROUGH is set, ignore this region
-            if (getEffectiveFlag(region, DefaultFlag.PASSTHROUGH, player) == State.ALLOW) {
+            if (getEffectiveFlag(region, DefaultFlag.PASSTHROUGH, subject) == State.ALLOW) {
                 continue;
             }
 
@@ -153,7 +153,7 @@ public class FlagValueCalculator {
             foundApplicableRegion = true;
 
             if (!hasCleared.contains(region)) {
-                if (!region.isMember(player)) {
+                if (!RegionGroup.MEMBERS.contains(subject.getAssociation(region))) {
                     needsClear.add(region);
                 } else {
                     // Need to clear all parents
@@ -175,24 +175,24 @@ public class FlagValueCalculator {
      * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
      * and {@code ALLOW} overrides {@code NONE}.
      *
-     * <p>A player can be provided that is used to determine whether the value
+     * <p>A subject can be provided that is used to determine whether the value
      * of a flag on a particular region should be used. For example, if a
      * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * player is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the player, then
+     * subject is not a member, then the region would be skipped when
+     * querying that flag. If {@code null} is provided for the subject, then
      * only flags that use {@link RegionGroup#ALL},
      * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
      *
-     * @param player an optional player, which would be used to determine the region group to apply
+     * @param subject an optional subject, which would be used to determine the region group to apply
      * @param flags a list of flags to check
      * @return a state
      */
     @Nullable
-    public State queryState(@Nullable LocalPlayer player, StateFlag... flags) {
+    public State queryState(@Nullable RegionAssociable subject, StateFlag... flags) {
         State value = null;
 
         for (StateFlag flag : flags) {
-            value = StateFlag.combine(value, queryValue(player, flag));
+            value = StateFlag.combine(value, queryValue(subject, flag));
             if (value == State.DENY) {
                 break;
             }
@@ -214,21 +214,21 @@ public class FlagValueCalculator {
      * type of flag that can consistently return the same 'best' value is
      * {@link StateFlag}.</p>
      *
-     * <p>A player can be provided that is used to determine whether the value
+     * <p>A subject can be provided that is used to determine whether the value
      * of a flag on a particular region should be used. For example, if a
      * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * player is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the player, then
+     * subject is not a member, then the region would be skipped when
+     * querying that flag. If {@code null} is provided for the subject, then
      * only flags that use {@link RegionGroup#ALL},
      * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
      *
-     * @param player an optional player, which would be used to determine the region group to apply
+     * @param subject an optional subject, which would be used to determine the region group to apply
      * @param flag the flag
      * @return a value, which could be {@code null}
      */
     @Nullable
-    public <V> V queryValue(@Nullable LocalPlayer player, Flag<V> flag) {
-        Collection<V> values = queryAllValues(player, flag);
+    public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
+        Collection<V> values = queryAllValues(subject, flag);
         return flag.chooseValue(values);
     }
 
@@ -237,20 +237,20 @@ public class FlagValueCalculator {
      * values. It is up to the caller to determine which value, if any,
      * from the collection will be used.
      *
-     * <p>A player can be provided that is used to determine whether the value
+     * <p>A subject can be provided that is used to determine whether the value
      * of a flag on a particular region should be used. For example, if a
      * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
-     * player is not a member, then the region would be skipped when
-     * querying that flag. If {@code null} is provided for the player, then
+     * subject is not a member, then the region would be skipped when
+     * querying that flag. If {@code null} is provided for the subject, then
      * only flags that use {@link RegionGroup#ALL},
      * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
      *
-     * @param player an optional player, which would be used to determine the region group to apply
+     * @param subject an optional subject, which would be used to determine the region group to apply
      * @param flag the flag
      * @return a collection of values
      */
     @SuppressWarnings("unchecked")
-    public <V> Collection<V> queryAllValues(@Nullable LocalPlayer player, Flag<V> flag) {
+    public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
         checkNotNull(flag);
 
         int minimumPriority = Integer.MIN_VALUE;
@@ -295,7 +295,7 @@ public class FlagValueCalculator {
                 break;
             }
 
-            V value = getEffectiveFlag(region, flag, player);
+            V value = getEffectiveFlag(region, flag, subject);
 
             if (value != null) {
                 if (!ignoredRegions.contains(region)) {
@@ -314,11 +314,11 @@ public class FlagValueCalculator {
         }
 
         if (flag == DefaultFlag.BUILD && consideredValues.isEmpty()) {
-            if (player == null) {
-                throw new NullPointerException("The BUILD flag is handled in a special fashion and requires a non-null player parameter");
+            if (subject == null) {
+                throw new NullPointerException("The BUILD flag is handled in a special fashion and requires a non-null subject parameter");
             }
 
-            switch (getMembership(player)) {
+            switch (getMembership(subject)) {
                 case FAIL:
                     return ImmutableList.of();
                 case SUCCESS:
@@ -359,10 +359,11 @@ public class FlagValueCalculator {
      *
      * @param region the region
      * @param flag the flag
+     * @param subject an subject object
      * @return the value
      */
     @SuppressWarnings("unchecked")
-    public <V> V getEffectiveFlag(final ProtectedRegion region, Flag<V> flag, @Nullable LocalPlayer player) {
+    public <V> V getEffectiveFlag(final ProtectedRegion region, Flag<V> flag, @Nullable RegionAssociable subject) {
         if (region == globalRegion) {
             if (flag == DefaultFlag.PASSTHROUGH) {
                 // Has members/owners -> the global region acts like
@@ -393,7 +394,9 @@ public class FlagValueCalculator {
                     group = flag.getRegionGroupFlag().getDefault();
                 }
 
-                if (!RegionGroupFlag.isMember(region, group, player)) {
+                if (subject == null) {
+                    use = group.contains(Association.NON_MEMBER);
+                } else if (!group.contains(subject.getAssociation(region))) {
                     use = false;
                 }
             }
@@ -448,7 +451,7 @@ public class FlagValueCalculator {
 
     /**
      * Describes the membership result from
-     * {@link #getMembership(LocalPlayer)}.
+     * {@link #getMembership(RegionAssociable)}.
      */
     public static enum Result {
         /**
