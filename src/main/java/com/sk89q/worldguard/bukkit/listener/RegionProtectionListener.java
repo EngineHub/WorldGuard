@@ -31,6 +31,7 @@ import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
 import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
+import com.sk89q.worldguard.bukkit.util.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.domains.Association;
@@ -114,12 +115,10 @@ public class RegionProtectionListener extends AbstractListener {
             return getPlugin().wrapPlayer((Player) rootCause);
         } else if (rootCause instanceof Entity) {
             RegionQuery query = getPlugin().getRegionContainer().createQuery();
-            ApplicableRegionSet source = query.getApplicableRegions(((Entity) rootCause).getLocation());
-            return new RegionOverlapAssociation(source.getRegions());
+            return new DelayedRegionOverlapAssociation(query, ((Entity) rootCause).getLocation());
         } else if (rootCause instanceof Block) {
             RegionQuery query = getPlugin().getRegionContainer().createQuery();
-            ApplicableRegionSet source = query.getApplicableRegions(((Block) rootCause).getLocation());
-            return new RegionOverlapAssociation(source.getRegions());
+            return new DelayedRegionOverlapAssociation(query, ((Block) rootCause).getLocation());
         } else {
             return Associables.constant(Association.NON_MEMBER);
         }
