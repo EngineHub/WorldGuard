@@ -390,23 +390,26 @@ public class FlagValueCalculator {
 
         while (current != null) {
             V value = current.getFlag(flag);
-            boolean use = true;
 
-            if (flag.getRegionGroupFlag() != null) {
-                RegionGroup group = current.getFlag(flag.getRegionGroupFlag());
-                if (group == null) {
-                    group = flag.getRegionGroupFlag().getDefault();
+            if (value != null) {
+                boolean use = true;
+
+                if (flag.getRegionGroupFlag() != null) {
+                    RegionGroup group = current.getFlag(flag.getRegionGroupFlag());
+                    if (group == null) {
+                        group = flag.getRegionGroupFlag().getDefault();
+                    }
+
+                    if (subject == null) {
+                        use = group.contains(Association.NON_MEMBER);
+                    } else if (!group.contains(subject.getAssociation(region))) {
+                        use = false;
+                    }
                 }
 
-                if (subject == null) {
-                    use = group.contains(Association.NON_MEMBER);
-                } else if (!group.contains(subject.getAssociation(region))) {
-                    use = false;
+                if (use) {
+                    return value;
                 }
-            }
-
-            if (use && value != null) {
-                return value;
             }
 
             current = current.getParent();
