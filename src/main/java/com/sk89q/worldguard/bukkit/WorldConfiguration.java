@@ -324,7 +324,7 @@ public class WorldConfiguration {
         }
         blockPotionsAlways = getBoolean("gameplay.block-potions-overly-reliably", false);
 
-        simulateSponge = getBoolean("simulation.sponge.enable", true);
+        simulateSponge = getBoolean("simulation.sponge.enable", false);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
 
