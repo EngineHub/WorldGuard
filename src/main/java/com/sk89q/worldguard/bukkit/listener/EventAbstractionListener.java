@@ -356,17 +356,28 @@ public class EventAbstractionListener implements Listener {
     public void onBlockFromTo(BlockFromToEvent event) {
         Block from = event.getBlock();
         Block to = event.getToBlock();
+        Material fromType = from.getType();
+        Material toType = to.getType();
 
         // Liquids pass this event when flowing to solid blocks
-        if (to.getType().isSolid() && Materials.isLiquid(from.getType())) {
+        if (toType.isSolid() && Materials.isLiquid(fromType)) {
+            return;
+        }
+
+        // This significantly reduces the number of events without having
+        // too much effect. Unfortunately it appears that even if this
+        // check didn't exist, you can raise the level of some liquid
+        // flow and the from/to data may not be correct.
+        if ((Materials.isWater(fromType) && Materials.isWater(toType)) || (Materials.isLava(fromType) && Materials.isLava(toType))) {
             return;
         }
 
         Cause cause = create(from);
 
-        if (from.getType() != Material.AIR) {
+        // Disable since it's probably not needed
+        /*if (from.getType() != Material.AIR) {
             Events.fireToCancel(event, new BreakBlockEvent(event, cause, to));
-        }
+        }*/
 
         Events.fireToCancel(event, new PlaceBlockEvent(event, cause, to.getLocation(), from.getType()));
     }
