@@ -33,18 +33,21 @@ public class BukkitPlayer extends LocalPlayer {
 
     private final WorldGuardPlugin plugin;
     private final Player player;
-    
+    private final String name;
+
     public BukkitPlayer(WorldGuardPlugin plugin, Player player) {
         checkNotNull(plugin);
         checkNotNull(player);
 
         this.plugin = plugin;
         this.player = player;
+        // getName() takes longer than before in newer versions of Minecraft
+        this.name = player.getName();
     }
 
     @Override
     public String getName() {
-        return player.getName();
+        return name;
     }
 
     @Override
