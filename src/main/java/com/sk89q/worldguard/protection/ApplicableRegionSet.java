@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ObjectArrays;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
@@ -35,6 +34,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -346,7 +346,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return a set of regions
      */
     public Set<ProtectedRegion> getRegions() {
-        return ImmutableSet.copyOf(applicable);
+        return new HashSet<ProtectedRegion>(applicable);
     }
 
     @Override

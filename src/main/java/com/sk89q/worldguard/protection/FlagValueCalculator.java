@@ -31,6 +31,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,6 +56,7 @@ public class FlagValueCalculator {
     private final List<ProtectedRegion> regions;
     @Nullable
     private final ProtectedRegion globalRegion;
+    private final Iterable<ProtectedRegion> applicable;
 
     /**
      * Create a new instance.
@@ -67,6 +69,12 @@ public class FlagValueCalculator {
 
         this.regions = regions;
         this.globalRegion = globalRegion;
+
+        if (globalRegion != null) {
+            applicable = Iterables.concat(regions, Arrays.asList(globalRegion));
+        } else {
+            applicable = regions;
+        }
     }
 
     /**
@@ -76,11 +84,7 @@ public class FlagValueCalculator {
      * @return an iterable
      */
     private Iterable<ProtectedRegion> getApplicable() {
-        if (globalRegion != null) {
-            return Iterables.concat(regions, ImmutableList.of(globalRegion));
-        } else {
-            return regions;
-        }
+        return applicable;
     }
 
     /**
