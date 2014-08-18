@@ -34,9 +34,9 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -52,17 +52,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FlagValueCalculator {
 
-    private final SortedSet<ProtectedRegion> regions;
+    private final List<ProtectedRegion> regions;
     @Nullable
     private final ProtectedRegion globalRegion;
 
     /**
      * Create a new instance.
      *
-     * @param regions a list of applicable regions
+     * @param regions a list of applicable regions that <strong>must be sorted by priority descending</strong>
      * @param globalRegion an optional global region (null to not use one)
      */
-    public FlagValueCalculator(SortedSet<ProtectedRegion> regions, @Nullable ProtectedRegion globalRegion) {
+    public FlagValueCalculator(List<ProtectedRegion> regions, @Nullable ProtectedRegion globalRegion) {
         checkNotNull(regions);
 
         this.regions = regions;

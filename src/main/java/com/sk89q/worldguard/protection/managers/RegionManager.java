@@ -43,7 +43,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -289,7 +288,7 @@ public final class RegionManager {
     public ApplicableRegionSet getApplicableRegions(Vector position) {
         checkNotNull(position);
 
-        TreeSet<ProtectedRegion> regions = new TreeSet<ProtectedRegion>();
+        List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
         index.applyContaining(position, new RegionCollectionConsumer(regions, true));
         return new ApplicableRegionSet(regions, index.get("__global__"));
     }
@@ -304,7 +303,7 @@ public final class RegionManager {
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion region) {
         checkNotNull(region);
 
-        TreeSet<ProtectedRegion> regions = new TreeSet<ProtectedRegion>();
+        List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
         index.applyIntersecting(region, new RegionCollectionConsumer(regions, true));
         return new ApplicableRegionSet(regions, index.get("__global__"));
     }

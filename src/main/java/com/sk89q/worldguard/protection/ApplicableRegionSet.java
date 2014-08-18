@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ObjectArrays;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
@@ -35,9 +36,8 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldguard.protection.flags.StateFlag.test;
@@ -56,7 +56,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      */
     private static final ApplicableRegionSet EMPTY = new ApplicableRegionSet(Collections.<ProtectedRegion>emptyList(), null);
 
-    private final SortedSet<ProtectedRegion> applicable;
+    private final List<ProtectedRegion> applicable;
     private final FlagValueCalculator flagValueCalculator;
 
     /**
@@ -67,8 +67,8 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param applicable the regions contained in this set
      * @param globalRegion the global region, set aside for special handling.
      */
-    public ApplicableRegionSet(Collection<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion) {
-        this(new TreeSet<ProtectedRegion>(checkNotNull(applicable)), globalRegion);
+    public ApplicableRegionSet(List<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion) {
+        this(applicable, globalRegion, false);
     }
 
     /**
@@ -76,9 +76,13 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * 
      * @param applicable the regions contained in this set
      * @param globalRegion the global region, set aside for special handling.
+     * @param sorted true if the list is already sorted
      */
-    public ApplicableRegionSet(SortedSet<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion) {
+    private ApplicableRegionSet(List<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion, boolean sorted) {
         checkNotNull(applicable);
+        if (!sorted) {
+            Collections.sort(applicable);
+        }
         this.applicable = applicable;
         this.flagValueCalculator = new FlagValueCalculator(applicable, globalRegion);
     }
@@ -342,7 +346,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return a set of regions
      */
     public Set<ProtectedRegion> getRegions() {
-        return Collections.unmodifiableSet(applicable);
+        return ImmutableSet.copyOf(applicable);
     }
 
     @Override
@@ -355,6 +359,18 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      */
     public static ApplicableRegionSet getEmpty() {
         return EMPTY;
+    }
+
+    /**
+     * Create a new instance using a list of regions that is known to
+     * already be sorted by priority descending.
+     *
+     * @param regions a list of regions
+     * @param globalRegion a global region
+     * @return
+     */
+    public static ApplicableRegionSet fromSortedList(List<ProtectedRegion> regions, @Nullable ProtectedRegion globalRegion) {
+        return new ApplicableRegionSet(regions, globalRegion, true);
     }
 
 }
