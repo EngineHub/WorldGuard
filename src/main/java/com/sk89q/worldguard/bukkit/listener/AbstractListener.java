@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.World;
@@ -58,6 +59,15 @@ class AbstractListener implements Listener {
      */
     protected WorldGuardPlugin getPlugin() {
         return plugin;
+    }
+
+    /**
+     * Get the global configuration.
+     *
+     * @return the configuration
+     */
+    protected ConfigurationManager getConfig() {
+        return plugin.getGlobalStateManager();
     }
 
     /**
