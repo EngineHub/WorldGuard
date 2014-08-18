@@ -37,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 class QueryCache {
 
-    private final ConcurrentMap<CacheKey, ApplicableRegionSet> cache = new ConcurrentHashMap<CacheKey, ApplicableRegionSet>();
+    private final ConcurrentMap<CacheKey, ApplicableRegionSet> cache = new ConcurrentHashMap<CacheKey, ApplicableRegionSet>(16, 0.75f, 2);
 
     /**
      * Get from the cache a {@code ApplicableRegionSet} if an entry exists;
@@ -76,12 +76,20 @@ class QueryCache {
         private final int x;
         private final int y;
         private final int z;
+        private final int hashCode;
 
         private CacheKey(Location location) {
             this.world = location.getWorld();
             this.x = location.getBlockX();
             this.y = location.getBlockY();
             this.z = location.getBlockZ();
+
+            // Pre-compute hash code
+            int result = world.hashCode();
+            result = 31 * result + x;
+            result = 31 * result + y;
+            result = 31 * result + z;
+            this.hashCode = result;
         }
 
         @Override
@@ -101,11 +109,7 @@ class QueryCache {
 
         @Override
         public int hashCode() {
-            int result = world.hashCode();
-            result = 31 * result + x;
-            result = 31 * result + y;
-            result = 31 * result + z;
-            return result;
+            return hashCode;
         }
     }
 
