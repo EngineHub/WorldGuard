@@ -57,6 +57,8 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
 
     private final List<ProtectedRegion> applicable;
     private final FlagValueCalculator flagValueCalculator;
+    @Nullable
+    private Set<ProtectedRegion> regionSet;
 
     /**
      * Construct the object.
@@ -345,7 +347,11 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return a set of regions
      */
     public Set<ProtectedRegion> getRegions() {
-        return new HashSet<ProtectedRegion>(applicable);
+        if (regionSet != null) {
+            return regionSet;
+        }
+        regionSet = Collections.unmodifiableSet(new HashSet<ProtectedRegion>(applicable));
+        return regionSet;
     }
 
     @Override
