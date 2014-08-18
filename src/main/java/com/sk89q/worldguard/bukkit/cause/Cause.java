@@ -180,10 +180,20 @@ public class Cause {
     /**
      * Add a parent cause to a {@code Metadatable} object.
      *
+     * <p>Note that {@code target} cannot be an instance of
+     * {@link Block} because {@link #create(Object...)} will not bother
+     * checking for such data on blocks (because it is relatively costly
+     * to do so).</p>
+     *
      * @param target the target
      * @param parent the parent cause
+     * @throws IllegalArgumentException thrown if {@code target} is an instance of {@link Block}
      */
     public static void trackParentCause(Metadatable target, Object parent) {
+        if (target instanceof Block) {
+            throw new IllegalArgumentException("Can't track causes on Blocks because Cause doesn't check block metadata");
+        }
+
         WGMetadata.put(target, CAUSE_KEY, parent);
     }
 
