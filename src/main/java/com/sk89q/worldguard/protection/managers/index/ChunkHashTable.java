@@ -55,6 +55,8 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
     private LongHashTable<ChunkState> states = new LongHashTable<ChunkState>();
     private final RegionIndex index;
     private final Object lock = new Object();
+    @Nullable
+    private ChunkState lastState;
 
     /**
      * Create a new instance.
@@ -130,6 +132,8 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
             if (!positions.isEmpty()) {
                 executor.submit(new EnumerateRegions(positions));
             }
+
+            lastState = null;
         }
     }
 
@@ -172,6 +176,10 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
         checkNotNull(chunkPosition);
         synchronized (lock) {
             states.remove(chunkPosition.getBlockX(), chunkPosition.getBlockZ());
+            ChunkState state = lastState;
+            if (state != null && state.getPosition().getBlockX() == chunkPosition.getBlockX() && state.getPosition().getBlockZ() == chunkPosition.getBlockZ()) {
+                lastState = null;
+            }
         }
     }
 
@@ -181,6 +189,7 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
             executor.shutdownNow();
             states = new LongHashTable<ChunkState>();
             executor = createExecutor();
+            lastState = null;
         }
     }
 
@@ -224,7 +233,14 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
         checkNotNull(position);
         checkNotNull(consumer);
 
-        ChunkState state = get(new Vector2D(position.getBlockX() >> 4, position.getBlockZ() >> 4), false);
+        ChunkState state = lastState;
+        int chunkX = position.getBlockX() >> 4;
+        int chunkZ = position.getBlockZ() >> 4;
+
+        if (state == null || state.getPosition().getBlockX() != chunkX || state.getPosition().getBlockZ() != chunkZ) {
+            state = get(new Vector2D(chunkX, chunkZ), false);
+        }
+
         if (state != null && state.isLoaded()) {
             for (ProtectedRegion region : state.getRegions()) {
                 if (region.contains(position)) {
