@@ -42,6 +42,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,7 +108,11 @@ public class YamlFileStore implements RegionStore {
         Map<String, ProtectedRegion> loaded = new HashMap<String, ProtectedRegion>();
 
         YAMLProcessor config = createYamlProcessor(file);
-        config.load();
+        try {
+            config.load();
+        } catch (FileNotFoundException e) {
+            return new HashSet<ProtectedRegion>(loaded.values());
+        }
 
         Map<String, YAMLNode> regionData = config.getNodes("regions");
 
