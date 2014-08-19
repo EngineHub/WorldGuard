@@ -72,7 +72,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
@@ -124,25 +123,9 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onExpBottle(ExpBottleEvent event) {
-        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
-
-        if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
-                event.getEntity().getLocation())) {
-            event.setExperience(0);
-            // event.setShowEffect(false); // don't want to cancel the bottle entirely I suppose, just the exp
-        }
-    }
-
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDeath(EntityDeathEvent event) {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(event.getEntity().getWorld());
-
-        if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
-                event.getEntity().getLocation())) {
-            event.setDroppedExp(0);
-        }
 
         if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
             ((PlayerDeathEvent) event).setDeathMessage("");

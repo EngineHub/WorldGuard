@@ -72,9 +72,11 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityUnleashEvent;
+import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
@@ -83,6 +85,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -443,7 +446,28 @@ public class EventAbstractionListener implements Listener {
         }
     }
 
-    // TODO: XP pickup is an entity destroy event
+    @EventHandler
+    public void onPlayerFish(PlayerFishEvent event) {
+        if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getPlayer(), event.getHook()), event.getCaught().getLocation(), EntityType.EXPERIENCE_ORB))) {
+            event.setExpToDrop(0);
+        }
+    }
+
+    @EventHandler
+    public void onExpBottle(ExpBottleEvent event) {
+        if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getEntity()), event.getEntity().getLocation(), EntityType.EXPERIENCE_ORB))) {
+            event.setExperience(0);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (event.getDroppedExp() > 0) {
+            if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getEntity()), event.getEntity().getLocation(), EntityType.EXPERIENCE_ORB))) {
+                event.setDroppedExp(0);
+            }
+        }
+    }
 
     //-------------------------------------------------------------------------
     // Entity external interaction
