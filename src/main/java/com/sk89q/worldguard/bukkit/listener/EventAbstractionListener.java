@@ -436,8 +436,10 @@ public class EventAbstractionListener implements Listener {
 
     @EventHandler
     public void onBlockExp(BlockExpEvent event) {
-        if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getBlock()), event.getBlock().getLocation(), EntityType.EXPERIENCE_ORB))) {
-            event.setExpToDrop(0);
+        if (event.getExpToDrop() > 0) { // Event is raised even where no XP is being dropped
+            if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getBlock()), event.getBlock().getLocation(), EntityType.EXPERIENCE_ORB))) {
+                event.setExpToDrop(0);
+            }
         }
     }
 
