@@ -532,6 +532,18 @@ public final class Materials {
     }
 
     /**
+     * Test whether the given material is a piston block, not including
+     * the "technical blocks" such as the piston extension block.
+     *
+     * @param material the material
+     * @return true if a piston block
+     */
+    public static boolean isPistonBlock(Material material) {
+        return material == Material.PISTON_BASE
+                || material == Material.PISTON_STICKY_BASE;
+    }
+
+    /**
      * Test whether the given material is a Minecart.
      *
      * @param material the material
