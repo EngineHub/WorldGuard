@@ -101,9 +101,8 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
-        if (isWhitelisted(event.getCause())) {
-            return; // Whitelisted cause
-        }
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
 
         final Material type = event.getEffectiveMaterial();
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
@@ -134,9 +133,8 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        if (isWhitelisted(event.getCause())) {
-            return; // Whitelisted cause
-        }
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
 
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
 
@@ -161,9 +159,8 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
-        if (isWhitelisted(event.getCause())) {
-            return; // Whitelisted cause
-        }
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
 
         final Material type = event.getEffectiveMaterial();
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
@@ -203,9 +200,8 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
-        if (isWhitelisted(event.getCause())) {
-            return; // Whitelisted cause
-        }
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
 
         Location target = event.getTarget();
         EntityType type = event.getEffectiveType();
@@ -229,9 +225,8 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
-        if (isWhitelisted(event.getCause())) {
-            return; // Whitelisted cause
-        }
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
 
         Location target = event.getTarget();
         EntityType type = event.getEntity().getType();
@@ -254,9 +249,8 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
-        if (isWhitelisted(event.getCause())) {
-            return; // Whitelisted cause
-        }
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
 
         Location target = event.getTarget();
         RegionAssociable associable = createRegionAssociable(event.getCause());
