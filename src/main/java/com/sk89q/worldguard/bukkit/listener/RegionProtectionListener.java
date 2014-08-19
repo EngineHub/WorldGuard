@@ -113,10 +113,11 @@ public class RegionProtectionListener extends AbstractListener {
             public boolean apply(Location target) {
                 boolean canPlace;
 
-                // Flint and steel, fire charge
+                /* Flint and steel, fire charge, etc. */
                 if (type == Material.FIRE) {
                     canPlace = query.testBuild(target, associable, DefaultFlag.LIGHTER);
 
+                /* Everything else */
                 } else {
                     canPlace = query.testBuild(target, associable);
                 }
@@ -171,19 +172,19 @@ public class RegionProtectionListener extends AbstractListener {
             public boolean apply(Location target) {
                 boolean canUse;
 
-                // Inventory blocks (CHEST_ACCESS)
+                /* Inventory */
                 if (Materials.isInventoryBlock(type)) {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
 
-                    // Beds (SLEEP)
+                /* Beds */
                 } else if (type == Material.BED) {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.SLEEP);
 
-                    // TNT (TNT)
+                /* TNT */
                 } else if (type == Material.TNT) {
                     canUse = query.testBuild(target, associable, DefaultFlag.TNT);
 
-                    // Everything else
+                /* Everything else */
                 } else {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE);
                 }
@@ -211,8 +212,11 @@ public class RegionProtectionListener extends AbstractListener {
 
         boolean canSpawn;
 
+        /* Vehicles */
         if (Entities.isVehicle(type)) {
             canSpawn = query.testBuild(target, associable, DefaultFlag.PLACE_VEHICLE);
+
+        /* Everything else */
         } else {
             canSpawn = query.testBuild(target, associable);
         }
@@ -235,8 +239,11 @@ public class RegionProtectionListener extends AbstractListener {
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
         boolean canDestroy;
 
+        /* Vehicles */
         if (Entities.isVehicle(type)) {
             canDestroy = query.testBuild(target, associable, DefaultFlag.DESTROY_VEHICLE);
+
+        /* Everything else */
         } else {
             canDestroy = query.testBuild(target, associable);
         }
