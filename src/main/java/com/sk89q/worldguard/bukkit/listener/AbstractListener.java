@@ -90,4 +90,14 @@ class AbstractListener implements Listener {
         return getWorldConfig(player.getWorld());
     }
 
+    /**
+     * Return whether region support is enabled.
+     *
+     * @param world the world
+     * @return true if region support is enabled
+     */
+    protected boolean isRegionSupportEnabled(World world) {
+        return getWorldConfig(world).useRegions;
+    }
+
 }
