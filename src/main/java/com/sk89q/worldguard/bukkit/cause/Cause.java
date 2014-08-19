@@ -103,6 +103,17 @@ public class Cause {
         return null;
     }
 
+    @Nullable
+    public Block getFirstBlock() {
+        for (Object object : causes) {
+            if (object instanceof Block) {
+                return (Block) object;
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public String toString() {
         return Joiner.on(" | ").join(causes);
