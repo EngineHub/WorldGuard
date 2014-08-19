@@ -60,6 +60,8 @@ import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -95,6 +97,7 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.sk89q.worldguard.bukkit.cause.Cause.create;
@@ -200,7 +203,27 @@ public class EventAbstractionListener implements Listener {
         Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR));
     }
 
-    // TODO: Handle pistons
+    @EventHandler
+    public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+        if (event.isSticky()) {
+            Cause cause = create(event.getBlock());
+            Events.fireToCancel(event, new BreakBlockEvent(event, cause, event.getRetractLocation(), Material.AIR));
+            Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getRelative(event.getDirection())));
+        }
+    }
+
+    @EventHandler
+    public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+        // A hack for now
+        List<Block> blocks = new ArrayList<Block>(event.getBlocks());
+        Block lastBlock = event.getBlock().getRelative(event.getDirection(), event.getLength() + 1);
+        blocks.add(lastBlock);
+        int originalLength = blocks.size();
+        Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getBlock()), event.getBlock().getWorld(), blocks, Material.STONE));
+        if (blocks.size() != originalLength) {
+            event.setCancelled(true);
+        }
+    }
 
     //-------------------------------------------------------------------------
     // Block external interaction
