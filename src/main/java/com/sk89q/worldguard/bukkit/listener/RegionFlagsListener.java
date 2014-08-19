@@ -24,11 +24,14 @@ import com.sk89q.worldguard.bukkit.RegionQuery;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
+import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
+import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
@@ -50,28 +53,79 @@ public class RegionFlagsListener extends AbstractListener {
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onBreakBlock(final BreakBlockEvent event) {
-        WorldConfiguration config = getWorldConfig(event.getWorld());
+    public void onPlaceBlock(final PlaceBlockEvent event) {
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
 
-        Entity entity;
-        if ((entity = event.getCause().getFirstEntity()) != null) {
-            if (entity instanceof Creeper) { // Creeper
-                event.filter(testState(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
+        Block block;
+        if ((block = event.getCause().getFirstBlock()) != null) {
+            // ================================================================
+            // PISTONS flag
+            // ================================================================
 
-            } else if (entity instanceof EnderDragon) { // Enderdragon
-                event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
-
-            } else if (Entities.isTNTBased(entity)) { // TNT + explosive TNT carts
-                event.filter(testState(query, DefaultFlag.TNT), config.explosionFlagCancellation);
-
+            if (Materials.isPistonBlock(block.getType())) {
+                event.filter(testState(query, DefaultFlag.PISTONS), false);
             }
         }
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onSpawnEntity(final SpawnEntityEvent event) {
+    public void onBreakBlock(final BreakBlockEvent event) {
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+
+        WorldConfiguration config = getWorldConfig(event.getWorld());
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
+
+        Block block;
+        if ((block = event.getCause().getFirstBlock()) != null) {
+            // ================================================================
+            // PISTONS flag
+            // ================================================================
+
+            if (Materials.isPistonBlock(block.getType())) {
+                event.filter(testState(query, DefaultFlag.PISTONS), false);
+            }
+        }
+
+        Entity entity;
+        if ((entity = event.getCause().getFirstEntity()) != null) {
+            // ================================================================
+            // CREEPER_EXPLOSION flag
+            // ================================================================
+
+            if (entity instanceof Creeper) { // Creeper
+                event.filter(testState(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
+            }
+
+            // ================================================================
+            // ENDERDRAGON_BLOCK_DAMAGE flag
+            // ================================================================
+
+            if (entity instanceof EnderDragon) { // Enderdragon
+                event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
+            }
+
+            // ================================================================
+            // TNT flag
+            // ================================================================
+
+            if (Entities.isTNTBased(entity)) { // TNT + explosive TNT carts
+                event.filter(testState(query, DefaultFlag.TNT), config.explosionFlagCancellation);
+            }
+
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onSpawnEntity(final SpawnEntityEvent event) {
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+
+        RegionQuery query = getPlugin().getRegionContainer().createQuery();
+
+        // ================================================================
+        // EXP_DROPS flag
+        // ================================================================
 
         if (event.getEffectiveType() == EntityType.EXPERIENCE_ORB) {
             event.filter(testState(query, DefaultFlag.EXP_DROPS), false);
