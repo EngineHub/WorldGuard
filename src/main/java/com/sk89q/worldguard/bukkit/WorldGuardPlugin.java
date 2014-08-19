@@ -30,6 +30,7 @@ import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
 import com.sk89q.worldguard.util.task.SimpleSupervisor;
 import com.sk89q.worldguard.util.task.Supervisor;
@@ -227,6 +228,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new BlacklistListener(this)).registerEvents();
         (new ChestProtectionListener(this)).registerEvents();
         (new RegionProtectionListener(this)).registerEvents();
+        (new RegionFlagsListener(this)).registerEvents();
         (new BlockedPotionsListener(this)).registerEvents();
         (new EventAbstractionListener(this)).registerEvents();
         if ("true".equalsIgnoreCase(System.getProperty("worldguard.debug.listener"))) {

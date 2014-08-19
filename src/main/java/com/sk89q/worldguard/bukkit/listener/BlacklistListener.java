@@ -84,7 +84,7 @@ public class BlacklistListener extends AbstractListener {
             return;
         }
 
-        event.filterBlocks(new Predicate<Location>() {
+        event.filter(new Predicate<Location>() {
             @Override
             public boolean apply(Location target) {
                 if (!wcfg.getBlacklist().check(
@@ -116,7 +116,7 @@ public class BlacklistListener extends AbstractListener {
             return;
         }
 
-        event.filterBlocks(new Predicate<Location>() {
+        event.filter(new Predicate<Location>() {
             @Override
             public boolean apply(Location target) {
                 return wcfg.getBlacklist().check(new BlockPlaceBlacklistEvent(
@@ -142,7 +142,7 @@ public class BlacklistListener extends AbstractListener {
             return;
         }
 
-        event.filterBlocks(new Predicate<Location>() {
+        event.filter(new Predicate<Location>() {
             @Override
             public boolean apply(Location target) {
                 return wcfg.getBlacklist().check(new BlockInteractBlacklistEvent(

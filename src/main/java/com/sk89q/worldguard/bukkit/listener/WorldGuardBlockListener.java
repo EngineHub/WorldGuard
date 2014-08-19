@@ -37,7 +37,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
@@ -703,19 +702,6 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        }
-    }
-
-    /*
-     * Called when a block yields exp
-     */
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onBlockExp(BlockExpEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getBlock().getWorld());
-        if (wcfg.disableExpDrops || !plugin.getGlobalRegionManager().allows(DefaultFlag.EXP_DROPS,
-                event.getBlock().getLocation())) {
-            event.setExpToDrop(0);
         }
     }
 
