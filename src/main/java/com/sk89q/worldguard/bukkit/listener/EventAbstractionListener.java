@@ -56,6 +56,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
@@ -408,6 +409,13 @@ public class EventAbstractionListener implements Listener {
     @EventHandler
     public void onVehicleDestroy(VehicleDestroyEvent event) {
         Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getAttacker()), event.getVehicle()));
+    }
+
+    @EventHandler
+    public void onBlockExp(BlockExpEvent event) {
+        if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getBlock()), event.getBlock().getLocation(), EntityType.EXPERIENCE_ORB))) {
+            event.setExpToDrop(0);
+        }
     }
 
     // TODO: XP pickup is an entity destroy event
