@@ -93,7 +93,7 @@ public class Cause {
     }
 
     @Nullable
-    public Entity getEntityRootCause() {
+    public Entity getFirstEntity() {
         for (Object object : causes) {
             if (object instanceof Entity) {
                 return (Entity) object;

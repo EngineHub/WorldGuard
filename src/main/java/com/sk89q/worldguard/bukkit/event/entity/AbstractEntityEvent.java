@@ -19,9 +19,11 @@
 
 package com.sk89q.worldguard.bukkit.event.entity;
 
+import com.google.common.base.Predicate;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.AbstractDelegateEvent;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 
@@ -50,6 +52,15 @@ abstract class AbstractEntityEvent extends AbstractDelegateEvent {
     }
 
     /**
+     * Get the world.
+     *
+     * @return the world
+     */
+    public World getWorld() {
+        return target.getWorld();
+    }
+
+    /**
      * Get the target location being affected.
      *
      * @return a location
@@ -67,6 +78,25 @@ abstract class AbstractEntityEvent extends AbstractDelegateEvent {
     @Nullable
     public Entity getEntity() {
         return entity;
+    }
+
+    /**
+     * Filter the list of affected entities with the given predicate. If the
+     * predicate returns {@code false}, then the entity is not affected.
+     *
+     * @param predicate the predicate
+     * @param cancelEventOnFalse true to cancel the event and clear the entity
+     *                           list once the predicate returns {@code false}
+     * @return true if one or more entities were filtered out
+     */
+    public boolean filter(Predicate<Location> predicate, boolean cancelEventOnFalse) {
+        if (!isCancelled()) {
+            if (!predicate.apply(getTarget())) {
+                setCancelled(true);
+            }
+        }
+
+        return isCancelled();
     }
 
 }

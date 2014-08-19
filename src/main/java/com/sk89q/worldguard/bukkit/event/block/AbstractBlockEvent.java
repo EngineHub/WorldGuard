@@ -103,7 +103,7 @@ abstract class AbstractBlockEvent extends AbstractDelegateEvent implements BulkE
      *                           list once the predicate returns {@code false}
      * @return true if one or more blocks were filtered out
      */
-    public boolean filterBlocks(Predicate<Location> predicate, boolean cancelEventOnFalse) {
+    public boolean filter(Predicate<Location> predicate, boolean cancelEventOnFalse) {
         boolean hasRemoval = false;
 
         Iterator<Block> it = blocks.iterator();
@@ -130,14 +130,14 @@ abstract class AbstractBlockEvent extends AbstractDelegateEvent implements BulkE
      *
      * <p>This method will <strong>not</strong> fail fast and
      * cancel the event the first instance that the predicate returns
-     * {@code false}. See {@link #filterBlocks(Predicate, boolean)} to adjust
+     * {@code false}. See {@link #filter(Predicate, boolean)} to adjust
      * this behavior.</p>
      *
      * @param predicate the predicate
      * @return true if one or more blocks were filtered out
      */
-    public boolean filterBlocks(Predicate<Location> predicate) {
-        return filterBlocks(predicate, false);
+    public boolean filter(Predicate<Location> predicate) {
+        return filter(predicate, false);
     }
 
     /**

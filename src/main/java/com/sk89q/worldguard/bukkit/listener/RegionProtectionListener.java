@@ -20,9 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.google.common.base.Predicate;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.RegionQuery;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
@@ -35,24 +33,17 @@ import com.sk89q.worldguard.bukkit.util.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.domains.Association;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
-import com.sk89q.worldguard.protection.association.RegionOverlapAssociation;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-
-import javax.annotation.Nullable;
 
 /**
  * Handle events that need to be processed by region protection.
@@ -92,22 +83,6 @@ public class RegionProtectionListener extends AbstractListener {
         return false;
     }
 
-    /**
-     * Create a new predicate to test a state flag for each location.
-     *
-     * @param query the query
-     * @param flag the flag
-     * @return a predicate
-     */
-    private Predicate<Location> createStateTest(final RegionQuery query, final StateFlag flag) {
-        return new Predicate<Location>() {
-            @Override
-            public boolean apply(@Nullable Location location) {
-                return query.testState(location, null, flag);
-            }
-        };
-    }
-
     private RegionAssociable createRegionAssociable(Cause cause) {
         Object rootCause = cause.getRootCause();
 
@@ -134,7 +109,7 @@ public class RegionProtectionListener extends AbstractListener {
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
         final RegionAssociable associable = createRegionAssociable(event.getCause());
 
-        event.filterBlocks(new Predicate<Location>() {
+        event.filter(new Predicate<Location>() {
             @Override
             public boolean apply(Location target) {
                 boolean canPlace;
@@ -163,32 +138,12 @@ public class RegionProtectionListener extends AbstractListener {
             return; // Whitelisted cause
         }
 
-        ConfigurationManager globalConfig = getPlugin().getGlobalStateManager();
-        WorldConfiguration config = globalConfig.get(event.getWorld());
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
-
-        // TODO: Move this to another event handler
-        Entity entity;
-        if ((entity = event.getCause().getEntityRootCause()) != null) {
-            // Creeper
-            if (entity instanceof Creeper) {
-                event.filterBlocks(createStateTest(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
-
-            // Enderdragon
-            } else if (entity instanceof EnderDragon) {
-                event.filterBlocks(createStateTest(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
-
-            // TNT + explosive TNT carts
-            } else if (Entities.isTNTBased(entity)) {
-                event.filterBlocks(createStateTest(query, DefaultFlag.TNT), config.explosionFlagCancellation);
-
-            }
-        }
 
         if (!event.isCancelled()) {
             final RegionAssociable associable = createRegionAssociable(event.getCause());
 
-            event.filterBlocks(new Predicate<Location>() {
+            event.filter(new Predicate<Location>() {
                 @Override
                 public boolean apply(Location target) {
                     boolean canBreak = query.testBuild(target, associable);
@@ -214,7 +169,7 @@ public class RegionProtectionListener extends AbstractListener {
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
         final RegionAssociable associable = createRegionAssociable(event.getCause());
 
-        event.filterBlocks(new Predicate<Location>() {
+        event.filter(new Predicate<Location>() {
             @Override
             public boolean apply(Location target) {
                 boolean canUse;
@@ -223,15 +178,15 @@ public class RegionProtectionListener extends AbstractListener {
                 if (Materials.isInventoryBlock(type)) {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
 
-                // Beds (SLEEP)
+                    // Beds (SLEEP)
                 } else if (type == Material.BED) {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.SLEEP);
 
-                // TNT (TNT)
+                    // TNT (TNT)
                 } else if (type == Material.TNT) {
                     canUse = query.testBuild(target, associable, DefaultFlag.TNT);
 
-                // Everything else
+                    // Everything else
                 } else {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE);
                 }

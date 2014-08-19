@@ -58,7 +58,7 @@ public class ChestProtectionListener extends AbstractListener {
                 return;
             }
 
-            event.filterBlocks(new Predicate<Location>() {
+            event.filter(new Predicate<Location>() {
                 @Override
                 public boolean apply(Location target) {
                     if (wcfg.getChestProtection().isChest(event.getEffectiveMaterial().getId()) && wcfg.isChestProtected(target.getBlock(), player)) {
@@ -84,7 +84,7 @@ public class ChestProtectionListener extends AbstractListener {
         }
 
         if (player != null) {
-            event.filterBlocks(new Predicate<Location>() {
+            event.filter(new Predicate<Location>() {
                 @Override
                 public boolean apply(Location target) {
                     if (wcfg.isChestProtected(target.getBlock(), player)) {
@@ -96,7 +96,7 @@ public class ChestProtectionListener extends AbstractListener {
                 }
             }, true);
         } else {
-            event.filterBlocks(new Predicate<Location>() {
+            event.filter(new Predicate<Location>() {
                 @Override
                 public boolean apply(Location target) {
                     return !wcfg.isChestProtected(target.getBlock());
@@ -118,7 +118,7 @@ public class ChestProtectionListener extends AbstractListener {
         }
 
         if (player != null) {
-            event.filterBlocks(new Predicate<Location>() {
+            event.filter(new Predicate<Location>() {
                 @Override
                 public boolean apply(Location target) {
                     if (wcfg.isChestProtected(target.getBlock(), player)) {
@@ -130,7 +130,7 @@ public class ChestProtectionListener extends AbstractListener {
                 }
             }, true);
         } else {
-            event.filterBlocks(new Predicate<Location>() {
+            event.filter(new Predicate<Location>() {
                 @Override
                 public boolean apply(Location target) {
                     return !wcfg.isChestProtected(target.getBlock());
