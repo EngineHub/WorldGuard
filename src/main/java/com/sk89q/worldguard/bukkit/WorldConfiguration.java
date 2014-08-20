@@ -31,6 +31,7 @@ import com.sk89q.worldguard.chest.SignChestProtection;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
@@ -81,7 +82,7 @@ public class WorldConfiguration {
     public boolean simulateSponge;
     public int spongeRadius;
     public boolean disableExpDrops;
-    public Set<PotionEffectType> blockPotions;
+    public Set<PotionEffect> blockPotions;
     public boolean blockPotionsAlways;
     public boolean pumpkinScuba;
     public boolean redstoneSponges;
@@ -312,14 +313,22 @@ public class WorldConfiguration {
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
         disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
 
-        blockPotions = new HashSet<PotionEffectType>();
-        for (String potionName : getStringList("gameplay.block-potions", null)) {
-            PotionEffectType effect = PotionEffectType.getByName(potionName);
-
+        blockPotions = new HashSet<PotionEffect>();
+        for (String option : getStringList("gameplay.block-potions", null)) {
+            PotionEffectType effect;
+            String[] potion;
+            if(option.contains(":")){
+                potion = option.split(":");
+            }else{
+                potion = new String[]{ option };
+            }
+            effect = PotionEffectType.getByName(potion[0]);
             if (effect == null) {
-                plugin.getLogger().warning("Unknown potion effect type '" + potionName + "'");
-            } else {
-                blockPotions.add(effect);
+                plugin.getLogger().warning("Unknown potion effect type '" + potion[0] + "'");
+            } else if(option.length()==1){
+                blockPotions.add(new PotionEffect(effect,0,0));
+            }else{
+                blockPotions.add(new PotionEffect(effect,0,Integer.parseInt(potion[1])));
             }
         }
         blockPotionsAlways = getBoolean("gameplay.block-potions-overly-reliably", false);
