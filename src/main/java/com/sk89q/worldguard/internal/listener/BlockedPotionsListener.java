@@ -75,7 +75,7 @@ public class BlockedPotionsListener extends AbstractListener {
 
             Potion potion = Potion.fromItemStack(item);
 
-            // Find the firstcd  blocked effect
+            // Find the first blocked effect
             findEffect:
             for (PotionEffect effect : potion.getEffects()) {
                 for (PotionEffect compareEffect : wcfg.blockPotions) {
