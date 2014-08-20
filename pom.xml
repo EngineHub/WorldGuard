@@ -66,10 +66,6 @@
       <url>http://maven.sk89q.com/repo/</url>
     </repository>
     <repository>
-      <id>zml-repo</id>
-      <url>http://files.zachsthings.com/repo</url>
-    </repository>
-    <repository>
       <id>bukkit-repo</id>
       <url>http://repo.bukkit.org/content/groups/public</url>
     </repository>
