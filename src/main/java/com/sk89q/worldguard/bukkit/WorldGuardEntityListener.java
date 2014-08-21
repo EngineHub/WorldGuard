@@ -940,7 +940,15 @@ public class WorldGuardEntityListener implements Listener {
 
         GlobalRegionManager regionMan = plugin.getGlobalRegionManager();
 
+        if (event.getAffectedEntities().isEmpty()) {
+            if (!regionMan.allows(DefaultFlag.POTION_SPLASH, potion.getLocation())) {
+                event.setCancelled(true);
+            }
+            return;
+        }
+        
         int blockedEntities = 0;
+        int size = event.getAffectedEntities().size();
         for (LivingEntity e : event.getAffectedEntities()) {
             if (!regionMan.allows(DefaultFlag.POTION_SPLASH, e.getLocation(),
                     e instanceof Player ? plugin.wrapPlayer((Player) e) : null)) {
@@ -949,7 +957,7 @@ public class WorldGuardEntityListener implements Listener {
             }
         }
 
-        if (blockedEntities == event.getAffectedEntities().size()) {
+        if (blockedEntities == size) {
             event.setCancelled(true);
         }
     }
