@@ -263,6 +263,11 @@ public class RegionProtectionListener extends AbstractListener {
             canSpawn = query.testBuild(target, associable, DefaultFlag.PLACE_VEHICLE);
             what = "place vehicles";
 
+        /* Item pickup */
+        } else if (event.getEntity() instanceof Item) {
+            canSpawn = query.testBuild(target, associable, DefaultFlag.ITEM_DROP);
+            what = "drop items";
+
         /* Everything else */
         } else {
             canSpawn = query.testBuild(target, associable);
@@ -298,15 +303,15 @@ public class RegionProtectionListener extends AbstractListener {
             canDestroy = query.testBuild(target, associable, DefaultFlag.DESTROY_VEHICLE);
             what = "break vehicles";
 
+        /* Item pickup */
+        } else if (event.getEntity() instanceof Item) {
+            canDestroy = query.testBuild(target, associable, DefaultFlag.ITEM_PICKUP);
+            what = "pick up items";
+
         /* Everything else */
         } else {
             canDestroy = query.testBuild(target, associable);
-
-            if (event.getEntity() instanceof Item) {
-                what = "pick up items";
-            } else {
-                what = "break things";
-            }
+            what = "break things";
         }
 
         if (!canDestroy) {

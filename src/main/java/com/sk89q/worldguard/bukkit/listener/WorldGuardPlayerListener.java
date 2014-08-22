@@ -569,21 +569,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPlayerDropItem(PlayerDropItemEvent event) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
-        Player player = event.getPlayer();
-
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())
-                    && !plugin.getGlobalRegionManager().allows(DefaultFlag.ITEM_DROP, player.getLocation())) {
-                event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "You don't have permission to do that in this area.");
-            }
-        }
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();

@@ -24,18 +24,26 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 
 /**
- *
- * @author sk89q
+ * The flags that are used in WorldGuard.
  */
 public final class DefaultFlag {
 
+    // Overrides membership check
     public static final StateFlag PASSTHROUGH = new StateFlag("passthrough", false);
+
+    /**
+     * @deprecated This flag is being removed because group flags can now be
+     *             set on all flags.
+     */
+    @Deprecated
     public static final RegionGroupFlag CONSTRUCT = new RegionGroupFlag("construct", RegionGroup.MEMBERS);
 
-    // This flag is unlike the others. It forces the checking of region
-    // membership.
+    // This flag is unlike the others. It forces the checking of region membership
     public static final StateFlag BUILD = new StateFlag("build", true);
 
+    // These flags are used in tandem with the BUILD flag - if the player can
+    // build, then the following flags do not need to be checked (although they
+    // are still checked for DENY), so they are false by default
     public static final StateFlag USE = new StateFlag("use", false);
     public static final StateFlag PVP = new StateFlag("pvp", false);
     public static final StateFlag SLEEP = new StateFlag("sleep", false);
@@ -45,6 +53,16 @@ public final class DefaultFlag {
     public static final StateFlag DESTROY_VEHICLE = new StateFlag("vehicle-destroy", false);
     public static final StateFlag LIGHTER = new StateFlag("lighter", false);
 
+    // These flags are similar to the ones above (used in tandem with BUILD),
+    // but their defaults are set to TRUE because it is more user friendly.
+    // However, it is not possible to disable these flags by default in all
+    // regions because setting DENY in __global__ would also override the
+    // BUILD flag. In the future, StateFlags will need a DISALLOW state.
+    public static final StateFlag ITEM_PICKUP = new StateFlag("item-pickup", true); // Intentionally true
+    public static final StateFlag ITEM_DROP = new StateFlag("item-drop", true); // Intentionally true
+
+    // These flags adjust behavior and are not checked in tandem with the
+    // BUILD flag so they need to be TRUE for their defaults.
     public static final StateFlag MOB_DAMAGE = new StateFlag("mob-damage", true);
     public static final StateFlag MOB_SPAWNING = new StateFlag("mob-spawning", true);
     public static final StateFlag CREEPER_EXPLOSION = new StateFlag("creeper-explosion", true);
@@ -74,12 +92,12 @@ public final class DefaultFlag {
     public static final StateFlag RECEIVE_CHAT = new StateFlag("receive-chat", true);
     public static final StateFlag ENTRY = new StateFlag("entry", true);
     public static final StateFlag EXIT = new StateFlag("exit", true);
-    public static final StateFlag ITEM_DROP = new StateFlag("item-drop", true);
     public static final StateFlag ENDERPEARL = new StateFlag("enderpearl", true);
     public static final StateFlag ENTITY_PAINTING_DESTROY = new StateFlag("entity-painting-destroy", true);
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = new StateFlag("entity-item-frame-destroy", true);
     public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
 
+    // Flags that adjust behaviors that aren't state flags
     public static final StringFlag DENY_MESSAGE = new StringFlag("deny-message",
             "" + ChatColor.RED + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't %what% here.");
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
@@ -113,7 +131,7 @@ public final class DefaultFlag {
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
             DENY_MESSAGE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
             EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,
-            ENTITY_ITEM_FRAME_DESTROY, ITEM_DROP, /*MAX_PLAYERS, MAX_PLAYERS_MESSAGE,*/
+            ENTITY_ITEM_FRAME_DESTROY, ITEM_PICKUP, ITEM_DROP, /*MAX_PLAYERS, MAX_PLAYERS_MESSAGE,*/
             HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
             FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
             SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, SOIL_DRY, GAME_MODE,
