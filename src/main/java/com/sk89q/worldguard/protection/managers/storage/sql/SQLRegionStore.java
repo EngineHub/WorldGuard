@@ -60,6 +60,7 @@ public class SQLRegionStore implements RegionStore {
 
     private static final Logger log = Logger.getLogger(SQLRegionStore.class.getCanonicalName());
 
+    private final String name;
     private final BoneCP connectionPool;
     private final DataSourceConfig config;
     private final int worldId;
@@ -67,6 +68,7 @@ public class SQLRegionStore implements RegionStore {
     /**
      * Create a new instance.
      *
+     * @param name the name of this store
      * @param config a configuration object that configures a {@link Connection}
      * @param connectionPool a connection pool
      * @param worldName the name of the world to store regions by
@@ -77,6 +79,7 @@ public class SQLRegionStore implements RegionStore {
         checkNotNull(connectionPool);
         checkNotNull(worldName);
 
+        this.name = worldName;
         this.config = config;
         this.connectionPool = connectionPool;
 
@@ -93,6 +96,11 @@ public class SQLRegionStore implements RegionStore {
         } catch (SQLException e) {
             throw new IOException("Failed to choose the ID for this world", e);
         }
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     /**

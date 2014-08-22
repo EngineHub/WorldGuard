@@ -44,6 +44,6 @@ public interface RegionStoreDriver {
      * @return a list of names
      * @throws IOException thrown if the fetch operation fails
      */
-    List<String> fetchAllExisting() throws IOException;
+    List<RegionStore> getAll() throws IOException;
 
 }

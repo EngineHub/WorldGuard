@@ -80,17 +80,17 @@ public class SQLDriver implements RegionStoreDriver {
     }
 
     @Override
-    public List<String> fetchAllExisting() throws IOException {
+    public List<RegionStore> getAll() throws IOException {
         Closer closer = Closer.create();
         try {
-            List<String> names = new ArrayList<String>();
+            List<RegionStore> stores = new ArrayList<RegionStore>();
             Connection connection = closer.register(getConnectionPool().getConnection());
             Statement stmt = connection.createStatement();
             ResultSet rs = closer.register(stmt.executeQuery("SELECT name FROM world"));
             while (rs.next()) {
-                names.add(rs.getString(1));
+                stores.add(get(rs.getString(1)));
             }
-            return names;
+            return stores;
         } catch (SQLException e) {
             throw new IOException("Failed to fetch list of worlds", e);
         } finally {

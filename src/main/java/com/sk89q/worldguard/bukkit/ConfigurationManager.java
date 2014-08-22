@@ -19,11 +19,17 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.google.common.collect.ImmutableMap;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.GodComponent;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.protection.managers.storage.driver.DirectoryYamlDriver;
+import com.sk89q.worldguard.protection.managers.storage.driver.DriverType;
+import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
+import com.sk89q.worldguard.protection.managers.storage.driver.SQLDriver;
+import com.sk89q.worldguard.util.sql.DataSourceConfig;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -90,11 +96,8 @@ public class ConfigurationManager {
     /**
      * Region Storage Configuration method, and config values
      */
-    public boolean useSqlDatabase = false;
-    public String sqlDsn;
-    public String sqlUsername;
-    public String sqlPassword;
-    public String sqlTablePrefix;
+    public RegionStoreDriver selectedRegionStoreDriver;
+    public Map<DriverType, RegionStoreDriver> regionStoreDriverMap;
 
     /**
      * Construct the object.
@@ -167,12 +170,25 @@ public class ConfigurationManager {
             }
         }
 
-        useSqlDatabase = config.getBoolean("regions.sql.use", false);
+        // ====================================================================
+        // Region store drivers
+        // ====================================================================
 
-        sqlDsn = config.getString("regions.sql.dsn", "jdbc:mysql://localhost/worldguard");
-        sqlUsername = config.getString("regions.sql.username", "worldguard");
-        sqlPassword = config.getString("regions.sql.password", "worldguard");
-        sqlTablePrefix = config.getString("regions.sql.table-prefix", "");
+        boolean useSqlDatabase = config.getBoolean("regions.sql.use", false);
+        String sqlDsn = config.getString("regions.sql.dsn", "jdbc:mysql://localhost/worldguard");
+        String sqlUsername = config.getString("regions.sql.username", "worldguard");
+        String sqlPassword = config.getString("regions.sql.password", "worldguard");
+        String sqlTablePrefix = config.getString("regions.sql.table-prefix", "");
+
+        DataSourceConfig dataSourceConfig = new DataSourceConfig(sqlDsn, sqlUsername, sqlPassword, sqlTablePrefix);
+        SQLDriver sqlDriver = new SQLDriver(dataSourceConfig);
+        DirectoryYamlDriver yamlDriver = new DirectoryYamlDriver(getWorldsDataFolder(), "regions.yml");
+
+        this.regionStoreDriverMap = ImmutableMap.<DriverType, RegionStoreDriver>builder()
+                .put(DriverType.MYSQL, sqlDriver)
+                .put(DriverType.YAML, yamlDriver)
+                .build();
+        this.selectedRegionStoreDriver = useSqlDatabase ? sqlDriver : yamlDriver;
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {

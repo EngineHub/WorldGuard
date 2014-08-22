@@ -81,7 +81,11 @@ public final class RegionManager {
      * @throws IOException thrown when loading fails
      */
     public void load() throws IOException {
-        setRegions(store.loadAll());
+        Set<ProtectedRegion> regions = store.loadAll();
+        for (ProtectedRegion region : regions) {
+            region.setDirty(false);
+        }
+        setRegions(regions);
     }
 
     /**
@@ -100,9 +104,10 @@ public final class RegionManager {
      *
      * <p>This method does nothing if there are no changes.</p>
      *
+     * @return true if there were changes to be saved
      * @throws IOException thrown on save error
      */
-    public void saveChanges() throws IOException {
+    public boolean saveChanges() throws IOException {
         RegionDifference diff = index.getAndClearDifference();
 
         if (diff.containsChanges()) {
@@ -111,6 +116,9 @@ public final class RegionManager {
             } catch (DifferenceSaveException e) {
                 save(); // Partial save is not supported
             }
+            return true;
+        } else {
+            return false;
         }
     }
 

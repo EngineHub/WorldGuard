@@ -17,15 +17,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit;
+package com.sk89q.worldguard.protection.managers;
 
 import com.google.common.base.Supplier;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.index.ChunkHashTable;
 import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
 import com.sk89q.worldguard.protection.managers.index.PriorityRTreeIndex;
 import com.sk89q.worldguard.protection.managers.storage.RegionStore;
-import com.sk89q.worldguard.protection.managers.storage.driver.DriverType;
 import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
 import com.sk89q.worldguard.util.Normal;
 
@@ -33,7 +31,6 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -48,43 +45,35 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Manages different {@link RegionManager}s for different worlds or dimensions.
  */
-class ManagerContainer {
+public class ManagerContainer {
 
     private static final Logger log = Logger.getLogger(ManagerContainer.class.getCanonicalName());
     private static final int SAVE_INTERVAL = 1000 * 30;
 
-    private final ConfigurationManager config;
     private final ConcurrentMap<Normal, RegionManager> mapping = new ConcurrentHashMap<Normal, RegionManager>();
     private final Object lock = new Object();
-    private final EnumMap<DriverType, RegionStoreDriver> drivers = new EnumMap<DriverType, RegionStoreDriver>(DriverType.class);
-    private RegionStoreDriver defaultDriver;
+    private final RegionStoreDriver driver;
     private final Supplier<? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
     private final Timer timer = new Timer();
 
     /**
      * Create a new instance.
      *
-     * @param config the configuration
+     * @param driver the region store driver
      */
-    ManagerContainer(ConfigurationManager config) {
-        checkNotNull(config);
-        this.config = config;
+    public ManagerContainer(RegionStoreDriver driver) {
+        checkNotNull(driver);
+        this.driver = driver;
         timer.schedule(new BackgroundSaver(), SAVE_INTERVAL, SAVE_INTERVAL);
     }
 
     /**
-     * Create drivers from the configuration.
+     * Get the region store driver.
+     *
+     * @return the driver
      */
-    public void initialize() {
-        for (DriverType type : DriverType.values()) {
-            drivers.put(type, type.create(config));
-        }
-
-        if (config.useSqlDatabase) {
-            defaultDriver = drivers.get(DriverType.SQL);
-        } else {
-            defaultDriver = drivers.get(DriverType.YAML);
-        }
+    public RegionStoreDriver getDriver() {
+        return driver;
     }
 
     /**
@@ -125,7 +114,7 @@ class ManagerContainer {
      * @throws IOException thrown if loading fals
      */
     private RegionManager createAndLoad(String name) throws IOException {
-        RegionStore store = defaultDriver.get(name);
+        RegionStore store = driver.get(name);
         RegionManager manager = new RegionManager(store, indexFactory);
         manager.load(); // Try loading, although it may fail
         return manager;
@@ -168,7 +157,7 @@ class ManagerContainer {
                 String name = entry.getKey().toString();
                 RegionManager manager = entry.getValue();
                 try {
-                    manager.save();
+                    manager.saveChanges();
                 } catch (IOException e) {
                     log.log(Level.WARNING, "Failed to save the region data for '" + name + "' while unloading the data for all worlds", e);
                 }
@@ -212,7 +201,9 @@ class ManagerContainer {
                     String name = entry.getKey().toString();
                     RegionManager manager = entry.getValue();
                     try {
-                        manager.saveChanges();
+                        if (manager.saveChanges()) {
+                            log.info("Region data changes made in '" + name + "' have been background saved");
+                        }
                     } catch (IOException e) {
                         log.log(Level.WARNING, "Failed to save the region data for '" + name + "' during a periodical save", e);
                     } catch (Exception e) {

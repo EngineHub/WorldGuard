@@ -35,6 +35,11 @@ public class MemoryRegionStore implements RegionStore {
     private Set<ProtectedRegion> regions = Collections.emptySet();
 
     @Override
+    public String getName() {
+        return "MEMORY";
+    }
+
+    @Override
     public Set<ProtectedRegion> loadAll() throws IOException {
         return regions;
     }

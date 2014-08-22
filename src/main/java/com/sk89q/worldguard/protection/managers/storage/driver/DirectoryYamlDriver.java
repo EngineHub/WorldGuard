@@ -81,23 +81,23 @@ public class DirectoryYamlDriver implements RegionStoreDriver {
             }
         }
 
-        return new YamlFileStore(file);
+        return new YamlFileStore(id, file);
     }
 
     @Override
-    public List<String> fetchAllExisting() {
-        List<String> names = new ArrayList<String>();
+    public List<RegionStore> getAll() throws IOException {
+        List<RegionStore> stores = new ArrayList<RegionStore>();
 
         File files[] = rootDir.listFiles();
         if (files != null) {
             for (File dir : files) {
                 if (dir.isDirectory() && new File(dir, "regions.yml").isFile()) {
-                    names.add(dir.getName());
+                    stores.add(new YamlFileStore(dir.getName(), getPath(dir.getName())));
                 }
             }
         }
 
-        return names;
+        return stores;
     }
 
 }

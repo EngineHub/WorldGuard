@@ -20,7 +20,12 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldguard.protection.managers.ManagerContainer;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.migration.Migration;
+import com.sk89q.worldguard.protection.managers.migration.MigrationException;
+import com.sk89q.worldguard.protection.managers.migration.UUIDMigration;
+import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -35,6 +40,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -51,6 +58,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RegionContainer {
 
+    private static final Logger log = Logger.getLogger(RegionContainer.class.getCanonicalName());
+
     /**
      * Invalidation frequency in ticks.
      */
@@ -58,8 +67,8 @@ public class RegionContainer {
 
     private final Object lock = new Object();
     private final WorldGuardPlugin plugin;
-    private final ManagerContainer container;
     private final QueryCache cache = new QueryCache();
+    private ManagerContainer container;
 
     /**
      * Create a new instance.
@@ -68,16 +77,17 @@ public class RegionContainer {
      */
     RegionContainer(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-
-        ConfigurationManager config = plugin.getGlobalStateManager();
-        container = new ManagerContainer(config);
     }
 
     /**
      * Initialize the region container.
      */
     void initialize() {
-        container.initialize();
+        ConfigurationManager config = plugin.getGlobalStateManager();
+        container = new ManagerContainer(config.selectedRegionStoreDriver);
+
+        // Migrate to UUIDs
+        autoMigrate();
 
         loadWorlds();
 
@@ -126,6 +136,15 @@ public class RegionContainer {
         synchronized (lock) {
             container.unloadAll();
         }
+    }
+
+    /**
+     * Get the region store driver.
+     *
+     * @return the driver
+     */
+    public RegionStoreDriver getDriver() {
+        return container.getDriver();
     }
 
     /**
@@ -227,6 +246,51 @@ public class RegionContainer {
      */
     public RegionQuery createQuery() {
         return new RegionQuery(plugin, cache);
+    }
+
+    /**
+     * Execute a migration and block any loading of region data during
+     * the migration.
+     *
+     * @param migration the migration
+     * @throws MigrationException thrown by the migration on error
+     */
+    public void migrate(Migration migration) throws MigrationException {
+        checkNotNull(migration);
+
+        synchronized (lock) {
+            try {
+                log.info("Unloading and saving region data that is currently loaded...");
+                unload();
+                migration.migrate();
+            } finally {
+                log.info("Loading region data for loaded worlds...");
+                loadWorlds();
+            }
+        }
+    }
+
+    /**
+     * Execute auto-migration.
+     */
+    private void autoMigrate() {
+        ConfigurationManager config = plugin.getGlobalStateManager();
+
+        if (config.migrateRegionsToUuid) {
+            RegionStoreDriver driver = getDriver();
+            UUIDMigration migrator = new UUIDMigration(driver, plugin.getProfileService());
+            migrator.setKeepUnresolvedNames(config.keepUnresolvedNames);
+            try {
+                migrate(migrator);
+
+                log.info("Regions saved after UUID migration! This won't happen again unless " +
+                        "you change the relevant configuration option in WorldGuard's config.");
+
+                config.disableUuidMigration();
+            } catch (MigrationException e) {
+                log.log(Level.WARNING, "Failed to execute the migration", e);
+            }
+        }
     }
 
 }
