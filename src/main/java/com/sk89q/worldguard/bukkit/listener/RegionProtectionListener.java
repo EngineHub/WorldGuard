@@ -34,6 +34,7 @@ import com.sk89q.worldguard.bukkit.util.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.bukkit.util.WGMetadata;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
@@ -52,6 +53,9 @@ import org.bukkit.event.EventHandler;
  * Handle events that need to be processed by region protection.
  */
 public class RegionProtectionListener extends AbstractListener {
+
+    private static final String LAST_MESSAGE_KEY = "worldguard.region.lastMessage";
+    private static final int LAST_MESSAGE_DELAY = 500;
 
     /**
      * Construct the listener.
@@ -73,11 +77,17 @@ public class RegionProtectionListener extends AbstractListener {
         Object rootCause = cause.getRootCause();
 
         if (rootCause instanceof Player) {
-            RegionQuery query = getPlugin().getRegionContainer().createQuery();
             Player player = (Player) rootCause;
-            String message = query.queryValue(location, player, DefaultFlag.DENY_MESSAGE);
-            if (message != null) {
-                player.sendMessage(message.replace("%what%", what));
+
+            long now = System.currentTimeMillis();
+            Long lastTime = WGMetadata.getIfPresent(player, LAST_MESSAGE_KEY, Long.class);
+            if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
+                RegionQuery query = getPlugin().getRegionContainer().createQuery();
+                String message = query.queryValue(location, player, DefaultFlag.DENY_MESSAGE);
+                if (message != null) {
+                    player.sendMessage(message.replace("%what%", what));
+                }
+                WGMetadata.put(player, LAST_MESSAGE_KEY, now);
             }
         }
     }
