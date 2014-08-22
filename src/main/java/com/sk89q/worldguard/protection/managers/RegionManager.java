@@ -105,6 +105,7 @@ public final class RegionManager {
      * @throws StorageException thrown on save error
      */
     public void save() throws StorageException {
+        index.setDirty(false);
         store.saveAll(new HashSet<ProtectedRegion>(getValuesCopy()));
     }
 
