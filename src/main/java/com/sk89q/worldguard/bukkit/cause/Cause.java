@@ -23,6 +23,7 @@ import com.google.common.base.Joiner;
 import com.sk89q.worldguard.bukkit.util.WGMetadata;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
@@ -108,6 +109,27 @@ public class Cause {
         for (Object object : causes) {
             if (object instanceof Block) {
                 return (Block) object;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find the first type matching one in the given array.
+     *
+     * @param types an array of types
+     * @return a found type or null
+     */
+    @Nullable
+    public EntityType find(EntityType... types) {
+        for (Object object : causes) {
+            if (object instanceof Entity) {
+                for (EntityType type : types) {
+                    if (((Entity) object).getType() == type) {
+                        return type;
+                    }
+                }
             }
         }
 

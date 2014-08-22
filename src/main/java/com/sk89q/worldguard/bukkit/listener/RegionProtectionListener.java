@@ -146,7 +146,16 @@ public class RegionProtectionListener extends AbstractListener {
             event.filter(new Predicate<Location>() {
                 @Override
                 public boolean apply(Location target) {
-                    boolean canBreak = query.testBuild(target, associable);
+                    boolean canBreak;
+
+                    /* TNT */
+                    if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.PRIMED_TNT) != null) {
+                        canBreak = query.testBuild(target, associable, DefaultFlag.TNT);
+
+                    /* Everything else */
+                    } else {
+                        canBreak = query.testBuild(target, associable);
+                    }
 
                     if (!canBreak) {
                         tellErrorMessage(event.getCause(), target);
