@@ -22,13 +22,18 @@ package com.sk89q.worldguard.protection.managers.storage;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import java.io.IOException;
 import java.util.Set;
 
 /**
- * An object that persists region data to a persistent store.
+ * A region database stores a set of regions for a single world.
+ *
+ * <p>If there are multiple worlds, then there should be one region database
+ * per world. To manage multiple region databases, consider using an
+ * implementation of a {@link RegionDriver}.</p>
+ *
+ * @see RegionDriver
  */
-public interface RegionStore {
+public interface RegionDatabase {
 
     /**
      * Get a displayable name for this store.
@@ -48,18 +53,18 @@ public interface RegionStore {
      * {@code get()} and {@code put()} calls in order to maximize performance.
      * </p>
      *
-     * @return a setf loaded regions
-     * @throws IOException thrown on read error
+     * @return a set of loaded regions
+     * @throws StorageException thrown on read error
      */
-    Set<ProtectedRegion> loadAll() throws IOException;
+    Set<ProtectedRegion> loadAll() throws StorageException;
 
     /**
      * Replace all the data in the store with the given collection of regions.
      *
      * @param regions a set of regions
-     * @throws IOException thrown on write error
+     * @throws StorageException thrown on write error
      */
-    void saveAll(Set<ProtectedRegion> regions) throws IOException;
+    void saveAll(Set<ProtectedRegion> regions) throws StorageException;
 
     /**
      * Perform a partial save that only commits changes, rather than the
@@ -67,8 +72,8 @@ public interface RegionStore {
      *
      * @param difference the difference
      * @throws DifferenceSaveException thrown if partial saves are not supported
-     * @throws IOException thrown on write error
+     * @throws StorageException thrown on write error
      */
-    void saveChanges(RegionDifference difference) throws DifferenceSaveException, IOException;
+    void saveChanges(RegionDifference difference) throws DifferenceSaveException, StorageException;
 
 }

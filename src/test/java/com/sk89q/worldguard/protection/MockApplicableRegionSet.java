@@ -78,11 +78,11 @@ public class MockApplicableRegionSet {
     }
 
     public ApplicableRegionSet getApplicableSetInWilderness() {
-        return new ApplicableRegionSet(Collections.<ProtectedRegion>emptyList(), global);
+        return new RegionResultSet(Collections.<ProtectedRegion>emptyList(), global);
     }
 
     public ApplicableRegionSet getApplicableSet() {
-        return new ApplicableRegionSet(regions, global);
+        return new RegionResultSet(regions, global);
     }
 
     public FlagValueCalculator getFlagCalculator() {

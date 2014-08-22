@@ -54,7 +54,7 @@ class RegionUpdater {
     private final Set<UUID> userUuids = new HashSet<UUID>();
     private final Set<String> groupNames = new HashSet<String>();
 
-    private final Yaml yaml = SQLRegionStore.createYaml();
+    private final Yaml yaml = SQLRegionDatabase.createYaml();
 
     private final List<ProtectedRegion> typesToUpdate = new ArrayList<ProtectedRegion>();
     private final List<ProtectedRegion> parentsToSet = new ArrayList<ProtectedRegion>();
@@ -308,7 +308,7 @@ class RegionUpdater {
 
             for (List<ProtectedRegion> partition : Lists.partition(typesToUpdate, StatementBatch.MAX_BATCH_SIZE)) {
                 for (ProtectedRegion region : partition) {
-                    stmt.setString(1, SQLRegionStore.getRegionTypeName(region));
+                    stmt.setString(1, SQLRegionDatabase.getRegionTypeName(region));
                     stmt.setInt(2, region.getPriority());
                     stmt.setString(3, region.getId());
                     stmt.addBatch();

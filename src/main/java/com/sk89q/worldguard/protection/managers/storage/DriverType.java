@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.managers.storage.driver;
+package com.sk89q.worldguard.protection.managers.storage;
 
 /**
  * An enumeration of supported drivers.

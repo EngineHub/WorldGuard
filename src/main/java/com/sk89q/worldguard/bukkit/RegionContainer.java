@@ -20,12 +20,12 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.Vector2D;
-import com.sk89q.worldguard.protection.managers.ManagerContainer;
+import com.sk89q.worldguard.protection.managers.RegionContainerImpl;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.migration.Migration;
 import com.sk89q.worldguard.protection.managers.migration.MigrationException;
 import com.sk89q.worldguard.protection.managers.migration.UUIDMigration;
-import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
+import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -69,7 +69,7 @@ public class RegionContainer {
     private final Object lock = new Object();
     private final WorldGuardPlugin plugin;
     private final QueryCache cache = new QueryCache();
-    private ManagerContainer container;
+    private RegionContainerImpl container;
 
     /**
      * Create a new instance.
@@ -85,7 +85,7 @@ public class RegionContainer {
      */
     void initialize() {
         ConfigurationManager config = plugin.getGlobalStateManager();
-        container = new ManagerContainer(config.selectedRegionStoreDriver);
+        container = new RegionContainerImpl(config.selectedRegionStoreDriver);
 
         // Migrate to UUIDs
         autoMigrate();
@@ -144,7 +144,7 @@ public class RegionContainer {
      *
      * @return the driver
      */
-    public RegionStoreDriver getDriver() {
+    public RegionDriver getDriver() {
         return container.getDriver();
     }
 
@@ -287,7 +287,7 @@ public class RegionContainer {
         ConfigurationManager config = plugin.getGlobalStateManager();
 
         if (config.migrateRegionsToUuid) {
-            RegionStoreDriver driver = getDriver();
+            RegionDriver driver = getDriver();
             UUIDMigration migrator = new UUIDMigration(driver, plugin.getProfileService());
             migrator.setKeepUnresolvedNames(config.keepUnresolvedNames);
             try {

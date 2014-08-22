@@ -150,15 +150,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.jolbox</groupId>
-      <artifactId>bonecp</artifactId>
-      <version>0.8.0.RELEASE</version>
-      <scope>compile</scope>
-      <type>jar</type>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>10.0.1</version> <!-- Bukkit only bundles 10.0.1 -->
@@ -398,16 +389,11 @@
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
                   <include>org.khelekore:prtree</include>
-                  <include>com.jolbox:bonecp</include>
                   <include>org.flywaydb:flyway-core</include>
                   <include>com.sk89q:squirrelid</include>
                 </includes>
               </artifactSet>
               <relocations>
-                <relocation>
-                  <pattern>com.jolbox.bonecp</pattern>
-                  <shadedPattern>com.sk89q.worldguard.internal.bonecp</shadedPattern>
-                </relocation>
                 <relocation>
                   <pattern>org.flywaydb</pattern>
                   <shadedPattern>com.sk89q.worldguard.internal.flywaydb</shadedPattern>

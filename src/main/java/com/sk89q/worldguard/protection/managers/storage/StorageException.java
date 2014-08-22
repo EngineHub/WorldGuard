@@ -22,20 +22,20 @@ package com.sk89q.worldguard.protection.managers.storage;
 /**
  * Exceptions related to region stores inherit from this exception.
  */
-public class RegionStoreException extends Exception {
+public class StorageException extends Exception {
 
-    public RegionStoreException() {
+    public StorageException() {
     }
 
-    public RegionStoreException(String message) {
+    public StorageException(String message) {
         super(message);
     }
 
-    public RegionStoreException(String message, Throwable cause) {
+    public StorageException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public RegionStoreException(Throwable cause) {
+    public StorageException(Throwable cause) {
         super(cause);
     }
 

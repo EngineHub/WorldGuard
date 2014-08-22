@@ -54,8 +54,8 @@ import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.managers.migration.DriverMigration;
 import com.sk89q.worldguard.protection.managers.migration.MigrationException;
 import com.sk89q.worldguard.protection.managers.migration.UUIDMigration;
-import com.sk89q.worldguard.protection.managers.storage.driver.DriverType;
-import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
+import com.sk89q.worldguard.protection.managers.storage.DriverType;
+import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.util.Enums;
@@ -864,8 +864,8 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         ConfigurationManager config = plugin.getGlobalStateManager();
-        RegionStoreDriver fromDriver = config.regionStoreDriverMap.get(from);
-        RegionStoreDriver toDriver = config.regionStoreDriverMap.get(to);
+        RegionDriver fromDriver = config.regionStoreDriverMap.get(from);
+        RegionDriver toDriver = config.regionStoreDriverMap.get(to);
 
         if (fromDriver == null) {
             throw new CommandException("The driver specified as 'from' does not seem to be supported in your version of WorldGuard.");
@@ -933,7 +933,7 @@ public final class RegionCommands extends RegionCommandsBase {
         try {
             ConfigurationManager config = plugin.getGlobalStateManager();
             RegionContainer container = plugin.getRegionContainer();
-            RegionStoreDriver driver = container.getDriver();
+            RegionDriver driver = container.getDriver();
             UUIDMigration migration = new UUIDMigration(driver, plugin.getProfileService());
             migration.setKeepUnresolvedNames(config.keepUnresolvedNames);
             sender.sendMessage(ChatColor.YELLOW + "Now performing migration... this may take a while.");

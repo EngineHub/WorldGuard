@@ -25,16 +25,17 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.RegionResultSet;
 import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
 import com.sk89q.worldguard.protection.managers.index.RegionIndex;
 import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
-import com.sk89q.worldguard.protection.managers.storage.RegionStore;
+import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.RegionCollectionConsumer;
 import com.sk89q.worldguard.util.Normal;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,9 +49,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A region manager holds the regions for a world.
+ */
 public final class RegionManager {
 
-    private final RegionStore store;
+    private final RegionDatabase store;
     private final Supplier<? extends ConcurrentRegionIndex> indexFactory;
     private ConcurrentRegionIndex index;
 
@@ -60,7 +64,7 @@ public final class RegionManager {
      * @param store the region store
      * @param indexFactory the factory for creating new instances of the index
      */
-    public RegionManager(RegionStore store, Supplier<? extends ConcurrentRegionIndex> indexFactory) {
+    public RegionManager(RegionDatabase store, Supplier<? extends ConcurrentRegionIndex> indexFactory) {
         checkNotNull(store);
         checkNotNull(indexFactory);
 
@@ -85,9 +89,9 @@ public final class RegionManager {
      * prevent the creation or modification of regions in the index while
      * a new collection of regions is loaded from storage.</p>
      *
-     * @throws IOException thrown when loading fails
+     * @throws StorageException thrown when loading fails
      */
-    public void load() throws IOException {
+    public void load() throws StorageException {
         Set<ProtectedRegion> regions = store.loadAll();
         for (ProtectedRegion region : regions) {
             region.setDirty(false);
@@ -98,9 +102,9 @@ public final class RegionManager {
     /**
      * Save a snapshot of all the regions as it is right now to storage.
      *
-     * @throws IOException
+     * @throws StorageException thrown on save error
      */
-    public void save() throws IOException {
+    public void save() throws StorageException {
         store.saveAll(new HashSet<ProtectedRegion>(getValuesCopy()));
     }
 
@@ -112,9 +116,9 @@ public final class RegionManager {
      * <p>This method does nothing if there are no changes.</p>
      *
      * @return true if there were changes to be saved
-     * @throws IOException thrown on save error
+     * @throws StorageException thrown on save error
      */
-    public boolean saveChanges() throws IOException {
+    public boolean saveChanges() throws StorageException {
         RegionDifference diff = index.getAndClearDifference();
         boolean successful = false;
 
@@ -314,7 +318,7 @@ public final class RegionManager {
 
         List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
         index.applyContaining(position, new RegionCollectionConsumer(regions, true));
-        return new ApplicableRegionSet(regions, index.get("__global__"));
+        return new RegionResultSet(regions, index.get("__global__"));
     }
 
     /**
@@ -329,7 +333,7 @@ public final class RegionManager {
 
         List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
         index.applyIntersecting(region, new RegionCollectionConsumer(regions, true));
-        return new ApplicableRegionSet(regions, index.get("__global__"));
+        return new RegionResultSet(regions, index.get("__global__"));
     }
 
     /**

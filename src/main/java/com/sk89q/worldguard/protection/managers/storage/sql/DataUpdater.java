@@ -43,7 +43,7 @@ class DataUpdater {
     final int worldId;
     final DomainTableCache domainTableCache;
 
-    DataUpdater(SQLRegionStore regionStore, Connection conn) throws SQLException {
+    DataUpdater(SQLRegionDatabase regionStore, Connection conn) throws SQLException {
         checkNotNull(regionStore);
 
         this.conn = conn;

@@ -17,10 +17,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.managers.storage.driver;
+package com.sk89q.worldguard.protection.managers.storage.file;
 
-import com.sk89q.worldguard.protection.managers.storage.RegionStore;
-import com.sk89q.worldguard.protection.managers.storage.file.YamlFileStore;
+import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
+import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,9 +32,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores region data in a {root_dir}/{id}/{filename} pattern on disk
- * using {@link YamlFileStore}.
+ * using {@link YamlRegionFile}.
  */
-public class DirectoryYamlDriver implements RegionStoreDriver {
+public class DirectoryYamlDriver implements RegionDriver {
 
     private final File rootDir;
     private final String filename;
@@ -70,29 +71,23 @@ public class DirectoryYamlDriver implements RegionStoreDriver {
     }
 
     @Override
-    public RegionStore get(String id) throws IOException {
+    public RegionDatabase get(String id) {
         checkNotNull(id);
 
         File file = getPath(id);
-        File parentDir = file.getParentFile();
-        if (!parentDir.exists()) {
-            if (!parentDir.mkdirs()) {
-                throw new IOException("Failed to create the parent directory (" + parentDir.getAbsolutePath() + ") to store the regions file in");
-            }
-        }
 
-        return new YamlFileStore(id, file);
+        return new YamlRegionFile(id, file);
     }
 
     @Override
-    public List<RegionStore> getAll() throws IOException {
-        List<RegionStore> stores = new ArrayList<RegionStore>();
+    public List<RegionDatabase> getAll() throws StorageException {
+        List<RegionDatabase> stores = new ArrayList<RegionDatabase>();
 
         File files[] = rootDir.listFiles();
         if (files != null) {
             for (File dir : files) {
                 if (dir.isDirectory() && new File(dir, "regions.yml").isFile()) {
-                    stores.add(new YamlFileStore(dir.getName(), getPath(dir.getName())));
+                    stores.add(new YamlRegionFile(dir.getName(), getPath(dir.getName())));
                 }
             }
         }
