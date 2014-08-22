@@ -50,7 +50,7 @@ public class BlockedPotionsListener extends AbstractListener {
     @EventHandler
     public void onItemInteract(UseItemEvent event) {
         // We only care about player caused events
-        if (event.getCause().getPlayerRootCause() == null) {
+        if (event.getCause().getFirstPlayer() == null) {
             return;
         }
 
@@ -83,7 +83,7 @@ public class BlockedPotionsListener extends AbstractListener {
             }
 
             if (blockedEffect != null) {
-                Player player = event.getCause().getPlayerRootCause();
+                Player player = event.getCause().getFirstPlayer();
 
                 if (player != null) {
                     if (getPlugin().hasPermission(player, "worldguard.override.potions")) {

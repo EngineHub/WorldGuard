@@ -83,7 +83,7 @@ public class Cause {
     }
 
     @Nullable
-    public Player getPlayerRootCause() {
+    public Player getFirstPlayer() {
         for (Object object : causes) {
             if (object instanceof Player) {
                 return (Player) object;

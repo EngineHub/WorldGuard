@@ -70,7 +70,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        final Player player = event.getCause().getPlayerRootCause();
+        final Player player = event.getCause().getFirstPlayer();
 
         if (player == null) {
             return;
@@ -102,7 +102,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
-        Player player = event.getCause().getPlayerRootCause();
+        Player player = event.getCause().getFirstPlayer();
 
         if (player == null) {
             return;
@@ -128,7 +128,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
-        Player player = event.getCause().getPlayerRootCause();
+        Player player = event.getCause().getFirstPlayer();
 
         if (player == null) {
             return;
@@ -153,7 +153,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
-        Player player = event.getCause().getPlayerRootCause();
+        Player player = event.getCause().getFirstPlayer();
 
         if (player == null) {
             return;
@@ -177,7 +177,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
-        Player player = event.getCause().getPlayerRootCause();
+        Player player = event.getCause().getFirstPlayer();
 
         if (player == null) {
             return;
@@ -203,7 +203,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseItem(UseItemEvent event) {
-        Player player = event.getCause().getPlayerRootCause();
+        Player player = event.getCause().getFirstPlayer();
 
         if (player == null) {
             return;
