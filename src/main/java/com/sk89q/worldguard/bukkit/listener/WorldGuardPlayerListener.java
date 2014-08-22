@@ -62,6 +62,7 @@ import org.bukkit.plugin.PluginManager;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -69,6 +70,7 @@ import java.util.regex.Pattern;
  */
 public class WorldGuardPlayerListener implements Listener {
 
+    private static final Logger log = Logger.getLogger(WorldGuardPlayerListener.class.getCanonicalName());
     private Pattern opPattern = Pattern.compile("^/op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
     private WorldGuardPlugin plugin;
 
@@ -329,7 +331,7 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (removed > 10) {
-                plugin.getLogger().info("Halt-Act: " + removed + " entities (>10) auto-removed from "
+                log.info("Halt-Act: " + removed + " entities (>10) auto-removed from "
                         + player.getWorld().toString());
             }
         }
@@ -341,12 +343,12 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (!cfg.hasCommandBookGodMode() && cfg.autoGodMode && (plugin.inGroup(player, "wg-invincible")
                 || plugin.hasPermission(player, "worldguard.auto-invincible"))) {
-            plugin.getLogger().log(Level.INFO, "Enabled auto-god mode for " + player.getName());
+            log.log(Level.INFO, "Enabled auto-god mode for " + player.getName());
             cfg.enableGodMode(player);
         }
 
         if (plugin.inGroup(player, "wg-amphibious")) {
-            plugin.getLogger().log(Level.INFO, "Enabled no-drowning mode for " + player.getName() + " (player is in group 'wg-amphibious')");
+            log.log(Level.INFO, "Enabled no-drowning mode for " + player.getName() + " (player is in group 'wg-amphibious')");
             cfg.enableAmphibiousMode(player);
         }
 
@@ -398,7 +400,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (!hostname.equals(hostKey)) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
                         "You did not join with the valid host key!");
-                plugin.getLogger().warning("WorldGuard host key check: " +
+                log.warning("WorldGuard host key check: " +
                         player.getName() + " joined with '" + hostname +
                         "' but '" + hostKey + "' was expected. Kicked!");
                 return;

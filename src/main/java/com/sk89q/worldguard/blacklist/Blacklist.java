@@ -39,16 +39,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.logging.Logger;
 
 public abstract class Blacklist {
+
+    private static final Logger log = Logger.getLogger(Blacklist.class.getCanonicalName());
 
     private MatcherIndex index = MatcherIndex.getEmptyInstance();
     private final BlacklistLoggerHandler blacklistLogger = new BlacklistLoggerHandler();
     private BlacklistEvent lastEvent;
     private boolean useAsWhitelist;
-    private final java.util.logging.Logger logger;
     private Cache<String, TrackedEvent> repeatingEventCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(30, TimeUnit.SECONDS)
@@ -59,10 +59,8 @@ public abstract class Blacklist {
                 }
             });
 
-    public Blacklist(boolean useAsWhitelist, java.util.logging.Logger logger) {
-        checkNotNull(logger);
+    public Blacklist(boolean useAsWhitelist) {
         this.useAsWhitelist = useAsWhitelist;
-        this.logger = logger;
     }
 
     /**
@@ -93,7 +91,7 @@ public abstract class Blacklist {
     }
 
     /**
-     * Get the logger.
+     * Get the log.
      *
      * @return The logger used in this blacklist
      */
@@ -165,14 +163,14 @@ public abstract class Blacklist {
                             builder.add(matcher, entry);
                             currentEntries.add(entry);
                         } catch (TargetMatcherParseException e) {
-                            logger.log(Level.WARNING, "Could not parse a block/item heading: " + e.getMessage());
+                            log.log(Level.WARNING, "Could not parse a block/item heading: " + e.getMessage());
                         }
                     }
                 } else if (currentEntries != null) {
                     String[] parts = line.split("=");
 
                     if (parts.length == 1) {
-                        logger.log(Level.WARNING, "Found option with no value " + file.getName() + " for '" + line + "'");
+                        log.log(Level.WARNING, "Found option with no value " + file.getName() + " for '" + line + "'");
                         continue;
                     }
 
@@ -209,10 +207,10 @@ public abstract class Blacklist {
                     }
 
                     if (unknownOption) {
-                        logger.log(Level.WARNING, "Unknown option '" + parts[0] + "' in " + file.getName() + " for '" + line + "'");
+                        log.log(Level.WARNING, "Unknown option '" + parts[0] + "' in " + file.getName() + " for '" + line + "'");
                     }
                 } else {
-                    logger.log(Level.WARNING, "Found option with no heading "
+                    log.log(Level.WARNING, "Found option with no heading "
                             + file.getName() + " for '" + line + "'");
                 }
             }
@@ -246,7 +244,7 @@ public abstract class Blacklist {
             }
 
             if (!found) {
-                logger.log(Level.WARNING, "Unknown blacklist action: " + name);
+                log.log(Level.WARNING, "Unknown blacklist action: " + name);
             }
         }
 

@@ -30,8 +30,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
+import java.util.logging.Logger;
+
 public class WorldGuardWorldListener implements Listener {
 
+    private static final Logger log = Logger.getLogger(WorldGuardWorldListener.class.getCanonicalName());
     private WorldGuardPlugin plugin;
 
     /**
@@ -65,8 +68,7 @@ public class WorldGuardWorldListener implements Listener {
             }
 
             if (removed > 50) {
-                plugin.getLogger().info("Halt-Act: " + removed + " entities (>50) auto-removed from "
-                        + event.getChunk().toString());
+                log.info("Halt-Act: " + removed + " entities (>50) auto-removed from " + event.getChunk().toString());
             }
         }
     }

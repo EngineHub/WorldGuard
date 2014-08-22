@@ -71,7 +71,7 @@ public class WorldGuardCommands {
         if (sender instanceof Player) {
             handler = new LoggerToChatHandler(sender);
             handler.setLevel(Level.ALL);
-            minecraftLogger = Logger.getLogger("Minecraft");
+            minecraftLogger = Logger.getLogger("com.sk89q.worldguard");
             minecraftLogger.addHandler(handler);
         }
 

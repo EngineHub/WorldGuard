@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Holds the configuration for individual worlds.
@@ -51,6 +52,8 @@ import java.util.logging.Level;
  * @author Michael
  */
 public class WorldConfiguration {
+
+    private static final Logger log = Logger.getLogger(WorldConfiguration.class.getCanonicalName());
 
     public static final String CONFIG_HEADER = "#\r\n" +
             "# WorldGuard's world configuration file\r\n" +
@@ -197,7 +200,7 @@ public class WorldConfiguration {
         loadConfiguration();
 
         if (summaryOnStart) {
-            plugin.getLogger().info("Loaded configuration for world '" + worldName + "'");
+            log.info("Loaded configuration for world '" + worldName + "'");
         }
     }
 
@@ -300,7 +303,7 @@ public class WorldConfiguration {
         try {
             config.load();
         } catch (IOException e) {
-            plugin.getLogger().severe("Error reading configuration for world " + worldName + ": ");
+            log.severe("Error reading configuration for world " + worldName + ": ");
             e.printStackTrace();
         }
 
@@ -317,7 +320,7 @@ public class WorldConfiguration {
             PotionEffectType effect = PotionEffectType.getByName(potionName);
 
             if (effect == null) {
-                plugin.getLogger().warning("Unknown potion effect type '" + potionName + "'");
+                log.warning("Unknown potion effect type '" + potionName + "'");
             } else {
                 blockPotions.add(effect);
             }
@@ -438,9 +441,9 @@ public class WorldConfiguration {
             EntityType creature = EntityType.fromName(creatureName);
 
             if (creature == null) {
-                plugin.getLogger().warning("Unknown mob type '" + creatureName + "'");
+                log.warning("Unknown mob type '" + creatureName + "'");
             } else if (!creature.isAlive()) {
-                plugin.getLogger().warning("Entity type '" + creatureName + "' is not a creature");
+                log.warning("Entity type '" + creatureName + "' is not a creature");
             } else {
                 blockCreatureSpawn.add(creature);
             }
@@ -481,53 +484,53 @@ public class WorldConfiguration {
             } else {
                 this.blacklist = blist;
                 if (summaryOnStart) {
-                    plugin.getLogger().log(Level.INFO, "Blacklist loaded.");
+                    log.log(Level.INFO, "Blacklist loaded.");
                 }
 
                 BlacklistLoggerHandler blacklistLogger = blist.getLogger();
 
                 if (logDatabase) {
-                    blacklistLogger.addHandler(new DatabaseHandler(dsn, user, pass, table, worldName, plugin.getLogger()));
+                    blacklistLogger.addHandler(new DatabaseHandler(dsn, user, pass, table, worldName, log));
                 }
 
                 if (logConsole) {
-                    blacklistLogger.addHandler(new ConsoleHandler(worldName, plugin.getLogger()));
+                    blacklistLogger.addHandler(new ConsoleHandler(worldName, log));
                 }
 
                 if (logFile) {
                     FileHandler handler =
-                            new FileHandler(logFilePattern, logFileCacheSize, worldName, plugin.getLogger());
+                            new FileHandler(logFilePattern, logFileCacheSize, worldName, log);
                     blacklistLogger.addHandler(handler);
                 }
             }
         } catch (FileNotFoundException e) {
-            plugin.getLogger().log(Level.WARNING, "WorldGuard blacklist does not exist.");
+            log.log(Level.WARNING, "WorldGuard blacklist does not exist.");
         } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, "Could not load WorldGuard blacklist: "
+            log.log(Level.WARNING, "Could not load WorldGuard blacklist: "
                     + e.getMessage());
         }
 
         // Print an overview of settings
         if (summaryOnStart) {
-            plugin.getLogger().log(Level.INFO, blockTNTExplosions
+            log.log(Level.INFO, blockTNTExplosions
                     ? "(" + worldName + ") TNT ignition is blocked."
                     : "(" + worldName + ") TNT ignition is PERMITTED.");
-            plugin.getLogger().log(Level.INFO, blockLighter
+            log.log(Level.INFO, blockLighter
                     ? "(" + worldName + ") Lighters are blocked."
                     : "(" + worldName + ") Lighters are PERMITTED.");
-            plugin.getLogger().log(Level.INFO, preventLavaFire
+            log.log(Level.INFO, preventLavaFire
                     ? "(" + worldName + ") Lava fire is blocked."
                     : "(" + worldName + ") Lava fire is PERMITTED.");
 
             if (disableFireSpread) {
-                plugin.getLogger().log(Level.INFO, "(" + worldName + ") All fire spread is disabled.");
+                log.log(Level.INFO, "(" + worldName + ") All fire spread is disabled.");
             } else {
                 if (disableFireSpreadBlocks.size() > 0) {
-                    plugin.getLogger().log(Level.INFO, "(" + worldName
+                    log.log(Level.INFO, "(" + worldName
                             + ") Fire spread is limited to "
                             + disableFireSpreadBlocks.size() + " block types.");
                 } else {
-                    plugin.getLogger().log(Level.INFO, "(" + worldName
+                    log.log(Level.INFO, "(" + worldName
                             + ") Fire spread is UNRESTRICTED.");
                 }
             }
