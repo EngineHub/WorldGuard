@@ -35,6 +35,7 @@ import com.sk89q.worldguard.bukkit.util.BlockStateAsBlockFunction;
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.bukkit.util.WGMetadata;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -110,11 +111,7 @@ import static com.sk89q.worldguard.bukkit.util.Materials.isItemAppliedToBlock;
 
 public class EventAbstractionListener extends AbstractListener {
 
-    /**
-     * Abstract {@link BlockFromToEvent}s into break and place events.
-     * Currently disabled as it creates a lot of new events.
-     */
-    public static final boolean ABSTRACT_FROM_TO_EVENTS = false;
+    private static final String ITEM_PICKUP_DEBOUNCE_KEY = "worldguard.debounce.itemPickup";
 
     /**
      * Construct the listener.
@@ -557,7 +554,21 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-        Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getPlayer()), event.getItem()));
+        Item item = event.getItem();
+
+        // These events happen very frequently so let's reduce their frequency
+        EventDebounce debounce = WGMetadata.getIfPresent(item, ITEM_PICKUP_DEBOUNCE_KEY, EventDebounce.class);
+        if (debounce != null && debounce.isValid()) {
+            if (debounce.getLastCancellation()) {
+                event.setCancelled(true);
+            }
+        } else {
+            boolean cancelled = Events.fireAndTestCancel(new DestroyEntityEvent(event, create(event.getPlayer()), event.getItem()));
+            if (cancelled) {
+                event.setCancelled(true);
+            }
+            WGMetadata.put(item, ITEM_PICKUP_DEBOUNCE_KEY, new EventDebounce(cancelled));
+        }
     }
 
     @EventHandler
