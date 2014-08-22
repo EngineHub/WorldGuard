@@ -555,20 +555,7 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
         Item item = event.getItem();
-
-        // These events happen very frequently so let's reduce their frequency
-        EventDebounce debounce = WGMetadata.getIfPresent(item, ITEM_PICKUP_DEBOUNCE_KEY, EventDebounce.class);
-        if (debounce != null && debounce.isValid()) {
-            if (debounce.getLastCancellation()) {
-                event.setCancelled(true);
-            }
-        } else {
-            boolean cancelled = Events.fireAndTestCancel(new DestroyEntityEvent(event, create(event.getPlayer()), event.getItem()));
-            if (cancelled) {
-                event.setCancelled(true);
-            }
-            WGMetadata.put(item, ITEM_PICKUP_DEBOUNCE_KEY, new EventDebounce(cancelled));
-        }
+        EventDebounce.debounce(item, ITEM_PICKUP_DEBOUNCE_KEY, 10000, event, new DestroyEntityEvent(event, create(event.getPlayer()), event.getItem()));
     }
 
     @EventHandler
