@@ -17,14 +17,27 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.managers.storage.driver;
+package com.sk89q.worldguard.protection.managers.migration;
 
 /**
- * An enumeration of supported drivers.
+ * Thrown when a migration fails.
  */
-public enum DriverType {
+public class MigrationException extends Exception {
 
-    YAML,
-    MYSQL
+    public MigrationException() {
+        super();
+    }
+
+    public MigrationException(String message) {
+        super(message);
+    }
+
+    public MigrationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public MigrationException(Throwable cause) {
+        super(cause);
+    }
 
 }

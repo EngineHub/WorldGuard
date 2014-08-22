@@ -28,6 +28,8 @@ import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.Location;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.RegionContainer;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.AsyncCommandHelper;
@@ -49,17 +51,20 @@ import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
+import com.sk89q.worldguard.protection.managers.migration.DriverMigration;
+import com.sk89q.worldguard.protection.managers.migration.MigrationException;
+import com.sk89q.worldguard.protection.managers.migration.UUIDMigration;
+import com.sk89q.worldguard.protection.managers.storage.driver.DriverType;
+import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
-import com.sk89q.worldguard.protection.util.migrator.MigrationException;
-import com.sk89q.worldguard.protection.util.migrator.UUIDMigrator;
+import com.sk89q.worldguard.util.Enums;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -808,60 +813,74 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"migratedb"}, usage = "<from> <to>",
-            desc = "Migrate from one Protection Database to another.", min = 2, max = 2)
+             flags = "y",
+             desc = "Migrate from one Protection Database to another.", min = 2, max = 2)
     public void migrateDB(CommandContext args, CommandSender sender) throws CommandException {
         // Check permissions
         if (!getPermissionModel(sender).mayMigrateRegionStore()) {
             throw new CommandPermissionsException();
         }
 
-        /*
-        String from = args.getString(0).toLowerCase().trim();
-        String to = args.getString(1).toLowerCase().trim();
+        DriverType from = Enums.findFuzzyByValue(DriverType.class, args.getString(0));
+        DriverType to = Enums.findFuzzyByValue(DriverType.class, args.getString(1));
+
+        if (from == null) {
+            throw new CommandException("The value of 'from' is not a recognized type of region data database.");
+        }
+
+        if (to == null) {
+            throw new CommandException("The value of 'to' is not a recognized type of region region data database.");
+        }
 
         if (from.equals(to)) {
-            throw new CommandException("Will not migrate with common source and target.");
+            throw new CommandException("It is not possible to migrate between the same types of region data databases.");
         }
 
-        Map<MigratorKey, Class<? extends AbstractDatabaseMigrator>> migrators =
-                AbstractDatabaseMigrator.getMigrators();
-        MigratorKey key = new MigratorKey(from,to);
-
-        if (!migrators.containsKey(key)) {
-            throw new CommandException("No migrator found for that combination and direction.");
-        }
-
-        long lastRequest = 10000000;
-        if (this.migrateDBRequestDate != null) {
-            lastRequest = new Date().getTime() - this.migrateDBRequestDate.getTime();
-        }
-        if (this.migrateDBRequest == null || lastRequest > 60000) {
-            this.migrateDBRequest = key;
-            this.migrateDBRequestDate = new Date();
-
+        if (!args.hasFlag('y')) {
             throw new CommandException("This command is potentially dangerous.\n" +
-                    "Please ensure you have made a backup of your data, and then re-enter the command exactly to procede.");
+                    "Please ensure you have made a backup of your data, and then re-enter the command with -y tacked on at the end to proceed.");
         }
 
-        Class<? extends AbstractDatabaseMigrator> cls = migrators.get(key);
+        ConfigurationManager config = plugin.getGlobalStateManager();
+        RegionStoreDriver fromDriver = config.regionStoreDriverMap.get(from);
+        RegionStoreDriver toDriver = config.regionStoreDriverMap.get(to);
+
+        if (fromDriver == null) {
+            throw new CommandException("The driver specified as 'from' does not seem to be supported in your version of WorldGuard.");
+        }
+
+        if (toDriver == null) {
+            throw new CommandException("The driver specified as 'to' does not seem to be supported in your version of WorldGuard.");
+        }
+
+        DriverMigration migration = new DriverMigration(fromDriver, toDriver);
+
+        LoggerToChatHandler handler = null;
+        Logger minecraftLogger = null;
+
+        if (sender instanceof Player) {
+            handler = new LoggerToChatHandler(sender);
+            handler.setLevel(Level.ALL);
+            minecraftLogger = Logger.getLogger("com.sk89q.worldguard");
+            minecraftLogger.addHandler(handler);
+        }
 
         try {
-            AbstractDatabaseMigrator migrator = cls.getConstructor(WorldGuardPlugin.class).newInstance(plugin);
-
-            migrator.migrate();
-        } catch (IllegalArgumentException ignore) {
-        } catch (SecurityException ignore) {
-        } catch (InstantiationException ignore) {
-        } catch (IllegalAccessException ignore) {
-        } catch (InvocationTargetException ignore) {
-        } catch (NoSuchMethodException ignore) {
+            RegionContainer container = plugin.getRegionContainer();
+            sender.sendMessage(ChatColor.YELLOW + "Now performing migration... this may take a while.");
+            container.migrate(migration);
+            sender.sendMessage(ChatColor.YELLOW +
+                    "Migration complete! This only migrated the data. If you already changed your settings to use " +
+                    "the target driver, then WorldGuard is now using the new data. If not, you have to adjust your " +
+                    "configuration to use the new driver and then restart your server.");
         } catch (MigrationException e) {
-            throw new CommandException("Error migrating database: " + e.getMessage());
+            plugin.getLogger().log(Level.WARNING, "Failed to migrate", e);
+            throw new CommandException("Error encountered while migrating: " + e.getMessage());
+        } finally {
+            if (minecraftLogger != null) {
+                minecraftLogger.removeHandler(handler);
+            }
         }
-
-        sender.sendMessage(ChatColor.YELLOW + "Regions have been migrated successfully.\n" +
-                "If you wish to use the destination format as your new backend, please update your config and reload WorldGuard.");
-                */
     }
 
     /**
@@ -885,30 +904,19 @@ public final class RegionCommands extends RegionCommandsBase {
         if (sender instanceof Player) {
             handler = new LoggerToChatHandler(sender);
             handler.setLevel(Level.ALL);
-            minecraftLogger = Logger.getLogger("Minecraft");
+            minecraftLogger = Logger.getLogger("com.sk89q.worldguard");
             minecraftLogger.addHandler(handler);
         }
 
         try {
-            UUIDMigrator migrator = new UUIDMigrator(plugin.getProfileService(), plugin.getLogger());
-            migrator.readConfiguration(plugin.getGlobalStateManager());
-            List<RegionManager> managers = plugin.getRegionContainer().getLoaded();
-
-            // Try migration
-            if (migrator.migrate(managers)) {
-                sender.sendMessage(ChatColor.YELLOW + "Now saving regions... this may take a while.");
-
-                for (RegionManager manager : managers) {
-                    manager.save();
-                }
-
-                sender.sendMessage(ChatColor.YELLOW + "Migration complete!");
-            } else {
-                sender.sendMessage(ChatColor.YELLOW + "There were no names to migrate.");
-            }
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, "Failed to save", e);
-            throw new CommandException("Error encountered while saving: " + e.getMessage());
+            ConfigurationManager config = plugin.getGlobalStateManager();
+            RegionContainer container = plugin.getRegionContainer();
+            RegionStoreDriver driver = container.getDriver();
+            UUIDMigration migration = new UUIDMigration(driver, plugin.getProfileService());
+            migration.setKeepUnresolvedNames(config.keepUnresolvedNames);
+            sender.sendMessage(ChatColor.YELLOW + "Now performing migration... this may take a while.");
+            container.migrate(migration);
+            sender.sendMessage(ChatColor.YELLOW + "Migration complete!");
         } catch (MigrationException e) {
             plugin.getLogger().log(Level.WARNING, "Failed to migrate", e);
             throw new CommandException("Error encountered while migrating: " + e.getMessage());

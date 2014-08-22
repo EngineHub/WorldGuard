@@ -78,6 +78,7 @@ public class YamlFileStore implements RegionStore {
             "# REMEMBER TO KEEP PERIODICAL BACKUPS.\r\n" +
             "#";
 
+    private final String name;
     private final File file;
 
     static {
@@ -91,16 +92,24 @@ public class YamlFileStore implements RegionStore {
     /**
      * Create a new instance.
      *
+     * @param name the name of this store
      * @param file the file
      * @throws IOException thrown if the file cannot be written to
      */
-    public YamlFileStore(File file) throws IOException {
+    public YamlFileStore(String name, File file) throws IOException {
+        checkNotNull(name);
         checkNotNull(file);
+        this.name = name;
         this.file = file;
         if (!file.exists()) {
             //noinspection ResultOfMethodCallIgnored
             file.createNewFile();
         }
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override

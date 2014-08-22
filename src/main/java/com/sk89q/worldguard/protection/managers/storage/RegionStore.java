@@ -31,6 +31,11 @@ import java.util.Set;
 public interface RegionStore {
 
     /**
+     * Get a displayable name for this store.
+     */
+    String getName();
+
+    /**
      * Load all regions from storage and place them into the passed map.
      *
      * <p>The map will only be modified from one thread. The keys of

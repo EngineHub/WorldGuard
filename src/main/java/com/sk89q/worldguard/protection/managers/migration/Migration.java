@@ -17,27 +17,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection.util.migrator;
+package com.sk89q.worldguard.protection.managers.migration;
 
 /**
- * Thrown when a migration fails.
+ * An object that migrates region data.
  */
-public class MigrationException extends Exception {
+public interface Migration {
 
-    public MigrationException() {
-        super();
-    }
-
-    public MigrationException(String message) {
-        super(message);
-    }
-
-    public MigrationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public MigrationException(Throwable cause) {
-        super(cause);
-    }
+    /**
+     * Execute the migration.
+     *
+     * @throws MigrationException thrown if the migration fails
+     */
+    void migrate() throws MigrationException;
 
 }

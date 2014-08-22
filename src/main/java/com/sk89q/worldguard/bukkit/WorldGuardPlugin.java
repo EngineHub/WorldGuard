@@ -30,11 +30,6 @@ import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
-import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
-import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
-import com.sk89q.worldguard.util.task.SimpleSupervisor;
-import com.sk89q.worldguard.util.task.Supervisor;
-import com.sk89q.worldguard.util.task.Task;
 import com.sk89q.squirrelid.cache.HashMapCache;
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.squirrelid.cache.SQLiteCache;
@@ -55,6 +50,7 @@ import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.DebuggingListener;
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
 import com.sk89q.worldguard.bukkit.listener.FlagStateManager;
+import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
 import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardCommandBookListener;
@@ -68,9 +64,11 @@ import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
-import com.sk89q.worldguard.protection.util.migrator.MigrationException;
-import com.sk89q.worldguard.protection.util.migrator.UUIDMigrator;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
+import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
+import com.sk89q.worldguard.util.task.SimpleSupervisor;
+import com.sk89q.worldguard.util.task.Supervisor;
+import com.sk89q.worldguard.util.task.Task;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -188,11 +186,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             // Load the configuration
             configuration.load();
-
-            getLogger().info("Loading region data...");
-            regionContainer.initialize();
-
-            migrateRegionUniqueIds(); // Migrate to UUIDs
         } catch (FatalConfigurationLoadingException e) {
             getLogger().log(Level.WARNING, "Encountered fatal error while loading configuration", e);
             getServer().shutdown();
@@ -207,6 +200,9 @@ public class WorldGuardPlugin extends JavaPlugin {
                     "* http://forum.enginehub.org\n" +
                     "******************************************************\n");
         }
+
+        getLogger().info("Loading region data...");
+        regionContainer.initialize();
 
         flagStateManager = new FlagStateManager(this);
 
@@ -287,35 +283,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         regionContainer.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
-    }
-
-    private void migrateRegionUniqueIds() {
-        try {
-            if (configuration.migrateRegionsToUuid) {
-                UUIDMigrator migrator = new UUIDMigrator(profileService, getLogger());
-                migrator.readConfiguration(configuration);
-                List<RegionManager> managers = globalRegionManager.getLoaded();
-
-                // Try migration
-                if (migrator.migrate(managers)) {
-                    getLogger().info("Now saving regions... this may take a while.");
-
-                    for (RegionManager manager : managers) {
-                        manager.save();
-                    }
-
-                    getLogger().info(
-                            "Regions saved after UUID migration! This won't happen again unless " +
-                                    "you change the relevant configuration option in WorldGuard's config.");
-
-                    configuration.disableUuidMigration();
-                }
-            }
-        } catch (MigrationException e) {
-            getLogger().log(Level.WARNING, "Failed to migrate regions to use UUIDs instead of player names", e);
-        } catch (IOException e) {
-            getLogger().log(Level.WARNING, "Failed to save region data", e);
-        }
     }
 
     @Override
