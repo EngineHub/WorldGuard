@@ -66,6 +66,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
+import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
 import com.sk89q.worldguard.util.task.SimpleSupervisor;
 import com.sk89q.worldguard.util.task.Supervisor;
 import com.sk89q.worldguard.util.task.Task;
@@ -99,12 +100,15 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
  */
 public class WorldGuardPlugin extends JavaPlugin {
+
+    private static final Logger log = Logger.getLogger(WorldGuardPlugin.class.getCanonicalName());
 
     private static WorldGuardPlugin inst;
     private final CommandsManager<CommandSender> commands;
@@ -145,6 +149,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     @SuppressWarnings("deprecation")
     public void onEnable() {
+        configureLogger();
+
         getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
 
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
@@ -171,7 +177,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
         } catch (IOException e) {
-            getLogger().log(Level.WARNING, "Failed to initialize SQLite profile cache");
+            log.log(Level.WARNING, "Failed to initialize SQLite profile cache");
             profileCache = new HashMapCache();
         }
 
@@ -187,9 +193,9 @@ public class WorldGuardPlugin extends JavaPlugin {
             // Load the configuration
             configuration.load();
         } catch (FatalConfigurationLoadingException e) {
-            getLogger().log(Level.WARNING, "Encountered fatal error while loading configuration", e);
+            log.log(Level.WARNING, "Encountered fatal error while loading configuration", e);
             getServer().shutdown();
-            getLogger().log(Level.WARNING, "\n" +
+            log.log(Level.WARNING, "\n" +
                     "******************************************************\n" +
                     "* Failed to load WorldGuard configuration!\n" +
                     "* \n" +
@@ -201,7 +207,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     "******************************************************\n");
         }
 
-        getLogger().info("Loading region data...");
+        log.info("Loading region data...");
         regionContainer.initialize();
 
         flagStateManager = new FlagStateManager(this);
@@ -228,7 +234,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new BlockedPotionsListener(this)).registerEvents();
         (new EventAbstractionListener(this)).registerEvents();
         if ("true".equalsIgnoreCase(System.getProperty("worldguard.debug.listener"))) {
-            (new DebuggingListener(this, getLogger())).registerEvents();
+            (new DebuggingListener(this, log)).registerEvents();
         }
 
         configuration.updateCommandBookGodMode();
@@ -260,7 +266,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         executorService.shutdown();
 
         try {
-            getLogger().log(Level.INFO, "Shutting down executor and waiting for any pending tasks...");
+            log.log(Level.INFO, "Shutting down executor and waiting for any pending tasks...");
 
             List<Task<?>> tasks = supervisor.getTasks();
             if (!tasks.isEmpty()) {
@@ -269,7 +275,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     builder.append("\n");
                     builder.append(task.getName());
                 }
-                getLogger().log(Level.INFO, builder.toString());
+                log.log(Level.INFO, builder.toString());
             }
 
             Futures.successfulAsList(tasks).get();
@@ -277,7 +283,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            getLogger().log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
+            log.log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
         }
 
         regionContainer.unload();
@@ -325,7 +331,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         } else if (throwable instanceof CommandException) {
             return throwable.getMessage();
         } else {
-            getLogger().log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
+            log.log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
             return "WorldGuard: An unexpected error occurred! Please see the server console.";
         }
     }
@@ -842,6 +848,13 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
 
     /**
+     * Configure WorldGuard's loggers.
+     */
+    private void configureLogger() {
+        RecordMessagePrefixer.register(Logger.getLogger("com.sk89q.worldguard"), "[WorldGuard] ");
+    }
+
+    /**
      * Create a default configuration file from the .jar.
      *
      * @param actual The destination file
@@ -868,7 +881,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 if (copy == null) throw new FileNotFoundException();
                 input = file.getInputStream(copy);
             } catch (IOException e) {
-                getLogger().severe("Unable to read default configuration: " + defaultName);
+                log.severe("Unable to read default configuration: " + defaultName);
             }
 
         if (input != null) {
@@ -882,7 +895,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     output.write(buf, 0, length);
                 }
 
-                getLogger().info("Default configuration file written: "
+                log.info("Default configuration file written: "
                         + actual.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -920,7 +933,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 player.sendMessage(msg);
             }
         }
-        getLogger().info(msg);
+        log.info(msg);
     }
 
     /**
@@ -1004,4 +1017,5 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         return message;
     }
+
 }

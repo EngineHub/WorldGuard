@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 
 /**
  * Represents the global configuration and also delegates configuration
@@ -50,6 +51,8 @@ import java.util.concurrent.ConcurrentMap;
  * @author Michael
  */
 public class ConfigurationManager {
+
+    private static final Logger log = Logger.getLogger(ConfigurationManager.class.getCanonicalName());
 
     private static final String CONFIG_HEADER = "#\r\n" +
             "# WorldGuard's main configuration file\r\n" +
@@ -141,7 +144,7 @@ public class ConfigurationManager {
         try {
             config.load();
         } catch (IOException e) {
-            plugin.getLogger().severe("Error reading configuration for global config: ");
+            log.severe("Error reading configuration for global config: ");
             e.printStackTrace();
         }
 
@@ -208,7 +211,7 @@ public class ConfigurationManager {
     public void disableUuidMigration() {
         config.setProperty("regions.uuid-migration.perform-on-next-start", false);
         if (!config.save()) {
-            plugin.getLogger().severe("Error saving configuration!");
+            log.severe("Error saving configuration!");
         }
     }
 

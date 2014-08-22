@@ -77,6 +77,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class RegionCommands extends RegionCommandsBase {
 
+    private static final Logger log = Logger.getLogger(RegionCommands.class.getCanonicalName());
     private final WorldGuardPlugin plugin;
 
     public RegionCommands(WorldGuardPlugin plugin) {
@@ -874,7 +875,7 @@ public final class RegionCommands extends RegionCommandsBase {
                     "the target driver, then WorldGuard is now using the new data. If not, you have to adjust your " +
                     "configuration to use the new driver and then restart your server.");
         } catch (MigrationException e) {
-            plugin.getLogger().log(Level.WARNING, "Failed to migrate", e);
+            log.log(Level.WARNING, "Failed to migrate", e);
             throw new CommandException("Error encountered while migrating: " + e.getMessage());
         } finally {
             if (minecraftLogger != null) {
@@ -918,7 +919,7 @@ public final class RegionCommands extends RegionCommandsBase {
             container.migrate(migration);
             sender.sendMessage(ChatColor.YELLOW + "Migration complete!");
         } catch (MigrationException e) {
-            plugin.getLogger().log(Level.WARNING, "Failed to migrate", e);
+            log.log(Level.WARNING, "Failed to migrate", e);
             throw new CommandException("Error encountered while migrating: " + e.getMessage());
         } finally {
             if (minecraftLogger != null) {
