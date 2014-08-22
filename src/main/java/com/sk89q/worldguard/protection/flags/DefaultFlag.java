@@ -81,7 +81,7 @@ public final class DefaultFlag {
     public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
 
     public static final StringFlag DENY_MESSAGE = new StringFlag("deny-message",
-            "" + ChatColor.RED + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't do that here.");
+            "" + ChatColor.RED + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't %what% here.");
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
