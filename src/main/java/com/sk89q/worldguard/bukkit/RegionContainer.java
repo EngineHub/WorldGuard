@@ -182,6 +182,11 @@ public class RegionContainer {
     private RegionManager load(World world) {
         checkNotNull(world);
 
+        WorldConfiguration config = plugin.getGlobalStateManager().get(world);
+        if (!config.useRegions) {
+            return null;
+        }
+
         RegionManager manager;
 
         synchronized (lock) {

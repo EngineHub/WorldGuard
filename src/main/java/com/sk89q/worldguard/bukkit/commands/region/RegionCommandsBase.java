@@ -247,9 +247,16 @@ class RegionCommandsBase {
      * @throws CommandException thrown if the manager is null
      */
     protected static RegionManager checkRegionManager(WorldGuardPlugin plugin, World world) throws CommandException {
+        if (!plugin.getGlobalStateManager().get(world).useRegions) {
+            throw new CommandException("Region support is disabled in the target world. " +
+                    "It can be enabled per-world in WorldGuard's configuration files. " +
+                    "However, you may need to restart your server afterwards.");
+        }
+
         RegionManager manager = plugin.getRegionContainer().get(world);
         if (manager == null) {
-            throw new CommandException("Either region support is disabled or region data failed to load in the target world.");
+            throw new CommandException("Region data failed to load for this world. " +
+                    "Please ask a server administrator to read the logs to identify the reason.");
         }
         return manager;
     }
