@@ -25,10 +25,10 @@ import com.sk89q.commandbook.GodComponent;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.managers.storage.driver.DirectoryYamlDriver;
-import com.sk89q.worldguard.protection.managers.storage.driver.DriverType;
-import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
-import com.sk89q.worldguard.protection.managers.storage.driver.SQLDriver;
+import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
+import com.sk89q.worldguard.protection.managers.storage.DriverType;
+import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
+import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -99,8 +99,8 @@ public class ConfigurationManager {
     /**
      * Region Storage Configuration method, and config values
      */
-    public RegionStoreDriver selectedRegionStoreDriver;
-    public Map<DriverType, RegionStoreDriver> regionStoreDriverMap;
+    public RegionDriver selectedRegionStoreDriver;
+    public Map<DriverType, RegionDriver> regionStoreDriverMap;
 
     /**
      * Construct the object.
@@ -187,7 +187,7 @@ public class ConfigurationManager {
         SQLDriver sqlDriver = new SQLDriver(dataSourceConfig);
         DirectoryYamlDriver yamlDriver = new DirectoryYamlDriver(getWorldsDataFolder(), "regions.yml");
 
-        this.regionStoreDriverMap = ImmutableMap.<DriverType, RegionStoreDriver>builder()
+        this.regionStoreDriverMap = ImmutableMap.<DriverType, RegionDriver>builder()
                 .put(DriverType.MYSQL, sqlDriver)
                 .put(DriverType.YAML, yamlDriver)
                 .build();

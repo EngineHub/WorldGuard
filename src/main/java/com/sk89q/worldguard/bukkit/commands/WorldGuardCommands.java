@@ -151,9 +151,9 @@ public class WorldGuardCommands {
             Collections.sort(tasks, new TaskStateComparator());
             StringBuilder builder = new StringBuilder();
             builder.append(ChatColor.GRAY);
-            builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
+            builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
             builder.append(" Running tasks ");
-            builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
+            builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
             builder.append("\n").append(ChatColor.GRAY).append("Note: Some 'running' tasks may be waiting to be start.");
             for (Task task : tasks) {
                 builder.append("\n");

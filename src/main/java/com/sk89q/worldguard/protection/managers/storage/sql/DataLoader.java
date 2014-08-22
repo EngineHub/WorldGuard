@@ -27,7 +27,7 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.managers.storage.RegionStoreUtils;
+import com.sk89q.worldguard.protection.managers.storage.RegionDatabaseUtils;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
@@ -62,9 +62,9 @@ class DataLoader {
 
     private final Map<String, ProtectedRegion> loaded = new HashMap<String, ProtectedRegion>();
     private final Map<ProtectedRegion, String> parentSets = new HashMap<ProtectedRegion, String>();
-    private final Yaml yaml = SQLRegionStore.createYaml();
+    private final Yaml yaml = SQLRegionDatabase.createYaml();
 
-    DataLoader(SQLRegionStore regionStore, Connection conn) throws SQLException {
+    DataLoader(SQLRegionDatabase regionStore, Connection conn) throws SQLException {
         checkNotNull(regionStore);
 
         this.conn = conn;
@@ -81,7 +81,7 @@ class DataLoader {
         loadDomainUsers();
         loadDomainGroups();
 
-        RegionStoreUtils.relinkParents(loaded, parentSets);
+        RegionDatabaseUtils.relinkParents(loaded, parentSets);
 
         return new HashSet<ProtectedRegion>(loaded.values());
     }
@@ -238,7 +238,7 @@ class DataLoader {
             for (Map.Entry<String, Map<String, Object>> entry : data.rowMap().entrySet()) {
                 ProtectedRegion region = loaded.get(entry.getKey());
                 if (region != null) {
-                    RegionStoreUtils.trySetFlagMap(region, entry.getValue());
+                    RegionDatabaseUtils.trySetFlagMap(region, entry.getValue());
                 } else {
                     throw new RuntimeException("An unexpected error occurred (loaded.get() returned null)");
                 }

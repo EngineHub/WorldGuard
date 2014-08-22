@@ -63,6 +63,7 @@ import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
@@ -320,6 +321,9 @@ public class WorldGuardPlugin extends JavaPlugin {
     public String convertThrowable(@Nullable Throwable throwable) {
         if (throwable instanceof NumberFormatException) {
             return "Number expected, string received instead.";
+        } else if (throwable instanceof StorageException) {
+            log.log(Level.WARNING, "Error loading/saving regions", throwable);
+            return "Region data could not be loaded/saved: " + throwable.getMessage();
         } else if (throwable instanceof RejectedExecutionException) {
             return "There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.";
         } else if (throwable instanceof CancellationException) {

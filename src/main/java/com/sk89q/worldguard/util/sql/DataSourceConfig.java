@@ -19,7 +19,9 @@
 
 package com.sk89q.worldguard.util.sql;
 
-import com.jolbox.bonecp.BoneCPConfig;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -130,16 +132,13 @@ public class DataSourceConfig {
     }
 
     /**
-     * Create a new BoneCP configuration object.
+     * Create a new connection.
      *
-     * @return a new configuration object
+     * @return the new connection
+     * @throws SQLException raised if the connection cannot be instantiated
      */
-    public BoneCPConfig createBoneCPConfig() {
-        BoneCPConfig config = new BoneCPConfig();
-        config.setJdbcUrl(dsn);
-        config.setUsername(username);
-        config.setPassword(password);
-        return config;
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(dsn, username, password);
     }
 
 }

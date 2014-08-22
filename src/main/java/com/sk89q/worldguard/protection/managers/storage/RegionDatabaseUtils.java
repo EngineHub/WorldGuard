@@ -31,13 +31,16 @@ import java.util.logging.Logger;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Utility methods for region stores.
+ * This class provides utility methods that may be helpful in the
+ * implementation of region databases.
+ *
+ * @see RegionDatabase
  */
-public final class RegionStoreUtils {
+public final class RegionDatabaseUtils {
 
-    private static final Logger log = Logger.getLogger(RegionStoreUtils.class.getCanonicalName());
+    private static final Logger log = Logger.getLogger(RegionDatabaseUtils.class.getCanonicalName());
 
-    private RegionStoreUtils() {
+    private RegionDatabaseUtils() {
     }
 
     /**
@@ -59,14 +62,14 @@ public final class RegionStoreUtils {
 
             Object o = flagData.get(flag.getName());
             if (o != null) {
-                RegionStoreUtils.trySetFlag(region, flag, o);
+                RegionDatabaseUtils.trySetFlag(region, flag, o);
             }
 
             // Set group
             if (flag.getRegionGroupFlag() != null) {
                 Object o2 = flagData.get(flag.getRegionGroupFlag().getName());
                 if (o2 != null) {
-                    RegionStoreUtils.trySetFlag(region, flag.getRegionGroupFlag(), o2);
+                    RegionDatabaseUtils.trySetFlag(region, flag.getRegionGroupFlag(), o2);
                 }
             }
         }

@@ -22,15 +22,17 @@ package com.sk89q.worldguard.protection.managers.storage;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A memory store that saves the memory to a temporary variable.
+ * A region database that saves the memory to an in-memory {@link HashSet}.
+ *
+ * <p>This implementation is thread-safe. Difference saves
+ * are not supported.</p>
  */
-public class MemoryRegionStore implements RegionStore {
+public class MemoryRegionDatabase implements RegionDatabase {
 
     private Set<ProtectedRegion> regions = Collections.emptySet();
 
@@ -40,17 +42,17 @@ public class MemoryRegionStore implements RegionStore {
     }
 
     @Override
-    public Set<ProtectedRegion> loadAll() throws IOException {
+    public Set<ProtectedRegion> loadAll() {
         return regions;
     }
 
     @Override
-    public void saveAll(Set<ProtectedRegion> regions) throws IOException {
+    public void saveAll(Set<ProtectedRegion> regions) {
         this.regions = Collections.unmodifiableSet(new HashSet<ProtectedRegion>(regions));
     }
 
     @Override
-    public void saveChanges(RegionDifference difference) throws DifferenceSaveException, IOException {
+    public void saveChanges(RegionDifference difference) throws DifferenceSaveException {
         throw new DifferenceSaveException();
     }
 

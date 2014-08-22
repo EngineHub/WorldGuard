@@ -21,7 +21,10 @@ package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.FailedLoadRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.PermissiveRegionSet;
+import com.sk89q.worldguard.protection.RegionResultSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -70,7 +73,7 @@ public class RegionQuery {
     /**
      * Query for regions containing the given location.
      *
-     * <p>An instance of {@link ApplicableRegionSet} will always be returned,
+     * <p>An instance of {@link RegionResultSet} will always be returned,
      * even if regions are disabled or region data failed to load. An
      * appropriate "virtual" set will be returned in such a case
      * (for example, if regions are disabled, the returned set
@@ -86,14 +89,14 @@ public class RegionQuery {
         WorldConfiguration worldConfig = config.get(world);
 
         if (!worldConfig.useRegions) {
-            return ApplicableRegionSet.getEmpty();
+            return PermissiveRegionSet.getInstance();
         }
 
         RegionManager manager = globalManager.get(location.getWorld());
         if (manager != null) {
             return cache.queryContains(manager, location);
         } else {
-            return ApplicableRegionSet.getEmpty();
+            return FailedLoadRegionSet.getInstance();
         }
     }
 
@@ -109,7 +112,7 @@ public class RegionQuery {
      * @param player the player
      * @param flags zero or more flags
      * @return true if permission is granted
-     * @see ApplicableRegionSet#testBuild(RegionAssociable, StateFlag...)
+     * @see RegionResultSet#testBuild(RegionAssociable, StateFlag...)
      */
     public boolean testBuild(Location location, Player player, StateFlag... flags) {
         checkNotNull(location);
@@ -137,7 +140,7 @@ public class RegionQuery {
      * @param subject the subject
      * @param flags zero or more flags
      * @return true if permission is granted
-     * @see ApplicableRegionSet#testBuild(RegionAssociable, StateFlag...)
+     * @see RegionResultSet#testBuild(RegionAssociable, StateFlag...)
      */
     public boolean testBuild(Location location, RegionAssociable subject, StateFlag... flags) {
         checkNotNull(location);
@@ -165,7 +168,7 @@ public class RegionQuery {
      * @param player an optional player, which would be used to determine the region group to apply
      * @param flag the flag
      * @return true if the result was {@code ALLOW}
-     * @see ApplicableRegionSet#queryValue(RegionAssociable, Flag)
+     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
      */
     public boolean testState(Location location, @Nullable Player player, StateFlag... flag) {
         return StateFlag.test(queryState(location, player, flag));
@@ -186,7 +189,7 @@ public class RegionQuery {
      * @param player an optional player, which would be used to determine the region groups that apply
      * @param flags a list of flags to check
      * @return a state
-     * @see ApplicableRegionSet#queryState(RegionAssociable, StateFlag...)
+     * @see RegionResultSet#queryState(RegionAssociable, StateFlag...)
      */
     @Nullable
     public State queryState(Location location, @Nullable Player player, StateFlag... flags) {
@@ -216,7 +219,7 @@ public class RegionQuery {
      * @param player an optional player, which would be used to determine the region group to apply
      * @param flag the flag
      * @return a value, which could be {@code null}
-     * @see ApplicableRegionSet#queryValue(RegionAssociable, Flag)
+     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
      */
     @Nullable
     public <V> V queryValue(Location location, @Nullable Player player, Flag<V> flag) {
@@ -239,7 +242,7 @@ public class RegionQuery {
      * @param player an optional player, which would be used to determine the region group to apply
      * @param flag the flag
      * @return a collection of values
-     * @see ApplicableRegionSet#queryAllValues(RegionAssociable, Flag)
+     * @see RegionResultSet#queryAllValues(RegionAssociable, Flag)
      */
     public <V> Collection<V> queryAllValues(Location location, @Nullable Player player, Flag<V> flag) {
         LocalPlayer localPlayer = player != null ? plugin.wrapPlayer(player) : null;

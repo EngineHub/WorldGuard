@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.RegionResultSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Keeps a cache of {@link ApplicableRegionSet}s. The contents of the cache
+ * Keeps a cache of {@link RegionResultSet}s. The contents of the cache
  * must be externally invalidated occasionally (and frequently).
  *
  * <p>This class is fully concurrent.</p>

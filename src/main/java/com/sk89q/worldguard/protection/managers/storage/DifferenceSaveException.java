@@ -22,7 +22,7 @@ package com.sk89q.worldguard.protection.managers.storage;
 /**
  * Thrown when a partial save is not supported.
  */
-public class DifferenceSaveException extends RegionStoreException {
+public class DifferenceSaveException extends StorageException {
 
     public DifferenceSaveException() {
     }

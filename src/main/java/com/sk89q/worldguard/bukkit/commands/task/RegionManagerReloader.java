@@ -20,8 +20,8 @@
 package com.sk89q.worldguard.bukkit.commands.task;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -42,7 +42,7 @@ public class RegionManagerReloader implements Callable<Collection<RegionManager>
     }
 
     @Override
-    public Collection<RegionManager> call() throws IOException {
+    public Collection<RegionManager> call() throws StorageException {
         for (RegionManager manager : managers) {
             manager.load();
         }

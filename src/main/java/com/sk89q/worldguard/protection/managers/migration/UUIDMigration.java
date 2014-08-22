@@ -24,8 +24,9 @@ import com.sk89q.squirrelid.Profile;
 import com.sk89q.squirrelid.resolver.ProfileService;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.domains.PlayerDomain;
-import com.sk89q.worldguard.protection.managers.storage.RegionStore;
-import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
+import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
+import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.io.IOException;
@@ -62,21 +63,21 @@ public class UUIDMigration extends AbstractMigration {
      * @param driver the storage driver
      * @param profileService the profile service
      */
-    public UUIDMigration(RegionStoreDriver driver, ProfileService profileService) {
+    public UUIDMigration(RegionDriver driver, ProfileService profileService) {
         super(driver);
         checkNotNull(profileService);
         this.profileService = profileService;
     }
 
     @Override
-    protected void migrate(RegionStore store) throws MigrationException {
+    protected void migrate(RegionDatabase store) throws MigrationException {
         log.log(Level.INFO, "Migrating regions in '" + store.getName() + "' to convert names -> UUIDs...");
 
         Set<ProtectedRegion> regions;
 
         try {
             regions = store.loadAll();
-        } catch (IOException e) {
+        } catch (StorageException e) {
             throw new MigrationException("Failed to load region data for the world '" + store.getName() + "'", e);
         }
 
@@ -84,7 +85,7 @@ public class UUIDMigration extends AbstractMigration {
 
         try {
             store.saveAll(regions);
-        } catch (IOException e) {
+        } catch (StorageException e) {
             throw new MigrationException("Failed to save region data after migration of the world '" + store.getName() + "'", e);
         }
     }

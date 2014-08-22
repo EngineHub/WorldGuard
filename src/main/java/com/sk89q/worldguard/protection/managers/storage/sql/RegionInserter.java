@@ -86,7 +86,7 @@ class RegionInserter {
                 for (ProtectedRegion region : partition) {
                     stmt.setString(1, region.getId());
                     stmt.setInt(2, worldId);
-                    stmt.setString(3, SQLRegionStore.getRegionTypeName(region));
+                    stmt.setString(3, SQLRegionDatabase.getRegionTypeName(region));
                     stmt.setInt(4, region.getPriority());
                     stmt.addBatch();
                 }

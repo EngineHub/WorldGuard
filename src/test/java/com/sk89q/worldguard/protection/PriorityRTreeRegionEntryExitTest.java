@@ -21,13 +21,13 @@ package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.protection.managers.index.PriorityRTreeIndex;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.managers.storage.MemoryRegionStore;
+import com.sk89q.worldguard.protection.managers.storage.MemoryRegionDatabase;
 
 public class PriorityRTreeRegionEntryExitTest extends RegionEntryExitTest {
 
     @Override
     protected RegionManager createRegionManager() throws Exception {
-        return new RegionManager(new MemoryRegionStore(), new PriorityRTreeIndex.Factory());
+        return new RegionManager(new MemoryRegionDatabase(), new PriorityRTreeIndex.Factory());
     }
 
 }

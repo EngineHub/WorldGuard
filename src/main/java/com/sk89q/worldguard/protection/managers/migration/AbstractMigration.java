@@ -19,10 +19,10 @@
 
 package com.sk89q.worldguard.protection.managers.migration;
 
-import com.sk89q.worldguard.protection.managers.storage.RegionStore;
-import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
+import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
+import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,14 +36,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 abstract class AbstractMigration implements Migration {
 
     private static final Logger log = Logger.getLogger(AbstractMigration.class.getCanonicalName());
-    private final RegionStoreDriver driver;
+    private final RegionDriver driver;
 
     /**
      * Create a new instance.
      *
      * @param driver the storage driver
      */
-    public AbstractMigration(RegionStoreDriver driver) {
+    public AbstractMigration(RegionDriver driver) {
         checkNotNull(driver);
 
         this.driver = driver;
@@ -52,7 +52,7 @@ abstract class AbstractMigration implements Migration {
     @Override
     public final void migrate() throws MigrationException {
         try {
-            for (RegionStore store : driver.getAll()) {
+            for (RegionDatabase store : driver.getAll()) {
                 try {
                     migrate(store);
                 } catch (MigrationException e) {
@@ -61,7 +61,7 @@ abstract class AbstractMigration implements Migration {
             }
 
             postMigration();
-        } catch (IOException e) {
+        } catch (StorageException e) {
             throw new MigrationException("Migration failed because the process of getting a list of all the worlds to migrate failed", e);
         }
     }
@@ -72,7 +72,7 @@ abstract class AbstractMigration implements Migration {
      * @param store the region store
      * @throws MigrationException on migration error
      */
-    protected abstract void migrate(RegionStore store)throws MigrationException;
+    protected abstract void migrate(RegionDatabase store)throws MigrationException;
 
     /**
      * Called after migration has successfully completed.

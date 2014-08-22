@@ -29,8 +29,9 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
-import com.sk89q.worldguard.protection.managers.storage.RegionStore;
-import com.sk89q.worldguard.protection.managers.storage.RegionStoreUtils;
+import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
+import com.sk89q.worldguard.protection.managers.storage.RegionDatabaseUtils;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
@@ -61,9 +62,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A store that persists regions in a YAML-encoded file.
  */
-public class YamlFileStore implements RegionStore {
+public class YamlRegionFile implements RegionDatabase {
 
-    private static final Logger log = Logger.getLogger(YamlFileStore.class.getCanonicalName());
+    private static final Logger log = Logger.getLogger(YamlRegionFile.class.getCanonicalName());
     private static final Yaml ERROR_DUMP_YAML;
 
     private static final String FILE_HEADER = "#\r\n" +
@@ -94,17 +95,12 @@ public class YamlFileStore implements RegionStore {
      *
      * @param name the name of this store
      * @param file the file
-     * @throws IOException thrown if the file cannot be written to
      */
-    public YamlFileStore(String name, File file) throws IOException {
+    public YamlRegionFile(String name, File file) {
         checkNotNull(name);
         checkNotNull(file);
         this.name = name;
         this.file = file;
-        if (!file.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            file.createNewFile();
-        }
     }
 
     @Override
@@ -113,7 +109,7 @@ public class YamlFileStore implements RegionStore {
     }
 
     @Override
-    public Set<ProtectedRegion> loadAll() throws IOException {
+    public Set<ProtectedRegion> loadAll() throws StorageException {
         Map<String, ProtectedRegion> loaded = new HashMap<String, ProtectedRegion>();
 
         YAMLProcessor config = createYamlProcessor(file);
@@ -121,6 +117,8 @@ public class YamlFileStore implements RegionStore {
             config.load();
         } catch (FileNotFoundException e) {
             return new HashSet<ProtectedRegion>(loaded.values());
+        } catch (IOException e) {
+            throw new StorageException("Failed to load region data from '" + file + "'", e);
         }
 
         Map<String, YAMLNode> regionData = config.getNodes("regions");
@@ -183,13 +181,13 @@ public class YamlFileStore implements RegionStore {
         }
 
         // Relink parents
-        RegionStoreUtils.relinkParents(loaded, parentSets);
+        RegionDatabaseUtils.relinkParents(loaded, parentSets);
 
         return new HashSet<ProtectedRegion>(loaded.values());
     }
 
     @Override
-    public void saveAll(Set<ProtectedRegion> regions) throws IOException {
+    public void saveAll(Set<ProtectedRegion> regions) throws StorageException {
         checkNotNull(regions);
 
         File tempFile = new File(file.getParentFile(), file.getName() + ".tmp");
@@ -248,7 +246,7 @@ public class YamlFileStore implements RegionStore {
         //noinspection ResultOfMethodCallIgnored
         file.delete();
         if (!tempFile.renameTo(file)) {
-            throw new IOException("Failed to rename temporary regions file to " + file.getAbsolutePath());
+            throw new StorageException("Failed to rename temporary regions file to " + file.getAbsolutePath());
         }
     }
 
@@ -297,7 +295,7 @@ public class YamlFileStore implements RegionStore {
 
     private void setFlags(ProtectedRegion region, YAMLNode flagsData) {
         if (flagsData != null) {
-            RegionStoreUtils.trySetFlagMap(region, flagsData.getMap());
+            RegionDatabaseUtils.trySetFlagMap(region, flagsData.getMap());
         }
     }
 

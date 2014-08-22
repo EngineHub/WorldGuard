@@ -19,11 +19,11 @@
 
 package com.sk89q.worldguard.protection.managers.migration;
 
-import com.sk89q.worldguard.protection.managers.storage.RegionStore;
-import com.sk89q.worldguard.protection.managers.storage.driver.RegionStoreDriver;
+import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
+import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class DriverMigration extends AbstractMigration {
 
     private static final Logger log = Logger.getLogger(DriverMigration.class.getCanonicalName());
-    private final RegionStoreDriver target;
+    private final RegionDriver target;
 
     /**
      * Create a new instance.
@@ -43,21 +43,21 @@ public class DriverMigration extends AbstractMigration {
      * @param driver the source storage driver
      * @param target the target storage driver
      */
-    public DriverMigration(RegionStoreDriver driver, RegionStoreDriver target) {
+    public DriverMigration(RegionDriver driver, RegionDriver target) {
         super(driver);
         checkNotNull(target);
         this.target = target;
     }
 
     @Override
-    protected void migrate(RegionStore store) throws MigrationException {
+    protected void migrate(RegionDatabase store) throws MigrationException {
         Set<ProtectedRegion> regions;
 
         log.info("Loading the regions for '" + store.getName() + "' with the old driver...");
 
         try {
             regions = store.loadAll();
-        } catch (IOException e) {
+        } catch (StorageException e) {
             throw new MigrationException("Failed to load region data for the world '" + store.getName() + "'", e);
         }
 
@@ -67,17 +67,11 @@ public class DriverMigration extends AbstractMigration {
     private void write(String name, Set<ProtectedRegion> regions) throws MigrationException {
         log.info("Saving the data for '" + name + "' with the new driver...");
 
-        RegionStore store;
-
-        try {
-            store = target.get(name);
-        } catch (IOException e) {
-            throw new MigrationException("The driver to migrate to can't store region data for the world '" + name + "'", e);
-        }
+        RegionDatabase store = target.get(name);
 
         try {
             store.saveAll(regions);
-        } catch (IOException e) {
+        } catch (StorageException e) {
             throw new MigrationException("Failed to save region data for '" + store.getName() + "' to the new driver", e);
         }
     }

@@ -20,11 +20,11 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.RegionQuery;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -32,14 +32,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldguard.protection.flags.StateFlag.test;
 
 /**
  * Represents the effective set of flags, owners, and members for a given
@@ -48,45 +41,25 @@ import static com.sk89q.worldguard.protection.flags.StateFlag.test;
  * <p>An instance of this can be created using the spatial query methods
  * available on {@link RegionManager}.</p>
  */
-public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
+public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
 
     /**
-     * A static instance of an empty set.
-     */
-    private static final ApplicableRegionSet EMPTY = new ApplicableRegionSet(Collections.<ProtectedRegion>emptyList(), null);
-
-    private final List<ProtectedRegion> applicable;
-    private final FlagValueCalculator flagValueCalculator;
-    @Nullable
-    private Set<ProtectedRegion> regionSet;
-
-    /**
-     * Construct the object.
+     * Return whether this region set is a virtual set. A virtual set
+     * does not contain real results.
      *
-     * <p>A sorted set will be created to include the collection of regions.</p>
+     * <p>A virtual result may be returned if region data failed to load or
+     * there was some special exception (i.e. the region bypass permission).
+     * </p>
      *
-     * @param applicable the regions contained in this set
-     * @param globalRegion the global region, set aside for special handling.
+     * <p>Be sure to check the value of this flag if an instance of this
+     * interface is being retrieved from {@link RegionQuery} as it may
+     * return an instance of {@link PermissiveRegionSet} or
+     * {@link FailedLoadRegionSet}, among other possibilities.</p>
+     *
+     * @return true if loaded
+     * @see FailedLoadRegionSet
      */
-    public ApplicableRegionSet(List<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion) {
-        this(applicable, globalRegion, false);
-    }
-
-    /**
-     * Construct the object.
-     * 
-     * @param applicable the regions contained in this set
-     * @param globalRegion the global region, set aside for special handling.
-     * @param sorted true if the list is already sorted
-     */
-    private ApplicableRegionSet(List<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion, boolean sorted) {
-        checkNotNull(applicable);
-        if (!sorted) {
-            Collections.sort(applicable);
-        }
-        this.applicable = applicable;
-        this.flagValueCalculator = new FlagValueCalculator(applicable, globalRegion);
-    }
+    boolean isVirtual();
 
     /**
      * Tests whether the {@link DefaultFlag#BUILD} flag or membership
@@ -102,10 +75,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @deprecated use {@link #testBuild(RegionAssociable, StateFlag...)}
      */
     @Deprecated
-    public boolean canBuild(LocalPlayer player) {
-        checkNotNull(player);
-        return test(flagValueCalculator.queryState(player, DefaultFlag.BUILD));
-    }
+    boolean canBuild(LocalPlayer player);
 
     /**
      * Test whether the given flags evaluate to {@code ALLOW}, implicitly also
@@ -120,10 +90,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return true if permission is granted
      * @see #queryState(RegionAssociable, StateFlag...)
      */
-    public boolean testBuild(RegionAssociable subject, StateFlag... flags) {
-        checkNotNull(subject);
-        return test(flagValueCalculator.queryState(subject, DefaultFlag.BUILD, flags));
-    }
+    boolean testBuild(RegionAssociable subject, StateFlag... flags);
 
     /**
      * Test whether the (effective) value for a list of state flags equals
@@ -140,9 +107,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return true if the result was {@code ALLOW}
      * @see #queryState(RegionAssociable, StateFlag...)
      */
-    public boolean testState(@Nullable RegionAssociable subject, StateFlag... flags) {
-        return test(flagValueCalculator.queryState(subject, flags));
-    }
+    boolean testState(@Nullable RegionAssociable subject, StateFlag... flags);
 
     /**
      * Get the (effective) value for a list of state flags. The rules of
@@ -160,9 +125,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return a state
      */
     @Nullable
-    public State queryState(@Nullable RegionAssociable subject, StateFlag... flags) {
-        return flagValueCalculator.queryState(subject, flags);
-    }
+    State queryState(@Nullable RegionAssociable subject, StateFlag... flags);
 
     /**
      * Get the effective value for a flag. If there are multiple values
@@ -187,9 +150,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @return a value, which could be {@code null}
      */
     @Nullable
-    public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
-        return flagValueCalculator.queryValue(subject, flag);
-    }
+    <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag);
 
     /**
      * Get the effective values for a flag, returning a collection of all
@@ -206,9 +167,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param flag the flag
      * @return a collection of values
      */
-    public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
-        return flagValueCalculator.queryAllValues(subject, flag);
-    }
+    <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag);
 
     /**
      * Test whether the construct flag evaluates true for the given player.
@@ -219,11 +178,7 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      *             needed because flags now support groups assigned to them.
      */
     @Deprecated
-    public boolean canConstruct(LocalPlayer player) {
-        checkNotNull(player);
-        final RegionGroup flag = getFlag(DefaultFlag.CONSTRUCT, player);
-        return RegionGroupFlag.isMember(this, flag, player);
-    }
+    boolean canConstruct(LocalPlayer player);
 
     /**
      * Gets the state of a state flag. This cannot be used for the build flag.
@@ -234,19 +189,11 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @deprecated use {@link #queryState(RegionAssociable, StateFlag...)} instead
      */
     @Deprecated
-    public boolean allows(StateFlag flag) {
-        checkNotNull(flag);
+    boolean allows(StateFlag flag);
 
-        if (flag == DefaultFlag.BUILD) {
-            throw new IllegalArgumentException("Can't use build flag with allows()");
-        }
-
-        return test(flagValueCalculator.queryState(null, flag));
-    }
-    
     /**
      * Gets the state of a state flag. This cannot be used for the build flag.
-     * 
+     *
      * @param flag flag to check
      * @param player player (used by some flags)
      * @return whether the state is allows for it
@@ -254,51 +201,23 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @deprecated use {@link #queryState(RegionAssociable, StateFlag...)} instead
      */
     @Deprecated
-    public boolean allows(StateFlag flag, @Nullable LocalPlayer player) {
-        checkNotNull(flag);
+    boolean allows(StateFlag flag, @Nullable LocalPlayer player);
 
-        if (flag == DefaultFlag.BUILD) {
-            throw new IllegalArgumentException("Can't use build flag with allows()");
-        }
-
-        return test(flagValueCalculator.queryState(player, flag));
-    }
-    
     /**
      * Test whether a player is an owner of all regions in this set.
-     * 
+     *
      * @param player the player
      * @return whether the player is an owner of all regions
      */
-    public boolean isOwnerOfAll(LocalPlayer player) {
-        checkNotNull(player);
+    boolean isOwnerOfAll(LocalPlayer player);
 
-        for (ProtectedRegion region : applicable) {
-            if (!region.isOwner(player)) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-    
     /**
      * Test whether a player is an owner or member of all regions in this set.
-     * 
+     *
      * @param player the player
      * @return whether the player is a member of all regions
      */
-    public boolean isMemberOfAll(LocalPlayer player) {
-        checkNotNull(player);
-
-        for (ProtectedRegion region : applicable) {
-            if (!region.isMember(player)) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
+    boolean isMemberOfAll(LocalPlayer player);
 
     /**
      * Gets the value of a flag. Do not use this for state flags
@@ -311,14 +230,12 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      */
     @Deprecated
     @Nullable
-    public <T extends Flag<V>, V> V getFlag(T flag) {
-        return getFlag(flag, null);
-    }
+    <T extends Flag<V>, V> V getFlag(T flag);
 
     /**
      * Gets the value of a flag. Do not use this for state flags
      * (use {@link #allows(StateFlag, LocalPlayer)} for that).
-     * 
+     *
      * @param flag flag to check
      * @param groupPlayer player to check {@link RegionGroup}s against
      * @return value of the flag, which may be null
@@ -328,54 +245,20 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      */
     @Deprecated
     @Nullable
-    public <T extends Flag<V>, V> V getFlag(T flag, @Nullable LocalPlayer groupPlayer) {
-        return flagValueCalculator.queryValue(groupPlayer, flag);
-    }
-    
+    <T extends Flag<V>, V> V getFlag(T flag, @Nullable LocalPlayer groupPlayer);
+
     /**
      * Get the number of regions that are included.
-     * 
+     *
      * @return the number of contained regions
      */
-    public int size() {
-        return applicable.size();
-    }
+    int size();
 
     /**
      * Get an immutable set of regions that are included in this set.
      *
      * @return a set of regions
      */
-    public Set<ProtectedRegion> getRegions() {
-        if (regionSet != null) {
-            return regionSet;
-        }
-        regionSet = Collections.unmodifiableSet(new HashSet<ProtectedRegion>(applicable));
-        return regionSet;
-    }
-
-    @Override
-    public Iterator<ProtectedRegion> iterator() {
-        return applicable.iterator();
-    }
-
-    /**
-     * Return an instance that contains no regions and has no global region.
-     */
-    public static ApplicableRegionSet getEmpty() {
-        return EMPTY;
-    }
-
-    /**
-     * Create a new instance using a list of regions that is known to
-     * already be sorted by priority descending.
-     *
-     * @param regions a list of regions
-     * @param globalRegion a global region
-     * @return
-     */
-    public static ApplicableRegionSet fromSortedList(List<ProtectedRegion> regions, @Nullable ProtectedRegion globalRegion) {
-        return new ApplicableRegionSet(regions, globalRegion, true);
-    }
+    Set<ProtectedRegion> getRegions();
 
 }
