@@ -26,7 +26,6 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
-import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -104,14 +103,6 @@ public class RegionFlagsListener extends AbstractListener {
 
             if (entity instanceof EnderDragon) { // Enderdragon
                 event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
-            }
-
-            // ================================================================
-            // TNT flag
-            // ================================================================
-
-            if (Entities.isTNTBased(entity)) { // TNT + explosive TNT carts
-                event.filter(testState(query, DefaultFlag.TNT), config.explosionFlagCancellation);
             }
 
         }
