@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.google.common.collect.Lists;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
@@ -51,7 +52,6 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
@@ -108,7 +108,7 @@ import static com.sk89q.worldguard.bukkit.cause.Cause.create;
 import static com.sk89q.worldguard.bukkit.util.Materials.isBlockModifiedOnClick;
 import static com.sk89q.worldguard.bukkit.util.Materials.isItemAppliedToBlock;
 
-public class EventAbstractionListener implements Listener {
+public class EventAbstractionListener extends AbstractListener {
 
     /**
      * Abstract {@link BlockFromToEvent}s into break and place events.
@@ -116,14 +116,17 @@ public class EventAbstractionListener implements Listener {
      */
     public static final boolean ABSTRACT_FROM_TO_EVENTS = false;
 
-    private final WorldGuardPlugin plugin;
-
+    /**
+     * Construct the listener.
+     *
+     * @param plugin an instance of WorldGuardPlugin
+     */
     public EventAbstractionListener(WorldGuardPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     public void registerEvents() {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
     }
 
     //-------------------------------------------------------------------------
@@ -382,6 +385,14 @@ public class EventAbstractionListener implements Listener {
 
     @EventHandler
     public void onBlockFromTo(BlockFromToEvent event) {
+        WorldConfiguration config = getWorldConfig(event.getBlock().getWorld());
+
+        // This only applies to regions but nothing else cares about high
+        // frequency events at the moment
+        if (!config.useRegions || (!config.highFreqFlags && !config.checkLiquidFlow)) {
+            return;
+        }
+
         Block from = event.getBlock();
         Block to = event.getToBlock();
         Material fromType = from.getType();

@@ -130,6 +130,7 @@ public class WorldConfiguration {
     public boolean disableMobDamage;
     public boolean useRegions;
     public boolean highFreqFlags;
+    public boolean checkLiquidFlow;
     public int regionWand;
     public Set<EntityType> blockCreatureSpawn;
     public boolean allowTamedSpawns;
@@ -415,6 +416,7 @@ public class WorldConfiguration {
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
         explosionFlagCancellation = getBoolean("regions.explosion-flags-block-entity-damage", true);
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
+        checkLiquidFlow = getBoolean("regions.protect-against-liquid-flow", false);
         regionWand = getInt("regions.wand", 334);
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
