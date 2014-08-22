@@ -52,6 +52,8 @@ public class MemberCommands extends RegionCommandsBase {
             desc = "Add a member to a region",
             min = 2)
     public void addMember(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
         RegionManager manager = checkRegionManager(plugin, world);
@@ -87,6 +89,8 @@ public class MemberCommands extends RegionCommandsBase {
             desc = "Add an owner to a region",
             min = 2)
     public void addOwner(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
 
         Player player = null;
@@ -148,6 +152,8 @@ public class MemberCommands extends RegionCommandsBase {
             desc = "Remove an owner to a region",
             min = 1)
     public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
         RegionManager manager = checkRegionManager(plugin, world);
@@ -193,6 +199,8 @@ public class MemberCommands extends RegionCommandsBase {
             desc = "Remove an owner to a region",
             min = 1)
     public void removeOwner(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
         RegionManager manager = checkRegionManager(plugin, world);

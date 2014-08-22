@@ -40,6 +40,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -237,6 +238,15 @@ public class RegionContainer {
      */
     public List<RegionManager> getLoaded() {
         return Collections.unmodifiableList(container.getLoaded());
+    }
+
+    /**
+     * Get the a set of region managers that are failing to save.
+     *
+     * @return a set of region managers
+     */
+    public Set<RegionManager> getSaveFailures() {
+        return container.getSaveFailures();
     }
 
     /**

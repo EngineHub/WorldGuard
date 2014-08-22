@@ -161,6 +161,13 @@ public interface RegionIndex extends ChangeTracked {
     RegionDifference getAndClearDifference();
 
     /**
+     * Set the index to be dirty using the given difference.
+     *
+     * @param difference the difference
+     */
+    void setDirty(RegionDifference difference);
+
+    /**
      * Get an unmodifiable collection of regions stored in this index.
      *
      * @return a collection of regions

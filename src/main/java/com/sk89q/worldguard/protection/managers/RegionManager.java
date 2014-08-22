@@ -70,6 +70,13 @@ public final class RegionManager {
     }
 
     /**
+     * Get a displayable name for this store.
+     */
+    public String getName() {
+        return store.getName();
+    }
+
+    /**
      * Load regions from storage and replace the index on this manager with
      * the regions loaded from the store.
      *
@@ -109,16 +116,25 @@ public final class RegionManager {
      */
     public boolean saveChanges() throws IOException {
         RegionDifference diff = index.getAndClearDifference();
+        boolean successful = false;
 
-        if (diff.containsChanges()) {
-            try {
-                store.saveChanges(diff);
-            } catch (DifferenceSaveException e) {
-                save(); // Partial save is not supported
+        try {
+            if (diff.containsChanges()) {
+                try {
+                    store.saveChanges(diff);
+                } catch (DifferenceSaveException e) {
+                    save(); // Partial save is not supported
+                }
+                successful = true;
+                return true;
+            } else {
+                successful = true;
+                return false;
             }
-            return true;
-        } else {
-            return false;
+        } finally {
+            if (!successful) {
+                index.setDirty(diff);
+            }
         }
     }
 

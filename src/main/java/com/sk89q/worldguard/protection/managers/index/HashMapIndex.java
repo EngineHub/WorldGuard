@@ -237,6 +237,16 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
     }
 
     @Override
+    public void setDirty(RegionDifference difference) {
+        synchronized (lock) {
+            for (ProtectedRegion changed : difference.getChanged()) {
+                changed.setDirty(true);
+            }
+            removed.addAll(difference.getRemoved());
+        }
+    }
+
+    @Override
     public Collection<ProtectedRegion> values() {
         return Collections.unmodifiableCollection(regions.values());
     }

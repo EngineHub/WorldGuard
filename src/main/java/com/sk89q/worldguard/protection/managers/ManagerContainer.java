@@ -31,10 +31,13 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
@@ -55,6 +58,9 @@ public class ManagerContainer {
     private final RegionStoreDriver driver;
     private final Supplier<? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
     private final Timer timer = new Timer();
+
+    private final Set<RegionManager> failingSaves = Collections.synchronizedSet(
+            Collections.newSetFromMap(new WeakHashMap<RegionManager, Boolean>()));
 
     /**
      * Create a new instance.
@@ -189,6 +195,15 @@ public class ManagerContainer {
     }
 
     /**
+     * Get the a set of region managers that are failing to save.
+     *
+     * @return a set of region managers
+     */
+    public Set<RegionManager> getSaveFailures() {
+        return new HashSet<RegionManager>(failingSaves);
+    }
+
+    /**
      * A task to save managers in the background.
      */
     private class BackgroundSaver extends TimerTask {
@@ -204,9 +219,12 @@ public class ManagerContainer {
                         if (manager.saveChanges()) {
                             log.info("Region data changes made in '" + name + "' have been background saved");
                         }
+                        failingSaves.remove(manager);
                     } catch (IOException e) {
+                        failingSaves.add(manager);
                         log.log(Level.WARNING, "Failed to save the region data for '" + name + "' during a periodical save", e);
                     } catch (Exception e) {
+                        failingSaves.add(manager);
                         log.log(Level.WARNING, "An expected error occurred during a periodical save", e);
                     }
                 }
