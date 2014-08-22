@@ -48,8 +48,9 @@ public class StateFlag extends Flag<StateFlag.State> {
         this.def = def;
     }
 
-    public boolean getDefault() {
-        return def;
+    @Override
+    public State getDefault() {
+        return def ? State.ALLOW : null;
     }
 
     @Override

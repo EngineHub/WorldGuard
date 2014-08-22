@@ -24,7 +24,6 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import javax.annotation.Nullable;
@@ -58,11 +57,7 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
     @Nullable
     @Override
     public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
-        if (flag instanceof StateFlag) {
-            return ((StateFlag) flag).getDefault() ? (V) State.DENY : (V) State.ALLOW; // Inverse default
-        } else {
-            return null;
-        }
+        return flag.getDefault();
     }
 
     @Override

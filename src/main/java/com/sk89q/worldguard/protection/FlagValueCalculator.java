@@ -379,10 +379,10 @@ public class FlagValueCalculator {
 
         if (consideredValues.isEmpty()) {
             if (flag instanceof StateFlag) {
-                //noinspection unchecked
-                return (Collection<V>) (((StateFlag) flag).getDefault()
-                        ? ImmutableList.of(State.ALLOW)
-                        : ImmutableList.of());
+                V fallback = flag.getDefault();
+                return fallback != null
+                        ? ImmutableList.of(fallback)
+                        : (Collection<V>) ImmutableList.of();
             }
         }
 
