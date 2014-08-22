@@ -48,6 +48,10 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,7 +72,6 @@ public class SQLRegionStore implements RegionStore {
     /**
      * Create a new instance.
      *
-     * @param name the name of this store
      * @param config a configuration object that configures a {@link Connection}
      * @param connectionPool a connection pool
      * @param worldName the name of the world to store regions by
@@ -227,7 +230,20 @@ public class SQLRegionStore implements RegionStore {
      * @throws SQLException thrown if the connection could not be created
      */
     private Connection getConnection() throws SQLException {
-        return connectionPool.getConnection();
+        Future<Connection> future = connectionPool.getAsyncConnection();
+        try {
+            return future.get(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            future.cancel(true);
+            throw new SQLException("Failed to get connection -- interrupted");
+        } catch (ExecutionException e) {
+            future.cancel(true);
+            throw new SQLException("Failed to get connection; an error occurred", e);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw new SQLException("Failed to get connection; took too long to get a valid SQL connection (is the database server down?)");
+        }
     }
 
     /**

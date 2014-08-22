@@ -75,7 +75,7 @@ public class SQLDriver implements RegionStoreDriver {
         try {
             return new SQLRegionStore(config, getConnectionPool(), name);
         } catch (SQLException e) {
-            throw new IOException("Failed to get a connection pool for storing regions (are the SQL details correct?)");
+            throw new IOException("Failed to get a connection pool for storing regions (are the SQL details correct? is the SQL server online?)");
         }
     }
 

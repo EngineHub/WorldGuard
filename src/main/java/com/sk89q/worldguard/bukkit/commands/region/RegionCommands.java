@@ -98,6 +98,7 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Defines a region",
              min = 1)
     public void define(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
         Player player = plugin.checkPlayer(sender);
 
         // Check permissions
@@ -140,6 +141,8 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Re-defines the shape of a region",
              min = 1, max = 1)
     public void redefine(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
 
@@ -186,6 +189,8 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Claim a region",
              min = 1)
     public void claim(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         Player player = plugin.checkPlayer(sender);
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         RegionPermissionModel permModel = getPermissionModel(sender);
@@ -309,6 +314,8 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Get information about a region",
              min = 0, max = 1)
     public void info(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
         RegionPermissionModel permModel = getPermissionModel(sender);
 
@@ -372,6 +379,8 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "np:w:",
              max = 1)
     public void list(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
         String ownedBy;
         
@@ -425,6 +434,8 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Set flags",
              min = 2)
     public void flag(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
         String flagName = args.getString(1);
         String value = args.argsLength() >= 3 ? args.getJoinedStrings(2) : null;
@@ -563,6 +574,8 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Set the priority of a region",
              min = 2, max = 2)
     public void setPriority(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
         int priority = args.getInteger(1);
 
@@ -595,6 +608,8 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Set the parent of a region",
              min = 1, max = 2)
     public void setParent(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
         ProtectedRegion parent;
         ProtectedRegion child;
@@ -660,6 +675,8 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Remove a region",
              min = 1, max = 1)
     public void remove(CommandContext args, CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = checkWorld(args, sender, 'w'); // Get the world
         boolean removeChildren = args.hasFlag('f');
         boolean unsetParent = args.hasFlag('u');
@@ -704,6 +721,8 @@ public final class RegionCommands extends RegionCommandsBase {
             desc = "Reload regions from file",
             flags = "w:")
     public void load(CommandContext args, final CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = null;
         try {
             world = checkWorld(args, sender, 'w'); // Get the world
@@ -761,6 +780,8 @@ public final class RegionCommands extends RegionCommandsBase {
             desc = "Re-save regions to file",
             flags = "w:")
     public void save(CommandContext args, final CommandSender sender) throws CommandException {
+        warnAboutSaveFailures(sender);
+
         World world = null;
         try {
             world = checkWorld(args, sender, 'w'); // Get the world

@@ -268,6 +268,11 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
     }
 
     @Override
+    public void setDirty(RegionDifference difference) {
+        index.setDirty(difference);
+    }
+
+    @Override
     public Collection<ProtectedRegion> values() {
         return index.values();
     }

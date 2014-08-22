@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.bukkit.commands.region;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.BlockVector;
@@ -27,6 +30,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldguard.bukkit.RegionContainer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -41,6 +45,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.Set;
 
 class RegionCommandsBase {
 
@@ -271,6 +277,29 @@ class RegionCommandsBase {
             return new ProtectedCuboidRegion(id, min, max);
         } else {
             throw new CommandException("Sorry, you can only use cuboids and polygons for WorldGuard regions.");
+        }
+    }
+
+    /**
+     * Warn the region saving is failing.
+     *
+     * @param sender the sender to send the message to
+     */
+    protected static void warnAboutSaveFailures(CommandSender sender) {
+        RegionContainer container = WorldGuardPlugin.inst().getRegionContainer();
+        Set<RegionManager> failures = container.getSaveFailures();
+
+        if (failures.size() > 0) {
+            String failingList = Joiner.on(", ").join(Iterables.transform(failures, new Function<RegionManager, String>() {
+                @Override
+                public String apply(RegionManager regionManager) {
+                    return "'" + regionManager.getName() + "'";
+                }
+            }));
+
+            sender.sendMessage(ChatColor.GOLD +
+                    "(Warning: The background saving of region data is failing for these worlds: " + failingList + ". " +
+                    "Your changes are getting lost. See the server log for more information.)");
         }
     }
 

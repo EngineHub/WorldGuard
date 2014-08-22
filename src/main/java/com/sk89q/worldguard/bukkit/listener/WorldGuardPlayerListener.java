@@ -130,6 +130,9 @@ public class WorldGuardPlayerListener implements Listener {
         }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(toWorld);
+        if (mgr == null) {
+            return false;
+        }
         Vector pt = new Vector(to.getBlockX(), to.getBlockY(), to.getBlockZ());
         ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
