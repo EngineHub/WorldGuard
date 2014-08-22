@@ -46,6 +46,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -265,7 +266,12 @@ public class RegionProtectionListener extends AbstractListener {
         /* Everything else */
         } else {
             canSpawn = query.testBuild(target, associable);
-            what = "place things";
+
+            if (event.getEntity() instanceof Item) {
+                what = "drop items";
+            } else {
+                what = "place things";
+            }
         }
 
         if (!canSpawn) {
@@ -295,7 +301,12 @@ public class RegionProtectionListener extends AbstractListener {
         /* Everything else */
         } else {
             canDestroy = query.testBuild(target, associable);
-            what = "break things";
+
+            if (event.getEntity() instanceof Item) {
+                what = "pick up items";
+            } else {
+                what = "break things";
+            }
         }
 
         if (!canDestroy) {
