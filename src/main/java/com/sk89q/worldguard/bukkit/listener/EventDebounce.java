@@ -21,7 +21,7 @@ package com.sk89q.worldguard.bukkit.listener;
 
 class EventDebounce {
 
-    private static final int DEBOUNCE_TIME = 5000;
+    private static final int DEBOUNCE_TIME = 10000;
 
     private final long time = System.currentTimeMillis();
     private final boolean cancelled;
