@@ -141,12 +141,12 @@ public class RegionProtectionListener extends AbstractListener {
 
                 /* Flint and steel, fire charge, etc. */
                 if (type == Material.FIRE) {
-                    canPlace = query.testBuild(target, associable, DefaultFlag.LIGHTER);
+                    canPlace = query.testBuild(target, associable, DefaultFlag.BLOCK_PLACE, DefaultFlag.LIGHTER);
                     what = "place fire";
 
                 /* Everything else */
                 } else {
-                    canPlace = query.testBuild(target, associable);
+                    canPlace = query.testBuild(target, associable, DefaultFlag.BLOCK_PLACE);
                     what = "place that block";
                 }
 
@@ -178,12 +178,12 @@ public class RegionProtectionListener extends AbstractListener {
 
                     /* TNT */
                     if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.PRIMED_TNT) != null) {
-                        canBreak = query.testBuild(target, associable, DefaultFlag.TNT);
+                        canBreak = query.testBuild(target, associable, DefaultFlag.BLOCK_BREAK, DefaultFlag.TNT);
                         what = "dynamite blocks";
 
                     /* Everything else */
                     } else {
-                        canBreak = query.testBuild(target, associable);
+                        canBreak = query.testBuild(target, associable, DefaultFlag.BLOCK_BREAK);
                         what = "break that block";
                     }
 
