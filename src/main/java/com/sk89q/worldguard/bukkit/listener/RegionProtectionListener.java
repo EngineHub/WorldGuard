@@ -36,7 +36,6 @@ import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -63,13 +62,15 @@ public class RegionProtectionListener extends AbstractListener {
      * Tell a sender that s/he cannot do something 'here'.
      *
      * @param cause the cause
-     * @param subject the subject that the sender was blocked from touching
+     * @param location the location
      */
-    private void tellErrorMessage(Cause cause, Object subject) {
+    private void tellErrorMessage(Cause cause, Location location) {
         Object rootCause = cause.getRootCause();
 
         if (rootCause instanceof Player) {
-            ((Player) rootCause).sendMessage(ChatColor.DARK_RED + "Sorry, but you are not allowed to do that here.");
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
+            Player player = (Player) rootCause;
+            player.sendMessage(query.queryValue(location, player, DefaultFlag.DENY_MESSAGE));
         }
     }
 

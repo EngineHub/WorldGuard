@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.google.common.base.Function;
+import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -34,6 +35,76 @@ public final class CommandUtils {
 
     private CommandUtils() {
     }
+
+    /**
+     * Replace color macros in a string.
+     *
+     * @param str the string
+     * @return the new string
+     */
+    public static String replaceColorMacros(String str) {
+        // TODO: Make this more efficient
+
+        str = str.replace("`r", ChatColor.RED.toString());
+        str = str.replace("`R", ChatColor.DARK_RED.toString());
+
+        str = str.replace("`y", ChatColor.YELLOW.toString());
+        str = str.replace("`Y", ChatColor.GOLD.toString());
+
+        str = str.replace("`g", ChatColor.GREEN.toString());
+        str = str.replace("`G", ChatColor.DARK_GREEN.toString());
+
+        str = str.replace("`c", ChatColor.AQUA.toString());
+        str = str.replace("`C", ChatColor.DARK_AQUA.toString());
+
+        str = str.replace("`b", ChatColor.BLUE.toString());
+        str = str.replace("`B", ChatColor.DARK_BLUE.toString());
+
+        str = str.replace("`p", ChatColor.LIGHT_PURPLE.toString());
+        str = str.replace("`P", ChatColor.DARK_PURPLE.toString());
+
+        str = str.replace("`0", ChatColor.BLACK.toString());
+        str = str.replace("`1", ChatColor.DARK_GRAY.toString());
+        str = str.replace("`2", ChatColor.GRAY.toString());
+        str = str.replace("`w", ChatColor.WHITE.toString());
+
+        str = str.replace("`k", ChatColor.MAGIC.toString());
+
+        str = str.replace("`l", ChatColor.BOLD.toString());
+        str = str.replace("`m", ChatColor.STRIKETHROUGH.toString());
+        str = str.replace("`n", ChatColor.UNDERLINE.toString());
+        str = str.replace("`o", ChatColor.ITALIC.toString());
+
+        str = str.replace("`x", ChatColor.RESET.toString());
+
+        // MC classic
+
+        str = str.replace("&c", ChatColor.RED.toString());
+        str = str.replace("&4", ChatColor.DARK_RED.toString());
+
+        str = str.replace("&e", ChatColor.YELLOW.toString());
+        str = str.replace("&6", ChatColor.GOLD.toString());
+
+        str = str.replace("&a", ChatColor.GREEN.toString());
+        str = str.replace("&2", ChatColor.DARK_GREEN.toString());
+
+        str = str.replace("&b", ChatColor.AQUA.toString());
+        str = str.replace("&3", ChatColor.DARK_AQUA.toString());
+
+        str = str.replace("&9", ChatColor.BLUE.toString());
+        str = str.replace("&1", ChatColor.DARK_BLUE.toString());
+
+        str = str.replace("&d", ChatColor.LIGHT_PURPLE.toString());
+        str = str.replace("&5", ChatColor.DARK_PURPLE.toString());
+
+        str = str.replace("&0", ChatColor.BLACK.toString());
+        str = str.replace("&8", ChatColor.DARK_GRAY.toString());
+        str = str.replace("&7", ChatColor.GRAY.toString());
+        str = str.replace("&f", ChatColor.WHITE.toString());
+
+        return str;
+    }
+
 
     /**
      * Get the name of the given owner object.

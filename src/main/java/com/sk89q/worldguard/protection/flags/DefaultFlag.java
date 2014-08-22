@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 
@@ -79,6 +80,8 @@ public final class DefaultFlag {
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = new StateFlag("entity-item-frame-destroy", true);
     public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
 
+    public static final StringFlag DENY_MESSAGE = new StringFlag("deny-message",
+            "" + ChatColor.RED + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't do that here.");
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
@@ -108,7 +111,7 @@ public final class DefaultFlag {
             TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
             MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
-            GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
+            DENY_MESSAGE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
             EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,
             ENTITY_ITEM_FRAME_DESTROY, ITEM_DROP, /*MAX_PLAYERS, MAX_PLAYERS_MESSAGE,*/
             HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,

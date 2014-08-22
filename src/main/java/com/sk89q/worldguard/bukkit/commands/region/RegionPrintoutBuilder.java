@@ -126,13 +126,13 @@ public class RegionPrintoutBuilder implements Callable<String> {
                 group = region.getFlag(groupFlag);
             }
 
-            if(group == null) {
+            if (group == null) {
                 builder.append(flag.getName()).append(": ")
-                    .append(val);
+                        .append(ChatColor.stripColor(String.valueOf(val)));
             } else {
                 builder.append(flag.getName()).append(" -g ")
-                    .append(group).append(": ")
-                    .append(val);
+                        .append(group).append(": ")
+                        .append(ChatColor.stripColor(String.valueOf(val)));
             }
 
             hasFlags = true;
