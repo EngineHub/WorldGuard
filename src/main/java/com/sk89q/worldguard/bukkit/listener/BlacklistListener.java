@@ -45,10 +45,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
@@ -192,6 +190,16 @@ public class BlacklistListener extends AbstractListener {
             return;
         }
 
+        if (target instanceof Item) {
+            Item item = (Item) target;
+            if (!wcfg.getBlacklist().check(
+                    new ItemAcquireBlacklistEvent(localPlayer,
+                            toVector(target.getLocation()), createTarget(item.getItemStack())), false, true)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         Material material = Materials.getRelatedMaterial(target.getType());
         if (material != null) {
             // Not really a block but we only have one on-break blacklist event
@@ -234,22 +242,6 @@ public class BlacklistListener extends AbstractListener {
             if (!wcfg.getBlacklist().check(
                     new ItemDropBlacklistEvent(getPlugin().wrapPlayer(event.getPlayer()),
                             toVector(ci.getLocation()), createTarget(ci.getItemStack())), false, false)) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-        ConfigurationManager cfg = getPlugin().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getPlayer().getWorld());
-
-        if (wcfg.getBlacklist() != null) {
-            Item ci = event.getItem();
-
-            if (!wcfg.getBlacklist().check(
-                    new ItemAcquireBlacklistEvent(getPlugin().wrapPlayer(event.getPlayer()),
-                            toVector(ci.getLocation()), createTarget(ci.getItemStack())), false, true)) {
                 event.setCancelled(true);
             }
         }
