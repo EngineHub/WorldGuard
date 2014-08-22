@@ -113,6 +113,11 @@ public class RegionProtectionListener extends AbstractListener {
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
         final RegionAssociable associable = createRegionAssociable(event.getCause());
 
+        // Don't check liquid flow unless it's enabled
+        if (Materials.isLiquid(type) && !getWorldConfig(event.getWorld()).checkLiquidFlow) {
+            return;
+        }
+
         event.filter(new Predicate<Location>() {
             @Override
             public boolean apply(Location target) {
