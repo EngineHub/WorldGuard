@@ -442,6 +442,9 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionGroup groupValue = null;
         RegionPermissionModel permModel = getPermissionModel(sender);
 
+        // Add color codes
+        value = CommandUtils.replaceColorMacros(value);
+
         // Lookup the existing region
         RegionManager manager = checkRegionManager(plugin, world);
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), true);
@@ -473,8 +476,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             sender.sendMessage(ChatColor.RED + "Unknown flag specified: " + flagName);
-            sender.sendMessage(ChatColor.RED + "Available " +
-                    "flags: " + list);
+            sender.sendMessage(ChatColor.RED + "Available " + "flags: " + list);
             
             return;
         }
@@ -517,7 +519,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             sender.sendMessage(ChatColor.YELLOW
                     + "Region flag " + foundFlag.getName() + " set on '" +
-                    existing.getId() + "' to '" + value + "'.");
+                    existing.getId() + "' to '" + ChatColor.stripColor(value) + "'.");
         
         // No value? Clear the flag, if -g isn't specified
         } else if (!args.hasFlag('g')) {
