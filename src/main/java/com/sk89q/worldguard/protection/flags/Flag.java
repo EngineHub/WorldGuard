@@ -51,6 +51,16 @@ public abstract class Flag<T> {
         return name;
     }
 
+    /**
+     * Get the default value.
+     *
+     * @return the default value, if one exists, otherwise {@code null} may be returned
+     */
+    @Nullable
+    public T getDefault() {
+        return null;
+    }
+
     @Nullable
     public T chooseValue(Collection<T> values) {
         if (!values.isEmpty()) {
