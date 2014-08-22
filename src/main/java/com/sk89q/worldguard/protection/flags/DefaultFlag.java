@@ -44,6 +44,8 @@ public final class DefaultFlag {
     // These flags are used in tandem with the BUILD flag - if the player can
     // build, then the following flags do not need to be checked (although they
     // are still checked for DENY), so they are false by default
+    public static final StateFlag BLOCK_BREAK = new StateFlag("block-break", false);
+    public static final StateFlag BLOCK_PLACE = new StateFlag("block-place", false);
     public static final StateFlag USE = new StateFlag("use", false);
     public static final StateFlag PVP = new StateFlag("pvp", false);
     public static final StateFlag SLEEP = new StateFlag("sleep", false);
@@ -125,7 +127,7 @@ public final class DefaultFlag {
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", new CommandStringFlag(null));
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
-            PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
+            PASSTHROUGH, BUILD, CONSTRUCT, BLOCK_BREAK, BLOCK_PLACE, PVP, CHEST_ACCESS, PISTONS,
             TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
             MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
