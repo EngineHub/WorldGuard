@@ -48,7 +48,7 @@ public class ChestProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
-        final Player player = event.getCause().getPlayerRootCause();
+        final Player player = event.getCause().getFirstPlayer();
 
         if (player != null) {
             final WorldConfiguration wcfg = getWorldConfig(player);
@@ -74,7 +74,7 @@ public class ChestProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        final Player player = event.getCause().getPlayerRootCause();
+        final Player player = event.getCause().getFirstPlayer();
 
         final WorldConfiguration wcfg = getWorldConfig(event.getWorld());
 
@@ -108,7 +108,7 @@ public class ChestProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
-        final Player player = event.getCause().getPlayerRootCause();
+        final Player player = event.getCause().getFirstPlayer();
 
         final WorldConfiguration wcfg = getWorldConfig(event.getWorld());
 

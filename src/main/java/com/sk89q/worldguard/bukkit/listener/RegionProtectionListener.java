@@ -26,16 +26,20 @@ import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
+import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.util.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.util.Entities;
+import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
+import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -276,6 +280,41 @@ public class RegionProtectionListener extends AbstractListener {
         boolean canUse = query.testBuild(target, associable, DefaultFlag.USE);
 
         if (!canUse) {
+            tellErrorMessage(event.getCause(), target);
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onDamageEntity(DamageEntityEvent event) {
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
+
+        Location target = event.getTarget();
+        RegionAssociable associable = createRegionAssociable(event.getCause());
+
+        RegionQuery query = getPlugin().getRegionContainer().createQuery();
+        Player attacker;
+        boolean canDamage;
+
+        /* PVP */
+        if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null) {
+            Player defender = (Player) event.getEntity();
+
+            canDamage = query.testBuild(target, associable, DefaultFlag.PVP)
+                    && query.queryState(attacker.getLocation(), attacker, DefaultFlag.PVP) != State.DENY;
+
+            // Fire the disallow PVP event
+            if (!canDamage && Events.fireAndTestCancel(new DisallowedPVPEvent(attacker, defender, event.getOriginalEvent()))) {
+                canDamage = true;
+            }
+
+        /* Everything else */
+        } else {
+            canDamage = query.testBuild(target, associable, DefaultFlag.USE);
+        }
+
+        if (!canDamage) {
             tellErrorMessage(event.getCause(), target);
             event.setCancelled(true);
         }

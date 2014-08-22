@@ -29,16 +29,13 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.RegionQueryUtil;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -245,18 +242,6 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             if (attacker != null) {
-                if (attacker instanceof Player) {
-                    if (wcfg.useRegions) {
-                        RegionQuery query = plugin.getRegionContainer().createQuery();
-
-                        if (!query.testBuild(attacker.getLocation(), (Player) attacker, DefaultFlag.PVP)) {
-                            tryCancelPVPEvent((Player) attacker, player, event, true);
-                        } else if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.PVP)) {
-                            tryCancelPVPEvent((Player) attacker, player, event, false);
-                        }
-                    }
-                }
-
                 if (attacker instanceof TNTPrimed || attacker instanceof ExplosiveMinecart) {
 
                     // The check for explosion damage should be handled already... But... What ever...
@@ -288,18 +273,9 @@ public class WorldGuardEntityListener implements Listener {
                     if (wcfg.useRegions) {
                         Fireball fireball = (Fireball) attacker;
                         RegionQuery query = plugin.getRegionContainer().createQuery();
-                        if (fireball.getShooter() instanceof Player) {
-                            Location pt2 = ((Player) fireball.getShooter()).getLocation();
-                            if (!query.testBuild(pt2, (Player) fireball.getShooter(), DefaultFlag.PVP)) {
-                                tryCancelPVPEvent((Player) fireball.getShooter(), player, event, true);
-                            } else if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.PVP)) {
-                                tryCancelPVPEvent((Player) fireball.getShooter(), player, event, false);
-                            }
-                        } else {
-                            if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.GHAST_FIREBALL) && wcfg.explosionFlagCancellation) {
-                                event.setCancelled(true);
-                                return;
-                            }
+                        if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.GHAST_FIREBALL) && wcfg.explosionFlagCancellation) {
+                            event.setCancelled(true);
+                            return;
                         }
 
                     }
@@ -329,23 +305,6 @@ public class WorldGuardEntityListener implements Listener {
                             if (!set.allows(DefaultFlag.CREEPER_EXPLOSION, localPlayer) && wcfg.explosionFlagCancellation) {
                                 event.setCancelled(true);
                                 return;
-                            }
-                        }
-                        if (attacker instanceof Tameable) {
-                            if (((Tameable) attacker).getOwner() == null) {
-                                if (!set.allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
-                                    event.setCancelled(true);
-                                    return;
-                                }
-                            }
-                            if (!(((Tameable) attacker).getOwner() instanceof Player)) {
-                                return;
-                            }
-                            Player beastMaster = (Player) ((Tameable) attacker).getOwner();
-                            if (!plugin.getRegionContainer().createQuery().getApplicableRegions(attacker.getLocation()).allows(DefaultFlag.PVP, plugin.wrapPlayer(beastMaster))) {
-                                tryCancelPVPEvent(beastMaster, player, event, true);
-                            } else if (!set.allows(DefaultFlag.PVP, localPlayer)) {
-                                tryCancelPVPEvent(beastMaster, player, event, false);
                             }
                         }
                     }
@@ -387,19 +346,6 @@ public class WorldGuardEntityListener implements Listener {
                     if (!plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation()).allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
                         event.setCancelled(true);
                         return;
-                    }
-                }
-            }
-
-            // Check Player
-            // if (event.getDamager() instanceof EnderPearl || event.getDamager() instanceof Snowball) return;
-            if (attacker != null && attacker instanceof Player) {
-                if (event.getDamager() instanceof EnderPearl && attacker == player) return;
-                if (wcfg.useRegions) {
-                    if (!plugin.getRegionContainer().createQuery().getApplicableRegions(attacker.getLocation()).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) attacker))) {
-                        tryCancelPVPEvent((Player) attacker, player, event, true);
-                    } else if (!plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation()).allows(DefaultFlag.PVP, localPlayer)) {
-                        tryCancelPVPEvent((Player) attacker, player, event, false);
                     }
                 }
             }
@@ -880,26 +826,6 @@ public class WorldGuardEntityListener implements Listener {
             }
         } else {
             return god;
-        }
-    }
-
-    /**
-     * Using a DisallowedPVPEvent, notifies other plugins that WorldGuard
-     * wants to cancel a PvP damage event.<br />
-     * If this event is not cancelled, the attacking player is notified that
-     * PvP is disabled and WorldGuard cancels the damage event.
-     *
-     * @param attackingPlayer The attacker
-     * @param defendingPlayer The defender
-     * @param event The event that caused WorldGuard to act
-     */
-    public void tryCancelPVPEvent(final Player attackingPlayer, final Player defendingPlayer, EntityDamageByEntityEvent event, boolean aggressorTriggered) {
-        final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
-        plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
-        if (!disallowedPVPEvent.isCancelled()) {
-            if (aggressorTriggered) attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-            else attackingPlayer.sendMessage(ChatColor.DARK_RED + "That player is in a no-PvP area.");
-            event.setCancelled(true);
         }
     }
 

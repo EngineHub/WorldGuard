@@ -25,6 +25,7 @@ import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
+import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
@@ -487,12 +488,12 @@ public class EventAbstractionListener implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (event instanceof EntityDamageByBlockEvent) {
-            Events.fireToCancel(event, new UseEntityEvent(event, create(((EntityDamageByBlockEvent) event).getDamager()), event.getEntity()));
+            Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityDamageByBlockEvent) event).getDamager()), event.getEntity()));
 
         } else if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) event;
             Entity damager = entityEvent.getDamager();
-            Events.fireToCancel(event, new UseEntityEvent(event, create(damager), event.getEntity()));
+            Events.fireToCancel(event, new DamageEntityEvent(event, create(damager), event.getEntity()));
 
             // Item use event with the item in hand
             // Older blacklist handler code used this, although it suffers from
@@ -506,20 +507,20 @@ public class EventAbstractionListener implements Listener {
             }
 
         } else {
-            Events.fireToCancel(event, new UseEntityEvent(event, Cause.unknown(), event.getEntity()));
+            Events.fireToCancel(event, new DamageEntityEvent(event, Cause.unknown(), event.getEntity()));
         }
     }
 
     @EventHandler
     public void onEntityCombust(EntityCombustEvent event) {
         if (event instanceof EntityCombustByBlockEvent) {
-            Events.fireToCancel(event, new UseEntityEvent(event, create(((EntityCombustByBlockEvent) event).getCombuster()), event.getEntity()));
+            Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityCombustByBlockEvent) event).getCombuster()), event.getEntity()));
 
         } else if (event instanceof EntityCombustByEntityEvent) {
-            Events.fireToCancel(event, new UseEntityEvent(event, create(((EntityCombustByEntityEvent) event).getCombuster()), event.getEntity()));
+            Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityCombustByEntityEvent) event).getCombuster()), event.getEntity()));
 
         } else {
-            Events.fireToCancel(event, new UseEntityEvent(event, Cause.unknown(), event.getEntity()));
+            Events.fireToCancel(event, new DamageEntityEvent(event, Cause.unknown(), event.getEntity()));
         }
     }
 
