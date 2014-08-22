@@ -67,14 +67,18 @@ public class RegionProtectionListener extends AbstractListener {
      *
      * @param cause the cause
      * @param location the location
+     * @param what what was done
      */
-    private void tellErrorMessage(Cause cause, Location location) {
+    private void tellErrorMessage(Cause cause, Location location, String what) {
         Object rootCause = cause.getRootCause();
 
         if (rootCause instanceof Player) {
             RegionQuery query = getPlugin().getRegionContainer().createQuery();
             Player player = (Player) rootCause;
-            player.sendMessage(query.queryValue(location, player, DefaultFlag.DENY_MESSAGE));
+            String message = query.queryValue(location, player, DefaultFlag.DENY_MESSAGE);
+            if (message != null) {
+                player.sendMessage(message.replace("%what%", what));
+            }
         }
     }
 
@@ -122,18 +126,21 @@ public class RegionProtectionListener extends AbstractListener {
             @Override
             public boolean apply(Location target) {
                 boolean canPlace;
+                String what;
 
                 /* Flint and steel, fire charge, etc. */
                 if (type == Material.FIRE) {
                     canPlace = query.testBuild(target, associable, DefaultFlag.LIGHTER);
+                    what = "place fire";
 
                 /* Everything else */
                 } else {
                     canPlace = query.testBuild(target, associable);
+                    what = "place that block";
                 }
 
                 if (!canPlace) {
-                    tellErrorMessage(event.getCause(), target);
+                    tellErrorMessage(event.getCause(), target, what);
                     return false;
                 }
 
@@ -156,18 +163,21 @@ public class RegionProtectionListener extends AbstractListener {
                 @Override
                 public boolean apply(Location target) {
                     boolean canBreak;
+                    String what;
 
                     /* TNT */
                     if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.PRIMED_TNT) != null) {
                         canBreak = query.testBuild(target, associable, DefaultFlag.TNT);
+                        what = "dynamite blocks";
 
                     /* Everything else */
                     } else {
                         canBreak = query.testBuild(target, associable);
+                        what = "break that block";
                     }
 
                     if (!canBreak) {
-                        tellErrorMessage(event.getCause(), target);
+                        tellErrorMessage(event.getCause(), target, what);
                         return false;
                     }
 
@@ -190,26 +200,31 @@ public class RegionProtectionListener extends AbstractListener {
             @Override
             public boolean apply(Location target) {
                 boolean canUse;
+                String what;
 
                 /* Inventory */
                 if (Materials.isInventoryBlock(type)) {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
+                    what = "open that";
 
                 /* Beds */
                 } else if (type == Material.BED) {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.SLEEP);
+                    what = "sleep";
 
                 /* TNT */
                 } else if (type == Material.TNT) {
                     canUse = query.testBuild(target, associable, DefaultFlag.TNT);
+                    what = "use explosives";
 
                 /* Everything else */
                 } else {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE);
+                    what = "use that";
                 }
 
                 if (!canUse) {
-                    tellErrorMessage(event.getCause(), target);
+                    tellErrorMessage(event.getCause(), target, what);
                     return false;
                 }
 
@@ -230,18 +245,21 @@ public class RegionProtectionListener extends AbstractListener {
         RegionAssociable associable = createRegionAssociable(event.getCause());
 
         boolean canSpawn;
+        String what;
 
         /* Vehicles */
         if (Entities.isVehicle(type)) {
             canSpawn = query.testBuild(target, associable, DefaultFlag.PLACE_VEHICLE);
+            what = "place vehicles";
 
         /* Everything else */
         } else {
             canSpawn = query.testBuild(target, associable);
+            what = "place things";
         }
 
         if (!canSpawn) {
-            tellErrorMessage(event.getCause(), target);
+            tellErrorMessage(event.getCause(), target, what);
             event.setCancelled(true);
         }
     }
@@ -257,18 +275,21 @@ public class RegionProtectionListener extends AbstractListener {
 
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
         boolean canDestroy;
+        String what;
 
         /* Vehicles */
         if (Entities.isVehicle(type)) {
             canDestroy = query.testBuild(target, associable, DefaultFlag.DESTROY_VEHICLE);
+            what = "break vehicles";
 
         /* Everything else */
         } else {
             canDestroy = query.testBuild(target, associable);
+            what = "break things";
         }
 
         if (!canDestroy) {
-            tellErrorMessage(event.getCause(), target);
+            tellErrorMessage(event.getCause(), target, what);
             event.setCancelled(true);
         }
     }
@@ -283,9 +304,10 @@ public class RegionProtectionListener extends AbstractListener {
 
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
         boolean canUse = query.testBuild(target, associable, DefaultFlag.USE);
+        String what = "use that";
 
         if (!canUse) {
-            tellErrorMessage(event.getCause(), target);
+            tellErrorMessage(event.getCause(), target, what);
             event.setCancelled(true);
         }
     }
@@ -301,6 +323,7 @@ public class RegionProtectionListener extends AbstractListener {
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
         Player attacker;
         boolean canDamage;
+        String what;
 
         /* PVP */
         if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null) {
@@ -314,13 +337,16 @@ public class RegionProtectionListener extends AbstractListener {
                 canDamage = true;
             }
 
+            what = "PvP";
+
         /* Everything else */
         } else {
             canDamage = query.testBuild(target, associable, DefaultFlag.USE);
+            what = "hit that";
         }
 
         if (!canDamage) {
-            tellErrorMessage(event.getCause(), target);
+            tellErrorMessage(event.getCause(), target, what);
             event.setCancelled(true);
         }
     }
