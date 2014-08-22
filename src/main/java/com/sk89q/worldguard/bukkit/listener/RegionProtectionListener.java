@@ -219,7 +219,7 @@ public class RegionProtectionListener extends AbstractListener {
                     what = "open that";
 
                 /* Beds */
-                } else if (type == Material.BED) {
+                } else if (type == Material.BED_BLOCK) {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.SLEEP);
                     what = "sleep";
 
