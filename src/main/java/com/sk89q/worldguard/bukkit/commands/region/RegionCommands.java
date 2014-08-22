@@ -443,7 +443,9 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionPermissionModel permModel = getPermissionModel(sender);
 
         // Add color codes
-        value = CommandUtils.replaceColorMacros(value);
+        if (value != null) {
+            value = CommandUtils.replaceColorMacros(value);
+        }
 
         // Lookup the existing region
         RegionManager manager = checkRegionManager(plugin, world);
