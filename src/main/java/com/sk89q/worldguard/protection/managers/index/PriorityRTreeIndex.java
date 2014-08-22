@@ -86,7 +86,21 @@ public class PriorityRTreeIndex extends HashMapIndex {
 
     @Override
     public void applyIntersecting(ProtectedRegion region, Predicate<ProtectedRegion> consumer) {
-        super.applyIntersecting(region, consumer);
+        Vector min = region.getMinimumPoint().floor();
+        Vector max = region.getMaximumPoint().ceil();
+
+        Set<ProtectedRegion> candidates = new HashSet<ProtectedRegion>();
+        MBR pointMBR = new SimpleMBR(min.getX(), max.getX(), min.getY(), max.getY(), min.getZ(), max.getZ());
+
+        for (ProtectedRegion found : tree.find(pointMBR)) {
+            candidates.add(found);
+        }
+
+        for (ProtectedRegion found : region.getIntersectingRegions(candidates)) {
+            if (!consumer.apply(found)) {
+                break;
+            }
+        }
     }
 
     /**
