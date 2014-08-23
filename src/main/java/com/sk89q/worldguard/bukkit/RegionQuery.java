@@ -41,9 +41,14 @@ import java.util.Collection;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This object allows easy spatial queries involving region data.
+ * This object allows easy spatial queries involving region data for the
+ * purpose of implementing protection / region flag checks.
  *
- * <p>Results may be cached for brief amounts of time.</p>
+ * <p>Results may be cached for brief amounts of time. If you want to get
+ * data for the purposes of changing it, use of this class is not recommended.
+ * Some of the return values of the methods may be simulated to reduce
+ * boilerplate code related to implementing protection, meaning that false
+ * data is returned.</p>
  */
 public class RegionQuery {
 
