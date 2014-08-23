@@ -36,6 +36,128 @@ import static org.junit.Assert.*;
 public class ApplicableRegionSetTest {
 
     @Test
+    public void testWildernessBuild() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        LocalPlayer player = mock.createPlayer();
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertThat(set.testBuild(player), is(true));
+    }
+
+    @Test
+    public void testWildernessBuildWithGlobalRegion() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        LocalPlayer player = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertThat(set.testBuild(player), is(true));
+    }
+
+    @Test
+    public void testWildernessBuildWithRegion() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion region = mock.add(0);
+        region.getMembers().addPlayer(member);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+        assertThat(set.testBuild(member), is(true));
+        assertThat(set.testBuild(nonMember), is(false));
+    }
+
+    @Test
+    public void testWildernessFlags() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        LocalPlayer player = mock.createPlayer();
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+
+        assertThat(set.testState(player, DefaultFlag.MOB_DAMAGE), is(true));
+        assertThat(set.testState(player, DefaultFlag.ENTRY), is(true));
+        assertThat(set.testState(player, DefaultFlag.EXIT), is(true));
+        assertThat(set.testState(player, DefaultFlag.LEAF_DECAY), is(true));
+        assertThat(set.testState(player, DefaultFlag.RECEIVE_CHAT), is(true));
+        assertThat(set.testState(player, DefaultFlag.SEND_CHAT), is(true));
+        assertThat(set.testState(player, DefaultFlag.INVINCIBILITY), is(false));
+
+        assertThat(set.testBuild(player, DefaultFlag.CHEST_ACCESS), is(true));
+        assertThat(set.testBuild(player, DefaultFlag.SLEEP), is(true));
+        assertThat(set.testBuild(player, DefaultFlag.TNT), is(true));
+        assertThat(set.testBuild(player, DefaultFlag.PVP), is(true));
+    }
+
+    @Test
+    public void testWildernessFlagsWithGlobalRegion() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        LocalPlayer player = mock.createPlayer();
+
+        ProtectedRegion global = mock.global();
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+
+        assertThat(set.testState(player, DefaultFlag.MOB_DAMAGE), is(true));
+        assertThat(set.testState(player, DefaultFlag.ENTRY), is(true));
+        assertThat(set.testState(player, DefaultFlag.EXIT), is(true));
+        assertThat(set.testState(player, DefaultFlag.LEAF_DECAY), is(true));
+        assertThat(set.testState(player, DefaultFlag.RECEIVE_CHAT), is(true));
+        assertThat(set.testState(player, DefaultFlag.SEND_CHAT), is(true));
+        assertThat(set.testState(player, DefaultFlag.INVINCIBILITY), is(false));
+
+        assertThat(set.testBuild(player, DefaultFlag.CHEST_ACCESS), is(true));
+        assertThat(set.testBuild(player, DefaultFlag.SLEEP), is(true));
+        assertThat(set.testBuild(player, DefaultFlag.TNT), is(true));
+        assertThat(set.testBuild(player, DefaultFlag.PVP), is(true));
+    }
+
+    @Test
+    public void testFlagsWithRegion() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        LocalPlayer member = mock.createPlayer();
+        LocalPlayer nonMember = mock.createPlayer();
+
+        ProtectedRegion region = mock.add(0);
+        region.getMembers().addPlayer(member);
+
+        ApplicableRegionSet set = mock.getApplicableSet();
+
+        assertThat(set.testState(member, DefaultFlag.MOB_DAMAGE), is(true));
+        assertThat(set.testState(member, DefaultFlag.ENTRY), is(true));
+        assertThat(set.testState(member, DefaultFlag.EXIT), is(true));
+        assertThat(set.testState(member, DefaultFlag.LEAF_DECAY), is(true));
+        assertThat(set.testState(member, DefaultFlag.RECEIVE_CHAT), is(true));
+        assertThat(set.testState(member, DefaultFlag.SEND_CHAT), is(true));
+        assertThat(set.testState(member, DefaultFlag.INVINCIBILITY), is(false));
+
+        assertThat(set.testBuild(member, DefaultFlag.CHEST_ACCESS), is(true));
+        assertThat(set.testBuild(member, DefaultFlag.SLEEP), is(true));
+        assertThat(set.testBuild(member, DefaultFlag.TNT), is(true));
+        assertThat(set.testBuild(member, DefaultFlag.PVP), is(true));
+
+        assertThat(set.testState(nonMember, DefaultFlag.MOB_DAMAGE), is(true));
+        assertThat(set.testState(nonMember, DefaultFlag.ENTRY), is(true));
+        assertThat(set.testState(nonMember, DefaultFlag.EXIT), is(true));
+        assertThat(set.testState(nonMember, DefaultFlag.LEAF_DECAY), is(true));
+        assertThat(set.testState(nonMember, DefaultFlag.RECEIVE_CHAT), is(true));
+        assertThat(set.testState(nonMember, DefaultFlag.SEND_CHAT), is(true));
+        assertThat(set.testState(nonMember, DefaultFlag.INVINCIBILITY), is(false));
+
+        assertThat(set.testBuild(nonMember, DefaultFlag.CHEST_ACCESS), is(false));
+        assertThat(set.testBuild(nonMember, DefaultFlag.SLEEP), is(false));
+        assertThat(set.testBuild(nonMember, DefaultFlag.TNT), is(false));
+        assertThat(set.testBuild(nonMember, DefaultFlag.PVP), is(false));
+    }
+
+    @Test
     public void testStateFlagPriorityFallThrough() {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
         ProtectedRegion region;
@@ -300,7 +422,7 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
+        assertFalse(set.canBuild(member));
         assertFalse(set.canBuild(nonMember));
     }
 
@@ -433,7 +555,7 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
+        assertFalse(set.canBuild(member));
         assertFalse(set.canBuild(nonMember));
     }
 

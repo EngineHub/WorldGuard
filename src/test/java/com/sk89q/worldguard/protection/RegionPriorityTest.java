@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.protection;
 
-import java.util.ArrayList;
-import org.junit.Before;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
@@ -29,9 +27,17 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.*;
+import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class RegionPriorityTest {
     static String COURTYARD_ID = "courtyard";
@@ -143,7 +149,7 @@ public abstract class RegionPriorityTest {
     public void testPriorities2() throws Exception {
         ApplicableRegionSet appl;
 
-        fountain.setPriority(0);
+        courtyard.setPriority(0);
         fountain.setPriority(5);
         
         appl = manager.getApplicableRegions(inCourtyard);

@@ -19,122 +19,260 @@
 
 package com.sk89q.worldguard.protection.managers;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabase;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.RegionResultSet;
+import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
+import com.sk89q.worldguard.protection.managers.index.RegionIndex;
+import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
+import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.util.RegionCollectionConsumer;
+import com.sk89q.worldguard.util.Normal;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An abstract class for getting, setting, and looking up regions. The most
- * simple implementation uses a flat list and iterates through the entire list
- * to look for applicable regions, but a more complicated (and more efficient)
- * implementation may use space partitioning techniques.
- *
- * @author sk89q
+ * A region manager holds the regions for a world.
  */
-public abstract class RegionManager {
+public final class RegionManager {
 
-    protected ProtectionDatabase loader;
+    private final RegionDatabase store;
+    private final Supplier<? extends ConcurrentRegionIndex> indexFactory;
+    private ConcurrentRegionIndex index;
 
     /**
-     * Construct the object.
+     * Create a new index.
      *
-     * @param loader The loader for this region
+     * @param store the region store
+     * @param indexFactory the factory for creating new instances of the index
      */
-    public RegionManager(ProtectionDatabase loader) {
-        this.loader = loader;
+    public RegionManager(RegionDatabase store, Supplier<? extends ConcurrentRegionIndex> indexFactory) {
+        checkNotNull(store);
+        checkNotNull(indexFactory);
+
+        this.store = store;
+        this.indexFactory = indexFactory;
+        this.index = indexFactory.get();
     }
 
     /**
-     * Load the list of regions. If the regions do not load properly, then
-     * the existing list should be used (as stored previously).
-     *
-     * @throws ProtectionDatabaseException when an error occurs
+     * Get a displayable name for this store.
      */
-    public void load() throws ProtectionDatabaseException {
-        loader.load(this);
-    }
-    /**
-     * Load the list of regions. If the regions do not load properly, then
-     * the existing list should be used (as stored previously).
-     *
-     * @param async true to attempt to save the data asynchronously
-     */
-    public ListenableFuture<?> load(boolean async) {
-        return loader.load(this, async);
+    public String getName() {
+        return store.getName();
     }
 
     /**
-     * Save the list of regions.
+     * Load regions from storage and replace the index on this manager with
+     * the regions loaded from the store.
      *
-     * @throws ProtectionDatabaseException when an error occurs while saving
+     * <p>This method will block until the save completes, but it will
+     * not block access to the region data from other threads, nor will it
+     * prevent the creation or modification of regions in the index while
+     * a new collection of regions is loaded from storage.</p>
+     *
+     * @throws StorageException thrown when loading fails
      */
-    public void save() throws ProtectionDatabaseException {
-        loader.save(this);
+    public void load() throws StorageException {
+        Set<ProtectedRegion> regions = store.loadAll();
+        for (ProtectedRegion region : regions) {
+            region.setDirty(false);
+        }
+        setRegions(regions);
     }
 
     /**
-     * Save the list of regions.
+     * Save a snapshot of all the regions as it is right now to storage.
      *
-     * @param async true to attempt to save the data asynchronously
+     * @throws StorageException thrown on save error
      */
-    public ListenableFuture<?> save(boolean async) {
-        return loader.save(this, async);
+    public void save() throws StorageException {
+        index.setDirty(false);
+        store.saveAll(new HashSet<ProtectedRegion>(getValuesCopy()));
     }
 
     /**
-     * Get a map of protected regions. Use one of the region manager methods
-     * if possible if working with regions.
+     * Save changes to the region index to disk, preferring to only save
+     * the changes (rather than the whole index), but choosing to save the
+     * whole index if the underlying store does not support partial saves.
      *
-     * @return map of regions, with keys being region IDs (lowercase)
+     * <p>This method does nothing if there are no changes.</p>
+     *
+     * @return true if there were changes to be saved
+     * @throws StorageException thrown on save error
      */
-    public abstract Map<String, ProtectedRegion> getRegions();
+    public boolean saveChanges() throws StorageException {
+        RegionDifference diff = index.getAndClearDifference();
+        boolean successful = false;
+
+        try {
+            if (diff.containsChanges()) {
+                try {
+                    store.saveChanges(diff);
+                } catch (DifferenceSaveException e) {
+                    save(); // Partial save is not supported
+                }
+                successful = true;
+                return true;
+            } else {
+                successful = true;
+                return false;
+            }
+        } finally {
+            if (!successful) {
+                index.setDirty(diff);
+            }
+        }
+    }
 
     /**
-     * Set a list of protected regions. Keys should be lowercase in the given
-     * map fo regions.
+     * Load the regions for a chunk.
      *
-     * @param regions map of regions
+     * @param position the position
      */
-    public abstract void setRegions(Map<String, ProtectedRegion> regions);
+    public void loadChunk(Vector2D position) {
+        index.bias(position);
+    }
 
     /**
-     * Adds a region. If a region by the given name already exists, then
-     * the existing region will be replaced.
+     * Load the regions for a chunk.
      *
-     * @param region region to add
+     * @param positions a collection of positions
      */
-    public abstract void addRegion(ProtectedRegion region);
+    public void loadChunks(Collection<Vector2D> positions) {
+        index.biasAll(positions);
+    }
 
     /**
-     * Return whether a region exists by an ID.
+     * Unload the regions for a chunk.
      *
-     * @param id id of the region, can be mixed-case
-     * @return whether the region exists
+     * @param position the position
      */
-    public abstract boolean hasRegion(String id);
+    public void unloadChunk(Vector2D position) {
+        index.forget(position);
+    }
 
     /**
-     * Get a region by its ID. Includes symbolic names like #&lt;index&gt;
+     * Get an unmodifiable map of regions containing the state of the
+     * index at the time of call.
      *
-     * @param id id of the region, can be mixed-case
-     * @return region or null if it doesn't exist
+     * <p>This call is relatively heavy (and may block other threads),
+     * so refrain from calling it frequently.</p>
+     *
+     * @return a map of regions
      */
+    public Map<String, ProtectedRegion> getRegions() {
+        Map<String, ProtectedRegion> map = new HashMap<String, ProtectedRegion>();
+        for (ProtectedRegion region : index.values()) {
+            map.put(Normal.normalize(region.getId()), region);
+        }
+        return Collections.unmodifiableMap(map);
+    }
+
+    /**
+     * Replace the index with the regions in the given map.
+     *
+     * <p>The parents of the regions will also be added to the index, even
+     * if they are not in the provided map.</p>
+     *
+     * @param regions a map of regions
+     */
+    public void setRegions(Map<String, ProtectedRegion> regions) {
+        checkNotNull(regions);
+
+        setRegions(regions.values());
+    }
+
+    /**
+     * Replace the index with the regions in the given collection.
+     *
+     * <p>The parents of the regions will also be added to the index, even
+     * if they are not in the provided map.</p>
+     *
+     * @param regions a collection of regions
+     */
+    public void setRegions(Collection<ProtectedRegion> regions) {
+        checkNotNull(regions);
+
+        ConcurrentRegionIndex newIndex = indexFactory.get();
+        newIndex.addAll(regions);
+        newIndex.getAndClearDifference(); // Clear changes
+        this.index = newIndex;
+    }
+
+    /**
+     * Aad a region to the manager.
+     *
+     * <p>The parents of the region will also be added to the index.</p>
+     *
+     * @param region the region
+     */
+    public void addRegion(ProtectedRegion region) {
+        checkNotNull(region);
+        index.add(region);
+    }
+
+    /**
+     * Return whether the index contains a region by the given name,
+     * with equality determined by {@link Normal}.
+     *
+     * @param id the name of the region
+     * @return true if this index contains the region
+     */
+    public boolean hasRegion(String id) {
+        return index.contains(id);
+    }
+
+    /**
+     * Get the region named by the given name (equality determined using
+     * {@link Normal}).
+     *
+     * @param id the name of the region
+     * @return a region or {@code null}
+     */
+    @Nullable
     public ProtectedRegion getRegion(String id) {
-        if (id.startsWith("#")) {
+        checkNotNull(id);
+        return index.get(id);
+    }
+
+    /**
+     * Matches a region using either the pattern {@code #{region_index}} or
+     * simply by the exact name of the region.
+     *
+     * @param pattern the pattern
+     * @return a region
+     */
+    @Nullable
+    public ProtectedRegion matchRegion(String pattern) {
+        checkNotNull(pattern);
+
+        if (pattern.startsWith("#")) {
             int index;
             try {
-                index = Integer.parseInt(id.substring(1)) - 1;
+                index = Integer.parseInt(pattern.substring(1)) - 1;
             } catch (NumberFormatException e) {
                 return null;
             }
-            for (ProtectedRegion region : getRegions().values()) {
+            for (ProtectedRegion region : this.index.values()) {
                 if (index == 0) {
                     return region;
                 }
@@ -143,87 +281,167 @@ public abstract class RegionManager {
             return null;
         }
 
-        return getRegionExact(id);
+        return getRegion(pattern);
     }
 
     /**
-     * Get a region by its ID.
+     * Remove a region from the index with the given name, opting to remove
+     * the children of the removed region.
      *
-     * @param id id of the region, can be mixed-case
-     * @return region or null if it doesn't exist
+     * @param id the name of the region
+     * @return a list of removed regions where the first entry is the region specified by {@code id}
      */
-    public ProtectedRegion getRegionExact(String id) {
-        return getRegions().get(id.toLowerCase());
+    @Nullable
+    public Set<ProtectedRegion> removeRegion(String id) {
+        return removeRegion(id, RemovalStrategy.REMOVE_CHILDREN);
     }
 
     /**
-     * Removes a region, including inheriting children.
+     * Remove a region from the index with the given name.
      *
-     * @param id id of the region, can be mixed-case
+     * @param id the name of the region
+     * @param strategy what to do with children
+     * @return a list of removed regions where the first entry is the region specified by {@code id}
      */
-    public abstract void removeRegion(String id);
+    @Nullable
+    public Set<ProtectedRegion> removeRegion(String id, RemovalStrategy strategy) {
+        return index.remove(id, strategy);
+    }
 
     /**
-     * Get an object for a point for rules to be applied with. Use this in order
-     * to query for flag data or membership data for a given point.
+     * Query for effective flags and owners for the given positive.
      *
-     * @param loc Bukkit location
-     * @return applicable region set
+     * @param position the position
+     * @return the query object
+     */
+    public ApplicableRegionSet getApplicableRegions(Vector position) {
+        checkNotNull(position);
+
+        List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
+        index.applyContaining(position, new RegionCollectionConsumer(regions, true));
+        return new RegionResultSet(regions, index.get("__global__"));
+    }
+
+    /**
+     * Query for effective flags and owners for the area represented
+     * by the given region.
+     *
+     * @param region the region
+     * @return the query object
+     */
+    public ApplicableRegionSet getApplicableRegions(ProtectedRegion region) {
+        checkNotNull(region);
+
+        List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
+        index.applyIntersecting(region, new RegionCollectionConsumer(regions, true));
+        return new RegionResultSet(regions, index.get("__global__"));
+    }
+
+    /**
+     * Get a list of region names for regions that contain the given position.
+     *
+     * @param position the position
+     * @return a list of names
+     */
+    public List<String> getApplicableRegionsIDs(Vector position) {
+        checkNotNull(position);
+
+        final List<String> names = new ArrayList<String>();
+
+        index.applyContaining(position, new Predicate<ProtectedRegion>() {
+            @Override
+            public boolean apply(ProtectedRegion region) {
+                return names.add(region.getId());
+            }
+        });
+
+        return names;
+    }
+
+    /**
+     * Return whether there are any regions intersecting the given region that
+     * are not owned by the given player.
+     *
+     * @param region the region
+     * @param player the player
+     * @return true if there are such intersecting regions
+     */
+    public boolean overlapsUnownedRegion(ProtectedRegion region, final LocalPlayer player) {
+        checkNotNull(region);
+        checkNotNull(player);
+
+        RegionIndex index = this.index;
+
+        final AtomicBoolean overlapsUnowned = new AtomicBoolean();
+
+        index.applyIntersecting(region, new Predicate<ProtectedRegion>() {
+            @Override
+            public boolean apply(ProtectedRegion test) {
+                if (!test.getOwners().contains(player)) {
+                    overlapsUnowned.set(true);
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        });
+
+        return overlapsUnowned.get();
+    }
+
+    /**
+     * Get the number of regions.
+     *
+     * @return the number of regions
+     */
+    public int size() {
+        return index.size();
+    }
+
+    /**
+     * Get the number of regions that are owned by the given player.
+     *
+     * @param player the player
+     * @return name number of regions that a player owns
+     */
+    public int getRegionCountOfPlayer(final LocalPlayer player) {
+        checkNotNull(player);
+
+        final AtomicInteger count = new AtomicInteger();
+
+        index.apply(new Predicate<ProtectedRegion>() {
+            @Override
+            public boolean apply(ProtectedRegion test) {
+                if (test.getOwners().contains(player)) {
+                    count.incrementAndGet();
+                }
+                return true;
+            }
+        });
+
+        return count.get();
+    }
+
+    /**
+     * Get an {@link ArrayList} copy of regions in the index.
+     *
+     * @return a list
+     */
+    private List<ProtectedRegion> getValuesCopy() {
+        return new ArrayList<ProtectedRegion>(index.values());
+    }
+
+    // =============== HELPER METHODS ===============
+
+    /**
+     * Helper method for {@link #getApplicableRegions(Vector)} using Bukkit
+     * locations.
+     *
+     * @param loc the location
+     * @return an {@code ApplicableRegionSet}
      */
     public ApplicableRegionSet getApplicableRegions(org.bukkit.Location loc) {
         return getApplicableRegions(com.sk89q.worldedit.bukkit.BukkitUtil.toVector(loc));
     }
 
-    /**
-     * Get an object for a point for rules to be applied with. Use this in order
-     * to query for flag data or membership data for a given point.
-     *
-     * @param pt point
-     * @return applicable region set
-     */
-    public abstract ApplicableRegionSet getApplicableRegions(Vector pt);
-
-    /**
-     * Get an object for a point for rules to be applied with. This gets
-     * a set for the given reason.
-     *
-     * @param region region
-     * @return regino set
-     */
-    public abstract ApplicableRegionSet getApplicableRegions(
-            ProtectedRegion region);
-
-    /**
-     * Get a list of region IDs that contain a point.
-     *
-     * @param pt point
-     * @return list of region Ids
-     */
-    public abstract List<String> getApplicableRegionsIDs(Vector pt);
-
-    /**
-     * Returns true if the provided region overlaps with any other region that
-     * is not owned by the player.
-     *
-     * @param region region to check
-     * @param player player to check against
-     * @return whether there is an overlap
-     */
-    public abstract boolean overlapsUnownedRegion(ProtectedRegion region,
-            LocalPlayer player);
-
-    /**
-     * Get the number of regions.
-     *
-     * @return number of regions
-     */
-    public abstract int size();
-
-    /**
-     * Get the number of regions for a player.
-     *
-     * @param player player
-     * @return name number of regions that a player owns
-     */
-    public abstract int getRegionCountOfPlayer(LocalPlayer player);
 }

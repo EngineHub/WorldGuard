@@ -19,40 +19,170 @@
 
 package com.sk89q.worldguard.domains;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.util.ChangeTracked;
 
-public class PlayerDomain implements Domain {
-    private Set<String> players;
+import java.util.Collections;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Stores players (only) in a domain.
+ */
+public class PlayerDomain implements Domain, ChangeTracked {
+
+    private final Set<UUID> uniqueIds = new CopyOnWriteArraySet<UUID>();
+    private final Set<String> names = new CopyOnWriteArraySet<String>();
+    private boolean dirty = true;
+
+    /**
+     * Create a new instance.
+     */
     public PlayerDomain() {
-        this.players = new HashSet<String>();
     }
 
-    public PlayerDomain(String[] players) {
-        this.players = new HashSet<String>();
-
-        for (String name : players) {
-            this.players.add(name.toLowerCase());
+    /**
+     * Create a new instance with the given names.
+     *
+     * @param names an array of names
+     * @deprecated names are deprecated in favor of UUIDs in MC 1.7+
+     */
+    @Deprecated
+    public PlayerDomain(String[] names) {
+        for (String name : names) {
+            addPlayer(name);
         }
     }
 
+    /**
+     * Add the given player to the domain, identified by the player's name.
+     *
+     * @param name the name of the player
+     */
     public void addPlayer(String name) {
-        players.add(name.toLowerCase());
+        checkNotNull(name);
+        checkArgument(!name.trim().isEmpty(), "Can't add empty player name");
+        setDirty(true);
+        names.add(name.trim().toLowerCase());
+        // Trim because some names contain spaces (previously valid Minecraft
+        // names) and we cannot store these correctly in the SQL storage
+        // implementations
     }
 
+    /**
+     * Add the given player to the domain, identified by the player's UUID.
+     *
+     * @param uniqueId the UUID of the player
+     */
+    public void addPlayer(UUID uniqueId) {
+        checkNotNull(uniqueId);
+        setDirty(true);
+        uniqueIds.add(uniqueId);
+    }
+
+    /**
+     * Add the given player to the domain, identified by the player's UUID.
+     *
+     * @param player the player
+     */
+    public void addPlayer(LocalPlayer player) {
+        checkNotNull(player);
+        setDirty(true);
+        addPlayer(player.getUniqueId());
+    }
+
+    /**
+     * Remove the given player from the domain, identified by the player's name.
+     *
+     * @param name the name of the player
+     */
+    public void removePlayer(String name) {
+        checkNotNull(name);
+        setDirty(true);
+        names.remove(name.trim().toLowerCase());
+    }
+
+    /**
+     * Remove the given player from the domain, identified by the player's UUID.
+     *
+     * @param uuid the UUID of the player
+     */
+    public void removePlayer(UUID uuid) {
+        checkNotNull(uuid);
+        uniqueIds.remove(uuid);
+    }
+
+    /**
+     * Remove the given player from the domain, identified by either the
+     * player's name, the player's unique ID, or both.
+     *
+     * @param player the player
+     */
+    public void removePlayer(LocalPlayer player) {
+        checkNotNull(player);
+        removePlayer(player.getName());
+        removePlayer(player.getUniqueId());
+    }
+
+    @Override
     public boolean contains(LocalPlayer player) {
-        return contains(player.getName());
+        checkNotNull(player);
+        return contains(player.getName()) || contains(player.getUniqueId());
+    }
+
+    /**
+     * Get the set of player names.
+     *
+     * @return the set of player names
+     */
+    public Set<String> getPlayers() {
+        return Collections.unmodifiableSet(names);
+    }
+
+    /**
+     * Get the set of player UUIDs.
+     *
+     * @return the set of player UUIDs
+     */
+    public Set<UUID> getUniqueIds() {
+        return Collections.unmodifiableSet(uniqueIds);
+    }
+
+    @Override
+    public boolean contains(UUID uniqueId) {
+        checkNotNull(uniqueId);
+        return uniqueIds.contains(uniqueId);
     }
 
     @Override
     public boolean contains(String playerName) {
-        return players.contains(playerName.toLowerCase());
+        checkNotNull(playerName);
+        return names.contains(playerName.trim().toLowerCase());
     }
 
+    @Override
     public int size() {
-        return players.size();
+        return names.size() + uniqueIds.size();
     }
+
+    @Override
+    public void clear() {
+        uniqueIds.clear();
+        names.clear();
+    }
+
+    @Override
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    @Override
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
+    }
+
 }

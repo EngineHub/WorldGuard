@@ -303,13 +303,29 @@ public class BukkitUtil {
 
     /**
      * Get a blacklist target for the given block.
-     * 
+     *
      * @param block the block
      * @return a target
      */
     public static Target createTarget(Block block) {
         checkNotNull(block);
         return new MaterialTarget(block.getTypeId(), block.getData());
+    }
+
+    /**
+     * Get a blacklist target for the given block.
+     *
+     * @param block the block
+     * @param material a fallback material
+     * @return a target
+     */
+    public static Target createTarget(Block block, Material material) {
+        checkNotNull(material);
+        if (block.getType() == material) {
+            return new MaterialTarget(block.getTypeId(), block.getData());
+        } else {
+            return new MaterialTarget(material.getId(), (short) 0);
+        }
     }
 
     /**

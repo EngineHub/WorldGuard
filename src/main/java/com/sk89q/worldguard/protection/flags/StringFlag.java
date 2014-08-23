@@ -23,18 +23,40 @@ import org.bukkit.command.CommandSender;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
+import javax.annotation.Nullable;
+
 /**
  *
  * @author sk89q
  */
 public class StringFlag extends Flag<String> {
 
-    public StringFlag(String name, RegionGroup defaultGroup) {
-        super(name, defaultGroup);
-    }
+    private final String defaultValue;
 
     public StringFlag(String name) {
         super(name);
+        this.defaultValue = null;
+    }
+
+    public StringFlag(String name, String defaultValue) {
+        super(name);
+        this.defaultValue = defaultValue;
+    }
+
+    public StringFlag(String name, RegionGroup defaultGroup) {
+        super(name, defaultGroup);
+        this.defaultValue = null;
+    }
+
+    public StringFlag(String name, RegionGroup defaultGroup, String defaultValue) {
+        super(name, defaultGroup);
+        this.defaultValue = defaultValue;
+    }
+
+    @Nullable
+    @Override
+    public String getDefault() {
+        return defaultValue;
     }
 
     @Override

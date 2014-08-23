@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldguard</artifactId>
-  <version>5.9.1-SNAPSHOT</version>
+  <version>6.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   
   <!-- Project information -->
@@ -78,6 +78,16 @@
       <version>5.5.8</version>
       <scope>compile</scope>
       <type>jar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>com.zachsthings.libcomponents</groupId>
+          <artifactId>libcomponents-bukkit</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.bukkit</groupId>
+          <artifactId>bukkit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Used for running CraftBukkit from within your IDE
@@ -85,7 +95,7 @@
     <dependency>
       <groupId>org.sk89q.bukkit</groupId>
       <artifactId>bukkit-classloader-check</artifactId>
-      <version>1.7.2-R0.3</version>
+      <version>1.7.9-R0.2</version>
       <scope>runtime</scope>
       <type>jar</type>
       <optional>true</optional>
@@ -93,7 +103,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
-      <version>1.7.2-R0.3</version>
+      <version>1.7.9-R0.2</version>
       <scope>runtime</scope>
       <type>jar</type>
       <optional>true</optional>
@@ -103,7 +113,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.7.2-R0.3</version>
+      <version>1.7.9-R0.2</version>
       <scope>compile</scope>
       <type>jar</type>
     </dependency>
@@ -123,6 +133,10 @@
           <groupId>org.spout</groupId>
           <artifactId>spoutapi</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.bukkit</groupId>
+          <artifactId>bukkit</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     
@@ -132,6 +146,7 @@
       <version>5.0</version>
       <scope>compile</scope>
       <type>jar</type>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -146,6 +161,8 @@
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
       <version>1.3.9</version>
+      <scope>compile</scope>
+      <type>jar</type>
     </dependency>
     
     <dependency>
@@ -162,14 +179,47 @@
       <version>2.0</version>
       <scope>compile</scope>
       <type>jar</type>
+      <optional>true</optional>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>3.0</version>
+      <scope>compile</scope>
+      <type>jar</type>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sk89q</groupId>
+      <artifactId>squirrelid</artifactId>
+      <version>0.1.0</version>
+      <scope>compile</scope>
+      <type>jar</type>
+      <optional>true</optional>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.1</version>
+      <version>4.11</version>
       <scope>test</scope>
       <type>jar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.2.1</version>
+      <scope>test</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
   
@@ -203,6 +253,11 @@
           <include>config_world.yml</include>
           <include>blacklist.txt</include>
         </includes>
+      </resource>
+      <resource>
+        <targetPath>migrations/</targetPath>
+        <filtering>false</filtering>
+        <directory>${basedir}/src/main/resources/migrations/</directory>
       </resource>
     </resources>
 
@@ -334,8 +389,20 @@
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
                   <include>org.khelekore:prtree</include>
+                  <include>org.flywaydb:flyway-core</include>
+                  <include>com.sk89q:squirrelid</include>
                 </includes>
               </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.flywaydb</pattern>
+                  <shadedPattern>com.sk89q.worldguard.internal.flywaydb</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sk89q.squirrelid</pattern>
+                  <shadedPattern>com.sk89q.worldguard.util.profile</shadedPattern>
+                </relocation>
+              </relocations>
             </configuration>
           </execution>
         </executions>

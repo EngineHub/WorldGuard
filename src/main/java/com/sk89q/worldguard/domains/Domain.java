@@ -21,21 +21,53 @@ package com.sk89q.worldguard.domains;
 
 import com.sk89q.worldguard.LocalPlayer;
 
+import java.util.UUID;
+
+/**
+ * A domain contains a list of memberships.
+ */
 public interface Domain {
+
     /**
      * Returns true if a domain contains a player.
      *
-     * @param player The player to check
+     * @param player the player to check
      * @return whether this domain contains {@code player}
      */
     boolean contains(LocalPlayer player);
 
     /**
-     * Returns true if a domain contains a player.<br />
-     * This method doesn't check for groups!
+     * Returns true if a domain contains a player.
+     *
+     * <p>This method doesn't check for groups!</p>
+     *
+     * @param uniqueId the UUID of the user
+     * @return whether this domain contains a player by that name
+     */
+    boolean contains(UUID uniqueId);
+
+    /**
+     * Returns true if a domain contains a player.
+     *
+     * <p>This method doesn't check for groups!</p>
      *
      * @param playerName The name of the player to check
      * @return whether this domain contains a player by that name
+     * @deprecated names are deprecated in MC 1.7+ in favor of UUIDs
      */
+    @Deprecated
     boolean contains(String playerName);
+
+    /**
+     * Get the number of entries.
+     *
+     * @return the number of entries
+     */
+    int size();
+
+    /**
+     * Remove all entries.
+     */
+    void clear();
+
 }

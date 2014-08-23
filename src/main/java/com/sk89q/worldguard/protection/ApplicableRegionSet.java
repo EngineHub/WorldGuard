@@ -20,66 +20,165 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.flags.*;
+import com.sk89q.worldguard.bukkit.RegionQuery;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Set;
 
 /**
- * Represents a set of regions for a particular point or area and the rules
- * that are represented by that set. An instance of this can be used to
- * query the value of a flag or check if a player can build in the respective
- * region or point. This object contains the list of applicable regions and so
- * the expensive search of regions that are in the desired area has already
- * been completed.
- * 
- * @author sk89q
+ * Represents the effective set of flags, owners, and members for a given
+ * spatial query.
+ *
+ * <p>An instance of this can be created using the spatial query methods
+ * available on {@link RegionManager}.</p>
  */
-public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
-
-    private Collection<ProtectedRegion> applicable;
-    private ProtectedRegion globalRegion;
+public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
 
     /**
-     * Construct the object.
-     * 
-     * @param applicable The regions contained in this set
-     * @param globalRegion The global region, set aside for special handling.
+     * Return whether this region set is a virtual set. A virtual set
+     * does not contain real results.
+     *
+     * <p>A virtual result may be returned if region data failed to load or
+     * there was some special exception (i.e. the region bypass permission).
+     * </p>
+     *
+     * <p>Be sure to check the value of this flag if an instance of this
+     * interface is being retrieved from {@link RegionQuery} as it may
+     * return an instance of {@link PermissiveRegionSet} or
+     * {@link FailedLoadRegionSet}, among other possibilities.</p>
+     *
+     * @return true if loaded
+     * @see FailedLoadRegionSet
      */
-    public ApplicableRegionSet(Collection<ProtectedRegion> applicable,
-            ProtectedRegion globalRegion) {
-        this.applicable = applicable;
-        this.globalRegion = globalRegion;
-    }
-    
-    /**
-     * Checks if a player can build in an area.
-     * 
-     * @param player The player to check
-     * @return build ability
-     */
-    public boolean canBuild(LocalPlayer player) {
-        return internalGetState(DefaultFlag.BUILD, player, null);
-    }
-
-    public boolean canConstruct(LocalPlayer player) {
-        final RegionGroup flag = getFlag(DefaultFlag.CONSTRUCT, player);
-        return RegionGroupFlag.isMember(this, flag, player);
-    }
+    boolean isVirtual();
 
     /**
-     * Checks if a player can use buttons and such in an area.
-     * 
-     * @param player The player to check
-     * @return able to use items
-     * @deprecated This method seems to be the opposite of its name
+     * Tests whether the {@link DefaultFlag#BUILD} flag or membership
+     * requirements permit the given player.
+     *
+     * <p>If there are several relevant flags (i.e. in addition to
+     * {@code BUILD}, such as {@link DefaultFlag#SLEEP} when the target
+     * object is a bed), then
+     * {@link #testBuild(RegionAssociable, StateFlag...)} should be used.</p>
+     *
+     * @param player the player to check
+     * @return true if permitted
+     * @deprecated use {@link #testBuild(RegionAssociable, StateFlag...)}
      */
     @Deprecated
-    public boolean canUse(LocalPlayer player) {
-        return !allows(DefaultFlag.USE, player)
-                && !canBuild(player);
-    }
+    boolean canBuild(LocalPlayer player);
+
+    /**
+     * Test whether the given flags evaluate to {@code ALLOW}, implicitly also
+     * considering the {@link DefaultFlag#BUILD} flag.
+     *
+     * <p>This method is equivalent to calling
+     * {@link #testState(RegionAssociable, StateFlag...)} with {@code flags} plus
+     * the {@code BUILD} flag.</p>
+     *
+     * @param subject the subject
+     * @param flags zero or more flags
+     * @return true if permission is granted
+     * @see #queryState(RegionAssociable, StateFlag...)
+     */
+    boolean testBuild(RegionAssociable subject, StateFlag... flags);
+
+    /**
+     * Test whether the (effective) value for a list of state flags equals
+     * {@code ALLOW}.
+     *
+     * <p>{@code subject} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The subject argument is required if the
+     * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
+     *
+     * @param subject an optional subject, which would be used to determine the region groups that apply
+     * @param flags a list of flags to check
+     * @return true if the result was {@code ALLOW}
+     * @see #queryState(RegionAssociable, StateFlag...)
+     */
+    boolean testState(@Nullable RegionAssociable subject, StateFlag... flags);
+
+    /**
+     * Get the (effective) value for a list of state flags. The rules of
+     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
+     * and {@code ALLOW} overrides {@code NONE}. One flag may override another.
+     *
+     * <p>{@code subject} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The subject argument is required if the
+     * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
+     *
+     * @param subject an optional subject, which would be used to determine the region groups that apply
+     * @param flags a list of flags to check
+     * @return a state
+     */
+    @Nullable
+    State queryState(@Nullable RegionAssociable subject, StateFlag... flags);
+
+    /**
+     * Get the effective value for a flag. If there are multiple values
+     * (for example, multiple overlapping regions with
+     * the same priority may have the same flag set), then the selected
+     * (or "winning") value will depend on the flag type.
+     *
+     * <p>Only some flag types actually have a strategy for picking the
+     * "best value." For most types, the actual value that is chosen to be
+     * returned is undefined (it could be any value). As of writing, the only
+     * type of flag that actually has a strategy for picking a value is the
+     * {@link StateFlag}.</p>
+     *
+     * <p>{@code subject} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The subject argument is required if the
+     * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
+     *
+     * @param subject an optional subject, which would be used to determine the region group to apply
+     * @param flag the flag
+     * @return a value, which could be {@code null}
+     */
+    @Nullable
+    <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag);
+
+    /**
+     * Get the effective values for a flag, returning a collection of all
+     * values. It is up to the caller to determine which value, if any,
+     * from the collection will be used.
+     *
+     * <p>{@code subject} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The subject argument is required if the
+     * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
+     *
+     * @param subject an optional subject, which would be used to determine the region group to apply
+     * @param flag the flag
+     * @return a collection of values
+     */
+    <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag);
+
+    /**
+     * Test whether the construct flag evaluates true for the given player.
+     *
+     * @param player the player
+     * @return true if true
+     * @deprecated The {@code CONSTRUCT} flag is being removed and is no longer
+     *             needed because flags now support groups assigned to them.
+     */
+    @Deprecated
+    boolean canConstruct(LocalPlayer player);
 
     /**
      * Gets the state of a state flag. This cannot be used for the build flag.
@@ -87,317 +186,79 @@ public class ApplicableRegionSet implements Iterable<ProtectedRegion> {
      * @param flag flag to check
      * @return whether it is allowed
      * @throws IllegalArgumentException if the build flag is given
+     * @deprecated use {@link #queryState(RegionAssociable, StateFlag...)} instead
      */
-    public boolean allows(StateFlag flag) {
-        if (flag == DefaultFlag.BUILD) {
-            throw new IllegalArgumentException("Can't use build flag with allows()");
-        }
-        return internalGetState(flag, null, null);
-    }
-    
+    @Deprecated
+    boolean allows(StateFlag flag);
+
     /**
      * Gets the state of a state flag. This cannot be used for the build flag.
-     * 
+     *
      * @param flag flag to check
      * @param player player (used by some flags)
      * @return whether the state is allows for it
      * @throws IllegalArgumentException if the build flag is given
+     * @deprecated use {@link #queryState(RegionAssociable, StateFlag...)} instead
      */
-    public boolean allows(StateFlag flag, LocalPlayer player) {
-        if (flag == DefaultFlag.BUILD) {
-            throw new IllegalArgumentException("Can't use build flag with allows()");
-        }
-        return internalGetState(flag, null, player);
-    }
-    
+    @Deprecated
+    boolean allows(StateFlag flag, @Nullable LocalPlayer player);
+
     /**
-     * Indicates whether a player is an owner of all regions in this set.
-     * 
-     * @param player player
+     * Test whether a player is an owner of all regions in this set.
+     *
+     * @param player the player
      * @return whether the player is an owner of all regions
      */
-    public boolean isOwnerOfAll(LocalPlayer player) {
-        for (ProtectedRegion region : applicable) {
-            if (!region.isOwner(player)) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-    
+    boolean isOwnerOfAll(LocalPlayer player);
+
     /**
-     * Indicates whether a player is an owner or member of all regions in
-     * this set.
-     * 
-     * @param player player
+     * Test whether a player is an owner or member of all regions in this set.
+     *
+     * @param player the player
      * @return whether the player is a member of all regions
      */
-    public boolean isMemberOfAll(LocalPlayer player) {
-        for (ProtectedRegion region : applicable) {
-            if (!region.isMember(player)) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-
-    /**
-     * Checks to see if a flag is permitted.
-     * 
-     * @param flag flag to check
-     * @param player null to not check owners and members
-     * @param groupPlayer player to use for the group flag check
-     * @return the allow/deny state for the flag
-     */
-    private boolean internalGetState(StateFlag flag, LocalPlayer player,
-                                     LocalPlayer groupPlayer) {
-        boolean found = false;
-        boolean hasFlagDefined = false;
-        boolean allowed = false; // Used for ALLOW override
-        boolean def = flag.getDefault();
-        
-        // Handle defaults
-        if (globalRegion != null) {
-            State globalState = globalRegion.getFlag(flag);
-
-            // The global region has this flag set
-            if (globalState != null) {
-                // Build flag is very special
-                if (player != null && globalRegion.hasMembersOrOwners()) {
-                    def = globalRegion.isMember(player) && (globalState == State.ALLOW);
-                } else {
-                    def = (globalState == State.ALLOW);
-                }
-            } else {
-                // Build flag is very special
-                if (player != null && globalRegion.hasMembersOrOwners()) {
-                    def = globalRegion.isMember(player);
-                }
-            }
-        }
-        
-        // The player argument is used if and only if the flag is the build
-        // flag -- in which case, if there are any regions in this area, we
-        // default to FALSE, otherwise true if there are no defined regions.
-        // However, other flags are different -- if there are regions defined,
-        // we default to the global region value. 
-        if (player == null) {
-            allowed = def; 
-        }
-        
-        int lastPriority = Integer.MIN_VALUE;
-
-        // The algorithm is as follows:
-        // While iterating through the list of regions, if an entry disallows
-        // the flag, then put it into the needsClear set. If an entry allows
-        // the flag and it has a parent, then its parent is put into hasCleared.
-        // In the situation that the child is reached before the parent, upon
-        // the parent being reached, even if the parent disallows, because the
-        // parent will be in hasCleared, permission will be allowed. In the
-        // other case, where the parent is reached first, if it does not allow
-        // permissions, it will be placed into needsClear. If a child of
-        // the parent is reached later, the parent will be removed from
-        // needsClear. At the end, if needsClear is not empty, that means that
-        // permission should not be given. If a parent has multiple children
-        // and one child does not allow permissions, then it will be placed into
-        // needsClear just like as if was a parent.
-
-        Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
-        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
-
-        for (ProtectedRegion region : applicable) {
-            // Ignore lower priority regions
-            if (hasFlagDefined && region.getPriority() < lastPriority) {
-                break;
-            }
-
-            lastPriority = region.getPriority();
-
-            // Ignore non-build regions
-            if (player != null
-                    && region.getFlag(DefaultFlag.PASSTHROUGH) == State.ALLOW) {
-                continue;
-            }
-
-            // Check group permissions
-            if (groupPlayer != null && flag.getRegionGroupFlag() != null) {
-                RegionGroup group = region.getFlag(flag.getRegionGroupFlag());
-                if (group == null) {
-                    group = flag.getRegionGroupFlag().getDefault();
-                }
-                if (!RegionGroupFlag.isMember(region, group, groupPlayer)) {
-                    continue;
-                }
-            }
-
-            State v = region.getFlag(flag);
-
-            // Allow DENY to override everything
-            if (v == State.DENY) {
-                return false;
-            }
-
-            // Forget about regions that allow it, although make sure the
-            // default state is now to allow
-            if (v == State.ALLOW) {
-                allowed = true;
-                found = true;
-                hasFlagDefined = true;
-                continue;
-            }
-
-            // For the build flag, the flags are conditional and are based
-            // on membership, so we have to check for parent-child
-            // relationships
-            if (player != null) {
-                hasFlagDefined = true;
-
-                if (hasCleared.contains(region)) {
-                    // Already cleared, so do nothing
-                } else {
-                    if (!region.isMember(player)) {
-                        needsClear.add(region);
-                    } else {
-                        // Need to clear all parents
-                        clearParents(needsClear, hasCleared, region);
-                    }
-                }
-            }
-
-            found = true;
-        }
-
-        return !found ? def :
-                (allowed || (player != null && needsClear.size() == 0));
-    }
-
-    /**
-     * Clear a region's parents for isFlagAllowed().
-     * 
-     * @param needsClear The regions that should be cleared
-     * @param hasCleared The regions already cleared
-     * @param region The region to start from
-     */
-    private void clearParents(Set<ProtectedRegion> needsClear,
-            Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
-        ProtectedRegion parent = region.getParent();
-
-        while (parent != null) {
-            if (!needsClear.remove(parent)) {
-                hasCleared.add(parent);
-            }
-
-            parent = parent.getParent();
-        }
-    }
-
-    /**
-     * @see #getFlag(com.sk89q.worldguard.protection.flags.Flag, com.sk89q.worldguard.LocalPlayer)
-     * @param flag flag to check
-     * @return value of the flag
-     */
-    public <T extends Flag<V>, V> V getFlag(T flag) {
-        return getFlag(flag, null);
-    }
+    boolean isMemberOfAll(LocalPlayer player);
 
     /**
      * Gets the value of a flag. Do not use this for state flags
      * (use {@link #allows(StateFlag, LocalPlayer)} for that).
-     * 
+     *
+     * @param flag the flag to check
+     * @return value of the flag, which may be null
+     * @deprecated Use {@link #queryValue(RegionAssociable, Flag)} instead. There
+     *             is no difference in functionality.
+     */
+    @Deprecated
+    @Nullable
+    <T extends Flag<V>, V> V getFlag(T flag);
+
+    /**
+     * Gets the value of a flag. Do not use this for state flags
+     * (use {@link #allows(StateFlag, LocalPlayer)} for that).
+     *
      * @param flag flag to check
      * @param groupPlayer player to check {@link RegionGroup}s against
-     * @return value of the flag
+     * @return value of the flag, which may be null
      * @throws IllegalArgumentException if a StateFlag is given
+     * @deprecated Use {@link #queryValue(RegionAssociable, Flag)} instead. There
+     *             is no difference in functionality.
      */
-    public <T extends Flag<V>, V> V getFlag(T flag, LocalPlayer groupPlayer) {
-        /*
-        if (flag instanceof StateFlag) {
-            throw new IllegalArgumentException("Cannot use StateFlag with getFlag()");
-        }
-        */
+    @Deprecated
+    @Nullable
+    <T extends Flag<V>, V> V getFlag(T flag, @Nullable LocalPlayer groupPlayer);
 
-        int lastPriority = 0;
-        boolean found = false;
-
-        Map<ProtectedRegion, V> needsClear = new HashMap<ProtectedRegion, V>();
-        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
-
-        for (ProtectedRegion region : applicable) {
-            // Ignore lower priority regions
-            if (found && region.getPriority() < lastPriority) {
-                break;
-            }
-
-            // Check group permissions
-            if (groupPlayer != null && flag.getRegionGroupFlag() != null) {
-                RegionGroup group = region.getFlag(flag.getRegionGroupFlag());
-                if (group == null) {
-                    group = flag.getRegionGroupFlag().getDefault();
-                }
-                if (!RegionGroupFlag.isMember(region, group, groupPlayer)) {
-                    continue;
-                }
-            }
-
-            if (hasCleared.contains(region)) {
-                // Already cleared, so do nothing
-            } else if (region.getFlag(flag) != null) {
-                clearParents(needsClear, hasCleared, region);
-
-                needsClear.put(region, region.getFlag(flag));
-
-                found = true;
-            }
-
-            lastPriority = region.getPriority();
-        }
-        
-        if (!needsClear.isEmpty()) {
-            return needsClear.values().iterator().next();
-        } else {
-            if (globalRegion != null) {
-                V gFlag = globalRegion.getFlag(flag);
-                if (gFlag != null) return gFlag;
-            }
-            return null;
-        }
-    }
-
-    /**
-     * Clear a region's parents for getFlag().
-     * 
-     * @param needsClear The regions that should be cleared
-     * @param hasCleared The regions already cleared
-     * @param region The region to start from
-     */
-    private void clearParents(Map<ProtectedRegion, ?> needsClear,
-            Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
-        ProtectedRegion parent = region.getParent();
-
-        while (parent != null) {
-            if (needsClear.remove(parent) == null) {
-                hasCleared.add(parent);
-            }
-
-            parent = parent.getParent();
-        }
-    }
-    
     /**
      * Get the number of regions that are included.
-     * 
-     * @return the size of this ApplicbleRegionSet
+     *
+     * @return the number of contained regions
      */
-    public int size() {
-        return applicable.size();
-    }
-    
+    int size();
+
     /**
-     * Get an iterator of affected regions.
+     * Get an immutable set of regions that are included in this set.
+     *
+     * @return a set of regions
      */
-    public Iterator<ProtectedRegion> iterator() {
-        return applicable.iterator();
-    }
+    Set<ProtectedRegion> getRegions();
+
 }

@@ -19,11 +19,17 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.google.common.collect.ImmutableMap;
 import com.sk89q.commandbook.CommandBook;
 import com.sk89q.commandbook.GodComponent;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
+import com.sk89q.worldguard.protection.managers.storage.DriverType;
+import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
+import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
+import com.sk89q.worldguard.util.sql.DataSourceConfig;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -35,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 
 /**
  * Represents the global configuration and also delegates configuration
@@ -44,6 +51,8 @@ import java.util.concurrent.ConcurrentMap;
  * @author Michael
  */
 public class ConfigurationManager {
+
+    private static final Logger log = Logger.getLogger(ConfigurationManager.class.getCanonicalName());
 
     private static final String CONFIG_HEADER = "#\r\n" +
             "# WorldGuard's main configuration file\r\n" +
@@ -66,30 +75,11 @@ public class ConfigurationManager {
             "# - Lines starting with # are comments and so they are ignored.\r\n" +
             "#\r\n";
 
-    /**
-     * Reference to the plugin.
-     */
     private WorldGuardPlugin plugin;
-
-    /**
-     * Holds configurations for different worlds.
-     */
     private ConcurrentMap<String, WorldConfiguration> worlds;
-
-    /**
-     * The global configuration for use when loading worlds
-     */
     private YAMLProcessor config;
-
-    /**
-     * List of people with god mode.
-     */
     @Deprecated
     private Set<String> hasGodMode = new HashSet<String>();
-
-    /**
-     * List of people who can breathe underwater.
-     */
     private Set<String> hasAmphibious = new HashSet<String>();
 
     private boolean hasCommandBookGodMode = false;
@@ -102,16 +92,15 @@ public class ConfigurationManager {
     public boolean usePlayerTeleports;
     public boolean deopOnJoin;
     public boolean blockInGameOp;
+    public boolean migrateRegionsToUuid;
+    public boolean keepUnresolvedNames;
     public Map<String, String> hostKeys = new HashMap<String, String>();
 
     /**
      * Region Storage Configuration method, and config values
      */
-    public boolean useSqlDatabase = false;
-    public String sqlDsn;
-    public String sqlUsername;
-    public String sqlPassword;
-    public String sqlTablePrefix;
+    public RegionDriver selectedRegionStoreDriver;
+    public Map<DriverType, RegionDriver> regionStoreDriverMap;
 
     /**
      * Construct the object.
@@ -121,6 +110,25 @@ public class ConfigurationManager {
     public ConfigurationManager(WorldGuardPlugin plugin) {
         this.plugin = plugin;
         this.worlds = new ConcurrentHashMap<String, WorldConfiguration>();
+    }
+
+    /**
+     * Get the folder for storing data files and configuration.
+     *
+     * @return the data folder
+     */
+    public File getDataFolder() {
+        return plugin.getDataFolder();
+    }
+
+    /**
+     * Get the folder for storing data files and configuration for each
+     * world.
+     *
+     * @return the data folder
+     */
+    public File getWorldsDataFolder() {
+        return new File(getDataFolder(), "worlds");
     }
 
     /**
@@ -136,12 +144,14 @@ public class ConfigurationManager {
         try {
             config.load();
         } catch (IOException e) {
-            plugin.getLogger().severe("Error reading configuration for global config: ");
+            log.severe("Error reading configuration for global config: ");
             e.printStackTrace();
         }
 
         config.removeProperty("suppress-tick-sync-warnings");
         useRegionsScheduler = config.getBoolean("regions.use-scheduler", true);
+        migrateRegionsToUuid = config.getBoolean("regions.uuid-migration.perform-on-next-start", true);
+        keepUnresolvedNames = config.getBoolean("regions.uuid-migration.keep-names-that-lack-uuids", true);
         useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
         autoGodMode = config.getBoolean("auto-invincible", config.getBoolean("auto-invincible-permission", false));
         config.removeProperty("auto-invincible-permission");
@@ -163,13 +173,25 @@ public class ConfigurationManager {
             }
         }
 
-        useSqlDatabase = config.getBoolean(
-                "regions.sql.use", false);
+        // ====================================================================
+        // Region store drivers
+        // ====================================================================
 
-        sqlDsn = config.getString("regions.sql.dsn", "jdbc:mysql://localhost/worldguard");
-        sqlUsername = config.getString("regions.sql.username", "worldguard");
-        sqlPassword = config.getString("regions.sql.password", "worldguard");
-        sqlTablePrefix = config.getString("regions.sql.table-prefix", "");
+        boolean useSqlDatabase = config.getBoolean("regions.sql.use", false);
+        String sqlDsn = config.getString("regions.sql.dsn", "jdbc:mysql://localhost/worldguard");
+        String sqlUsername = config.getString("regions.sql.username", "worldguard");
+        String sqlPassword = config.getString("regions.sql.password", "worldguard");
+        String sqlTablePrefix = config.getString("regions.sql.table-prefix", "");
+
+        DataSourceConfig dataSourceConfig = new DataSourceConfig(sqlDsn, sqlUsername, sqlPassword, sqlTablePrefix);
+        SQLDriver sqlDriver = new SQLDriver(dataSourceConfig);
+        DirectoryYamlDriver yamlDriver = new DirectoryYamlDriver(getWorldsDataFolder(), "regions.yml");
+
+        this.regionStoreDriverMap = ImmutableMap.<DriverType, RegionDriver>builder()
+                .put(DriverType.MYSQL, sqlDriver)
+                .put(DriverType.YAML, yamlDriver)
+                .build();
+        this.selectedRegionStoreDriver = useSqlDatabase ? sqlDriver : yamlDriver;
 
         // Load configurations for each world
         for (World world : plugin.getServer().getWorlds()) {
@@ -177,10 +199,6 @@ public class ConfigurationManager {
         }
 
         config.setHeader(CONFIG_HEADER);
-
-        if (!config.save()) {
-            plugin.getLogger().severe("Error saving configuration!");
-        }
     }
 
     /**
@@ -188,6 +206,13 @@ public class ConfigurationManager {
      */
     public void unload() {
         worlds.clear();
+    }
+
+    public void disableUuidMigration() {
+        config.setProperty("regions.uuid-migration.perform-on-next-start", false);
+        if (!config.save()) {
+            log.severe("Error saving configuration!");
+        }
     }
 
     /**

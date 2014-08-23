@@ -23,6 +23,8 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import javax.annotation.Nullable;
+
 /**
  *
  * @author sk89q
@@ -36,6 +38,7 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
         this.def = def;
     }
 
+    @Override
     public RegionGroup getDefault() {
         return def;
     }
@@ -61,23 +64,23 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
         }
     }
 
-    public static boolean isMember(ProtectedRegion region, RegionGroup group, LocalPlayer player) {
+    public static boolean isMember(ProtectedRegion region, RegionGroup group, @Nullable LocalPlayer player) {
         if (group == null || group == RegionGroup.ALL) {
             return true;
         } else if (group == RegionGroup.OWNERS) {
-            if (region.isOwner(player)) {
+            if (player != null && region.isOwner(player)) {
                 return true;
             }
         } else if (group == RegionGroup.MEMBERS) {
-            if (region.isMember(player)) {
+            if (player != null && region.isMember(player)) {
                 return true;
             }
         } else if (group == RegionGroup.NON_OWNERS) {
-            if (!region.isOwner(player)) {
+            if (player == null || !region.isOwner(player)) {
                 return true;
             }
         } else if (group == RegionGroup.NON_MEMBERS) {
-            if (!region.isMember(player)) {
+            if (player == null || !region.isMember(player)) {
                 return true;
             }
         }
@@ -85,8 +88,7 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
         return false;
     }
 
-    public static boolean isMember(ApplicableRegionSet set,
-                                   RegionGroup group, LocalPlayer player) {
+    public static boolean isMember(ApplicableRegionSet set, @Nullable RegionGroup group, LocalPlayer player) {
         if (group == null || group == RegionGroup.ALL) {
             return true;
         } else if (group == RegionGroup.OWNERS) {
