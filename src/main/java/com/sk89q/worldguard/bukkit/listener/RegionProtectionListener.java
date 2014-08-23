@@ -41,6 +41,7 @@ import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -49,14 +50,17 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Tameable;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 
 /**
  * Handle events that need to be processed by region protection.
  */
 public class RegionProtectionListener extends AbstractListener {
 
-    private static final String LAST_MESSAGE_KEY = "worldguard.region.lastMessage";
+    private static final String DENY_MESSAGE_KEY = "worldguard.region.lastMessage";
+    private static final String DISEMBARK_MESSAGE_KEY = "worldguard.region.disembarkMessage";
     private static final int LAST_MESSAGE_DELAY = 500;
 
     /**
@@ -82,14 +86,14 @@ public class RegionProtectionListener extends AbstractListener {
             Player player = (Player) rootCause;
 
             long now = System.currentTimeMillis();
-            Long lastTime = WGMetadata.getIfPresent(player, LAST_MESSAGE_KEY, Long.class);
+            Long lastTime = WGMetadata.getIfPresent(player, DENY_MESSAGE_KEY, Long.class);
             if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
                 RegionQuery query = getPlugin().getRegionContainer().createQuery();
                 String message = query.queryValue(location, player, DefaultFlag.DENY_MESSAGE);
                 if (message != null) {
                     player.sendMessage(message.replace("%what%", what));
                 }
-                WGMetadata.put(player, LAST_MESSAGE_KEY, now);
+                WGMetadata.put(player, DENY_MESSAGE_KEY, now);
             }
         }
     }
@@ -377,6 +381,28 @@ public class RegionProtectionListener extends AbstractListener {
         if (!canDamage) {
             tellErrorMessage(event.getCause(), target, what);
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onVehicleExit(VehicleExitEvent event) {
+        Entity vehicle = event.getVehicle();
+        Entity exited = event.getExited();
+
+        if (vehicle instanceof Tameable && exited instanceof Player) {
+            Player player = (Player) exited;
+            RegionQuery query = getPlugin().getRegionContainer().createQuery();
+            Location location = vehicle.getLocation();
+            if (!query.testBuild(location, player, DefaultFlag.USE)) {
+                long now = System.currentTimeMillis();
+                Long lastTime = WGMetadata.getIfPresent(player, DISEMBARK_MESSAGE_KEY, Long.class);
+                if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
+                    player.sendMessage("" + ChatColor.GOLD + "Don't disembark here!" + ChatColor.GRAY + " You can't get back on.");
+                    WGMetadata.put(player, DISEMBARK_MESSAGE_KEY, now);
+                }
+
+                event.setCancelled(true);
+            }
         }
     }
 
