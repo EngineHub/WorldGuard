@@ -73,6 +73,7 @@ import com.sk89q.worldguard.util.task.Supervisor;
 import com.sk89q.worldguard.util.task.Task;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
@@ -849,6 +850,18 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public LocalPlayer wrapPlayer(Player player) {
         return new BukkitPlayer(this, player);
+    }
+
+    /**
+     * Wrap a player as a LocalPlayer.
+     *
+     * <p>This implementation is incomplete -- permissions cannot be checked.</p>
+     *
+     * @param player The player to wrap
+     * @return The wrapped player
+     */
+    public LocalPlayer wrapOfflinePlayer(OfflinePlayer player) {
+        return new BukkitOfflinePlayer(player);
     }
 
     /**
