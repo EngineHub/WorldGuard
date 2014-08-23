@@ -45,7 +45,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -272,15 +271,12 @@ public class WorldGuardPlayerListener implements Listener {
     class PlayerMoveHandler implements Listener {
         @EventHandler(priority = EventPriority.HIGH)
         public void onPlayerMove(PlayerMoveEvent event) {
-            Player player = event.getPlayer();
+            final Player player = event.getPlayer();
             World world = player.getWorld();
 
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(world);
 
-            if (player.getVehicle() != null) {
-                return; // handled in vehicle listener
-            }
             if (wcfg.useRegions) {
                 // Did we move a block?
                 if (event.getFrom().getBlockX() != event.getTo().getBlockX()
@@ -288,11 +284,19 @@ public class WorldGuardPlayerListener implements Listener {
                         || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
                     boolean result = checkMove(plugin, player, event.getFrom(), event.getTo());
                     if (result) {
-                        Location newLoc = event.getFrom();
+                        final Location newLoc = event.getFrom();
                         newLoc.setX(newLoc.getBlockX() + 0.5);
                         newLoc.setY(newLoc.getBlockY());
                         newLoc.setZ(newLoc.getBlockZ() + 0.5);
                         event.setTo(newLoc);
+
+                        final Entity vehicle = player.getVehicle();
+                        if (vehicle != null) {
+                            vehicle.eject();
+                            vehicle.teleport(newLoc);
+                            player.teleport(newLoc);
+                            vehicle.setPassenger(player);
+                        }
                     }
                 }
             }
