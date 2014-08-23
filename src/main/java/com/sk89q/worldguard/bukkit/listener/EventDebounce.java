@@ -31,7 +31,7 @@ class EventDebounce {
     private final int debounceTime;
     private final boolean cancelled;
 
-    EventDebounce(int debounceTime, boolean cancelled) {
+    private EventDebounce(int debounceTime, boolean cancelled) {
         this.debounceTime = debounceTime;
         this.cancelled = cancelled;
     }
