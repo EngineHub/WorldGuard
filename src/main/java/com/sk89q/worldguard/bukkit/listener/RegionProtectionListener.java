@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.google.common.base.Predicate;
 import com.sk89q.worldguard.bukkit.RegionQuery;
+import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
@@ -30,6 +31,7 @@ import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
+import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
 import com.sk89q.worldguard.bukkit.util.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
@@ -45,6 +47,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -104,8 +107,21 @@ public class RegionProtectionListener extends AbstractListener {
      * @param cause the cause
      * @return true if whitelisted
      */
-    private boolean isWhitelisted(Cause cause) {
-        return false;
+    private boolean isWhitelisted(Cause cause, World world) {
+        Object rootCause = cause.getRootCause();
+
+        if (rootCause instanceof Player) {
+            Player player = (Player) rootCause;
+            WorldConfiguration config = getWorldConfig(world);
+
+            if (config.fakePlayerBuildOverride && Entities.isFakePlayer(player)) {
+                return true;
+            }
+
+            return new RegionPermissionModel(getPlugin(), player).mayIgnoreRegionProtection(world);
+        } else {
+            return false;
+        }
     }
 
     private RegionAssociable createRegionAssociable(Cause cause) {
@@ -129,7 +145,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
 
         final Material type = event.getEffectiveMaterial();
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
@@ -170,7 +186,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
 
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
 
@@ -208,7 +224,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
 
         final Material type = event.getEffectiveMaterial();
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
@@ -254,7 +270,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
 
         Location target = event.getTarget();
         EntityType type = event.getEffectiveType();
@@ -295,7 +311,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
 
         Location target = event.getTarget();
         EntityType type = event.getEntity().getType();
@@ -330,7 +346,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
 
         Location target = event.getTarget();
         RegionAssociable associable = createRegionAssociable(event.getCause());
@@ -348,7 +364,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onDamageEntity(DamageEntityEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
 
         Location target = event.getTarget();
         RegionAssociable associable = createRegionAssociable(event.getCause());
@@ -391,17 +407,19 @@ public class RegionProtectionListener extends AbstractListener {
 
         if (vehicle instanceof Tameable && exited instanceof Player) {
             Player player = (Player) exited;
-            RegionQuery query = getPlugin().getRegionContainer().createQuery();
-            Location location = vehicle.getLocation();
-            if (!query.testBuild(location, player, DefaultFlag.USE)) {
-                long now = System.currentTimeMillis();
-                Long lastTime = WGMetadata.getIfPresent(player, DISEMBARK_MESSAGE_KEY, Long.class);
-                if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
-                    player.sendMessage("" + ChatColor.GOLD + "Don't disembark here!" + ChatColor.GRAY + " You can't get back on.");
-                    WGMetadata.put(player, DISEMBARK_MESSAGE_KEY, now);
-                }
+            if (!isWhitelisted(Cause.create(player), vehicle.getWorld())) {
+                RegionQuery query = getPlugin().getRegionContainer().createQuery();
+                Location location = vehicle.getLocation();
+                if (!query.testBuild(location, player, DefaultFlag.USE)) {
+                    long now = System.currentTimeMillis();
+                    Long lastTime = WGMetadata.getIfPresent(player, DISEMBARK_MESSAGE_KEY, Long.class);
+                    if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
+                        player.sendMessage("" + ChatColor.GOLD + "Don't disembark here!" + ChatColor.GRAY + " You can't get back on.");
+                        WGMetadata.put(player, DISEMBARK_MESSAGE_KEY, now);
+                    }
 
-                event.setCancelled(true);
+                    event.setCancelled(true);
+                }
             }
         }
     }

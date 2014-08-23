@@ -158,7 +158,8 @@ public class GlobalRegionManager {
      */
     @Deprecated
     public boolean canBuild(Player player, Location location) {
-        return createQuery().testBuild(location, player);
+        return hasBypass(player, location.getWorld()) || createQuery().testBuild(location, player);
+
     }
 
     /**

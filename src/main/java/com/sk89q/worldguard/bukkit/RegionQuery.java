@@ -113,6 +113,9 @@ public class RegionQuery {
      * {@link #testState(Location, Player, StateFlag...)} with
      * {@code flags} plus the {@code BUILD} flag.</p>
      *
+     * <p>This method does not check the region bypass permission. That must
+     * be done by the calling code.</p>
+     *
      * @param location the location
      * @param player the player
      * @param flags zero or more flags
@@ -122,12 +125,6 @@ public class RegionQuery {
     public boolean testBuild(Location location, Player player, StateFlag... flags) {
         checkNotNull(location);
         checkNotNull(player);
-
-        World world = location.getWorld();
-
-        if (player.hasPermission("worldguard.region.bypass." + world.getName())) {
-            return true;
-        }
 
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         return testBuild(location, localPlayer, flags);
@@ -140,6 +137,9 @@ public class RegionQuery {
      * <p>This method is equivalent to calling
      * {@link #testState(Location, Player, StateFlag...)} with
      * {@code flags} plus the {@code BUILD} flag.</p>
+     *
+     * <p>This method does not check the region bypass permission. That must
+     * be done by the calling code.</p>
      *
      * @param location the location
      * @param subject the subject
@@ -168,6 +168,9 @@ public class RegionQuery {
      * regions. (Flags on a region can be changed so that they only apply
      * to certain users.) The player argument is required if the
      * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
+     *
+     * <p>This method does not check the region bypass permission. That must
+     * be done by the calling code.</p>
      *
      * @param location the location
      * @param player an optional player, which would be used to determine the region group to apply
