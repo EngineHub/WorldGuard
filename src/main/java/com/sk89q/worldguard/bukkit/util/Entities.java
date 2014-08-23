@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.util;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
@@ -113,4 +114,15 @@ public final class Entities {
         return entity;
     }
 
+    /**
+     * Return whether the given player is a fake player using the typical
+     * fake player convention of [Mod].
+     *
+     * @param player the player
+     * @return true if a fake player
+     */
+    public static boolean isFakePlayer(Player player) {
+        String name = player.getName();
+        return name.length() >= 3 && name.charAt(0) == '[' && name.charAt(name.length() - 1) == ']';
+    }
 }
