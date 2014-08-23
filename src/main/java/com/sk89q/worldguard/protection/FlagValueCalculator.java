@@ -443,7 +443,9 @@ public class FlagValueCalculator {
                         group = flag.getRegionGroupFlag().getDefault();
                     }
 
-                    if (subject == null) {
+                    if (group == null) {
+                        use = false;
+                    } else if (subject == null) {
                         use = group.contains(Association.NON_MEMBER);
                     } else if (!group.contains(subject.getAssociation(region))) {
                         use = false;
