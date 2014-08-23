@@ -127,7 +127,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.FURNACE, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.BURNING_FURNACE, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.SIGN_POST, 0);
-        MATERIAL_FLAGS.put(Material.WOODEN_DOOR, 0);
+        MATERIAL_FLAGS.put(Material.WOODEN_DOOR, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.LADDER, 0);
         MATERIAL_FLAGS.put(Material.RAILS, 0);
         MATERIAL_FLAGS.put(Material.COBBLESTONE_STAIRS, 0);
