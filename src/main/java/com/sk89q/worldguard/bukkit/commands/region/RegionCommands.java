@@ -56,6 +56,7 @@ import com.sk89q.worldguard.protection.managers.migration.MigrationException;
 import com.sk89q.worldguard.protection.managers.migration.UUIDMigration;
 import com.sk89q.worldguard.protection.managers.storage.DriverType;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
+import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.util.Enums;
@@ -94,7 +95,7 @@ public final class RegionCommands extends RegionCommandsBase {
      */
     @Command(aliases = {"define", "def", "d", "create"},
              usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
-             flags = "n",
+             flags = "ng",
              desc = "Defines a region",
              min = 1)
     public void define(CommandContext args, CommandSender sender) throws CommandException {
@@ -112,9 +113,15 @@ public final class RegionCommands extends RegionCommandsBase {
 
         checkRegionDoesNotExist(manager, id, true);
 
-        ProtectedRegion region = checkRegionFromSelection(player, id);
-        warnAboutDimensions(player, region);
-        informNewUser(player, manager, region);
+        ProtectedRegion region;
+
+        if (args.hasFlag('g')) {
+            region = new GlobalProtectedRegion(id);
+        } else {
+            region = checkRegionFromSelection(player, id);
+            warnAboutDimensions(player, region);
+            informNewUser(player, manager, region);
+        }
 
         RegionAdder task = new RegionAdder(plugin, manager, region);
         task.addOwnersFromCommand(args, 2);
@@ -139,6 +146,7 @@ public final class RegionCommands extends RegionCommandsBase {
     @Command(aliases = {"redefine", "update", "move"},
              usage = "<id>",
              desc = "Re-defines the shape of a region",
+             flags = "g",
              min = 1, max = 1)
     public void redefine(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -157,10 +165,17 @@ public final class RegionCommands extends RegionCommandsBase {
             throw new CommandPermissionsException();
         }
 
-        ProtectedRegion region = checkRegionFromSelection(player, id);
-        region.copyFrom(existing);
+        ProtectedRegion region;
 
-        warnAboutDimensions(sender, region);
+        if (args.hasFlag('g')) {
+            region = new GlobalProtectedRegion(id);
+        } else {
+            region = checkRegionFromSelection(player, id);
+            warnAboutDimensions(player, region);
+            informNewUser(player, manager, region);
+        }
+
+        region.copyFrom(existing);
 
         RegionAdder task = new RegionAdder(plugin, manager, region);
         ListenableFuture<?> future = plugin.getExecutorService().submit(task);
