@@ -43,6 +43,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -108,6 +109,8 @@ public class RegionProtectionListener extends AbstractListener {
 
         if (rootCause instanceof Player) {
             return getPlugin().wrapPlayer((Player) rootCause);
+        } else if (rootCause instanceof OfflinePlayer) {
+            return getPlugin().wrapOfflinePlayer((OfflinePlayer) rootCause);
         } else if (rootCause instanceof Entity) {
             RegionQuery query = getPlugin().getRegionContainer().createQuery();
             return new DelayedRegionOverlapAssociation(query, ((Entity) rootCause).getLocation());
