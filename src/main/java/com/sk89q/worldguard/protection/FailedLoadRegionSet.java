@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.ChatColor;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -42,6 +43,10 @@ import java.util.Set;
 public class FailedLoadRegionSet extends AbstractRegionSet {
 
     private static final FailedLoadRegionSet INSTANCE = new FailedLoadRegionSet();
+
+    private final String denyMessage = ChatColor.RED + "Region data for WorldGuard failed to load for this world, so " +
+            "everything has been protected as a precaution. Please inform a server administrator.";
+    private final Collection<String> denyMessageCollection = ImmutableList.of(denyMessage);
 
     private FailedLoadRegionSet() {
     }
@@ -62,6 +67,8 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
     public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
         if (flag == DefaultFlag.BUILD) {
             return (V) State.DENY;
+        } else if (flag == DefaultFlag.DENY_MESSAGE) {
+            return (V) denyMessage;
         }
         return flag.getDefault();
     }
@@ -71,6 +78,8 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
     public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
         if (flag == DefaultFlag.BUILD) {
             return (Collection<V>) ImmutableList.of(State.DENY);
+        } else if (flag == DefaultFlag.DENY_MESSAGE) {
+            return (Collection<V>) denyMessageCollection;
         }
         V fallback = flag.getDefault();
         return fallback != null ? ImmutableList.of(fallback) : (Collection<V>) ImmutableList.of();
