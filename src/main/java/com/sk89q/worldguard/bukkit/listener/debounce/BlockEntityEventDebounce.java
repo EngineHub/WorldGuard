@@ -17,54 +17,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener;
+package com.sk89q.worldguard.bukkit.listener.debounce;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.sk89q.worldguard.bukkit.util.Events;
+import com.sk89q.worldguard.bukkit.listener.debounce.BlockEntityEventDebounce.Key;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
-import java.util.concurrent.TimeUnit;
+public class BlockEntityEventDebounce extends AbstractEventDebounce<Key> {
 
-class BlockEntityEventDebounce {
-
-    private final Cache<Key, Entry> cache;
-
-    BlockEntityEventDebounce(int debounceTime) {
-        cache = CacheBuilder.newBuilder()
-                .maximumSize(1000)
-                .expireAfterWrite(debounceTime, TimeUnit.MILLISECONDS)
-                .concurrencyLevel(2)
-                .build(new CacheLoader<Key, Entry>() {
-                    @Override
-                    public Entry load(Key key) throws Exception {
-                        return new Entry();
-                    }
-                });
+    public BlockEntityEventDebounce(int debounceTime) {
+        super(debounceTime);
     }
 
     public <T extends Event & Cancellable> void debounce(Block block, Entity entity, Cancellable originalEvent, T firedEvent) {
-        Key key = new Key(block, entity);
-        Entry entry = cache.getUnchecked(key);
-        if (entry.cancelled != null) {
-            if (entry.cancelled) {
-                originalEvent.setCancelled(true);
-            }
-        } else {
-            boolean cancelled = Events.fireAndTestCancel(firedEvent);
-            if (cancelled) {
-                originalEvent.setCancelled(true);
-            }
-            entry.cancelled = cancelled;
-        }
+        super.debounce(new Key(block, entity), originalEvent, firedEvent);
     }
 
-    private static class Key {
+    protected static class Key {
         private final Block block;
         private final Material blockMaterial;
         private final Entity entity;
@@ -96,10 +68,6 @@ class BlockEntityEventDebounce {
             result = 31 * result + entity.hashCode();
             return result;
         }
-    }
-
-    private static class Entry {
-        private Boolean cancelled;
     }
 
 }

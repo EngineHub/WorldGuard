@@ -31,6 +31,8 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
+import com.sk89q.worldguard.bukkit.listener.debounce.BlockEntityEventDebounce;
+import com.sk89q.worldguard.bukkit.listener.debounce.EntityEntityEventDebounce;
 import com.sk89q.worldguard.bukkit.util.BlockStateAsBlockFunction;
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
@@ -110,9 +112,8 @@ import static com.sk89q.worldguard.bukkit.util.Materials.isItemAppliedToBlock;
 
 public class EventAbstractionListener extends AbstractListener {
 
-    private static final String ITEM_PICKUP_DEBOUNCE_KEY = "worldguard.debounce.itemPickup";
-
     private final BlockEntityEventDebounce interactDebounce = new BlockEntityEventDebounce(10000);
+    private final EntityEntityEventDebounce pickupDebounce = new EntityEntityEventDebounce(10000);
 
     /**
      * Construct the listener.
@@ -553,7 +554,7 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
         Item item = event.getItem();
-        EventDebounce.debounce(item, ITEM_PICKUP_DEBOUNCE_KEY, 10000, event, new DestroyEntityEvent(event, create(event.getPlayer()), event.getItem()));
+        pickupDebounce.debounce(event.getPlayer(), item, event, new DestroyEntityEvent(event, create(event.getPlayer()), event.getItem()));
     }
 
     @EventHandler
