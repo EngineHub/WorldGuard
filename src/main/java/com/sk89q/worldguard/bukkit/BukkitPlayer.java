@@ -25,18 +25,34 @@ import org.bukkit.entity.Player;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class BukkitPlayer extends LocalPlayer {
-    private Player player;
-    private WorldGuardPlugin plugin;
-    
+
+    private final WorldGuardPlugin plugin;
+    private final Player player;
+    private final String name;
+
     public BukkitPlayer(WorldGuardPlugin plugin, Player player) {
+        checkNotNull(plugin);
+        checkNotNull(player);
+
         this.plugin = plugin;
         this.player = player;
+        // getName() takes longer than before in newer versions of Minecraft
+        this.name = player.getName();
     }
 
     @Override
     public String getName() {
-        return player.getName();
+        return name;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return player.getUniqueId();
     }
 
     @Override
@@ -75,4 +91,9 @@ public class BukkitPlayer extends LocalPlayer {
     public boolean hasPermission(String perm) {
         return plugin.hasPermission(player, perm);
     }
+
+    public Player getPlayer() {
+        return player;
+    }
+
 }

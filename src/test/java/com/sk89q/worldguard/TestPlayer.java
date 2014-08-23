@@ -19,15 +19,18 @@
 
 package com.sk89q.worldguard;
 
+import com.sk89q.worldedit.Vector;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import com.sk89q.worldedit.Vector;
+import java.util.UUID;
 
 @org.junit.Ignore
 public class TestPlayer extends LocalPlayer {
-    private String name;
-    private Set<String> groups = new HashSet<String>();
+
+    private final UUID uuid = UUID.randomUUID();
+    private final String name;
+    private final Set<String> groups = new HashSet<String>();
     
     public TestPlayer(String name) {
         this.name = name;
@@ -40,6 +43,11 @@ public class TestPlayer extends LocalPlayer {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return uuid;
     }
 
     @Override

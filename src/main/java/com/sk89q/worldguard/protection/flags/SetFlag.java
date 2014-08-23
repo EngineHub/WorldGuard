@@ -19,15 +19,14 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import org.bukkit.command.CommandSender;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.bukkit.command.CommandSender;
-
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 /**
  * Represents a flag that consists of a set.
@@ -46,6 +45,15 @@ public class SetFlag<T> extends Flag<Set<T>> {
     public SetFlag(String name, Flag<T> subFlag) {
         super(name);
         this.subFlag = subFlag;
+    }
+
+    /**
+     * Get the flag that is stored in this flag.
+     *
+     * @return the stored flag type
+     */
+    public Flag<T> getType() {
+        return subFlag;
     }
 
     @Override

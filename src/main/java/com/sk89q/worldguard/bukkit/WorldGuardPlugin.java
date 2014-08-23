@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -27,21 +30,50 @@ import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import com.sk89q.squirrelid.cache.HashMapCache;
+import com.sk89q.squirrelid.cache.ProfileCache;
+import com.sk89q.squirrelid.cache.SQLiteCache;
+import com.sk89q.squirrelid.resolver.BukkitPlayerService;
+import com.sk89q.squirrelid.resolver.CacheForwardingService;
+import com.sk89q.squirrelid.resolver.CombinedProfileService;
+import com.sk89q.squirrelid.resolver.HttpRepositoryService;
+import com.sk89q.squirrelid.resolver.ProfileService;
 import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
-import com.sk89q.worldguard.internal.listener.BlacklistListener;
-import com.sk89q.worldguard.internal.listener.BlockedPotionsListener;
-import com.sk89q.worldguard.internal.listener.ChestProtectionListener;
-import com.sk89q.worldguard.internal.listener.RegionProtectionListener;
+import com.sk89q.worldguard.bukkit.listener.BlacklistListener;
+import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
+import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
+import com.sk89q.worldguard.bukkit.listener.DebuggingListener;
+import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
+import com.sk89q.worldguard.bukkit.listener.FlagStateManager;
+import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
+import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardCommandBookListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardEntityListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardHangingListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardPlayerListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardServerListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardVehicleListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
+import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
+import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
+import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
+import com.sk89q.worldguard.util.task.SimpleSupervisor;
+import com.sk89q.worldguard.util.task.Supervisor;
+import com.sk89q.worldguard.util.task.Task;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
@@ -53,6 +85,7 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -63,51 +96,38 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
- *
- * @author sk89q
  */
 public class WorldGuardPlugin extends JavaPlugin {
 
-    /**
-     * Current instance of this plugin.
-     */
+    private static final Logger log = Logger.getLogger(WorldGuardPlugin.class.getCanonicalName());
+
     private static WorldGuardPlugin inst;
-
-    /**
-     * Manager for commands. This automatically handles nested commands,
-     * permissions checking, and a number of other fancy command things.
-     * We just set it up and register commands against it.
-     */
     private final CommandsManager<CommandSender> commands;
-
-    /**
-     * Handles the region databases for all worlds.
-     */
-    private final GlobalRegionManager globalRegionManager;
-
-    /**
-     * Handles all configuration.
-     */
-    private final ConfigurationManager configuration;
-
-    /**
-     * Used for scheduling flags.
-     */
+    private final ConfigurationManager configuration = new ConfigurationManager(this);
+    private final RegionContainer regionContainer = new RegionContainer(this);
+    private final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this, regionContainer);
     private FlagStateManager flagStateManager;
+    private final Supervisor supervisor = new SimpleSupervisor();
+    private ListeningExecutorService executorService;
+    private ProfileService profileService;
+    private ProfileCache profileCache;
 
     /**
      * Construct objects. Actual loading occurs when the plugin is enabled, so
      * this merely instantiates the objects.
      */
     public WorldGuardPlugin() {
-        configuration = new ConfigurationManager(this);
-        globalRegionManager = new GlobalRegionManager(this);
-
         final WorldGuardPlugin plugin = inst = this;
         commands = new CommandsManager<CommandSender>() {
             @Override
@@ -131,6 +151,11 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     @SuppressWarnings("deprecation")
     public void onEnable() {
+        configureLogger();
+
+        getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
+
+        executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
 
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(this));
@@ -149,26 +174,43 @@ public class WorldGuardPlugin extends JavaPlugin {
             }
         }, 0L);
 
-        // Need to create the plugins/WorldGuard folder
-        getDataFolder().mkdirs();
+        File cacheDir = new File(getDataFolder(), "cache");
+        cacheDir.mkdirs();
+        try {
+            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
+        } catch (IOException e) {
+            log.log(Level.WARNING, "Failed to initialize SQLite profile cache");
+            profileCache = new HashMapCache();
+        }
+
+        profileService = new CacheForwardingService(
+                new CombinedProfileService(
+                        BukkitPlayerService.getInstance(),
+                        HttpRepositoryService.forMinecraft()),
+                profileCache);
 
         PermissionsResolverManager.initialize(this);
-
-        // This must be done before configuration is loaded
-        LegacyWorldGuardMigration.migrateBlacklist(this);
 
         try {
             // Load the configuration
             configuration.load();
-            globalRegionManager.preload();
         } catch (FatalConfigurationLoadingException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "Encountered fatal error while loading configuration", e);
             getServer().shutdown();
+            log.log(Level.WARNING, "\n" +
+                    "******************************************************\n" +
+                    "* Failed to load WorldGuard configuration!\n" +
+                    "* \n" +
+                    "* Shutting down the server just in case...\n" +
+                    "* \n" +
+                    "* The error should be printed above this message. If you can't\n" +
+                    "* figure out the problem, ask us on our forums:\n" +
+                    "* http://forum.enginehub.org\n" +
+                    "******************************************************\n");
         }
 
-        // Migrate regions after the regions were loaded because
-        // the migration code reuses the loaded region managers
-        LegacyWorldGuardMigration.migrateRegions(this);
+        log.info("Loading region data...");
+        regionContainer.initialize();
 
         flagStateManager = new FlagStateManager(this);
 
@@ -190,7 +232,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new BlacklistListener(this)).registerEvents();
         (new ChestProtectionListener(this)).registerEvents();
         (new RegionProtectionListener(this)).registerEvents();
+        (new RegionFlagsListener(this)).registerEvents();
         (new BlockedPotionsListener(this)).registerEvents();
+        (new EventAbstractionListener(this)).registerEvents();
+        if ("true".equalsIgnoreCase(System.getProperty("worldguard.debug.listener"))) {
+            (new DebuggingListener(this, log)).registerEvents();
+        }
 
         configuration.updateCommandBookGodMode();
 
@@ -216,22 +263,38 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
     }
 
-    /**
-     * Called on plugin disable.
-     */
     @Override
     public void onDisable() {
-        globalRegionManager.unload();
+        executorService.shutdown();
+
+        try {
+            log.log(Level.INFO, "Shutting down executor and waiting for any pending tasks...");
+
+            List<Task<?>> tasks = supervisor.getTasks();
+            if (!tasks.isEmpty()) {
+                StringBuilder builder = new StringBuilder("Known tasks:");
+                for (Task<?> task : tasks) {
+                    builder.append("\n");
+                    builder.append(task.getName());
+                }
+                log.log(Level.INFO, builder.toString());
+            }
+
+            Futures.successfulAsList(tasks).get();
+            executorService.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+            log.log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
+        }
+
+        regionContainer.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
     }
 
-    /**
-     * Handle a command.
-     */
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label,
-            String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         try {
             commands.execute(cmd.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
@@ -242,12 +305,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             sender.sendMessage(ChatColor.RED + e.getMessage());
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (WrappedCommandException e) {
-            if (e.getCause() instanceof NumberFormatException) {
-                sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
-            } else {
-                sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
-                e.printStackTrace();
-            }
+            sender.sendMessage(ChatColor.RED + convertThrowable(e.getCause()));
         } catch (CommandException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }
@@ -256,12 +314,51 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
 
     /**
+     * Convert the throwable into a somewhat friendly message.
+     *
+     * @param throwable the throwable
+     * @return a message
+     */
+    public String convertThrowable(@Nullable Throwable throwable) {
+        if (throwable instanceof NumberFormatException) {
+            return "Number expected, string received instead.";
+        } else if (throwable instanceof StorageException) {
+            log.log(Level.WARNING, "Error loading/saving regions", throwable);
+            return "Region data could not be loaded/saved: " + throwable.getMessage();
+        } else if (throwable instanceof RejectedExecutionException) {
+            return "There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.";
+        } else if (throwable instanceof CancellationException) {
+            return "WorldGuard: Task was cancelled";
+        } else if (throwable instanceof InterruptedException) {
+            return "WorldGuard: Task was interrupted";
+        } else if (throwable instanceof UnresolvedNamesException) {
+            return throwable.getMessage();
+        } else if (throwable instanceof CommandException) {
+            return throwable.getMessage();
+        } else {
+            log.log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
+            return "WorldGuard: An unexpected error occurred! Please see the server console.";
+        }
+    }
+
+    /**
      * Get the GlobalRegionManager.
      *
-     * @return The plugin's global region manager
+     * @return the plugin's global region manager
+     * @deprecated use {@link #getRegionContainer()}
      */
+    @Deprecated
     public GlobalRegionManager getGlobalRegionManager() {
         return globalRegionManager;
+    }
+
+    /**
+     * Get the object that manages region data.
+     *
+     * @return the region container
+     */
+    public RegionContainer getRegionContainer() {
+        return regionContainer;
     }
 
     /**
@@ -291,6 +388,43 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public ConfigurationManager getGlobalStateManager() {
         return configuration;
+    }
+
+    /**
+     * Get the supervisor.
+     *
+     * @return the supervisor
+     */
+    public Supervisor getSupervisor() {
+        return supervisor;
+    }
+
+    /**
+     * Get the global executor service for internal usage (please use your
+     * own executor service).
+     *
+     * @return the global executor service
+     */
+    public ListeningExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    /**
+     * Get the profile lookup service.
+     *
+     * @return the profile lookup service
+     */
+    public ProfileService getProfileService() {
+        return profileService;
+    }
+
+    /**
+     * Get the profile cache.
+     *
+     * @return the profile cache
+     */
+    public ProfileCache getProfileCache() {
+        return profileCache;
     }
 
     /**
@@ -719,6 +853,25 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
 
     /**
+     * Wrap a player as a LocalPlayer.
+     *
+     * <p>This implementation is incomplete -- permissions cannot be checked.</p>
+     *
+     * @param player The player to wrap
+     * @return The wrapped player
+     */
+    public LocalPlayer wrapOfflinePlayer(OfflinePlayer player) {
+        return new BukkitOfflinePlayer(player);
+    }
+
+    /**
+     * Configure WorldGuard's loggers.
+     */
+    private void configureLogger() {
+        RecordMessagePrefixer.register(Logger.getLogger("com.sk89q.worldguard"), "[WorldGuard] ");
+    }
+
+    /**
      * Create a default configuration file from the .jar.
      *
      * @param actual The destination file
@@ -745,7 +898,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 if (copy == null) throw new FileNotFoundException();
                 input = file.getInputStream(copy);
             } catch (IOException e) {
-                getLogger().severe("Unable to read default configuration: " + defaultName);
+                log.severe("Unable to read default configuration: " + defaultName);
             }
 
         if (input != null) {
@@ -759,7 +912,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     output.write(buf, 0, length);
                 }
 
-                getLogger().info("Default configuration file written: "
+                log.info("Default configuration file written: "
                         + actual.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -797,7 +950,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 player.sendMessage(msg);
             }
         }
-        getLogger().info(msg);
+        log.info(msg);
     }
 
     /**
@@ -881,4 +1034,5 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         return message;
     }
+
 }

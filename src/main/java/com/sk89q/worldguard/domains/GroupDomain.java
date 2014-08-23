@@ -19,28 +19,69 @@
 
 package com.sk89q.worldguard.domains;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.util.ChangeTracked;
 
-public class GroupDomain implements Domain {
-    private Set<String> groups;
+import java.util.Collections;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArraySet;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Contains groups in a domain.
+ */
+public class GroupDomain implements Domain, ChangeTracked {
+
+    private final Set<String> groups = new CopyOnWriteArraySet<String>();
+    private boolean dirty = true;
+
+    /**
+     * Create a new instance.
+     */
     public GroupDomain() {
-        this.groups = new LinkedHashSet<String>();
     }
 
+    /**
+     * Create a new instance.
+     *
+     * @param groups an array of groups
+     */
     public GroupDomain(String[] groups) {
-        this.groups = new LinkedHashSet<String>(Arrays.asList(groups));
+        checkNotNull(groups);
+        for (String group : groups) {
+            addGroup(group);
+        }
     }
 
+    /**
+     * Add the name of the group to the domain.
+     *
+     * @param name the name of the group.
+     */
     public void addGroup(String name) {
-        groups.add(name);
+        checkNotNull(name);
+        checkArgument(!name.trim().isEmpty(), "Can't add empty group name");
+        setDirty(true);
+        groups.add(name.trim().toLowerCase());
     }
 
+    /**
+     * Remove the given group from the domain.
+     *
+     * @param name the name of the group
+     */
+    public void removeGroup(String name) {
+        checkNotNull(name);
+        setDirty(true);
+        groups.remove(name.trim().toLowerCase());
+    }
+
+    @Override
     public boolean contains(LocalPlayer player) {
+        checkNotNull(player);
         for (String group : groups) {
             if (player.hasGroup(group)) {
                 return true;
@@ -50,12 +91,43 @@ public class GroupDomain implements Domain {
         return false;
     }
 
+    /**
+     * Get the set of group names.
+     *
+     * @return the set of group names
+     */
+    public Set<String> getGroups() {
+        return Collections.unmodifiableSet(groups);
+    }
+
+    @Override
+    public boolean contains(UUID uniqueId) {
+        return false; // GroupDomains can't contain UUIDs
+    }
+
     @Override
     public boolean contains(String playerName) {
         return false; // GroupDomains can't contain player names.
     }
 
+    @Override
     public int size() {
         return groups.size();
     }
+
+    @Override
+    public void clear() {
+        groups.clear();
+    }
+
+    @Override
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    @Override
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
+    }
+
 }

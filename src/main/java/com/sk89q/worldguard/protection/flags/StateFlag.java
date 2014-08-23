@@ -19,9 +19,11 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.command.CommandSender;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
  *
@@ -46,8 +48,19 @@ public class StateFlag extends Flag<StateFlag.State> {
         this.def = def;
     }
 
-    public boolean getDefault() {
-        return def;
+    @Override
+    public State getDefault() {
+        return def ? State.ALLOW : null;
+    }
+
+    @Override
+    @Nullable
+    public State chooseValue(Collection<State> values) {
+        if (!values.isEmpty()) {
+            return combine(values);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -87,6 +100,94 @@ public class StateFlag extends Flag<StateFlag.State> {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Test whether at least one of the given states is {@code ALLOW}
+     * but none are set to {@code DENY}.
+     *
+     * @param states zero or more states
+     * @return true if the condition is matched
+     */
+    public static boolean test(State... states) {
+        boolean allowed = false;
+
+        for (State state : states) {
+            if (state == State.DENY) {
+                return false;
+            } else if (state == State.ALLOW) {
+                allowed = true;
+            }
+        }
+
+        return allowed;
+    }
+
+    /**
+     * Combine states, letting {@code DENY} override {@code ALLOW} and
+     * {@code ALLOW} override {@code NONE} (or null).
+     *
+     * @param states zero or more states
+     * @return the new state
+     */
+    @Nullable
+    public static State combine(State... states) {
+        boolean allowed = false;
+
+        for (State state : states) {
+            if (state == State.DENY) {
+                return State.DENY;
+            } else if (state == State.ALLOW) {
+                allowed = true;
+            }
+        }
+
+        return allowed ? State.ALLOW : null;
+    }
+
+    /**
+     * Combine states, letting {@code DENY} override {@code ALLOW} and
+     * {@code ALLOW} override {@code NONE} (or null).
+     *
+     * @param states zero or more states
+     * @return the new state
+     */
+    @Nullable
+    public static State combine(Collection<State> states) {
+        boolean allowed = false;
+
+        for (State state : states) {
+            if (state == State.DENY) {
+                return State.DENY;
+            } else if (state == State.ALLOW) {
+                allowed = true;
+            }
+        }
+
+        return allowed ? State.ALLOW : null;
+    }
+
+    /**
+     * Turn a boolean into either {@code NONE} (null) or {@code ALLOW} if
+     * the boolean is false or true, respectively.
+     *
+     * @param flag a boolean value
+     * @return a state
+     */
+    @Nullable
+    public static State allowOrNone(boolean flag) {
+        return flag ? State.ALLOW : null;
+    }
+
+    /**
+     * Turn {@code DENY} into {@code NONE} (null).
+     *
+     * @param state a state
+     * @return a state
+     */
+    @Nullable
+    public static State denyToNone(State state) {
+        return state == State.DENY ? null : state;
     }
 
 }

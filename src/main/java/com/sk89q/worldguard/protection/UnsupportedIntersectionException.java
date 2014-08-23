@@ -19,6 +19,12 @@
 
 package com.sk89q.worldguard.protection;
 
+/**
+ * Thrown when an intersection between two different types of regions is not
+ * supported.
+ *
+ * @deprecated no longer utilized
+ */
+@Deprecated
 public class UnsupportedIntersectionException extends Exception {
-    private static final long serialVersionUID = 6423189392345575148L;
 }

@@ -23,7 +23,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 /**
  * This event is fired when PVP is disallowed between players due to a "pvp deny" flag.
@@ -37,9 +36,9 @@ public class DisallowedPVPEvent extends Event implements Cancellable {
     private boolean cancelled = false;
     private final Player attacker;
     private final Player defender;
-    private final EntityDamageByEntityEvent event;
+    private final Event event;
 
-    public DisallowedPVPEvent(final Player attacker, final Player defender, EntityDamageByEntityEvent event) {
+    public DisallowedPVPEvent(final Player attacker, final Player defender, Event event) {
         this.attacker = attacker;
         this.defender = defender;
         this.event = event;
@@ -67,7 +66,7 @@ public class DisallowedPVPEvent extends Event implements Cancellable {
         return defender;
     }
 
-    public EntityDamageByEntityEvent getCause() {
+    public Event getCause() {
         return event;
     }
 

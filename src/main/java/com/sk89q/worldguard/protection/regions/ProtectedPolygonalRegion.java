@@ -19,23 +19,25 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.protection.UnsupportedIntersectionException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ProtectedPolygonalRegion extends ProtectedRegion {
 
-    protected List<BlockVector2D> points;
-    protected int minY;
-    protected int maxY;
+    private List<BlockVector2D> points;
+    private int minY;
+    private int maxY;
 
     public ProtectedPolygonalRegion(String id, List<BlockVector2D> points, int minY, int maxY) {
         super(id);
-        this.points = points;
         setMinMaxPoints(points, minY, maxY);
+        this.points = points;
         this.minY = min.getBlockY();
         this.maxY = max.getBlockY();
     }
@@ -48,6 +50,8 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * @param maxY The maximum y coordinate
      */
     private void setMinMaxPoints(List<BlockVector2D> points2D, int minY, int maxY) {
+        checkNotNull(points2D);
+
         List<Vector> points = new ArrayList<Vector>();
         int y = minY;
         for (BlockVector2D point2D : points2D) {
@@ -57,18 +61,18 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         setMinMaxPoints(points);
     }
 
+    @Override
     public List<BlockVector2D> getPoints() {
         return points;
     }
 
-    /**
-     * Checks to see if a point is inside this region.
-     */
     @Override
-    public boolean contains(Vector pt) {
-        int targetX = pt.getBlockX(); //wide
-        int targetY = pt.getBlockY(); //height
-        int targetZ = pt.getBlockZ(); //depth
+    public boolean contains(Vector position) {
+        checkNotNull(position);
+
+        int targetX = position.getBlockX(); // Width
+        int targetY = position.getBlockY(); // Height
+        int targetZ = position.getBlockZ(); // Depth
 
         if (targetY < minY || targetY > maxY) {
             return false;
@@ -124,7 +128,14 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     }
 
     @Override
-    public List<ProtectedRegion> getIntersectingRegions(List<ProtectedRegion> regions) throws UnsupportedIntersectionException {
+    public RegionType getType() {
+        return RegionType.POLYGON;
+    }
+
+    @Override
+    public List<ProtectedRegion> getIntersectingRegions(Collection<ProtectedRegion> regions) {
+        checkNotNull(regions);
+
         List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
 
         for (ProtectedRegion region : regions) {
@@ -133,67 +144,22 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
             if (region instanceof ProtectedPolygonalRegion || region instanceof ProtectedCuboidRegion) {
                 // If either region contains the points of the other,
                 // or if any edges intersect, the regions intersect
-                if (containsAny(region.getPoints())
-                        || region.containsAny(getPoints())
-                        || intersectsEdges(region)) {
+                if (containsAny(region.getPoints()) || region.containsAny(getPoints()) || intersectsEdges(region)) {
                     intersectingRegions.add(region);
-                    continue;
                 }
+            } else if (region instanceof GlobalProtectedRegion) {
+                // Never intersects
             } else {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new IllegalArgumentException("Not supported yet.");
             }
         }
         return intersectingRegions;
     }
 
-
-    /**
-     * Return the type of region as a user-friendly name.
-     *
-     * @return type of region
-     */
-    @Override
-    public String getTypeName() {
-        return "polygon";
-    }
-
     @Override
     public int volume() {
-        int volume = 0;
-        // TODO: Fix this
-        /*int numPoints = points.size();
-        if (numPoints < 3) {
-            return 0;
-        }
-
-        double area = 0;
-        int xa, z1, z2;
-
-        for (int i = 0; i < numPoints; i++) {
-            xa = points.get(i).getBlockX();
-            //za = points.get(i).getBlockZ();
-
-            if (points.get(i + 1) == null) {
-                z1 = points.get(0).getBlockZ();
-            } else {
-                z1 = points.get(i + 1).getBlockZ();
-            }
-            if (points.get(i - 1) == null) {
-                z2 = points.get(numPoints - 1).getBlockZ();
-            } else {
-                z2 = points.get(i - 1).getBlockZ();
-            }
-
-            area = area + (xa * (z1 - z2));
-        }
-
-        xa = points.get(0).getBlockX();
-        //za = points.get(0).getBlockZ();
-
-        area = area + (xa * (points.get(1).getBlockZ() - points.get(numPoints - 1).getBlockZ()));
-
-        volume = (Math.abs(maxY - minY) + 1) * (int) Math.ceil((Math.abs(area) / 2));*/
-
-        return volume;
+        // TODO: Fix this -- the previous algorithm returned incorrect results, but the current state of this method is even worse
+        return 0;
     }
+
 }

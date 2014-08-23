@@ -26,12 +26,13 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.TreeSet;
+import java.util.List;
 
 public class MockApplicableRegionSet {
 
-    private TreeSet<ProtectedRegion> regions = new TreeSet<ProtectedRegion>();
+    private List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
     private ProtectedRegion global;
     private int id = 0;
     private int playerIndex = 0;
@@ -49,6 +50,13 @@ public class MockApplicableRegionSet {
     public ProtectedRegion global() {
         global = new GlobalProtectedRegion("__global__");
         return global;
+    }
+
+    public ProtectedRegion createOutside(int priority) {
+        ProtectedRegion region = new ProtectedCuboidRegion(getNextId(),
+                new BlockVector(0, 0, 0), new BlockVector(1, 1, 1));
+        region.setPriority(priority);
+        return region;
     }
 
     public ProtectedRegion add(int priority) {
@@ -70,16 +78,21 @@ public class MockApplicableRegionSet {
     }
 
     public ApplicableRegionSet getApplicableSetInWilderness() {
-        return new ApplicableRegionSet(Collections.<ProtectedRegion>emptyList(), global);
+        return new RegionResultSet(Collections.<ProtectedRegion>emptyList(), global);
     }
 
     public ApplicableRegionSet getApplicableSet() {
-        return new ApplicableRegionSet(regions, global);
+        return new RegionResultSet(regions, global);
+    }
+
+    public FlagValueCalculator getFlagCalculator() {
+        Collections.sort(regions);
+        return new FlagValueCalculator(regions, global);
     }
 
     private String getNextId() {
         id++;
-        return "#REGION_" + id;
+        return "REGION_" + id;
     }
 
 }
