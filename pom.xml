@@ -95,7 +95,7 @@
     <dependency>
       <groupId>org.sk89q.bukkit</groupId>
       <artifactId>bukkit-classloader-check</artifactId>
-      <version>1.7.2-R0.3</version>
+      <version>1.7.9-R0.2</version>
       <scope>runtime</scope>
       <type>jar</type>
       <optional>true</optional>
@@ -103,7 +103,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
-      <version>1.7.2-R0.3</version>
+      <version>1.7.9-R0.2</version>
       <scope>runtime</scope>
       <type>jar</type>
       <optional>true</optional>
@@ -113,7 +113,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.7.2-R0.3</version>
+      <version>1.7.9-R0.2</version>
       <scope>compile</scope>
       <type>jar</type>
     </dependency>
