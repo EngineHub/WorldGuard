@@ -29,6 +29,12 @@ Be aware of these breaking changes:
 * If you want to blacklist only water and lava blocks and not buckets, you can no longer apply `on-place` to water or lava blocks because it will also deny the use of buckets. If you wish to deny the use of just the liquid blocks, use `on-use`. This is because WorldGuard now considers the use of a bucket also the placement of a liquid block.
 * In the rare situation that you are user of the "auto-invincibility" and "auto-no-drowning" groups (`wg-invincible` and `wg-amphibious`), you now have to enable these features in the config (`auto-invincible-group: true` and `auto-no-drowning-group: true`). This is because some permission plugins have been causing severe hang ups whenever it is queried for a player's groups, which, in this case, happens to include when the player joins.
 
+## Incompatible plugins
+
+These plugins are known to be incompatible or have issues unless you update them.
+
+* EchoPet ([issue #393](https://github.com/DSH105/EchoPet/issues/393))
+
 ## Major features
 
 ### UUID support
