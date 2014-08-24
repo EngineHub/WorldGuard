@@ -24,16 +24,20 @@ Be aware of these breaking changes:
 * Children regions now inherit from their parent even if there is no overlap.
 * Flags are now evaluated together so a `DENY` on `SLEEP` will override a `BUILD` set to `ALLOW`. (The sleep flag only applies to beds.) Possibly the real gotcha is that if you set `BUILD` to deny, then it will also override `PVP` (remember that `DENY` > `ALLOW` > `NONE`).
 * MySQL support now features the ability to migrate tables. If you are using tables without a prefix, then the new migration code should be able to handle your table. However, if you are using a table prefix, you may encounter trouble with migration.
-* Plugins that utility WorldGuard's API may not work anymore.
-* Protection is now a lot more exhaustive so it is no longer, for example, possible to fling sand into a region.
+* Protection is now a lot more exhaustive so it is no longer, for example, possible to fling sand into a region, grow trees into a region, and so on.
+* The `USE` flag is now much more encompassing so you may find that it blocks things like CraftBook gates (for users of CraftBook). To fix that, you can do `/rg flag REGION_NAME use allow`, but be aware that that will also allow the opening of inventories. To block inventories specifically, use `/rg flag REGION_NAME chest-access deny -g nonmembers`. The `-g nonmembers` makes it so only non-members of the region are unable to use chests, but this is optional.
 * If you want to blacklist only water and lava blocks and not buckets, you can no longer apply `on-place` to water or lava blocks because it will also deny the use of buckets. If you wish to deny the use of just the liquid blocks, use `on-use`. This is because WorldGuard now considers the use of a bucket also the placement of a liquid block.
 * In the rare situation that you are user of the "auto-invincibility" and "auto-no-drowning" groups (`wg-invincible` and `wg-amphibious`), you now have to enable these features in the config (`auto-invincible-group: true` and `auto-no-drowning-group: true`). This is because some permission plugins have been causing severe hang ups whenever it is queried for a player's groups, which, in this case, happens to include when the player joins.
+* Plugins that utilize WorldGuard's API may not work anymore. They may crash with errors.
 
 ## Incompatible plugins
 
 These plugins are known to be incompatible or have issues unless you update them.
 
-* EchoPet ([issue #393](https://github.com/DSH105/EchoPet/issues/393))
+* EchoPet
+    * Can't spawn pets ([issue #393](https://github.com/DSH105/EchoPet/issues/393))
+* CraftBook
+    * Unable to use mechanics unless the `USE` flag is explicitly set to `ALLOW` ([CRAFTBOOK-3057](http://youtrack.sk89q.com/issue/CRAFTBOOK-3057))
 
 ## Major features
 
