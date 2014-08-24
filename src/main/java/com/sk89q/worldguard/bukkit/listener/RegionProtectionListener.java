@@ -379,7 +379,7 @@ public class RegionProtectionListener extends AbstractListener {
         String what;
 
         /* PVP */
-        if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null) {
+        if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null && !attacker.equals(event.getEntity())) {
             Player defender = (Player) event.getEntity();
 
             canDamage = query.testBuild(target, associable, DefaultFlag.PVP)
