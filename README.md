@@ -1,16 +1,22 @@
-# ![WorldGuard](http://static.sk89q.com/readme/worldguard.png)
+# ![WorldGuard](http://static.sk89q.com/readme/worldguard-new.png)
 
-WorldGuard is a toolbox of various functions, useful for multiplayer servers,
-that lets you:
+WorldGuard lets you and players guard areas of land against griefers and undesirables, as well as tweak and disable various gameplay features of Minecraft.
 
-* Protect your server from a number of problems.
-* Block fire spread, lava spread, endermen, and more.
-* Flag areas as "no PVP" or "no TNT."
-* Assign ownership to areas so only selected individuals can build.
-* Use a number of useful commands.
+* Block creeper and wither block damage, falling damage, etc.;
+* Disable fire spread, lava fire spread, ice formation, Endermen picking up blocks, etc.;
+* Blacklist certain items and blocks so they can't be used;
+* Warn moderators when certain items and blocks are used;
+* Protect areas of your world so only certain people can build in them;
+* Set areas where PVP, TNT, mob damage, and other features are disabled;
+* Protect your server from various 'exploits' like magical obsidian creation machines;
+* Disable, or enable, various Minecraft features, like sponges from classic;
+* Add useful commands like an immediate "STOP ALL FIRE SPREAD" command.
+* Enable only features you want! Everything is off by default.
 
 WorldGuard is open source and is available under the GNU Lesser
 General Public License v3.
+
+Currently, Bukkit is required to use WorldGuard. You can get a release copy of WorldGuard from the [BukkitDev site](http://dev.bukkit.org/bukkit-plugins/worldguard/).
 
 Compiling
 ---------
@@ -36,5 +42,5 @@ Links
 * [Homepage](http://enginehub.org/worldguard)
 * [IRC channel](http://skq.me/irc/irc.esper.net/sk89q/) (#sk89q on irc.esper.net)
 * [Issue tracker](http://youtrack.sk89q.com/issues/WORLDGUARD)
-* [Continuous integration](http://builds.enginehub.org) [![Build Status](https://secure.travis-ci.org/sk89q/worldguard.png)](http://travis-ci.org/sk89q/worldguard)
+* [Continuous integration](http://builds.enginehub.org)
 * [End-user documentation](http://wiki.sk89q.com/wiki/WorldGuard)
