@@ -407,6 +407,26 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>com.ruleoftech</groupId>
+        <artifactId>markdown-page-generator-plugin</artifactId>
+        <version>0.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <inputDirectory>${basedir}</inputDirectory>
+          <outputDirectory>${project.build.directory}</outputDirectory>
+          <headerHtmlFile>${project.basedir}/config/markdown/header.html</headerHtmlFile>
+          <footerHtmlFile>${project.basedir}/config/markdown/footer.html</footerHtmlFile>
+        </configuration>
+      </plugin>
       
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>

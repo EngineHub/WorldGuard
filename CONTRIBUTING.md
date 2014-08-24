@@ -1,5 +1,4 @@
-Contributing
-============
+# Contributing
 
 Thank you for your interest in contributing to WorldGuard! We appreciate your 
 effort, but to make sure that the inclusion of your patch is a smooth process, we
