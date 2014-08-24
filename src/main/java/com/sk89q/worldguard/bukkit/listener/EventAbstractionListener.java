@@ -46,6 +46,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.DoubleChest;
+import org.bukkit.block.Hopper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -630,7 +631,11 @@ public class EventAbstractionListener extends AbstractListener {
 
             handleInventoryHolderUse(event, cause, targetHolder);
 
-            entry.setCancelled(event.isCancelled());
+            if (event.isCancelled() && causeHolder instanceof Hopper) {
+                ((Hopper) causeHolder).getBlock().breakNaturally();
+            } else {
+                entry.setCancelled(event.isCancelled());
+            }
         }
     }
 
