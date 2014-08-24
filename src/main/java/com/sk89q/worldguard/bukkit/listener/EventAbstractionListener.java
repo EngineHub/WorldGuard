@@ -124,10 +124,6 @@ public class EventAbstractionListener extends AbstractListener {
         super(plugin);
     }
 
-    public void registerEvents() {
-        getPlugin().getServer().getPluginManager().registerEvents(this, getPlugin());
-    }
-
     //-------------------------------------------------------------------------
     // Block break / place
     //-------------------------------------------------------------------------
