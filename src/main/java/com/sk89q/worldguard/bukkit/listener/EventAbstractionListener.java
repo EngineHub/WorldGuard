@@ -453,7 +453,36 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        Events.fireToCancel(event, new SpawnEntityEvent(event, Cause.unknown(), event.getEntity()));
+        switch (event.getSpawnReason()) {
+            case DISPENSE_EGG:
+            case EGG:
+            case SPAWNER_EGG:
+                if (getWorldConfig(event.getEntity().getWorld()).strictEntitySpawn) {
+                    Events.fireToCancel(event, new SpawnEntityEvent(event, Cause.unknown(), event.getEntity()));
+                }
+                break;
+            case NATURAL:
+            case JOCKEY:
+            case CHUNK_GEN:
+            case SPAWNER:
+            case LIGHTNING:
+            case BUILD_SNOWMAN:
+            case BUILD_IRONGOLEM:
+            case BUILD_WITHER:
+            case VILLAGE_DEFENSE:
+            case VILLAGE_INVASION:
+            case BREEDING:
+            case SLIME_SPLIT:
+            case REINFORCEMENTS:
+            case NETHER_PORTAL:
+            case INFECTION:
+            case CURED:
+            case OCELOT_BABY:
+            case SILVERFISH_BLOCK:
+            case MOUNT:
+            case CUSTOM:
+            case DEFAULT:
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
