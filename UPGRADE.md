@@ -104,6 +104,25 @@ Events that tend to reoccur very frequently (such as the ones that occur when yo
 
 A long requested feature was the availability of block place and break flags. These newly added flags work in tandem with the `BUILD` flag but can override `BUILD`. At the moment, it is not possible to allow explicit types of blocks to be placed or broken yet.
 
+### Build permission nodes
+
+A new optional (disabled by default in the configuration) feature is the checking of build permission nodes. For every block, entity, and item, the following permission nodes are checked:
+
+* Block place: `worldguard.build.block.place.<material>`
+* Block break: `worldguard.build.block.remove.<material>`
+* Block interact: `worldguard.build.block.interact.<material>`
+* Entity spawn: `worldguard.build.block.place.<type>`
+* Entity destroy: `worldguard.build.block.remove.<type>`
+* Entity interact: `worldguard.build.block.interact.<type>`
+* Entity damage: `worldguard.build.block.damage.<type>`
+* Item use: `worldguard.build.item.interact.<material>`
+
+In addition, the permissions are also checked in the style of `worldguard.build.block.<material>.<action>`, so `worldguard.build.block.<material>.place` would work too.
+
+The list of usable material names comes from the [Material enumeration in Bukkit](http://jd.bukkit.org/rb/apidocs/org/bukkit/Material.html). For example, the permission for placing the bed block would be `worldguard.build.build.place.bed_block`. Be aware that _Material_ contains both item and block names.
+
+For entity names, see [EntityType](http://jd.bukkit.org/rb/apidocs/org/bukkit/entity/EntityType.html).
+
 # Other changes
 
 The rest of the changes can be found in the CHANGELOG file.
