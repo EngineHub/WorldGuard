@@ -13,6 +13,10 @@ It is __NOT POSSIBLE TO DOWNGRADE__ after upgrading to WorldGuard 6 without loss
 
 If downgrading becomes necessary, please file a ticket on our issue tracker.
 
+If this is a __BETA BUILD__ or __SNAPSHOT BUILD__, then you should re-read this document every new release until after you have upgraded to a final release. Breaking changes may be added until the final release.
+
+You have downloaded version ${project.version}.
+
 ## Breaking changes
 
 Be aware of these breaking changes:
