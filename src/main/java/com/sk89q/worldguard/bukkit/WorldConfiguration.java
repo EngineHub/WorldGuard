@@ -26,6 +26,7 @@ import com.sk89q.worldguard.blacklist.BlacklistLoggerHandler;
 import com.sk89q.worldguard.blacklist.logger.ConsoleHandler;
 import com.sk89q.worldguard.blacklist.logger.DatabaseHandler;
 import com.sk89q.worldguard.blacklist.logger.FileHandler;
+import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.chest.SignChestProtection;
 import org.bukkit.block.Block;
@@ -79,6 +80,8 @@ public class WorldConfiguration {
     /* Configuration data start */
     public boolean summaryOnStart;
     public boolean opPermissions;
+    public boolean buildPermissions;
+    public String buildPermissionDenyMessage = "";
     public boolean fireSpreadDisableToggle;
     public boolean itemDurability;
     public boolean simulateSponge;
@@ -311,6 +314,9 @@ public class WorldConfiguration {
 
         summaryOnStart = getBoolean("summary-on-start", true);
         opPermissions = getBoolean("op-permissions", true);
+        buildPermissions = getBoolean("build-permission-nodes.enable", false);
+        buildPermissionDenyMessage = CommandUtils.replaceColorMacros(
+                getString("build-permission-nodes.deny-message", "&eSorry, but you are not permitted to do that here."));
 
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);

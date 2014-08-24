@@ -47,6 +47,7 @@ import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.BlacklistListener;
 import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
+import com.sk89q.worldguard.bukkit.listener.BuildPermissionListener;
 import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.DebuggingListener;
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
@@ -239,6 +240,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new BlockedPotionsListener(this)).registerEvents();
         (new EventAbstractionListener(this)).registerEvents();
         (new PlayerModesListener(this)).registerEvents();
+        (new BuildPermissionListener(this)).registerEvents();
         if ("true".equalsIgnoreCase(System.getProperty("worldguard.debug.listener"))) {
             (new DebuggingListener(this, log)).registerEvents();
         }
