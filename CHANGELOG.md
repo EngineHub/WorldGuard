@@ -12,6 +12,7 @@ In addition, be aware of these breaking changes:
 * Once the region data has been converted (automatically) to use UUIDs, it is no longer possible to downgrade.
 * Plugins that utility WorldGuard's API may not work anymore.
 * Protection is now a lot more exhaustive so it is no longer, for example, possible to fling sand into a region.
+* In the rare situation that you are user of the "auto-invincibility" and "auto-no-drowning" groups (`wg-invincible` and `wg-amphibious`), you now have to enable these features in the config (`auto-invincible-group: true` and `auto-no-drowning-group: true`). This is because some permission plugins have been causing severe hang ups whenever it is queried for a player's groups, which, in this case, happens to include when the player joins.
 
 ### UUID support
 
@@ -108,6 +109,7 @@ A long requested feature was the availability of block place and break flags. Th
 * Changed sponges to now be disabled by default. However, if you had previously installed WorldGuard, sponges will still be enabled. Sponges are being added in Minecraft and they work differently than in Minecraft Classic (which WorldGuard emulates). In addition, enabling sponge support in WorldGuard incurs extra CPU cost even if no sponges exist in the world.
 * Changed how region data is loaded and saved so failures are now more graceful. If the region data fails to load for a world, then the entire world will be protected by default. In addition, periodic attempts will be made to load the region data in the background.
 * Changed the `FEED` flag to maximize the player's saturation level if the hunger level is raised.
+* Changed the `wg-invincible` and `wg-amphibious` groups feature so that it now must be enabled in the configuration.
 * Removed the ability for WorldGuard to upgrade from a version for Minecraft Alpha.
 
 ### API changes

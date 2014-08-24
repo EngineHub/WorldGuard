@@ -26,6 +26,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Utility methods to deal with events.
  */
@@ -35,13 +37,23 @@ public final class Events {
     }
 
     /**
+     * Fire an event.
+     *
+     * @param event the event
+     */
+    public static void fire(Event event) {
+        checkNotNull(event);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+    }
+
+    /**
      * Fire the {@code eventToFire} and return whether the event was cancelled.
      *
      * @param eventToFire the event to fire
      * @param <T> an event that can be fired and is cancellable
      * @return true if the event was cancelled
      */
-    public static <T extends Event & Cancellable> boolean fireAndTestCancel( T eventToFire) {
+    public static <T extends Event & Cancellable> boolean fireAndTestCancel(T eventToFire) {
         Bukkit.getServer().getPluginManager().callEvent(eventToFire);
         return eventToFire.isCancelled();
     }

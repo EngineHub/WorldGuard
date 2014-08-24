@@ -26,7 +26,9 @@ import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.FlagStateManager.PlayerFlagState;
+import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -60,7 +62,6 @@ import org.bukkit.plugin.PluginManager;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -348,16 +349,7 @@ public class WorldGuardPlayerListener implements Listener {
                     + "Fire spread is currently globally disabled for this world.");
         }
 
-        if (!cfg.hasCommandBookGodMode() && cfg.autoGodMode && (plugin.inGroup(player, "wg-invincible")
-                || plugin.hasPermission(player, "worldguard.auto-invincible"))) {
-            log.log(Level.INFO, "Enabled auto-god mode for " + player.getName());
-            cfg.enableGodMode(player);
-        }
-
-        if (plugin.inGroup(player, "wg-amphibious")) {
-            log.log(Level.INFO, "Enabled no-drowning mode for " + player.getName() + " (player is in group 'wg-amphibious')");
-            cfg.enableAmphibiousMode(player);
-        }
+        Events.fire(new ProcessPlayerEvent(player));
 
         if (wcfg.useRegions) {
             PlayerFlagState state = plugin.getFlagStateManager().getState(player);

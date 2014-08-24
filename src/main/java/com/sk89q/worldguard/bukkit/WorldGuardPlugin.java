@@ -44,12 +44,14 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
+import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.BlacklistListener;
 import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
 import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.DebuggingListener;
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
 import com.sk89q.worldguard.bukkit.listener.FlagStateManager;
+import com.sk89q.worldguard.bukkit.listener.PlayerModesListener;
 import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
 import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
@@ -61,6 +63,7 @@ import com.sk89q.worldguard.bukkit.listener.WorldGuardServerListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardVehicleListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
+import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
@@ -235,6 +238,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new RegionFlagsListener(this)).registerEvents();
         (new BlockedPotionsListener(this)).registerEvents();
         (new EventAbstractionListener(this)).registerEvents();
+        (new PlayerModesListener(this)).registerEvents();
         if ("true".equalsIgnoreCase(System.getProperty("worldguard.debug.listener"))) {
             (new DebuggingListener(this, log)).registerEvents();
         }
@@ -252,14 +256,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        if (!configuration.hasCommandBookGodMode()) {
-            // Check god mode for existing players, if any
-            for (Player player : getServer().getOnlinePlayers()) {
-                if (inGroup(player, "wg-invincible") ||
-                        (configuration.autoGodMode && hasPermission(player, "worldguard.auto-invincible"))) {
-                    configuration.enableGodMode(player);
-                }
-            }
+        for (Player player : getServer().getOnlinePlayers()) {
+            ProcessPlayerEvent event = new ProcessPlayerEvent(player);
+            Events.fire(event);
         }
     }
 
