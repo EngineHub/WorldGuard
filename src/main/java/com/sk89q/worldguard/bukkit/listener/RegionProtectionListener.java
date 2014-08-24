@@ -127,7 +127,9 @@ public class RegionProtectionListener extends AbstractListener {
     private RegionAssociable createRegionAssociable(Cause cause) {
         Object rootCause = cause.getRootCause();
 
-        if (rootCause instanceof Player) {
+        if (!cause.isKnown()) {
+            return Associables.constant(Association.NON_MEMBER);
+        } else if (rootCause instanceof Player) {
             return getPlugin().wrapPlayer((Player) rootCause);
         } else if (rootCause instanceof OfflinePlayer) {
             return getPlugin().wrapOfflinePlayer((OfflinePlayer) rootCause);
