@@ -87,7 +87,9 @@ public class ConfigurationManager {
     public boolean useRegionsScheduler;
     public boolean useRegionsCreatureSpawnEvent;
     public boolean activityHaltToggle = false;
-    public boolean autoGodMode;
+    public boolean useGodPermission;
+    public boolean useGodGroup;
+    public boolean useAmphibiousGroup;
     public boolean usePlayerMove;
     public boolean usePlayerTeleports;
     public boolean deopOnJoin;
@@ -153,7 +155,9 @@ public class ConfigurationManager {
         migrateRegionsToUuid = config.getBoolean("regions.uuid-migration.perform-on-next-start", true);
         keepUnresolvedNames = config.getBoolean("regions.uuid-migration.keep-names-that-lack-uuids", true);
         useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
-        autoGodMode = config.getBoolean("auto-invincible", config.getBoolean("auto-invincible-permission", false));
+        useGodPermission = config.getBoolean("auto-invincible", config.getBoolean("auto-invincible-permission", false));
+        useGodGroup = config.getBoolean("auto-invincible-group", false);
+        useAmphibiousGroup = config.getBoolean("auto-no-drowning-group", false);
         config.removeProperty("auto-invincible-permission");
         usePlayerMove = config.getBoolean("use-player-move-event", true);
         usePlayerTeleports = config.getBoolean("use-player-teleports", true);
