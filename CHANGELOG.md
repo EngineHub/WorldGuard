@@ -95,10 +95,10 @@ A new optional (disabled by default in the configuration) feature is the checkin
 * Block place: `worldguard.build.block.place.<material>`
 * Block break: `worldguard.build.block.remove.<material>`
 * Block interact: `worldguard.build.block.interact.<material>`
-* Entity spawn: `worldguard.build.block.place.<type>`
-* Entity destroy: `worldguard.build.block.remove.<type>`
-* Entity interact: `worldguard.build.block.interact.<type>`
-* Entity damage: `worldguard.build.block.damage.<type>`
+* Entity spawn: `worldguard.build.entity.place.<type>`
+* Entity destroy: `worldguard.build.entity.remove.<type>`
+* Entity interact: `worldguard.build.entity.interact.<type>`
+* Entity damage: `worldguard.build.entity.damage.<type>`
 * Item use: `worldguard.build.item.interact.<material>`
 
 In addition, the permissions are also checked in the style of `worldguard.build.block.<material>.<action>`, so `worldguard.build.block.<material>.place` would work too.
