@@ -154,6 +154,16 @@ public class Cause {
                     continue;
                 }
 
+                if (o instanceof TNTPrimed) {
+                    expand(list, ((TNTPrimed) o).getSource());
+                } else if (o instanceof Projectile) {
+                    expand(list, ((Projectile) o).getShooter());
+                } else if (o instanceof Vehicle) {
+                    expand(list, ((Vehicle) o).getPassenger());
+                } else if (o instanceof Tameable) {
+                    expand(list, ((Tameable) o).getOwner());
+                }
+
                 // Add manually tracked parent causes
                 Object source = o;
                 int index = list.size();
@@ -164,21 +174,7 @@ public class Cause {
                     }
                 }
 
-                if (o instanceof TNTPrimed) {
-                    expand(list, ((TNTPrimed) o).getSource());
-                    list.add(o);
-                } else if (o instanceof Projectile) {
-                    expand(list, ((Projectile) o).getShooter());
-                    list.add(o);
-                } else if (o instanceof Vehicle) {
-                    expand(list, ((Vehicle) o).getPassenger());
-                    list.add(o);
-                } else if (o instanceof Tameable) {
-                    expand(list, ((Tameable) o).getOwner());
-                    list.add(o);
-                } else {
-                    list.add(o);
-                }
+                list.add(o);
             }
         }
     }
