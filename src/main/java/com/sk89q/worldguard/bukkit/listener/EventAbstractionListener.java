@@ -614,7 +614,7 @@ public class EventAbstractionListener extends AbstractListener {
             int blocked = 0;
 
             for (LivingEntity affected : event.getAffectedEntities()) {
-                if (Events.fireAndTestCancel(new UseEntityEvent(event, cause, affected))) {
+                if (Events.fireAndTestCancel(new DamageEntityEvent(event, cause, affected))) {
                     event.setIntensity(affected, 0);
                     blocked++;
                 }
