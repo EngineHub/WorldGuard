@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ WorldGuard, a suite of tools for Minecraft
+  ~ Copyright (C) sk89q <http://www.sk89q.com>
+  ~ Copyright (C) WorldGuard team and contributors
+  ~
+  ~ This program is free software: you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as published by the
+  ~ Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  ~ FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+  ~ for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<assembly
+  xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <formats>
+    <format>tar.gz</format>
+    <format>tar.bz2</format>
+    <format>zip</format>
+  </formats>
+  <files>
+    <file>
+      <source>${project.build.directory}/${artifactId}-${project.version}.jar</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+    </file>
+    <file>
+      <source>${project.build.directory}/CHANGELOG.html</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <source>${project.build.directory}/INSTALL.html</source>
+      <destName>README.html</destName>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <source>${project.build.directory}/UPGRADE.html</source>
+      <destName>READ_BEFORE_UPGRADING_FROM_V5.html</destName>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+  </files>
+  <fileSets>
+    <fileSet>
+      <includes>
+        <include>contrib/blacklist_table.sql</include>
+        <include>contrib/region_manual_update_20110325.sql</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</assembly>
