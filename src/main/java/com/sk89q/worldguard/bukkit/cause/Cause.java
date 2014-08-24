@@ -65,12 +65,26 @@ public class Cause {
     }
 
     /**
-     * Return whether a cause is known.
+     * Return whether a cause is known. This method will return true if
+     * the list of causes is empty or the list of causes only contains
+     * objects that really are not root causes (i.e primed TNT).
      *
      * @return true if known
      */
     public boolean isKnown() {
-        return !causes.isEmpty();
+        if (causes.isEmpty()) {
+            return false;
+        }
+
+        boolean found = false;
+        for (Object object : causes) {
+            if (!(object instanceof TNTPrimed)) {
+                found = true;
+                break;
+            }
+        }
+
+        return found;
     }
 
     @Nullable
