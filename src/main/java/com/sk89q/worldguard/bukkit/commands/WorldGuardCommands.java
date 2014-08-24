@@ -23,14 +23,17 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldguard.util.task.Task;
-import com.sk89q.worldguard.util.task.TaskStateComparator;
+import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.LoggerToChatHandler;
 import com.sk89q.worldguard.bukkit.util.ReportWriter;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.util.PastebinPoster;
 import com.sk89q.worldguard.util.PastebinPoster.PasteCallback;
+import com.sk89q.worldguard.util.task.Task;
+import com.sk89q.worldguard.util.task.TaskStateComparator;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -76,9 +79,13 @@ public class WorldGuardCommands {
         }
 
         try {
-            plugin.getGlobalStateManager().unload();
+            ConfigurationManager config = plugin.getGlobalStateManager();
+            config.unload();
+            config.load();
+            for (World world : Bukkit.getServer().getWorlds()) {
+                config.get(world);
+            }
             plugin.getRegionContainer().reload();
-            plugin.getGlobalStateManager().load();
             // WGBukkit.cleanCache();
             sender.sendMessage("WorldGuard configuration reloaded.");
         } catch (Throwable t) {
