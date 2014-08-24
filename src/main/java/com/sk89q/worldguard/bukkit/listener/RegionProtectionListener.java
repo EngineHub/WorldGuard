@@ -152,7 +152,9 @@ public class RegionProtectionListener extends AbstractListener {
         final RegionAssociable associable = createRegionAssociable(event.getCause());
 
         // Don't check liquid flow unless it's enabled
-        if (Materials.isLiquid(type) && !getWorldConfig(event.getWorld()).checkLiquidFlow) {
+        if (event.getCause().getRootCause() instanceof Block
+                && Materials.isLiquid(type)
+                && !getWorldConfig(event.getWorld()).checkLiquidFlow) {
             return;
         }
 
