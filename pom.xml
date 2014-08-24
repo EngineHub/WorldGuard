@@ -296,7 +296,7 @@
                 It is a bit draconian, so update as necessary!
                 -->
                 <module name="ImportControl">
-                  <property name="file" value="${basedir}/src/main/build/import-control.xml"/>
+                  <property name="file" value="${basedir}/config/checkstyle/import-control.xml"/>
                 </module>
 
                 <!-- Code -->
@@ -338,7 +338,7 @@
               <!-- Require the header, something that many people forget and we hate to fix -->
               <!-- You should configure the header in your IDE -->
               <module name="Header">
-                <property name="headerFile" value="${basedir}/src/main/build/header.txt"/>
+                <property name="headerFile" value="${basedir}/config/checkstyle/header.txt"/>
                 <property name="fileExtensions" value="java"/>
               </module>
             </module>
@@ -432,7 +432,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.2-beta-2</version>
         <configuration>
-          <descriptor>${basedir}/src/main/assembly/default.xml</descriptor>
+          <descriptor>${basedir}/config/assembly/default.xml</descriptor>
         </configuration>
         <executions>
           <execution>
