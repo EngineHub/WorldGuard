@@ -616,6 +616,7 @@ EduardBaer, TomyLobo, and halvors
 * Item durability can now be toggled with item-durability. Thanks to Dinnerbone for figuring this out while filfilling my request. The default setting is to fix item durability.
 * New no-physics-gravel and no-physics-sand options allow you to prevent gravel and sand from falling.
 * New allow-portal-anywhere option allows you to create portal blocks anywhere. 
+
 ## 1.3
 
 * UPGRADE WARNING: If you are using database logging, you must add a NULL 'comment' VARCHAR field to the table. The line of SQL that you can run for MySQL can be found in blacklist_table.sql.
