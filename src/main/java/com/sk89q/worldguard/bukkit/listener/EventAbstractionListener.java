@@ -105,6 +105,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Dispenser;
 import org.bukkit.material.MaterialData;
+import org.bukkit.material.SpawnEgg;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
@@ -736,6 +737,14 @@ public class EventAbstractionListener extends AbstractListener {
         if (item != null && Materials.isMinecart(item.getType())) {
             // TODO: Give a more specific Minecart type
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.MINECART));
+        }
+
+        // Handle created spawn eggs
+        if (item != null && item.getType() == Material.MONSTER_EGG) {
+            MaterialData data = item.getData();
+            if (data instanceof SpawnEgg) {
+                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), ((SpawnEgg) data).getSpawnedType()));
+            }
         }
 
         // Handle cocoa beans
