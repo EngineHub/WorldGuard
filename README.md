@@ -1,5 +1,4 @@
-![WorldGuard](http://static.sk89q.com/readme/worldguard.png)
-==========
+# ![WorldGuard](http://static.sk89q.com/readme/worldguard.png)
 
 WorldGuard is a toolbox of various functions, useful for multiplayer servers,
 that lets you:
