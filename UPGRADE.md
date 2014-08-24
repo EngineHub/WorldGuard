@@ -101,44 +101,4 @@ A long requested feature was the availability of block place and break flags. Th
 
 # Other changes
 
-* Added a setting to permit "fake players" to bypass protection. Fake players are used by some servers and some mods to allow events to be thrown for mod blocks. WorldGuard considers a player to be a fake player if the name starts with `[` and ends with `]`.
-* Added a check so players can no longer disembark in a region from their tamed animal if they don't have permission to get back on.
-* Added an item pickup flag to go along with the item drop flag.
-* Added a new `//running` command was added to show currently running background tasks.
-* Added a blacklist `on-dispense` event.
-* Added more detailed error messages when parsing the YAML regions file.
-* Added the `-Dworldguard.debug.listener=true` option that can be set on your server's command line to see how WorldGuard processes events, although this will result in a lot of log messages.
-* Added log messages that occur on player join when a player had auto-god mode or auto-amphibious mode.
-* Fixed the heal command so that it now sets a player's health to the maximum rather than 20.
-* Fixed `ProtectedCuboidRegion.getPoints()` returning points in wrong order.
-* Fixed the obsidian generator disable option to also apply to tripwire.
-* Fixed an error with the blocked commands flag.
-* Fixed a connection leak with the MySQL region code.
-* Changed the region removal command so that child regions are no longer removed without warning when removing the parent region.
-* Changed the YAML region data save code to first write the data to a temporary file before replacing the final file.
-* Changed how region data is handled when region support is disabled: it is no longer loaded.
-* Changed sponges to now be disabled by default. However, if you had previously installed WorldGuard, sponges will still be enabled. Sponges are being added in Minecraft and they work differently than in Minecraft Classic (which WorldGuard emulates). In addition, enabling sponge support in WorldGuard incurs extra CPU cost even if no sponges exist in the world.
-* Changed how region data is loaded and saved so failures are now more graceful. If the region data fails to load for a world, then the entire world will be protected by default. In addition, periodic attempts will be made to load the region data in the background.
-* Changed the `FEED` flag to maximize the player's saturation level if the hunger level is raised.
-* Removed the ability for WorldGuard to upgrade from a version for Minecraft Alpha.
-
-# API changes
-
-* The listener classes were moved. Consider them internal -- if you want to make use of the listener somehow, please put in a ticket in our issue tracker.
-* Much of the protection-related handling was previously scattered throughout the code. Now WorldGuard funnels events into an internal event system and then processes protection queries in a more consistent matter. These events are for internal use so it is strongly recommended that you do not use them (they may change without notice drastically). A lot of the protection-related flag handling was moved there.
-* A significant portion of classes under the package of `com.sk89q.worldguard.protection` were changed or removed. However, the basic calls (testing the value of a flag, etc.) should still work, but they may be deprecated. Some of the utility `Domain`-related classes were removed.
-* The old region database (load/save) API was removed and replaced with a new one. The new one no longer needs to pointless store a collection of regions on itself -- it has `collection = load()` and `save(collection)` methods.
-* Previously, there were subclasses of `RegionManager` that implemented different spatial indices. However, now `RegionManager` is a final class and the spatial indices are separate (see the `RegionIndex` interface).
-* A hash table was implemented that caches a list of regions within each loaded chunk. This increases performance of spatial queries substantially.
-* A cache of recent spatial queries now exists (a cache of `ApplicableRegionSets`), but you need to make use of `RegionQuery` to make use of this cache. However, if you need to do a spatial query to modify region data, then the old method is better (get a `RegionManager`, etc.).
-* `ApplicableRegionSet` was converted into an interface. In addition, there are now "virtual" `ApplicableRegionSet` instances that are returned by `RegionQuery` for certain special cases (such as, for example, region support being disabled by the user or region data being unavailable for a world due to an error). A new `isVirtual()` method is available. This is not an issue if you are getting `ApplicableRegionSet` instances from a `RegionManager`.
-* `ApplicableRegionSet` now can accept a pre-sorted collection and its use of a `TreeSet` was removed for performance reasons.
-* `FileNotFoundException` is now properly handled in the YAML region file class. It creates the new file and continues on.
-* Player names are deprecated by Mojang and so they need to be converted into UUIDs. As this will take some time, you should do this conversion in a background task. To check whether a region contains a player, it recommended that `contains(LocalPlayer)` be used because it's possible that the user may be still using names. A new `WorldGuardPlugin.wrapOfflinePlayer()` method was added for this specific purposes.
-* All flags now use `RegionGroup.ALL` as the default region group.
-* `StateFlag.getDefault()` now returns a `State` rather than a `boolean`.
-* The priority R-tree index now uses the R-tree for region intersection queries. Previously, it was only used for single point containment queries.
-* Regions now keep a "dirty" flag and changes it whenever data within the region is changed. When WorldGuard decides to periodically save region data, it may only save changed regions. Calling `save()` on the `RegionManager` is no longer needed as periodical saves happen automatically.
-* The old region data migration API was removed in favor of region store drivers. There is no longer a need to have an implementation for every possible conversion (i.e. YAML -> MySQL, MySQL -> YAML, etc.).
-* `ProtectedRegion.copyFrom()` was added to copy region settings from another region.
-* `@Nullable` annotations were added throughout the code. If you use IntelliJ IDEA, you may notice that it now warns you when a return value may be `null`.
+The rest of the changes can be found in the CHANGELOG file.
