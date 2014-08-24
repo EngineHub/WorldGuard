@@ -31,7 +31,6 @@
   <files>
     <file>
       <source>${project.build.directory}/${artifactId}-${project.version}.jar</source>
-      <destName>WorldGuard.jar</destName>
       <outputDirectory>/</outputDirectory>
       <filtered>false</filtered>
     </file>
