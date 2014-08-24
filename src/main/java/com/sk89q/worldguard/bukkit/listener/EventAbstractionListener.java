@@ -62,7 +62,6 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -147,7 +146,33 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler
     public void onBlockBurn(BlockBurnEvent event) {
-        Events.fireToCancel(event, new UseBlockEvent(event, Cause.unknown(), event.getBlock()));
+        Block target = event.getBlock();
+
+        Block[] adjacent = new Block[] {
+                target.getRelative(BlockFace.NORTH),
+                target.getRelative(BlockFace.SOUTH),
+                target.getRelative(BlockFace.WEST),
+                target.getRelative(BlockFace.EAST),
+                target.getRelative(BlockFace.UP),
+                target.getRelative(BlockFace.DOWN)};
+
+        int found = 0;
+        boolean allowed = false;
+
+        for (Block source : adjacent) {
+            if (source.getType() == Material.FIRE) {
+                found++;
+                if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(source), target))) {
+                    source.setType(Material.AIR);
+                } else {
+                    allowed = true;
+                }
+            }
+        }
+
+        if (found > 0 && !allowed) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -308,6 +333,7 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler
     public void onBlockIgnite(BlockIgniteEvent event) {
         Block block = event.getBlock();
+        Material type = block.getType();
         Cause cause;
 
         // Find the cause
@@ -321,15 +347,7 @@ public class EventAbstractionListener extends AbstractListener {
             cause = Cause.unknown();
         }
 
-        if (block.getType() != Material.AIR) {
-            Events.fireToCancel(event, new BreakBlockEvent(event, cause, event.getBlock()));
-        }
-
-        // This is also handled in the PlayerInteractEvent listener
-        if (event.getCause() == IgniteCause.FLINT_AND_STEEL || event.getCause() == IgniteCause.FIREBALL) {
-            // TODO: Test location of block
-            Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getLocation(), Material.FIRE));
-        }
+        Events.fireToCancel(event, new PlaceBlockEvent(event, cause, block.getLocation(), Material.FIRE));
     }
 
     @EventHandler
