@@ -122,6 +122,7 @@ For entity names, see [EntityType](http://jd.bukkit.org/rb/apidocs/org/bukkit/en
 * Fixed the obsidian generator disable option to also apply to tripwire.
 * Fixed an error with the blocked commands flag.
 * Fixed a connection leak with the MySQL region code.
+* Fixed `/wg reload` sometimes not applying new changes right away.
 * Changed the region removal command so that child regions are no longer removed without warning when removing the parent region.
 * Changed the YAML region data save code to first write the data to a temporary file before replacing the final file.
 * Changed how region data is handled when region support is disabled: it is no longer loaded.
