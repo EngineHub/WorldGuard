@@ -264,7 +264,9 @@ public class YamlRegionFile implements RegionDatabase {
         DefaultDomain domain = new DefaultDomain();
 
         for (String name : node.getStringList("players", null)) {
-            domain.addPlayer(name);
+            if (!name.isEmpty()) {
+                domain.addPlayer(name);
+            }
         }
 
         for (String stringId : node.getStringList("unique-ids", null)) {
@@ -276,7 +278,9 @@ public class YamlRegionFile implements RegionDatabase {
         }
 
         for (String name : node.getStringList("groups", null)) {
-            domain.addGroup(name);
+            if (!name.isEmpty()) {
+                domain.addGroup(name);
+            }
         }
 
         return domain;
