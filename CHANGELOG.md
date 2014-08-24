@@ -4,15 +4,7 @@
 
 This is a __MAJOR UPGRADE__ to WorldGuard so we recommend making backups of your worlds and WorldGuard configuration (although periodical backups are recommended regardless).
 
-In addition, be aware of these breaking changes:
-
-* Children regions now inherit from their parent even if there is no overlap.
-* Flags are now evaluated together so a `DENY` on `SLEEP` will override a `BUILD` set to `ALLOW`.
-* MySQL support now features the ability to migrate tables. If you are using tables without a prefix, then the new migration code should be able to handle your table. However, if you are using a table prefix, you may encounter trouble with migration.
-* Once the region data has been converted (automatically) to use UUIDs, it is no longer possible to downgrade.
-* Plugins that utility WorldGuard's API may not work anymore.
-* Protection is now a lot more exhaustive so it is no longer, for example, possible to fling sand into a region.
-* In the rare situation that you are user of the "auto-invincibility" and "auto-no-drowning" groups (`wg-invincible` and `wg-amphibious`), you now have to enable these features in the config (`auto-invincible-group: true` and `auto-no-drowning-group: true`). This is because some permission plugins have been causing severe hang ups whenever it is queried for a player's groups, which, in this case, happens to include when the player joins.
+Please see the upgrade document for a list of breaking changes.
 
 ### UUID support
 
