@@ -26,6 +26,7 @@ import com.sk89q.worldguard.bukkit.util.Events;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
 
 public class AbstractEventDebounce<K> {
@@ -60,8 +61,25 @@ public class AbstractEventDebounce<K> {
         }
     }
 
-    private static class Entry {
+    @Nullable
+    protected <T extends Event & Cancellable> Entry getEntry(K key, Cancellable originalEvent) {
+        Entry entry = cache.getUnchecked(key);
+        if (entry.cancelled != null) {
+            if (entry.cancelled) {
+                originalEvent.setCancelled(true);
+            }
+            return null;
+        } else {
+            return entry;
+        }
+    }
+
+    public static class Entry {
         private Boolean cancelled;
+
+        public void setCancelled(boolean cancelled) {
+            this.cancelled = cancelled;
+        }
     }
 
 }

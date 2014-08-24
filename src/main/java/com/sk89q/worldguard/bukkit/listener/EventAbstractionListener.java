@@ -31,8 +31,10 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
+import com.sk89q.worldguard.bukkit.listener.debounce.AbstractEventDebounce.Entry;
 import com.sk89q.worldguard.bukkit.listener.debounce.BlockEntityEventDebounce;
 import com.sk89q.worldguard.bukkit.listener.debounce.EntityEntityEventDebounce;
+import com.sk89q.worldguard.bukkit.listener.debounce.InventoryMoveItemEventDebounce;
 import com.sk89q.worldguard.bukkit.util.BlockStateAsBlockFunction;
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
@@ -43,6 +45,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -83,6 +86,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -96,6 +100,7 @@ import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Dispenser;
 import org.bukkit.material.MaterialData;
@@ -114,6 +119,7 @@ public class EventAbstractionListener extends AbstractListener {
     private final BlockEntityEventDebounce interactDebounce = new BlockEntityEventDebounce(10000);
     private final EntityEntityEventDebounce pickupDebounce = new EntityEntityEventDebounce(10000);
     private final BlockEntityEventDebounce entityBreakBlockDebounce = new BlockEntityEventDebounce(10000);
+    private final InventoryMoveItemEventDebounce moveItemDebounce = new InventoryMoveItemEventDebounce(30000);
 
     /**
      * Construct the listener.
@@ -600,6 +606,35 @@ public class EventAbstractionListener extends AbstractListener {
     //-------------------------------------------------------------------------
 
     @EventHandler(ignoreCancelled = true)
+    public void onInventoryMoveItem(InventoryMoveItemEvent event) {
+        InventoryHolder causeHolder = event.getInitiator().getHolder();
+        InventoryHolder sourceHolder = event.getSource().getHolder();
+        InventoryHolder targetHolder = event.getDestination().getHolder();
+
+        Entry entry;
+
+        if ((entry = moveItemDebounce.tryDebounce(event)) != null) {
+            Cause cause;
+
+            if (causeHolder instanceof Entity) {
+                cause = create(causeHolder);
+            } else if (causeHolder instanceof BlockState) {
+                cause = create(((BlockState) causeHolder).getBlock());
+            } else {
+                cause = Cause.unknown();
+            }
+
+            if (!causeHolder.equals(sourceHolder)) {
+                handleInventoryHolderUse(event, cause, sourceHolder);
+            }
+
+            handleInventoryHolderUse(event, cause, targetHolder);
+
+            entry.setCancelled(event.isCancelled());
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
     public void onPotionSplash(PotionSplashEvent event) {
         Entity entity = event.getEntity();
         ThrownPotion potion = event.getPotion();
@@ -683,6 +718,20 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
-    // TODO: Inventory events?
+    @SuppressWarnings("unchecked")
+    private static <T extends Event & Cancellable> void handleInventoryHolderUse(T originalEvent, Cause cause, InventoryHolder holder) {
+        if (originalEvent.isCancelled()) {
+            return;
+        }
+
+        if (holder instanceof Entity) {
+            Events.fireToCancel(originalEvent, new UseEntityEvent(originalEvent, cause, (Entity) holder));
+        } else if (holder instanceof BlockState) {
+            Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) holder).getBlock()));
+        } else if (holder instanceof DoubleChest) {
+            Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) ((DoubleChest) holder).getLeftSide()).getBlock()));
+            Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) ((DoubleChest) holder).getRightSide()).getBlock()));
+        }
+    }
 
 }
