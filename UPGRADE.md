@@ -22,7 +22,7 @@ You have downloaded version ${project.version}.
 Be aware of these breaking changes:
 
 * Children regions now inherit from their parent even if there is no overlap.
-* Flags are now evaluated together so a `DENY` on `SLEEP` will override a `BUILD` set to `ALLOW`. (The sleep flag only applies to beds.)
+* Flags are now evaluated together so a `DENY` on `SLEEP` will override a `BUILD` set to `ALLOW`. (The sleep flag only applies to beds.) Possibly the real gotcha is that if you set `BUILD` to deny, then it will also override `PVP` (remember that `DENY` > `ALLOW` > `NONE`).
 * MySQL support now features the ability to migrate tables. If you are using tables without a prefix, then the new migration code should be able to handle your table. However, if you are using a table prefix, you may encounter trouble with migration.
 * Plugins that utility WorldGuard's API may not work anymore.
 * Protection is now a lot more exhaustive so it is no longer, for example, possible to fling sand into a region.
