@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection.regions;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldguard.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -146,7 +147,17 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         int yLength = max.getBlockY() - min.getBlockY() + 1;
         int zLength = max.getBlockZ() - min.getBlockZ() + 1;
 
-        return xLength * yLength * zLength;
+        try {
+            long v = MathUtils.checkedMultiply(xLength, yLength);
+            v = MathUtils.checkedMultiply(v, zLength);
+            if (v > Integer.MAX_VALUE) {
+                return Integer.MAX_VALUE;
+            } else {
+                return (int) v;
+            }
+        } catch (ArithmeticException e) {
+            return Integer.MAX_VALUE;
+        }
     }
 
 }
