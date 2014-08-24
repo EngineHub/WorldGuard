@@ -45,6 +45,12 @@
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
+    <file>
+      <source>${project.build.directory}/UPGRADE.html</source>
+      <destName>READ_BEFORE_UPGRADING_FROM_V5.html</destName>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
   </files>
   <fileSets>
     <fileSet>
