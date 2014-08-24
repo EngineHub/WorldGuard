@@ -20,6 +20,10 @@
 package com.sk89q.worldguard.bukkit.listener.debounce;
 
 import com.sk89q.worldguard.bukkit.listener.debounce.InventoryMoveItemEventDebounce.Key;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -34,14 +38,24 @@ public class InventoryMoveItemEventDebounce extends AbstractEventDebounce<Key> {
     }
 
     protected static class Key {
-        private final InventoryHolder cause;
-        private final InventoryHolder source;
-        private final InventoryHolder target;
+        private final Object cause;
+        private final Object source;
+        private final Object target;
 
         public Key(InventoryMoveItemEvent event) {
-            cause = event.getInitiator().getHolder();
-            source = event.getSource().getHolder();
-            target = event.getDestination().getHolder();
+            cause = transform(event.getInitiator().getHolder());
+            source = transform(event.getSource().getHolder());
+            target = transform(event.getDestination().getHolder());
+        }
+
+        private Object transform(InventoryHolder holder) {
+            if (holder instanceof BlockState) {
+                return new BlockMaterialKey(((BlockState) holder).getBlock());
+            } else if (holder instanceof DoubleChest) {
+                return new BlockMaterialKey(((BlockState) ((DoubleChest) holder).getLeftSide()).getBlock());
+            } else {
+                return holder;
+            }
         }
 
         @Override
@@ -66,6 +80,36 @@ public class InventoryMoveItemEventDebounce extends AbstractEventDebounce<Key> {
             int result = cause != null ? cause.hashCode() : 0;
             result = 31 * result + (source != null ? source.hashCode() : 0);
             result = 31 * result + (target != null ? target.hashCode() : 0);
+            return result;
+        }
+    }
+
+    private static class BlockMaterialKey {
+        private final Block block;
+        private final Material material;
+
+        private BlockMaterialKey(Block block) {
+            this.block = block;
+            material = block.getType();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            BlockMaterialKey that = (BlockMaterialKey) o;
+
+            if (!block.equals(that.block)) return false;
+            if (material != that.material) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = block.hashCode();
+            result = 31 * result + material.hashCode();
             return result;
         }
     }
