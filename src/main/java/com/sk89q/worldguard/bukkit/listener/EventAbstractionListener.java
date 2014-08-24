@@ -113,6 +113,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     private final BlockEntityEventDebounce interactDebounce = new BlockEntityEventDebounce(10000);
     private final EntityEntityEventDebounce pickupDebounce = new EntityEntityEventDebounce(10000);
+    private final BlockEntityEventDebounce entityBreakBlockDebounce = new BlockEntityEventDebounce(10000);
 
     /**
      * Construct the listener.
@@ -202,7 +203,8 @@ public class EventAbstractionListener extends AbstractListener {
                     // Switch around the event
                     Events.fireToCancel(event, new SpawnEntityEvent(event, create(block), entity));
                 } else {
-                    Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), event.getBlock()));
+                    entityBreakBlockDebounce.debounce(
+                            event.getBlock(), event.getEntity(), event, new BreakBlockEvent(event, create(entity), event.getBlock()));
                 }
             } else {
                 boolean wasCancelled = event.isCancelled();
