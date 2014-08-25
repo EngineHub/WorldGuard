@@ -21,7 +21,7 @@ package com.sk89q.worldguard.bukkit.event.block;
 
 import com.google.common.base.Predicate;
 import com.sk89q.worldguard.bukkit.cause.Cause;
-import com.sk89q.worldguard.bukkit.event.AbstractDelegateEvent;
+import com.sk89q.worldguard.bukkit.event.DelegateEvent;
 import com.sk89q.worldguard.bukkit.event.BulkEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,7 +36,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-abstract class AbstractBlockEvent extends AbstractDelegateEvent implements BulkEvent {
+abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
 
     private final World world;
     private final List<Block> blocks;
@@ -149,5 +149,4 @@ abstract class AbstractBlockEvent extends AbstractDelegateEvent implements BulkE
     public Material getEffectiveMaterial() {
         return effectiveMaterial;
     }
-
 }

@@ -23,6 +23,7 @@ import com.google.common.base.Predicate;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.event.DelegateEvent;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
@@ -46,6 +47,12 @@ public class ChestProtectionListener extends AbstractListener {
         super(plugin);
     }
 
+    private void sendMessage(DelegateEvent event, Player player, String message) {
+        if (!event.isSilent()) {
+            player.sendMessage(message);
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
         final Player player = event.getCause().getFirstPlayer();
@@ -62,7 +69,7 @@ public class ChestProtectionListener extends AbstractListener {
                 @Override
                 public boolean apply(Location target) {
                     if (wcfg.getChestProtection().isChest(event.getEffectiveMaterial().getId()) && wcfg.isChestProtected(target.getBlock(), player)) {
-                        player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
+                        sendMessage(event, player, ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
                         return false;
                     }
 
@@ -88,7 +95,7 @@ public class ChestProtectionListener extends AbstractListener {
                 @Override
                 public boolean apply(Location target) {
                     if (wcfg.isChestProtected(target.getBlock(), player)) {
-                        player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
+                        sendMessage(event, player, ChatColor.DARK_RED + "This chest is protected.");
                         return false;
                     }
 
@@ -122,7 +129,7 @@ public class ChestProtectionListener extends AbstractListener {
                 @Override
                 public boolean apply(Location target) {
                     if (wcfg.isChestProtected(target.getBlock(), player)) {
-                        player.sendMessage(ChatColor.DARK_RED + "This chest is protected.");
+                        sendMessage(event, player, ChatColor.DARK_RED + "This chest is protected.");
                         return false;
                     }
 

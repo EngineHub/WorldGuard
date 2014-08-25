@@ -27,12 +27,13 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractDelegateEvent extends Event implements Cancellable {
+public abstract class DelegateEvent extends Event implements Cancellable {
 
     @Nullable
     private final Event originalEvent;
     private final Cause cause;
     private boolean cancelled;
+    private boolean silent;
 
     /**
      * Create a new instance
@@ -40,7 +41,7 @@ public abstract class AbstractDelegateEvent extends Event implements Cancellable
      * @param originalEvent the original event
      * @param cause the cause
      */
-    protected AbstractDelegateEvent(@Nullable Event originalEvent, Cause cause) {
+    protected DelegateEvent(@Nullable Event originalEvent, Cause cause) {
         checkNotNull(cause);
         this.originalEvent = originalEvent;
         this.cause = cause;
@@ -73,6 +74,24 @@ public abstract class AbstractDelegateEvent extends Event implements Cancellable
     @Override
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
+    }
+
+    /**
+     * Get whether this should be a silent check.
+     *
+     * @return true if a silent check
+     */
+    public boolean isSilent() {
+        return silent;
+    }
+
+    /**
+     * Set whether this should be a silent check.
+     *
+     * @param silent true if silent
+     */
+    void setSilent(boolean silent) {
+        this.silent = silent;
     }
 
 }

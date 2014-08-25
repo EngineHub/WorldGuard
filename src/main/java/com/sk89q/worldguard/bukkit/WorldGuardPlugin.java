@@ -856,6 +856,17 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Wrap a player as a LocalPlayer.
      *
+     * @param player The player to wrap
+     * @param silenced True to silence messages
+     * @return The wrapped player
+     */
+    public LocalPlayer wrapPlayer(Player player, boolean silenced) {
+        return new BukkitPlayer(this, player, silenced);
+    }
+
+    /**
+     * Wrap a player as a LocalPlayer.
+     *
      * <p>This implementation is incomplete -- permissions cannot be checked.</p>
      *
      * @param player The player to wrap
@@ -863,6 +874,17 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public LocalPlayer wrapOfflinePlayer(OfflinePlayer player) {
         return new BukkitOfflinePlayer(player);
+    }
+
+    /**
+     * Return a protection query helper object that can be used by another
+     * plugin to test whether WorldGuard permits an action at a particular
+     * place.
+     *
+     * @return an instance
+     */
+    public ProtectionQuery createProtectionQuery() {
+        return new ProtectionQuery();
     }
 
     /**
