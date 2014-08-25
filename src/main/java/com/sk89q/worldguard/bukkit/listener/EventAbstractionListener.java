@@ -303,7 +303,7 @@ public class EventAbstractionListener extends AbstractListener {
         switch (event.getAction()) {
             case PHYSICAL:
                 // Forget about Redstone ore
-                if (Materials.isRedstoneOre(clicked.getType())) {
+                if (Materials.isRedstoneOre(clicked.getType()) || clicked.getType() == Material.SOIL) {
                     silent = true;
                 }
 
