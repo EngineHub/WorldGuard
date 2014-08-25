@@ -92,8 +92,8 @@ public final class DefaultFlag {
     public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true);
     public static final StateFlag SEND_CHAT = new StateFlag("send-chat", true);
     public static final StateFlag RECEIVE_CHAT = new StateFlag("receive-chat", true);
-    public static final StateFlag ENTRY = new StateFlag("entry", true);
-    public static final StateFlag EXIT = new StateFlag("exit", true);
+    public static final StateFlag ENTRY = new StateFlag("entry", true, RegionGroup.NON_MEMBERS);
+    public static final StateFlag EXIT = new StateFlag("exit", true, RegionGroup.NON_MEMBERS);
     public static final StateFlag ENDERPEARL = new StateFlag("enderpearl", true);
     public static final StateFlag ENTITY_PAINTING_DESTROY = new StateFlag("entity-painting-destroy", true);
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = new StateFlag("entity-item-frame-destroy", true);
