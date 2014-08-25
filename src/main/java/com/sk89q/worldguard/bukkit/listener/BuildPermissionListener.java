@@ -193,8 +193,8 @@ public class BuildPermissionListener extends AbstractListener {
             Player player = (Player) rootCause;
             Material material = event.getItemStack().getType();
 
-            if (!hasBuildPermission(player, "item." + material.name().toLowerCase() + ".interact")
-                    || hasBuildPermission(player, "item.interact." + material.name().toLowerCase())) {
+            if (!hasBuildPermission(player, "item." + material.name().toLowerCase() + ".use")
+                    || hasBuildPermission(player, "item.use." + material.name().toLowerCase())) {
                 tellErrorMessage(player, event.getWorld());
                 event.setCancelled(true);
             }
