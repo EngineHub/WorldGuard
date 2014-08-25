@@ -329,20 +329,17 @@ public class EventAbstractionListener extends AbstractListener {
             case LEFT_CLICK_BLOCK:
                 placed = clicked.getRelative(event.getBlockFace());
 
-                // As of MC ~1.6, sneaking blocks the use of blocks with right click
-                if (!player.isSneaking() || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                    // Only fire events for blocks that are modified when right clicked
-                    if (isBlockModifiedOnClick(clicked.getType()) || (item != null && isItemAppliedToBlock(item.getType(), clicked.getType()))) {
-                        if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, clicked))) {
-                            event.setUseInteractedBlock(Result.DENY);
-                        }
+                // Only fire events for blocks that are modified when right clicked
+                if (isBlockModifiedOnClick(clicked.getType()) || (item != null && isItemAppliedToBlock(item.getType(), clicked.getType()))) {
+                    if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, clicked))) {
+                        event.setUseInteractedBlock(Result.DENY);
+                    }
 
-                        // Handle connected blocks (i.e. beds, chests)
-                        for (Block connected : Blocks.getConnected(clicked)) {
-                            if (Events.fireAndTestCancel(new UseBlockEvent(event, create(event.getPlayer()), connected))) {
-                                event.setUseInteractedBlock(Result.DENY);
-                                break;
-                            }
+                    // Handle connected blocks (i.e. beds, chests)
+                    for (Block connected : Blocks.getConnected(clicked)) {
+                        if (Events.fireAndTestCancel(new UseBlockEvent(event, create(event.getPlayer()), connected))) {
+                            event.setUseInteractedBlock(Result.DENY);
+                            break;
                         }
                     }
                 }
