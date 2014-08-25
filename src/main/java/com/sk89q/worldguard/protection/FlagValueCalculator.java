@@ -223,36 +223,6 @@ public class FlagValueCalculator {
     }
 
     /**
-     * Get the effective value for a list of state flags. The rules of
-     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
-     * and {@code ALLOW} overrides {@code NONE}.
-     *
-     * <p>This method is the same as
-     * {@link #queryState(RegionAssociable, StateFlag...)} except it allows
-     * another flag to be added at the beginning of the flag list without
-     * having to concatenate the vararg array with the first flag.</p>
-     *
-     * @param subject an optional subject, which would be used to determine the region group to apply
-     * @param flags a list of flags to check
-     * @return a state
-     */
-    @Nullable
-    public State queryState(@Nullable RegionAssociable subject, StateFlag firstFlag, StateFlag... flags) {
-        State value = queryValue(subject, firstFlag);
-
-        if (value != State.DENY) {
-            for (StateFlag flag : flags) {
-                value = StateFlag.combine(value, queryValue(subject, flag));
-                if (value == State.DENY) {
-                    break;
-                }
-            }
-        }
-
-        return value;
-    }
-
-    /**
      * Get the effective value for a flag. If there are multiple values
      * (for example, if there are multiple regions with the same priority
      * but with different farewell messages set, there would be multiple

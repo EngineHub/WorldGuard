@@ -27,6 +27,7 @@ import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Location;
@@ -134,7 +135,7 @@ public class RegionFlagsListener extends AbstractListener {
         return new Predicate<Location>() {
             @Override
             public boolean apply(@Nullable Location location) {
-                return query.testState(location, null, flag);
+                return query.testState(location, (RegionAssociable) null, flag);
             }
         };
     }

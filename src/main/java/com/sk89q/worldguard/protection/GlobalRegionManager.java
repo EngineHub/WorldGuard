@@ -24,6 +24,8 @@ import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.RegionContainer;
 import com.sk89q.worldguard.bukkit.RegionQuery;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.Location;
@@ -158,7 +160,7 @@ public class GlobalRegionManager {
      */
     @Deprecated
     public boolean canBuild(Player player, Location location) {
-        return hasBypass(player, location.getWorld()) || createQuery().testBuild(location, player);
+        return hasBypass(player, location.getWorld()) || createQuery().testState(location, player, DefaultFlag.BUILD);
 
     }
 
@@ -216,7 +218,7 @@ public class GlobalRegionManager {
     @Deprecated
     public boolean allows(StateFlag flag, Location location, @Nullable LocalPlayer player) {
         if (player == null) {
-            return StateFlag.test(createQuery().queryState(location, null, flag));
+            return StateFlag.test(createQuery().queryState(location, (RegionAssociable) null, flag));
         } else if (player instanceof BukkitPlayer) {
             Player p = ((BukkitPlayer) player).getPlayer();
             return StateFlag.test(createQuery().queryState(location, p, flag));

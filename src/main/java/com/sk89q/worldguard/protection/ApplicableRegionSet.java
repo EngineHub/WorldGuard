@@ -65,32 +65,12 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
      * Tests whether the {@link DefaultFlag#BUILD} flag or membership
      * requirements permit the given player.
      *
-     * <p>If there are several relevant flags (i.e. in addition to
-     * {@code BUILD}, such as {@link DefaultFlag#SLEEP} when the target
-     * object is a bed), then
-     * {@link #testBuild(RegionAssociable, StateFlag...)} should be used.</p>
-     *
      * @param player the player to check
      * @return true if permitted
-     * @deprecated use {@link #testBuild(RegionAssociable, StateFlag...)}
+     * @deprecated use {@link #testState(RegionAssociable, StateFlag...)}
      */
     @Deprecated
     boolean canBuild(LocalPlayer player);
-
-    /**
-     * Test whether the given flags evaluate to {@code ALLOW}, implicitly also
-     * considering the {@link DefaultFlag#BUILD} flag.
-     *
-     * <p>This method is equivalent to calling
-     * {@link #testState(RegionAssociable, StateFlag...)} with {@code flags} plus
-     * the {@code BUILD} flag.</p>
-     *
-     * @param subject the subject
-     * @param flags zero or more flags
-     * @return true if permission is granted
-     * @see #queryState(RegionAssociable, StateFlag...)
-     */
-    boolean testBuild(RegionAssociable subject, StateFlag... flags);
 
     /**
      * Test whether the (effective) value for a list of state flags equals

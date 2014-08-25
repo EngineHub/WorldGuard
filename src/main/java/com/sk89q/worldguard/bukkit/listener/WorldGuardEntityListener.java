@@ -243,18 +243,10 @@ public class WorldGuardEntityListener implements Listener {
 
             if (attacker != null) {
                 if (attacker instanceof TNTPrimed || attacker instanceof ExplosiveMinecart) {
-
                     // The check for explosion damage should be handled already... But... What ever...
                     if (wcfg.blockTNTExplosions) {
                         event.setCancelled(true);
                         return;
-                    }
-                    if (wcfg.useRegions && wcfg.explosionFlagCancellation) {
-                        RegionQuery query = plugin.getRegionContainer().createQuery();
-                        if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.TNT)) {
-                            event.setCancelled(true);
-                            return;
-                        }
                     }
                 }
 
@@ -273,7 +265,7 @@ public class WorldGuardEntityListener implements Listener {
                     if (wcfg.useRegions) {
                         Fireball fireball = (Fireball) attacker;
                         RegionQuery query = plugin.getRegionContainer().createQuery();
-                        if (!query.testBuild(defender.getLocation(), (Player) defender, DefaultFlag.GHAST_FIREBALL) && wcfg.explosionFlagCancellation) {
+                        if (!query.testState(defender.getLocation(), (Player) defender, DefaultFlag.GHAST_FIREBALL) && wcfg.explosionFlagCancellation) {
                             event.setCancelled(true);
                             return;
                         }
