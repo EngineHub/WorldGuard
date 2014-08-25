@@ -384,8 +384,13 @@ public class RegionProtectionListener extends AbstractListener {
         boolean canDamage;
         String what;
 
+        /* Hostile / ambient mob override */
+        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())) {
+            canDamage = true;
+            what = "hit that";
+
         /* PVP */
-        if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null && !attacker.equals(event.getEntity())) {
+        } else if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null && !attacker.equals(event.getEntity())) {
             Player defender = (Player) event.getEntity();
 
             canDamage = query.testBuild(target, associable, DefaultFlag.PVP)
