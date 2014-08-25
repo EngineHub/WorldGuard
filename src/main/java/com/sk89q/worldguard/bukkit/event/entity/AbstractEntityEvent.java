@@ -21,7 +21,7 @@ package com.sk89q.worldguard.bukkit.event.entity;
 
 import com.google.common.base.Predicate;
 import com.sk89q.worldguard.bukkit.cause.Cause;
-import com.sk89q.worldguard.bukkit.event.AbstractDelegateEvent;
+import com.sk89q.worldguard.bukkit.event.DelegateEvent;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-abstract class AbstractEntityEvent extends AbstractDelegateEvent {
+abstract class AbstractEntityEvent extends DelegateEvent {
 
     private final Location target;
     @Nullable

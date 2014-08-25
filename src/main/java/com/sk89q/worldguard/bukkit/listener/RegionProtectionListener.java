@@ -24,6 +24,7 @@ import com.sk89q.worldguard.bukkit.RegionQuery;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
+import com.sk89q.worldguard.bukkit.event.DelegateEvent;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
@@ -78,11 +79,16 @@ public class RegionProtectionListener extends AbstractListener {
     /**
      * Tell a sender that s/he cannot do something 'here'.
      *
+     * @param event the event
      * @param cause the cause
      * @param location the location
      * @param what what was done
      */
-    private void tellErrorMessage(Cause cause, Location location, String what) {
+    private void tellErrorMessage(DelegateEvent event, Cause cause, Location location, String what) {
+        if (event.isSilent()) {
+            return;
+        }
+
         Object rootCause = cause.getRootCause();
 
         if (rootCause instanceof Player) {
@@ -178,7 +184,7 @@ public class RegionProtectionListener extends AbstractListener {
                 }
 
                 if (!canPlace) {
-                    tellErrorMessage(event.getCause(), target, what);
+                    tellErrorMessage(event, event.getCause(), target, what);
                     return false;
                 }
 
@@ -215,7 +221,7 @@ public class RegionProtectionListener extends AbstractListener {
                     }
 
                     if (!canBreak) {
-                        tellErrorMessage(event.getCause(), target, what);
+                        tellErrorMessage(event, event.getCause(), target, what);
                         return false;
                     }
 
@@ -262,7 +268,7 @@ public class RegionProtectionListener extends AbstractListener {
                 }
 
                 if (!canUse) {
-                    tellErrorMessage(event.getCause(), target, what);
+                    tellErrorMessage(event, event.getCause(), target, what);
                     return false;
                 }
 
@@ -307,7 +313,7 @@ public class RegionProtectionListener extends AbstractListener {
         }
 
         if (!canSpawn) {
-            tellErrorMessage(event.getCause(), target, what);
+            tellErrorMessage(event, event.getCause(), target, what);
             event.setCancelled(true);
         }
     }
@@ -342,7 +348,7 @@ public class RegionProtectionListener extends AbstractListener {
         }
 
         if (!canDestroy) {
-            tellErrorMessage(event.getCause(), target, what);
+            tellErrorMessage(event, event.getCause(), target, what);
             event.setCancelled(true);
         }
     }
@@ -360,7 +366,7 @@ public class RegionProtectionListener extends AbstractListener {
         String what = "use that";
 
         if (!canUse) {
-            tellErrorMessage(event.getCause(), target, what);
+            tellErrorMessage(event, event.getCause(), target, what);
             event.setCancelled(true);
         }
     }
@@ -399,7 +405,7 @@ public class RegionProtectionListener extends AbstractListener {
         }
 
         if (!canDamage) {
-            tellErrorMessage(event.getCause(), target, what);
+            tellErrorMessage(event, event.getCause(), target, what);
             event.setCancelled(true);
         }
     }

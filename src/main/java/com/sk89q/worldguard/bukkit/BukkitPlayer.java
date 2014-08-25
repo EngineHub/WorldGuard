@@ -34,8 +34,13 @@ public class BukkitPlayer extends LocalPlayer {
     private final WorldGuardPlugin plugin;
     private final Player player;
     private final String name;
+    private final boolean silenced;
 
     public BukkitPlayer(WorldGuardPlugin plugin, Player player) {
+        this(plugin, player, false);
+    }
+
+    BukkitPlayer(WorldGuardPlugin plugin, Player player, boolean silenced) {
         checkNotNull(plugin);
         checkNotNull(player);
 
@@ -43,6 +48,7 @@ public class BukkitPlayer extends LocalPlayer {
         this.player = player;
         // getName() takes longer than before in newer versions of Minecraft
         this.name = player.getName();
+        this.silenced = silenced;
     }
 
     @Override
@@ -68,13 +74,17 @@ public class BukkitPlayer extends LocalPlayer {
 
     @Override
     public void kick(String msg) {
-        player.kickPlayer(msg);
+        if (!silenced) {
+            player.kickPlayer(msg);
+        }
     }
 
     @Override
     public void ban(String msg) {
-        player.setBanned(true);
-        player.kickPlayer(msg);
+        if (!silenced) {
+            player.setBanned(true);
+            player.kickPlayer(msg);
+        }
     }
 
     @Override
@@ -84,7 +94,9 @@ public class BukkitPlayer extends LocalPlayer {
 
     @Override
     public void printRaw(String msg) {
-        player.sendMessage(msg);
+        if (!silenced) {
+            player.sendMessage(msg);
+        }
     }
 
     @Override

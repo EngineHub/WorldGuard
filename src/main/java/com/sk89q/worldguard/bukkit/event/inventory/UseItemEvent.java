@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.event.inventory;
 
 import com.sk89q.worldguard.bukkit.cause.Cause;
-import com.sk89q.worldguard.bukkit.event.AbstractDelegateEvent;
+import com.sk89q.worldguard.bukkit.event.DelegateEvent;
 import org.bukkit.World;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Fired when an item is interacted with.
  */
-public class UseItemEvent extends AbstractDelegateEvent {
+public class UseItemEvent extends DelegateEvent {
 
     private static final HandlerList handlers = new HandlerList();
     private final World world;
