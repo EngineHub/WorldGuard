@@ -26,7 +26,6 @@ You can report bugs that you encounter on our [issue tracker](http://youtrack.sk
 Be aware of these breaking changes:
 
 * Children regions now inherit from their parent even if there is no overlap.
-* Flags are now evaluated together so a `DENY` on `SLEEP` will override a `BUILD` set to `ALLOW`. (The sleep flag only applies to beds.) Possibly the real gotcha is that if you set `BUILD` to deny, then it will also override `PVP` (remember that `DENY` > `ALLOW` > `NONE`).
 * MySQL support now features the ability to migrate tables. If you are using tables without a prefix, then the new migration code should be able to handle your table. However, if you are using a table prefix, you may encounter trouble with migration.
 * Protection is now a lot more exhaustive so it is no longer, for example, possible to fling sand into a region, grow trees into a region, and so on.
 * The `USE` flag is now much more encompassing so you may find that it blocks things like CraftBook gates (for users of CraftBook). To fix that, you can do `/rg flag REGION_NAME use allow`, but be aware that that will also allow the opening of inventories. To block inventories specifically, use `/rg flag REGION_NAME chest-access deny -g nonmembers`. The `-g nonmembers` makes it so only non-members of the region are unable to use chests, but this is optional.
