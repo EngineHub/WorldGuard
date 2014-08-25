@@ -42,6 +42,8 @@ import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
+import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -141,6 +143,10 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getPlayer()), event.getBlock()));
+
+        if (event.isCancelled()) {
+            playDenyEffect(event.getPlayer(), event.getBlock().getLocation().add(0.5, 0.7, 0.5));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -159,6 +165,10 @@ public class EventAbstractionListener extends AbstractListener {
 
         if (!event.isCancelled()) {
             Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), event.getBlock()));
+        }
+
+        if (event.isCancelled()) {
+            playDenyEffect(event.getPlayer(), event.getBlockPlaced().getLocation().add(0.5, 0.5, 0.5));
         }
     }
 
@@ -345,6 +355,10 @@ public class EventAbstractionListener extends AbstractListener {
                     }
                 }
 
+                if (event.isCancelled()) {
+                    playDenyEffect(event.getPlayer(), clicked.getLocation().add(0.5, 1, 0.5));
+                }
+
             case LEFT_CLICK_AIR:
             case RIGHT_CLICK_AIR:
                 if (item != null && !item.getType().isBlock() && Events.fireAndTestCancel(new UseItemEvent(event, cause, player.getWorld(), item))) {
@@ -402,6 +416,8 @@ public class EventAbstractionListener extends AbstractListener {
             Events.fireToCancel(event, new PlaceBlockEvent(event, create(player), blockAffected.getLocation(), blockMaterial));
             Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item));
         }
+
+        playDenyEffect(event.getPlayer(), blockAffected.getLocation().add(0.5, 0.5, 0.5));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -415,6 +431,8 @@ public class EventAbstractionListener extends AbstractListener {
             Events.fireToCancel(event, new BreakBlockEvent(event, create(player), blockAffected));
             Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item));
         }
+
+        playDenyEffect(event.getPlayer(), blockAffected.getLocation().add(0.5, 1, 0.5));
     }
 
     // TODO: Handle EntityPortalEnterEvent
@@ -584,6 +602,11 @@ public class EventAbstractionListener extends AbstractListener {
                 if (item != null) {
                     Events.fireToCancel(event, new UseItemEvent(event, create(damager), event.getEntity().getWorld(), item));
                 }
+            }
+
+            if (event.isCancelled() && damager instanceof Player) {
+                Player player = (Player) damager;
+                playDenyEffect(player, event.getEntity().getLocation().add(0, 1, 0));
             }
 
         } else {
@@ -793,6 +816,11 @@ public class EventAbstractionListener extends AbstractListener {
             Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) ((DoubleChest) holder).getLeftSide()).getBlock()));
             Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) ((DoubleChest) holder).getRightSide()).getBlock()));
         }
+    }
+
+    private void playDenyEffect(Player player, Location location) {
+        //player.playSound(location, Sound.SUCCESSFUL_HIT, 0.2f, 0.4f);
+        player.playEffect(location, Effect.SMOKE, BlockFace.UP);
     }
 
 }
