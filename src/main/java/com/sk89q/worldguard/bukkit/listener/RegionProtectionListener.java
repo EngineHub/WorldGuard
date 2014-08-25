@@ -372,8 +372,19 @@ public class RegionProtectionListener extends AbstractListener {
         RegionAssociable associable = createRegionAssociable(event.getCause());
 
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
-        boolean canUse = query.testState(target, associable, DefaultFlag.BUILD) || query.testState(target, associable, DefaultFlag.USE);
-        String what = "use that";
+        boolean canUse;
+        String what;
+
+        /* Hostile / ambient mob override */
+        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())) {
+            canUse = true;
+            what = "use that";
+
+        /* Everything else */
+        } else {
+            canUse = query.testState(target, associable, DefaultFlag.BUILD) || query.testState(target, associable, DefaultFlag.USE);
+            what = "use that";
+        }
 
         if (!canUse) {
             tellErrorMessage(event, event.getCause(), target, what);
