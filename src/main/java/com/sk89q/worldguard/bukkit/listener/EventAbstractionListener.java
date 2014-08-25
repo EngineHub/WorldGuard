@@ -39,6 +39,7 @@ import com.sk89q.worldguard.bukkit.util.BlockStateAsBlockFunction;
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -638,7 +639,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
-        InventoryHolder causeHolder = event.getInitiator().getHolder();
+        final InventoryHolder causeHolder = event.getInitiator().getHolder();
         InventoryHolder sourceHolder = event.getSource().getHolder();
         InventoryHolder targetHolder = event.getDestination().getHolder();
 
@@ -662,7 +663,12 @@ public class EventAbstractionListener extends AbstractListener {
             handleInventoryHolderUse(event, cause, targetHolder);
 
             if (event.isCancelled() && causeHolder instanceof Hopper) {
-                ((Hopper) causeHolder).getBlock().breakNaturally();
+                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
+                    @Override
+                    public void run() {
+                        ((Hopper) causeHolder).getBlock().breakNaturally();
+                    }
+                });
             } else {
                 entry.setCancelled(event.isCancelled());
             }
