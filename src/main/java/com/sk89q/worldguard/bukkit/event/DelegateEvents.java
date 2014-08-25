@@ -36,4 +36,17 @@ public final class DelegateEvents {
         return event;
     }
 
+    /**
+     * Set an event to be silent.
+     *
+     * @param event the event
+     * @param silent true to set silent
+     * @param <T> the type of event
+     * @return the same event
+     */
+    public static <T extends DelegateEvent> T setSilent(T event, boolean silent) {
+        event.setSilent(silent);
+        return event;
+    }
+
 }

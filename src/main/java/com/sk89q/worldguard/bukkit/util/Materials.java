@@ -577,6 +577,16 @@ public final class Materials {
     }
 
     /**
+     * Test whether the given type is Redstone ore.
+     *
+     * @param type the material
+     * @return true if Redstone ore
+     */
+    public static boolean isRedstoneOre(Material type) {
+        return type == Material.GLOWING_REDSTONE_ORE || type == Material.REDSTONE_ORE;
+    }
+
+    /**
      * Test whether the given material is a block that is modified when it is
      * left or right clicked.
      *
