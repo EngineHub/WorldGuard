@@ -17,6 +17,10 @@ If this is a __BETA BUILD__ or __SNAPSHOT BUILD__, then you should re-read this 
 
 You have downloaded version ${project.version}.
 
+## Reporting problems
+
+You can report bugs that you encounter on our [issue tracker](http://youtrack.sk89q.com) and [ask questions on our forum](http://forum.sk89q.com).
+
 ## Breaking changes
 
 Be aware of these breaking changes:
