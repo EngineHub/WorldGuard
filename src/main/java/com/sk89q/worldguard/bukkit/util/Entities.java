@@ -19,10 +19,13 @@
 
 package com.sk89q.worldguard.bukkit.util;
 
+import org.bukkit.entity.Ambient;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Slime;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
@@ -125,4 +128,25 @@ public final class Entities {
         String name = player.getName();
         return name.length() >= 3 && name.charAt(0) == '[' && name.charAt(name.length() - 1) == ']';
     }
+
+    /**
+     * Test whether an entity is hostile.
+     *
+     * @param entity the entity
+     * @return true if hostile
+     */
+    public static boolean isHostile(Entity entity) {
+        return entity instanceof Monster || entity instanceof Slime;
+    }
+
+    /**
+     * Test whether an entity is ambient.
+     *
+     * @param entity the entity
+     * @return true if ambient
+     */
+    public static boolean isAmbient(Entity entity) {
+        return entity instanceof Ambient;
+    }
+
 }
