@@ -42,7 +42,7 @@ public class ApplicableRegionSetTest {
         LocalPlayer player = mock.createPlayer();
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertThat(set.testBuild(player), is(true));
+        assertThat(set.testState(player, DefaultFlag.BUILD), is(true));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class ApplicableRegionSetTest {
         ProtectedRegion global = mock.global();
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertThat(set.testBuild(player), is(true));
+        assertThat(set.testState(player, DefaultFlag.BUILD), is(true));
     }
 
     @Test
@@ -68,8 +68,8 @@ public class ApplicableRegionSetTest {
         region.getMembers().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertThat(set.testBuild(member), is(true));
-        assertThat(set.testBuild(nonMember), is(false));
+        assertThat(set.testState(member, DefaultFlag.BUILD), is(true));
+        assertThat(set.testState(nonMember, DefaultFlag.BUILD), is(false));
     }
 
     @Test
@@ -88,10 +88,7 @@ public class ApplicableRegionSetTest {
         assertThat(set.testState(player, DefaultFlag.SEND_CHAT), is(true));
         assertThat(set.testState(player, DefaultFlag.INVINCIBILITY), is(false));
 
-        assertThat(set.testBuild(player, DefaultFlag.CHEST_ACCESS), is(true));
-        assertThat(set.testBuild(player, DefaultFlag.SLEEP), is(true));
-        assertThat(set.testBuild(player, DefaultFlag.TNT), is(true));
-        assertThat(set.testBuild(player, DefaultFlag.PVP), is(true));
+        assertThat(set.testState(player, DefaultFlag.BUILD), is(true));
     }
 
     @Test
@@ -112,10 +109,7 @@ public class ApplicableRegionSetTest {
         assertThat(set.testState(player, DefaultFlag.SEND_CHAT), is(true));
         assertThat(set.testState(player, DefaultFlag.INVINCIBILITY), is(false));
 
-        assertThat(set.testBuild(player, DefaultFlag.CHEST_ACCESS), is(true));
-        assertThat(set.testBuild(player, DefaultFlag.SLEEP), is(true));
-        assertThat(set.testBuild(player, DefaultFlag.TNT), is(true));
-        assertThat(set.testBuild(player, DefaultFlag.PVP), is(true));
+        assertThat(set.testState(player, DefaultFlag.BUILD), is(true));
     }
 
     @Test
@@ -138,10 +132,7 @@ public class ApplicableRegionSetTest {
         assertThat(set.testState(member, DefaultFlag.SEND_CHAT), is(true));
         assertThat(set.testState(member, DefaultFlag.INVINCIBILITY), is(false));
 
-        assertThat(set.testBuild(member, DefaultFlag.CHEST_ACCESS), is(true));
-        assertThat(set.testBuild(member, DefaultFlag.SLEEP), is(true));
-        assertThat(set.testBuild(member, DefaultFlag.TNT), is(true));
-        assertThat(set.testBuild(member, DefaultFlag.PVP), is(true));
+        assertThat(set.testState(member, DefaultFlag.BUILD), is(true));
 
         assertThat(set.testState(nonMember, DefaultFlag.MOB_DAMAGE), is(true));
         assertThat(set.testState(nonMember, DefaultFlag.ENTRY), is(true));
@@ -151,10 +142,7 @@ public class ApplicableRegionSetTest {
         assertThat(set.testState(nonMember, DefaultFlag.SEND_CHAT), is(true));
         assertThat(set.testState(nonMember, DefaultFlag.INVINCIBILITY), is(false));
 
-        assertThat(set.testBuild(nonMember, DefaultFlag.CHEST_ACCESS), is(false));
-        assertThat(set.testBuild(nonMember, DefaultFlag.SLEEP), is(false));
-        assertThat(set.testBuild(nonMember, DefaultFlag.TNT), is(false));
-        assertThat(set.testBuild(nonMember, DefaultFlag.PVP), is(false));
+        assertThat(set.testState(nonMember, DefaultFlag.BUILD), is(false));
     }
 
     @Test

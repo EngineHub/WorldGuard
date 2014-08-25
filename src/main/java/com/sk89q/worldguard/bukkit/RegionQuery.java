@@ -106,60 +106,6 @@ public class RegionQuery {
     }
 
     /**
-     * Test whether the given flags evaluate to {@code ALLOW}, implicitly also
-     * considering the {@link DefaultFlag#BUILD} flag.
-     *
-     * <p>This method is equivalent to calling
-     * {@link #testState(Location, Player, StateFlag...)} with
-     * {@code flags} plus the {@code BUILD} flag.</p>
-     *
-     * <p>This method does not check the region bypass permission. That must
-     * be done by the calling code.</p>
-     *
-     * @param location the location
-     * @param player the player
-     * @param flags zero or more flags
-     * @return true if permission is granted
-     * @see RegionResultSet#testBuild(RegionAssociable, StateFlag...)
-     */
-    public boolean testBuild(Location location, Player player, StateFlag... flags) {
-        checkNotNull(location);
-        checkNotNull(player);
-
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        return testBuild(location, localPlayer, flags);
-    }
-
-    /**
-     * Test whether the given flags evaluate to {@code ALLOW}, implicitly also
-     * considering the {@link DefaultFlag#BUILD} flag.
-     *
-     * <p>This method is equivalent to calling
-     * {@link #testState(Location, Player, StateFlag...)} with
-     * {@code flags} plus the {@code BUILD} flag.</p>
-     *
-     * <p>This method does not check the region bypass permission. That must
-     * be done by the calling code.</p>
-     *
-     * @param location the location
-     * @param subject the subject
-     * @param flags zero or more flags
-     * @return true if permission is granted
-     * @see RegionResultSet#testBuild(RegionAssociable, StateFlag...)
-     */
-    public boolean testBuild(Location location, RegionAssociable subject, StateFlag... flags) {
-        checkNotNull(location);
-        checkNotNull(subject);
-        checkNotNull(flags);
-
-        World world = location.getWorld();
-        WorldConfiguration worldConfig = config.get(world);
-
-        return !worldConfig.useRegions || getApplicableRegions(location).testBuild(subject, flags);
-
-    }
-
-    /**
      * Test whether the (effective) value for a list of state flags equals
      * {@code ALLOW}.
      *
@@ -183,6 +129,29 @@ public class RegionQuery {
     }
 
     /**
+     * Test whether the (effective) value for a list of state flags equals
+     * {@code ALLOW}.
+     *
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
+     *
+     * <p>This method does not check the region bypass permission. That must
+     * be done by the calling code.</p>
+     *
+     * @param location the location
+     * @param associable an optional associable
+     * @param flag the flag
+     * @return true if the result was {@code ALLOW}
+     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
+     */
+    public boolean testState(Location location, @Nullable RegionAssociable associable, StateFlag... flag) {
+        return StateFlag.test(queryState(location, associable, flag));
+    }
+
+    /**
      * Get the (effective) value for a list of state flags. The rules of
      * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
      * and {@code ALLOW} overrides {@code NONE}. One flag may override another.
@@ -203,6 +172,28 @@ public class RegionQuery {
     public State queryState(Location location, @Nullable Player player, StateFlag... flags) {
         LocalPlayer localPlayer = player != null ? plugin.wrapPlayer(player) : null;
         return getApplicableRegions(location).queryState(localPlayer, flags);
+    }
+
+    /**
+     * Get the (effective) value for a list of state flags. The rules of
+     * states is observed here; that is, {@code DENY} overrides {@code ALLOW},
+     * and {@code ALLOW} overrides {@code NONE}. One flag may override another.
+     *
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is in the list of flags.</p>
+     *
+     * @param location the location
+     * @param associable an optional associable
+     * @param flags a list of flags to check
+     * @return a state
+     * @see RegionResultSet#queryState(RegionAssociable, StateFlag...)
+     */
+    @Nullable
+    public State queryState(Location location, @Nullable RegionAssociable associable, StateFlag... flags) {
+        return getApplicableRegions(location).queryState(associable, flags);
     }
 
     /**
@@ -236,6 +227,35 @@ public class RegionQuery {
     }
 
     /**
+     * Get the effective value for a flag. If there are multiple values
+     * (for example, multiple overlapping regions with
+     * the same priority may have the same flag set), then the selected
+     * (or "winning") value will depend on the flag type.
+     *
+     * <p>Only some flag types actually have a strategy for picking the
+     * "best value." For most types, the actual value that is chosen to be
+     * returned is undefined (it could be any value). As of writing, the only
+     * type of flag that actually has a strategy for picking a value is the
+     * {@link StateFlag}.</p>
+     *
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
+     *
+     * @param location the location
+     * @param associable an optional associable
+     * @param flag the flag
+     * @return a value, which could be {@code null}
+     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
+     */
+    @Nullable
+    public <V> V queryValue(Location location, @Nullable RegionAssociable associable, Flag<V> flag) {
+        return getApplicableRegions(location).queryValue(associable, flag);
+    }
+
+    /**
      * Get the effective values for a flag, returning a collection of all
      * values. It is up to the caller to determine which value, if any,
      * from the collection will be used.
@@ -255,6 +275,27 @@ public class RegionQuery {
     public <V> Collection<V> queryAllValues(Location location, @Nullable Player player, Flag<V> flag) {
         LocalPlayer localPlayer = player != null ? plugin.wrapPlayer(player) : null;
         return getApplicableRegions(location).queryAllValues(localPlayer, flag);
+    }
+
+    /**
+     * Get the effective values for a flag, returning a collection of all
+     * values. It is up to the caller to determine which value, if any,
+     * from the collection will be used.
+     *
+     * <p>{@code player} can be non-null to satisfy region group requirements,
+     * otherwise it will be assumed that the caller that is not a member of any
+     * regions. (Flags on a region can be changed so that they only apply
+     * to certain users.) The player argument is required if the
+     * {@link DefaultFlag#BUILD} flag is the flag being queried.</p>
+     *
+     * @param location the location
+     * @param associable an optional associable
+     * @param flag the flag
+     * @return a collection of values
+     * @see RegionResultSet#queryAllValues(RegionAssociable, Flag)
+     */
+    public <V> Collection<V> queryAllValues(Location location, @Nullable RegionAssociable associable, Flag<V> flag) {
+        return getApplicableRegions(location).queryAllValues(associable, flag);
     }
 
 }

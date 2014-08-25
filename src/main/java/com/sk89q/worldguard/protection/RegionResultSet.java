@@ -21,7 +21,6 @@ package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
@@ -36,7 +35,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldguard.protection.flags.StateFlag.test;
 
 /**
  * An implementation that calculates flags using a list of regions.
@@ -79,12 +77,6 @@ public class RegionResultSet extends AbstractRegionSet {
     @Override
     public boolean isVirtual() {
         return false;
-    }
-
-    @Override
-    public boolean testBuild(RegionAssociable subject, StateFlag... flags) {
-        checkNotNull(subject);
-        return test(flagValueCalculator.queryState(subject, DefaultFlag.BUILD, flags));
     }
 
     @Override

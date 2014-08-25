@@ -56,11 +56,6 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
         return true;
     }
 
-    @Override
-    public boolean testBuild(RegionAssociable subject, StateFlag... flags) {
-        return false;
-    }
-
     @SuppressWarnings("unchecked")
     @Nullable
     @Override

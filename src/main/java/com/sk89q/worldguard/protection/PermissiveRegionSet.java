@@ -51,11 +51,6 @@ public class PermissiveRegionSet extends AbstractRegionSet {
         return true;
     }
 
-    @Override
-    public boolean testBuild(RegionAssociable subject, StateFlag... flags) {
-        return true;
-    }
-
     @SuppressWarnings("unchecked")
     @Nullable
     @Override

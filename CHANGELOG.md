@@ -48,9 +48,11 @@ MySQL support has been completely overhauled. It should now be faster, no longer
 
 For users of MySQL, WorldGuard now only saves changed and deleted regions when saving region data. No longer does WorldGuard have to rewrite the entire region database on each save.
 
-### Improved handling of multiple related-flags
+### Improved handling of related flags
 
-Multiple flags that apply to an event are now evaluated together. For example, if a player right clicks a bed to sleep in it, both the `BUILD` flag, the `SLEEP` flag, and the player's membership level is considered. If one of those flags is set to `DENY`, then the player will be prevented from sleeping. If none of the flags or membership gives the player permission to sleep, it is possible to set `SLEEP` to `ALLOW` and allow players to _only_ sleep.
+Multiple flags that apply to an event are now evaluated together if they are similar. For example, if a player right clicks a bed to sleep in it, both the `USE` and `SLEEP` flag are checked since they are both interaction-related. If one of them is `DENY`, then sleeping is denied (remember, `DENY` overrides `ALLOW`). If one of them is `ALLOW` and the other is not `DENY`, then sleeping is permitted.
+
+Only one "category" of flags needs to evaluate to true to permit an action. `DENY` will not cross categories. For example, if `BUILD` is deny, it will not override `SLEEP`, so if `SLEEP` is set to `ALLOW`, sleeping will be permitted. This is fairly similar to how it worked on WorldGuard 5.
 
 ### Flag groups now work properly
 
