@@ -544,7 +544,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerFish(PlayerFishEvent event) {
-        if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getPlayer(), event.getHook()), event.getCaught().getLocation(), EntityType.EXPERIENCE_ORB))) {
+        if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getPlayer(), event.getHook()), event.getHook().getLocation(), EntityType.EXPERIENCE_ORB))) {
             event.setExpToDrop(0);
         }
     }
