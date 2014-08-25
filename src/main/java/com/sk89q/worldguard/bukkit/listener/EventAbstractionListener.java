@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
+import com.sk89q.worldguard.bukkit.event.DelegateEvents;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
@@ -206,6 +207,11 @@ public class EventAbstractionListener extends AbstractListener {
         Entity entity = event.getEntity();
         Material to = event.getTo();
 
+        // Forget about Redstone ore, especially since we handle it in INTERACT
+        if (Materials.isRedstoneOre(block.getType()) && Materials.isRedstoneOre(to)) {
+            return;
+        }
+
         // Fire two events: one as BREAK and one as PLACE
         if (event.getTo() != Material.AIR && event.getBlock().getType() != Material.AIR) {
             Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), block));
@@ -291,11 +297,17 @@ public class EventAbstractionListener extends AbstractListener {
         @Nullable ItemStack item = player.getItemInHand();
         Block clicked = event.getClickedBlock();
         Block placed;
+        boolean silent = false;
         Cause cause = create(player);
 
         switch (event.getAction()) {
             case PHYSICAL:
-                interactDebounce.debounce(clicked, event.getPlayer(), event, new UseBlockEvent(event, cause, clicked));
+                // Forget about Redstone ore
+                if (Materials.isRedstoneOre(clicked.getType())) {
+                    silent = true;
+                }
+
+                interactDebounce.debounce(clicked, event.getPlayer(), event, DelegateEvents.setSilent(new UseBlockEvent(event, cause, clicked), silent));
                 break;
 
             case RIGHT_CLICK_BLOCK:
