@@ -126,7 +126,7 @@ A new optional (disabled by default in the configuration) feature is the checkin
 * Entity destroy: `worldguard.build.entity.remove.<type>`
 * Entity interact: `worldguard.build.entity.interact.<type>`
 * Entity damage: `worldguard.build.entity.damage.<type>`
-* Item use: `worldguard.build.item.interact.<material>`
+* Item use: `worldguard.build.item.use.<material>`
 
 In addition, the permissions are also checked in the style of `worldguard.build.block.<material>.<action>`, so `worldguard.build.block.<material>.place` would work too.
 

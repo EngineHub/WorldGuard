@@ -91,7 +91,7 @@ A new optional (disabled by default in the configuration) feature is the checkin
 * Entity destroy: `worldguard.build.entity.remove.<type>`
 * Entity interact: `worldguard.build.entity.interact.<type>`
 * Entity damage: `worldguard.build.entity.damage.<type>`
-* Item use: `worldguard.build.item.interact.<material>`
+* Item use: `worldguard.build.item.use.<material>`
 
 In addition, the permissions are also checked in the style of `worldguard.build.block.<material>.<action>`, so `worldguard.build.block.<material>.place` would work too.
 
@@ -126,6 +126,7 @@ For entity names, see [EntityType](http://jd.bukkit.org/rb/apidocs/org/bukkit/en
 
 ### API changes
 
+* You can use a new `WorldGuardPlugin.createProtectionQuery()` method to easily check build permissions.
 * The listener classes were moved. Consider them internal -- if you want to make use of the listener somehow, please put in a ticket in our issue tracker.
 * Much of the protection-related handling was previously scattered throughout the code. Now WorldGuard funnels events into an internal event system and then processes protection queries in a more consistent matter. These events are for internal use so it is strongly recommended that you do not use them (they may change without notice drastically). A lot of the protection-related flag handling was moved there.
 * A significant portion of classes under the package of `com.sk89q.worldguard.protection` were changed or removed. However, the basic calls (testing the value of a flag, etc.) should still work, but they may be deprecated. Some of the utility `Domain`-related classes were removed.
