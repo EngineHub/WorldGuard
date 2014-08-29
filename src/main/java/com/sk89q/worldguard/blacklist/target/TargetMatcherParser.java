@@ -23,6 +23,8 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Ranges;
 import com.sk89q.worldedit.blocks.ItemType;
+import com.sk89q.worldguard.util.Enums;
+import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,10 +54,16 @@ public class TargetMatcherParser {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
             int id = getItemID(input);
-            if (id == 0) {
-                throw new TargetMatcherParseException("Unknown block or item name: " + input);
+            if (id != 0) {
+                return id;
             }
-            return id;
+            
+            Material material = Enums.findFuzzyByValue(Material.class, input);
+            if (material != null) {
+                return material.getId();
+            }
+
+            throw new TargetMatcherParseException("Unknown block or item name: " + input);
         }
     }
 
