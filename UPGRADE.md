@@ -33,14 +33,15 @@ Be aware of these breaking changes:
 * In the rare situation that you are user of the "auto-invincibility" and "auto-no-drowning" groups (`wg-invincible` and `wg-amphibious`), you now have to enable these features in the config (`auto-invincible-group: true` and `auto-no-drowning-group: true`). This is because some permission plugins have been causing severe hang ups whenever it is queried for a player's groups, which, in this case, happens to include when the player joins.
 * Plugins that utilize WorldGuard's API may not work anymore. They may crash with errors.
 
-## Incompatible plugins
+## Incompatibility issues
 
-These plugins are known to be incompatible or have issues unless you update them.
-
+* Spigot:
+    * `settings.global-api-cache`, if enabled, will crash WG UUID lookups (fixed in Spigot build #1625)
 * EchoPet
     * Can't spawn pets ([issue #393](https://github.com/DSH105/EchoPet/issues/393))
 * CraftBook
     * Unable to use mechanics unless the `USE` flag is explicitly set to `ALLOW` ([CRAFTBOOK-3057](http://youtrack.sk89q.com/issue/CRAFTBOOK-3057))
+    
 
 ## Major features
 
