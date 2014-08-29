@@ -274,6 +274,11 @@ public class FlagValueCalculator {
     public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
         checkNotNull(flag);
 
+        // Check to see whether we have a subject if this is BUILD
+        if (flag == DefaultFlag.BUILD && subject == null) {
+            throw new NullPointerException("The BUILD flag is handled in a special fashion and requires a non-null subject parameter");
+        }
+
         int minimumPriority = Integer.MIN_VALUE;
 
         // Say there are two regions in one location: CHILD and PARENT (CHILD
@@ -317,10 +322,11 @@ public class FlagValueCalculator {
             }
 
             V value = getEffectiveFlag(region, flag, subject);
+            int priority = getPriority(region);
 
             if (value != null) {
                 if (!ignoredRegions.contains(region)) {
-                    minimumPriority = getPriority(region);
+                    minimumPriority = priority;
 
                     ignoreValuesOfParents(consideredValues, ignoredRegions, region);
                     consideredValues.put(region, value);
@@ -332,13 +338,17 @@ public class FlagValueCalculator {
                     }
                 }
             }
+
+            // The BUILD flag (of lower priorities) can be overridden if
+            // this region has members... this check is here due to legacy
+            // reasons
+            if (priority != minimumPriority && flag == DefaultFlag.BUILD
+                    && getEffectiveFlag(region, DefaultFlag.PASSTHROUGH, subject) != State.ALLOW) {
+                minimumPriority = getPriority(region);
+            }
         }
 
         if (flag == DefaultFlag.BUILD && consideredValues.isEmpty()) {
-            if (subject == null) {
-                throw new NullPointerException("The BUILD flag is handled in a special fashion and requires a non-null subject parameter");
-            }
-
             switch (getMembership(subject)) {
                 case FAIL:
                     return ImmutableList.of();
