@@ -174,13 +174,12 @@ public class RegionProtectionListener extends AbstractListener {
 
                 /* Flint and steel, fire charge, etc. */
                 if (type == Material.FIRE) {
-                    canPlace = query.testState(target, associable, DefaultFlag.BUILD, DefaultFlag.BLOCK_PLACE)
-                            || query.testState(target, associable, DefaultFlag.LIGHTER);
+                    canPlace = query.testBuild(target, associable, DefaultFlag.BLOCK_PLACE, DefaultFlag.LIGHTER);
                     what = "place fire";
 
                 /* Everything else */
                 } else {
-                    canPlace = query.testState(target, associable, DefaultFlag.BUILD, DefaultFlag.BLOCK_PLACE);
+                    canPlace = query.testBuild(target, associable, DefaultFlag.BLOCK_PLACE);
                     what = "place that block";
                 }
 
@@ -212,13 +211,12 @@ public class RegionProtectionListener extends AbstractListener {
 
                     /* TNT */
                     if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.PRIMED_TNT) != null) {
-                        canBreak = query.testState(target, associable, DefaultFlag.BUILD, DefaultFlag.BLOCK_BREAK)
-                                || query.testState(target, associable, DefaultFlag.TNT);
+                        canBreak = query.testBuild(target, associable, DefaultFlag.BLOCK_BREAK, DefaultFlag.TNT);
                         what = "dynamite blocks";
 
                     /* Everything else */
                     } else {
-                        canBreak = query.testState(target, associable, DefaultFlag.BUILD, DefaultFlag.BLOCK_BREAK);
+                        canBreak = query.testBuild(target, associable, DefaultFlag.BLOCK_BREAK);
                         what = "break that block";
                     }
 
@@ -250,26 +248,22 @@ public class RegionProtectionListener extends AbstractListener {
 
                 /* Inventory */
                 if (Materials.isInventoryBlock(type)) {
-                    canUse = query.testState(target, associable, DefaultFlag.BUILD)
-                            || query.testState(target, associable, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
+                    canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
                     what = "open that";
 
                 /* Beds */
                 } else if (type == Material.BED_BLOCK) {
-                    canUse = query.testState(target, associable, DefaultFlag.BUILD)
-                            || query.testState(target, associable, DefaultFlag.USE, DefaultFlag.SLEEP);
+                    canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.SLEEP);
                     what = "sleep";
 
                 /* TNT */
                 } else if (type == Material.TNT) {
-                    canUse = query.testState(target, associable, DefaultFlag.BUILD)
-                            || query.testState(target, associable, DefaultFlag.TNT);
+                    canUse = query.testBuild(target, associable, DefaultFlag.TNT);
                     what = "use explosives";
 
                 /* Everything else */
                 } else {
-                    canUse = query.testState(target, associable, DefaultFlag.BUILD)
-                            || query.testState(target, associable, DefaultFlag.USE);
+                    canUse = query.testBuild(target, associable, DefaultFlag.USE);
                     what = "use that";
                 }
 
@@ -299,19 +293,17 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Vehicles */
         if (Entities.isVehicle(type)) {
-            canSpawn = query.testState(target, associable, DefaultFlag.BUILD)
-                    || query.testState(target, associable, DefaultFlag.PLACE_VEHICLE);
+            canSpawn = query.testBuild(target, associable, DefaultFlag.PLACE_VEHICLE);
             what = "place vehicles";
 
         /* Item pickup */
         } else if (event.getEntity() instanceof Item) {
-            canSpawn = query.testState(target, associable, DefaultFlag.BUILD)
-                    || query.testState(target, associable, DefaultFlag.ITEM_DROP);
+            canSpawn = query.testBuild(target, associable, DefaultFlag.ITEM_DROP);
             what = "drop items";
 
         /* Everything else */
         } else {
-            canSpawn = query.testState(target, associable, DefaultFlag.BUILD);
+            canSpawn = query.testBuild(target, associable);
 
             if (event.getEntity() instanceof Item) {
                 what = "drop items";
@@ -341,19 +333,17 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Vehicles */
         if (Entities.isVehicle(type)) {
-            canDestroy = query.testState(target, associable, DefaultFlag.BUILD)
-                    || query.testState(target, associable, DefaultFlag.DESTROY_VEHICLE);
+            canDestroy = query.testBuild(target, associable, DefaultFlag.DESTROY_VEHICLE);
             what = "break vehicles";
 
         /* Item pickup */
         } else if (event.getEntity() instanceof Item) {
-            canDestroy = query.testState(target, associable, DefaultFlag.BUILD)
-                    || query.testState(target, associable, DefaultFlag.ITEM_PICKUP);
+            canDestroy = query.testBuild(target, associable, DefaultFlag.ITEM_PICKUP);
             what = "pick up items";
 
         /* Everything else */
         } else {
-            canDestroy = query.testState(target, associable, DefaultFlag.BUILD);
+            canDestroy = query.testBuild(target, associable);
             what = "break things";
         }
 
@@ -382,7 +372,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Everything else */
         } else {
-            canUse = query.testState(target, associable, DefaultFlag.BUILD) || query.testState(target, associable, DefaultFlag.USE);
+            canUse = query.testBuild(target, associable, DefaultFlag.USE);
             what = "use that";
         }
 
@@ -414,7 +404,7 @@ public class RegionProtectionListener extends AbstractListener {
         } else if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null && !attacker.equals(event.getEntity())) {
             Player defender = (Player) event.getEntity();
 
-            canDamage = (query.testState(target, associable, DefaultFlag.BUILD) || query.testState(target, associable, DefaultFlag.PVP))
+            canDamage = query.testBuild(target, associable, DefaultFlag.PVP)
                     && query.queryState(attacker.getLocation(), attacker, DefaultFlag.PVP) != State.DENY;
 
             // Fire the disallow PVP event
@@ -426,7 +416,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Everything else */
         } else {
-            canDamage = query.testState(target, associable, DefaultFlag.BUILD) || query.testState(target, associable, DefaultFlag.USE);
+            canDamage = query.testBuild(target, associable, DefaultFlag.USE);
             what = "hit that";
         }
 
@@ -446,7 +436,7 @@ public class RegionProtectionListener extends AbstractListener {
             if (!isWhitelisted(Cause.create(player), vehicle.getWorld())) {
                 RegionQuery query = getPlugin().getRegionContainer().createQuery();
                 Location location = vehicle.getLocation();
-                if (!query.testState(location, player, DefaultFlag.BUILD) && !query.testState(location, player, DefaultFlag.USE)) {
+                if (!query.testBuild(location, player, DefaultFlag.USE)) {
                     long now = System.currentTimeMillis();
                     Long lastTime = WGMetadata.getIfPresent(player, DISEMBARK_MESSAGE_KEY, Long.class);
                     if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {

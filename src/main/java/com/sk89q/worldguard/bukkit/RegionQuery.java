@@ -106,6 +106,78 @@ public class RegionQuery {
     }
 
     /**
+     * Returns true if the BUILD flag allows the action in the location, but it
+     * can be overridden by a list of other flags. The BUILD flag will not
+     * override the other flags, but the other flags can override BUILD. If
+     * neither BUILD or any of the flags permit the action, then false will
+     * be returned.
+     *
+     * <p>Use this method when checking flags that are related to build
+     * protection. For example, lighting fire in a region should not be
+     * permitted unless the player is a member of the region or the
+     * LIGHTER flag allows it. However, the LIGHTER flag should be able
+     * to allow lighting fires even if BUILD is set to DENY.</p>
+     *
+     * <p>How this method works (BUILD can be overridden by other flags but
+     * not the other way around) is inconsistent, but it's required for
+     * legacy reasons.</p>
+     *
+     * <p>This method does not check the region bypass permission. That must
+     * be done by the calling code.</p>
+     *
+     * @param location the location
+     * @param player an optional player, which would be used to determine the region group to apply
+     * @param flag the flag
+     * @return true if the result was {@code ALLOW}
+     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
+     */
+    public boolean testBuild(Location location, Player player, StateFlag... flag) {
+        if (flag.length == 0) {
+            return testState(location, player, DefaultFlag.BUILD);
+        }
+
+        return StateFlag.test(StateFlag.combine(
+                StateFlag.denyToNone(queryState(location, player, DefaultFlag.BUILD)),
+                queryState(location, player, flag)));
+    }
+
+    /**
+     * Returns true if the BUILD flag allows the action in the location, but it
+     * can be overridden by a list of other flags. The BUILD flag will not
+     * override the other flags, but the other flags can override BUILD. If
+     * neither BUILD or any of the flags permit the action, then false will
+     * be returned.
+     *
+     * <p>Use this method when checking flags that are related to build
+     * protection. For example, lighting fire in a region should not be
+     * permitted unless the player is a member of the region or the
+     * LIGHTER flag allows it. However, the LIGHTER flag should be able
+     * to allow lighting fires even if BUILD is set to DENY.</p>
+     *
+     * <p>How this method works (BUILD can be overridden by other flags but
+     * not the other way around) is inconsistent, but it's required for
+     * legacy reasons.</p>
+     *
+     * <p>This method does not check the region bypass permission. That must
+     * be done by the calling code.</p>
+     *
+     * @param location the location
+     * @param associable an optional associable
+     * @param flag the flag
+     * @return true if the result was {@code ALLOW}
+     * @see RegionResultSet#queryValue(RegionAssociable, Flag)
+     */
+    public boolean testBuild(Location location, RegionAssociable associable, StateFlag... flag) {
+        if (flag.length == 0) {
+            return testState(location, associable, DefaultFlag.BUILD);
+        }
+
+        return StateFlag.test(StateFlag.combine(
+                StateFlag.denyToNone(queryState(location, associable, DefaultFlag.BUILD)),
+                queryState(location, associable, flag)));
+    }
+
+    /**
      * Test whether the (effective) value for a list of state flags equals
      * {@code ALLOW}.
      *
