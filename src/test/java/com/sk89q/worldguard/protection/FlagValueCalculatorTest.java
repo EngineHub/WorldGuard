@@ -900,10 +900,11 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(globalMember, DefaultFlag.BUILD), is(State.DENY));
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is(State.DENY));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is(State.DENY));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.DENY));
+        // Inconsistent due to legacy reasons
+        assertThat(result.queryValue(globalMember, DefaultFlag.BUILD), is((State) null));
+        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is((State) null));
+        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
     }
 
     @Test

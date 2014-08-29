@@ -410,7 +410,7 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.canBuild(member));
+        assertTrue(set.canBuild(member));
         assertFalse(set.canBuild(nonMember));
     }
 
@@ -543,7 +543,7 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.canBuild(member));
+        assertTrue(set.canBuild(member));
         assertFalse(set.canBuild(nonMember));
     }
 
