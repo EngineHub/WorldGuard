@@ -68,8 +68,9 @@ public final class Enums {
         checkNotNull(enumType);
         checkNotNull(values);
         for (String test : values) {
+            test = test.replace("_", "");
             for (T value : enumType.getEnumConstants()) {
-                if (value.name().equalsIgnoreCase(test)) {
+                if (value.name().equalsIgnoreCase(test.replace("_", ""))) {
                     return value;
                 }
             }
