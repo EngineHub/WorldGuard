@@ -370,6 +370,11 @@ public class RegionProtectionListener extends AbstractListener {
             canUse = true;
             what = "use that";
 
+        /* Paintings, item frames, etc. */
+        } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
+            canUse = query.testBuild(target, associable);
+            what = "change that";
+
         /* Everything else */
         } else {
             canUse = query.testBuild(target, associable, DefaultFlag.USE);
@@ -399,6 +404,11 @@ public class RegionProtectionListener extends AbstractListener {
         if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())) {
             canDamage = true;
             what = "hit that";
+
+        /* Paintings, item frames, etc. */
+        } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
+            canDamage = query.testBuild(target, associable);
+            what = "change that";
 
         /* PVP */
         } else if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null && !attacker.equals(event.getEntity())) {
