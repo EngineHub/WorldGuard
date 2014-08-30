@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit.util;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -147,6 +148,17 @@ public final class Entities {
      */
     public static boolean isAmbient(Entity entity) {
         return entity instanceof Ambient;
+    }
+
+    /**
+     * Test whether using the given entity should be considered "building"
+     * rather than merely using an entity.
+     *
+     * @param entity the entity
+     * @return true if considered building
+     */
+    public static boolean isConsideredBuildingIfUsed(Entity entity) {
+        return entity instanceof Hanging;
     }
 
 }
