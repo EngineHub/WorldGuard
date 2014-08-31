@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.bukkit.event;
 
+/**
+ * Utility methods for dealing with delegate events.
+ */
 public final class DelegateEvents {
 
     private DelegateEvents() {

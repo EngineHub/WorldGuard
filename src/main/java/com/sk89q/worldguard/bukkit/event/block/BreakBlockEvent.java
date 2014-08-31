@@ -30,6 +30,12 @@ import org.bukkit.event.HandlerList;
 import javax.annotation.Nullable;
 import java.util.List;
 
+/**
+ * This event is an internal event. We do not recommend handling or throwing
+ * this event or its subclasses as the interface is highly subject to change.
+ *
+ * <p>Thrown when a block is broken.</p>
+ */
 public class BreakBlockEvent extends AbstractBlockEvent {
 
     private static final HandlerList handlers = new HandlerList();

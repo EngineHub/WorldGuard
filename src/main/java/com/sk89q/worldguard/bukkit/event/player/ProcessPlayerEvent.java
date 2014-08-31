@@ -25,6 +25,13 @@ import org.bukkit.event.HandlerList;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * This event is an internal event. We do not recommend handling or throwing
+ * this event or its subclasses as the interface is highly subject to change.
+ *
+ * <p>Posted when a player has to be processed, either because a world has been
+ * loaded, the server has started, or WorldGuard has been reloaded.</p>
+ */
 public class ProcessPlayerEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();

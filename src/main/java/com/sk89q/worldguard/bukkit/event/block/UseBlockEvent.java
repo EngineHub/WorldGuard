@@ -31,7 +31,10 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * Fired when a block is interacted with.
+ * This event is an internal event. We do not recommend handling or throwing
+ * this event or its subclasses as the interface is highly subject to change.
+ *
+ * <p>Thrown when a block is interacted with.</p>
  */
 public class UseBlockEvent extends AbstractBlockEvent {
 
