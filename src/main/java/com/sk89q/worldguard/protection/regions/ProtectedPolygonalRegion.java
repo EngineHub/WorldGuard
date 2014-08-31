@@ -21,7 +21,6 @@ package com.sk89q.worldguard.protection.regions;
 
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -157,51 +156,82 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
         return intersectingRegions;
     }
 
-    @Override
-    public int volume() {
-        int yLength = max.getBlockY() - min.getBlockY() + 1;
+    private double k(List<BlockVector2D> points) {
+        double a = 0;
+        double b = 0;
+        for (int i = 0; i < points.size(); ++i) {
+            BlockVector2D cur = points.get(i);
+            BlockVector2D nxt = i + 1 >= points.size() ? points.get(0) : points.get(i + 1);
 
+            a += cur.getX() * nxt.getZ();
+            b += cur.getZ() * nxt.getX();
+        }
+        return a - b;
+    }
+
+    public List<BlockVector2D> getProtectionBoundries() {
+
+        // Return an empty list
+        if (points.size() < 3) {
+            return new ArrayList<BlockVector2D>();
+        }
+
+        boolean clockWise = k(points) > 0;
+        List<BlockVector2D> boundries = new ArrayList<BlockVector2D>();
+        for (BlockVector2D cur : points) {
+            // Create an array of test points & determine point order
+            BlockVector2D[] testPts;
+            if (clockWise) {
+                testPts = new BlockVector2D[]{
+                        cur.add(1, 0).toBlockVector2D(),
+                        cur.add(1, 1).toBlockVector2D(),
+                        cur.add(0, 1).toBlockVector2D()
+                };
+            } else {
+                testPts = new BlockVector2D[]{
+                        cur.add(0, 1).toBlockVector2D(),
+                        cur.add(1, 1).toBlockVector2D(),
+                        cur.add(1, 0).toBlockVector2D()
+                };
+            }
+
+            // Test the points and remove the original point if
+            // other points have been injected to replace it
+            boolean overridden = false;
+            for (BlockVector2D testPt : testPts) {
+                if (!contains(testPt)) {
+                    boundries.add(testPt);
+                    overridden = true;
+                }
+            }
+
+            // Add back the original point, since it was
+            // encompassed by the region
+            if (!overridden) {
+                boundries.add(cur);
+            }
+        }
+        return boundries;
+    }
+
+    public int area() {
+        // Use the defined/native points here
+        // as the boundaries method will return an
+        // empty list if there are less
+        // than 3 native points
         int numPoints = points.size();
         if (numPoints < 3) {
             return -1; // Invalid polygon region
         }
 
-        double a = 0;
-        double b = 0;
+        return (int) (.5 * Math.abs(k(getProtectionBoundries())));
+    }
 
-        List<BlockVector2D> points = getPoints();
-        for (int i = 0; i < points.size(); ++i) {
-            Vector2D cur = points.get(i);
-            Vector2D next;
-            if (i + 1 >= points.size()) {
-                next = points.get(0);
-            } else {
-                next = points.get(i + 1);
-            }
-
-            int cx = 0, cz = 0;
-            int nx = 0, nz = 0;
-
-            if (!contains(new Vector(cur.getX() + 1, minY, cur.getZ()))) {
-                ++cx;
-            }
-            if (!contains(new Vector(cur.getX(), minY, cur.getZ() + 1))) {
-                ++cz;
-            }
-            if (!contains(new Vector(next.getX() + 1, minY, next.getZ()))) {
-                ++nx;
-            }
-            if (!contains(new Vector(next.getX(), minY, next.getZ() + 1))) {
-                ++nz;
-            }
-
-            cur = cur.add(cx, cz);
-            next = next.add(nx, nz);
-
-            a += cur.getX() * next.getZ();
-            b += cur.getZ() * next.getX();
-        }
-        return (int) (.5 * Math.abs(a - b)) * yLength;
+    @Override
+    public int volume() {
+        int area = area();
+        int height = max.getBlockY() - min.getBlockY() + 1;
+        return area == -1 ? -1 : area * height;
     }
 
 }
