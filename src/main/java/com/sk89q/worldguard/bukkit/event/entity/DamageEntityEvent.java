@@ -29,6 +29,12 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * This event is an internal event. We do not recommend handling or throwing
+ * this event or its subclasses as the interface is highly subject to change.
+ *
+ * <p>Thrown when an entity is damaged.</p>
+ */
 public class DamageEntityEvent extends AbstractEntityEvent {
 
     private static final HandlerList handlers = new HandlerList();

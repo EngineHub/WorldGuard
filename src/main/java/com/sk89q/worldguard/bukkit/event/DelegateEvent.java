@@ -27,6 +27,10 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * This event is an internal event. We do not recommend handling or throwing
+ * this event or its subclasses as the interface is highly subject to change.
+ */
 public abstract class DelegateEvent extends Event implements Cancellable {
 
     @Nullable
