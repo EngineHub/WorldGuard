@@ -455,7 +455,7 @@ public final class RegionCommands extends RegionCommandsBase {
      */
     @Command(aliases = {"flag", "f"},
              usage = "<id> <flag> [-w world] [-g group] [value]",
-             flags = "g:w:",
+             flags = "g:w:e",
              desc = "Set flags",
              min = 2)
     public void flag(CommandContext args, CommandSender sender) throws CommandException {
@@ -466,6 +466,14 @@ public final class RegionCommands extends RegionCommandsBase {
         String value = args.argsLength() >= 3 ? args.getJoinedStrings(2) : null;
         RegionGroup groupValue = null;
         RegionPermissionModel permModel = getPermissionModel(sender);
+
+        if (args.hasFlag('e')) {
+            if (value != null) {
+                throw new CommandException("You cannot use -e(mpty) with a flag value.");
+            }
+
+            value = "";
+        }
 
         // Add color codes
         if (value != null) {
