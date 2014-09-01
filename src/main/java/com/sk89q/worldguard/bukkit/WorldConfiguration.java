@@ -26,7 +26,10 @@ import com.sk89q.worldguard.blacklist.BlacklistLoggerHandler;
 import com.sk89q.worldguard.blacklist.logger.ConsoleHandler;
 import com.sk89q.worldguard.blacklist.logger.DatabaseHandler;
 import com.sk89q.worldguard.blacklist.logger.FileHandler;
+import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
+import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
+import com.sk89q.worldguard.bukkit.util.TargetMatcherSet;
 import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.chest.SignChestProtection;
 import org.bukkit.block.Block;
@@ -55,6 +58,7 @@ import java.util.logging.Logger;
 public class WorldConfiguration {
 
     private static final Logger log = Logger.getLogger(WorldConfiguration.class.getCanonicalName());
+    private static final TargetMatcherParser matcherParser = new TargetMatcherParser();
 
     public static final String CONFIG_HEADER = "#\r\n" +
             "# WorldGuard's world configuration file\r\n" +
@@ -177,9 +181,9 @@ public class WorldConfiguration {
     public boolean disableDeathMessages;
     public boolean disableObsidianGenerators;
     public boolean strictEntitySpawn;
+    public TargetMatcherSet allowAllInteract;
 
     private Map<String, Integer> maxRegionCounts;
-
 
     /* Configuration data end */
 
@@ -265,6 +269,26 @@ public class WorldConfiguration {
         return res;
     }
 
+    private TargetMatcherSet getTargetMatchers(String node) {
+        TargetMatcherSet set = new TargetMatcherSet();
+        List<String> inputs = parentConfig.getStringList(node, null);
+
+        if (inputs == null || inputs.size() == 0) {
+            parentConfig.setProperty(node, new ArrayList<String>());
+            return set;
+        }
+
+        for (String input : inputs) {
+            try {
+                set.add(matcherParser.fromInput(input));
+            } catch (TargetMatcherParseException e) {
+                log.warning("Failed to parse the block / item type specified as '" + input + "'");
+            }
+        }
+
+        return set;
+    }
+
     private List<String> getStringList(String node, List<String> def) {
         List<String> res = parentConfig.getStringList(node, def);
 
@@ -320,7 +344,8 @@ public class WorldConfiguration {
         buildPermissionDenyMessage = CommandUtils.replaceColorMacros(
                 getString("build-permission-nodes.deny-message", "&eSorry, but you are not permitted to do that here."));
 
-        strictEntitySpawn = getBoolean("strictness.block-entity-spawns-with-untraceable-cause", false);
+        strictEntitySpawn = getBoolean("event-handling.block-entity-spawns-with-untraceable-cause", false);
+        allowAllInteract = getTargetMatchers("event-handling.interaction-whitelist");
 
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
