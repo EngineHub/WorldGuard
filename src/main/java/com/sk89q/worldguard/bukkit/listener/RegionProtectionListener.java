@@ -401,12 +401,13 @@ public class RegionProtectionListener extends AbstractListener {
         RegionAssociable associable = createRegionAssociable(event.getCause());
 
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
+        Object rootCause = event.getCause().getRootCause();
         Player attacker;
         boolean canDamage;
         String what;
 
         /* Hostile / ambient mob override */
-        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())) {
+        if (isWhitelistedEntity(event.getEntity()) || (rootCause instanceof Entity && isWhitelistedEntity((Entity) rootCause))) {
             canDamage = true;
             what = "hit that";
 
@@ -463,6 +464,10 @@ public class RegionProtectionListener extends AbstractListener {
                 }
             }
         }
+    }
+
+    private boolean isWhitelistedEntity(Entity entity) {
+        return Entities.isHostile(entity) || Entities.isAmbient(entity);
     }
 
 }
