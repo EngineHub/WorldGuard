@@ -52,6 +52,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
@@ -342,7 +343,7 @@ public class RegionProtectionListener extends AbstractListener {
             what = "break vehicles";
 
         /* Item pickup */
-        } else if (event.getEntity() instanceof Item) {
+        } else if (event.getEntity() instanceof Item || event.getEntity() instanceof ExperienceOrb) {
             canDestroy = query.testBuild(target, associable, DefaultFlag.ITEM_PICKUP);
             what = "pick up items";
 
