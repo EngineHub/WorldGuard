@@ -150,7 +150,7 @@ public class EventAbstractionListener extends AbstractListener {
         Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getPlayer()), event.getBlock()));
 
         if (event.isCancelled()) {
-            playDenyEffect(event.getPlayer(), event.getBlock().getLocation().add(0.5, 0.7, 0.5));
+            playDenyEffect(event.getPlayer(), event.getBlock().getLocation().add(0.5, 1, 0.5));
         }
     }
 
@@ -426,6 +426,10 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onSignChange(SignChangeEvent event) {
         Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getBlock()));
+
+        if (event.isCancelled()) {
+            playDenyEffect(event.getPlayer(), event.getBlock().getLocation().add(0.5, 0.5, 0.5));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -549,12 +553,22 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onHangingPlace(HangingPlaceEvent event) {
         Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), event.getEntity()));
+
+        if (event.isCancelled()) {
+            Block effectBlock = event.getBlock().getRelative(event.getBlockFace());
+            playDenyEffect(event.getPlayer(), effectBlock.getLocation().add(0.5, 0.5, 0.5));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onHangingBreak(HangingBreakEvent event) {
         if (event instanceof HangingBreakByEntityEvent) {
-            Events.fireToCancel(event,  new DestroyEntityEvent(event, create(((HangingBreakByEntityEvent) event).getRemover()), event.getEntity()));
+            Entity remover = ((HangingBreakByEntityEvent) event).getRemover();
+            Events.fireToCancel(event, new DestroyEntityEvent(event, create(remover), event.getEntity()));
+
+            if (event.isCancelled() && remover instanceof Player) {
+                playDenyEffect((Player) remover, event.getEntity().getLocation());
+            }
         } else {
             Events.fireToCancel(event, new DestroyEntityEvent(event, Cause.unknown(), event.getEntity()));
         }
@@ -610,6 +624,10 @@ public class EventAbstractionListener extends AbstractListener {
 
         Events.fireToCancel(event, new UseItemEvent(event, create(player), world, item));
         Events.fireToCancel(event, new UseEntityEvent(event, create(player), entity));
+
+        if (event.isCancelled()) {
+            playDenyEffect(player, entity.getLocation().add(0, 1, 0));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -674,6 +692,10 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerShearEntity(PlayerShearEntityEvent event) {
         Events.fireToCancel(event, new UseEntityEvent(event, create(event.getPlayer()), event.getEntity()));
+
+        if (event.isCancelled()) {
+            playDenyEffect(event.getPlayer(), event.getEntity().getLocation().add(0, 1, 0));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -689,7 +711,12 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDamage(VehicleDamageEvent event) {
-        Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getAttacker()), event.getVehicle()));
+        Entity attacker = event.getAttacker();
+        Events.fireToCancel(event, new DestroyEntityEvent(event, create(attacker), event.getVehicle()));
+
+        if (event.isCancelled() && attacker instanceof Player) {
+            playDenyEffect((Player) attacker, event.getVehicle().getLocation());
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
