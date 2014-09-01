@@ -210,6 +210,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onStructureGrowEvent(StructureGrowEvent event) {
+        int originalCount = event.getBlocks().size();
         List<Block> blockList = Lists.transform(event.getBlocks(), new BlockStateAsBlockFunction());
 
         Player player = event.getPlayer();
@@ -217,6 +218,10 @@ public class EventAbstractionListener extends AbstractListener {
             Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(player), event.getLocation().getWorld(), blockList, Material.AIR));
         } else {
             Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getLocation().getBlock()), event.getLocation().getWorld(), blockList, Material.AIR));
+        }
+
+        if (!event.isCancelled() && event.getBlocks().size() != originalCount) {
+            event.getLocation().getBlock().setType(Material.AIR);
         }
     }
 
