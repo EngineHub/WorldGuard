@@ -246,8 +246,13 @@ public class RegionProtectionListener extends AbstractListener {
                 boolean canUse;
                 String what;
 
+                /* Saplings, etc. */
+                if (Materials.isConsideredBuildingIfUsed(type)) {
+                    canUse = query.testBuild(target, associable);
+                    what = "use that";
+
                 /* Inventory */
-                if (Materials.isInventoryBlock(type)) {
+                } else if (Materials.isInventoryBlock(type)) {
                     canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
                     what = "open that";
 

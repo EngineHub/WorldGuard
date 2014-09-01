@@ -616,4 +616,15 @@ public final class Materials {
         return flags == null || (flags & MODIFIES_BLOCKS) == MODIFIES_BLOCKS;
     }
 
+    /**
+     * Test whether the given material should be tested as "building" when
+     * it is used.
+     *
+     * @param type the type
+     * @return true to be considered as used
+     */
+    public static boolean isConsideredBuildingIfUsed(Material type) {
+        return type == Material.SAPLING;
+    }
+
 }
