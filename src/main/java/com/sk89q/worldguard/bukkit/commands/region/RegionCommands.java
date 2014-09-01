@@ -259,6 +259,11 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
+        if (wcfg.maxClaimVolume >= Integer.MAX_VALUE) {
+            throw new CommandException("The maximum claim volume get in the configuration is higher than is supported. " +
+                    "Currently, it must be " + Integer.MAX_VALUE+ " or smaller. Please contact a server administrator.");
+        }
+
         // Check claim volume
         if (!permModel.mayClaimRegionsUnbounded()) {
             if (region.volume() > wcfg.maxClaimVolume) {
