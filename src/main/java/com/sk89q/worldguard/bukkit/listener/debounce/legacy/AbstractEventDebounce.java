@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.debounce;
+package com.sk89q.worldguard.bukkit.listener.debounce.legacy;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

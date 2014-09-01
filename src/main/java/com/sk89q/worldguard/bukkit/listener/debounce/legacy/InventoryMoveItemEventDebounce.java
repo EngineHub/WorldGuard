@@ -17,9 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.debounce;
+package com.sk89q.worldguard.bukkit.listener.debounce.legacy;
 
-import com.sk89q.worldguard.bukkit.listener.debounce.InventoryMoveItemEventDebounce.Key;
+import com.sk89q.worldguard.bukkit.listener.debounce.legacy.InventoryMoveItemEventDebounce.Key;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
