@@ -120,8 +120,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sk89q.worldguard.bukkit.cause.Cause.create;
-import static com.sk89q.worldguard.bukkit.util.Materials.isBlockModifiedOnClick;
-import static com.sk89q.worldguard.bukkit.util.Materials.isItemAppliedToBlock;
 
 public class EventAbstractionListener extends AbstractListener {
 
@@ -362,7 +360,7 @@ public class EventAbstractionListener extends AbstractListener {
                 placed = clicked.getRelative(event.getBlockFace());
 
                 // Only fire events for blocks that are modified when right clicked
-                if (isBlockModifiedOnClick(clicked.getType()) || (item != null && isItemAppliedToBlock(item.getType(), clicked.getType()))) {
+                if (isBlockModifiedOnClick(clicked) || (item != null && isItemAppliedToBlock(item, clicked))) {
                     if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, clicked))) {
                         event.setUseInteractedBlock(Result.DENY);
                     }
@@ -872,6 +870,16 @@ public class EventAbstractionListener extends AbstractListener {
             Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) ((DoubleChest) holder).getLeftSide()).getBlock()));
             Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) ((DoubleChest) holder).getRightSide()).getBlock()));
         }
+    }
+
+    private boolean isBlockModifiedOnClick(Block block) {
+        return Materials.isBlockModifiedOnClick(block.getType()) && !getWorldConfig(block.getWorld()).allowAllInteract.test(block);
+    }
+
+    private boolean isItemAppliedToBlock(ItemStack item, Block clicked) {
+        return Materials.isItemAppliedToBlock(item.getType(), clicked.getType())
+                && !getWorldConfig(clicked.getWorld()).allowAllInteract.test(clicked)
+                && !getWorldConfig(clicked.getWorld()).allowAllInteract.test(item);
     }
 
     private void playDenyEffect(Player player, Location location) {
