@@ -827,6 +827,11 @@ public class EventAbstractionListener extends AbstractListener {
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.MINECART));
         }
 
+        // Handle created boats
+        if (item != null && item.getType() == Material.BOAT) {
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.BOAT));
+        }
+
         // Handle created spawn eggs
         if (item != null && item.getType() == Material.MONSTER_EGG) {
             MaterialData data = item.getData();
