@@ -330,7 +330,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.GLOWSTONE_DUST, 0);
         MATERIAL_FLAGS.put(Material.RAW_FISH, 0);
         MATERIAL_FLAGS.put(Material.COOKED_FISH, 0);
-        MATERIAL_FLAGS.put(Material.INK_SACK, 0);
+        MATERIAL_FLAGS.put(Material.INK_SACK, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.BONE, 0);
         MATERIAL_FLAGS.put(Material.SUGAR, 0);
         MATERIAL_FLAGS.put(Material.CAKE, 0);
