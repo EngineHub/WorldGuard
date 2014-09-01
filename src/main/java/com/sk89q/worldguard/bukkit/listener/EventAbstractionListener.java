@@ -392,6 +392,16 @@ public class EventAbstractionListener extends AbstractListener {
                     event.setUseItemInHand(Result.DENY);
                 }
 
+                // Check for items that the administrator has configured to
+                // emit a "use block here" event where the player is
+                // standing, which is a hack to protect items that don't
+                // throw events
+                if (item != null && getWorldConfig(player.getWorld()).blockUseAtFeet.test(item)) {
+                    if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, player.getLocation().getBlock()))) {
+                        event.setCancelled(true);
+                    }
+                }
+
                 break;
         }
     }

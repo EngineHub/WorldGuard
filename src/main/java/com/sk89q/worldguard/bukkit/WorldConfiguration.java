@@ -182,6 +182,7 @@ public class WorldConfiguration {
     public boolean disableObsidianGenerators;
     public boolean strictEntitySpawn;
     public TargetMatcherSet allowAllInteract;
+    public TargetMatcherSet blockUseAtFeet;
 
     private Map<String, Integer> maxRegionCounts;
 
@@ -346,6 +347,7 @@ public class WorldConfiguration {
 
         strictEntitySpawn = getBoolean("event-handling.block-entity-spawns-with-untraceable-cause", false);
         allowAllInteract = getTargetMatchers("event-handling.interaction-whitelist");
+        blockUseAtFeet = getTargetMatchers("event-handling.emit-block-use-at-feet");
 
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
