@@ -17,30 +17,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener.debounce;
+package com.sk89q.worldguard.bukkit.listener.debounce.legacy;
 
-import com.sk89q.worldguard.bukkit.listener.debounce.EntityEntityEventDebounce.Key;
+import com.sk89q.worldguard.bukkit.listener.debounce.legacy.BlockEntityEventDebounce.Key;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
-public class EntityEntityEventDebounce extends AbstractEventDebounce<Key> {
+public class BlockEntityEventDebounce extends AbstractEventDebounce<Key> {
 
-    public EntityEntityEventDebounce(int debounceTime) {
+    public BlockEntityEventDebounce(int debounceTime) {
         super(debounceTime);
     }
 
-    public <T extends Event & Cancellable> void debounce(Entity source, Entity target, Cancellable originalEvent, T firedEvent) {
-        super.debounce(new Key(source, target), originalEvent, firedEvent);
+    public <T extends Event & Cancellable> void debounce(Block block, Entity entity, Cancellable originalEvent, T firedEvent) {
+        super.debounce(new Key(block, entity), originalEvent, firedEvent);
     }
 
     protected static class Key {
-        private final Entity source;
-        private final Entity target;
+        private final Block block;
+        private final Material blockMaterial;
+        private final Entity entity;
 
-        public Key(Entity source, Entity target) {
-            this.source = source;
-            this.target = target;
+        private Key(Block block, Entity entity) {
+            this.block = block;
+            this.blockMaterial = block.getType();
+            this.entity = entity;
         }
 
         @Override
@@ -50,16 +54,18 @@ public class EntityEntityEventDebounce extends AbstractEventDebounce<Key> {
 
             Key key = (Key) o;
 
-            if (!source.equals(key.source)) return false;
-            if (!target.equals(key.target)) return false;
+            if (!block.equals(key.block)) return false;
+            if (blockMaterial != key.blockMaterial) return false;
+            if (!entity.equals(key.entity)) return false;
 
             return true;
         }
 
         @Override
         public int hashCode() {
-            int result = source.hashCode();
-            result = 31 * result + target.hashCode();
+            int result = block.hashCode();
+            result = 31 * result + blockMaterial.hashCode();
+            result = 31 * result + entity.hashCode();
             return result;
         }
     }

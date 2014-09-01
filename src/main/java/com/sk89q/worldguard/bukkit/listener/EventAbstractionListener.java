@@ -32,10 +32,13 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
-import com.sk89q.worldguard.bukkit.listener.debounce.AbstractEventDebounce.Entry;
-import com.sk89q.worldguard.bukkit.listener.debounce.BlockEntityEventDebounce;
-import com.sk89q.worldguard.bukkit.listener.debounce.EntityEntityEventDebounce;
-import com.sk89q.worldguard.bukkit.listener.debounce.InventoryMoveItemEventDebounce;
+import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonExtendKey;
+import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonRetractKey;
+import com.sk89q.worldguard.bukkit.listener.debounce.EventDebounce;
+import com.sk89q.worldguard.bukkit.listener.debounce.legacy.AbstractEventDebounce.Entry;
+import com.sk89q.worldguard.bukkit.listener.debounce.legacy.BlockEntityEventDebounce;
+import com.sk89q.worldguard.bukkit.listener.debounce.legacy.EntityEntityEventDebounce;
+import com.sk89q.worldguard.bukkit.listener.debounce.legacy.InventoryMoveItemEventDebounce;
 import com.sk89q.worldguard.bukkit.util.BlockStateAsBlockFunction;
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
@@ -126,6 +129,8 @@ public class EventAbstractionListener extends AbstractListener {
     private final EntityEntityEventDebounce pickupDebounce = new EntityEntityEventDebounce(10000);
     private final BlockEntityEventDebounce entityBreakBlockDebounce = new BlockEntityEventDebounce(10000);
     private final InventoryMoveItemEventDebounce moveItemDebounce = new InventoryMoveItemEventDebounce(30000);
+    private final EventDebounce<BlockPistonRetractKey> pistonRetractDebounce = EventDebounce.create(5000);
+    private final EventDebounce<BlockPistonExtendKey> pistonExtendDebounce = EventDebounce.create(5000);
 
     /**
      * Construct the listener.
@@ -267,22 +272,38 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPistonRetract(BlockPistonRetractEvent event) {
         if (event.isSticky()) {
-            Cause cause = create(event.getBlock());
-            Events.fireToCancel(event, new BreakBlockEvent(event, cause, event.getRetractLocation(), Material.AIR));
-            Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getRelative(event.getDirection())));
+            EventDebounce.Entry entry = pistonRetractDebounce.getIfNotPresent(new BlockPistonRetractKey(event), event);
+            if (entry != null) {
+                Cause cause = create(event.getBlock());
+                Events.fireToCancel(event, new BreakBlockEvent(event, cause, event.getRetractLocation(), Material.AIR));
+                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getRelative(event.getDirection())));
+                entry.setCancelled(event.isCancelled());
+
+                if (event.isCancelled()) {
+                    playDenyEffect(event.getBlock().getLocation().add(0.5, 1, 0.5));
+                }
+            }
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
-        // A hack for now
-        List<Block> blocks = new ArrayList<Block>(event.getBlocks());
-        Block lastBlock = event.getBlock().getRelative(event.getDirection(), event.getLength() + 1);
-        blocks.add(lastBlock);
-        int originalLength = blocks.size();
-        Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getBlock()), event.getBlock().getWorld(), blocks, Material.STONE));
-        if (blocks.size() != originalLength) {
-            event.setCancelled(true);
+        EventDebounce.Entry entry = pistonExtendDebounce.getIfNotPresent(new BlockPistonExtendKey(event), event);
+        if (entry != null) {
+            // A hack for now
+            List<Block> blocks = new ArrayList<Block>(event.getBlocks());
+            Block lastBlock = event.getBlock().getRelative(event.getDirection(), event.getLength() + 1);
+            blocks.add(lastBlock);
+            int originalLength = blocks.size();
+            Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getBlock()), event.getBlock().getWorld(), blocks, Material.STONE));
+            if (blocks.size() != originalLength) {
+                event.setCancelled(true);
+            }
+            entry.setCancelled(event.isCancelled());
+
+            if (event.isCancelled()) {
+                playDenyEffect(event.getBlock().getLocation().add(0.5, 1, 0.5));
+            }
         }
     }
 
@@ -818,6 +839,10 @@ public class EventAbstractionListener extends AbstractListener {
     private void playDenyEffect(Player player, Location location) {
         //player.playSound(location, Sound.SUCCESSFUL_HIT, 0.2f, 0.4f);
         player.playEffect(location, Effect.SMOKE, BlockFace.UP);
+    }
+
+    private void playDenyEffect(Location location) {
+        location.getWorld().playEffect(location, Effect.SMOKE, BlockFace.UP);
     }
 
 }
