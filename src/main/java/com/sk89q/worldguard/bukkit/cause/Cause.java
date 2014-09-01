@@ -78,7 +78,7 @@ public class Cause {
 
         boolean found = false;
         for (Object object : causes) {
-            if (!(object instanceof TNTPrimed)) {
+            if (!(object instanceof TNTPrimed) && !(object instanceof Vehicle)) {
                 found = true;
                 break;
             }
