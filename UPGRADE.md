@@ -27,7 +27,7 @@ Be aware of these breaking changes:
 
 * Children regions now inherit from their parent even if there is no overlap.
 * MySQL support now features the ability to migrate tables. If you are using tables without a prefix, then the new migration code should be able to handle your table. However, if you are using a table prefix, you may encounter trouble with migration.
-* Protection is now a lot more exhaustive so it is no longer, for example, possible to fling sand into a region, grow trees into a region, and so on.
+* Protection is now a lot more exhaustive so it is no longer, for example, possible to fling sand into a region, grow trees into a region, and so on.build
 * The `USE` flag is now much more encompassing so you may find that it blocks things like CraftBook gates (for users of CraftBook). To fix that, you can do `/rg flag REGION_NAME use allow`, but be aware that that will also allow the opening of inventories. To block inventories specifically, use `/rg flag REGION_NAME chest-access deny -g nonmembers`. The `-g nonmembers` makes it so only non-members of the region are unable to use chests, but this is optional.
 * If you want to blacklist only water and lava blocks and not buckets, you can no longer apply `on-place` to water or lava blocks because it will also deny the use of buckets. If you wish to deny the use of just the liquid blocks, use `on-use`. This is because WorldGuard now considers the use of a bucket also the placement of a liquid block.
 * In the rare situation that you are user of the "auto-invincibility" and "auto-no-drowning" groups (`wg-invincible` and `wg-amphibious`), you now have to enable these features in the config (`auto-invincible-group: true` and `auto-no-drowning-group: true`). This is because some permission plugins have been causing severe hang ups whenever it is queried for a player's groups, which, in this case, happens to include when the player joins.
@@ -90,8 +90,6 @@ For users of MySQL, WorldGuard now only saves changed and deleted regions when s
 ### Improved handling of related flags
 
 Multiple flags that apply to an event are now evaluated together if they are similar. For example, if a player right clicks a bed to sleep in it, both the `USE` and `SLEEP` flag are checked since they are both interaction-related. If one of them is `DENY`, then sleeping is denied (remember, `DENY` overrides `ALLOW`). If one of them is `ALLOW` and the other is not `DENY`, then sleeping is permitted.
-
-Only one "category" of flags needs to evaluate to true to permit an action. `DENY` will not cross categories. For example, if `BUILD` is deny, it will not override `SLEEP`, so if `SLEEP` is set to `ALLOW`, sleeping will be permitted. This is fairly similar to how it worked on WorldGuard 5.
 
 ### Flag groups now work properly
 
