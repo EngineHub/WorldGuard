@@ -211,7 +211,13 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onStructureGrowEvent(StructureGrowEvent event) {
         List<Block> blockList = Lists.transform(event.getBlocks(), new BlockStateAsBlockFunction());
-        Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), event.getLocation().getWorld(), blockList, Material.AIR));
+
+        Player player = event.getPlayer();
+        if (player != null) {
+            Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(player), event.getLocation().getWorld(), blockList, Material.AIR));
+        } else {
+            Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getLocation().getBlock()), event.getLocation().getWorld(), blockList, Material.AIR));
+        }
     }
 
     // TODO: Handle EntityCreatePortalEvent?
