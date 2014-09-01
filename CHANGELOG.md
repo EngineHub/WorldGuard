@@ -1,10 +1,27 @@
 # Changelog
 
+## 6.0 beta 2
+
+* Added an `-e` parameter to `/rg flag` that sets the flag to an empty value. You can use this to, for example, make it so the `deny-message` flag is empty, meaning that players won't get a message at all.
+* Added a visual smoke effect when an action on a block has been denied.
+* Added `event-handling.interaction-whitelist`, a list of items or blocks that should never be protected. For example, adding `wooden_door` to the list would make it so that doors could be used by anyone regardless if they have permission or not. You may still protect the blocks via other means.
+* Added `event-handling.emit-block-use-at-feet`, a list of items that, when used, will also be considered as the player using that item on the block at the player's feet. The purpose of this setting is, for example, to allow you to (sort of) prevent the use of a mod-added item that does not emit events.
+* Added `-s` to silently turn toggle `/stoplag` and `-i` to show the current state of the setting. (Thanks, [stuntguy3000](https://github.com/stuntguy3000)).
+* Added support for Bukkit [Material](http://jd.bukkit.org/rb/apidocs/org/bukkit/Material.html) names in the blacklist.
+* Fixed [#3167](http://youtrack.sk89q.com/issue/WORLDGUARD-3167): Saplings can be used without permission although it won't place blocks inside the region
+* Fixed [#3168](http://youtrack.sk89q.com/issue/WORLDGUARD-3168): Grown saplings that are partially prevented from placing all of its leaves may not remove the sapling
+* Fixed [#3169](http://youtrack.sk89q.com/issue/WORLDGUARD-3169): Bonemeal usage falls under the USE flag when it should really fall under building
+* Fixed [#3174](http://youtrack.sk89q.com/issue/WORLDGUARD-3174): Boat placement is not properly prevented in a protected region
+* Fixed [#3130](http://youtrack.sk89q.com/issue/WORLDGUARD-3130): Polygonal selections allow unlimited claim volumes with /rg claim
+* Fixed [#3137](http://youtrack.sk89q.com/issue/WORLDGUARD-3137): Claiming infinite regions is possible due to integer overflow
+* Fixed [#3171](http://youtrack.sk89q.com/issue/WORLDGUARD-3171): Can't pickup XP in protected regions without permission
+* Fixed [#3170](http://youtrack.sk89q.com/issue/WORLDGUARD-3170): Boats without a driver can be used to break lily pads
+* Fixed [#3172](http://youtrack.sk89q.com/issue/WORLDGUARD-3172): Players cannot be damaged by mobs in protected regions unless they have permission
+* Fixed [#3152](http://youtrack.sk89q.com/issue/WORLDGUARD-3152): BUILD overrides all other flags, unlike in WG 5
+* Fixed [#3154](http://youtrack.sk89q.com/issue/WORLDGUARD-3154): notify-enterflag doesn't work with horses and other vehicles
+* Fixed [#3166](http://youtrack.sk89q.com/issue/WORLDGUARD-3166): Trees do not grow naturally within protected regions
+
 ## 6.0 beta 1
-
-This is a __MAJOR UPGRADE__ to WorldGuard so we recommend making backups of your worlds and WorldGuard configuration (although periodical backups are recommended regardless).
-
-Please see the upgrade document for a list of breaking changes.
 
 ### UUID support
 
