@@ -70,7 +70,7 @@ public final class Enums {
         for (String test : values) {
             test = test.replace("_", "");
             for (T value : enumType.getEnumConstants()) {
-                if (value.name().equalsIgnoreCase(test.replace("_", ""))) {
+                if (value.name().replace("_", "").equalsIgnoreCase(test)) {
                     return value;
                 }
             }
