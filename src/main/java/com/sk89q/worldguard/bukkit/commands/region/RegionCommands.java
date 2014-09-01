@@ -57,6 +57,7 @@ import com.sk89q.worldguard.protection.managers.migration.UUIDMigration;
 import com.sk89q.worldguard.protection.managers.storage.DriverType;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.util.Enums;
@@ -266,6 +267,10 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Check claim volume
         if (!permModel.mayClaimRegionsUnbounded()) {
+            if (region instanceof ProtectedPolygonalRegion) {
+                throw new CommandException("Polygons are currently not supported for /rg claim.");
+            }
+
             if (region.volume() > wcfg.maxClaimVolume) {
                 player.sendMessage(ChatColor.RED + "This region is too large to claim.");
                 player.sendMessage(ChatColor.RED +
