@@ -85,7 +85,7 @@ public class SQLDriver implements RegionDriver {
             List<RegionDatabase> stores = new ArrayList<RegionDatabase>();
             Connection connection = closer.register(getConnection());
             Statement stmt = connection.createStatement();
-            ResultSet rs = closer.register(stmt.executeQuery("SELECT name FROM world"));
+            ResultSet rs = closer.register(stmt.executeQuery("SELECT name FROM " + config.getTablePrefix() + "world"));
             while (rs.next()) {
                 stores.add(get(rs.getString(1)));
             }
