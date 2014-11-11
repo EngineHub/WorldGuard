@@ -372,7 +372,7 @@ public class RegionProtectionListener extends AbstractListener {
         String what;
 
         /* Hostile / ambient mob override */
-        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())) {
+        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity()) || Entities.isNPC(event.getEntity())) {
             canUse = true;
             what = "use that";
 
