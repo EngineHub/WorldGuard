@@ -20,9 +20,12 @@
 package com.sk89q.worldguard.bukkit.util;
 
 import org.bukkit.entity.Ambient;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Flying;
 import org.bukkit.entity.Hanging;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -137,7 +140,10 @@ public final class Entities {
      * @return true if hostile
      */
     public static boolean isHostile(Entity entity) {
-        return entity instanceof Monster || entity instanceof Slime;
+        return entity instanceof Monster
+                || entity instanceof Slime
+                || entity instanceof Flying
+                || entity instanceof EnderDragon;
     }
 
     /**
@@ -148,6 +154,17 @@ public final class Entities {
      */
     public static boolean isAmbient(Entity entity) {
         return entity instanceof Ambient;
+    }
+
+    /**
+     * Test whether an entity is a creature (a living thing) that is
+     * not a player.
+     *
+     * @param entity the entity
+     * @return true if a non-player creature
+     */
+    public static boolean isNonPlayerCreature(Entity entity) {
+        return entity instanceof LivingEntity && !(entity instanceof Player);
     }
 
     /**
