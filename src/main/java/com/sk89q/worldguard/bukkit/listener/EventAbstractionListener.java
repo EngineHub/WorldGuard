@@ -836,7 +836,11 @@ public class EventAbstractionListener extends AbstractListener {
         if (item != null && item.getType() == Material.MONSTER_EGG) {
             MaterialData data = item.getData();
             if (data instanceof SpawnEgg) {
-                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), ((SpawnEgg) data).getSpawnedType()));
+                @Nullable EntityType type = ((SpawnEgg) data).getSpawnedType();
+                if (type == null) {
+                    type = EntityType.SHEEP; // Haven't investigated why it's sometimes null
+                }
+                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), type));
             }
         }
 
