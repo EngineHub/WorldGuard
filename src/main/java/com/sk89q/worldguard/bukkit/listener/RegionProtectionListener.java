@@ -431,6 +431,11 @@ public class RegionProtectionListener extends AbstractListener {
 
             what = "PvP";
 
+        /* Player damage not caused  by another player */
+        } else if (event.getEntity() instanceof Player) {
+            canDamage = true;
+            what = "damage that";
+
         /* Everything else */
         } else {
             canDamage = query.testBuild(target, associable, DefaultFlag.USE);
