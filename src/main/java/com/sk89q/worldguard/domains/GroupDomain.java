@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -63,9 +62,10 @@ public class GroupDomain implements Domain, ChangeTracked {
      */
     public void addGroup(String name) {
         checkNotNull(name);
-        checkArgument(!name.trim().isEmpty(), "Can't add empty group name");
-        setDirty(true);
-        groups.add(name.trim().toLowerCase());
+        if (!name.trim().isEmpty()) {
+            setDirty(true);
+            groups.add(name.trim().toLowerCase());
+        }
     }
 
     /**

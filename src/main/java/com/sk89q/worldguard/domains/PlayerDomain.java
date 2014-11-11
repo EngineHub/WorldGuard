@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -65,12 +64,13 @@ public class PlayerDomain implements Domain, ChangeTracked {
      */
     public void addPlayer(String name) {
         checkNotNull(name);
-        checkArgument(!name.trim().isEmpty(), "Can't add empty player name");
-        setDirty(true);
-        names.add(name.trim().toLowerCase());
-        // Trim because some names contain spaces (previously valid Minecraft
-        // names) and we cannot store these correctly in the SQL storage
-        // implementations
+        if (!name.trim().isEmpty()) {
+            setDirty(true);
+            names.add(name.trim().toLowerCase());
+            // Trim because some names contain spaces (previously valid Minecraft
+            // names) and we cannot store these correctly in the SQL storage
+            // implementations
+        }
     }
 
     /**
