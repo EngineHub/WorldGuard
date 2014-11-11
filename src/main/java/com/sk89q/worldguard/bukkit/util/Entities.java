@@ -27,6 +27,7 @@ import org.bukkit.entity.Flying;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
@@ -154,6 +155,16 @@ public final class Entities {
      */
     public static boolean isAmbient(Entity entity) {
         return entity instanceof Ambient;
+    }
+
+    /**
+     * Test whether an entity is an NPC.
+     *
+     * @param entity the entity
+     * @return true if an NPC
+     */
+    public static boolean isNPC(Entity entity) {
+        return entity instanceof NPC;
     }
 
     /**
