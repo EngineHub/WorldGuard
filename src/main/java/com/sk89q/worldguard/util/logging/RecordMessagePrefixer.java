@@ -62,9 +62,12 @@ public class RecordMessagePrefixer extends Handler {
     public static void register(Logger logger, String prefix) {
         checkNotNull(logger);
 
+        // Fix issues with multiple classloaders loading the same class
+        String className = RecordMessagePrefixer.class.getCanonicalName();
+
         logger.setUseParentHandlers(false);
         for (Handler handler : logger.getHandlers()) {
-            if (handler instanceof RecordMessagePrefixer) {
+            if (handler.getClass().getCanonicalName().equals(className)) {
                 logger.removeHandler(handler);
             }
         }
