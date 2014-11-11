@@ -468,7 +468,7 @@ public class RegionProtectionListener extends AbstractListener {
     }
 
     private boolean isWhitelistedEntity(Entity entity) {
-        return Entities.isHostile(entity) || Entities.isAmbient(entity);
+        return Entities.isNonPlayerCreature(entity);
     }
 
 }
