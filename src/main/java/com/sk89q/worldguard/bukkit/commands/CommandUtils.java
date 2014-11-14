@@ -102,6 +102,15 @@ public final class CommandUtils {
         str = str.replace("&7", ChatColor.GRAY.toString());
         str = str.replace("&f", ChatColor.WHITE.toString());
 
+        str = str.replace("&k", ChatColor.MAGIC.toString());
+
+        str = str.replace("&l", ChatColor.BOLD.toString());
+        str = str.replace("&m", ChatColor.STRIKETHROUGH.toString());
+        str = str.replace("&n", ChatColor.UNDERLINE.toString());
+        str = str.replace("&o", ChatColor.ITALIC.toString());
+
+        str = str.replace("&x", ChatColor.RESET.toString());
+
         return str;
     }
 
