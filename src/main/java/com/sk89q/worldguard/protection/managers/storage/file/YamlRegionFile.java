@@ -163,8 +163,9 @@ public class YamlRegionFile implements RegionDatabase {
                 Integer priority = checkNotNull(node.getInt("priority"));
                 region.setPriority(priority);
                 setFlags(region, node.getNode("flags"));
-                region.setOwners(parseDomain(node.getNode("owners")));
-                region.setMembers(parseDomain(node.getNode("members")));
+                
+                region.setOwners(parseDomain(region, node.getNode("owners")));
+                region.setMembers(parseDomain(region, node.getNode("members")));
 
                 loaded.put(id, region);
 
@@ -256,7 +257,7 @@ public class YamlRegionFile implements RegionDatabase {
     }
 
     @SuppressWarnings("deprecation")
-    private DefaultDomain parseDomain(YAMLNode node) {
+    private DefaultDomain parseDomain(ProtectedRegion region, YAMLNode node) {
         if (node == null) {
             return new DefaultDomain();
         }
@@ -264,8 +265,11 @@ public class YamlRegionFile implements RegionDatabase {
         DefaultDomain domain = new DefaultDomain();
 
         for (String name : node.getStringList("players", null)) {
-            if (!name.isEmpty()) {
+            if (!name.trim().isEmpty()) {
                 domain.addPlayer(name);
+            }else{
+                log.log(Level.WARNING, "Region '" + region.getId() + 
+                        "' has a blank player name in file: " + file.getAbsolutePath());
             }
         }
 
@@ -278,7 +282,7 @@ public class YamlRegionFile implements RegionDatabase {
         }
 
         for (String name : node.getStringList("groups", null)) {
-            if (!name.isEmpty()) {
+            if (!name.trim().isEmpty()) {
                 domain.addGroup(name);
             }
         }
