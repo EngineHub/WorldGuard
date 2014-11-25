@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit.listener.debounce.legacy;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldguard.bukkit.util.Events;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -47,7 +48,7 @@ public class AbstractEventDebounce<K> {
     }
 
     protected <T extends Event & Cancellable> void debounce(K key, Cancellable originalEvent, T firedEvent) {
-        Entry entry = cache.getUnchecked(key);
+        Entry entry = ((LoadingCache<K,Entry>)cache).getUnchecked(key);
         if (entry.cancelled != null) {
             if (entry.cancelled) {
                 originalEvent.setCancelled(true);
@@ -63,7 +64,7 @@ public class AbstractEventDebounce<K> {
 
     @Nullable
     protected <T extends Event & Cancellable> Entry getEntry(K key, Cancellable originalEvent) {
-        Entry entry = cache.getUnchecked(key);
+        Entry entry = ((LoadingCache<K,Entry>)cache).getUnchecked(key);
         if (entry.cancelled != null) {
             if (entry.cancelled) {
                 originalEvent.setCancelled(true);

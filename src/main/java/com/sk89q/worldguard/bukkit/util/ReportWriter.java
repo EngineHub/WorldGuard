@@ -168,7 +168,7 @@ public class ReportWriter {
         log.put("Implementation", server.getVersion());
         //log.put("Address", server.getIp(), server.getPort());
         log.put("Player count", "%d/%d",
-                server.getOnlinePlayers().length, server.getMaxPlayers());
+                server.getOnlinePlayers().size(), server.getMaxPlayers());
 
         append(log);
         appendln();
