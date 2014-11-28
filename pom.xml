@@ -75,7 +75,7 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
-      <version>5.5.8</version>
+      <version>6.0.0-SNAPSHOT</version>
       <scope>compile</scope>
       <type>jar</type>
       <exclusions>
@@ -93,7 +93,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.7.9-R0.2</version>
+      <version>1.8-R0.1-SNAPSHOT</version>
       <scope>compile</scope>
       <type>jar</type>
     </dependency>
@@ -132,8 +132,8 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>10.0.1</version> <!-- Bukkit only bundles 10.0.1 -->
-      <scope>compile</scope> <!-- required runtime dependency -->
+      <version>17.0</version>
+      <scope>compile</scope>
       <type>jar</type>
     </dependency>
 

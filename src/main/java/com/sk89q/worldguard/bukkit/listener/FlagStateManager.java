@@ -61,10 +61,9 @@ public class FlagStateManager implements Runnable {
      */
     @Override
     public void run() {
-        Player[] players = plugin.getServer().getOnlinePlayers();
         ConfigurationManager config = plugin.getGlobalStateManager();
 
-        for (Player player : players) {
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
             WorldConfiguration worldConfig = config.get(player.getWorld());
 
             if (!worldConfig.useRegions) {
