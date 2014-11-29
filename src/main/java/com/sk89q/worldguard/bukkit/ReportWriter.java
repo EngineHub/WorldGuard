@@ -19,6 +19,18 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.LogListBlock;
+import org.bukkit.Server;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.plugin.Plugin;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -29,19 +41,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.bukkit.Server;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.plugin.Plugin;
-
-import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.util.LogListBlock;
 
 public class ReportWriter {
 
@@ -165,7 +164,7 @@ public class ReportWriter {
         log.put("Implementation", server.getVersion());
         //log.put("Address", server.getIp(), server.getPort());
         log.put("Player count", "%d/%d",
-                server.getOnlinePlayers().length, server.getMaxPlayers());
+                server.getOnlinePlayers().size(), server.getMaxPlayers());
 
         append(log);
         appendln();

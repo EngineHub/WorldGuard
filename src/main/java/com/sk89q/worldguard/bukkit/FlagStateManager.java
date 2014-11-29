@@ -27,6 +27,7 @@ import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,7 +62,7 @@ public class FlagStateManager implements Runnable {
      */
     @Override
     public void run() {
-        Player[] players = plugin.getServer().getOnlinePlayers();
+        Collection<? extends Player> players = plugin.getServer().getOnlinePlayers();
         ConfigurationManager config = plugin.getGlobalStateManager();
 
         for (Player player : players) {

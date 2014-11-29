@@ -181,7 +181,7 @@ public class BlacklistEntry {
         Cache<String, TrackedEvent> repeatingEventCache = blacklist.getRepeatingEventCache();
 
         // Check to see whether this event is being repeated
-        TrackedEvent tracked = repeatingEventCache.getUnchecked(eventCacheKey);
+        TrackedEvent tracked = repeatingEventCache.getIfPresent(eventCacheKey);
         if (tracked.matches(event)) {
             repeating = true;
         } else {

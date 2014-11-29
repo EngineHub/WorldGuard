@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -426,7 +427,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return A {@link List} of players who match {@code filter}
      */
     public List<Player> matchPlayerNames(String filter) {
-        Player[] players = getServer().getOnlinePlayers();
+        Collection<? extends Player> players = getServer().getOnlinePlayers();
 
         filter = filter.toLowerCase();
 
@@ -479,7 +480,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return {@code players} as an {@link Iterable}
      * @throws CommandException If {@code players} is empty
      */
-    protected Iterable<Player> checkPlayerMatch(List<Player> players)
+    protected Iterable<Player> checkPlayerMatch(Collection<Player> players)
             throws CommandException {
         // Check to see if there were any matches
         if (players.size() == 0) {
@@ -507,12 +508,12 @@ public class WorldGuardPlugin extends JavaPlugin {
     public Iterable<Player> matchPlayers(CommandSender source, String filter)
             throws CommandException {
 
-        if (getServer().getOnlinePlayers().length == 0) {
+        if (getServer().getOnlinePlayers().isEmpty()) {
             throw new CommandException("No players matched query.");
         }
 
         if (filter.equals("*")) {
-            return checkPlayerMatch(Arrays.asList(getServer().getOnlinePlayers()));
+            return checkPlayerMatch((Collection<Player>) getServer().getOnlinePlayers());
         }
 
         // Handle special hash tag groups
@@ -865,11 +866,9 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return The message with macros replaced
      */
     public String replaceMacros(CommandSender sender, String message) {
-        Player[] online = getServer().getOnlinePlayers();
-
         message = message.replace("%name%", toName(sender));
         message = message.replace("%id%", toUniqueName(sender));
-        message = message.replace("%online%", String.valueOf(online.length));
+        message = message.replace("%online%", String.valueOf(getServer().getOnlinePlayers().size()));
 
         if (sender instanceof Player) {
             Player player = (Player) sender;
