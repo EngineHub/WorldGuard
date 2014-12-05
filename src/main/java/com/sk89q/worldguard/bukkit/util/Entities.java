@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.util;
 
 import org.bukkit.entity.Ambient;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -175,7 +176,7 @@ public final class Entities {
      * @return true if a non-player creature
      */
     public static boolean isNonPlayerCreature(Entity entity) {
-        return entity instanceof LivingEntity && !(entity instanceof Player);
+        return entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof ArmorStand);
     }
 
     /**
@@ -186,7 +187,7 @@ public final class Entities {
      * @return true if considered building
      */
     public static boolean isConsideredBuildingIfUsed(Entity entity) {
-        return entity instanceof Hanging;
+        return entity instanceof Hanging || entity instanceof ArmorStand;
     }
 
 }

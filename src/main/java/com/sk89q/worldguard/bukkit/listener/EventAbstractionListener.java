@@ -100,6 +100,7 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -632,6 +633,11 @@ public class EventAbstractionListener extends AbstractListener {
 
         Events.fireToCancel(event, new UseItemEvent(event, create(player), world, item));
         Events.fireToCancel(event, new UseEntityEvent(event, create(player), entity));
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event){
+        onPlayerInteractEntity(event);
     }
 
     @EventHandler(ignoreCancelled = true)
