@@ -636,7 +636,7 @@ public class EventAbstractionListener extends AbstractListener {
     }
     
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event){
+    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
         onPlayerInteractEntity(event);
     }
 
