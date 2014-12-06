@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.blacklist;
 
 import com.google.common.cache.Cache;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.action.Action;
 import com.sk89q.worldguard.blacklist.action.ActionResult;
@@ -181,7 +182,7 @@ public class BlacklistEntry {
         Cache<String, TrackedEvent> repeatingEventCache = blacklist.getRepeatingEventCache();
 
         // Check to see whether this event is being repeated
-        TrackedEvent tracked = repeatingEventCache.getIfPresent(eventCacheKey);
+        TrackedEvent tracked = ((LoadingCache<String, TrackedEvent>)repeatingEventCache).getUnchecked(eventCacheKey);
         if (tracked.matches(event)) {
             repeating = true;
         } else {
