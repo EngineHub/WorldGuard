@@ -36,6 +36,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -106,6 +107,13 @@ public class RegionFlagsListener extends AbstractListener {
                 event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
             }
 
+            // ================================================================
+            // WITHERBOSS_BLOCK_DAMAGE flag
+            // ================================================================
+
+            if (entity instanceof Wither) { // WitherBoss
+                event.filter(testState(query, DefaultFlag.WITHERBOSS_BLOCK_DAMAGE), config.explosionFlagCancellation);
+            }
         }
     }
 
