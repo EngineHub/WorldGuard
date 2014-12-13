@@ -38,11 +38,22 @@ public class GlobalProtectedRegion extends ProtectedRegion {
 
     /**
      * Create a new instance.
+     * transience will be set to false, and this region can be saved.
      *
      * @param id the ID
      */
     public GlobalProtectedRegion(String id) {
-        super(id);
+        this(id, false);
+    }
+
+    /**
+     * Create a new instance.
+     *
+     * @param id the ID
+     * @param transience whether this region should only be kept in memory and not be saved
+     */
+    public GlobalProtectedRegion(String id, boolean transience) {
+        super(id, transience);
         min = new BlockVector(0, 0, 0);
         max = new BlockVector(0, 0, 0);
     }

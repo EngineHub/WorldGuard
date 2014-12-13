@@ -53,21 +53,22 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     protected BlockVector max;
 
     private final String id;
+    private final boolean transience;
     private int priority = 0;
     private ProtectedRegion parent;
     private DefaultDomain owners = new DefaultDomain();
     private DefaultDomain members = new DefaultDomain();
     private ConcurrentMap<Flag<?>, Object> flags = new ConcurrentHashMap<Flag<?>, Object>();
-    private boolean transience;
     private boolean dirty = true;
 
     /**
      * Construct a new instance of this region.
      *
      * @param id the name of this region
+     * @param transience whether this region should only be kept in memory and not be saved
      * @throws IllegalArgumentException thrown if the ID is invalid (see {@link #isValidId(String)}
      */
-    ProtectedRegion(String id) { // Package private because we can't have people creating their own region types
+    ProtectedRegion(String id, boolean transience) { // Package private because we can't have people creating their own region types
         checkNotNull(id);
 
         if (!isValidId(id)) {
@@ -75,6 +76,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         }
 
         this.id = Normal.normalize(id);
+        this.transience = transience;
     }
 
     /**
@@ -630,20 +632,12 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         }
         return false;
     }
-    
+
     /**
      * @return true if this region should only be kept in memory and not be saved
      */
     public boolean isTransient() {
         return transience;
-    }
-    
-    /**
-     * Set whether this region should only be kept in memory and not be saved.
-     * @param transience - the transitory nature of this region
-     */
-    public void setTransient(boolean transience) {
-        this.transience = transience;
     }
 
     /**

@@ -39,13 +39,26 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
 
     /**
      * Construct a new instance of this cuboid region.
+     * transience will be set to false, and this region can be saved.
      *
      * @param id the region id
      * @param pt1 the first point of this region
      * @param pt2 the second point of this region
      */
     public ProtectedCuboidRegion(String id, BlockVector pt1, BlockVector pt2) {
-        super(id);
+        this(id, false, pt1, pt2);
+    }
+
+    /**
+     * Construct a new instance of this cuboid region.
+     *
+     * @param id the region id
+     * @param transience whether this region should only be kept in memory and not be saved
+     * @param pt1 the first point of this region
+     * @param pt2 the second point of this region
+     */
+    public ProtectedCuboidRegion(String id, boolean transience, BlockVector pt1, BlockVector pt2) {
+        super(id, transience);
         setMinMaxPoints(pt1, pt2);
     }
 
