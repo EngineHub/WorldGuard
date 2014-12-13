@@ -58,6 +58,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     private DefaultDomain owners = new DefaultDomain();
     private DefaultDomain members = new DefaultDomain();
     private ConcurrentMap<Flag<?>, Object> flags = new ConcurrentHashMap<Flag<?>, Object>();
+    private boolean transience;
     private boolean dirty = true;
 
     /**
@@ -629,10 +630,28 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         }
         return false;
     }
+    
+    /**
+     * @return true if this region should only be kept in memory and not be saved
+     */
+    public boolean isTransient() {
+    	return transience;
+    }
+    
+    /**
+     * Set whether this region should only be kept in memory and not be saved.
+     * @param transience - the transitory nature of this region
+     */
+    public void setTransient(boolean transience) {
+    	this.transience = transience;
+    }
 
+    /**
+     * Tests whether changes have been made and the region is not transient.
+     */
     @Override
     public boolean isDirty() {
-        return dirty || owners.isDirty() || members.isDirty();
+        return !isTransient() && (dirty || owners.isDirty() || members.isDirty());
     }
 
     @Override
