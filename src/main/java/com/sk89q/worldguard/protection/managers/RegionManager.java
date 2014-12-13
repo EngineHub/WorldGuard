@@ -428,12 +428,12 @@ public final class RegionManager {
      * @return a list
      */
     private List<ProtectedRegion> getFilteredValuesCopy() {
-    	List<ProtectedRegion> filteredValues = new ArrayList<ProtectedRegion>();
-    	for (ProtectedRegion region : index.values()) {
-    		if (!region.isTransient()) {
-    			filteredValues.add(region);
-    		}
-    	}
+        List<ProtectedRegion> filteredValues = new ArrayList<ProtectedRegion>();
+        for (ProtectedRegion region : index.values()) {
+            if (!region.isTransient()) {
+                filteredValues.add(region);
+            }
+        }
         return filteredValues;
     }
 

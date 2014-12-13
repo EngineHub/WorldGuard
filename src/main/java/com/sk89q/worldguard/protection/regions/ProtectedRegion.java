@@ -635,7 +635,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @return true if this region should only be kept in memory and not be saved
      */
     public boolean isTransient() {
-    	return transience;
+        return transience;
     }
     
     /**
@@ -643,7 +643,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @param transience - the transitory nature of this region
      */
     public void setTransient(boolean transience) {
-    	this.transience = transience;
+        this.transience = transience;
     }
 
     /**
