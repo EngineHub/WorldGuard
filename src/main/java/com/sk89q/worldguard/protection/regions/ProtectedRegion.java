@@ -645,7 +645,10 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      */
     @Override
     public boolean isDirty() {
-        return !isTransient() && (dirty || owners.isDirty() || members.isDirty());
+        if (isTransient()) {
+            return false;
+        }
+        return dirty || owners.isDirty() || members.isDirty();
     }
 
     @Override
