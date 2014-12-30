@@ -19,25 +19,18 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.LocalWorld;
 import com.sk89q.worldedit.Location;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-/**
- *
- * @author sk89q
- */
+import java.util.HashMap;
+import java.util.Map;
+
 public class LocationFlag extends Flag<Location> {
 
     public LocationFlag(String name, RegionGroup defaultGroup) {
@@ -60,7 +53,7 @@ public class LocationFlag extends Flag<Location> {
         }
 
         if ("here".equalsIgnoreCase(input)) {
-            return BukkitUtil.toLocation(player.getLocation());
+            return toLazyLocation(player.getLocation());
         } else if ("none".equalsIgnoreCase(input)) {
             return null;
         } else {
@@ -74,15 +67,7 @@ public class LocationFlag extends Flag<Location> {
                     final float yaw = split.length < 4 ? 0 : Float.parseFloat(split[3]);
                     final float pitch = split.length < 5 ? 0 : Float.parseFloat(split[4]);
 
-                    return new Location(
-                            BukkitUtil.getLocalWorld(world),
-                            new Vector(
-                                    x,
-                                    y,
-                                    z
-                            ),
-                            yaw, pitch
-                    );
+                    return new LazyLocation(world.getName(), new Vector(x, y, z), yaw, pitch);
                 } catch (NumberFormatException ignored) {
                 }
             }
@@ -91,10 +76,14 @@ public class LocationFlag extends Flag<Location> {
         }
     }
 
+    private Location toLazyLocation(org.bukkit.Location location) {
+        return new LazyLocation(location.getWorld().getName(), BukkitUtil.toVector(location), location.getYaw(), location.getPitch());
+    }
+
     @Override
     public Location unmarshal(Object o) {
         if (o instanceof Map<?, ?>) {
-            Map<?, ?> map  = (Map<?, ?>) o;
+            Map<?, ?> map = (Map<?, ?>) o;
 
             Object rawWorld = map.get("world");
             if (rawWorld == null) return null;
@@ -114,13 +103,11 @@ public class LocationFlag extends Flag<Location> {
             Object rawPitch = map.get("pitch");
             if (rawPitch == null) return null;
 
-            World bukkitWorld = Bukkit.getServer().getWorld((String) rawWorld);
-            LocalWorld world = BukkitUtil.getLocalWorld(bukkitWorld);
             Vector position = new Vector(toNumber(rawX), toNumber(rawY), toNumber(rawZ));
             float yaw = (float) toNumber(rawYaw);
             float pitch = (float) toNumber(rawPitch);
 
-            return new Location(world, position, yaw, pitch);
+            return new LazyLocation(String.valueOf(rawWorld), position, yaw, pitch);
         }
 
         return null;
@@ -130,7 +117,15 @@ public class LocationFlag extends Flag<Location> {
     public Object marshal(Location o) {
         Vector position = o.getPosition();
         Map<String, Object> vec = new HashMap<String, Object>();
-        vec.put("world", o.getWorld().getName());
+        if (o instanceof LazyLocation) {
+            vec.put("world", ((LazyLocation) o).getWorldName());
+        } else {
+            try {
+                vec.put("world", o.getWorld().getName());
+            } catch (NullPointerException e) {
+                return null;
+            }
+        }
         vec.put("x", position.getX());
         vec.put("y", position.getY());
         vec.put("z", position.getZ());
