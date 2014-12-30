@@ -24,6 +24,7 @@ import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionType;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;
@@ -65,7 +66,7 @@ public class DelayedRegionOverlapAssociation implements RegionAssociable {
             source = result.getRegions();
         }
 
-        if (source.contains(region)) {
+        if ((region.getType() == RegionType.GLOBAL && source.isEmpty()) || source.contains(region)) {
             return Association.OWNER;
         } else {
             return Association.NON_MEMBER;
