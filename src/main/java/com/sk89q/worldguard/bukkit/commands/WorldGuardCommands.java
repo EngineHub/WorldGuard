@@ -180,4 +180,8 @@ public class WorldGuardCommands {
         }
     }
 
+    @Command(aliases = {"debug"}, desc = "Debugging commands")
+    @NestedCommand({DebuggingCommands.class})
+    public void debug(CommandContext args, CommandSender sender) {}
+
 }
