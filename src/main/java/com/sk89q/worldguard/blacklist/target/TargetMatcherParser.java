@@ -54,7 +54,7 @@ public class TargetMatcherParser {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
             int id = getItemID(input);
-            if (id != 0) {
+            if (id > 0) {
                 return id;
             }
             
