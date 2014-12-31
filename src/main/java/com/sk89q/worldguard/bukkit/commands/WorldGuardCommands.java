@@ -25,7 +25,7 @@ import com.google.common.util.concurrent.Futures;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.util.LoggerToChatHandler;
+import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.bukkit.util.report.*;
 import com.sk89q.worldguard.util.paste.Pastebin;
 import com.sk89q.worldguard.util.report.ReportList;

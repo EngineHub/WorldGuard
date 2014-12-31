@@ -21,9 +21,12 @@ package com.sk89q.worldguard.bukkit.util;
 
 import com.sk89q.worldguard.bukkit.event.BulkEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -115,4 +118,46 @@ public final class Events {
         return false;
     }
 
+    /**
+     * Return whether the given damage cause is fire-reltaed.
+     *
+     * @param cause the cause
+     * @return true if fire related
+     */
+    public static boolean isFireCause(DamageCause cause) {
+        return cause == DamageCause.FIRE || cause == DamageCause.FIRE_TICK;
+    }
+
+    /**
+     * Return whether the given cause is an explosion.
+     *
+     * @param cause the cause
+     * @return true if it is an explosion cuase
+     */
+    public static boolean isExplosionCause(DamageCause cause) {
+        return cause == DamageCause.BLOCK_EXPLOSION || cause == DamageCause.ENTITY_EXPLOSION;
+    }
+
+    /**
+     * Restore the statistic associated with the given cause. For example,
+     * for the {@link DamageCause#DROWNING} cause, the entity would have its
+     * air level set to its maximum.
+     *
+     * @param entity the entity
+     * @param cause the cuase
+     */
+    public static void restoreStatistic(Entity entity, DamageCause cause) {
+        if (cause == DamageCause.DROWNING && entity instanceof LivingEntity) {
+            LivingEntity living = (LivingEntity) entity;
+            living.setRemainingAir(living.getMaximumAir());
+        }
+
+        if (isFireCause(cause)) {
+            entity.setFireTicks(0);
+        }
+
+        if (cause == DamageCause.LAVA) {
+            entity.setFireTicks(0);
+        }
+    }
 }

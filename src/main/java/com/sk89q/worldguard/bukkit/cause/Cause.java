@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.cause;
 
 import com.google.common.base.Joiner;
-import com.sk89q.worldguard.bukkit.util.WGMetadata;
+import com.sk89q.worldguard.bukkit.internal.WGMetadata;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
