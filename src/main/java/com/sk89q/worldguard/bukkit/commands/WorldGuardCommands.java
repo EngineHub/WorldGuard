@@ -19,16 +19,14 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.LoggerToChatHandler;
 import com.sk89q.worldguard.bukkit.util.ReportWriter;
-import com.sk89q.worldguard.util.PastebinPoster;
-import com.sk89q.worldguard.util.PastebinPoster.PasteCallback;
+import com.sk89q.worldguard.util.paste.Pastebin;
 import com.sk89q.worldguard.util.task.Task;
 import com.sk89q.worldguard.util.task.TaskStateComparator;
 import org.bukkit.Bukkit;
@@ -39,12 +37,16 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class WorldGuardCommands {
+
+    private static final Logger log = Logger.getLogger(WorldGuardCommands.class.getCanonicalName());
+
     private final WorldGuardPlugin plugin;
 
     public WorldGuardCommands(WorldGuardPlugin plugin) {
@@ -117,16 +119,17 @@ public class WorldGuardCommands {
             plugin.checkPermission(sender, "worldguard.report.pastebin");
             
             sender.sendMessage(ChatColor.YELLOW + "Now uploading to Pastebin...");
-            PastebinPoster.paste(report.toString(), new PasteCallback() {
-                
-                public void handleSuccess(String url) {
-                    // Hope we don't have a thread safety issue here
-                    sender.sendMessage(ChatColor.YELLOW + "WorldGuard report (1 hour): " + url);
+
+            Futures.addCallback(new Pastebin().paste(report.toString()), new FutureCallback<URL>() {
+                @Override
+                public void onSuccess(URL url) {
+                    sender.sendMessage(ChatColor.YELLOW + "WorldGuard report: " + url);
                 }
-                
-                public void handleError(String err) {
-                    // Hope we don't have a thread safety issue here
-                    sender.sendMessage(ChatColor.YELLOW + "WorldGuard report pastebin error: " + err);
+
+                @Override
+                public void onFailure(Throwable throwable) {
+                    log.log(Level.WARNING, "Failed to submit pastebin", throwable);
+                    sender.sendMessage(ChatColor.RED + "The WorldGuard report could not be saved to a pastebin service. Please see console for the error.");
                 }
             });
         }
