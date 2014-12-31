@@ -19,14 +19,17 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import com.google.common.io.Files;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.LoggerToChatHandler;
-import com.sk89q.worldguard.bukkit.util.ReportWriter;
+import com.sk89q.worldguard.bukkit.util.report.*;
 import com.sk89q.worldguard.util.paste.Pastebin;
+import com.sk89q.worldguard.util.report.ReportList;
+import com.sk89q.worldguard.util.report.SystemInfoReport;
 import com.sk89q.worldguard.util.task.Task;
 import com.sk89q.worldguard.util.task.TaskStateComparator;
 import org.bukkit.Bukkit;
@@ -38,6 +41,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -103,14 +107,21 @@ public class WorldGuardCommands {
     @Command(aliases = {"report"}, desc = "Writes a report on WorldGuard", flags = "p", max = 0)
     @CommandPermissions({"worldguard.report"})
     public void report(CommandContext args, final CommandSender sender) throws CommandException {
-        
-        File dest = new File(plugin.getDataFolder(), "report.txt");
-        ReportWriter report = new ReportWriter(plugin);
-        
+        ReportList report = new ReportList("Report");
+        report.add(new SystemInfoReport());
+        report.add(new ServerReport());
+        report.add(new PluginReport());
+        report.add(new SchedulerReport());
+        report.add(new ServicesReport());
+        report.add(new WorldReport());
+        report.add(new PerformanceReport());
+        report.add(new ConfigReport(plugin));
+        String result = report.toString();
+
         try {
-            report.write(dest);
-            sender.sendMessage(ChatColor.YELLOW + "WorldGuard report written to "
-                    + dest.getAbsolutePath());
+            File dest = new File(plugin.getDataFolder(), "report.txt");
+            Files.write(result, dest, Charset.forName("UTF-8"));
+            sender.sendMessage(ChatColor.YELLOW + "WorldGuard report written to " + dest.getAbsolutePath());
         } catch (IOException e) {
             throw new CommandException("Failed to write report: " + e.getMessage());
         }
@@ -120,7 +131,7 @@ public class WorldGuardCommands {
             
             sender.sendMessage(ChatColor.YELLOW + "Now uploading to Pastebin...");
 
-            Futures.addCallback(new Pastebin().paste(report.toString()), new FutureCallback<URL>() {
+            Futures.addCallback(new Pastebin().paste(result), new FutureCallback<URL>() {
                 @Override
                 public void onSuccess(URL url) {
                     sender.sendMessage(ChatColor.YELLOW + "WorldGuard report: " + url);

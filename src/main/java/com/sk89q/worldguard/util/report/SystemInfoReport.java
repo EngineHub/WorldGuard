@@ -1,0 +1,43 @@
+/*
+ * WorldGuard, a suite of tools for Minecraft
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldGuard team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.sk89q.worldguard.util.report;
+
+public class SystemInfoReport extends DataReport {
+
+    public SystemInfoReport() {
+        super("System Information");
+
+        Runtime runtime = Runtime.getRuntime();
+
+        append("Java", "%s %s (%s)",
+                System.getProperty("java.vendor"),
+                System.getProperty("java.version"),
+                System.getProperty("java.vendor.url"));
+        append("Operating System", "%s %s (%s)",
+                System.getProperty("os.name"),
+                System.getProperty("os.version"),
+                System.getProperty("os.arch"));
+        append("Available Processors", runtime.availableProcessors());
+        append("Free Memory", runtime.freeMemory() / 1024 / 1024 + " MB");
+        append("Max Memory", runtime.maxMemory() / 1024 / 1024 + " MB");
+        append("Total Memory", runtime.totalMemory() / 1024 / 1024 + " MB");
+    }
+
+}

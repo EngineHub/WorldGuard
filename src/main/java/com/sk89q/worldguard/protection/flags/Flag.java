@@ -82,7 +82,7 @@ public abstract class Flag<T> {
 
     @Override
     public String toString() {
-        return getClass().getName() + "{" +
+        return getClass().getSimpleName() + "{" +
                 "name='" + name + '\'' +
                 '}';
     }

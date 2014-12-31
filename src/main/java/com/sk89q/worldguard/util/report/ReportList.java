@@ -178,9 +178,9 @@ public class ReportList implements Report, List<Report> {
         if (!reports.isEmpty()) {
             StringBuilder builder = new StringBuilder();
             for (Report report : reports) {
-                builder.append("================================")
+                builder.append("================================\n")
                         .append(report.getTitle())
-                        .append("================================")
+                        .append("\n================================")
                         .append("\n\n")
                         .append(report.toString())
                         .append("\n\n");

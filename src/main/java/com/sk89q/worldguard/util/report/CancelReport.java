@@ -30,6 +30,9 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Reports on cancelled events.
+ */
 public class CancelReport implements Report {
 
     private final Event event;

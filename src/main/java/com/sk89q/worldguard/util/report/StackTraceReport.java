@@ -41,10 +41,10 @@ public class StackTraceReport implements Report {
             StringBuilder builder = new StringBuilder();
             boolean first = true;
             for (StackTraceElement element : stackTrace) {
-                if (!first) {
-                    builder.append("\n");
-                } else {
+                if (first) {
                     first = false;
+                } else {
+                    builder.append("\n");
                 }
                 builder.append(element.getClassName())
                         .append(".")

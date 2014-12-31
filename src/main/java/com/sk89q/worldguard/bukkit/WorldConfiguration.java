@@ -32,6 +32,7 @@ import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.bukkit.util.TargetMatcherSet;
 import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.chest.SignChestProtection;
+import com.sk89q.worldguard.util.report.Unreported;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -40,12 +41,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,15 +67,15 @@ public class WorldConfiguration {
             "# Remove the {} and add your own entries.\r\n" +
             "#\r\n";
 
-    private WorldGuardPlugin plugin;
+    @Unreported private WorldGuardPlugin plugin;
 
-    private String worldName;
-    private YAMLProcessor parentConfig;
-    private YAMLProcessor config;
+    @Unreported private String worldName;
+    @Unreported private YAMLProcessor parentConfig;
+    @Unreported private YAMLProcessor config;
     private File blacklistFile;
 
-    private Blacklist blacklist;
-    private ChestProtection chestProtection = new SignChestProtection();
+    @Unreported private Blacklist blacklist;
+    @Unreported private ChestProtection chestProtection = new SignChestProtection();
 
     /* Configuration data start */
     public boolean summaryOnStart;
