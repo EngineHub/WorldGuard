@@ -92,6 +92,8 @@ public class PlayerMoveListener implements Listener {
             state = plugin.getFlagStateManager().getState(player);
         }
 
+        // TODO: Clean up this disaster
+
         World world = from.getWorld();
         World toWorld = to.getWorld();
 
@@ -104,25 +106,23 @@ public class PlayerMoveListener implements Listener {
             hasRemoteBypass = hasBypass(player, toWorld);
         }
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(toWorld);
-        if (mgr == null) {
+        RegionManager regions = plugin.getGlobalRegionManager().get(toWorld);
+        if (regions == null) {
             return false;
         }
+
         Vector pt = new Vector(to.getBlockX(), to.getBlockY(), to.getBlockZ());
-        ApplicableRegionSet set = mgr.getApplicableRegions(pt);
+        ApplicableRegionSet set = regions.getApplicableRegions(pt);
 
         boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-        if (!hasRemoteBypass && (!entryAllowed /*|| regionFull*/)) {
-            String message = /*maxPlayerMessage != null ? maxPlayerMessage :*/ "You are not permitted to enter this area.";
-
-            player.sendMessage(ChatColor.DARK_RED + message);
+        if (!hasRemoteBypass && !entryAllowed) {
+            player.sendMessage(ChatColor.DARK_RED + "You are not permitted to enter this area.");
             return true;
         }
 
         // Have to set this state
         if (state.lastExitAllowed == null) {
-            state.lastExitAllowed = plugin.getRegionContainer().createQuery().getApplicableRegions(from)
-                        .allows(DefaultFlag.EXIT, localPlayer);
+            state.lastExitAllowed = plugin.getRegionContainer().createQuery().getApplicableRegions(from).allows(DefaultFlag.EXIT, localPlayer);
         }
 
         boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
@@ -131,41 +131,36 @@ public class PlayerMoveListener implements Listener {
             return true;
         }
 
-        String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);//, localPlayer);
-        String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);//, localPlayer);
-        Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);//, localPlayer);
-        Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);//, localPlayer);
+        String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);
+        String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);
+        Boolean notifyEnter = set.getFlag(DefaultFlag.NOTIFY_ENTER);
+        Boolean notifyLeave = set.getFlag(DefaultFlag.NOTIFY_LEAVE);
         GameMode gameMode = set.getFlag(DefaultFlag.GAME_MODE);
 
-        if (state.lastFarewell != null && (farewell == null
-                || !state.lastFarewell.equals(farewell))) {
-            String replacedFarewell = plugin.replaceMacros(
-                    player, BukkitUtil.replaceColorMacros(state.lastFarewell));
+        if (state.lastFarewell != null && (farewell == null || !state.lastFarewell.equals(farewell))) {
+            String replacedFarewell = plugin.replaceMacros(player, BukkitUtil.replaceColorMacros(state.lastFarewell));
             player.sendMessage(replacedFarewell.replaceAll("\\\\n", "\n").split("\\n"));
         }
 
-        if (greeting != null && (state.lastGreeting == null
-                || !state.lastGreeting.equals(greeting))) {
-            String replacedGreeting = plugin.replaceMacros(
-                    player, BukkitUtil.replaceColorMacros(greeting));
+        if (greeting != null && (state.lastGreeting == null || !state.lastGreeting.equals(greeting))) {
+            String replacedGreeting = plugin.replaceMacros(player, BukkitUtil.replaceColorMacros(greeting));
             player.sendMessage(replacedGreeting.replaceAll("\\\\n", "\n").split("\\n"));
         }
 
-        if ((notifyLeave == null || !notifyLeave)
-                && state.notifiedForLeave != null && state.notifiedForLeave) {
+        if ((notifyLeave == null || !notifyLeave) && state.notifiedForLeave != null && state.notifiedForLeave) {
             plugin.broadcastNotification(ChatColor.GRAY + "WG: "
                     + ChatColor.LIGHT_PURPLE + player.getName()
                     + ChatColor.GOLD + " left NOTIFY region");
         }
 
-        if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
-                || !state.notifiedForEnter)) {
+        if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null || !state.notifiedForEnter)) {
             StringBuilder regionList = new StringBuilder();
 
             for (ProtectedRegion region : set) {
                 if (regionList.length() != 0) {
                     regionList.append(", ");
                 }
+
                 regionList.append(region.getId());
             }
 
