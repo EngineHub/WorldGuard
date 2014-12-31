@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
 public class WorldGuardPlayerListener implements Listener {
 
     private static final Logger log = Logger.getLogger(WorldGuardPlayerListener.class.getCanonicalName());
-    private Pattern opPattern = Pattern.compile("^/op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern opPattern = Pattern.compile("^/(?:bukkit:)?op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
     private WorldGuardPlugin plugin;
 
     /**
