@@ -42,7 +42,7 @@ import com.sk89q.worldguard.bukkit.commands.task.RegionManagerReloader;
 import com.sk89q.worldguard.bukkit.commands.task.RegionManagerSaver;
 import com.sk89q.worldguard.bukkit.commands.task.RegionRemover;
 import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
-import com.sk89q.worldguard.bukkit.util.LoggerToChatHandler;
+import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;

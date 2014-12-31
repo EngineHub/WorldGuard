@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.util;
+package com.sk89q.worldguard.bukkit.internal;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.metadata.FixedMetadataValue;

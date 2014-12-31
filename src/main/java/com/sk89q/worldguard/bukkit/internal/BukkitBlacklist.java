@@ -17,19 +17,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.util;
+package com.sk89q.worldguard.bukkit.internal;
 
-import com.google.common.base.Function;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
+import com.sk89q.worldguard.blacklist.Blacklist;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
-import javax.annotation.Nullable;
+public class BukkitBlacklist extends Blacklist {
 
-public class BlockStateAsBlockFunction implements Function<BlockState, Block> {
-
+    private WorldGuardPlugin plugin;
+    
+    public BukkitBlacklist(Boolean useAsWhitelist, WorldGuardPlugin plugin) {
+        super(useAsWhitelist);
+        this.plugin = plugin;
+    }
+    
     @Override
-    public Block apply(@Nullable BlockState blockState) {
-        return blockState != null ? blockState.getBlock() : null;
+    public void broadcastNotification(String msg) {
+        plugin.broadcastNotification(msg);
     }
 
 }

@@ -39,7 +39,6 @@ import com.sk89q.worldguard.bukkit.listener.debounce.legacy.AbstractEventDebounc
 import com.sk89q.worldguard.bukkit.listener.debounce.legacy.BlockEntityEventDebounce;
 import com.sk89q.worldguard.bukkit.listener.debounce.legacy.EntityEntityEventDebounce;
 import com.sk89q.worldguard.bukkit.listener.debounce.legacy.InventoryMoveItemEventDebounce;
-import com.sk89q.worldguard.bukkit.util.BlockStateAsBlockFunction;
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
