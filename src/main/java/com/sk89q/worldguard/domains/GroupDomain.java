@@ -130,4 +130,11 @@ public class GroupDomain implements Domain, ChangeTracked {
         this.dirty = dirty;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "names=" + groups +
+                '}';
+    }
+
 }

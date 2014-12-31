@@ -29,6 +29,7 @@ import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver
 import com.sk89q.worldguard.protection.managers.storage.DriverType;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
+import com.sk89q.worldguard.util.report.Unreported;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -75,12 +76,11 @@ public class ConfigurationManager {
             "# - Lines starting with # are comments and so they are ignored.\r\n" +
             "#\r\n";
 
-    private WorldGuardPlugin plugin;
-    private ConcurrentMap<String, WorldConfiguration> worlds;
-    private YAMLProcessor config;
-    @Deprecated
-    private Set<String> hasGodMode = new HashSet<String>();
-    private Set<String> hasAmphibious = new HashSet<String>();
+    @Unreported private WorldGuardPlugin plugin;
+    @Unreported private ConcurrentMap<String, WorldConfiguration> worlds;
+    @Unreported private YAMLProcessor config;
+    @Deprecated @Unreported private Set<String> hasGodMode = new HashSet<String>();
+    @Unreported private Set<String> hasAmphibious = new HashSet<String>();
 
     private boolean hasCommandBookGodMode = false;
 
@@ -96,13 +96,14 @@ public class ConfigurationManager {
     public boolean blockInGameOp;
     public boolean migrateRegionsToUuid;
     public boolean keepUnresolvedNames;
-    public Map<String, String> hostKeys = new HashMap<String, String>();
+
+    @Unreported public Map<String, String> hostKeys = new HashMap<String, String>();
 
     /**
      * Region Storage Configuration method, and config values
      */
-    public RegionDriver selectedRegionStoreDriver;
-    public Map<DriverType, RegionDriver> regionStoreDriverMap;
+    @Unreported public RegionDriver selectedRegionStoreDriver;
+    @Unreported public Map<DriverType, RegionDriver> regionStoreDriverMap;
 
     /**
      * Construct the object.

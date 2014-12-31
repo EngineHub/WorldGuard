@@ -344,4 +344,12 @@ public class DefaultDomain implements Domain, ChangeTracked {
         playerDomain.setDirty(dirty);
         groupDomain.setDirty(dirty);
     }
+
+    @Override
+    public String toString() {
+        return "{players=" + playerDomain +
+                ", groups=" + groupDomain +
+                '}';
+    }
+
 }

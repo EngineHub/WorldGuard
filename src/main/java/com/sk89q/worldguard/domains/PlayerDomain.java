@@ -185,4 +185,11 @@ public class PlayerDomain implements Domain, ChangeTracked {
         this.dirty = dirty;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "uuids=" + uniqueIds +
+                ", names=" + names +
+                '}';
+    }
 }
