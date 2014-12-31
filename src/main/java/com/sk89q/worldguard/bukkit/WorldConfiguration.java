@@ -37,6 +37,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
+import org.yaml.snakeyaml.parser.ParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -332,6 +333,9 @@ public class WorldConfiguration {
         } catch (IOException e) {
             log.severe("Error reading configuration for world " + worldName + ": ");
             e.printStackTrace();
+        } catch (ParserException e) {
+            log.severe("Error parsing configuration for world " + worldName + ". ");
+            throw e;
         }
 
         summaryOnStart = getBoolean("summary-on-start", true);
