@@ -389,6 +389,7 @@ public class EventAbstractionListener extends AbstractListener {
             case RIGHT_CLICK_AIR:
                 if (item != null && !item.getType().isBlock() && Events.fireAndTestCancel(new UseItemEvent(event, cause, player.getWorld(), item))) {
                     event.setUseItemInHand(Result.DENY);
+                    event.setCancelled(true); // The line above does not appear to work with spawn eggs
                 }
 
                 // Check for items that the administrator has configured to
