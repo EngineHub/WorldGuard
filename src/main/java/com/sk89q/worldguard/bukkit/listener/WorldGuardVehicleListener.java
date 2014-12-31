@@ -64,7 +64,7 @@ public class WorldGuardVehicleListener implements Listener {
             if (event.getFrom().getBlockX() != event.getTo().getBlockX()
                     || event.getFrom().getBlockY() != event.getTo().getBlockY()
                     || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-                boolean result = PlayerMoveListener.shouldDenyMove(plugin, player, event.getFrom(), event.getTo());
+                boolean result = plugin.getPlayerMoveListener().shouldDenyMove(player, event.getFrom(), event.getTo());
                 if (result) {
                     vehicle.setVelocity(new org.bukkit.util.Vector(0,0,0));
                     vehicle.teleport(event.getFrom());

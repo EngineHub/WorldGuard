@@ -390,7 +390,7 @@ public class WorldGuardPlayerListener implements Listener {
             LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
 
             if (cfg.usePlayerTeleports) {
-                boolean result = PlayerMoveListener.shouldDenyMove(plugin, event.getPlayer(), event.getFrom(), event.getTo());
+                boolean result = plugin.getPlayerMoveListener().shouldDenyMove(event.getPlayer(), event.getFrom(), event.getTo());
                 if (result) {
                     event.setCancelled(true);
                     return;

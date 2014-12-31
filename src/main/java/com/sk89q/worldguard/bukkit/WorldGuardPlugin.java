@@ -89,6 +89,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     private ListeningExecutorService executorService;
     private ProfileService profileService;
     private ProfileCache profileCache;
+    private PlayerMoveListener playerMoveListener;
 
     /**
      * Construct objects. Actual loading occurs when the plugin is enabled, so
@@ -179,7 +180,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new WorldGuardHangingListener(this)).registerEvents();
 
         // Modules
-        (new PlayerMoveListener(this)).registerEvents();
+        (playerMoveListener = new PlayerMoveListener(this)).registerEvents();
         (new BlacklistListener(this)).registerEvents();
         (new ChestProtectionListener(this)).registerEvents();
         (new RegionProtectionListener(this)).registerEvents();
@@ -970,6 +971,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         return getGlobalRegionManager().get(world);
+    }
+
+    public PlayerMoveListener getPlayerMoveListener() {
+        return playerMoveListener;
     }
 
     /**
