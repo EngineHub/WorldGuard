@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
@@ -42,9 +45,20 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.PluginManager;
 
+import java.util.concurrent.TimeUnit;
+
 public class PlayerMoveListener implements Listener {
 
     private final WorldGuardPlugin plugin;
+    private Cache<WorldPlayerTuple, Boolean> bypassCache = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .expireAfterAccess(5, TimeUnit.SECONDS)
+            .build(new CacheLoader<WorldPlayerTuple, Boolean>() {
+                @Override
+                public Boolean load(WorldPlayerTuple tuple) throws Exception {
+                    return plugin.getGlobalRegionManager().hasBypass(tuple.player, tuple.world);
+                }
+            });
 
     public PlayerMoveListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -57,51 +71,22 @@ public class PlayerMoveListener implements Listener {
         }
     }
 
-    private static boolean hasMoved(Location loc1, Location loc2) {
-        return loc1.getBlockX() != loc2.getBlockX()
-                || loc1.getBlockY() != loc2.getBlockY()
-                || loc1.getBlockZ() != loc2.getBlockZ();
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerMove(PlayerMoveEvent event) {
-        final Player player = event.getPlayer();
-        World world = player.getWorld();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        if (wcfg.useRegions) {
-            if (hasMoved(event.getFrom(), event.getTo())) {
-                if (shouldDenyMove(plugin, player, event.getFrom(), event.getTo())) {
-                    Location newLoc = event.getFrom();
-                    newLoc.setX(newLoc.getBlockX() + 0.5);
-                    newLoc.setY(newLoc.getBlockY());
-                    newLoc.setZ(newLoc.getBlockZ() + 0.5);
-                    event.setTo(newLoc);
-
-                    Entity vehicle = player.getVehicle();
-                    if (vehicle != null) {
-                        vehicle.eject();
-                        vehicle.teleport(newLoc);
-                        player.teleport(newLoc);
-                        vehicle.setPassenger(player);
-                    }
-                }
-            }
-        }
+    private boolean hasBypass(Player player, World world) {
+        return bypassCache.getUnchecked(new WorldPlayerTuple(world, player));
     }
 
     /**
      * Handles movement related events, including changing gamemode, sending
      * greeting/farewell messages, etc.
      *
-     * @return true if the movement should not be allowed
+     * @param from The before location
+     * @param to The to location
+     * @return True if the movement should not be allowed
      */
-    public static boolean shouldDenyMove(WorldGuardPlugin plugin, Player player, Location from, Location to) {
+    public boolean shouldDenyMove(Player player, Location from, Location to) {
         PlayerFlagState state = plugin.getFlagStateManager().getState(player);
 
-        //Flush states in multiworld scenario
+        // Flush states in multi-world scenario
         if (state.lastWorld != null && !state.lastWorld.equals(to.getWorld())) {
             plugin.getFlagStateManager().forget(player);
             state = plugin.getFlagStateManager().getState(player);
@@ -111,12 +96,12 @@ public class PlayerMoveListener implements Listener {
         World toWorld = to.getWorld();
 
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
+        boolean hasBypass = hasBypass(player, world);
         boolean hasRemoteBypass;
         if (world.equals(toWorld)) {
             hasRemoteBypass = hasBypass;
         } else {
-            hasRemoteBypass = plugin.getGlobalRegionManager().hasBypass(player, toWorld);
+            hasRemoteBypass = hasBypass(player, toWorld);
         }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(toWorld);
@@ -125,44 +110,6 @@ public class PlayerMoveListener implements Listener {
         }
         Vector pt = new Vector(to.getBlockX(), to.getBlockY(), to.getBlockZ());
         ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
-        /*
-        // check if region is full
-        // get the lowest number of allowed members in any region
-        boolean regionFull = false;
-        String maxPlayerMessage = null;
-        if (!hasBypass) {
-            for (ProtectedRegion region : set) {
-                if (region instanceof GlobalProtectedRegion) {
-                    continue; // global region can't have a max
-                }
-                // get the max for just this region
-                Integer maxPlayers = region.getFlag(DefaultFlag.MAX_PLAYERS);
-                if (maxPlayers == null) {
-                    continue;
-                }
-                int occupantCount = 0;
-                for(Player occupant : world.getPlayers()) {
-                    // each player in this region counts as one toward the max of just this region
-                    // A person with bypass doesn't count as an occupant of the region
-                    if (!occupant.equals(player) && !plugin.getGlobalRegionManager().hasBypass(occupant, world)) {
-                        if (region.contains(BukkitUtil.toVector(occupant.getLocation()))) {
-                            if (++occupantCount >= maxPlayers) {
-                                regionFull = true;
-                                maxPlayerMessage = region.getFlag(DefaultFlag.MAX_PLAYERS_MESSAGE);
-                                // At least one region in the set is full, we are going to use this message because it
-                                // was the first one we detected as full. In reality we should check them all and then
-                                // resolve the message from full regions, but that is probably a lot laggier (and this
-                                // is already pretty laggy. In practice, we can't really control which one we get first
-                                // right here.
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        */
 
         boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
         if (!hasRemoteBypass && (!entryAllowed /*|| regionFull*/)) {
@@ -183,9 +130,6 @@ public class PlayerMoveListener implements Listener {
             player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
             return true;
         }
-
-//        WorldGuardRegionMoveEvent event = new WorldGuardRegionMoveEvent(plugin, player, state, set, from, to);
-//        Bukkit.getPluginManager().callEvent(event);
 
         String greeting = set.getFlag(DefaultFlag.GREET_MESSAGE);//, localPlayer);
         String farewell = set.getFlag(DefaultFlag.FAREWELL_MESSAGE);//, localPlayer);
@@ -257,6 +201,71 @@ public class PlayerMoveListener implements Listener {
         state.lastBlockY = to.getBlockY();
         state.lastBlockZ = to.getBlockZ();
         return false;
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerMove(PlayerMoveEvent event) {
+        final Player player = event.getPlayer();
+        World world = player.getWorld();
+
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.useRegions) {
+            if (hasMoved(event.getFrom(), event.getTo())) {
+                if (shouldDenyMove(player, event.getFrom(), event.getTo())) {
+                    Location newLoc = event.getFrom();
+                    newLoc.setX(newLoc.getBlockX() + 0.5);
+                    newLoc.setY(newLoc.getBlockY());
+                    newLoc.setZ(newLoc.getBlockZ() + 0.5);
+                    event.setTo(newLoc);
+
+                    Entity vehicle = player.getVehicle();
+                    if (vehicle != null) {
+                        vehicle.eject();
+                        vehicle.teleport(newLoc);
+                        player.teleport(newLoc);
+                        vehicle.setPassenger(player);
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean hasMoved(Location loc1, Location loc2) {
+        return loc1.getBlockX() != loc2.getBlockX()
+                || loc1.getBlockY() != loc2.getBlockY()
+                || loc1.getBlockZ() != loc2.getBlockZ();
+    }
+
+    private static class WorldPlayerTuple {
+        private final World world;
+        private final Player player;
+
+        private WorldPlayerTuple(World world, Player player) {
+            this.world = world;
+            this.player = player;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            WorldPlayerTuple that = (WorldPlayerTuple) o;
+
+            if (!player.equals(that.player)) return false;
+            if (!world.equals(that.world)) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = world.hashCode();
+            result = 31 * result + player.hashCode();
+            return result;
+        }
     }
 
 }
