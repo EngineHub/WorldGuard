@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.util;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -572,6 +573,40 @@ public final class Materials {
                 || material == Material.BURNING_FURNACE
                 || material == Material.BREWING_STAND
                 || material == Material.TRAPPED_CHEST
+                || material == Material.HOPPER
+                || material == Material.DROPPER;
+    }
+
+    /**
+     * Test whether the given material is affected by
+     * {@link DefaultFlag#USE}.
+     *
+     * <p>Generally, materials that are considered by this method are those
+     * that are not inventories but can be used.</p>
+     *
+     * @param material the material
+     * @return true if covered by the use flag
+     */
+    public static boolean isUseFlagApplicable(Material material) {
+        return material == Material.LEVER
+                || material == Material.STONE_BUTTON
+                || material == Material.WOOD_BUTTON
+                || material == Material.NOTE_BLOCK
+                || material == Material.DIODE_BLOCK_OFF
+                || material == Material.DIODE_BLOCK_ON
+                || material == Material.WOODEN_DOOR
+                || material == Material.TRAP_DOOR
+                || material == Material.FENCE_GATE
+                || material == Material.JUKEBOX
+                || material == Material.DISPENSER
+                || material == Material.FURNACE
+                || material == Material.BURNING_FURNACE
+                || material == Material.WORKBENCH
+                || material == Material.BREWING_STAND
+                || material == Material.ENCHANTMENT_TABLE
+                || material == Material.CAULDRON
+                || material == Material.BEACON
+                || material == Material.ANVIL
                 || material == Material.HOPPER
                 || material == Material.DROPPER;
     }
