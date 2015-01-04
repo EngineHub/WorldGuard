@@ -117,7 +117,9 @@ public class RegionProtectionListener extends AbstractListener {
     private boolean isWhitelisted(Cause cause, World world) {
         Object rootCause = cause.getRootCause();
 
-        if (rootCause instanceof Player) {
+        if (rootCause instanceof Block) {
+            return ((Block) rootCause).getType() == Material.HOPPER;
+        } else if (rootCause instanceof Player) {
             Player player = (Player) rootCause;
             WorldConfiguration config = getWorldConfig(world);
 
