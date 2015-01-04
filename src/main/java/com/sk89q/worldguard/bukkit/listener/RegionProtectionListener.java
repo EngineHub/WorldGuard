@@ -254,22 +254,27 @@ public class RegionProtectionListener extends AbstractListener {
 
                 /* Inventory */
                 } else if (Materials.isInventoryBlock(type)) {
-                    canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.CHEST_ACCESS);
+                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT, DefaultFlag.CHEST_ACCESS);
                     what = "open that";
 
                 /* Beds */
                 } else if (type == Material.BED_BLOCK) {
-                    canUse = query.testBuild(target, associable, DefaultFlag.USE, DefaultFlag.SLEEP);
+                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT, DefaultFlag.SLEEP);
                     what = "sleep";
 
                 /* TNT */
                 } else if (type == Material.TNT) {
-                    canUse = query.testBuild(target, associable, DefaultFlag.TNT);
+                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT, DefaultFlag.TNT);
                     what = "use explosives";
+
+                /* Legacy USE flag */
+                } else if (Materials.isUseFlagApplicable(type)) {
+                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT, DefaultFlag.USE);
+                    what = "use that";
 
                 /* Everything else */
                 } else {
-                    canUse = query.testBuild(target, associable, DefaultFlag.USE);
+                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT);
                     what = "use that";
                 }
 
@@ -383,7 +388,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Everything else */
         } else {
-            canUse = query.testBuild(target, associable, DefaultFlag.USE);
+            canUse = query.testBuild(target, associable, DefaultFlag.INTERACT);
             what = "use that";
         }
 
@@ -438,7 +443,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Everything else */
         } else {
-            canDamage = query.testBuild(target, associable, DefaultFlag.USE);
+            canDamage = query.testBuild(target, associable, DefaultFlag.INTERACT);
             what = "hit that";
         }
 
@@ -458,7 +463,7 @@ public class RegionProtectionListener extends AbstractListener {
             if (!isWhitelisted(Cause.create(player), vehicle.getWorld())) {
                 RegionQuery query = getPlugin().getRegionContainer().createQuery();
                 Location location = vehicle.getLocation();
-                if (!query.testBuild(location, player, DefaultFlag.USE)) {
+                if (!query.testBuild(location, player, DefaultFlag.INTERACT)) {
                     long now = System.currentTimeMillis();
                     Long lastTime = WGMetadata.getIfPresent(player, DISEMBARK_MESSAGE_KEY, Long.class);
                     if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
