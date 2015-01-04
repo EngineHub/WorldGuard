@@ -116,6 +116,10 @@ public class RegionLister implements Callable<Integer> {
 
             @Override
             public boolean isContainedWithin(DefaultDomain domain) throws CommandException {
+                if (domain.contains(name)) {
+                    return true;
+                }
+
                 if (uniqueId == null) {
                     Profile profile;
 
