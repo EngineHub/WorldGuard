@@ -617,24 +617,16 @@ public final class Materials {
         return material == Material.LEVER
                 || material == Material.STONE_BUTTON
                 || material == Material.WOOD_BUTTON
-                || material == Material.NOTE_BLOCK
-                || material == Material.DIODE_BLOCK_OFF
-                || material == Material.DIODE_BLOCK_ON
                 || material == Material.WOODEN_DOOR
                 || material == Material.TRAP_DOOR
                 || material == Material.FENCE_GATE
-                || material == Material.JUKEBOX
-                || material == Material.DISPENSER
-                || material == Material.FURNACE
-                || material == Material.BURNING_FURNACE
                 || material == Material.WORKBENCH
-                || material == Material.BREWING_STAND
                 || material == Material.ENCHANTMENT_TABLE
-                || material == Material.CAULDRON
                 || material == Material.BEACON
                 || material == Material.ANVIL
-                || material == Material.HOPPER
-                || material == Material.DROPPER;
+                || material == Material.STONE_PLATE
+                || material == Material.IRON_PLATE  
+                || material == Material.GOLD_PLATE;
     }
 
     /**
