@@ -122,7 +122,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.REDSTONE_WIRE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_ORE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_BLOCK, 0);
-        MATERIAL_FLAGS.put(Material.WORKBENCH, 0);
+        MATERIAL_FLAGS.put(Material.WORKBENCH, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.CROPS, 0);
         MATERIAL_FLAGS.put(Material.SOIL, 0);
         MATERIAL_FLAGS.put(Material.FURNACE, MODIFIED_ON_CLICK);
@@ -180,7 +180,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.NETHER_FENCE, 0);
         MATERIAL_FLAGS.put(Material.NETHER_BRICK_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.NETHER_WARTS, 0);
-        MATERIAL_FLAGS.put(Material.ENCHANTMENT_TABLE, 0);
+        MATERIAL_FLAGS.put(Material.ENCHANTMENT_TABLE, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.BREWING_STAND, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.CAULDRON, MODIFIED_ON_CLICK);
         MATERIAL_FLAGS.put(Material.ENDER_PORTAL, 0);
