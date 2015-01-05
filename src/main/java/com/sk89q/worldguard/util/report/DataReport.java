@@ -103,7 +103,7 @@ public class DataReport implements Report {
                 } else {
                     builder.append("\n");
                 }
-                builder.append(getStringValue(entry, seen));
+                builder.append(getStringValue(entry, Sets.newHashSet(seen)));
             }
             return builder.toString();
         } else if (value instanceof Map<?, ?>) {
@@ -116,7 +116,7 @@ public class DataReport implements Report {
                     builder.append("\n");
                 }
 
-                String key = getStringValue(entry.getKey(), seen).replaceAll("[\r\n]", "");
+                String key = getStringValue(entry.getKey(), Sets.newHashSet(seen)).replaceAll("[\r\n]", "");
                 if (key.length() > 60) {
                     key = key.substring(0, 60) + "...";
                 }
@@ -124,7 +124,7 @@ public class DataReport implements Report {
                 builder
                         .append(key)
                         .append(": ")
-                        .append(getStringValue(entry.getValue(), seen));
+                        .append(getStringValue(entry.getValue(), Sets.newHashSet(seen)));
             }
             return builder.toString();
         } else {
