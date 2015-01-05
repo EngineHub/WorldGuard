@@ -346,7 +346,9 @@ public class EventAbstractionListener extends AbstractListener {
                     silent = true;
                 }
 
-                interactDebounce.debounce(clicked, event.getPlayer(), event, DelegateEvents.setSilent(new UseBlockEvent(event, cause, clicked), silent));
+                if (!hasInteractBypass(clicked)) {
+                    interactDebounce.debounce(clicked, event.getPlayer(), event, DelegateEvents.setSilent(new UseBlockEvent(event, cause, clicked), silent));
+                }
                 break;
 
             case RIGHT_CLICK_BLOCK:
@@ -408,7 +410,9 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityInteract(org.bukkit.event.entity.EntityInteractEvent event) {
-        interactDebounce.debounce(event.getBlock(), event.getEntity(), event, new UseBlockEvent(event, create(event.getEntity()), event.getBlock()));
+        if (!hasInteractBypass(event.getBlock())) {
+            interactDebounce.debounce(event.getBlock(), event.getEntity(), event, new UseBlockEvent(event, create(event.getEntity()), event.getBlock()));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -874,14 +878,22 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
+    private boolean hasInteractBypass(Block block) {
+        return getWorldConfig(block.getWorld()).allowAllInteract.test(block);
+    }
+
+    private boolean hasInteractBypass(World world, ItemStack item) {
+        return getWorldConfig(world).allowAllInteract.test(item);
+    }
+
     private boolean isBlockModifiedOnClick(Block block) {
-        return Materials.isBlockModifiedOnClick(block.getType()) && !getWorldConfig(block.getWorld()).allowAllInteract.test(block);
+        return Materials.isBlockModifiedOnClick(block.getType()) && !hasInteractBypass(block);
     }
 
     private boolean isItemAppliedToBlock(ItemStack item, Block clicked) {
         return Materials.isItemAppliedToBlock(item.getType(), clicked.getType())
-                && !getWorldConfig(clicked.getWorld()).allowAllInteract.test(clicked)
-                && !getWorldConfig(clicked.getWorld()).allowAllInteract.test(item);
+                && !hasInteractBypass(clicked)
+                && !hasInteractBypass(clicked.getWorld(), item);
     }
 
     private void playDenyEffect(Player player, Location location) {
