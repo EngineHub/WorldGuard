@@ -42,24 +42,13 @@ import com.sk89q.worldguard.bukkit.listener.debounce.legacy.InventoryMoveItemEve
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
-import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Hopper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.*;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
@@ -112,6 +101,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Dispenser;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.SpawnEgg;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
@@ -611,6 +601,15 @@ public class EventAbstractionListener extends AbstractListener {
     public void onExpBottle(ExpBottleEvent event) {
         if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getEntity()), event.getEntity().getLocation(), EntityType.EXPERIENCE_ORB))) {
             event.setExperience(0);
+
+            // Give the player back his or her XP bottle
+            ProjectileSource shooter = event.getEntity().getShooter();
+            if (shooter instanceof Player) {
+                Player player = (Player) shooter;
+                if (player.getGameMode() != GameMode.CREATIVE) {
+                    player.getInventory().addItem(new ItemStack(Material.EXP_BOTTLE, 1));
+                }
+            }
         }
     }
 
