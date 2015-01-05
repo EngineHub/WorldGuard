@@ -55,6 +55,7 @@ public final class DefaultFlag {
     public static final StateFlag PLACE_VEHICLE = new StateFlag("vehicle-place", false);
     public static final StateFlag DESTROY_VEHICLE = new StateFlag("vehicle-destroy", false);
     public static final StateFlag LIGHTER = new StateFlag("lighter", false);
+    public static final StateFlag RIDE = new StateFlag("ride", false);
 
     // These flags are similar to the ones above (used in tandem with BUILD),
     // but their defaults are set to TRUE because it is more user friendly.
@@ -129,7 +130,7 @@ public final class DefaultFlag {
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
             PASSTHROUGH, BUILD, CONSTRUCT, BLOCK_BREAK, BLOCK_PLACE, PVP, CHEST_ACCESS, PISTONS,
-            TNT, LIGHTER, USE, INTERACT, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
+            TNT, LIGHTER, RIDE, USE, INTERACT, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
             MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
             DENY_MESSAGE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,

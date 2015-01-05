@@ -389,6 +389,11 @@ public class RegionProtectionListener extends AbstractListener {
             canUse = query.testBuild(target, associable);
             what = "change that";
 
+        /* Ridden on use */
+        } else if (Entities.isRiddenOnUse(event.getEntity())) {
+            canUse = query.testBuild(target, associable, DefaultFlag.RIDE, DefaultFlag.INTERACT);
+            what = "ride that";
+
         /* Everything else */
         } else {
             canUse = query.testBuild(target, associable, DefaultFlag.INTERACT);
@@ -466,7 +471,7 @@ public class RegionProtectionListener extends AbstractListener {
             if (!isWhitelisted(Cause.create(player), vehicle.getWorld())) {
                 RegionQuery query = getPlugin().getRegionContainer().createQuery();
                 Location location = vehicle.getLocation();
-                if (!query.testBuild(location, player, DefaultFlag.INTERACT)) {
+                if (!query.testBuild(location, player, DefaultFlag.RIDE, DefaultFlag.INTERACT)) {
                     long now = System.currentTimeMillis();
                     Long lastTime = WGMetadata.getIfPresent(player, DISEMBARK_MESSAGE_KEY, Long.class);
                     if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
