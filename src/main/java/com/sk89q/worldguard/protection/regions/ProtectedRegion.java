@@ -47,6 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class ProtectedRegion implements ChangeTracked, Comparable<ProtectedRegion> {
 
+    public static final String GLOBAL_REGION = "__global__";
     private static final Pattern VALID_ID_PATTERN = Pattern.compile("^[A-Za-z0-9_,'\\-\\+/]{1,}$");
 
     protected BlockVector min;
