@@ -118,7 +118,8 @@ public class RegionProtectionListener extends AbstractListener {
         Object rootCause = cause.getRootCause();
 
         if (rootCause instanceof Block) {
-            return ((Block) rootCause).getType() == Material.HOPPER;
+            Material type = ((Block) rootCause).getType();
+            return type == Material.HOPPER || type == Material.DROPPER;
         } else if (rootCause instanceof Player) {
             Player player = (Player) rootCause;
             WorldConfiguration config = getWorldConfig(world);
