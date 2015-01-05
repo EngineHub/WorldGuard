@@ -27,10 +27,11 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.material.Dye;
 import org.bukkit.material.MaterialData;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Material utility class.
@@ -42,6 +43,7 @@ public final class Materials {
 
     private static final BiMap<EntityType, Material> ENTITY_ITEMS = HashBiMap.create();
     private static final Map<Material, Integer> MATERIAL_FLAGS = new HashMap<Material, Integer>();
+    private static final Set<PotionEffectType> DAMAGE_EFFECTS = new HashSet<PotionEffectType>();
 
     static {
         ENTITY_ITEMS.put(EntityType.PAINTING, Material.PAINTING);
@@ -407,6 +409,30 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.RECORD_10, 0);
         MATERIAL_FLAGS.put(Material.RECORD_11, 0);
         MATERIAL_FLAGS.put(Material.RECORD_12, 0);
+
+        //DAMAGE_EFFECTS.add(PotionEffectType.ABSORPTION);
+        DAMAGE_EFFECTS.add(PotionEffectType.BLINDNESS);
+        DAMAGE_EFFECTS.add(PotionEffectType.CONFUSION);
+        //DAMAGE_EFFECTS.add(PotionEffectType.DAMAGE_RESISTANCE);
+        //DAMAGE_EFFECTS.add(PotionEffectType.FAST_DIGGING);
+        //DAMAGE_EFFECTS.add(PotionEffectType.FIRE_RESISTANCE);
+        DAMAGE_EFFECTS.add(PotionEffectType.HARM);
+        //DAMAGE_EFFECTS.add(PotionEffectType.HEAL);
+        //DAMAGE_EFFECTS.add(PotionEffectType.HEALTH_BOOST);
+        DAMAGE_EFFECTS.add(PotionEffectType.HUNGER);
+        //DAMAGE_EFFECTS.add(PotionEffectType.INCREASE_DAMAGE);
+        //DAMAGE_EFFECTS.add(PotionEffectType.INVISIBILITY);
+        //DAMAGE_EFFECTS.add(PotionEffectType.JUMP);
+        //DAMAGE_EFFECTS.add(PotionEffectType.NIGHT_VISION);
+        DAMAGE_EFFECTS.add(PotionEffectType.POISON);
+        //DAMAGE_EFFECTS.add(PotionEffectType.REGENERATION);
+        //DAMAGE_EFFECTS.add(PotionEffectType.SATURATION);
+        DAMAGE_EFFECTS.add(PotionEffectType.SLOW);
+        DAMAGE_EFFECTS.add(PotionEffectType.SLOW_DIGGING);
+        //DAMAGE_EFFECTS.add(PotionEffectType.SPEED);
+        //DAMAGE_EFFECTS.add(PotionEffectType.WATER_BREATHING);
+        DAMAGE_EFFECTS.add(PotionEffectType.WEAKNESS);
+        DAMAGE_EFFECTS.add(PotionEffectType.WITHER);
     }
 
     private Materials() {
@@ -660,6 +686,23 @@ public final class Materials {
      */
     public static boolean isConsideredBuildingIfUsed(Material type) {
         return type == Material.SAPLING;
+    }
+
+    /**
+     * Test whether a list of potion effects contains one or more potion
+     * effects used for doing damage.
+     *
+     * @param effects A collection of effects
+     * @return True if at least one damage effect exists
+     */
+    public static boolean hasDamageEffect(Collection<PotionEffect> effects) {
+        for (PotionEffect effect : effects) {
+            if (DAMAGE_EFFECTS.contains(effect.getType())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
