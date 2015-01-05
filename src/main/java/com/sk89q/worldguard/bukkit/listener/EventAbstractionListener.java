@@ -23,14 +23,12 @@ import com.google.common.collect.Lists;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
+import com.sk89q.worldguard.bukkit.event.DelegateEvent;
 import com.sk89q.worldguard.bukkit.event.DelegateEvents;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
-import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
-import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
-import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
-import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
+import com.sk89q.worldguard.bukkit.event.entity.*;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
 import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonExtendKey;
 import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonRetractKey;
@@ -741,9 +739,14 @@ public class EventAbstractionListener extends AbstractListener {
         // Fire entity interaction event
         if (!event.isCancelled()) {
             int blocked = 0;
+            boolean hasDamageEffect = Materials.hasDamageEffect(potion.getEffects());
 
             for (LivingEntity affected : event.getAffectedEntities()) {
-                if (Events.fireAndTestCancel(new DamageEntityEvent(event, cause, affected))) {
+                DelegateEvent delegate = hasDamageEffect
+                        ? new DamageEntityEvent(event, cause, affected) :
+                        new UseEntityEvent(event, cause, affected);
+
+                if (Events.fireAndTestCancel(delegate)) {
                     event.setIntensity(affected, 0);
                     blocked++;
                 }
