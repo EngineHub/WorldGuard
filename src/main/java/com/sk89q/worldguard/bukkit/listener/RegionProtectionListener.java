@@ -315,6 +315,11 @@ public class RegionProtectionListener extends AbstractListener {
             canSpawn = query.testBuild(target, associable, DefaultFlag.ITEM_DROP);
             what = "drop items";
 
+        /* XP drops */
+        } else if (event.getEffectiveType() == EntityType.EXPERIENCE_ORB) {
+            canSpawn = query.testBuild(target, associable, DefaultFlag.EXP_DROPS);
+            what = "drop XP";
+
         /* Everything else */
         } else {
             canSpawn = query.testBuild(target, associable);

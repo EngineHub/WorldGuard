@@ -64,6 +64,7 @@ public final class DefaultFlag {
     // BUILD flag. In the future, StateFlags will need a DISALLOW state.
     public static final StateFlag ITEM_PICKUP = new StateFlag("item-pickup", true); // Intentionally true
     public static final StateFlag ITEM_DROP = new StateFlag("item-drop", true); // Intentionally true
+    public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true); // Intentionally true
 
     // These flags adjust behavior and are not checked in tandem with the
     // BUILD flag so they need to be TRUE for their defaults.
@@ -91,7 +92,6 @@ public final class DefaultFlag {
     public static final StateFlag SOIL_DRY = new StateFlag("soil-dry", true);
     public static final StateFlag ENDER_BUILD = new StateFlag("enderman-grief", true);
     public static final StateFlag INVINCIBILITY = new StateFlag("invincible", false);
-    public static final StateFlag EXP_DROPS = new StateFlag("exp-drops", true);
     public static final StateFlag SEND_CHAT = new StateFlag("send-chat", true);
     public static final StateFlag RECEIVE_CHAT = new StateFlag("receive-chat", true);
     public static final StateFlag ENTRY = new StateFlag("entry", true, RegionGroup.NON_MEMBERS);
