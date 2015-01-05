@@ -19,20 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.util;
 
-import org.bukkit.entity.Ambient;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Flying;
-import org.bukkit.entity.Hanging;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.NPC;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Tameable;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.projectiles.ProjectileSource;
 
@@ -72,6 +59,16 @@ public final class Entities {
      */
     public static boolean isFireball(EntityType type) {
         return type == EntityType.FIREBALL || type == EntityType.SMALL_FIREBALL;
+    }
+
+    /**
+     * Test whether the given entity can be ridden if it is right clicked.
+     *
+     * @param entity the entity
+     * @return true if the entity can be ridden
+     */
+    public static boolean isRiddenOnUse(Entity entity) {
+        return entity instanceof Vehicle;
     }
 
     /**
