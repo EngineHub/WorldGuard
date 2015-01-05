@@ -28,7 +28,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
@@ -49,20 +48,9 @@ public class BlockedPotionsListener extends AbstractListener {
 
     @EventHandler
     public void onItemInteract(UseItemEvent event) {
-        // We only care about player caused events
-        if (event.getCause().getFirstPlayer() == null) {
-            return;
-        }
-
         ConfigurationManager cfg = getPlugin().getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getWorld());
         ItemStack item = event.getItemStack();
-
-        // Only block potions via PotionSplashEvent if "over reliable potion
-        // blocking" is enabled
-        if (!wcfg.blockPotionsAlways && event.getOriginalEvent() instanceof PotionSplashEvent) {
-            return;
-        }
 
         // We only care about portions
         if (item.getType() != Material.POTION || BukkitUtil.isWaterPotion(item)) {
