@@ -25,7 +25,6 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
-import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -35,7 +34,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -106,21 +104,6 @@ public class RegionFlagsListener extends AbstractListener {
                 event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
             }
 
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onSpawnEntity(final SpawnEntityEvent event) {
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-
-        RegionQuery query = getPlugin().getRegionContainer().createQuery();
-
-        // ================================================================
-        // EXP_DROPS flag
-        // ================================================================
-
-        if (event.getEffectiveType() == EntityType.EXPERIENCE_ORB) {
-            event.filter(testState(query, DefaultFlag.EXP_DROPS), false);
         }
     }
 
