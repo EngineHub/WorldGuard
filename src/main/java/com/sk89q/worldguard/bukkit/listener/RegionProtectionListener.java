@@ -108,9 +108,10 @@ public class RegionProtectionListener extends AbstractListener {
      *
      * @param cause the cause
      * @param world the world
+     * @param pvp whether the event in question is PvP combat
      * @return true if whitelisted
      */
-    private boolean isWhitelisted(Cause cause, World world) {
+    private boolean isWhitelisted(Cause cause, World world, boolean pvp) {
         Object rootCause = cause.getRootCause();
 
         if (rootCause instanceof Block) {
@@ -124,7 +125,7 @@ public class RegionProtectionListener extends AbstractListener {
                 return true;
             }
 
-            return new RegionPermissionModel(getPlugin(), player).mayIgnoreRegionProtection(world);
+            return !pvp && new RegionPermissionModel(getPlugin(), player).mayIgnoreRegionProtection(world);
         } else {
             return false;
         }
@@ -153,7 +154,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         final Material type = event.getEffectiveMaterial();
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
@@ -196,7 +197,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
 
@@ -234,7 +235,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         final Material type = event.getEffectiveMaterial();
         final RegionQuery query = getPlugin().getRegionContainer().createQuery();
@@ -290,7 +291,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         Location target = event.getTarget();
         EntityType type = event.getEffectiveType();
@@ -336,7 +337,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         Location target = event.getTarget();
         EntityType type = event.getEntity().getType();
@@ -371,7 +372,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
+        if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         Location target = event.getTarget();
         RegionAssociable associable = createRegionAssociable(event.getCause());
@@ -410,16 +411,23 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onDamageEntity(DamageEntityEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-        if (isWhitelisted(event.getCause(), event.getWorld())) return; // Whitelisted cause
+        // Whitelist check is below
 
         Location target = event.getTarget();
         RegionAssociable associable = createRegionAssociable(event.getCause());
 
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
-        Object rootCause = event.getCause().getRootCause();
-        Player attacker;
+        Player playerAttacker = event.getCause().getFirstPlayer();
         boolean canDamage;
         String what;
+
+        // Block PvP like normal even if the player has an override permission
+        // because (1) this is a frequent source of confusion and
+        // (2) some users want to block PvP even with the bypass permission
+        boolean pvp = event.getEntity() instanceof Player && playerAttacker != null && !playerAttacker.equals(event.getEntity());
+        if (isWhitelisted(event.getCause(), event.getWorld(), pvp)) {
+            return;
+        }
 
         /* Hostile / ambient mob override */
         if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())) {
@@ -432,14 +440,14 @@ public class RegionProtectionListener extends AbstractListener {
             what = "change that";
 
         /* PVP */
-        } else if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null && !attacker.equals(event.getEntity())) {
+        } else if (pvp) {
             Player defender = (Player) event.getEntity();
 
             canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.PVP))
-                    && query.queryState(attacker.getLocation(), attacker, combine(event, DefaultFlag.PVP)) != State.DENY;
+                    && query.queryState(playerAttacker.getLocation(), playerAttacker, combine(event, DefaultFlag.PVP)) != State.DENY;
 
             // Fire the disallow PVP event
-            if (!canDamage && Events.fireAndTestCancel(new DisallowedPVPEvent(attacker, defender, event.getOriginalEvent()))) {
+            if (!canDamage && Events.fireAndTestCancel(new DisallowedPVPEvent(playerAttacker, defender, event.getOriginalEvent()))) {
                 canDamage = true;
             }
 
@@ -469,7 +477,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         if (vehicle instanceof Tameable && exited instanceof Player) {
             Player player = (Player) exited;
-            if (!isWhitelisted(Cause.create(player), vehicle.getWorld())) {
+            if (!isWhitelisted(Cause.create(player), vehicle.getWorld(), false)) {
                 RegionQuery query = getPlugin().getRegionContainer().createQuery();
                 Location location = vehicle.getLocation();
                 if (!query.testBuild(location, player, DefaultFlag.RIDE, DefaultFlag.INTERACT)) {
