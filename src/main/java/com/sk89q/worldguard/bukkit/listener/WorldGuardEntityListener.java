@@ -768,30 +768,6 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPotionSplash(PotionSplashEvent event) {
-        Entity entity = event.getEntity();
-        ThrownPotion potion = event.getPotion();
-        World world = entity.getWorld();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-
-        GlobalRegionManager regionMan = plugin.getGlobalRegionManager();
-
-        int blockedEntities = 0;
-        for (LivingEntity e : event.getAffectedEntities()) {
-            if (!regionMan.allows(DefaultFlag.POTION_SPLASH, e.getLocation(),
-                    e instanceof Player ? plugin.wrapPlayer((Player) e) : null)) {
-                event.setIntensity(e, 0);
-                ++blockedEntities;
-            }
-        }
-
-        if (blockedEntities == event.getAffectedEntities().size()) {
-            event.setCancelled(true);
-        }
-    }
-
     /**
      * Check if a player is invincible, via either god mode or region flag. If
      * the region denies invincibility, the player must have an extra permission

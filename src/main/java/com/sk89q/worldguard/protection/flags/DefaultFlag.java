@@ -56,6 +56,7 @@ public final class DefaultFlag {
     public static final StateFlag DESTROY_VEHICLE = new StateFlag("vehicle-destroy", false);
     public static final StateFlag LIGHTER = new StateFlag("lighter", false);
     public static final StateFlag RIDE = new StateFlag("ride", false);
+    public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", false);
 
     // These flags are similar to the ones above (used in tandem with BUILD),
     // but their defaults are set to TRUE because it is more user friendly.
@@ -99,7 +100,6 @@ public final class DefaultFlag {
     public static final StateFlag ENDERPEARL = new StateFlag("enderpearl", true);
     public static final StateFlag ENTITY_PAINTING_DESTROY = new StateFlag("entity-painting-destroy", true);
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = new StateFlag("entity-item-frame-destroy", true);
-    public static final StateFlag POTION_SPLASH = new StateFlag("potion-splash", true);
 
     // Flags that adjust behaviors that aren't state flags
     public static final StringFlag DENY_MESSAGE = new StringFlag("deny-message",

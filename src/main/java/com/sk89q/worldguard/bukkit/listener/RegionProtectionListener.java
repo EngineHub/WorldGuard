@@ -32,32 +32,27 @@ import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
+import com.sk89q.worldguard.bukkit.internal.WGMetadata;
 import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
 import com.sk89q.worldguard.bukkit.protection.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.bukkit.internal.WGMetadata;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Tameable;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.vehicle.VehicleExitEvent;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Handle events that need to be processed by region protection.
@@ -112,6 +107,7 @@ public class RegionProtectionListener extends AbstractListener {
      * Return whether the given cause is whitelist (should be ignored).
      *
      * @param cause the cause
+     * @param world the world
      * @return true if whitelisted
      */
     private boolean isWhitelisted(Cause cause, World world) {
@@ -178,12 +174,12 @@ public class RegionProtectionListener extends AbstractListener {
 
                 /* Flint and steel, fire charge, etc. */
                 if (type == Material.FIRE) {
-                    canPlace = query.testBuild(target, associable, DefaultFlag.BLOCK_PLACE, DefaultFlag.LIGHTER);
+                    canPlace = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_PLACE, DefaultFlag.LIGHTER));
                     what = "place fire";
 
                 /* Everything else */
                 } else {
-                    canPlace = query.testBuild(target, associable, DefaultFlag.BLOCK_PLACE);
+                    canPlace = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_PLACE));
                     what = "place that block";
                 }
 
@@ -215,12 +211,12 @@ public class RegionProtectionListener extends AbstractListener {
 
                     /* TNT */
                     if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.PRIMED_TNT) != null) {
-                        canBreak = query.testBuild(target, associable, DefaultFlag.BLOCK_BREAK, DefaultFlag.TNT);
+                        canBreak = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_BREAK, DefaultFlag.TNT));
                         what = "dynamite blocks";
 
                     /* Everything else */
                     } else {
-                        canBreak = query.testBuild(target, associable, DefaultFlag.BLOCK_BREAK);
+                        canBreak = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_BREAK));
                         what = "break that block";
                     }
 
@@ -252,32 +248,32 @@ public class RegionProtectionListener extends AbstractListener {
 
                 /* Saplings, etc. */
                 if (Materials.isConsideredBuildingIfUsed(type)) {
-                    canUse = query.testBuild(target, associable);
+                    canUse = query.testBuild(target, associable, combine(event));
                     what = "use that";
 
                 /* Inventory */
                 } else if (Materials.isInventoryBlock(type)) {
-                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT, DefaultFlag.CHEST_ACCESS);
+                    canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT, DefaultFlag.CHEST_ACCESS));
                     what = "open that";
 
                 /* Beds */
                 } else if (type == Material.BED_BLOCK) {
-                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT, DefaultFlag.SLEEP);
+                    canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT, DefaultFlag.SLEEP));
                     what = "sleep";
 
                 /* TNT */
                 } else if (type == Material.TNT) {
-                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT, DefaultFlag.TNT);
+                    canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT, DefaultFlag.TNT));
                     what = "use explosives";
 
                 /* Legacy USE flag */
                 } else if (Materials.isUseFlagApplicable(type)) {
-                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT, DefaultFlag.USE);
+                    canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT, DefaultFlag.USE));
                     what = "use that";
 
                 /* Everything else */
                 } else {
-                    canUse = query.testBuild(target, associable, DefaultFlag.INTERACT);
+                    canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT));
                     what = "use that";
                 }
 
@@ -307,22 +303,22 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Vehicles */
         if (Entities.isVehicle(type)) {
-            canSpawn = query.testBuild(target, associable, DefaultFlag.PLACE_VEHICLE);
+            canSpawn = query.testBuild(target, associable, combine(event, DefaultFlag.PLACE_VEHICLE));
             what = "place vehicles";
 
         /* Item pickup */
         } else if (event.getEntity() instanceof Item) {
-            canSpawn = query.testBuild(target, associable, DefaultFlag.ITEM_DROP);
+            canSpawn = query.testBuild(target, associable, combine(event, DefaultFlag.ITEM_DROP));
             what = "drop items";
 
         /* XP drops */
         } else if (event.getEffectiveType() == EntityType.EXPERIENCE_ORB) {
-            canSpawn = query.testBuild(target, associable, DefaultFlag.EXP_DROPS);
+            canSpawn = query.testBuild(target, associable, combine(event, DefaultFlag.EXP_DROPS));
             what = "drop XP";
 
         /* Everything else */
         } else {
-            canSpawn = query.testBuild(target, associable);
+            canSpawn = query.testBuild(target, associable, combine(event));
 
             if (event.getEntity() instanceof Item) {
                 what = "drop items";
@@ -352,17 +348,17 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Vehicles */
         if (Entities.isVehicle(type)) {
-            canDestroy = query.testBuild(target, associable, DefaultFlag.DESTROY_VEHICLE);
+            canDestroy = query.testBuild(target, associable, combine(event, DefaultFlag.DESTROY_VEHICLE));
             what = "break vehicles";
 
         /* Item pickup */
         } else if (event.getEntity() instanceof Item || event.getEntity() instanceof ExperienceOrb) {
-            canDestroy = query.testBuild(target, associable, DefaultFlag.ITEM_PICKUP);
+            canDestroy = query.testBuild(target, associable, combine(event, DefaultFlag.ITEM_PICKUP));
             what = "pick up items";
 
         /* Everything else */
         } else {
-            canDestroy = query.testBuild(target, associable);
+            canDestroy = query.testBuild(target, associable, combine(event));
             what = "break things";
         }
 
@@ -386,22 +382,22 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Hostile / ambient mob override */
         if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity()) || Entities.isNPC(event.getEntity())) {
-            canUse = true;
+            canUse = event.getRelevantFlags().isEmpty() || query.testState(target, associable, combine(event));
             what = "use that";
 
         /* Paintings, item frames, etc. */
         } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
-            canUse = query.testBuild(target, associable);
+            canUse = query.testBuild(target, associable, combine(event));
             what = "change that";
 
         /* Ridden on use */
         } else if (Entities.isRiddenOnUse(event.getEntity())) {
-            canUse = query.testBuild(target, associable, DefaultFlag.RIDE, DefaultFlag.INTERACT);
+            canUse = query.testBuild(target, associable, combine(event, DefaultFlag.RIDE, DefaultFlag.INTERACT));
             what = "ride that";
 
         /* Everything else */
         } else {
-            canUse = query.testBuild(target, associable, DefaultFlag.INTERACT);
+            canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT));
             what = "use that";
         }
 
@@ -427,20 +423,20 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Hostile / ambient mob override */
         if (isWhitelistedEntity(event.getEntity()) || (rootCause instanceof Entity && isWhitelistedEntity((Entity) rootCause))) {
-            canDamage = true;
+            canDamage = event.getRelevantFlags().isEmpty() || query.testState(target, associable, combine(event));
             what = "hit that";
 
         /* Paintings, item frames, etc. */
         } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
-            canDamage = query.testBuild(target, associable);
+            canDamage = query.testBuild(target, associable, combine(event));
             what = "change that";
 
         /* PVP */
         } else if (event.getEntity() instanceof Player && (attacker = event.getCause().getFirstPlayer()) != null && !attacker.equals(event.getEntity())) {
             Player defender = (Player) event.getEntity();
 
-            canDamage = query.testBuild(target, associable, DefaultFlag.PVP)
-                    && query.queryState(attacker.getLocation(), attacker, DefaultFlag.PVP) != State.DENY;
+            canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.PVP))
+                    && query.queryState(attacker.getLocation(), attacker, combine(event, DefaultFlag.PVP)) != State.DENY;
 
             // Fire the disallow PVP event
             if (!canDamage && Events.fireAndTestCancel(new DisallowedPVPEvent(attacker, defender, event.getOriginalEvent()))) {
@@ -451,12 +447,12 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Player damage not caused  by another player */
         } else if (event.getEntity() instanceof Player) {
-            canDamage = true;
+            canDamage = event.getRelevantFlags().isEmpty() || query.testState(target, associable, combine(event));
             what = "damage that";
 
         /* Everything else */
         } else {
-            canDamage = query.testBuild(target, associable, DefaultFlag.INTERACT);
+            canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT));
             what = "hit that";
         }
 
@@ -492,6 +488,24 @@ public class RegionProtectionListener extends AbstractListener {
 
     private boolean isWhitelistedEntity(Entity entity) {
         return Entities.isNonPlayerCreature(entity);
+    }
+
+    /**
+     * Combine the flags from a delegate event with an array of flags.
+     *
+     * <p>The delegate event's flags appear at the end.</p>
+     *
+     * @param event The event
+     * @param flag An array of flags
+     * @return An array of flags
+     */
+    private static StateFlag[] combine(DelegateEvent event, StateFlag... flag) {
+        List<StateFlag> extra = event.getRelevantFlags();
+        StateFlag[] flags = Arrays.copyOf(flag, flag.length + extra.size());
+        for (int i = 0; i < extra.size(); i++) {
+            flags[flag.length + i] = extra.get(i);
+        }
+        return flags;
     }
 
 }

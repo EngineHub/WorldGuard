@@ -28,7 +28,10 @@ import com.sk89q.worldguard.bukkit.event.DelegateEvents;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
-import com.sk89q.worldguard.bukkit.event.entity.*;
+import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
+import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
+import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
+import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
 import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonExtendKey;
 import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonRetractKey;
@@ -40,6 +43,7 @@ import com.sk89q.worldguard.bukkit.listener.debounce.legacy.InventoryMoveItemEve
 import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -731,7 +735,7 @@ public class EventAbstractionListener extends AbstractListener {
         Entity entity = event.getEntity();
         ThrownPotion potion = event.getPotion();
         World world = entity.getWorld();
-        Cause cause = create(potion.getShooter());
+        Cause cause = create(potion);
 
         // Fire item interaction event
         Events.fireToCancel(event, new UseItemEvent(event, cause, world, potion.getItem()));
@@ -745,6 +749,9 @@ public class EventAbstractionListener extends AbstractListener {
                 DelegateEvent delegate = hasDamageEffect
                         ? new DamageEntityEvent(event, cause, affected) :
                         new UseEntityEvent(event, cause, affected);
+
+                // Consider the potion splash flag
+                delegate.getRelevantFlags().add(DefaultFlag.POTION_SPLASH);
 
                 if (Events.fireAndTestCancel(delegate)) {
                     event.setIntensity(affected, 0);
