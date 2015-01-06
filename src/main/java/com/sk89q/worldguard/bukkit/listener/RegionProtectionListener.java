@@ -422,7 +422,7 @@ public class RegionProtectionListener extends AbstractListener {
         String what;
 
         /* Hostile / ambient mob override */
-        if (isWhitelistedEntity(event.getEntity()) || (rootCause instanceof Entity && isWhitelistedEntity((Entity) rootCause))) {
+        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())) {
             canDamage = event.getRelevantFlags().isEmpty() || query.testState(target, associable, combine(event));
             what = "hit that";
 
