@@ -19,11 +19,14 @@
 
 package com.sk89q.worldguard.bukkit.event;
 
+import com.google.common.collect.Lists;
 import com.sk89q.worldguard.bukkit.cause.Cause;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,6 +39,7 @@ public abstract class DelegateEvent extends Event implements Cancellable {
     @Nullable
     private final Event originalEvent;
     private final Cause cause;
+    private final List<StateFlag> relevantFlags = Lists.newArrayList();
     private boolean cancelled;
     private boolean silent;
 
@@ -68,6 +72,15 @@ public abstract class DelegateEvent extends Event implements Cancellable {
      */
     public Cause getCause() {
         return cause;
+    }
+
+    /**
+     * Get a list of relevant flags to consider for this event.
+     *
+     * @return A list of relevant flags
+     */
+    public List<StateFlag> getRelevantFlags() {
+        return relevantFlags;
     }
 
     @Override
