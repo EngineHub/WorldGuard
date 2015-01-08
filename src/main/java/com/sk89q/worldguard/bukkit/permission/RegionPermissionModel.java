@@ -27,6 +27,8 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
+
 /**
  * Used for querying region-related permissions.
  */
@@ -124,11 +126,16 @@ public class RegionPermissionModel extends AbstractPermissionModel {
                 "flag.flags." + flag.getName().toLowerCase(), region);
     }
 
-    public boolean maySetFlag(ProtectedRegion region, Flag<?> flag, String value) {
-        String sanitizedValue = value.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
+    public boolean maySetFlag(ProtectedRegion region, Flag<?> flag, @Nullable String value) {
+        String sanitizedValue;
 
-        if (sanitizedValue.length() > 20) {
-            sanitizedValue = sanitizedValue.substring(0, 20);
+        if (value != null) {
+            sanitizedValue = value.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
+            if (sanitizedValue.length() > 20) {
+                sanitizedValue = sanitizedValue.substring(0, 20);
+            }
+        } else {
+            sanitizedValue = "unset";
         }
 
         // This is a WTF permission
