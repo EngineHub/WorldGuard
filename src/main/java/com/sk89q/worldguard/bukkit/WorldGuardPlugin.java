@@ -207,7 +207,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        for (Player player : getServer().getOnlinePlayers()) {
+        for (Player player : BukkitUtil.getOnlinePlayers()) {
             ProcessPlayerEvent event = new ProcessPlayerEvent(player);
             Events.fire(event);
         }
@@ -510,7 +510,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return A {@link List} of players who match {@code filter}
      */
     public List<Player> matchPlayerNames(String filter) {
-        Collection<? extends Player> players = getServer().getOnlinePlayers();
+        Collection<? extends Player> players = BukkitUtil.getOnlinePlayers();
 
         filter = filter.toLowerCase();
 
@@ -591,12 +591,12 @@ public class WorldGuardPlugin extends JavaPlugin {
     public Iterable<? extends Player> matchPlayers(CommandSender source, String filter)
             throws CommandException {
 
-        if (getServer().getOnlinePlayers().isEmpty()) {
+        if (BukkitUtil.getOnlinePlayers().isEmpty()) {
             throw new CommandException("No players matched query.");
         }
 
         if (filter.equals("*")) {
-            return checkPlayerMatch(Lists.newArrayList(getServer().getOnlinePlayers()));
+            return checkPlayerMatch(Lists.newArrayList(BukkitUtil.getOnlinePlayers()));
         }
 
         // Handle special hash tag groups
@@ -608,7 +608,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 Player sourcePlayer = checkPlayer(source);
                 World sourceWorld = sourcePlayer.getWorld();
 
-                for (Player player : getServer().getOnlinePlayers()) {
+                for (Player player : BukkitUtil.getOnlinePlayers()) {
                     if (player.getWorld().equals(sourceWorld)) {
                         players.add(player);
                     }
@@ -624,7 +624,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 org.bukkit.util.Vector sourceVector
                         = sourcePlayer.getLocation().toVector();
 
-                for (Player player : getServer().getOnlinePlayers()) {
+                for (Player player : BukkitUtil.getOnlinePlayers()) {
                     if (player.getWorld().equals(sourceWorld)
                             && player.getLocation().toVector().distanceSquared(
                                     sourceVector) < 900) {
@@ -916,7 +916,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public void broadcastNotification(String msg) {
         getServer().broadcast(msg, "worldguard.notify");
         Set<Permissible> subs = getServer().getPluginManager().getPermissionSubscriptions("worldguard.notify");
-        for (Player player : getServer().getOnlinePlayers()) {
+        for (Player player : BukkitUtil.getOnlinePlayers()) {
             if (!(subs.contains(player) && player.hasPermission("worldguard.notify")) &&
                     hasPermission(player, "worldguard.notify")) { // Make sure the player wasn't already broadcasted to.
                 player.sendMessage(msg);
@@ -994,7 +994,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return The message with macros replaced
      */
     public String replaceMacros(CommandSender sender, String message) {
-        Collection<? extends Player> online = getServer().getOnlinePlayers();
+        Collection<? extends Player> online = BukkitUtil.getOnlinePlayers();
 
         message = message.replace("%name%", toName(sender));
         message = message.replace("%id%", toUniqueName(sender));

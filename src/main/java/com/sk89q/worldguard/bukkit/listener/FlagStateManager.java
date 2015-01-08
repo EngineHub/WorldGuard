@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -62,7 +63,7 @@ public class FlagStateManager implements Runnable {
      */
     @Override
     public void run() {
-        Collection<? extends Player> players = plugin.getServer().getOnlinePlayers();
+        Collection<? extends Player> players = BukkitUtil.getOnlinePlayers();
         ConfigurationManager config = plugin.getGlobalStateManager();
 
         for (Player player : players) {
