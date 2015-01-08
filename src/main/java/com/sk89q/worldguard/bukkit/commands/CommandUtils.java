@@ -110,6 +110,7 @@ public final class CommandUtils {
         str = str.replace("&o", ChatColor.ITALIC.toString());
 
         str = str.replace("&x", ChatColor.RESET.toString());
+        str = str.replace("&r", ChatColor.RESET.toString());
 
         return str;
     }
