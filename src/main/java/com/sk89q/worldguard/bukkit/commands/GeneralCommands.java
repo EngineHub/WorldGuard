@@ -45,7 +45,7 @@ public class GeneralCommands {
     public void god(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
         
-        Iterable<Player> targets = null;
+        Iterable<? extends Player> targets = null;
         boolean included = false;
         
         // Detect arguments based on the number of arguments provided
@@ -91,7 +91,7 @@ public class GeneralCommands {
     public void ungod(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
         
-        Iterable<Player> targets = null;
+        Iterable<? extends Player> targets = null;
         boolean included = false;
         
         // Detect arguments based on the number of arguments provided
@@ -132,8 +132,8 @@ public class GeneralCommands {
     
     @Command(aliases = {"heal"}, usage = "[player]", desc = "Heal a player", flags = "s", max = 1)
     public void heal(CommandContext args,CommandSender sender) throws CommandException {
-        
-        Iterable<Player> targets = null;
+
+        Iterable<? extends Player> targets = null;
         boolean included = false;
         
         // Detect arguments based on the number of arguments provided
@@ -176,7 +176,7 @@ public class GeneralCommands {
     @Command(aliases = {"slay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
     public void slay(CommandContext args, CommandSender sender) throws CommandException {
         
-        Iterable<Player> targets = null;
+        Iterable<? extends Player> targets = null;
         boolean included = false;
         
         // Detect arguments based on the number of arguments provided

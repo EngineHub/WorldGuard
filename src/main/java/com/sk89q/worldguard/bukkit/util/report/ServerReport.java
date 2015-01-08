@@ -34,7 +34,7 @@ public class ServerReport extends DataReport {
         append("Server Name", server.getServerName());
         append("Bukkit Version", server.getBukkitVersion());
         append("Implementation", server.getVersion());
-        append("Player Count", "%d/%d", server.getOnlinePlayers().length, server.getMaxPlayers());
+        append("Player Count", "%d/%d", server.getOnlinePlayers().size(), server.getMaxPlayers());
 
         DataReport spawning = new DataReport("Spawning");
         spawning.append("Ambient Spawn Limit", server.getAmbientSpawnLimit());
