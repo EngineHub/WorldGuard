@@ -1,5 +1,41 @@
 # Changelog
 
+## 6.0 beta 3
+
+MC 1.7.10 and 1.8 (Spigot only) are supported.
+
+* Support both MC 1.7.10 and 1.8.
+* Don't apply the region override permission to PvP.
+* Fix incorrect detection of hostile and ambient creatures when protecting against PvE.
+* Fix the splash potion flag not working with the other flags.
+* Fix potion blocking.
+* Fix inability to blacklist the enchantment table and the workbench.
+* Make PASSTHROUGH=DENY useful on ``__global__``.
+* Fix issues (pistons broken, etc.) caused by adding members to ``__global__``.
+* Make the EXP_DROPS flag a build-compat flag and set its deny message.
+* Give the player back his/her XP bottle if it was blocked.
+* Expand the interaction whitelist configuration to "physical" events.
+* Catch command prefixes in the command flags.
+* Add a RIDE flag for vehicles.
+* Check for names in addition to UUIDs with /rg list.
+* Whitelist hoppers and let them cross regions regardless of region protection.
+* Revert USE flag's functionality to 5.x, add new INTERACT flag.
+* Fix spawn egg blocking.
+* Fix failed detection of incorrect blacklist block and item names.
+* Fix command prefix bypass with the op command blocking configuration.
+* Rewrite and update report generation (wg report).
+* Add event cancellation debug commands.
+* Fix location flags causing NullPointerExceptions.
+* Show more details in error log which world the error belongs to.
+* Add missing color codes when parsing input.
+* Let players use NPCs always.
+* Fix [WorldGuard] in log messages stacking on reloads.
+* Better handle empty group / player names due to bad region data.
+* Fix players being invincible with BUILD=deny.
+* Fix certain entities not being damaged in protected regions.
+* Improve entity detection in Entities utility class, add Entities.isNonPlayerCreature().
+* Add missing SQL table prefix in statement selecting world names.
+
 ## 6.0 beta 2
 
 * Added an `-e` parameter to `/rg flag` that sets the flag to an empty value. You can use this to, for example, make it so the `deny-message` flag is empty, meaning that players won't get a message at all.
