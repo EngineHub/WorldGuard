@@ -21,14 +21,7 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.google.common.base.Predicate;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.event.BlockBreakBlacklistEvent;
-import com.sk89q.worldguard.blacklist.event.BlockDispenseBlacklistEvent;
-import com.sk89q.worldguard.blacklist.event.BlockInteractBlacklistEvent;
-import com.sk89q.worldguard.blacklist.event.BlockPlaceBlacklistEvent;
-import com.sk89q.worldguard.blacklist.event.ItemAcquireBlacklistEvent;
-import com.sk89q.worldguard.blacklist.event.ItemDestroyWithBlacklistEvent;
-import com.sk89q.worldguard.blacklist.event.ItemDropBlacklistEvent;
-import com.sk89q.worldguard.blacklist.event.ItemUseBlacklistEvent;
+import com.sk89q.worldguard.blacklist.event.*;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -42,11 +35,16 @@ import com.sk89q.worldguard.bukkit.util.Materials;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
@@ -255,6 +253,66 @@ public class BlacklistListener extends AbstractListener {
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(new BlockDispenseBlacklistEvent(null, toVector(event.getBlock()), createTarget(event.getItem())), false, false)) {
                 event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryClick(InventoryClickEvent event) {
+        HumanEntity entity = event.getWhoClicked();
+        Inventory inventory = event.getInventory();
+        ItemStack item = event.getCurrentItem();
+
+        if (item != null && entity instanceof Player) {
+            Player player = (Player) entity;
+            ConfigurationManager cfg = getPlugin().getGlobalStateManager();
+            WorldConfiguration wcfg = cfg.get(entity.getWorld());
+            LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+
+            if (wcfg.getBlacklist() != null && !wcfg.getBlacklist().check(
+                    new ItemAcquireBlacklistEvent(localPlayer, toVector(entity.getLocation()), createTarget(item)), false, false)) {
+                event.setCancelled(true);
+
+                if (inventory.getHolder().equals(player)) {
+                    event.setCurrentItem(null);
+                }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryCreative(InventoryCreativeEvent event) {
+        HumanEntity entity = event.getWhoClicked();
+        ItemStack item = event.getCursor();
+
+        if (item != null && entity instanceof Player) {
+            Player player = (Player) entity;
+            ConfigurationManager cfg = getPlugin().getGlobalStateManager();
+            WorldConfiguration wcfg = cfg.get(entity.getWorld());
+            LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+
+            if (wcfg.getBlacklist() != null && !wcfg.getBlacklist().check(
+                    new ItemAcquireBlacklistEvent(localPlayer, toVector(entity.getLocation()), createTarget(item)), false, false)) {
+                event.setCancelled(true);
+                event.setCursor(null);
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        Inventory inventory = player.getInventory();
+        ItemStack item = inventory.getItem(event.getNewSlot());
+
+        if (item != null) {
+            ConfigurationManager cfg = getPlugin().getGlobalStateManager();
+            WorldConfiguration wcfg = cfg.get(player.getWorld());
+            LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+
+            if (wcfg.getBlacklist() != null && !wcfg.getBlacklist().check(
+                    new ItemAcquireBlacklistEvent(localPlayer, toVector(player.getLocation()), createTarget(item)), false, false)) {
+                inventory.setItem(event.getNewSlot(), null);
             }
         }
     }
