@@ -21,7 +21,7 @@ package com.sk89q.worldguard.blacklist.target;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Ranges;
+import com.sk89q.guavabackport.collect.Range;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.util.Enums;
 import org.bukkit.Material;
@@ -84,22 +84,22 @@ public class TargetMatcherParser {
 
         matcher = LESS_THAN_PATTERN.matcher(input);
         if (matcher.matches()) {
-            return Ranges.atMost(Short.parseShort(matcher.group(1)));
+            return Range.atMost(Short.parseShort(matcher.group(1)));
         }
 
         matcher = GREATER_THAN_PATTERN.matcher(input);
         if (matcher.matches()) {
-            return Ranges.atLeast(Short.parseShort(matcher.group(1)));
+            return Range.atLeast(Short.parseShort(matcher.group(1)));
         }
 
         matcher = RANGE_PATTERN.matcher(input);
         if (matcher.matches()) {
-            return Ranges.closed(Short.parseShort(matcher.group(1)), Short.parseShort(matcher.group(2)));
+            return Range.closed(Short.parseShort(matcher.group(1)), Short.parseShort(matcher.group(2)));
         }
 
         try {
             short s = Short.parseShort(input);
-            return Ranges.closed(s, s);
+            return Range.closed(s, s);
         } catch (NumberFormatException e) {
             throw new TargetMatcherParseException("Unknown data value range: " + input);
         }

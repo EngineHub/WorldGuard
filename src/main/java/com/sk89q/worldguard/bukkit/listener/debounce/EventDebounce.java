@@ -19,10 +19,10 @@
 
 package com.sk89q.worldguard.bukkit.listener.debounce;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.sk89q.worldguard.bukkit.util.Events;
+import com.sk89q.guavabackport.cache.CacheBuilder;
+import com.sk89q.guavabackport.cache.CacheLoader;
+import com.sk89q.guavabackport.cache.LoadingCache;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 public class EventDebounce<K> {
 
-    private final Cache<K, Entry> cache;
+    private final LoadingCache<K, Entry> cache;
 
     public EventDebounce(int debounceTime) {
         cache = CacheBuilder.newBuilder()

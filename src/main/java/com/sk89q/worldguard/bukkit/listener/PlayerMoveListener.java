@@ -19,9 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
@@ -29,6 +26,9 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.FlagStateManager.PlayerFlagState;
+import com.sk89q.guavabackport.cache.CacheBuilder;
+import com.sk89q.guavabackport.cache.CacheLoader;
+import com.sk89q.guavabackport.cache.LoadingCache;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit;
 public class PlayerMoveListener implements Listener {
 
     private final WorldGuardPlugin plugin;
-    private Cache<WorldPlayerTuple, Boolean> bypassCache = CacheBuilder.newBuilder()
+    private LoadingCache<WorldPlayerTuple, Boolean> bypassCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(5, TimeUnit.SECONDS)
             .build(new CacheLoader<WorldPlayerTuple, Boolean>() {

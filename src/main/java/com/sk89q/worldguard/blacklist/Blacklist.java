@@ -19,9 +19,6 @@
 
 package com.sk89q.worldguard.blacklist;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.sk89q.worldguard.blacklist.action.Action;
 import com.sk89q.worldguard.blacklist.action.ActionType;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
@@ -29,6 +26,9 @@ import com.sk89q.worldguard.blacklist.event.EventType;
 import com.sk89q.worldguard.blacklist.target.TargetMatcher;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
+import com.sk89q.guavabackport.cache.CacheBuilder;
+import com.sk89q.guavabackport.cache.CacheLoader;
+import com.sk89q.guavabackport.cache.LoadingCache;
 import org.bukkit.ChatColor;
 
 import java.io.BufferedReader;
@@ -49,7 +49,7 @@ public abstract class Blacklist {
     private final BlacklistLoggerHandler blacklistLogger = new BlacklistLoggerHandler();
     private BlacklistEvent lastEvent;
     private boolean useAsWhitelist;
-    private Cache<String, TrackedEvent> repeatingEventCache = CacheBuilder.newBuilder()
+    private LoadingCache<String, TrackedEvent> repeatingEventCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(30, TimeUnit.SECONDS)
             .build(new CacheLoader<String, TrackedEvent>() {
@@ -284,7 +284,7 @@ public abstract class Blacklist {
      */
     public abstract void broadcastNotification(String msg);
 
-    public Cache<String, TrackedEvent> getRepeatingEventCache() {
+    public LoadingCache<String, TrackedEvent> getRepeatingEventCache() {
         return repeatingEventCache;
     }
 
