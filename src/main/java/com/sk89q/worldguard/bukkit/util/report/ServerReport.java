@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.util.report;
 
+import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.util.report.DataReport;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -34,7 +35,7 @@ public class ServerReport extends DataReport {
         append("Server Name", server.getServerName());
         append("Bukkit Version", server.getBukkitVersion());
         append("Implementation", server.getVersion());
-        append("Player Count", "%d/%d", server.getOnlinePlayers().size(), server.getMaxPlayers());
+        append("Player Count", "%d/%d", BukkitUtil.getOnlinePlayers().size(), server.getMaxPlayers());
 
         DataReport spawning = new DataReport("Spawning");
         spawning.append("Ambient Spawn Limit", server.getAmbientSpawnLimit());

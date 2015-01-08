@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
@@ -26,27 +27,20 @@ import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemID;
 import com.sk89q.worldguard.blacklist.target.MaterialTarget;
 import com.sk89q.worldguard.blacklist.target.Target;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Server;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Tameable;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BukkitUtil {
+
+    private static Method ONLINE_PLAYERS_METHOD;
 
     private BukkitUtil()  {
 
@@ -348,6 +342,44 @@ public class BukkitUtil {
     public static Target createTarget(Material material) {
         checkNotNull(material);
         return new MaterialTarget(material.getId(), (short) 0);
+    }
+
+    /**
+     * Get a collection of the currently online players.
+     *
+     * @return The online players
+     */
+    @SuppressWarnings("unchecked")
+    public static Collection<? extends Player> getOnlinePlayers() {
+        try {
+            return Bukkit.getServer().getOnlinePlayers();
+        } catch (NoSuchMethodError ignored) {
+        }
+
+        try {
+            if (ONLINE_PLAYERS_METHOD == null) {
+                ONLINE_PLAYERS_METHOD = getOnlinePlayersMethod();
+            }
+
+            Object result = ONLINE_PLAYERS_METHOD.invoke(Bukkit.getServer());
+            if (result instanceof Player[]) {
+                return ImmutableList.copyOf((Player[]) result);
+            } else if (result instanceof Collection<?>) {
+                return (Collection<? extends Player>) result;
+            } else {
+                throw new RuntimeException("Result of getOnlinePlayers() call was not a known data type");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("WorldGuard is not compatible with this version of Bukkit", e);
+        }
+    }
+
+    private static Method getOnlinePlayersMethod() throws NoSuchMethodException {
+        try {
+            return Server.class.getMethod("getOnlinePlayers");
+        } catch (NoSuchMethodException e1) {
+            return Server.class.getMethod("_INVALID_getOnlinePlayers");
+        }
     }
 
 }
