@@ -47,10 +47,6 @@ Plugins that utilize WorldGuard's API may not work anymore. They may crash with 
 
 * Spigot:
     * `settings.global-api-cache`, if enabled, will crash WG UUID lookups (fixed in Spigot build #1625)
-* EchoPet
-    * Can't spawn pets ([issue #393](https://github.com/DSH105/EchoPet/issues/393))
-* CraftBook
-    * Unable to use mechanics unless the `USE` flag is explicitly set to `ALLOW` ([CRAFTBOOK-3057](http://youtrack.sk89q.com/issue/CRAFTBOOK-3057))
 
 ## Other Changes
 
