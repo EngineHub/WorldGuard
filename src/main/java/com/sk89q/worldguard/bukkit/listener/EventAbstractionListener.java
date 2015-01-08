@@ -635,9 +635,6 @@ public class EventAbstractionListener extends AbstractListener {
 
         } else if (event instanceof EntityCombustByEntityEvent) {
             Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityCombustByEntityEvent) event).getCombuster()), event.getEntity()));
-
-        } else {
-            Events.fireToCancel(event, new DamageEntityEvent(event, Cause.unknown(), event.getEntity()));
         }
     }
 
