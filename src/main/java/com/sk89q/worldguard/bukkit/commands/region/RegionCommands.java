@@ -519,7 +519,7 @@ public final class RegionCommands extends RegionCommandsBase {
         // Also make sure that we can use this flag
         // This permission is confusing and probably should be replaced, but
         // but not here -- in the model
-        if (!permModel.maySetFlag(existing, foundFlag)) {
+        if (!permModel.maySetFlag(existing, foundFlag, value)) {
             throw new CommandPermissionsException();
         }
 
