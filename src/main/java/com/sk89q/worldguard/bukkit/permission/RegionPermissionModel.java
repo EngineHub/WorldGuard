@@ -117,11 +117,23 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     public boolean maySetFlag(ProtectedRegion region) {
         return hasPatternPermission("flag.regions", region);
     }
-    
+
     public boolean maySetFlag(ProtectedRegion region, Flag<?> flag) {
         // This is a WTF permission
         return hasPatternPermission(
                 "flag.flags." + flag.getName().toLowerCase(), region);
+    }
+
+    public boolean maySetFlag(ProtectedRegion region, Flag<?> flag, String value) {
+        String sanitizedValue = value.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
+
+        if (sanitizedValue.length() > 20) {
+            sanitizedValue = sanitizedValue.substring(0, 20);
+        }
+
+        // This is a WTF permission
+        return hasPatternPermission(
+                "flag.flags." + flag.getName().toLowerCase() + "." + sanitizedValue, region);
     }
 
     public boolean mayAddMembers(ProtectedRegion region) {
