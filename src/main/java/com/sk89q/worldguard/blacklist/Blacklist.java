@@ -29,6 +29,7 @@ import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
 import com.sk89q.guavabackport.cache.CacheBuilder;
 import com.sk89q.guavabackport.cache.CacheLoader;
 import com.sk89q.guavabackport.cache.LoadingCache;
+import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import org.bukkit.ChatColor;
 
 import java.io.BufferedReader;
@@ -184,10 +185,10 @@ public abstract class Blacklist {
                             entry.setIgnorePermissions(parts[1].split(","));
 
                         } else if (parts[0].equalsIgnoreCase("message")) {
-                            entry.setMessage(parts[1].trim());
+                            entry.setMessage(CommandUtils.replaceColorMacros(parts[1].trim()));
 
                         } else if (parts[0].equalsIgnoreCase("comment")) {
-                            entry.setComment(parts[1].trim());
+                            entry.setComment(CommandUtils.replaceColorMacros(parts[1].trim()));
 
                         } else {
                             boolean found = false;
