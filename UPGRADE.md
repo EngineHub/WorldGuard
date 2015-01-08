@@ -1,39 +1,49 @@
 # Upgrading to WorldGuard 6
 
-Version 6 is a __MAJOR UPGRADE__ to WorldGuard so we recommend:
+This is a **major upgrade**. However, it is relatively well-tested because many people have *accidentally* updated to version 6 when the Spigot team updated WorldGuard for 1.8 but did not update v5.9.
 
-* Making backups of your worlds
-* Making backups of your WorldGuard configuration
+The version that you downloaded supports Minecraft 1.7.10 and 1.8.
 
-(Periodical backups are recommended anyway.)
+**NEW DOCUMENTATION:** There is [new work-in-progress documentation](http://docs.enginehub.org/manual/worldguard/latest/). However, refer to the [older wiki](http://wiki.sk89q.com/wiki/WorldGuard) for missing pgaes.
 
-You can upgrade from any version of WorldGuard 5.
+## Downgrading to 5.9
 
-It is __NOT POSSIBLE TO DOWNGRADE__ after upgrading to WorldGuard 6 without loss of data due to the conversion to UUIDs. Do NOT downgrade WorldGuard once you have installed version 6.
+When updating to v6, your region data will be updated to use player UUIDs rather than their names. That means that you **cannot downgrade** to WG 5.9 because it does not understand UUIDs and will remove all ownership data. However, you can use [Six2Five](https://github.com/sk89q/Six2Five/releases/tag/release-1.0) to downgrade region data stored as YAML.
 
-If downgrading becomes necessary, please file a ticket on our issue tracker.
+Remember to make backups.
 
-If this is a __BETA BUILD__ or __SNAPSHOT BUILD__, then you should re-read this document every new release until after you have upgraded to a final release. Breaking changes may be added until the final release.
+If you do not use region protection, then downgrading requires no extra steps.
 
-You have downloaded version ${project.version}.
+## What's Changed?
 
-## Reporting problems
+There have been many changes, but the most important (and breaking ones) are listed below.
 
-You can report bugs that you encounter on our [issue tracker](http://youtrack.sk89q.com) and [ask questions on our forum](http://forum.sk89q.com).
+### Region Protection
 
-## Breaking changes
+The region protection has been optimized and aggressive caching has been added. That means that the impact of region protection when hundreds or thousands of regions exist has been minimized. 
 
-Be aware of these breaking changes:
+* UUID support was added. On first server start, your region data will be converted to use UUIDs. Names that lack a UUID (i.e. they refer to accounts that don't exist) will remain, but can be removed by re-running the conversion (see the config) after changing the configuration to remove unconverted names. 
+* Build protection for regions is now much more complete, and WorldGuard protects against entities and blocks making changes as if they were players. For example, TNT cannot be flung into a protected region and piston machines cannot push into a protected region. Liquid flow (lava and water) can also be checked, although this is disabled by default.
+* Setting the `build` flag to `deny` will break pistons and Redstone. When you set the `build` flag to `deny`, you are essentially saying that *no one* can build at all. Now that blocks and entities are considered the same as players, they get blocked in that case. What's the solution? First of all, you probably do **not** want to set the build flag: remember, when you create a region, only members can build in it, so there's no need to change the `build` flag.
+* If you want to deny building "in the wilderness," use `/rg flag __global__ passthrough deny`. Unset the `build` flag if you had set it to `deny`. As you may know, when you create a region, protection is automatically turned on (only members can build). If you don't want that, you can set a region's `passthrough` flag to `allow`. In the case of the global region, it *defaults* to `allow`, so you have to set it to `deny` to turn that off.
+* Earlier versions of WorldGuard 6 changed the ``use`` flag to be much more encompassing, but this is **no longer the case**. The ``use`` flag now works like it did before in 5.x, only applying to things like doors, pressure plates, and levers. A new ``interact`` flag was added instead that controls all right clicks of blocks and entities.
+* By default, the ``use`` flag is now set so only members of a region can use levers and doors within a region. If you want to disable this type of protection in all protected regions, use `/rg flag __global__ use allow`.
+* Region groups for flags now work properly. You can set a certain flag to apply to only a certain group (owners, members, nonmembers, nonowners, all). Before, it only worked correctly for some flags. Region groups can be set like this: `/rg flag spawn pvp -g nonmembers deny`.
+* In WG 5.9, some flags had a default region group of "non-members." That means that if you did `/rg flag spawn chest-access deny`, only non-members would be unable to open chests. In WG 6, you have to explicitly specify this: `/rg flag spawn chest-access -g nonmembers deny`.
+* It is now possible to change the message that users get when they are prevented from interacting with blocks or entities. This message is defined as a region flag, so you can set it on the `__global__` region or override it in a specific region. In addition, the tone and color of the default message has been softened, but you are free to change it entirely.
+* The MySQL code was substantially rewritten to be faster and more efficient. Some changes are needed to the table structure, but WorldGuard is now capable of performing those automatically. However, those who use table prefixes *may* run into trouble.
 
-* Children regions now inherit from their parent even if there is no overlap.
-* MySQL support now features the ability to migrate tables. If you are using tables without a prefix, then the new migration code should be able to handle your table. However, if you are using a table prefix, you may encounter trouble with migration.
-* Protection is now a lot more exhaustive so it is no longer, for example, possible to fling sand into a region, grow trees into a region, and so on.build
-* The `USE` flag is now much more encompassing so you may find that it blocks things like CraftBook gates (for users of CraftBook). To fix that, you can do `/rg flag REGION_NAME use allow`, but be aware that that will also allow the opening of inventories. To block inventories specifically, use `/rg flag REGION_NAME chest-access deny -g nonmembers`. The `-g nonmembers` makes it so only non-members of the region are unable to use chests, but this is optional.
+### Blacklist
+
 * If you want to blacklist only water and lava blocks and not buckets, you can no longer apply `on-place` to water or lava blocks because it will also deny the use of buckets. If you wish to deny the use of just the liquid blocks, use `on-use`. This is because WorldGuard now considers the use of a bucket also the placement of a liquid block.
-* In the rare situation that you are user of the "auto-invincibility" and "auto-no-drowning" groups (`wg-invincible` and `wg-amphibious`), you now have to enable these features in the config (`auto-invincible-group: true` and `auto-no-drowning-group: true`). This is because some permission plugins have been causing severe hang ups whenever it is queried for a player's groups, which, in this case, happens to include when the player joins.
-* Plugins that utilize WorldGuard's API may not work anymore. They may crash with errors.
 
-## Incompatibility issues
+### Miscellaneous
+
+* In the rare situation that you are user of the "auto-invincibility" and "auto-no-drowning" groups (`wg-invincible` and `wg-amphibious`), you now have to enable these features in the config (`auto-invincible-group: true` and `auto-no-drowning-group: true`). This is because some permission plugins have been causing severe hang ups whenever it is queried for a player's groups, which, in this case, happens to include when the player joins.
+
+## Known Incompatibilities
+
+Plugins that utilize WorldGuard's API may not work anymore. They may crash with errors. The API has changed somewhat.
 
 * Spigot:
     * `settings.global-api-cache`, if enabled, will crash WG UUID lookups (fixed in Spigot build #1625)
@@ -41,103 +51,9 @@ Be aware of these breaking changes:
     * Can't spawn pets ([issue #393](https://github.com/DSH105/EchoPet/issues/393))
 * CraftBook
     * Unable to use mechanics unless the `USE` flag is explicitly set to `ALLOW` ([CRAFTBOOK-3057](http://youtrack.sk89q.com/issue/CRAFTBOOK-3057))
-    
 
-## Major features
-
-### UUID support
-
-Regions now fully support the use of UUIDs rather than names for storing the owners and members of a region. Commands still accept names, but they are translated into UUIDs in the background. For users who already have existing region data, names will be automatically converted to UUIDs on the first run of WorldGuard.
-
-It is still possible to specify names rather than a UUID by using the `-n` flag with the region membership commands.
-
-### 'Deny by default'
-
-Previously, a pre-determined list of blocks and entities was used to determine whether an action by the player should be blocked. However, this has been reversed so that every action on a block or entity is denied (in a protected region) unless it has been deemed safe (such as, for example, right clicking with steak). Mods are now supported as a result.
-
-The `USE` flag has been repurposed as a general "interaction" flag and covers every left click or right click of a block or entity. It also covers interaction that falls outside clicking.
-
-### Exhaustive protection
-
-More events are now handled in the protection code. For example,
-
-* It is no longer possible to drop sand or gravel into a protected region from outside.
-* It is no longer possible to grief a region by growing a tree into it.
-* The entry and exit flags now handle players sitting on vehicles properly.
-* Piston-moved blocks cannot be pushed into a different protected region.
-* Owners of tamable animals are now considered in protection code.
-
-Even water and lava flow can also be checked, although this requires that it be explicitly enabled in the configuration (flow events are very frequent, so they incur extra CPU cost).
-
-The goal is to provide extremely exhaustive protection.
-
-### Large performance boost for spatial queries
-
-The performance of spatial queries for regions has been substantially increased at least an order of magnitude. Spatial queries are a necessity for the region code to query the list of regions that apply to a location in the world. There should be a negligible difference between 4, 40, and 4000 regions as long as too many regions are not overlapping.
-
-### Background region operations
-
-Region commands are now executed in the background. Notably, saves and loads will not lock up your server while they complete. Additionally, changes to regions are now saved periodically rather than immediately after every change.
-
-### Updated MySQL region support
-
-MySQL support has been completely overhauled. It should now be faster, no longer crash on foreign key index errors, use transactions, and support automatic creation and migration of tables (including support for table prefixes).
-
-### Partial region data saving
-
-For users of MySQL, WorldGuard now only saves changed and deleted regions when saving region data. No longer does WorldGuard have to rewrite the entire region database on each save.
-
-### Improved handling of related flags
-
-Multiple flags that apply to an event are now evaluated together if they are similar. For example, if a player right clicks a bed to sleep in it, both the `USE` and `SLEEP` flag are checked since they are both interaction-related. If one of them is `DENY`, then sleeping is denied (remember, `DENY` overrides `ALLOW`). If one of them is `ALLOW` and the other is not `DENY`, then sleeping is permitted.
-
-### Flag groups now work properly
-
-While you could always set a group to a flag's value, the functionality was incomplete and did not work most of the time.
-
-Now that groups are supported, you can change a flag so it only applies to a certain group of players. For example, `/rg flag example sleep deny -g members` would deny sleeping for only members of the `example` region.
-
-### Inheritance now works as expected
-
-Previously, a region only inherited flags and other details from its parents if the parent and the child overlapped at the location queried. This is no longer the case and inheritance is now always applied. 
-
-In addition, a new `-g` flag for `/rg define` lets you create a region with no physical area so that you can assign flags and use this region as a "template region."
-
-### Settable deny message
-
-It is now possible to change the message that users get when they are prevented from interacting with blocks or entities. This message is defined as a region flag, so you can set it on the `__global__` region or override it in a specific region. In addition, the tone and color of the default message has been softened, but you are free to change it entirely.
-
-### Blacklist support for data values (and later, variants)
-
-The blacklist was rewritten to support more than just block and item IDs. The immediate result is that you can now use data values, but as those are in the process of being deprecated by Mojang, it also allows support for Minecraft's new block variants in the future.
-
-### Debounced events
-
-Events that tend to reoccur very frequently (such as the ones that occur when you stand on a pressure plate continuously) have been "debounced" to reduce the number of checks that WorldGuard has to perform, reducing the amount of wasted CPU. In addition, the "you don't have permission" message is rate limited so players are not flooded with the message.
-
-### New block place and break flags
-
-A long requested feature was the availability of block place and break flags. These newly added flags work in tandem with the `BUILD` flag but can override `BUILD`. At the moment, it is not possible to allow explicit types of blocks to be placed or broken yet.
-
-### Build permission nodes
-
-A new optional (disabled by default in the configuration) feature is the checking of build permission nodes. For every block, entity, and item, the following permission nodes are checked:
-
-* Block place: `worldguard.build.block.place.<material>`
-* Block break: `worldguard.build.block.remove.<material>`
-* Block interact: `worldguard.build.block.interact.<material>`
-* Entity spawn: `worldguard.build.entity.place.<type>`
-* Entity destroy: `worldguard.build.entity.remove.<type>`
-* Entity interact: `worldguard.build.entity.interact.<type>`
-* Entity damage: `worldguard.build.entity.damage.<type>`
-* Item use: `worldguard.build.item.use.<material>`
-
-In addition, the permissions are also checked in the style of `worldguard.build.block.<material>.<action>`, so `worldguard.build.block.<material>.place` would work too.
-
-The list of usable material names comes from the [Material enumeration in Bukkit](http://jd.bukkit.org/rb/apidocs/org/bukkit/Material.html). For example, the permission for placing the bed block would be `worldguard.build.build.place.bed_block`. Be aware that _Material_ contains both item and block names.
-
-For entity names, see [EntityType](http://jd.bukkit.org/rb/apidocs/org/bukkit/entity/EntityType.html).
-
-# Other changes
+## Other Changes
 
 The rest of the changes can be found in the CHANGELOG file.
+
+In addition, there is [new work-in-progress documentation](http://docs.enginehub.org/manual/worldguard/latest/) that describes some of the new features.
