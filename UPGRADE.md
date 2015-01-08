@@ -4,7 +4,7 @@ This is a **major upgrade**. However, it is relatively well-tested because many 
 
 The version that you downloaded supports Minecraft 1.7.10 and 1.8.
 
-**NEW DOCUMENTATION:** There is [new work-in-progress documentation](http://docs.enginehub.org/manual/worldguard/latest/). However, refer to the [older wiki](http://wiki.sk89q.com/wiki/WorldGuard) for missing pgaes.
+**NEW DOCUMENTATION:** There is [new work-in-progress documentation](http://docs.enginehub.org/manual/worldguard/latest/). However, refer to the [older wiki](http://wiki.sk89q.com/wiki/WorldGuard) for missing pages.
 
 ## Downgrading to 5.9
 
