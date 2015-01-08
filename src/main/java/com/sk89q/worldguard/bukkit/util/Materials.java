@@ -624,6 +624,7 @@ public final class Materials {
                 || material == Material.ENCHANTMENT_TABLE
                 || material == Material.BEACON
                 || material == Material.ANVIL
+                || material == Material.WOOD_PLATE
                 || material == Material.STONE_PLATE
                 || material == Material.IRON_PLATE  
                 || material == Material.GOLD_PLATE;
