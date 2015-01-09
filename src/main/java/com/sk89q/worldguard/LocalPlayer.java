@@ -24,6 +24,7 @@ import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import java.util.List;
 import java.util.UUID;
 
 public abstract class LocalPlayer implements RegionAssociable {
@@ -94,14 +95,18 @@ public abstract class LocalPlayer implements RegionAssociable {
     public abstract boolean hasPermission(String perm);
 
     @Override
-    public Association getAssociation(ProtectedRegion region) {
-        if (region.isOwner(this)) {
-            return Association.OWNER;
-        } else if (region.isMember(this)) {
-            return Association.MEMBER;
-        } else {
-            return Association.NON_MEMBER;
+    public Association getAssociation(List<ProtectedRegion> regions) {
+        boolean member = false;
+
+        for (ProtectedRegion region : regions) {
+            if (region.isOwner(this)) {
+                return Association.OWNER;
+            } else if (!member && region.isMember(this)) {
+                member = true;
+            }
         }
+
+        return member ? Association.MEMBER : Association.NON_MEMBER;
     }
 
     @Override

@@ -31,13 +31,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -157,7 +151,7 @@ public class FlagValueCalculator {
             foundApplicableRegion = true;
 
             if (!hasCleared.contains(region)) {
-                if (!RegionGroup.MEMBERS.contains(subject.getAssociation(region))) {
+                if (!RegionGroup.MEMBERS.contains(subject.getAssociation(Arrays.asList(region)))) {
                     needsClear.add(region);
                 } else {
                     // Need to clear all parents
@@ -330,12 +324,6 @@ public class FlagValueCalculator {
 
                     ignoreValuesOfParents(consideredValues, ignoredRegions, region);
                     consideredValues.put(region, value);
-
-                    if (value == State.DENY) {
-                        // Since DENY overrides all other values, there
-                        // is no need to consider any further regions
-                        break;
-                    }
                 }
             }
 
@@ -411,7 +399,11 @@ public class FlagValueCalculator {
 
         ProtectedRegion current = region;
 
+        List<ProtectedRegion> seen = new ArrayList<ProtectedRegion>();
+
         while (current != null) {
+            seen.add(current);
+
             V value = current.getFlag(flag);
 
             if (value != null) {
@@ -427,7 +419,7 @@ public class FlagValueCalculator {
                         use = false;
                     } else if (subject == null) {
                         use = group.contains(Association.NON_MEMBER);
-                    } else if (!group.contains(subject.getAssociation(region))) {
+                    } else if (!group.contains(subject.getAssociation(seen))) {
                         use = false;
                     }
                 }

@@ -27,6 +27,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * region is in a set of source regions.
  *
  * <p>This class only performs a spatial query if its
- * {@link #getAssociation(ProtectedRegion)} method is called.</p>
+ * {@link #getAssociation(List)} method is called.</p>
  */
 public class DelayedRegionOverlapAssociation implements RegionAssociable {
 
@@ -59,17 +60,19 @@ public class DelayedRegionOverlapAssociation implements RegionAssociable {
     }
 
     @Override
-    public Association getAssociation(ProtectedRegion region) {
+    public Association getAssociation(List<ProtectedRegion> regions) {
         if (source == null) {
             ApplicableRegionSet result = query.getApplicableRegions(location);
             source = result.getRegions();
         }
 
-        if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty()) || source.contains(region)) {
-            return Association.OWNER;
-        } else {
-            return Association.NON_MEMBER;
+        for (ProtectedRegion region : regions) {
+            if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty()) || source.contains(region)) {
+                return Association.OWNER;
+            }
         }
+
+        return Association.NON_MEMBER;
     }
 
 }

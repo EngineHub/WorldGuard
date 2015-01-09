@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection.association;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,12 +46,14 @@ public class RegionOverlapAssociation implements RegionAssociable {
     }
 
     @Override
-    public Association getAssociation(ProtectedRegion region) {
-        if (source.contains(region)) {
-            return Association.OWNER;
-        } else {
-            return Association.NON_MEMBER;
+    public Association getAssociation(List<ProtectedRegion> regions) {
+        for (ProtectedRegion region : regions) {
+            if (source.contains(region)) {
+                return Association.OWNER;
+            }
         }
+
+        return Association.NON_MEMBER;
     }
 
 }

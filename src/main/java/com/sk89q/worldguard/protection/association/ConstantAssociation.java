@@ -22,6 +22,8 @@ package com.sk89q.worldguard.protection.association;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import java.util.List;
+
 class ConstantAssociation implements RegionAssociable {
 
     private final Association association;
@@ -31,7 +33,7 @@ class ConstantAssociation implements RegionAssociable {
     }
 
     @Override
-    public Association getAssociation(ProtectedRegion region) {
+    public Association getAssociation(List<ProtectedRegion> regions) {
         return association;
     }
 

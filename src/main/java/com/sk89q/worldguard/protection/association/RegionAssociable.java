@@ -22,17 +22,19 @@ package com.sk89q.worldguard.protection.association;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import java.util.List;
+
 /**
  * An object that can have membership in a region.
  */
 public interface RegionAssociable {
 
     /**
-     * Get the most specific association level for the input region.
+     * Get the highest association level for the input regions.
      *
-     * @param region the input region
-     * @return the most specific membership level
+     * @param regions a list of regions
+     * @return the highest membership level
      */
-    Association getAssociation(ProtectedRegion region);
+    Association getAssociation(List<ProtectedRegion> regions);
 
 }
