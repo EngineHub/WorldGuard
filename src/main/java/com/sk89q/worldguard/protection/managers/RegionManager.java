@@ -336,6 +336,21 @@ public final class RegionManager {
         index.applyIntersecting(region, new RegionCollectionConsumer(regions, true));
         return new RegionResultSet(regions, index.get("__global__"));
     }
+    
+        /**
+     * Query for effective flags and owners for the given chunk
+     *
+     * @param chunk the chunk
+     * @return the query object
+     */
+    public ApplicableRegionSet getApplicableRegions(Chunk chunk) {
+        checkNotNull(chunk);
+
+        Location l1 = chunk.getBlock(0, 0, 0).getLocation();
+		Location l2 = chunk.getBlock(15, 256, 15).getLocation();
+		ProtectedCuboidRegion cuboid = new ProtectedCuboidRegion("", BukkitUtil.toVector(l1).toBlockVector(), BukkitUtil.toVector(l2).toBlockVector());
+		return WGBukkit.getRegionManager(chunk.getWorld()).getApplicableRegions(cuboid);
+    }
 
     /**
      * Get a list of region names for regions that contain the given position.
