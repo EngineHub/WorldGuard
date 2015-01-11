@@ -58,9 +58,12 @@ import java.util.*;
  * <p>These sorted lists are required for {@link FlagValueCalculator} and
  * some implementations of {@link ApplicableRegionSet}.</p>
  */
-public class NormativeOrders {
+public final class NormativeOrders {
 
     private static final PriorityComparator PRIORITY_COMPARATOR = new PriorityComparator();
+
+    private NormativeOrders() {
+    }
 
     public static void sort(List<ProtectedRegion> regions) {
         sortInto(Sets.newHashSet(regions), regions);
