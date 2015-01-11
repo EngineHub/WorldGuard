@@ -24,8 +24,7 @@ import org.bukkit.command.CommandSender;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 /**
- *
- * @author sk89q
+ * Stores a command/
  */
 public class CommandStringFlag extends Flag<String> {
 
@@ -38,8 +37,7 @@ public class CommandStringFlag extends Flag<String> {
     }
 
     @Override
-    public String parseInput(WorldGuardPlugin plugin, CommandSender sender,
-            String input) throws InvalidFlagFormat {
+    public String parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
         input = input.trim();
         if (!input.startsWith("/")) {
             input = "/" + input;

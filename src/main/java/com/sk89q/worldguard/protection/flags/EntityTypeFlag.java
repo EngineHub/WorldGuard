@@ -22,9 +22,7 @@ package com.sk89q.worldguard.protection.flags;
 import org.bukkit.entity.EntityType;
 
 /**
- * Represents an entity type.
- *
- * @author sk89q
+ * Stores an entity type.
  */
 public class EntityTypeFlag extends EnumFlag<EntityType> {
 

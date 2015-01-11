@@ -26,8 +26,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import javax.annotation.Nullable;
 
 /**
- *
- * @author sk89q
+ * Stores a string.
  */
 public class StringFlag extends Flag<String> {
 
@@ -60,8 +59,7 @@ public class StringFlag extends Flag<String> {
     }
 
     @Override
-    public String parseInput(WorldGuardPlugin plugin, CommandSender sender,
-            String input) throws InvalidFlagFormat {
+    public String parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
         return input.replaceAll("(?!\\\\)\\\\n", "\n").replaceAll("\\\\\\\\n", "\\n");
     }
 

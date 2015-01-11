@@ -29,9 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents a flag that consists of a set.
- *
- * @author sk89q
+ * Stores a set of types.
  */
 public class SetFlag<T> extends Flag<Set<T>> {
 
@@ -57,8 +55,7 @@ public class SetFlag<T> extends Flag<Set<T>> {
     }
 
     @Override
-    public Set<T> parseInput(WorldGuardPlugin plugin, CommandSender sender,
-            String input) throws InvalidFlagFormat {
+    public Set<T> parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
         Set<T> items = new HashSet<T>();
 
         for (String str : input.split(",")) {

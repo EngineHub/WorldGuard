@@ -26,8 +26,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import javax.annotation.Nullable;
 
 /**
- *
- * @author sk89q
+ * Stores a region group.
  */
 public class RegionGroupFlag extends EnumFlag<RegionGroup> {
 

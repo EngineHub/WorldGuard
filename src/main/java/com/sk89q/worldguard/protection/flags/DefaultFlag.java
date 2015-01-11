@@ -39,7 +39,7 @@ public final class DefaultFlag {
     public static final RegionGroupFlag CONSTRUCT = new RegionGroupFlag("construct", RegionGroup.MEMBERS);
 
     // This flag is unlike the others. It forces the checking of region membership
-    public static final StateFlag BUILD = new StateFlag("build", true);
+    public static final StateFlag BUILD = new BuildFlag("build", true);
 
     // These flags are used in tandem with the BUILD flag - if the player can
     // build, then the following flags do not need to be checked (although they

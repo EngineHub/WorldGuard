@@ -24,8 +24,7 @@ import org.bukkit.command.CommandSender;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 /**
- *
- * @author sk89q
+ * Stores an integer.
  */
 public class IntegerFlag extends Flag<Integer> {
 
@@ -38,8 +37,7 @@ public class IntegerFlag extends Flag<Integer> {
     }
 
     @Override
-    public Integer parseInput(WorldGuardPlugin plugin, CommandSender sender,
-            String input) throws InvalidFlagFormat {
+    public Integer parseInput(WorldGuardPlugin plugin, CommandSender sender,String input) throws InvalidFlagFormat {
         input = input.trim();
 
         try {
