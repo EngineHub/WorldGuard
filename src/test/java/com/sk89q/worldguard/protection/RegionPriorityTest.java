@@ -129,7 +129,7 @@ public abstract class RegionPriorityTest {
         assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
         appl = manager.getApplicableRegions(inFountain);
         assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
-        assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
+        assertTrue(appl.allows(DefaultFlag.MOB_SPAWNING));
     }
     
     @Test
