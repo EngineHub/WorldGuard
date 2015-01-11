@@ -383,7 +383,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Hostile / ambient mob override */
         if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity()) || Entities.isNPC(event.getEntity())) {
-            canUse = event.getRelevantFlags().isEmpty() || query.testState(target, associable, combine(event));
+            canUse = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
             what = "use that";
 
         /* Paintings, item frames, etc. */
@@ -431,7 +431,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Hostile / ambient mob override */
         if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())) {
-            canDamage = event.getRelevantFlags().isEmpty() || query.testState(target, associable, combine(event));
+            canDamage = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
             what = "hit that";
 
         /* Paintings, item frames, etc. */
@@ -455,7 +455,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Player damage not caused  by another player */
         } else if (event.getEntity() instanceof Player) {
-            canDamage = event.getRelevantFlags().isEmpty() || query.testState(target, associable, combine(event));
+            canDamage = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
             what = "damage that";
 
         /* Everything else */
