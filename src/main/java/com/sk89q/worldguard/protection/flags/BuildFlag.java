@@ -19,47 +19,34 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import org.bukkit.command.CommandSender;
-
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-
 /**
- * Stores doubles.
+ * A special implementation of the {@link StateFlag} for
+ * {@link DefaultFlag#BUILD}.
  */
-public class DoubleFlag extends Flag<Double> {
+class BuildFlag extends StateFlag {
 
-    public DoubleFlag(String name, RegionGroup defaultGroup) {
-        super(name, defaultGroup);
-    }
-
-    public DoubleFlag(String name) {
-        super(name);
+    public BuildFlag(String name, boolean def) {
+        super(name, def);
     }
 
     @Override
-    public Double parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        input = input.trim();
-
-        try {
-            return Double.parseDouble(input);
-        } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
-        }
+    public boolean implicitlySetWithMembership() {
+        return true;
     }
 
     @Override
-    public Double unmarshal(Object o) {
-        if (o instanceof Double) {
-            return (Double) o;
-        } else if (o instanceof Number) {
-            return ((Number) o).doubleValue();
-        } else {
-            return null;
-        }
+    public boolean usesMembershipAsDefault() {
+        return true;
     }
 
     @Override
-    public Object marshal(Double o) {
-        return o;
+    public boolean preventsAllowOnGlobal() {
+        return true;
     }
+
+    @Override
+    public boolean requiresSubject() {
+        return true;
+    }
+
 }

@@ -26,8 +26,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**
- *
- * @author sk89q
+ * Stores a bi-state value.
  */
 public class StateFlag extends Flag<StateFlag.State> {
 
@@ -68,9 +67,21 @@ public class StateFlag extends Flag<StateFlag.State> {
         }
     }
 
+    /**
+     * Whether setting this flag to {@link State#ALLOW} is prevented on
+     * the global region.
+     *
+     * <p>This value is only changed, at least in WorldGuard, for the
+     * {@link DefaultFlag#BUILD} flag.</p>
+     *
+     * @return Whether {@code ALLOW} is prevented
+     */
+    public boolean preventsAllowOnGlobal() {
+        return false;
+    }
+
     @Override
-    public State parseInput(WorldGuardPlugin plugin, CommandSender sender,
-            String input) throws InvalidFlagFormat {
+    public State parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
         input = input.trim();
 
         if (input.equalsIgnoreCase("allow")) {

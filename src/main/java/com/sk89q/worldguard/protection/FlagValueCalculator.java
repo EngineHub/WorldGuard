@@ -270,8 +270,8 @@ public class FlagValueCalculator {
         }
 
         // Check to see whether we have a subject if this is BUILD
-        if (flag == DefaultFlag.BUILD && subject == null) {
-            throw new NullPointerException("The BUILD flag is handled in a special fashion and requires a non-null subject parameter");
+        if (flag.requiresSubject() && subject == null) {
+            throw new NullPointerException("The " + flag.getName() + " flag is handled in a special fashion and requires a non-null subject parameter");
         }
 
         int minimumPriority = Integer.MIN_VALUE;
@@ -303,16 +303,15 @@ public class FlagValueCalculator {
 
             addParents(ignoredParents, region);
 
-            // The BUILD flag (of lower priorities) can be overridden if
-            // this region has members... this check is here due to legacy
-            // reasons
-            if (priority != minimumPriority && flag == DefaultFlag.BUILD
+            // The BUILD flag is implicitly set on every region where
+            // PASSTHROUGH is not set to ALLOW
+            if (priority != minimumPriority && flag.implicitlySetWithMembership()
                     && getEffectiveFlag(region, DefaultFlag.PASSTHROUGH, subject) != State.ALLOW) {
                 minimumPriority = getPriority(region);
             }
         }
 
-        if (flag == DefaultFlag.BUILD && consideredValues.isEmpty()) {
+        if (flag.usesMembershipAsDefault() && consideredValues.isEmpty()) {
             switch (getMembership(subject)) {
                 case FAIL:
                     return ImmutableList.of();
@@ -365,10 +364,10 @@ public class FlagValueCalculator {
                     return (V) State.ALLOW;
                 }
 
-            } else if (flag == DefaultFlag.BUILD) {
+            } else if (flag instanceof StateFlag && ((StateFlag) flag).preventsAllowOnGlobal()) {
                 // Legacy behavior -> we can't let people change BUILD on
                 // the global region
-                State value = region.getFlag(DefaultFlag.BUILD);
+                State value = region.getFlag((StateFlag) flag);
                 return value != State.ALLOW ? (V) value : null;
             }
         }

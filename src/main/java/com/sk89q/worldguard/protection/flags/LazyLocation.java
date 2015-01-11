@@ -27,6 +27,9 @@ import org.bukkit.Bukkit;
 
 import javax.annotation.Nullable;
 
+/**
+ * A location that stores the name of the world in case the world is unloaded.
+ */
 class LazyLocation extends Location {
 
     private final String worldName;
@@ -65,7 +68,5 @@ class LazyLocation extends Location {
     public LazyLocation add(double x, double y, double z) {
         return this.setPosition(getPosition().add(x, y, z));
     }
-
-
 
 }

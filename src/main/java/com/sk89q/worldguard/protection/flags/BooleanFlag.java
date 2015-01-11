@@ -24,8 +24,7 @@ import org.bukkit.command.CommandSender;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 /**
- *
- * @author sk89q
+ * A boolean flag.
  */
 public class BooleanFlag extends Flag<Boolean> {
 
@@ -38,8 +37,7 @@ public class BooleanFlag extends Flag<Boolean> {
     }
 
     @Override
-    public Boolean parseInput(WorldGuardPlugin plugin, CommandSender sender,
-            String input) throws InvalidFlagFormat {
+    public Boolean parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
         input = input.trim();
         
         if (input.equalsIgnoreCase("true") || input.equalsIgnoreCase("yes")
