@@ -621,9 +621,6 @@ public class EventAbstractionListener extends AbstractListener {
                     Events.fireToCancel(event, new UseItemEvent(event, create(damager), event.getEntity().getWorld(), item));
                 }
             }
-
-        } else {
-            Events.fireToCancel(event, new DamageEntityEvent(event, Cause.unknown(), event.getEntity()));
         }
     }
 
