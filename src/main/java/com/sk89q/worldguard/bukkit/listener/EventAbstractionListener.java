@@ -51,6 +51,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -92,6 +93,16 @@ public class EventAbstractionListener extends AbstractListener {
      */
     public EventAbstractionListener(WorldGuardPlugin plugin) {
         super(plugin);
+    }
+
+    @Override
+    public void registerEvents() {
+        super.registerEvents();
+
+        try {
+            getPlugin().getServer().getPluginManager().registerEvents(new SpigotCompatListener(), getPlugin());
+        } catch (LinkageError ignored) {
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -883,6 +894,13 @@ public class EventAbstractionListener extends AbstractListener {
 
     private void playDenyEffect(Location location) {
         location.getWorld().playEffect(location, Effect.SMOKE, BlockFace.UP);
+    }
+
+    public class SpigotCompatListener implements Listener {
+        @EventHandler(ignoreCancelled = true)
+        public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event){
+            onPlayerInteractEntity(event);
+        }
     }
 
 }
