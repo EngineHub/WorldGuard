@@ -469,7 +469,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Everything else */
         } else {
-            canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT));
+            canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.ENTITY_DAMAGE));
             what = "hit that";
         }
 
