@@ -57,6 +57,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
@@ -536,8 +537,6 @@ public class EventAbstractionListener extends AbstractListener {
             if (event.isCancelled() && remover instanceof Player) {
                 playDenyEffect((Player) remover, event.getEntity().getLocation());
             }
-        } else {
-            Events.fireToCancel(event, new DestroyEntityEvent(event, Cause.unknown(), event.getEntity()));
         }
     }
 
@@ -687,6 +686,14 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
         Events.fireToCancel(event, new UseItemEvent(event, create(event.getPlayer()), event.getPlayer().getWorld(), event.getItem()));
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryOpen(InventoryOpenEvent event) {
+        InventoryHolder holder = event.getInventory().getHolder();
+        if (holder instanceof BlockState) {
+            Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), ((BlockState) holder).getBlock()));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
