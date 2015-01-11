@@ -25,6 +25,7 @@ import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.util.NormativeOrders;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,7 +87,7 @@ public class MockApplicableRegionSet {
     }
 
     public FlagValueCalculator getFlagCalculator() {
-        Collections.sort(regions);
+        NormativeOrders.sort(regions);
         return new FlagValueCalculator(regions, global);
     }
 

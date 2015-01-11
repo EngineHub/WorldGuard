@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.managers;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
+import com.google.common.collect.Sets;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.LocalPlayer;
@@ -317,7 +318,7 @@ public final class RegionManager {
     public ApplicableRegionSet getApplicableRegions(Vector position) {
         checkNotNull(position);
 
-        List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
+        Set<ProtectedRegion> regions = Sets.newHashSet();
         index.applyContaining(position, new RegionCollectionConsumer(regions, true));
         return new RegionResultSet(regions, index.get("__global__"));
     }
@@ -332,7 +333,7 @@ public final class RegionManager {
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion region) {
         checkNotNull(region);
 
-        List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
+        Set<ProtectedRegion> regions = Sets.newHashSet();
         index.applyIntersecting(region, new RegionCollectionConsumer(regions, true));
         return new RegionResultSet(regions, index.get("__global__"));
     }

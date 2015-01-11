@@ -364,6 +364,97 @@ public class FlagValueCalculatorTest {
     }
 
     @Test
+    public void testQueryValueFlagsWithRegionGroupsAndInheritance() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+
+        LocalPlayer nonMember = mock.createPlayer();
+        LocalPlayer member = mock.createPlayer();
+
+        ProtectedRegion parent = mock.add(0);
+        parent.setFlag(flag1, State.DENY);
+        parent.setFlag(flag1.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
+
+        ProtectedRegion region = mock.add(0);
+        region.getMembers().addPlayer(member);
+        region.setParent(parent);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.queryValue(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryValue(member, flag1), is((State) null));
+    }
+
+    @Test
+    public void testQueryValueFlagsWithRegionGroupsAndInheritanceAndParentMember() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+
+        LocalPlayer nonMember = mock.createPlayer();
+        LocalPlayer memberOne = mock.createPlayer();
+        LocalPlayer memberTwo = mock.createPlayer();
+
+        ProtectedRegion parent = mock.add(0);
+        parent.getMembers().addPlayer(memberOne);
+        parent.setFlag(flag1, State.DENY);
+        parent.setFlag(flag1.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
+
+        ProtectedRegion region = mock.add(0);
+        region.getMembers().addPlayer(memberOne);
+        region.setParent(parent);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.queryValue(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryValue(memberOne, flag1), is((State) null));
+        assertThat(result.queryValue(memberTwo, flag1), is(State.DENY));
+    }
+
+    @Test
+    public void testQueryValueFlagsWithRegionGroupsAndPriority() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+
+        LocalPlayer nonMember = mock.createPlayer();
+        LocalPlayer member = mock.createPlayer();
+
+        ProtectedRegion lower = mock.add(-1);
+        lower.setFlag(flag1, State.DENY);
+        lower.setFlag(flag1.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
+
+        ProtectedRegion region = mock.add(0);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.queryValue(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryValue(member, flag1), is(State.DENY));
+    }
+
+    @Test
+    public void testQueryValueFlagsWithRegionGroupsAndPriorityAndOveride() throws Exception {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+
+        StateFlag flag1 = new StateFlag("test1", false);
+
+        LocalPlayer nonMember = mock.createPlayer();
+        LocalPlayer member = mock.createPlayer();
+
+        ProtectedRegion lower = mock.add(-1);
+        lower.setFlag(flag1, State.DENY);
+        lower.setFlag(flag1.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
+
+        ProtectedRegion region = mock.add(0);
+        region.setFlag(flag1, State.ALLOW);
+        region.setFlag(flag1.getRegionGroupFlag(), RegionGroup.MEMBERS);
+        region.getMembers().addPlayer(member);
+
+        FlagValueCalculator result = mock.getFlagCalculator();
+        assertThat(result.queryValue(nonMember, flag1), is(State.DENY));
+        assertThat(result.queryValue(member, flag1), is(State.ALLOW));
+    }
+
+    @Test
     public void testQueryValueStringFlag() throws Exception {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
