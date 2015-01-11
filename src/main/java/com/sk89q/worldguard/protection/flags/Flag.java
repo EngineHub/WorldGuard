@@ -61,6 +61,19 @@ public abstract class Flag<T> {
         return null;
     }
 
+    /**
+     * Whether the flag can take a list of values and choose a "best one."
+     *
+     * <p>This is the case with the {@link StateFlag} where {@code DENY}
+     * overrides {@code ALLOW}, but most flags just return the
+     * first result from a list.</p>
+     *
+     * @return whether a best value can be chosen
+     */
+    public boolean hasConflictStrategy() {
+        return false;
+    }
+
     @Nullable
     public T chooseValue(Collection<T> values) {
         if (!values.isEmpty()) {

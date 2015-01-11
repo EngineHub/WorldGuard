@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -29,6 +30,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.util.NormativeOrders;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -55,7 +57,7 @@ public class FlagValueCalculator {
     /**
      * Create a new instance.
      *
-     * @param regions a list of applicable regions that <strong>must be sorted by priority descending</strong>
+     * @param regions a list of applicable regions that must be sorted according to {@link NormativeOrders}
      * @param globalRegion an optional global region (null to not use one)
      */
     public FlagValueCalculator(List<ProtectedRegion> regions, @Nullable ProtectedRegion globalRegion) {
@@ -102,36 +104,9 @@ public class FlagValueCalculator {
         checkNotNull(subject);
 
         int minimumPriority = Integer.MIN_VALUE;
-        boolean foundApplicableRegion = false;
+        Result result = Result.NO_REGIONS;
 
-        // Say there are two regions in one location: CHILD and PARENT (CHILD
-        // is a child of PARENT). If there are two overlapping regions in WG, a
-        // subject has to be a member of /both/ (or flags permit) in order to
-        // build in that location. However, inheritance is supposed
-        // to allow building if the subject is a member of just CHILD. That
-        // presents a problem.
-        //
-        // To rectify this, we keep two sets. When we iterate over the list of
-        // regions, there are two scenarios that we may encounter:
-        //
-        // 1) PARENT first, CHILD later:
-        //    a) When the loop reaches PARENT, PARENT is added to needsClear.
-        //    b) When the loop reaches CHILD, parents of CHILD (which includes
-        //       PARENT) are removed from needsClear.
-        //    c) needsClear is empty again.
-        //
-        // 2) CHILD first, PARENT later:
-        //    a) When the loop reaches CHILD, CHILD's parents (i.e. PARENT) are
-        //       added to hasCleared.
-        //    b) When the loop reaches PARENT, since PARENT is already in
-        //       hasCleared, it does not add PARENT to needsClear.
-        //    c) needsClear stays empty.
-        //
-        // As long as the process ends with needsClear being empty, then
-        // we have satisfied all membership requirements.
-
-        Set<ProtectedRegion> needsClear = new HashSet<ProtectedRegion>();
-        Set<ProtectedRegion> hasCleared = new HashSet<ProtectedRegion>();
+        Set<ProtectedRegion> ignoredRegions = Sets.newHashSet();
 
         for (ProtectedRegion region : getApplicable()) {
             // Don't consider lower priorities below minimumPriority
@@ -147,24 +122,23 @@ public class FlagValueCalculator {
                 continue;
             }
 
-            minimumPriority = getPriority(region);
-            foundApplicableRegion = true;
+            if (ignoredRegions.contains(region)) {
+                continue;
+            }
 
-            if (!hasCleared.contains(region)) {
-                if (!RegionGroup.MEMBERS.contains(subject.getAssociation(Arrays.asList(region)))) {
-                    needsClear.add(region);
-                } else {
-                    // Need to clear all parents
-                    removeParents(needsClear, hasCleared, region);
-                }
+            minimumPriority = getPriority(region);
+
+            boolean member = RegionGroup.MEMBERS.contains(subject.getAssociation(Arrays.asList(region)));
+
+            if (member) {
+                result = Result.SUCCESS;
+                addParents(ignoredRegions, region);
+            } else {
+                return Result.FAIL;
             }
         }
 
-        if (foundApplicableRegion) {
-            return needsClear.isEmpty() ? Result.SUCCESS : Result.FAIL;
-        } else {
-            return Result.NO_REGIONS;
-        }
+        return result;
     }
 
 
@@ -243,7 +217,7 @@ public class FlagValueCalculator {
      */
     @Nullable
     public <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag) {
-        Collection<V> values = queryAllValues(subject, flag);
+        Collection<V> values = queryAllValues(subject, flag, true);
         return flag.chooseValue(values);
     }
 
@@ -264,9 +238,36 @@ public class FlagValueCalculator {
      * @param flag the flag
      * @return a collection of values
      */
-    @SuppressWarnings("unchecked")
     public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
+        return queryAllValues(subject, flag, false);
+    }
+
+    /**
+     * Get the effective values for a flag, returning a collection of all
+     * values. It is up to the caller to determine which value, if any,
+     * from the collection will be used.
+     *
+     * <p>A subject can be provided that is used to determine whether the value
+     * of a flag on a particular region should be used. For example, if a
+     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
+     * subject is not a member, then the region would be skipped when
+     * querying that flag. If {@code null} is provided for the subject, then
+     * only flags that use {@link RegionGroup#ALL},
+     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
+     *
+     * @param subject an optional subject, which would be used to determine the region group to apply
+     * @param flag the flag
+     * @param acceptOne if possible, return only one value if it doesn't matter
+     * @return a collection of values
+     */
+    @SuppressWarnings("unchecked")
+    private <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag, boolean acceptOne) {
         checkNotNull(flag);
+
+        // Can't use this optimization with flags that have a conflict resolution strategy
+        if (acceptOne && flag.hasConflictStrategy()) {
+            acceptOne = false;
+        }
 
         // Check to see whether we have a subject if this is BUILD
         if (flag == DefaultFlag.BUILD && subject == null) {
@@ -275,57 +276,32 @@ public class FlagValueCalculator {
 
         int minimumPriority = Integer.MIN_VALUE;
 
-        // Say there are two regions in one location: CHILD and PARENT (CHILD
-        // is a child of PARENT). If the two are overlapping regions in WG,
-        // both with values set, then we have a problem. Due to inheritance,
-        // only the CHILD's value for the flag should be used because it
-        // overrides its parent's value, but default behavior is to collect
-        // all the values into a list.
-        //
-        // To rectify this, we keep a map of consideredValues (region -> value)
-        // and an ignoredRegions set. When we iterate over the list of
-        // regions, there are two scenarios that we may encounter:
-        //
-        // 1) PARENT first, CHILD later:
-        //    a) When the loop reaches PARENT, PARENT's value is added to
-        //       consideredValues
-        //    b) When the loop reaches CHILD, parents of CHILD (which includes
-        //       PARENT) are removed from consideredValues (so we no longer
-        //       consider those values). The CHILD's value is then added to
-        //       consideredValues.
-        //    c) In the end, only CHILD's value exists in consideredValues.
-        //
-        // 2) CHILD first, PARENT later:
-        //    a) When the loop reaches CHILD, CHILD's value is added to
-        //       consideredValues. In addition, the CHILD's parents (which
-        //       includes PARENT) are added to ignoredRegions.
-        //    b) When the loop reaches PARENT, since PARENT is in
-        //       ignoredRegions, the parent is skipped over.
-        //    c) In the end, only CHILD's value exists in consideredValues.
-
         Map<ProtectedRegion, V> consideredValues = new HashMap<ProtectedRegion, V>();
-        Set<ProtectedRegion> ignoredRegions = new HashSet<ProtectedRegion>();
+        Set<ProtectedRegion> ignoredParents = new HashSet<ProtectedRegion>();
 
         for (ProtectedRegion region : getApplicable()) {
-            // Don't consider lower priorities below minimumPriority
-            // (which starts at Integer.MIN_VALUE). A region that "counts"
-            // (has the flag set) will raise minimumPriority to its own
-            // priority.
             if (getPriority(region) < minimumPriority) {
                 break;
+            }
+
+            if (ignoredParents.contains(region)) {
+                continue;
             }
 
             V value = getEffectiveFlag(region, flag, subject);
             int priority = getPriority(region);
 
             if (value != null) {
-                if (!ignoredRegions.contains(region)) {
-                    minimumPriority = priority;
+                minimumPriority = priority;
 
-                    ignoreValuesOfParents(consideredValues, ignoredRegions, region);
+                if (acceptOne) {
+                    return Arrays.asList(value);
+                } else {
                     consideredValues.put(region, value);
                 }
             }
+
+            addParents(ignoredParents, region);
 
             // The BUILD flag (of lower priorities) can be overridden if
             // this region has members... this check is here due to legacy
@@ -436,39 +412,16 @@ public class FlagValueCalculator {
     }
 
     /**
-     * Clear a region's parents for isFlagAllowed().
-     *
-     * @param needsClear the regions that should be cleared
-     * @param hasCleared the regions already cleared
-     * @param region the region to start from
-     */
-    private void removeParents(Set<ProtectedRegion> needsClear, Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
-        ProtectedRegion parent = region.getParent();
-
-        while (parent != null) {
-            if (!needsClear.remove(parent)) {
-                hasCleared.add(parent);
-            }
-
-            parent = parent.getParent();
-        }
-    }
-
-    /**
      * Clear a region's parents for getFlag().
      *
-     * @param needsClear The regions that should be cleared
-     * @param hasCleared The regions already cleared
+     * @param ignored The regions to ignore
      * @param region The region to start from
      */
-    private void ignoreValuesOfParents(Map<ProtectedRegion, ?> needsClear, Set<ProtectedRegion> hasCleared, ProtectedRegion region) {
+    private void addParents(Set<ProtectedRegion> ignored, ProtectedRegion region) {
         ProtectedRegion parent = region.getParent();
 
         while (parent != null) {
-            if (needsClear.remove(parent) == null) {
-                hasCleared.add(parent);
-            }
-
+            ignored.add(parent);
             parent = parent.getParent();
         }
     }

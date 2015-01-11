@@ -25,14 +25,10 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.util.NormativeOrders;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,9 +43,10 @@ public class RegionResultSet extends AbstractRegionSet {
     private Set<ProtectedRegion> regionSet;
 
     /**
-     * Construct the object.
+     * Create a new region result set.
      *
-     * <p>A sorted set will be created to include the collection of regions.</p>
+     * <p>The given list must not contain duplicates or the behavior of
+     * this instance will be undefined.</p>
      *
      * @param applicable the regions contained in this set
      * @param globalRegion the global region, set aside for special handling.
@@ -59,16 +56,30 @@ public class RegionResultSet extends AbstractRegionSet {
     }
 
     /**
-     * Construct the object.
+     * Create a new region result set.
+     *
+     * @param applicable the regions contained in this set
+     * @param globalRegion the global region, set aside for special handling.
+     */
+    public RegionResultSet(Set<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion) {
+        this(NormativeOrders.fromSet(applicable), globalRegion, true);
+    }
+
+    /**
+     * Create a new region result set.
+     *
+     * <p>The list of regions may be first sorted with
+     * {@link NormativeOrders}. If that is the case, {@code sorted} should be
+     * {@code true}. Otherwise, the list will be sorted in-place.</p>
      * 
      * @param applicable the regions contained in this set
      * @param globalRegion the global region, set aside for special handling.
-     * @param sorted true if the list is already sorted
+     * @param sorted true if the list is already sorted with {@link NormativeOrders}
      */
-    private RegionResultSet(List<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion, boolean sorted) {
+    public RegionResultSet(List<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion, boolean sorted) {
         checkNotNull(applicable);
         if (!sorted) {
-            Collections.sort(applicable);
+            NormativeOrders.sort(applicable);
         }
         this.applicable = applicable;
         this.flagValueCalculator = new FlagValueCalculator(applicable, globalRegion);

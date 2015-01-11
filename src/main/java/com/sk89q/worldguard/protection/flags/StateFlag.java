@@ -54,6 +54,11 @@ public class StateFlag extends Flag<StateFlag.State> {
     }
 
     @Override
+    public boolean hasConflictStrategy() {
+        return true;
+    }
+
+    @Override
     @Nullable
     public State chooseValue(Collection<State> values) {
         if (!values.isEmpty()) {
