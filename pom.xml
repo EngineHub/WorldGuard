@@ -388,6 +388,7 @@
                   <include>org.flywaydb:flyway-core</include>
                   <include>com.sk89q:squirrelid</include>
                   <include>com.sk89q:guavabackport</include>
+                  <include>com.googlecode.json-simple:json-simple</include>
                 </includes>
               </artifactSet>
               <relocations>
@@ -402,6 +403,10 @@
                 <relocation>
                   <pattern>com.sk89q.squirrelid</pattern>
                   <shadedPattern>com.sk89q.worldguard.util.profile</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.json.simple</pattern>
+                  <shadedPattern>com.sk89q.worldguard.util.jsonsimple</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
