@@ -27,7 +27,7 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.bukkit.util.report.*;
-import com.sk89q.worldguard.util.paste.Pastebin;
+import com.sk89q.worldguard.util.paste.EngineHubPaste;
 import com.sk89q.worldguard.util.report.ReportList;
 import com.sk89q.worldguard.util.report.SystemInfoReport;
 import com.sk89q.worldguard.util.task.Task;
@@ -131,10 +131,10 @@ public class WorldGuardCommands {
             
             sender.sendMessage(ChatColor.YELLOW + "Now uploading to Pastebin...");
 
-            Futures.addCallback(new Pastebin().paste(result), new FutureCallback<URL>() {
+            Futures.addCallback(new EngineHubPaste().paste(result), new FutureCallback<URL>() {
                 @Override
                 public void onSuccess(URL url) {
-                    sender.sendMessage(ChatColor.YELLOW + "WorldGuard report: " + url);
+                    sender.sendMessage(ChatColor.YELLOW + "WorldGuard report: " + url + ".report");
                 }
 
                 @Override

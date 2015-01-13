@@ -19,38 +19,24 @@
 
 package com.sk89q.worldguard.util.paste;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.worldguard.util.net.HttpRequest;
 import com.sk89q.worldguard.util.net.HttpRequest.Form;
+import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Pastebin implements Paster {
+public class EngineHubPaste implements Paster {
 
-    private static final Pattern URL_PATTERN = Pattern.compile("https?://pastebin.com/([^/]+)$");
-
-    private boolean mungingLinks = true;
-
-    public boolean isMungingLinks() {
-        return mungingLinks;
-    }
-
-    public void setMungingLinks(boolean mungingLinks) {
-        this.mungingLinks = mungingLinks;
-    }
+    private static final Pattern URL_PATTERN = Pattern.compile("https?://.+$");
 
     @Override
     public ListenableFuture<URL> paste(String content) {
-        if (mungingLinks) {
-            content = content.replaceAll("http://", "http_//");
-        }
-
         return Pasters.getExecutor().submit(new PasteTask(content));
     }
 
@@ -64,16 +50,10 @@ public class Pastebin implements Paster {
         @Override
         public URL call() throws IOException, InterruptedException {
             Form form = Form.create();
-            form.add("api_option", "paste");
-            form.add("api_dev_key", "4867eae74c6990dbdef07c543cf8f805");
-            form.add("api_paste_code", content);
-            form.add("api_paste_private", "0");
-            form.add("api_paste_name", "");
-            form.add("api_paste_expire_date", "1W");
-            form.add("api_paste_format", "text");
-            form.add("api_user_key", "");
+            form.add("content", content);
+            form.add("from", "worldguard");
 
-            URL url = HttpRequest.url("http://pastebin.com/api/api_post.php");
+            URL url = HttpRequest.url("http://paste.enginehub.org/paste");
             String result = HttpRequest.post(url)
                     .bodyForm(form)
                     .execute()
@@ -81,16 +61,19 @@ public class Pastebin implements Paster {
                     .returnContent()
                     .asString("UTF-8").trim();
 
-            Matcher m = URL_PATTERN.matcher(result);
+            Object object = JSONValue.parse(result);
+            if (object instanceof Map) {
+                @SuppressWarnings("unchecked")
+                String urlString = String.valueOf(((Map<Object, Object>) object).get("url"));
+                Matcher m = URL_PATTERN.matcher(urlString);
 
-            if (m.matches()) {
-                return new URL("http://pastebin.com/raw.php?i=" + m.group(1));
-            } else if (result.matches("^https?://.+")) {
-                return new URL(result);
-            } else {
-                throw new IOException("Failed to save paste; instead, got: " + result);
+                if (m.matches()) {
+                    return new URL(urlString);
+                }
             }
+
+            throw new IOException("Failed to save paste; instead, got: " + result);
         }
     }
-    
+
 }
