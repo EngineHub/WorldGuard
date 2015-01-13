@@ -19,13 +19,35 @@
 
 package com.sk89q.worldguard.bukkit.util.report;
 
+import com.google.common.base.Optional;
+import com.google.common.reflect.TypeToken;
+import com.sk89q.guavabackport.cache.CacheBuilder;
+import com.sk89q.guavabackport.cache.CacheLoader;
+import com.sk89q.guavabackport.cache.LoadingCache;
 import com.sk89q.worldguard.util.report.DataReport;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
 public class SchedulerReport extends DataReport {
+
+    private LoadingCache<Class<?>, Optional<Field>> taskFieldCache = CacheBuilder.newBuilder()
+            .build(new CacheLoader<Class<?>, Optional<Field>>() {
+                @Override
+                public Optional<Field> load(Class<?> clazz) throws Exception {
+                    try {
+                        Field field = clazz.getDeclaredField("task");
+                        field.setAccessible(true);
+                        return Optional.fromNullable(field);
+                    } catch (NoSuchFieldException ignored) {
+                        return Optional.absent();
+                    }
+                }
+            });
 
     public SchedulerReport() {
         super("Scheduler");
@@ -35,10 +57,32 @@ public class SchedulerReport extends DataReport {
         append("Pending Task Count", tasks.size());
 
         for (BukkitTask task : tasks) {
+            Class<?> taskClass = getTaskClass(task);
+
             DataReport report = new DataReport("Task: #" + task.getTaskId());
             report.append("Owner", task.getOwner().getName());
+            report.append("Runnable", taskClass != null ? taskClass.getName() : "<Unknown>");
             report.append("Synchronous?", task.isSync());
             append(report.getTitle(), report);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    private Class<?> getTaskClass(BukkitTask task) {
+        Class<?> clazz = task.getClass();
+        Set<Class<?>> classes = (Set) TypeToken.of(clazz).getTypes().rawTypes();
+
+        try {
+            for (Class<?> type : classes) {
+                Optional<Field> field = taskFieldCache.getUnchecked(type);
+                if (field.isPresent()) {
+                    return field.get().get(task).getClass();
+                }
+            }
+        } catch (IllegalAccessException ignored) {
+        }
+
+        return null;
     }
 }

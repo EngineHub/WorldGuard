@@ -19,12 +19,21 @@
 
 package com.sk89q.worldguard.util.report;
 
+import java.lang.management.*;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 public class SystemInfoReport extends DataReport {
 
     public SystemInfoReport() {
         super("System Information");
 
         Runtime runtime = Runtime.getRuntime();
+        RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
+        ClassLoadingMXBean classLoadingBean = ManagementFactory.getClassLoadingMXBean();
+        List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
+        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+        ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
 
         append("Java", "%s %s (%s)",
                 System.getProperty("java.vendor"),
@@ -38,6 +47,47 @@ public class SystemInfoReport extends DataReport {
         append("Free Memory", runtime.freeMemory() / 1024 / 1024 + " MB");
         append("Max Memory", runtime.maxMemory() / 1024 / 1024 + " MB");
         append("Total Memory", runtime.totalMemory() / 1024 / 1024 + " MB");
+        append("System Load Average", osBean.getSystemLoadAverage());
+        append("Java Uptime", TimeUnit.MINUTES.convert(runtimeBean.getUptime(), TimeUnit.MILLISECONDS) + " minutes");
+
+        DataReport startup = new DataReport("Startup");
+        startup.append("Input Arguments", runtimeBean.getInputArguments());
+        startup.append("Boot Class Path", runtimeBean.getBootClassPath());
+        startup.append("Library Path", runtimeBean.getLibraryPath());
+        append(startup.getTitle(), startup);
+
+        DataReport vm = new DataReport("Virtual Machine");
+        vm.append("Name", runtimeBean.getVmName());
+        vm.append("Vendor", runtimeBean.getVmVendor());
+        vm.append("Version", runtimeBean.getVmVendor());
+        append(vm.getTitle(), vm);
+
+        DataReport spec = new DataReport("Specification");
+        spec.append("Name", runtimeBean.getSpecName());
+        spec.append("Vendor", runtimeBean.getSpecVendor());
+        spec.append("Version", runtimeBean.getSpecVersion());
+        append(spec.getTitle(), spec);
+
+        DataReport classLoader = new DataReport("Class Loader");
+        classLoader.append("Loaded Class Count", classLoadingBean.getLoadedClassCount());
+        classLoader.append("Total Loaded Class Count", classLoadingBean.getTotalLoadedClassCount());
+        classLoader.append("Unloaded Class Count", classLoadingBean.getUnloadedClassCount());
+        append(classLoader.getTitle(), classLoader);
+
+        DataReport gc = new DataReport("Garbage Collectors");
+        for (GarbageCollectorMXBean bean : gcBeans) {
+            DataReport thisGC = new DataReport(bean.getName());
+            thisGC.append("Collection Count", bean.getCollectionCount());
+            thisGC.append("Collection Time", bean.getCollectionTime() + "ms");
+            gc.append(thisGC.getTitle(), thisGC);
+        }
+        append(gc.getTitle(), gc);
+
+        DataReport threads = new DataReport("Threads");
+        for (ThreadInfo threadInfo : threadBean.dumpAllThreads(false, false)) {
+            threads.append("#" + threadInfo.getThreadId() + " " + threadInfo.getThreadName(), threadInfo.getThreadState());
+        }
+        append(threads.getTitle(), threads);
     }
 
 }
