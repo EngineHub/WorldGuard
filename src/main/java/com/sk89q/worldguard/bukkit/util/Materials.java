@@ -238,6 +238,31 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.COAL_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.PACKED_ICE, 0);
         MATERIAL_FLAGS.put(Material.DOUBLE_PLANT, 0);
+        try {
+            MATERIAL_FLAGS.put(Material.STANDING_BANNER, 0);
+            MATERIAL_FLAGS.put(Material.WALL_BANNER, 0);
+            MATERIAL_FLAGS.put(Material.DAYLIGHT_DETECTOR_INVERTED, 0);
+            MATERIAL_FLAGS.put(Material.RED_SANDSTONE, 0);
+            MATERIAL_FLAGS.put(Material.RED_SANDSTONE_STAIRS, 0);
+            MATERIAL_FLAGS.put(Material.DOUBLE_STONE_SLAB2, 0);
+            MATERIAL_FLAGS.put(Material.STONE_SLAB2, 0);
+            MATERIAL_FLAGS.put(Material.SPRUCE_FENCE_GATE, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.BIRCH_FENCE_GATE, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.JUNGLE_FENCE_GATE, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.DARK_OAK_FENCE_GATE, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.ACACIA_FENCE_GATE, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.SPRUCE_FENCE, 0);
+            MATERIAL_FLAGS.put(Material.BIRCH_FENCE, 0);
+            MATERIAL_FLAGS.put(Material.JUNGLE_FENCE, 0);
+            MATERIAL_FLAGS.put(Material.DARK_OAK_FENCE, 0);
+            MATERIAL_FLAGS.put(Material.ACACIA_FENCE, 0);
+            MATERIAL_FLAGS.put(Material.SPRUCE_DOOR, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.BIRCH_DOOR, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.JUNGLE_DOOR, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.ACACIA_DOOR, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR, MODIFIED_ON_RIGHT);
+        } catch (NoSuchFieldError ignored) {
+        }
 
         MATERIAL_FLAGS.put(Material.IRON_SPADE, 0);
         MATERIAL_FLAGS.put(Material.IRON_PICKAXE, 0);
