@@ -1,5 +1,25 @@
 # Changelog
 
+## 6.0 beta 4
+
+MC 1.7.9, 1.7.10 and 1.8 (Spigot only) are supported.
+
+* Added better support for MC 1.8 blocks (regarding the use flag, etc.).
+* Added an an experimental "lite" version of WarmRoast to CPU profile your server (try it: `/wg profile -p`)
+* Added permissions for individual flag values (i.e. `worldguard.region.flag.flags.use.allow`).
+* Added support for slightly older versions of Bukkit 1.7.9.
+* Improved `/wg report`'s output (try it: `/wg report -p`)
+* Fixed armor stands not being protected properly.
+* Fixed lack of wood plate support with the `USE` flag.
+* Fixed left click also being blocked when only right click needed to be blocked.
+* Fixed items and paintings/item frames not decaying under some versions of Spigot.
+* Fixed parent-child inheritance so the child will always inherit the parent.
+* Fixed inheritance issues with a flag is set with a region group on a parent region.
+* Fixed high CPU usage when Citizens is also installed.
+* Fixed `on-acquire` in the blacklist so it also handles item transfers between inventories.
+* Fixed the blacklist not supporting color codes.
+* Changed the PvP flag so it applies to self-attack like in WG 5 (this change *may* be reverted).
+
 ## 6.0 beta 3
 
 MC 1.7.10 and 1.8 (Spigot only) are supported.
