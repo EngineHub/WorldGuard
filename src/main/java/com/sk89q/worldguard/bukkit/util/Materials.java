@@ -615,20 +615,33 @@ public final class Materials {
      * @return true if covered by the use flag
      */
     public static boolean isUseFlagApplicable(Material material) {
-        return material == Material.LEVER
-                || material == Material.STONE_BUTTON
-                || material == Material.WOOD_BUTTON
-                || material == Material.WOODEN_DOOR
-                || material == Material.TRAP_DOOR
-                || material == Material.FENCE_GATE
-                || material == Material.WORKBENCH
-                || material == Material.ENCHANTMENT_TABLE
-                || material == Material.BEACON
-                || material == Material.ANVIL
-                || material == Material.WOOD_PLATE
-                || material == Material.STONE_PLATE
-                || material == Material.IRON_PLATE  
-                || material == Material.GOLD_PLATE;
+        switch (material) {
+            case LEVER: return true;
+            case STONE_BUTTON: return true;
+            case WOOD_BUTTON: return true;
+            case WOODEN_DOOR: return true;
+            case TRAP_DOOR: return true;
+            case FENCE_GATE: return true;
+            case WORKBENCH: return true;
+            case ENCHANTMENT_TABLE: return true;
+            case BEACON: return true;
+            case ANVIL: return true;
+            case WOOD_PLATE: return true;
+            case STONE_PLATE: return true;
+            case IRON_PLATE: return true;
+            case GOLD_PLATE: return true;
+            case SPRUCE_FENCE_GATE: return true;
+            case BIRCH_FENCE_GATE: return true;
+            case JUNGLE_FENCE_GATE: return true;
+            case DARK_OAK_FENCE_GATE: return true;
+            case ACACIA_FENCE_GATE: return true;
+            case SPRUCE_DOOR: return true;
+            case BIRCH_DOOR: return true;
+            case JUNGLE_DOOR: return true;
+            case ACACIA_DOOR: return true;
+            case DARK_OAK_DOOR: return true;
+            default: return false;
+        }
     }
 
     /**
