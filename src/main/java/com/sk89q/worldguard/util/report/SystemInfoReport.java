@@ -52,8 +52,6 @@ public class SystemInfoReport extends DataReport {
 
         DataReport startup = new DataReport("Startup");
         startup.append("Input Arguments", runtimeBean.getInputArguments());
-        startup.append("Boot Class Path", runtimeBean.getBootClassPath());
-        startup.append("Library Path", runtimeBean.getLibraryPath());
         append(startup.getTitle(), startup);
 
         DataReport vm = new DataReport("Virtual Machine");
