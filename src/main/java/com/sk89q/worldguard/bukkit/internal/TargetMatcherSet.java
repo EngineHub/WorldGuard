@@ -70,4 +70,9 @@ public class TargetMatcherSet {
         return test(new MaterialTarget(itemStack.getTypeId(), itemStack.getDurability()));
     }
 
+    @Override
+    public String toString() {
+        return entries.toString();
+    }
+
 }
