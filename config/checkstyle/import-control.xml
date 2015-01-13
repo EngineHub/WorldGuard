@@ -37,4 +37,5 @@
   <allow pkg="com.google.common"/>
   <allow pkg="com.jolbox.bonecp"/>
   <allow pkg="org.flywaydb.core"/>
+  <allow pkg="org.json.simple"/>
 </import-control>
