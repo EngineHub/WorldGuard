@@ -19,15 +19,21 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.bukkit.util.report.*;
-import com.sk89q.worldguard.util.paste.EngineHubPaste;
+import com.sk89q.worldguard.util.profiler.SamplerBuilder;
+import com.sk89q.worldguard.util.profiler.SamplerBuilder.Sampler;
+import com.sk89q.worldguard.util.profiler.ThreadIdFilter;
+import com.sk89q.worldguard.util.profiler.ThreadNameFilter;
 import com.sk89q.worldguard.util.report.ReportList;
 import com.sk89q.worldguard.util.report.SystemInfoReport;
 import com.sk89q.worldguard.util.task.Task;
@@ -38,12 +44,14 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.lang.management.ThreadInfo;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +60,8 @@ public class WorldGuardCommands {
     private static final Logger log = Logger.getLogger(WorldGuardCommands.class.getCanonicalName());
 
     private final WorldGuardPlugin plugin;
+    @Nullable
+    private Sampler activeSampler;
 
     public WorldGuardCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
@@ -128,23 +138,111 @@ public class WorldGuardCommands {
         
         if (args.hasFlag('p')) {
             plugin.checkPermission(sender, "worldguard.report.pastebin");
-            
-            sender.sendMessage(ChatColor.YELLOW + "Now uploading to Pastebin...");
+            CommandUtils.pastebin(plugin, sender, result, "WorldGuard report: %s.report");
+        }
+    }
 
-            Futures.addCallback(new EngineHubPaste().paste(result), new FutureCallback<URL>() {
-                @Override
-                public void onSuccess(URL url) {
-                    sender.sendMessage(ChatColor.YELLOW + "WorldGuard report: " + url + ".report");
-                }
+    @Command(aliases = {"profile"}, usage = "[<minutes>]",
+            desc = "Profile the CPU usage of the server", min = 0, max = 1,
+            flags = "t:p")
+    @CommandPermissions("worldguard.profile")
+    public void profile(final CommandContext args, final CommandSender sender) throws CommandException {
+        Predicate<ThreadInfo> threadFilter;
+        String threadName = args.getFlag('t');
+        final boolean pastebin;
 
-                @Override
-                public void onFailure(Throwable throwable) {
-                    log.log(Level.WARNING, "Failed to submit pastebin", throwable);
-                    sender.sendMessage(ChatColor.RED + "The WorldGuard report could not be saved to a pastebin service. Please see console for the error.");
-                }
-            });
+        if (args.hasFlag('p')) {
+            plugin.checkPermission(sender, "worldguard.report.pastebin");
+            pastebin = true;
+        } else {
+            pastebin = false;
         }
 
+        if (threadName == null) {
+            threadFilter = new ThreadIdFilter(Thread.currentThread().getId());
+        } else if (threadName.equals("*")) {
+            threadFilter = Predicates.alwaysTrue();
+        } else {
+            threadFilter = new ThreadNameFilter(threadName);
+        }
+
+        int minutes;
+        if (args.argsLength() == 0) {
+            minutes = 5;
+        } else {
+            minutes = args.getInteger(0);
+            if (minutes < 1) {
+                throw new CommandException("You must run the profile for at least 1 minute.");
+            } else if (minutes > 10) {
+                throw new CommandException("You can profile for, at maximum, 10 minutes.");
+            }
+        }
+
+        Sampler sampler;
+
+        synchronized (this) {
+            if (activeSampler != null) {
+                throw new CommandException("A profile is currently in progress! Please use /wg stopprofile to stop the current profile.");
+            }
+
+            SamplerBuilder builder = new SamplerBuilder();
+            builder.setThreadFilter(threadFilter);
+            builder.setRunTime(minutes, TimeUnit.MINUTES);
+            sampler = activeSampler = builder.start();
+        }
+
+        AsyncCommandHelper.wrap(sampler.getFuture(), plugin, sender)
+                .formatUsing(minutes)
+                .registerWithSupervisor("Running CPU profiler for %d minute(s)...")
+                .sendMessageAfterDelay("(Please wait... profiling for %d minute(s)...)")
+                .thenTellErrorsOnly("CPU profiling failed.");
+
+        sampler.getFuture().addListener(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (WorldGuardCommands.this) {
+                    activeSampler = null;
+                }
+            }
+        }, MoreExecutors.sameThreadExecutor());
+
+        Futures.addCallback(sampler.getFuture(), new FutureCallback<Sampler>() {
+            @Override
+            public void onSuccess(Sampler result) {
+                String output = result.toString();
+
+                try {
+                    File dest = new File(plugin.getDataFolder(), "profile.txt");
+                    Files.write(output, dest, Charset.forName("UTF-8"));
+                    sender.sendMessage(ChatColor.YELLOW + "CPU profiling data written to " + dest.getAbsolutePath());
+                } catch (IOException e) {
+                    sender.sendMessage(ChatColor.RED + "Failed to write CPU profiling data: " + e.getMessage());
+                }
+
+                if (pastebin) {
+                    CommandUtils.pastebin(plugin, sender, output, "Profile result: %s.profile");
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+            }
+        });
+    }
+
+    @Command(aliases = {"stopprofile"}, usage = "",desc = "Stop a running profile", min = 0, max = 0)
+    @CommandPermissions("worldguard.profile")
+    public void stopProfile(CommandContext args, final CommandSender sender) throws CommandException {
+        synchronized (this) {
+            if (activeSampler == null) {
+                throw new CommandException("No CPU profile is currently running.");
+            }
+
+            activeSampler.cancel();
+            activeSampler = null;
+        }
+
+        sender.sendMessage("The running CPU profile has been stopped.");
     }
 
     @Command(aliases = {"flushstates", "clearstates"},
