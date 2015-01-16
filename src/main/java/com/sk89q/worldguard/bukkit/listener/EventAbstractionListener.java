@@ -702,7 +702,9 @@ public class EventAbstractionListener extends AbstractListener {
         if (holder instanceof BlockState) {
             Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), ((BlockState) holder).getBlock()));
         } else if (holder instanceof Entity) {
-            Events.fireToCancel(event, new UseEntityEvent(event, create(event.getPlayer()), (Entity) holder));
+            if (!(holder instanceof Player)) {
+                Events.fireToCancel(event, new UseEntityEvent(event, create(event.getPlayer()), (Entity) holder));
+            }
         }
     }
 
