@@ -110,7 +110,7 @@ public final class Events {
      */
     public static <T extends Event & Cancellable & BulkEvent> boolean fireBulkEventToCancel(Cancellable original, T eventToFire) {
         Bukkit.getServer().getPluginManager().callEvent(eventToFire);
-        if (eventToFire.isExplicitlyCancelled()) {
+        if (eventToFire.getExplicitResult() == Result.DENY) {
             original.setCancelled(true);
             return true;
         }

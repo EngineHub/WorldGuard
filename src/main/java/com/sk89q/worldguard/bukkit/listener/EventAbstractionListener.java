@@ -24,7 +24,6 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.DelegateEvent;
-import com.sk89q.worldguard.bukkit.event.DelegateEvents;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
@@ -304,6 +303,7 @@ public class EventAbstractionListener extends AbstractListener {
         Block clicked = event.getClickedBlock();
         Block placed;
         boolean silent = false;
+        boolean modifiesWorld;
         Cause cause = create(player);
 
         switch (event.getAction()) {
@@ -313,9 +313,8 @@ public class EventAbstractionListener extends AbstractListener {
                     silent = true;
                 }
 
-                if (!hasInteractBypass(clicked)) {
-                    interactDebounce.debounce(clicked, event.getPlayer(), event, DelegateEvents.setSilent(new UseBlockEvent(event, cause, clicked), silent));
-                }
+                interactDebounce.debounce(clicked, event.getPlayer(), event,
+                        new UseBlockEvent(event, cause, clicked).setSilent(silent).setAllowed(hasInteractBypass(clicked)));
                 break;
 
             case RIGHT_CLICK_BLOCK:
@@ -328,17 +327,17 @@ public class EventAbstractionListener extends AbstractListener {
                 placed = clicked.getRelative(event.getBlockFace());
 
                 // Only fire events for blocks that are modified when right clicked
-                if (isBlockModifiedOnClick(clicked, event.getAction() == Action.RIGHT_CLICK_BLOCK) || (item != null && isItemAppliedToBlock(item, clicked))) {
-                    if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, clicked))) {
-                        event.setUseInteractedBlock(Result.DENY);
-                    }
+                modifiesWorld = isBlockModifiedOnClick(clicked, event.getAction() == Action.RIGHT_CLICK_BLOCK) || (item != null && isItemAppliedToBlock(item, clicked));
 
-                    // Handle connected blocks (i.e. beds, chests)
-                    for (Block connected : Blocks.getConnected(clicked)) {
-                        if (Events.fireAndTestCancel(new UseBlockEvent(event, create(event.getPlayer()), connected))) {
-                            event.setUseInteractedBlock(Result.DENY);
-                            break;
-                        }
+                if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, clicked).setAllowed(!modifiesWorld))) {
+                    event.setUseInteractedBlock(Result.DENY);
+                }
+
+                // Handle connected blocks (i.e. beds, chests)
+                for (Block connected : Blocks.getConnected(clicked)) {
+                    if (Events.fireAndTestCancel(new UseBlockEvent(event, create(event.getPlayer()), connected).setAllowed(!modifiesWorld))) {
+                        event.setUseInteractedBlock(Result.DENY);
+                        break;
                     }
                 }
 
@@ -377,9 +376,8 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityInteract(org.bukkit.event.entity.EntityInteractEvent event) {
-        if (!hasInteractBypass(event.getBlock())) {
-            interactDebounce.debounce(event.getBlock(), event.getEntity(), event, new UseBlockEvent(event, create(event.getEntity()), event.getBlock()));
-        }
+        interactDebounce.debounce(event.getBlock(), event.getEntity(), event,
+                new UseBlockEvent(event, create(event.getEntity()), event.getBlock()).setAllowed(hasInteractBypass(event.getBlock())));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -420,14 +418,17 @@ public class EventAbstractionListener extends AbstractListener {
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         Player player = event.getPlayer();
         Block blockAffected = event.getBlockClicked().getRelative(event.getBlockFace());
+        boolean allowed = false;
 
         // Milk buckets can't be emptied as of writing
-        if (event.getBucket() != Material.MILK_BUCKET) {
-            ItemStack item = new ItemStack(event.getBucket(), 1);
-            Material blockMaterial = Materials.getBucketBlockMaterial(event.getBucket());
-            Events.fireToCancel(event, new PlaceBlockEvent(event, create(player), blockAffected.getLocation(), blockMaterial));
-            Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item));
+        if (event.getBucket() == Material.MILK_BUCKET) {
+            allowed = true;
         }
+
+        ItemStack item = new ItemStack(event.getBucket(), 1);
+        Material blockMaterial = Materials.getBucketBlockMaterial(event.getBucket());
+        Events.fireToCancel(event, new PlaceBlockEvent(event, create(player), blockAffected.getLocation(), blockMaterial).setAllowed(allowed));
+        Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item).setAllowed(allowed));
 
         playDenyEffect(event.getPlayer(), blockAffected.getLocation().add(0.5, 0.5, 0.5));
     }
@@ -436,13 +437,16 @@ public class EventAbstractionListener extends AbstractListener {
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
         Player player = event.getPlayer();
         Block blockAffected = event.getBlockClicked().getRelative(event.getBlockFace());
+        boolean allowed = false;
 
-        // Milk buckets can't be filled by right clicking the ground as of writing
-        if (event.getBucket() != Material.MILK_BUCKET) {
-            ItemStack item = new ItemStack(event.getBucket(), 1);
-            Events.fireToCancel(event, new BreakBlockEvent(event, create(player), blockAffected));
-            Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item));
+        // Milk buckets can't be emptied as of writing
+        if (event.getBucket() == Material.MILK_BUCKET) {
+            allowed = true;
         }
+
+        ItemStack item = new ItemStack(event.getBucket(), 1);
+        Events.fireToCancel(event, new BreakBlockEvent(event, create(player), blockAffected).setAllowed(allowed));
+        Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item).setAllowed(allowed));
 
         playDenyEffect(event.getPlayer(), blockAffected.getLocation().add(0.5, 1, 0.5));
     }

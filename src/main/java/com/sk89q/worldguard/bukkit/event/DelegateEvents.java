@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.event;
 
+import org.bukkit.event.Event.Result;
+
 /**
  * Utility methods for dealing with delegate events.
  */
@@ -49,6 +51,21 @@ public final class DelegateEvents {
      */
     public static <T extends DelegateEvent> T setSilent(T event, boolean silent) {
         event.setSilent(silent);
+        return event;
+    }
+
+    /**
+     * Set an event as handled as {@link Result#ALLOW} if {@code allowed} is
+     * true, otherwise do nothing.
+     *
+     * @param event the event
+     * @param <T> the type of event
+     * @return the same event
+     */
+    public static <T extends Handleable> T setAllowed(T event, boolean allowed) {
+        if (allowed) {
+            event.setResult(Result.ALLOW);
+        }
         return event;
     }
 
