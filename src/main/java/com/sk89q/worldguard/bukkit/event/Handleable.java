@@ -21,19 +21,10 @@ package com.sk89q.worldguard.bukkit.event;
 
 import org.bukkit.event.Event.Result;
 
-/**
- * A bulk event contains several affected objects in a list.
- */
-public interface BulkEvent {
+public interface Handleable {
 
-    /**
-     * Get the actual result.
-     *
-     * <p>By default, bulk events will set the result to DENY if the number of
-     * affected objects drops to zero. This method returns the true result.</p>
-     *
-     * @return the explicit result
-     */
-    Result getExplicitResult();
+    Result getResult();
+
+    void setResult(Result result);
 
 }

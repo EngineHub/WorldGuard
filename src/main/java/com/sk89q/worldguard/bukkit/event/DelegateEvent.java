@@ -34,13 +34,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * This event is an internal event. We do not recommend handling or throwing
  * this event or its subclasses as the interface is highly subject to change.
  */
-public abstract class DelegateEvent extends Event implements Cancellable {
+public abstract class DelegateEvent extends Event implements Cancellable, Handleable {
 
     @Nullable
     private final Event originalEvent;
     private final Cause cause;
     private final List<StateFlag> relevantFlags = Lists.newArrayList();
-    private boolean cancelled;
+    private Result result = Result.DEFAULT;
     private boolean silent;
 
     /**
@@ -85,12 +85,24 @@ public abstract class DelegateEvent extends Event implements Cancellable {
 
     @Override
     public boolean isCancelled() {
-        return cancelled;
+        return getResult() == Result.DENY;
     }
 
     @Override
     public void setCancelled(boolean cancel) {
-        this.cancelled = cancel;
+        if (cancel) {
+            setResult(Result.DENY);
+        }
+    }
+
+    @Override
+    public Result getResult() {
+        return result;
+    }
+
+    @Override
+    public void setResult(Result result) {
+        this.result = result;
     }
 
     /**
@@ -106,9 +118,25 @@ public abstract class DelegateEvent extends Event implements Cancellable {
      * Set whether this should be a silent check.
      *
      * @param silent true if silent
+     * @return the same event
      */
-    void setSilent(boolean silent) {
+    public DelegateEvent setSilent(boolean silent) {
         this.silent = silent;
+        return this;
+    }
+
+    /**
+     * Set the event to {@link Result#ALLOW} if {@code allowed} is true.
+     *
+     * @param allowed true to set the result
+     * @return the same event
+     */
+    public DelegateEvent setAllowed(boolean allowed) {
+        if (allowed) {
+            setResult(Result.ALLOW);
+        }
+
+        return this;
     }
 
 }

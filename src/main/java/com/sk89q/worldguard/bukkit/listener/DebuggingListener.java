@@ -30,6 +30,7 @@ import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
@@ -67,8 +68,8 @@ public class DebuggingListener extends AbstractListener {
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
         builder.append(":").append(getEventName(event.getOriginalEvent()));
-        if (event.isCancelled()) {
-            builder.append(" [CANCELLED]");
+        if (event.getResult() != Result.DEFAULT) {
+            builder.append(" [").append(event.getResult()).append("]");
         }
         logger.info(builder.toString());
     }
@@ -85,8 +86,8 @@ public class DebuggingListener extends AbstractListener {
         builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
         builder.append(":").append(getEventName(event.getOriginalEvent()));
-        if (event.isCancelled()) {
-            builder.append(" [CANCELLED]");
+        if (event.getResult() != Result.DEFAULT) {
+            builder.append(" [").append(event.getResult()).append("]");
         }
         logger.info(builder.toString());
     }
@@ -103,8 +104,8 @@ public class DebuggingListener extends AbstractListener {
         builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
         builder.append(":").append(getEventName(event.getOriginalEvent()));
-        if (event.isCancelled()) {
-            builder.append(" [CANCELLED]");
+        if (event.getResult() != Result.DEFAULT) {
+            builder.append(" [").append(event.getResult()).append("]");
         }
         logger.info(builder.toString());
     }
@@ -121,8 +122,8 @@ public class DebuggingListener extends AbstractListener {
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
         builder.append(":").append(getEventName(event.getOriginalEvent()));
-        if (event.isCancelled()) {
-            builder.append(" [CANCELLED]");
+        if (event.getResult() != Result.DEFAULT) {
+            builder.append(" [").append(event.getResult()).append("]");
         }
         logger.info(builder.toString());
     }
@@ -139,8 +140,8 @@ public class DebuggingListener extends AbstractListener {
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
         builder.append(":").append(getEventName(event.getOriginalEvent()));
-        if (event.isCancelled()) {
-            builder.append(" [CANCELLED]");
+        if (event.getResult() != Result.DEFAULT) {
+            builder.append(" [").append(event.getResult()).append("]");
         }
         logger.info(builder.toString());
     }
@@ -157,8 +158,8 @@ public class DebuggingListener extends AbstractListener {
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
         builder.append(":").append(getEventName(event.getOriginalEvent()));
-        if (event.isCancelled()) {
-            builder.append(" [CANCELLED]");
+        if (event.getResult() != Result.DEFAULT) {
+            builder.append(" [").append(event.getResult()).append("]");
         }
         logger.info(builder.toString());
     }
@@ -175,8 +176,8 @@ public class DebuggingListener extends AbstractListener {
         builder.append("@").append(event.getWorld().getName());
         builder.append(" ");
         builder.append(":").append(getEventName(event.getOriginalEvent()));
-        if (event.isCancelled()) {
-            builder.append(" [CANCELLED]");
+        if (event.getResult() != Result.DEFAULT) {
+            builder.append(" [").append(event.getResult()).append("]");
         }
         logger.info(builder.toString());
     }

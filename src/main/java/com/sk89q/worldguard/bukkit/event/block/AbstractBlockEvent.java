@@ -70,16 +70,6 @@ abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
         return blocks;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return super.isCancelled() || blocks.isEmpty();
-    }
-
-    @Override
-    public boolean isExplicitlyCancelled() {
-        return super.isCancelled();
-    }
-
     /**
      * Get the world.
      *
@@ -153,4 +143,18 @@ abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
     public Material getEffectiveMaterial() {
         return effectiveMaterial;
     }
+
+    @Override
+    public Result getResult() {
+        if (blocks.isEmpty()) {
+            return Result.DENY;
+        }
+        return super.getResult();
+    }
+
+    @Override
+    public Result getExplicitResult() {
+        return super.getResult();
+    }
+
 }

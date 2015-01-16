@@ -48,6 +48,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
@@ -153,6 +154,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
+        if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
@@ -196,6 +198,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
+        if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
@@ -234,6 +237,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
+        if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
@@ -290,6 +294,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
+        if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
@@ -336,6 +341,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
+        if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
@@ -371,6 +377,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
+        if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
@@ -410,6 +417,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDamageEntity(DamageEntityEvent event) {
+        if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         // Whitelist check is below
 
