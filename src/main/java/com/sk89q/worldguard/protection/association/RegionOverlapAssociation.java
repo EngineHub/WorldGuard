@@ -48,7 +48,7 @@ public class RegionOverlapAssociation implements RegionAssociable {
     @Override
     public Association getAssociation(List<ProtectedRegion> regions) {
         for (ProtectedRegion region : regions) {
-            if (source.contains(region)) {
+            if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty()) || source.contains(region)) {
                 return Association.OWNER;
             }
         }
