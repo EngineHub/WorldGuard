@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection.managers.storage;
 
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -53,10 +54,11 @@ public interface RegionDatabase {
      * {@code get()} and {@code put()} calls in order to maximize performance.
      * </p>
      *
+     * @param flags a flag registry
      * @return a set of loaded regions
      * @throws StorageException thrown on read error
      */
-    Set<ProtectedRegion> loadAll() throws StorageException;
+    Set<ProtectedRegion> loadAll(FlagRegistry flags) throws StorageException;
 
     /**
      * Replace all the data in the store with the given collection of regions.

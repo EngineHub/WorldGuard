@@ -24,18 +24,14 @@ import com.sk89q.squirrelid.Profile;
 import com.sk89q.squirrelid.resolver.ProfileService;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.domains.PlayerDomain;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
@@ -53,6 +49,7 @@ public class UUIDMigration extends AbstractMigration {
 
     private final Timer timer = new Timer();
     private final ProfileService profileService;
+    private final FlagRegistry flagRegistry;
     private final ConcurrentMap<String, UUID> resolvedNames = new ConcurrentHashMap<String, UUID>();
     private final Set<String> unresolvedNames = new HashSet<String>();
     private boolean keepUnresolvedNames = true;
@@ -62,11 +59,14 @@ public class UUIDMigration extends AbstractMigration {
      *
      * @param driver the storage driver
      * @param profileService the profile service
+     * @param flagRegistry the flag registry
      */
-    public UUIDMigration(RegionDriver driver, ProfileService profileService) {
+    public UUIDMigration(RegionDriver driver, ProfileService profileService, FlagRegistry flagRegistry) {
         super(driver);
         checkNotNull(profileService);
+        checkNotNull(flagRegistry, "flagRegistry");
         this.profileService = profileService;
+        this.flagRegistry = flagRegistry;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class UUIDMigration extends AbstractMigration {
         Set<ProtectedRegion> regions;
 
         try {
-            regions = store.loadAll();
+            regions = store.loadAll(flagRegistry);
         } catch (StorageException e) {
             throw new MigrationException("Failed to load region data for the world '" + store.getName() + "'", e);
         }

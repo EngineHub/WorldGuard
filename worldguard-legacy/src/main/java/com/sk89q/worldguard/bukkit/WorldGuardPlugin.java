@@ -37,10 +37,33 @@ import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
-import com.sk89q.worldguard.bukkit.listener.*;
+import com.sk89q.worldguard.bukkit.listener.BlacklistListener;
+import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
+import com.sk89q.worldguard.bukkit.listener.BuildPermissionListener;
+import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
+import com.sk89q.worldguard.bukkit.listener.DebuggingListener;
+import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
+import com.sk89q.worldguard.bukkit.listener.InvincibilityListener;
+import com.sk89q.worldguard.bukkit.listener.PlayerModesListener;
+import com.sk89q.worldguard.bukkit.listener.PlayerMoveListener;
+import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
+import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardCommandBookListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardEntityListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardHangingListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardPlayerListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardServerListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardVehicleListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
+import com.sk89q.worldguard.bukkit.listener.WorldRulesListener;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -68,8 +91,17 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RejectedExecutionException;
@@ -91,6 +123,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     private final ConfigurationManager configuration = new ConfigurationManager(this);
     private final RegionContainer regionContainer = new RegionContainer(this);
     private final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this, regionContainer);
+    private final SimpleFlagRegistry flagRegistry = new SimpleFlagRegistry();
     private SessionManager sessionManager;
     private final Supervisor supervisor = new SimpleSupervisor();
     private ListeningExecutorService executorService;
@@ -110,6 +143,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 return plugin.hasPermission(player, perm);
             }
         };
+        flagRegistry.registerAll(DefaultFlag.getDefaultFlags());
     }
 
     /**
@@ -127,6 +161,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     @SuppressWarnings("deprecation")
     public void onEnable() {
         configureLogger();
+        flagRegistry.setInitialized(true);
 
         getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
 
@@ -386,6 +421,15 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public ProfileCache getProfileCache() {
         return profileCache;
+    }
+
+    /**
+     * Get the flag registry.
+     *
+     * @return the flag registry
+     */
+    public FlagRegistry getFlagRegistry() {
+        return flagRegistry;
     }
 
     /**
