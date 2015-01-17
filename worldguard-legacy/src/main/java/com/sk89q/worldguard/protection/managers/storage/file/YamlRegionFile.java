@@ -26,7 +26,8 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
@@ -45,15 +46,7 @@ import org.yaml.snakeyaml.representer.Representer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,8 +90,8 @@ public class YamlRegionFile implements RegionDatabase {
      * @param file the file
      */
     public YamlRegionFile(String name, File file) {
-        checkNotNull(name);
-        checkNotNull(file);
+        checkNotNull(name, "name");
+        checkNotNull(file, "file");
         this.name = name;
         this.file = file;
     }
@@ -109,7 +102,7 @@ public class YamlRegionFile implements RegionDatabase {
     }
 
     @Override
-    public Set<ProtectedRegion> loadAll() throws StorageException {
+    public Set<ProtectedRegion> loadAll(FlagRegistry flagRegistry) throws StorageException {
         Map<String, ProtectedRegion> loaded = new HashMap<String, ProtectedRegion>();
 
         YAMLProcessor config = createYamlProcessor(file);
@@ -162,7 +155,7 @@ public class YamlRegionFile implements RegionDatabase {
 
                 Integer priority = checkNotNull(node.getInt("priority"));
                 region.setPriority(priority);
-                setFlags(region, node.getNode("flags"));
+                setFlags(flagRegistry, region, node.getNode("flags"));
                 region.setOwners(parseDomain(node.getNode("owners")));
                 region.setMembers(parseDomain(node.getNode("members")));
 
@@ -287,29 +280,13 @@ public class YamlRegionFile implements RegionDatabase {
     }
 
     private Map<String, Object> getFlagData(ProtectedRegion region) {
-        Map<String, Object> flagData = new HashMap<String, Object>();
-
-        for (Map.Entry<Flag<?>, Object> entry : region.getFlags().entrySet()) {
-            Flag<?> flag = entry.getKey();
-            addMarshalledFlag(flagData, flag, entry.getValue());
-        }
-
-        return flagData;
+        return Flags.marshal(region.getFlags());
     }
 
-    private void setFlags(ProtectedRegion region, YAMLNode flagsData) {
+    private void setFlags(FlagRegistry flagRegistry, ProtectedRegion region, YAMLNode flagsData) {
         if (flagsData != null) {
-            RegionDatabaseUtils.trySetFlagMap(region, flagsData.getMap());
+            region.setFlags(flagRegistry.unmarshal(flagsData.getMap(), true));
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <V> void addMarshalledFlag(Map<String, Object> flagData, Flag<V> flag, Object val) {
-        if (val == null) {
-            return;
-        }
-
-        flagData.put(flag.getName(), flag.marshal((V) val));
     }
 
     private Map<String, Object> getDomainData(DefaultDomain domain) {

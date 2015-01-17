@@ -19,28 +19,46 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.google.common.collect.Iterators;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.FlagValueCalculator;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.regex.Pattern;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A flag carries extra data on a region.
+ *
+ * <p>Each flag implementation is a singleton and must be registered with a
+ * {@link FlagRegistry} to be useful. Flag values are stored as their
+ * proper data type, but they are first "loaded" by calling
+ * {@link #unmarshal(Object)}. On save, the objects are fed
+ * through {@link #marshal(Object)} and then saved.</p>
  */
 public abstract class Flag<T> {
 
+    private static final Pattern VALID_NAME = Pattern.compile("^[:A-Za-z0-9\\-]{1,40}$");
     private final String name;
     private final RegionGroupFlag regionGroup;
 
     /**
      * Create a new flag.
      *
+     * <p>Flag names should match the regex {@code ^[:A-Za-z0-9\-]{1,40}$}.</p>
+     *
      * @param name The name of the flag
      * @param defaultGroup The default group
+     * @throws IllegalArgumentException Thrown if the name is invalid
      */
-    public Flag(String name, @Nullable RegionGroup defaultGroup) {
+    protected Flag(String name, @Nullable RegionGroup defaultGroup) {
+        if (name != null && !isValidName(name)) {
+            throw new IllegalArgumentException("Invalid flag name used");
+        }
         this.name = name;
         this.regionGroup = defaultGroup != null ? new RegionGroupFlag(name + "-group", defaultGroup) : null;
     }
@@ -48,9 +66,12 @@ public abstract class Flag<T> {
     /**
      * Create a new flag with {@link RegionGroup#ALL} as the default group.
      *
+     * <p>Flag names should match the regex {@code ^[:A-Za-z0-9\-]{1,40}$}.</p>
+     *
      * @param name The name of the flag
+     * @throws IllegalArgumentException Thrown if the name is invalid
      */
-    public Flag(String name) {
+    protected Flag(String name) {
         this(name, RegionGroup.ALL);
     }
 
@@ -59,7 +80,7 @@ public abstract class Flag<T> {
      *
      * @return The name of the flag
      */
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
@@ -73,13 +94,20 @@ public abstract class Flag<T> {
         return null;
     }
 
+    /**
+     * Given a list of values, choose the best one.
+     *
+     * <p>If there is no "best value" defined, then the first value should
+     * be returned. The default implementation returns the first value. If
+     * an implementation does have a strategy defined, then
+     * {@link #hasConflictStrategy()} should be overridden too.</p>
+     *
+     * @param values A collection of values
+     * @return The chosen value
+     */
     @Nullable
     public T chooseValue(Collection<T> values) {
-        if (!values.isEmpty()) {
-            return values.iterator().next();
-        } else {
-            return null;
-        }
+        return Iterators.getNext(values.iterator(), null);
     }
 
     /**
@@ -145,7 +173,7 @@ public abstract class Flag<T> {
      *
      * @return The region group flag
      */
-    public RegionGroupFlag getRegionGroupFlag() {
+    public final RegionGroupFlag getRegionGroupFlag() {
         return regionGroup;
     }
 
@@ -184,4 +212,16 @@ public abstract class Flag<T> {
                 "name='" + name + '\'' +
                 '}';
     }
+
+    /**
+     * Test whether a flag name is valid.
+     *
+     * @param name The flag name
+     * @return Whether the name is valid
+     */
+    public static boolean isValidName(String name) {
+        checkNotNull(name, "name");
+        return VALID_NAME.matcher(name).matches();
+    }
+
 }

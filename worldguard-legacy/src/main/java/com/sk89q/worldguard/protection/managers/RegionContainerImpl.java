@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.protection.managers;
 
 import com.google.common.base.Supplier;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.index.ChunkHashTable;
 import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
 import com.sk89q.worldguard.protection.managers.index.PriorityRTreeIndex;
@@ -29,16 +30,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.util.Normal;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
@@ -62,6 +54,7 @@ public class RegionContainerImpl {
     private final RegionDriver driver;
     private final Supplier<? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
     private final Timer timer = new Timer();
+    private final FlagRegistry flagRegistry;
 
     private final Set<Normal> failingLoads = new HashSet<Normal>();
     private final Set<RegionManager> failingSaves = Collections.synchronizedSet(
@@ -71,12 +64,15 @@ public class RegionContainerImpl {
      * Create a new instance.
      *
      * @param driver the region store driver
+     * @param flagRegistry the flag registry
      */
-    public RegionContainerImpl(RegionDriver driver) {
+    public RegionContainerImpl(RegionDriver driver, FlagRegistry flagRegistry) {
         checkNotNull(driver);
+        checkNotNull(flagRegistry, "flagRegistry");
         this.driver = driver;
         timer.schedule(new BackgroundLoader(), LOAD_ATTEMPT_INTERVAL, LOAD_ATTEMPT_INTERVAL);
         timer.schedule(new BackgroundSaver(), SAVE_INTERVAL, SAVE_INTERVAL);
+        this.flagRegistry = flagRegistry;
     }
 
     /**
@@ -129,7 +125,7 @@ public class RegionContainerImpl {
      */
     private RegionManager createAndLoad(String name) throws StorageException {
         RegionDatabase store = driver.get(name);
-        RegionManager manager = new RegionManager(store, indexFactory);
+        RegionManager manager = new RegionManager(store, indexFactory, flagRegistry);
         manager.load(); // Try loading, although it may fail
         return manager;
     }

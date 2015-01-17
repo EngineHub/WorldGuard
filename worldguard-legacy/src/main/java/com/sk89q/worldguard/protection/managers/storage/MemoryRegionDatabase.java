@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection.managers.storage;
 
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -42,7 +43,7 @@ public class MemoryRegionDatabase implements RegionDatabase {
     }
 
     @Override
-    public Set<ProtectedRegion> loadAll() {
+    public Set<ProtectedRegion> loadAll(FlagRegistry flagRegistry) {
         return regions;
     }
 

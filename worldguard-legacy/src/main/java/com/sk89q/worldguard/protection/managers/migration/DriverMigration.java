@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.managers.migration;
 
+import com.google.common.base.Preconditions;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
@@ -36,17 +38,21 @@ public class DriverMigration extends AbstractMigration {
 
     private static final Logger log = Logger.getLogger(DriverMigration.class.getCanonicalName());
     private final RegionDriver target;
+    private final FlagRegistry flagRegistry;
 
     /**
      * Create a new instance.
      *
      * @param driver the source storage driver
      * @param target the target storage driver
+     * @param flagRegistry the flag registry
      */
-    public DriverMigration(RegionDriver driver, RegionDriver target) {
+    public DriverMigration(RegionDriver driver, RegionDriver target, FlagRegistry flagRegistry) {
         super(driver);
         checkNotNull(target);
+        Preconditions.checkNotNull(flagRegistry, "flagRegistry");
         this.target = target;
+        this.flagRegistry = flagRegistry;
     }
 
     @Override
@@ -56,7 +62,7 @@ public class DriverMigration extends AbstractMigration {
         log.info("Loading the regions for '" + store.getName() + "' with the old driver...");
 
         try {
-            regions = store.loadAll();
+            regions = store.loadAll(flagRegistry);
         } catch (StorageException e) {
             throw new MigrationException("Failed to load region data for the world '" + store.getName() + "'", e);
         }

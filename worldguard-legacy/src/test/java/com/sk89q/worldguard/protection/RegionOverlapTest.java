@@ -19,15 +19,6 @@
 
 package com.sk89q.worldguard.protection;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
@@ -35,11 +26,21 @@ import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class RegionOverlapTest {
     static String COURTYARD_ID = "courtyard";
@@ -58,6 +59,12 @@ public abstract class RegionOverlapTest {
     ProtectedRegion fountain;
     TestPlayer player1;
     TestPlayer player2;
+
+    protected FlagRegistry getFlagRegistry() {
+        FlagRegistry registry = new SimpleFlagRegistry();
+        registry.registerAll(DefaultFlag.getDefaultFlags());
+        return registry;
+    }
     
     protected abstract RegionManager createRegionManager() throws Exception;
 
