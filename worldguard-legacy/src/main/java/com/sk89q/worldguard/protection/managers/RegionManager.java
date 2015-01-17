@@ -27,6 +27,7 @@ import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.RegionResultSet;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
 import com.sk89q.worldguard.protection.managers.index.RegionIndex;
 import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
@@ -37,14 +38,7 @@ import com.sk89q.worldguard.protection.util.RegionCollectionConsumer;
 import com.sk89q.worldguard.util.Normal;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,6 +51,7 @@ public final class RegionManager {
 
     private final RegionDatabase store;
     private final Supplier<? extends ConcurrentRegionIndex> indexFactory;
+    private final FlagRegistry flagRegistry;
     private ConcurrentRegionIndex index;
 
     /**
@@ -64,14 +59,17 @@ public final class RegionManager {
      *
      * @param store the region store
      * @param indexFactory the factory for creating new instances of the index
+     * @param flagRegistry the flag registry
      */
-    public RegionManager(RegionDatabase store, Supplier<? extends ConcurrentRegionIndex> indexFactory) {
+    public RegionManager(RegionDatabase store, Supplier<? extends ConcurrentRegionIndex> indexFactory, FlagRegistry flagRegistry) {
         checkNotNull(store);
         checkNotNull(indexFactory);
+        checkNotNull(flagRegistry, "flagRegistry");
 
         this.store = store;
         this.indexFactory = indexFactory;
         this.index = indexFactory.get();
+        this.flagRegistry = flagRegistry;
     }
 
     /**
@@ -93,7 +91,7 @@ public final class RegionManager {
      * @throws StorageException thrown when loading fails
      */
     public void load() throws StorageException {
-        Set<ProtectedRegion> regions = store.loadAll();
+        Set<ProtectedRegion> regions = store.loadAll(flagRegistry);
         for (ProtectedRegion region : regions) {
             region.setDirty(false);
         }

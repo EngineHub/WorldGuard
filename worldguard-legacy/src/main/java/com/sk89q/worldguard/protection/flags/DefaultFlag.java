@@ -19,10 +19,14 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.EntityType;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The flags that are used in WorldGuard.
@@ -161,18 +165,35 @@ public final class DefaultFlag {
     private DefaultFlag() {
     }
 
+    /**
+     * Get a list of default flags.
+     *
+     * @deprecated Use {@link FlagRegistry}
+     * @return An array of flags
+     */
+    @Deprecated
     public static Flag<?>[] getFlags() {
         return flagsList;
     }
 
     /**
+     * Get a list of default flags.
+     *
+     * @return An array of flags
+     */
+    public static List<Flag<?>> getDefaultFlags() {
+        return Arrays.asList(flagsList);
+    }
+
+    /**
      * Try to match the flag with the given ID using a fuzzy name match.
      *
+     * @param flagRegistry the flag registry
      * @param id the flag ID
      * @return a flag, or null
      */
-    public static Flag<?> fuzzyMatchFlag(String id) {
-        for (Flag<?> flag : DefaultFlag.getFlags()) {
+    public static Flag<?> fuzzyMatchFlag(FlagRegistry flagRegistry, String id) {
+        for (Flag<?> flag : flagRegistry) {
             if (flag.getName().replace("-", "").equalsIgnoreCase(id.replace("-", ""))) {
                 return flag;
             }
@@ -180,4 +201,5 @@ public final class DefaultFlag {
 
         return null;
     }
+
 }

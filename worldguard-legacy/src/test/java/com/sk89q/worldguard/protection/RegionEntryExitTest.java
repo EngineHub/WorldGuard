@@ -26,6 +26,8 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -52,6 +54,12 @@ public abstract class RegionEntryExitTest {
     ProtectedRegion exitRegion;
     TestPlayer vipPlayer;
     TestPlayer builderPlayer;
+
+    protected FlagRegistry getFlagRegistry() {
+        FlagRegistry registry = new SimpleFlagRegistry();
+        registry.registerAll(DefaultFlag.getDefaultFlags());
+        return registry;
+    }
 
     protected abstract RegionManager createRegionManager() throws Exception;
 

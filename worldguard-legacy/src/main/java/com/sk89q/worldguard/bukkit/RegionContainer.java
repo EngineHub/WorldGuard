@@ -85,7 +85,7 @@ public class RegionContainer {
      */
     void initialize() {
         ConfigurationManager config = plugin.getGlobalStateManager();
-        container = new RegionContainerImpl(config.selectedRegionStoreDriver);
+        container = new RegionContainerImpl(config.selectedRegionStoreDriver, plugin.getFlagRegistry());
 
         // Migrate to UUIDs
         autoMigrate();
@@ -293,7 +293,7 @@ public class RegionContainer {
 
         if (config.migrateRegionsToUuid) {
             RegionDriver driver = getDriver();
-            UUIDMigration migrator = new UUIDMigration(driver, plugin.getProfileService());
+            UUIDMigration migrator = new UUIDMigration(driver, plugin.getProfileService(), plugin.getFlagRegistry());
             migrator.setKeepUnresolvedNames(config.keepUnresolvedNames);
             try {
                 migrate(migrator);

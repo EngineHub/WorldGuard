@@ -17,17 +17,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection;
+package com.sk89q.worldguard.protection.flags.registry;
 
-import com.sk89q.worldguard.protection.managers.index.HashMapIndex;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.managers.storage.MemoryRegionDatabase;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import org.bukkit.command.CommandSender;
 
-public class HashMapIndexRegionOverlapTest extends RegionOverlapTest {
+import javax.annotation.Nullable;
+
+public class UnknownFlag extends Flag<Object> {
+
+    public UnknownFlag(String name) {
+        super(name);
+    }
 
     @Override
-    protected RegionManager createRegionManager() throws Exception {
-        return new RegionManager(new MemoryRegionDatabase(), new HashMapIndex.Factory(), getFlagRegistry());
+    public Object parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
+        throw new InvalidFlagFormat("The plugin that registered this flag is not currently installed");
+    }
+
+    @Override
+    public Object unmarshal(@Nullable Object o) {
+        return o;
+    }
+
+    @Override
+    public Object marshal(Object o) {
+        return o;
     }
 
 }
