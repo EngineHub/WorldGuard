@@ -27,6 +27,7 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabaseUtils;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -59,17 +61,19 @@ class DataLoader {
     final Connection conn;
     final DataSourceConfig config;
     final int worldId;
+    final FlagRegistry flagRegistry;
 
     private final Map<String, ProtectedRegion> loaded = new HashMap<String, ProtectedRegion>();
     private final Map<ProtectedRegion, String> parentSets = new HashMap<ProtectedRegion, String>();
     private final Yaml yaml = SQLRegionDatabase.createYaml();
 
-    DataLoader(SQLRegionDatabase regionStore, Connection conn) throws SQLException {
+    DataLoader(SQLRegionDatabase regionStore, Connection conn, FlagRegistry flagRegistry) throws SQLException {
         checkNotNull(regionStore);
 
         this.conn = conn;
         this.config = regionStore.getDataSourceConfig();
         this.worldId = regionStore.getWorldId();
+        this.flagRegistry = flagRegistry;
     }
 
     public Set<ProtectedRegion> load() throws SQLException {
@@ -235,13 +239,9 @@ class DataLoader {
                         unmarshalFlagValue(rs.getString("value")));
             }
 
-            for (Map.Entry<String, Map<String, Object>> entry : data.rowMap().entrySet()) {
+            for (Entry<String, Map<String, Object>> entry : data.rowMap().entrySet()) {
                 ProtectedRegion region = loaded.get(entry.getKey());
-                if (region != null) {
-                    RegionDatabaseUtils.trySetFlagMap(region, entry.getValue());
-                } else {
-                    throw new RuntimeException("An unexpected error occurred (loaded.get() returned null)");
-                }
+                region.setFlags(flagRegistry.unmarshal(entry.getValue(), true));
             }
         } finally {
             closer.closeQuietly();

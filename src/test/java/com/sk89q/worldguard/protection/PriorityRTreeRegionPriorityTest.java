@@ -27,7 +27,7 @@ public class PriorityRTreeRegionPriorityTest extends RegionPriorityTest {
 
     @Override
     protected RegionManager createRegionManager() throws Exception {
-        return new RegionManager(new MemoryRegionDatabase(), new PriorityRTreeIndex.Factory());
+        return new RegionManager(new MemoryRegionDatabase(), new PriorityRTreeIndex.Factory(), getFlagRegistry());
     }
 
 }

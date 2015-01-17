@@ -27,7 +27,7 @@ public class HashMapIndexPriorityTest extends RegionPriorityTest {
 
     @Override
     protected RegionManager createRegionManager() throws Exception {
-        return new RegionManager(new MemoryRegionDatabase(), new HashMapIndex.Factory());
+        return new RegionManager(new MemoryRegionDatabase(), new HashMapIndex.Factory(), getFlagRegistry());
     }
 
 }

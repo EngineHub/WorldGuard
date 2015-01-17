@@ -39,6 +39,9 @@ import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.*;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
@@ -86,6 +89,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     private final RegionContainer regionContainer = new RegionContainer(this);
     private final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this, regionContainer);
     private FlagStateManager flagStateManager;
+    private final SimpleFlagRegistry flagRegistry = new SimpleFlagRegistry();
     private final Supervisor supervisor = new SimpleSupervisor();
     private ListeningExecutorService executorService;
     private ProfileService profileService;
@@ -104,6 +108,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 return plugin.hasPermission(player, perm);
             }
         };
+        flagRegistry.registerAll(DefaultFlag.getDefaultFlags());
     }
 
     /**
@@ -121,6 +126,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     @SuppressWarnings("deprecation")
     public void onEnable() {
         configureLogger();
+        flagRegistry.setInitialized(true);
 
         getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
 
@@ -375,6 +381,15 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public ProfileCache getProfileCache() {
         return profileCache;
+    }
+
+    /**
+     * Get the flag registry.
+     *
+     * @return the flag registry
+     */
+    public FlagRegistry getFlagRegistry() {
+        return flagRegistry;
     }
 
     /**

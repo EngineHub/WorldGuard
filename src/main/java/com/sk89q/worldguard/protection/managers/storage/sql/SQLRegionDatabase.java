@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection.managers.storage.sql;
 
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
@@ -198,7 +199,7 @@ class SQLRegionDatabase implements RegionDatabase {
     }
 
     @Override
-    public Set<ProtectedRegion> loadAll() throws StorageException {
+    public Set<ProtectedRegion> loadAll(FlagRegistry flagRegistry) throws StorageException {
         initialize();
 
         Closer closer = Closer.create();
@@ -206,7 +207,7 @@ class SQLRegionDatabase implements RegionDatabase {
 
         try {
             try {
-                loader = new DataLoader(this, closer.register(getConnection()));
+                loader = new DataLoader(this, closer.register(getConnection()), flagRegistry);
             } catch (SQLException e) {
                 throw new StorageException("Failed to get a connection to the database", e);
             }

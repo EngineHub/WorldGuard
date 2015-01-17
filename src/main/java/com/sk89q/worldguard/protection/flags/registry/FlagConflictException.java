@@ -17,17 +17,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection;
+package com.sk89q.worldguard.protection.flags.registry;
 
-import com.sk89q.worldguard.protection.managers.index.HashMapIndex;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.managers.storage.MemoryRegionDatabase;
+public class FlagConflictException extends RuntimeException {
 
-public class HashMapIndexRegionOverlapTest extends RegionOverlapTest {
-
-    @Override
-    protected RegionManager createRegionManager() throws Exception {
-        return new RegionManager(new MemoryRegionDatabase(), new HashMapIndex.Factory(), getFlagRegistry());
+    public FlagConflictException(String message) {
+        super(message);
     }
 
 }
