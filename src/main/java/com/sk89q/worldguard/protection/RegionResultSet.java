@@ -63,6 +63,7 @@ public class RegionResultSet extends AbstractRegionSet {
      */
     public RegionResultSet(Set<ProtectedRegion> applicable, @Nullable ProtectedRegion globalRegion) {
         this(NormativeOrders.fromSet(applicable), globalRegion, true);
+        this.regionSet = applicable;
     }
 
     /**
