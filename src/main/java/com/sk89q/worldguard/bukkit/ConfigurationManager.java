@@ -20,15 +20,13 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.google.common.collect.ImmutableMap;
-import com.sk89q.commandbook.CommandBook;
-import com.sk89q.commandbook.GodComponent;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
 import com.sk89q.worldguard.protection.managers.storage.DriverType;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
+import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
+import com.sk89q.worldguard.session.handler.WaterBreathing;
 import com.sk89q.worldguard.util.report.Unreported;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
 import org.bukkit.World;
@@ -37,9 +35,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
@@ -79,12 +75,9 @@ public class ConfigurationManager {
     @Unreported private WorldGuardPlugin plugin;
     @Unreported private ConcurrentMap<String, WorldConfiguration> worlds;
     @Unreported private YAMLProcessor config;
-    @Deprecated @Unreported private Set<String> hasGodMode = new HashSet<String>();
-    @Unreported private Set<String> hasAmphibious = new HashSet<String>();
 
     private boolean hasCommandBookGodMode = false;
 
-    public boolean useRegionsScheduler;
     public boolean useRegionsCreatureSpawnEvent;
     public boolean activityHaltToggle = false;
     public boolean useGodPermission;
@@ -152,7 +145,6 @@ public class ConfigurationManager {
         }
 
         config.removeProperty("suppress-tick-sync-warnings");
-        useRegionsScheduler = config.getBoolean("regions.use-scheduler", true);
         migrateRegionsToUuid = config.getBoolean("regions.uuid-migration.perform-on-next-start", true);
         keepUnresolvedNames = config.getBoolean("regions.uuid-migration.keep-names-that-lack-uuids", true);
         useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
@@ -243,50 +235,13 @@ public class ConfigurationManager {
     }
 
     /**
-     * Forget a player.
-     *
-     * @param player The player to forget about
-     */
-    public void forgetPlayer(LocalPlayer player) {
-        hasGodMode.remove(player.getName());
-        hasAmphibious.remove(player.getName());
-    }
-
-    /**
-     * Enable god mode for a player.
-     *
-     * @param player The player to enable god mode for.
-     */
-    @Deprecated
-    public void enableGodMode(Player player) {
-
-        hasGodMode.add(player.getName());
-    }
-
-    /**
-     * Disable god mode for a player.
-     *
-     * @param player The player to disable godmode for
-     */
-    @Deprecated
-    public void disableGodMode(Player player) {
-        hasGodMode.remove(player.getName());
-    }
-
-    /**
      * Check to see if god mode is enabled for a player.
      *
      * @param player The player to check
      * @return Whether the player has godmode through WorldGuard or CommandBook
      */
     public boolean hasGodMode(Player player) {
-        if (hasCommandBookGodMode) {
-            GodComponent god = CommandBook.inst().getComponentManager().getComponent(GodComponent.class);
-            if (god != null) {
-                return god.hasGodMode(player);
-            }
-        }
-        return hasGodMode.contains(player.getName());
+        return plugin.getSessionManager().get(player).isInvincible(player);
     }
 
     /**
@@ -295,7 +250,10 @@ public class ConfigurationManager {
      * @param player The player to enable amphibious mode for
      */
     public void enableAmphibiousMode(Player player) {
-        hasAmphibious.add(player.getName());
+        WaterBreathing handler = plugin.getSessionManager().get(player).getHandler(WaterBreathing.class);
+        if (handler != null) {
+            handler.setWaterBreathing(true);
+        }
     }
 
     /**
@@ -304,7 +262,10 @@ public class ConfigurationManager {
      * @param player The player to disable amphibious mode for
      */
     public void disableAmphibiousMode(Player player) {
-        hasAmphibious.remove(player.getName());
+        WaterBreathing handler = plugin.getSessionManager().get(player).getHandler(WaterBreathing.class);
+        if (handler != null) {
+            handler.setWaterBreathing(false);
+        }
     }
 
     /**
@@ -314,7 +275,8 @@ public class ConfigurationManager {
      * @return Whether {@code player} has amphibious mode
      */
     public boolean hasAmphibiousMode(Player player) {
-        return hasAmphibious.contains(player.getName());
+        WaterBreathing handler = plugin.getSessionManager().get(player).getHandler(WaterBreathing.class);
+        return handler != null && handler.hasWaterBreathing();
     }
 
     public void updateCommandBookGodMode() {

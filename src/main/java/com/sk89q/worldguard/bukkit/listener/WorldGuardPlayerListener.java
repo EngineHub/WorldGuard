@@ -26,11 +26,12 @@ import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
-import com.sk89q.worldguard.bukkit.listener.FlagStateManager.PlayerFlagState;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.session.MoveType;
+import com.sk89q.worldguard.session.handler.GameModeFlag;
 import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -83,10 +84,10 @@ public class WorldGuardPlayerListener implements Listener {
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
-        if (wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())) {
-            GameMode gameMode = plugin.getRegionContainer().createQuery().getApplicableRegions(player.getLocation()).getFlag(DefaultFlag.GAME_MODE);
-            if (plugin.getFlagStateManager().getState(player).lastGameMode != null
-                    && gameMode != null && event.getNewGameMode() != gameMode) {
+        GameModeFlag handler = plugin.getSessionManager().get(player).getHandler(GameModeFlag.class);
+        if (handler != null && wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())) {
+            GameMode expected = handler.getSetGameMode();
+            if (expected != event.getNewGameMode()) {
                 event.setCancelled(true);
             }
         }
@@ -126,14 +127,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         Events.fire(new ProcessPlayerEvent(player));
 
-        if (wcfg.useRegions) {
-            PlayerFlagState state = plugin.getFlagStateManager().getState(player);
-            Location loc = player.getLocation();
-            state.lastWorld = loc.getWorld();
-            state.lastBlockX = loc.getBlockX();
-            state.lastBlockY = loc.getBlockY();
-            state.lastBlockZ = loc.getBlockZ();
-        }
+        plugin.getSessionManager().get(player); // Initializes a session
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -184,46 +178,6 @@ public class WorldGuardPlayerListener implements Listener {
         if (cfg.deopOnJoin) {
             player.setOp(false);
         }
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        World world = player.getWorld();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        // This is to make the enter/exit flags accurate -- move events are not
-        // sent constantly, so it is possible to move just a little enough to
-        // not trigger the event and then rejoin so that you are then considered
-        // outside the border. This should work around that.
-        if (wcfg.useRegions) {
-            boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
-            PlayerFlagState state = plugin.getFlagStateManager().getState(player);
-
-            if (state.lastWorld != null && !hasBypass) {
-                LocalPlayer localPlayer = plugin.wrapPlayer(player);
-                Location loc = player.getLocation();
-                ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(loc);
-
-                if (state.lastExitAllowed == null) {
-                    state.lastExitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
-                }
-
-                if (!state.lastExitAllowed || !set.allows(DefaultFlag.ENTRY, localPlayer)) {
-                    // Only if we have the last location cached
-                    if (state.lastWorld.equals(world)) {
-                        Location newLoc = new Location(world, state.lastBlockX + 0.5,
-                                state.lastBlockY, state.lastBlockZ + 0.5);
-                        player.teleport(newLoc);
-                    }
-                }
-            }
-        }
-
-        cfg.forgetPlayer(plugin.wrapPlayer(player));
-        plugin.forgetPlayer(player);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -378,20 +332,20 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority= EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         World world = event.getFrom().getWorld();
+        Player player = event.getPlayer();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(event.getTo());
             ApplicableRegionSet setFrom = plugin.getRegionContainer().createQuery().getApplicableRegions(event.getFrom());
-            LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
             if (cfg.usePlayerTeleports) {
-                boolean result = plugin.getPlayerMoveListener().shouldDenyMove(event.getPlayer(), event.getFrom(), event.getTo());
-                if (result) {
+                if (null != plugin.getSessionManager().get(player).testMoveTo(player, event.getTo(), MoveType.TELEPORT)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -401,7 +355,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
                         && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
                                 && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
-                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
+                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
                     event.setCancelled(true);
                     return;
                 }

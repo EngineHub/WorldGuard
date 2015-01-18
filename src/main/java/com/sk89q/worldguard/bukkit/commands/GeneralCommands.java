@@ -19,11 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -31,6 +26,12 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.session.handler.GodMode;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class GeneralCommands {
     private final WorldGuardPlugin plugin;
@@ -54,7 +55,7 @@ public class GeneralCommands {
             
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god");
-        } else if (args.argsLength() == 1) {            
+        } else {
             targets = plugin.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
@@ -62,26 +63,29 @@ public class GeneralCommands {
         }
 
         for (Player player : targets) {
-            config.enableGodMode(player);
-            player.setFireTicks(0);
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "God mode enabled! Use /ungod to disable.");
-                
-                // Keep track of this
-                included = true;
-            } else {
-                player.sendMessage(ChatColor.YELLOW + "God enabled by "
-                        + plugin.toName(sender) + ".");
-                
+            Session session = plugin.getSessionManager().get(player);
+
+            if (GodMode.set(player, session, true)) {
+                player.setFireTicks(0);
+
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "God mode enabled! Use /ungod to disable.");
+
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "God enabled by "
+                            + plugin.toName(sender) + ".");
+
+                }
             }
         }
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players now have god mode.");
+            sender.sendMessage(ChatColor.YELLOW + "Players now have god mode.");
         }
     }
     
@@ -100,7 +104,7 @@ public class GeneralCommands {
             
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god");
-        } else if (args.argsLength() == 1) {            
+        } else {
             targets = plugin.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
@@ -108,25 +112,27 @@ public class GeneralCommands {
         }
 
         for (Player player : targets) {
-            config.disableGodMode(player);
-            
-            // Tell the user
-            if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "God mode disabled!");
-                
-                // Keep track of this
-                included = true;
-            } else {
-                player.sendMessage(ChatColor.YELLOW + "God disabled by "
-                        + plugin.toName(sender) + ".");
-                
+            Session session = plugin.getSessionManager().get(player);
+
+            if (GodMode.set(player, session, false)) {
+                // Tell the user
+                if (player.equals(sender)) {
+                    player.sendMessage(ChatColor.YELLOW + "God mode disabled!");
+
+                    // Keep track of this
+                    included = true;
+                } else {
+                    player.sendMessage(ChatColor.YELLOW + "God disabled by "
+                            + plugin.toName(sender) + ".");
+
+                }
             }
         }
         
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players no longer have god mode.");
+            sender.sendMessage(ChatColor.YELLOW + "Players no longer have god mode.");
         }
     }
     

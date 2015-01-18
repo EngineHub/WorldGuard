@@ -96,7 +96,7 @@ public final class DefaultFlag {
     public static final StateFlag SEND_CHAT = new StateFlag("send-chat", true);
     public static final StateFlag RECEIVE_CHAT = new StateFlag("receive-chat", true);
     public static final StateFlag ENTRY = new StateFlag("entry", true, RegionGroup.NON_MEMBERS);
-    public static final StateFlag EXIT = new StateFlag("exit", true, RegionGroup.NON_MEMBERS);
+    public static final StateFlag EXIT = new StateFlag("exit", false, RegionGroup.NON_MEMBERS);
     public static final StateFlag ENDERPEARL = new StateFlag("enderpearl", true);
     public static final StateFlag ENTITY_PAINTING_DESTROY = new StateFlag("entity-painting-destroy", true);
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = new StateFlag("entity-item-frame-destroy", true);
@@ -104,6 +104,10 @@ public final class DefaultFlag {
     // Flags that adjust behaviors that aren't state flags
     public static final StringFlag DENY_MESSAGE = new StringFlag("deny-message",
             "" + ChatColor.RED + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " Sorry, but you can't %what% here.");
+    public static final StringFlag ENTRY_DENY_MESSAGE = new StringFlag("entry-deny-message",
+            "" + ChatColor.RED + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " You are not permitted to enter this area.");
+    public static final StringFlag EXIT_DENY_MESSAGE = new StringFlag("exit-deny-message",
+            "" + ChatColor.RED + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " You are not permitted to leave this area.");
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
@@ -133,7 +137,8 @@ public final class DefaultFlag {
             TNT, LIGHTER, RIDE, USE, INTERACT, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
             MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
-            DENY_MESSAGE, GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
+            DENY_MESSAGE, ENTRY_DENY_MESSAGE, EXIT_DENY_MESSAGE,
+            GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
             EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,
             ENTITY_ITEM_FRAME_DESTROY, ITEM_PICKUP, ITEM_DROP, /*MAX_PLAYERS, MAX_PLAYERS_MESSAGE,*/
             HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
