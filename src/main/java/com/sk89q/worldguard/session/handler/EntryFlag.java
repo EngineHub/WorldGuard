@@ -22,10 +22,13 @@ package com.sk89q.worldguard.session.handler;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import java.util.Set;
 
 public class EntryFlag extends Handler {
 
@@ -37,7 +40,7 @@ public class EntryFlag extends Handler {
     }
 
     @Override
-    public boolean testMoveTo(Player player, Location from, Location to, ApplicableRegionSet toSet, MoveType moveType) {
+    public boolean onCrossBoundary(Player player, Location from, Location to, ApplicableRegionSet toSet, Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         boolean allowed = toSet.testState(localPlayer, DefaultFlag.ENTRY);
 
