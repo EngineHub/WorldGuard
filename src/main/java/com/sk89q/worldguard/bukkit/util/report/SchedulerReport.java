@@ -70,10 +70,10 @@ public class SchedulerReport extends DataReport {
     @SuppressWarnings("unchecked")
     @Nullable
     private Class<?> getTaskClass(BukkitTask task) {
-        Class<?> clazz = task.getClass();
-        Set<Class<?>> classes = (Set) TypeToken.of(clazz).getTypes().rawTypes();
-
         try {
+            Class<?> clazz = task.getClass();
+            Set<Class<?>> classes = (Set) TypeToken.of(clazz).getTypes().rawTypes();
+
             for (Class<?> type : classes) {
                 Optional<Field> field = taskFieldCache.getUnchecked(type);
                 if (field.isPresent()) {
@@ -81,6 +81,7 @@ public class SchedulerReport extends DataReport {
                 }
             }
         } catch (IllegalAccessException ignored) {
+        } catch (NoClassDefFoundError ignored) {
         }
 
         return null;
