@@ -22,6 +22,7 @@ package com.sk89q.worldguard.session.handler;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
@@ -38,8 +39,8 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
         super(session, DefaultFlag.EXIT);
     }
 
-    private void update(LocalPlayer localPlayer, ApplicableRegionSet set, State newState) {
-        if (newState == State.DENY) {
+    private void update(LocalPlayer localPlayer, ApplicableRegionSet set, boolean allowed) {
+        if (!allowed) {
             storedMessage = set.queryValue(localPlayer, DefaultFlag.EXIT_DENY_MESSAGE);
         }
     }
@@ -55,7 +56,7 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
 
     @Override
     protected void onInitialValue(Player player, ApplicableRegionSet set, State value) {
-        update(getPlugin().wrapPlayer(player), set, value);
+        update(getPlugin().wrapPlayer(player), set, StateFlag.test(value));
     }
 
     @Override
@@ -64,7 +65,20 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
             return true;
         }
 
-        update(getPlugin().wrapPlayer(player), toSet, currentValue);
+        boolean lastAllowed = StateFlag.test(lastValue);
+        boolean allowed = StateFlag.test(currentValue);
+
+        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+
+        if (allowed && !lastAllowed) {
+            Boolean override = toSet.queryValue(localPlayer, DefaultFlag.EXIT_OVERRIDE);
+            if (override == null || !override) {
+                sendMessage(player);
+                return false;
+            }
+        }
+
+        update(localPlayer, toSet, allowed);
         return true;
     }
 
@@ -74,9 +88,14 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
             return true;
         }
 
-        if (lastValue == State.DENY) {
-            sendMessage(player);
-            return false;
+        boolean lastAllowed = StateFlag.test(lastValue);
+
+        if (!lastAllowed) {
+            Boolean override = toSet.queryValue(getPlugin().wrapPlayer(player), DefaultFlag.EXIT_OVERRIDE);
+            if (override == null || !override) {
+                sendMessage(player);
+                return false;
+            }
         }
 
         return true;
