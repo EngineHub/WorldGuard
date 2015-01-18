@@ -22,12 +22,15 @@ package com.sk89q.worldguard.bukkit.listener;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.util.Locations;
+import com.sk89q.worldguard.session.MoveType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.util.Vector;
 
 public class WorldGuardVehicleListener implements Listener {
 
@@ -52,8 +55,7 @@ public class WorldGuardVehicleListener implements Listener {
     @EventHandler
     public void onVehicleMove(VehicleMoveEvent event) {
         Vehicle vehicle = event.getVehicle();
-        if (vehicle.getPassenger() == null
-                || !(vehicle.getPassenger() instanceof Player)) return;
+        if (vehicle.getPassenger() == null || !(vehicle.getPassenger() instanceof Player)) return;
         Player player = (Player) vehicle.getPassenger();
         World world = vehicle.getWorld();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
@@ -61,12 +63,9 @@ public class WorldGuardVehicleListener implements Listener {
 
         if (wcfg.useRegions) {
             // Did we move a block?
-            if (event.getFrom().getBlockX() != event.getTo().getBlockX()
-                    || event.getFrom().getBlockY() != event.getTo().getBlockY()
-                    || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-                boolean result = plugin.getPlayerMoveListener().shouldDenyMove(player, event.getFrom(), event.getTo());
-                if (result) {
-                    vehicle.setVelocity(new org.bukkit.util.Vector(0,0,0));
+            if (Locations.isDifferentBlock(event.getFrom(), event.getTo())) {
+                if (null != plugin.getSessionManager().get(player).testMoveTo(player, event.getTo(), MoveType.RIDE)) {
+                    vehicle.setVelocity(new Vector(0,0,0));
                     vehicle.teleport(event.getFrom());
                 }
             }

@@ -21,59 +21,21 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.RegionQuery;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.internal.RegionQueryUtil;
+import com.sk89q.worldguard.bukkit.*;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.WitherSkull;
-import org.bukkit.entity.Wolf;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.entity.CreeperPowerEvent;
-import org.bukkit.event.entity.EntityBreakDoorEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityCombustEvent;
-import org.bukkit.event.entity.EntityCreatePortalEvent;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PigZapEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
@@ -144,7 +106,7 @@ public class WorldGuardEntityListener implements Listener {
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            if (isInvincible(player)) {
+            if (plugin.getSessionManager().get(player).isInvincible(player)) {
                 event.setCancelled(true);
                 return;
             }
@@ -216,7 +178,7 @@ public class WorldGuardEntityListener implements Listener {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
 
-            if (isInvincible(player)) {
+            if (plugin.getSessionManager().get(player).isInvincible(player)) {
                 if (wcfg.regionInvinciblityRemovesMobs
                         && attacker instanceof LivingEntity && !(attacker instanceof Player)
                         && !(attacker instanceof Tameable && ((Tameable) attacker).isTamed())) {
@@ -323,7 +285,7 @@ public class WorldGuardEntityListener implements Listener {
             WorldConfiguration wcfg = cfg.get(player.getWorld());
 
             // Check Invincible
-            if (isInvincible(player)) {
+            if (plugin.getSessionManager().get(player).isInvincible(player)) {
                 event.setCancelled(true);
                 return;
             }
@@ -375,7 +337,7 @@ public class WorldGuardEntityListener implements Listener {
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            if (isInvincible(player)) {
+            if (plugin.getSessionManager().get(player).isInvincible(player)) {
                 event.setCancelled(true);
                 player.setFireTicks(0);
                 return;
@@ -455,9 +417,8 @@ public class WorldGuardEntityListener implements Listener {
         if (entity instanceof Player) {
             Player player = (Player) entity;
 
-            if (cfg.hasGodMode(player) || (wcfg.useRegions && RegionQueryUtil.isInvincible(plugin, player))) {
+            if (plugin.getSessionManager().get(player).isInvincible(player)) {
                 event.setCancelled(true);
-                return;
             }
         }
     }
@@ -762,38 +723,9 @@ public class WorldGuardEntityListener implements Listener {
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            if (event.getFoodLevel() < player.getFoodLevel() && isInvincible(player)) {
+            if (event.getFoodLevel() < player.getFoodLevel() && plugin.getSessionManager().get(player).isInvincible(player)) {
                 event.setCancelled(true);
             }
-        }
-    }
-
-    /**
-     * Check if a player is invincible, via either god mode or region flag. If
-     * the region denies invincibility, the player must have an extra permission
-     * to override it. (worldguard.god.override-regions)
-     *
-     * @param player The player to check
-     * @return Whether {@code player} is invincible
-     */
-    private boolean isInvincible(Player player) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
-
-        boolean god = cfg.hasGodMode(player);
-        if (wcfg.useRegions) {
-            Boolean flag = RegionQueryUtil.isAllowedInvinciblity(plugin, player);
-            boolean allowed = flag == null || flag;
-            boolean invincible = RegionQueryUtil.isInvincible(plugin, player);
-
-            if (allowed) {
-                return god || invincible;
-            } else {
-                return (god && plugin.hasPermission(player, "worldguard.god.override-regions"))
-                    || invincible;
-            }
-        } else {
-            return god;
         }
     }
 

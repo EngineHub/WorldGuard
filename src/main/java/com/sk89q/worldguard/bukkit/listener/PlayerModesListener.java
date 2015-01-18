@@ -22,6 +22,9 @@ package com.sk89q.worldguard.bukkit.listener;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
+import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.session.handler.GodMode;
+import com.sk89q.worldguard.session.handler.WaterBreathing;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -61,17 +64,18 @@ public class PlayerModesListener extends AbstractListener {
     public void onProcessPlayer(ProcessPlayerEvent event) {
         ConfigurationManager config = getConfig();
         Player player = event.getPlayer();
+        Session session = getPlugin().getSessionManager().get(player);
 
-        if (!config.hasCommandBookGodMode()) {
-            if (hasGodModeGroup(player) || hasGodModePermission(player)) {
+        if (hasGodModeGroup(player) || hasGodModePermission(player)) {
+            if (GodMode.set(player, session, true)) {
                 log.log(Level.INFO, "Enabled auto-god mode for " + player.getName());
-                config.enableGodMode(player);
             }
         }
 
         if (hasAmphibiousGroup(player)) {
-            log.log(Level.INFO, "Enabled no-drowning mode for " + player.getName() + " (player is in group 'wg-amphibious')");
-            config.enableAmphibiousMode(player);
+            if (WaterBreathing.set(player, session, true)) {
+                log.log(Level.INFO, "Enabled water breathing mode for " + player.getName() + " (player is in group 'wg-amphibious')");
+            }
         }
     }
 

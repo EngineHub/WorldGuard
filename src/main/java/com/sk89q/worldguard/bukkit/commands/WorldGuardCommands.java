@@ -250,12 +250,12 @@ public class WorldGuardCommands {
     @CommandPermissions("worldguard.flushstates")
     public void flushStates(CommandContext args, CommandSender sender) throws CommandException {
         if (args.argsLength() == 0) {
-            plugin.getFlagStateManager().forgetAll();
+            plugin.getSessionManager().resetAllStates();
             sender.sendMessage("Cleared all states.");
         } else {
             Player player = plugin.getServer().getPlayer(args.getString(0));
             if (player != null) {
-                plugin.getFlagStateManager().forget(player);
+                plugin.getSessionManager().resetState(player);
                 sender.sendMessage("Cleared states for player \"" + player.getName() + "\".");
             }
         }

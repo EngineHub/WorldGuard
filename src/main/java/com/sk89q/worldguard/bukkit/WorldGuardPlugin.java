@@ -37,6 +37,7 @@ import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.*;
+import com.sk89q.worldguard.session.SessionManager;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -85,7 +86,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     private final ConfigurationManager configuration = new ConfigurationManager(this);
     private final RegionContainer regionContainer = new RegionContainer(this);
     private final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this, regionContainer);
-    private FlagStateManager flagStateManager;
+    private SessionManager sessionManager;
     private final Supervisor supervisor = new SimpleSupervisor();
     private ListeningExecutorService executorService;
     private ProfileService profileService;
@@ -126,6 +127,8 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
 
+        sessionManager = new SessionManager(this);
+
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(this));
 
@@ -164,14 +167,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         log.info("Loading region data...");
         regionContainer.initialize();
 
-        flagStateManager = new FlagStateManager(this);
-
-        if (configuration.useRegionsScheduler) {
-            getServer().getScheduler().scheduleSyncRepeatingTask(this, flagStateManager,
-                    FlagStateManager.RUN_DELAY, FlagStateManager.RUN_DELAY);
-        }
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, SessionManager.RUN_DELAY, SessionManager.RUN_DELAY);
 
         // Register events
+        getServer().getPluginManager().registerEvents(sessionManager, this);
         (new WorldGuardPlayerListener(this)).registerEvents();
         (new WorldGuardBlockListener(this)).registerEvents();
         (new WorldGuardEntityListener(this)).registerEvents();
@@ -327,8 +326,8 @@ public class WorldGuardPlugin extends JavaPlugin {
      *
      * @return The flag state manager
      */
-    public FlagStateManager getFlagStateManager() {
-        return flagStateManager;
+    public SessionManager getSessionManager() {
+        return sessionManager;
     }
 
     /**
@@ -923,15 +922,6 @@ public class WorldGuardPlugin extends JavaPlugin {
             }
         }
         log.info(msg);
-    }
-
-    /**
-     * Forgets a player.
-     *
-     * @param player The player to remove state information for
-     */
-    public void forgetPlayer(Player player) {
-        flagStateManager.forget(player);
     }
 
     /**
