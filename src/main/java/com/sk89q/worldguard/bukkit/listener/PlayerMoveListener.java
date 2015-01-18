@@ -32,6 +32,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
@@ -56,6 +57,18 @@ public class PlayerMoveListener implements Listener {
 
         Session session = plugin.getSessionManager().get(player);
         session.testMoveTo(player, event.getRespawnLocation(), MoveType.RESPAWN, true);
+    }
+
+    @EventHandler
+    public void onVehicleEnter(VehicleEnterEvent event) {
+        Entity entity = event.getEntered();
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
+            Session session = plugin.getSessionManager().get(player);
+            if (null != session.testMoveTo(player, event.getVehicle().getLocation(), MoveType.EMBARK, true)) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)

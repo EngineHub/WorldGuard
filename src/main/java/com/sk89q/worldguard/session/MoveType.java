@@ -29,6 +29,7 @@ import org.bukkit.Location;
 public enum MoveType {
 
     RESPAWN(false),
+    EMBARK(true),
     MOVE(true),
     TELEPORT(true),
     RIDE(true),
