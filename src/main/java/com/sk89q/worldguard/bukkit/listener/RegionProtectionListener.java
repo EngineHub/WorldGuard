@@ -38,7 +38,7 @@ import com.sk89q.worldguard.bukkit.protection.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.bukkit.util.InteropUtil;
+import com.sk89q.worldguard.bukkit.util.InteropUtils;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
@@ -123,7 +123,7 @@ public class RegionProtectionListener extends AbstractListener {
             Player player = (Player) rootCause;
             WorldConfiguration config = getWorldConfig(world);
 
-            if (config.fakePlayerBuildOverride && InteropUtil.isFakePlayer(player)) {
+            if (config.fakePlayerBuildOverride && InteropUtils.isFakePlayer(player)) {
                 return true;
             }
 

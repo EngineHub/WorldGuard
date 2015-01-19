@@ -29,7 +29,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class InteropUtil {
+public final class InteropUtils {
 
     @Nullable
     private static final Class<?> forgeFakePlayerClass;
@@ -58,7 +58,7 @@ public final class InteropUtil {
         }
     }
 
-    private InteropUtil() {
+    private InteropUtils() {
     }
 
     /**
