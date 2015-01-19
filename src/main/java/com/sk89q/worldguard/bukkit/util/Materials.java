@@ -197,7 +197,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.COCOA, 0);
         MATERIAL_FLAGS.put(Material.SANDSTONE_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.EMERALD_ORE, 0);
-        MATERIAL_FLAGS.put(Material.ENDER_CHEST, 0);
+        MATERIAL_FLAGS.put(Material.ENDER_CHEST, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.TRIPWIRE_HOOK, 0);
         MATERIAL_FLAGS.put(Material.TRIPWIRE, 0);
         MATERIAL_FLAGS.put(Material.EMERALD_BLOCK, 0);
