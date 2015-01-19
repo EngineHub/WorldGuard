@@ -35,6 +35,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,8 +51,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Cause {
 
+    private static final Logger log = Logger.getLogger(Cause.class.getCanonicalName());
     private static final String CAUSE_KEY = "worldguard.cause";
     private static final Cause UNKNOWN = new Cause(Collections.emptyList());
+    private static final int MAX_CAUSE_LENGTH = 40;
 
     private final List<Object> causes;
 
@@ -162,6 +166,13 @@ public class Cause {
      * @param element an array of objects
      */
     private static void expand(List<Object> list, @Nullable Object ... element) {
+        if (list.size() >= MAX_CAUSE_LENGTH) {
+            log.log(Level.WARNING, "While discovering the true cause of an event, the chain of " +
+                    "causes exceeded the limit (" + MAX_CAUSE_LENGTH + "). This could be " +
+                    "caused by a circular cause (arrow's shooter = arrow).", new RuntimeException());
+            return;
+        }
+
         if (element != null) {
             for (Object o : element) {
                 if (o == null) {
