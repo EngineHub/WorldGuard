@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.session.handler;
 
 import com.google.common.collect.Sets;
+import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -46,7 +47,9 @@ public class GreetingFlag extends Handler {
 
         for (String message : messages) {
             if (!lastMessageStack.contains(message)) {
-                player.sendMessage(getPlugin().replaceMacros(player, message).replaceAll("\\\\n", "\n").split("\\n"));
+                String effective = CommandUtils.replaceColorMacros(message);
+                effective = getPlugin().replaceMacros(player, effective);
+                player.sendMessage(effective.replaceAll("\\\\n", "\n").split("\\n"));
                 break;
             }
         }
