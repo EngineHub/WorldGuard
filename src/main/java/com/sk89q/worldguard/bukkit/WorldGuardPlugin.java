@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -37,13 +38,17 @@ import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.*;
-import com.sk89q.worldguard.session.SessionManager;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
+import com.sk89q.worldguard.session.SessionManager;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
+import com.sk89q.worldguard.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
 import com.sk89q.worldguard.util.task.SimpleSupervisor;
 import com.sk89q.worldguard.util.task.Supervisor;
@@ -131,6 +136,11 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(this));
+
+        // Catch bad things being done by naughty plugins that include
+        // WorldGuard's classes
+        ClassSourceValidator verifier = new ClassSourceValidator(this);
+        verifier.reportMismatches(ImmutableList.of(WGBukkit.class, ProtectedRegion.class, ProtectedCuboidRegion.class, Flag.class));
 
         // Register command classes
         final CommandsManagerRegistration reg = new CommandsManagerRegistration(this, commands);
