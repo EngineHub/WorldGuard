@@ -21,8 +21,10 @@ package com.sk89q.worldguard.util.report;
 
 import com.google.common.collect.Lists;
 
-import java.util.*;
-import java.util.function.UnaryOperator;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class ReportList implements Report, List<Report> {
 
@@ -101,16 +103,6 @@ public class ReportList implements Report, List<Report> {
     @Override
     public boolean retainAll(Collection<?> c) {
         return reports.retainAll(c);
-    }
-
-    @Override
-    public void replaceAll(UnaryOperator<Report> operator) {
-        reports.replaceAll(operator);
-    }
-
-    @Override
-    public void sort(Comparator<? super Report> c) {
-        reports.sort(c);
     }
 
     @Override
