@@ -106,7 +106,7 @@ public class ClassSourceValidator {
             builder.append("** the ").append(plugin.getName()).append(" API and thinks that including\n");
             builder.append("** ").append(plugin.getName()).append(" is necessary. However, it is not!\n");
             builder.append("**\n");
-            builder.append("** Here are some of files that have been overridden:\n");
+            builder.append("** Here are some files that have been overridden:\n");
             builder.append("** \n");
             for (Map.Entry<Class<?>, CodeSource> entry : mismatches.entrySet()) {
                 CodeSource codeSource = entry.getValue();
