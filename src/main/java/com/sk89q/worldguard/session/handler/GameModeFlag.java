@@ -28,6 +28,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
+
 public class GameModeFlag extends FlagValueChangeHandler<GameMode> {
 
     private GameMode originalGameMode;
@@ -37,19 +39,27 @@ public class GameModeFlag extends FlagValueChangeHandler<GameMode> {
         super(session, DefaultFlag.GAME_MODE);
     }
 
+    public GameMode getOriginalGameMode() {
+        return originalGameMode;
+    }
+
     public GameMode getSetGameMode() {
         return setGameMode;
     }
 
-    private void updateGameMode(Player player, GameMode newValue, World world) {
-        if (player.getGameMode() != newValue) {
-            if (originalGameMode == null) {
+    private void updateGameMode(Player player, @Nullable GameMode newValue, World world) {
+        if (!getSession().getManager().hasBypass(player, world) && newValue != null) {
+            if (player.getGameMode() != newValue) {
                 originalGameMode = player.getGameMode();
-            }
-
-            if (!getSession().getManager().hasBypass(player, world)) {
                 player.setGameMode(newValue);
-                setGameMode = newValue;
+            } else if (originalGameMode == null) {
+                originalGameMode = player.getServer().getDefaultGameMode();
+            }
+        } else {
+            if (originalGameMode != null) {
+                GameMode mode = originalGameMode;
+                originalGameMode = null;
+                player.setGameMode(mode);
             }
         }
     }
@@ -67,13 +77,7 @@ public class GameModeFlag extends FlagValueChangeHandler<GameMode> {
 
     @Override
     protected boolean onAbsentValue(Player player, Location from, Location to, ApplicableRegionSet toSet, GameMode lastValue, MoveType moveType) {
-        if (originalGameMode != null) {
-            if (player.getGameMode() == setGameMode) {
-                player.setGameMode(originalGameMode);
-            }
-            originalGameMode = null;
-        }
-
+        updateGameMode(player, null, player.getWorld());
         return true;
     }
 
