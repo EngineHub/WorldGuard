@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.session.handler;
 
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -49,7 +50,7 @@ public class EntryFlag extends Handler {
             long now = System.currentTimeMillis();
 
             if ((now - lastMessage) > MESSAGE_THRESHOLD && message != null && !message.isEmpty()) {
-                player.sendMessage(message);
+                player.sendMessage(CommandUtils.replaceColorMacros(message));
                 lastMessage = now;
             }
 
