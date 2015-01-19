@@ -120,18 +120,6 @@ public final class Entities {
     }
 
     /**
-     * Return whether the given player is a fake player using the typical
-     * fake player convention of [Mod].
-     *
-     * @param player the player
-     * @return true if a fake player
-     */
-    public static boolean isFakePlayer(Player player) {
-        String name = player.getName();
-        return name.length() >= 3 && name.charAt(0) == '[' && name.charAt(name.length() - 1) == ']';
-    }
-
-    /**
      * Test whether an entity is hostile.
      *
      * @param entity the entity
