@@ -88,7 +88,7 @@ public class WorldGuardPlayerListener implements Listener {
         if (handler != null && wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())) {
             GameMode expected = handler.getSetGameMode();
             if (handler.getOriginalGameMode() != null && expected != null && expected != event.getNewGameMode()) {
-                log.info("Game mode change on " + player.getName() + " has been blocked due to the regionw GAMEMODE flag");
+                log.info("Game mode change on " + player.getName() + " has been blocked due to the region GAMEMODE flag");
                 event.setCancelled(true);
             }
         }
