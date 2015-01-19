@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.session.handler;
 
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -49,7 +50,7 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
         long now = System.currentTimeMillis();
 
         if ((now - lastMessage) > MESSAGE_THRESHOLD && storedMessage != null && !storedMessage.isEmpty()) {
-            player.sendMessage(storedMessage);
+            player.sendMessage(CommandUtils.replaceColorMacros(storedMessage));
             lastMessage = now;
         }
     }
