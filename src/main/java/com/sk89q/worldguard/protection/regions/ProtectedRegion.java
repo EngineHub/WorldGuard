@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection.regions;
 
+import com.google.common.collect.Lists;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
@@ -29,6 +30,7 @@ import com.sk89q.worldguard.util.ChangeTracked;
 import com.sk89q.worldguard.util.Normal;
 
 import javax.annotation.Nullable;
+import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.util.Collection;
 import java.util.List;
@@ -117,6 +119,13 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     public String getId() {
         return id;
     }
+
+    /**
+     * Return whether this type of region encompasses physical area.
+     *
+     * @return Whether physical area is encompassed
+     */
+    public abstract boolean isPhysicalArea();
 
     /**
      * Get a vector containing the smallest X, Y, and Z components for the
@@ -570,7 +579,39 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @param regions a list of regions to source from
      * @return the elements of {@code regions} that intersect with this region
      */
-    public abstract List<ProtectedRegion> getIntersectingRegions(Collection<ProtectedRegion> regions);
+    public List<ProtectedRegion> getIntersectingRegions(Collection<ProtectedRegion> regions) {
+        checkNotNull(regions, "regions");
+
+        List<ProtectedRegion> intersecting = Lists.newArrayList();
+        Area thisArea = toArea();
+
+        for (ProtectedRegion region : regions) {
+            if (!region.isPhysicalArea()) continue;
+
+            if (intersects(region, thisArea)) {
+                intersecting.add(region);
+            }
+        }
+
+        return intersecting;
+    }
+
+    /**
+     * Test whether the given region intersects with this area.
+     *
+     * @param region the region to test
+     * @param thisArea an area object for this region
+     * @return true if the two regions intersect
+     */
+    protected boolean intersects(ProtectedRegion region, Area thisArea) {
+        if (intersectsBoundingBox(region)) {
+            Area testArea = region.toArea();
+            testArea.intersect(thisArea);
+            return !testArea.isEmpty();
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Checks if the bounding box of a region intersects with with the bounding
@@ -630,6 +671,14 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         }
         return false;
     }
+
+    /**
+     * Return the AWT area, otherwise null if
+     * {@link #isPhysicalArea()} if false.
+     *
+     * @return The shape version
+     */
+    abstract Area toArea();
 
     @Override
     public boolean isDirty() {
