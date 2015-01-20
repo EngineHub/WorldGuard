@@ -83,7 +83,7 @@ public class RegionProtectionListener extends AbstractListener {
      * @param what what was done
      */
     private void tellErrorMessage(DelegateEvent event, Cause cause, Location location, String what) {
-        if (event.isSilent()) {
+        if (event.isSilent() || cause.isIndirect()) {
             return;
         }
 
