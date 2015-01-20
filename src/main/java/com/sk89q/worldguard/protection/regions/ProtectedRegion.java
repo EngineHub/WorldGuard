@@ -233,7 +233,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     public void setOwners(DefaultDomain owners) {
         checkNotNull(owners);
         setDirty(true);
-        this.owners = owners;
+        this.owners = new DefaultDomain(owners);
     }
 
     /**
@@ -254,7 +254,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     public void setMembers(DefaultDomain members) {
         checkNotNull(members);
         setDirty(true);
-        this.members = members;
+        this.members = new DefaultDomain(members);
     }
 
     /**

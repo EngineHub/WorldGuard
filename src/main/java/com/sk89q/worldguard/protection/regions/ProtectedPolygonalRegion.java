@@ -19,27 +19,28 @@
 
 package com.sk89q.worldguard.protection.regions;
 
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 
 import java.awt.*;
 import java.awt.geom.Area;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ProtectedPolygonalRegion extends ProtectedRegion {
 
-    private List<BlockVector2D> points;
-    private int minY;
-    private int maxY;
+    private final ImmutableList<BlockVector2D> points;
+    private final int minY;
+    private final int maxY;
 
     public ProtectedPolygonalRegion(String id, List<BlockVector2D> points, int minY, int maxY) {
         super(id);
-        setMinMaxPoints(points, minY, maxY);
-        this.points = Collections.unmodifiableList(points);
+        ImmutableList<BlockVector2D> immutablePoints = ImmutableList.copyOf(points);
+        setMinMaxPoints(immutablePoints, minY, maxY);
+        this.points = immutablePoints;
         this.minY = min.getBlockY();
         this.maxY = max.getBlockY();
     }

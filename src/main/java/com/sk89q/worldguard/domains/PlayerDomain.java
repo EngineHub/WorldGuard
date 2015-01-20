@@ -45,6 +45,18 @@ public class PlayerDomain implements Domain, ChangeTracked {
     }
 
     /**
+     * Create a new instance.
+     *
+     * @param domain the domain to copy values from
+     */
+    public PlayerDomain(PlayerDomain domain) {
+        checkNotNull(domain, "domain");
+        uniqueIds.addAll(domain.getUniqueIds());
+        names.addAll(domain.getPlayers());
+        dirty = true;
+    }
+
+    /**
      * Create a new instance with the given names.
      *
      * @param names an array of names

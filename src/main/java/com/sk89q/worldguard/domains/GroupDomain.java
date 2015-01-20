@@ -44,6 +44,17 @@ public class GroupDomain implements Domain, ChangeTracked {
     }
 
     /**
+     * Create a new instance with copies from another domain.
+     *
+     * @param domain the domain to copy values from
+     */
+    public GroupDomain(GroupDomain domain) {
+        checkNotNull(domain, "domain");
+        groups.addAll(domain.getGroups());
+        dirty = true;
+    }
+
+    /**
      * Create a new instance.
      *
      * @param groups an array of groups
