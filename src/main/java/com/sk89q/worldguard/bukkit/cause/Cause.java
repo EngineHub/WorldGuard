@@ -20,23 +20,17 @@
 package com.sk89q.worldguard.bukkit.cause;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
 import com.sk89q.worldguard.bukkit.internal.WGMetadata;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.*;
 import org.bukkit.metadata.Metadatable;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,23 +43,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * is the initiator, while the arrow is merely controlled by the player to
  * hit the item frame.</p>
  */
-public class Cause {
+public final class Cause {
 
-    private static final Logger log = Logger.getLogger(Cause.class.getCanonicalName());
     private static final String CAUSE_KEY = "worldguard.cause";
-    private static final Cause UNKNOWN = new Cause(Collections.emptyList());
-    private static final int MAX_CAUSE_LENGTH = 40;
+    private static final Cause UNKNOWN = new Cause(Collections.emptyList(), false);
 
     private final List<Object> causes;
+    private final boolean indirect;
 
     /**
      * Create a new instance.
      *
      * @param causes a list of causes
+     * @param indirect whether the cause is indirect
      */
-    private Cause(List<Object> causes) {
+    private Cause(List<Object> causes, boolean indirect) {
         checkNotNull(causes);
         this.causes = causes;
+        this.indirect = indirect;
+    }
+
+    /**
+     * Test whether the traced cause is indirect.
+     *
+     * <p>If the cause is indirect, then the root cause may not be notified,
+     * for example.</p>
+     *
+     * @return true if the cause is indirect
+     */
+    public boolean isIndirect() {
+        return indirect;
     }
 
     /**
@@ -160,51 +167,6 @@ public class Cause {
     }
 
     /**
-     * Expand an cause object.
-     *
-     * @param list the list to add elements to
-     * @param element an array of objects
-     */
-    private static void expand(List<Object> list, @Nullable Object ... element) {
-        if (list.size() >= MAX_CAUSE_LENGTH) {
-            log.log(Level.WARNING, "While discovering the true cause of an event, the chain of " +
-                    "causes exceeded the limit (" + MAX_CAUSE_LENGTH + "). This could be " +
-                    "caused by a circular cause (arrow's shooter = arrow).", new RuntimeException());
-            return;
-        }
-
-        if (element != null) {
-            for (Object o : element) {
-                if (o == null) {
-                    continue;
-                }
-
-                if (o instanceof TNTPrimed) {
-                    expand(list, ((TNTPrimed) o).getSource());
-                } else if (o instanceof Projectile) {
-                    expand(list, ((Projectile) o).getShooter());
-                } else if (o instanceof Vehicle) {
-                    expand(list, ((Vehicle) o).getPassenger());
-                } else if (o instanceof Tameable) {
-                    expand(list, ((Tameable) o).getOwner());
-                }
-
-                // Add manually tracked parent causes
-                Object source = o;
-                int index = list.size();
-                while (source instanceof Metadatable && !(source instanceof Block)) {
-                    source = WGMetadata.getIfPresent((Metadatable) source, CAUSE_KEY, Object.class);
-                    if (source != null) {
-                        list.add(index, source);
-                    }
-                }
-
-                list.add(o);
-            }
-        }
-    }
-
-    /**
      * Create a new instance with the given objects as the cause,
      * where the first-most object is the initial initiator and those
      * following it are controlled by the previous entry.
@@ -212,11 +174,11 @@ public class Cause {
      * @param cause an array of causing objects
      * @return a cause
      */
-    public static Cause create(@Nullable Object ... cause) {
+    public static Cause create(@Nullable Object... cause) {
         if (cause != null) {
-            List<Object> causes = new ArrayList<Object>(cause.length);
-            expand(causes, cause);
-            return new Cause(causes);
+            Builder builder = new Builder(cause.length);
+            builder.addAll(cause);
+            return builder.build();
         } else {
             return UNKNOWN;
         }
@@ -249,6 +211,62 @@ public class Cause {
         }
 
         WGMetadata.put(target, CAUSE_KEY, parent);
+    }
+
+    /**
+     * Builds causes.
+     */
+    private static final class Builder {
+        private final List<Object> causes;
+        private final Set<Object> seen = Sets.newHashSet();
+        private boolean indirect;
+
+        private Builder(int expectedSize) {
+            this.causes = new ArrayList<Object>(expectedSize);
+        }
+
+        private void addAll(@Nullable Object... element) {
+            if (element != null) {
+                for (Object o : element) {
+                    if (o == null || seen.contains(o)) {
+                        continue;
+                    }
+
+                    seen.add(o);
+
+                    if (o instanceof TNTPrimed) {
+                        addAll(((TNTPrimed) o).getSource());
+                    } else if (o instanceof Projectile) {
+                        addAll(((Projectile) o).getShooter());
+                    } else if (o instanceof Vehicle) {
+                        addAll(((Vehicle) o).getPassenger());
+                    } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
+                        indirect = true;
+                        addAll(((Creature) o).getTarget());
+                    } else if (o instanceof Tameable) {
+                        indirect = true;
+                        addAll(((Tameable) o).getOwner());
+                    }
+
+                    // Add manually tracked parent causes
+                    Object source = o;
+                    int index = causes.size();
+                    while (source instanceof Metadatable && !(source instanceof Block)) {
+                        source = WGMetadata.getIfPresent((Metadatable) source, CAUSE_KEY, Object.class);
+                        if (source != null) {
+                            causes.add(index, source);
+                            seen.add(source);
+                        }
+                    }
+
+                    causes.add(o);
+                }
+            }
+        }
+
+        public Cause build() {
+            return new Cause(causes, indirect);
+        }
     }
 
 }
