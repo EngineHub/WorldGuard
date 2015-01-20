@@ -108,7 +108,7 @@ public class SessionManager implements Runnable, Listener {
     public void resetAllStates() {
         Collection<? extends Player> players = BukkitUtil.getOnlinePlayers();
         for (Player player : players) {
-            Session session = sessions.getIfPresent(player);
+            Session session = sessions.getIfPresent(new CacheKey(player));
             if (session != null) {
                 session.resetState(player);
             }
@@ -123,7 +123,7 @@ public class SessionManager implements Runnable, Listener {
      */
     public void resetState(Player player) {
         checkNotNull(player, "player");
-        @Nullable Session session = sessions.getIfPresent(player);
+        @Nullable Session session = sessions.getIfPresent(new CacheKey(player));
         if (session != null) {
             session.resetState(player);
         }

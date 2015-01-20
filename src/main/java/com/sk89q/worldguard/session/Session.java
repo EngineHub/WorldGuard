@@ -34,6 +34,7 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,6 +47,7 @@ public class Session {
     private final HashMap<Class<?>, Handler> handlers = Maps.newLinkedHashMap();
     private Location lastValid;
     private Set<ProtectedRegion> lastRegionSet;
+    private final AtomicBoolean needRefresh = new AtomicBoolean(false);
 
     /**
      * Create a new session.
@@ -137,6 +139,7 @@ public class Session {
      */
     void resetState(Player player) {
         initialize(player);
+        needRefresh.set(true);
     }
 
     /**
@@ -194,6 +197,10 @@ public class Session {
     public Location testMoveTo(Player player, Location to, MoveType moveType, boolean forced) {
         RegionQuery query = getManager().getPlugin().getRegionContainer().createQuery();
 
+        if (!forced && needRefresh.getAndSet(false)) {
+            forced = true;
+        }
+
         if (forced || Locations.isDifferentBlock(lastValid, to)) {
             ApplicableRegionSet toSet = query.getApplicableRegions(to);
 
@@ -206,7 +213,7 @@ public class Session {
             Set<ProtectedRegion> entered = Sets.difference(toSet.getRegions(), lastRegionSet);
             Set<ProtectedRegion> exited = Sets.difference(lastRegionSet, toSet.getRegions());
 
-            if (!entered.isEmpty() || !exited.isEmpty()) {
+            if (!entered.isEmpty() || !exited.isEmpty() || forced) {
                 for (Handler handler : handlers.values()) {
                     if (!handler.onCrossBoundary(player, lastValid, to, toSet, entered, exited, moveType) && moveType.isCancellable()) {
                         return lastValid;

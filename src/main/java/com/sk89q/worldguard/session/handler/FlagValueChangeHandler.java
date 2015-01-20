@@ -42,9 +42,7 @@ public abstract class FlagValueChangeHandler<T> extends Handler {
     @Override
     public final void initialize(Player player, Location current, ApplicableRegionSet set) {
         lastValue = set.queryValue(getPlugin().wrapPlayer(player), flag);
-        if (lastValue != null) {
-            onInitialValue(player, set, lastValue);
-        }
+        onInitialValue(player, set, lastValue);
     }
 
     @Override
