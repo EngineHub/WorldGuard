@@ -27,6 +27,8 @@ import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.blocks.ItemID;
 import com.sk89q.worldguard.blacklist.target.MaterialTarget;
 import com.sk89q.worldguard.blacklist.target.Target;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -85,6 +87,20 @@ public class BukkitUtil {
      */
     public static Location toLocation(World world, Vector vec) {
         return new Location(world, vec.getX(), vec.getY(), vec.getZ());
+    }
+
+    /**
+     * Create a dummy region that encompasses the size of a chunk.
+     *
+     * @param chunk The chunk
+     * @return The dummy region
+     */
+    public static ProtectedRegion toRegion(Chunk chunk) {
+        World world = chunk.getWorld();
+
+        int minX = chunk.getX() << 4;
+        int minZ = chunk.getZ() << 4;
+        return new ProtectedCuboidRegion("_", new BlockVector(minX, 0, minZ), new BlockVector(minX + 15, world.getMaxHeight(), minZ + 15));
     }
 
     /**
