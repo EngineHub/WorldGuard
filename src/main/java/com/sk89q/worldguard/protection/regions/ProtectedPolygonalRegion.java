@@ -22,8 +22,10 @@ package com.sk89q.worldguard.protection.regions;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 
+import java.awt.*;
+import java.awt.geom.Area;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,7 +39,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     public ProtectedPolygonalRegion(String id, List<BlockVector2D> points, int minY, int maxY) {
         super(id);
         setMinMaxPoints(points, minY, maxY);
-        this.points = points;
+        this.points = Collections.unmodifiableList(points);
         this.minY = min.getBlockY();
         this.maxY = max.getBlockY();
     }
@@ -59,6 +61,11 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
             y = maxY;
         }
         setMinMaxPoints(points);
+    }
+
+    @Override
+    public boolean isPhysicalArea() {
+        return true;
     }
 
     @Override
@@ -133,27 +140,21 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     }
 
     @Override
-    public List<ProtectedRegion> getIntersectingRegions(Collection<ProtectedRegion> regions) {
-        checkNotNull(regions);
+    Area toArea() {
+        List<BlockVector2D> points = getPoints();
+        int numPoints = points.size();
+        int[] xCoords = new int[numPoints];
+        int[] yCoords = new int[numPoints];
 
-        List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
-
-        for (ProtectedRegion region : regions) {
-            if (!intersectsBoundingBox(region)) continue;
-
-            if (region instanceof ProtectedPolygonalRegion || region instanceof ProtectedCuboidRegion) {
-                // If either region contains the points of the other,
-                // or if any edges intersect, the regions intersect
-                if (containsAny(region.getPoints()) || region.containsAny(getPoints()) || intersectsEdges(region)) {
-                    intersectingRegions.add(region);
-                }
-            } else if (region instanceof GlobalProtectedRegion) {
-                // Never intersects
-            } else {
-                throw new IllegalArgumentException("Not supported yet.");
-            }
+        int i = 0;
+        for (BlockVector2D point : points) {
+            xCoords[i] = point.getBlockX();
+            yCoords[i] = point.getBlockZ();
+            i++;
         }
-        return intersectingRegions;
+
+        Polygon polygon = new Polygon(xCoords, yCoords, numPoints);
+        return new Area(polygon);
     }
 
     @Override

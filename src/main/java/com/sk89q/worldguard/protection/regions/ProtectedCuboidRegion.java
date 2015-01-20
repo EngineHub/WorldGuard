@@ -24,8 +24,9 @@ import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.util.MathUtils;
 
+import java.awt.*;
+import java.awt.geom.Area;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -84,6 +85,11 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     }
 
     @Override
+    public boolean isPhysicalArea() {
+        return true;
+    }
+
+    @Override
     public List<BlockVector2D> getPoints() {
         List<BlockVector2D> pts = new ArrayList<BlockVector2D>();
         int x1 = min.getBlockX();
@@ -115,30 +121,21 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     }
 
     @Override
-    public List<ProtectedRegion> getIntersectingRegions(Collection<ProtectedRegion> regions) {
-        checkNotNull(regions);
+    Area toArea() {
+        int x = getMinimumPoint().getBlockX();
+        int z = getMinimumPoint().getBlockZ();
+        int width = getMaximumPoint().getBlockX() - x;
+        int height = getMaximumPoint().getBlockZ() - z;
+        return new Area(new Rectangle(x, z, width, height));
+    }
 
-        List<ProtectedRegion> intersectingRegions = new ArrayList<ProtectedRegion>();
-
-        for (ProtectedRegion region : regions) {
-            if (!intersectsBoundingBox(region)) continue;
-
-            // If both regions are Cuboids and their bounding boxes intersect, they intersect
-            if (region instanceof ProtectedCuboidRegion) {
-                intersectingRegions.add(region);
-            } else if (region instanceof ProtectedPolygonalRegion) {
-                // If either region contains the points of the other,
-                // or if any edges intersect, the regions intersect
-                if (containsAny(region.getPoints()) || region.containsAny(getPoints()) || intersectsEdges(region)) {
-                    intersectingRegions.add(region);
-                }
-            } else if (region instanceof GlobalProtectedRegion) {
-                // Never intersects
-            } else {
-                throw new IllegalArgumentException("Not supported yet.");
-            }
+    @Override
+    protected boolean intersects(ProtectedRegion region, Area thisArea) {
+        if (region instanceof ProtectedCuboidRegion) {
+            return intersectsBoundingBox(region);
+        } else {
+            return super.intersects(region, thisArea);
         }
-        return intersectingRegions;
     }
 
     @Override

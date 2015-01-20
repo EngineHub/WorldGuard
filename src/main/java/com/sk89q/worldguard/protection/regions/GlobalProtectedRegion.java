@@ -23,8 +23,10 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 
+import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,6 +47,11 @@ public class GlobalProtectedRegion extends ProtectedRegion {
         super(id);
         min = new BlockVector(0, 0, 0);
         max = new BlockVector(0, 0, 0);
+    }
+
+    @Override
+    public boolean isPhysicalArea() {
+        return false;
     }
 
     @Override
@@ -74,7 +81,12 @@ public class GlobalProtectedRegion extends ProtectedRegion {
     @Override
     public List<ProtectedRegion> getIntersectingRegions(Collection<ProtectedRegion> regions) {
         // Global regions are handled separately so it must not contain any positions
-        return new ArrayList<ProtectedRegion>();
+        return Collections.emptyList();
+    }
+
+    @Override
+    Area toArea() {
+        return null;
     }
 
 }
