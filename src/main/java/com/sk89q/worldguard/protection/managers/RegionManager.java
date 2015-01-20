@@ -442,7 +442,7 @@ public final class RegionManager {
      * @return an {@code ApplicableRegionSet}
      */
     public ApplicableRegionSet getApplicableRegions(org.bukkit.Location loc) {
-        return getApplicableRegions(com.sk89q.worldedit.bukkit.BukkitUtil.toVector(loc));
+        return getApplicableRegions(com.sk89q.worldedit.bukkit.BukkitUtil.toVector(loc).floor());
     }
 
 }
