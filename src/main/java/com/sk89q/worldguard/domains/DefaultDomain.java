@@ -44,6 +44,22 @@ public class DefaultDomain implements Domain, ChangeTracked {
     private GroupDomain groupDomain = new GroupDomain();
 
     /**
+     * Create a new domain.
+     */
+    public DefaultDomain() {
+    }
+
+    /**
+     * Create a new domain from an existing one, making a copy of all values.
+     *
+     * @param existing the other domain to copy values from
+     */
+    public DefaultDomain(DefaultDomain existing) {
+        setPlayerDomain(existing.getPlayerDomain());
+        setGroupDomain(existing.getGroupDomain());
+    }
+
+    /**
      * Get the domain that holds the players.
      *
      * @return a domain
@@ -59,7 +75,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
      */
     public void setPlayerDomain(PlayerDomain playerDomain) {
         checkNotNull(playerDomain);
-        this.playerDomain = playerDomain;
+        this.playerDomain = new PlayerDomain(playerDomain);
     }
 
     /**
@@ -78,7 +94,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
      */
     public void setGroupDomain(GroupDomain groupDomain) {
         checkNotNull(groupDomain);
-        this.groupDomain = groupDomain;
+        this.groupDomain = new GroupDomain(groupDomain);
     }
 
     /**
