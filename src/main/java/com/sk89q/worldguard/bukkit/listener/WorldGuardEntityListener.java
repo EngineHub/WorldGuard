@@ -106,11 +106,6 @@ public class WorldGuardEntityListener implements Listener {
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
 
-            if (plugin.getSessionManager().get(player).isInvincible(player)) {
-                event.setCancelled(true);
-                return;
-            }
-
             if (wcfg.disableLavaDamage && type == DamageCause.LAVA) {
                 event.setCancelled(true);
                 player.setFireTicks(0);
@@ -177,17 +172,6 @@ public class WorldGuardEntityListener implements Listener {
 
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
-
-            if (plugin.getSessionManager().get(player).isInvincible(player)) {
-                if (wcfg.regionInvinciblityRemovesMobs
-                        && attacker instanceof LivingEntity && !(attacker instanceof Player)
-                        && !(attacker instanceof Tameable && ((Tameable) attacker).isTamed())) {
-                    attacker.remove();
-                }
-
-                event.setCancelled(true);
-                return;
-            }
 
             if (wcfg.disableLightningDamage && event.getCause() == DamageCause.LIGHTNING) {
                 event.setCancelled(true);
@@ -284,12 +268,6 @@ public class WorldGuardEntityListener implements Listener {
             ConfigurationManager cfg = plugin.getGlobalStateManager();
             WorldConfiguration wcfg = cfg.get(player.getWorld());
 
-            // Check Invincible
-            if (plugin.getSessionManager().get(player).isInvincible(player)) {
-                event.setCancelled(true);
-                return;
-            }
-
             // Check Mob
             if (attacker != null && !(attacker instanceof Player)) {
                 if (wcfg.disableMobDamage) {
@@ -336,12 +314,6 @@ public class WorldGuardEntityListener implements Listener {
             }
         } else if (defender instanceof Player) {
             Player player = (Player) defender;
-
-            if (plugin.getSessionManager().get(player).isInvincible(player)) {
-                event.setCancelled(true);
-                player.setFireTicks(0);
-                return;
-            }
 
             if (type == DamageCause.WITHER) {
                 // wither boss DoT tick
@@ -403,22 +375,6 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
                 event.setCancelled(true);
                 return;
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onEntityCombust(EntityCombustEvent event) {
-        Entity entity = event.getEntity();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(entity.getWorld());
-
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
-
-            if (plugin.getSessionManager().get(player).isInvincible(player)) {
-                event.setCancelled(true);
             }
         }
     }
@@ -715,16 +671,6 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.blockZombieDoorDestruction) {
                 event.setCancelled(true);
                 return;
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onFoodLevelChange(FoodLevelChangeEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
-            if (event.getFoodLevel() < player.getFoodLevel() && plugin.getSessionManager().get(player).isInvincible(player)) {
-                event.setCancelled(true);
             }
         }
     }
