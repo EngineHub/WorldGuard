@@ -1,5 +1,32 @@
 # Changelog
 
+## 6.0 beta 5
+
+MC 1.7.9, 1.7.10 and 1.8 (Spigot only) are supported.
+
+* Added a feature to detect when another plugin (incorrectly) includes WorldGuard's files, causing errors.
+* Added a new `exit-override` flag that can be used on an entry=allow region that players can walk into from an entry=deny region.
+* Added a new `entry-deny-message` to change the "entry denied" message.
+* Added a new `exit-deny-message` to change the "exit denied" message.
+* Changed entry/exit blocking to disembark players from their vehicles.
+* Changed the PvP flag to no longer apply to self-attack.
+* Fixed [#3220](http://youtrack.sk89q.com/issue/WORLDGUARD-3220): Polygon regions sharing points
+* Fixed [#3216](http://youtrack.sk89q.com/issue/WORLDGUARD-3216): Polygon regions 'disappearing' or not working correctly
+* Fixed [#3315](http://youtrack.sk89q.com/issue/WORLDGUARD-3315): Invincibility flag and mode not blocking knockback from snowballs, etc.
+* Fixed [#3314](http://youtrack.sk89q.com/issue/WORLDGUARD-3314): Protection bypassable by getting a skeleton or creeper to target a player
+* Fixed [#3326](http://youtrack.sk89q.com/issue/WORLDGUARD-3326): Enderchests cannot be protected with the use flag
+* Fixed [#3327](http://youtrack.sk89q.com/issue/WORLDGUARD-3327): Fake players from some Forge mods are not being detected properly
+* Fixed [#3328](http://youtrack.sk89q.com/issue/WORLDGUARD-3328): TypeToken error with CraftBukkit 1.7 in `/wg report`
+* Fixed [#3086](http://youtrack.sk89q.com/issue/WORLDGUARD-3086): Region entry / exit messages overlap between seprate worlds
+* Fixed [#2542](http://youtrack.sk89q.com/issue/WORLDGUARD-2542): Exit deny regions don't handle respawn / logout consistently
+* Fixed [#2731](http://youtrack.sk89q.com/issue/WORLDGUARD-2731): Greeting / farewell messages don't understand region inheritance
+* Fixed [#3308](http://youtrack.sk89q.com/issue/WORLDGUARD-3308): Enderchest interaction block not functioning with blacklist.txt
+* Fixed [#3312](http://youtrack.sk89q.com/issue/WORLDGUARD-3312): PVP flag blocking enderpearl teleport fall damage
+* Fixed [#3309](http://youtrack.sk89q.com/issue/WORLDGUARD-3309): Inventory view commands being blocked in protected regions
+* Fixed [#3310](http://youtrack.sk89q.com/issue/WORLDGUARD-3310): USE flag is not allowing workbench usage
+* Fixed [#3330](http://youtrack.sk89q.com/issue/WORLDGUARD-3330): Build permissions preventing block placement
+* API: Added `BukkitUtil.toRegion(Chunk)`
+
 ## 6.0 beta 4
 
 MC 1.7.9, 1.7.10 and 1.8 (Spigot only) are supported.
