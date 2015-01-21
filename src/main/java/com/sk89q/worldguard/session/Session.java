@@ -213,11 +213,9 @@ public class Session {
             Set<ProtectedRegion> entered = Sets.difference(toSet.getRegions(), lastRegionSet);
             Set<ProtectedRegion> exited = Sets.difference(lastRegionSet, toSet.getRegions());
 
-            if (!entered.isEmpty() || !exited.isEmpty() || forced) {
-                for (Handler handler : handlers.values()) {
-                    if (!handler.onCrossBoundary(player, lastValid, to, toSet, entered, exited, moveType) && moveType.isCancellable()) {
-                        return lastValid;
-                    }
+            for (Handler handler : handlers.values()) {
+                if (!handler.onCrossBoundary(player, lastValid, to, toSet, entered, exited, moveType) && moveType.isCancellable()) {
+                    return lastValid;
                 }
             }
 
