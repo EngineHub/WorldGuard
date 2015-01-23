@@ -423,6 +423,28 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.LEASH, 0);
         MATERIAL_FLAGS.put(Material.NAME_TAG, 0);
         MATERIAL_FLAGS.put(Material.COMMAND_MINECART, 0);
+        try {
+            MATERIAL_FLAGS.put(Material.PRISMARINE_SHARD, 0);
+            MATERIAL_FLAGS.put(Material.PRISMARINE_CRYSTALS, 0);
+            MATERIAL_FLAGS.put(Material.RABBIT, 0);
+            MATERIAL_FLAGS.put(Material.COOKED_RABBIT, 0);
+            MATERIAL_FLAGS.put(Material.RABBIT_STEW, 0);
+            MATERIAL_FLAGS.put(Material.RABBIT_FOOT, 0);
+            MATERIAL_FLAGS.put(Material.RABBIT_HIDE, 0);
+            MATERIAL_FLAGS.put(Material.ARMOR_STAND, 0);
+            MATERIAL_FLAGS.put(Material.IRON_BARDING, 0);
+            MATERIAL_FLAGS.put(Material.GOLD_BARDING, 0);
+            MATERIAL_FLAGS.put(Material.DIAMOND_BARDING, 0);;
+            MATERIAL_FLAGS.put(Material.MUTTON, 0);
+            MATERIAL_FLAGS.put(Material.COOKED_MUTTON, 0);
+            MATERIAL_FLAGS.put(Material.BANNER, 0);
+            MATERIAL_FLAGS.put(Material.SPRUCE_DOOR_ITEM, 0);
+            MATERIAL_FLAGS.put(Material.BIRCH_DOOR_ITEM, 0);
+            MATERIAL_FLAGS.put(Material.JUNGLE_DOOR_ITEM, 0);
+            MATERIAL_FLAGS.put(Material.ACACIA_DOOR_ITEM, 0);
+            MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR_ITEM, 0);
+        } catch (NoSuchFieldError ignored) {
+        }
         MATERIAL_FLAGS.put(Material.GOLD_RECORD, 0);
         MATERIAL_FLAGS.put(Material.GREEN_RECORD, 0);
         MATERIAL_FLAGS.put(Material.RECORD_3, 0);
