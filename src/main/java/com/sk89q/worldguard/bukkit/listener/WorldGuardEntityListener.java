@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit.listener;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.*;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -549,6 +550,11 @@ public class WorldGuardEntityListener implements Listener {
 
         // allow spawning of creatures from plugins
         if (!wcfg.blockPluginSpawning && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) {
+            return;
+        }
+
+        // armor stands are living entities, but we check them as blocks/non-living entities, so ignore them here
+        if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
             return;
         }
 

@@ -833,6 +833,13 @@ public class EventAbstractionListener extends AbstractListener {
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.BOAT));
         }
 
+        // Handle created armor stands
+        try { // backwards compat for 1.7
+            if (item != null && item.getType() == Material.ARMOR_STAND) {
+                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ARMOR_STAND));
+            }
+        } catch (Exception ignored) {}
+
         // Handle created spawn eggs
         if (item != null && item.getType() == Material.MONSTER_EGG) {
             MaterialData data = item.getData();
