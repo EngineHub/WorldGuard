@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.util;
 
+import com.sk89q.worldguard.util.Enums;
 import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.projectiles.ProjectileSource;
@@ -163,6 +164,9 @@ public final class Entities {
         return entity instanceof LivingEntity && !(entity instanceof Player);
     }
 
+    private static final org.bukkit.entity.EntityType armorStandType =
+            Enums.findByValue(org.bukkit.entity.EntityType.class, "ARMOR_STAND");
+
     /**
      * Test whether using the given entity should be considered "building"
      * rather than merely using an entity.
@@ -171,7 +175,8 @@ public final class Entities {
      * @return true if considered building
      */
     public static boolean isConsideredBuildingIfUsed(Entity entity) {
-        return entity instanceof Hanging;
+        return entity instanceof Hanging
+                || entity.getType() == armorStandType;
     }
 
 }

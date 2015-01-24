@@ -66,6 +66,9 @@ public final class Materials {
         ENTITY_ITEMS.put(EntityType.MINECART_HOPPER, Material.HOPPER_MINECART);
         ENTITY_ITEMS.put(EntityType.SPLASH_POTION, Material.POTION);
         ENTITY_ITEMS.put(EntityType.EGG, Material.EGG);
+        try {
+            ENTITY_ITEMS.put(EntityType.ARMOR_STAND, Material.ARMOR_STAND);
+        } catch (Exception ignored) {}
 
         MATERIAL_FLAGS.put(Material.AIR, 0);
         MATERIAL_FLAGS.put(Material.STONE, 0);
