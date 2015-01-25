@@ -130,6 +130,17 @@ public final class Cause {
     }
 
     @Nullable
+    public Entity getFirstNonPlayerEntity() {
+        for (Object object : causes) {
+            if (object instanceof Entity && !(object instanceof Player)) {
+                return (Entity) object;
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
     public Block getFirstBlock() {
         for (Object object : causes) {
             if (object instanceof Block) {

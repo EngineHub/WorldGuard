@@ -87,7 +87,7 @@ public class RegionFlagsListener extends AbstractListener {
         }
 
         Entity entity;
-        if ((entity = event.getCause().getFirstEntity()) != null) {
+        if ((entity = event.getCause().getFirstNonPlayerEntity()) != null) {
             // ================================================================
             // CREEPER_EXPLOSION flag
             // ================================================================

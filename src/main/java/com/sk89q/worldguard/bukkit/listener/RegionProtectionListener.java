@@ -215,9 +215,9 @@ public class RegionProtectionListener extends AbstractListener {
                     String what;
 
                     /* TNT */
-                    if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.PRIMED_TNT) != null) {
+                    if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.MINECART_TNT) != null) {
                         canBreak = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_BREAK, DefaultFlag.TNT));
-                        what = "dynamite blocks";
+                        what = "use dynamite";
 
                     /* Everything else */
                     } else {
