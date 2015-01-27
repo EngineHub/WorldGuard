@@ -28,22 +28,27 @@ import org.bukkit.Location;
  */
 public enum MoveType {
 
-    RESPAWN(false),
-    EMBARK(true),
-    MOVE(true),
-    TELEPORT(true),
-    RIDE(true),
-    OTHER_NON_CANCELLABLE(false),
-    OTHER_CANCELLABLE(true);
+    RESPAWN(false, true),
+    EMBARK(true, false),
+    MOVE(true, false),
+    TELEPORT(true, true),
+    RIDE(true, false),
+    OTHER_NON_CANCELLABLE(false, false),
+    OTHER_CANCELLABLE(true, false);
 
     private final boolean cancellable;
+    private final boolean teleport;
 
-    MoveType(boolean cancellable) {
+    MoveType(boolean cancellable, boolean teleport) {
         this.cancellable = cancellable;
+        this.teleport = teleport;
     }
 
     public boolean isCancellable() {
         return cancellable;
     }
 
+    public boolean isTeleport() {
+        return teleport;
+    }
 }

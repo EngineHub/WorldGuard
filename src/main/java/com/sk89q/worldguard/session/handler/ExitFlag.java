@@ -34,6 +34,7 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
 
     private static final long MESSAGE_THRESHOLD = 1000 * 2;
     private String storedMessage;
+    private boolean exitViaTeleport = false;
     private long lastMessage;
 
     public ExitFlag(Session session) {
@@ -43,6 +44,7 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
     private void update(LocalPlayer localPlayer, ApplicableRegionSet set, boolean allowed) {
         if (!allowed) {
             storedMessage = set.queryValue(localPlayer, DefaultFlag.EXIT_DENY_MESSAGE);
+            exitViaTeleport = set.testState(localPlayer, DefaultFlag.EXIT_VIA_TELEPORT);
         }
     }
 
@@ -71,7 +73,7 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
 
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
-        if (allowed && !lastAllowed) {
+        if (allowed && !lastAllowed && !(moveType.isTeleport() && exitViaTeleport)) {
             Boolean override = toSet.queryValue(localPlayer, DefaultFlag.EXIT_OVERRIDE);
             if (override == null || !override) {
                 sendMessage(player);
