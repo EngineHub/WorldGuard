@@ -109,6 +109,7 @@ public final class DefaultFlag {
     public static final StringFlag EXIT_DENY_MESSAGE = new StringFlag("exit-deny-message",
             "" + ChatColor.RED + ChatColor.BOLD + "Hey!" + ChatColor.GRAY + " You are not permitted to leave this area.");
     public static final BooleanFlag EXIT_OVERRIDE = new BooleanFlag("exit-override");
+    public static final StateFlag EXIT_VIA_TELEPORT = new StateFlag("exit-via-teleport", true);
     public static final StringFlag GREET_MESSAGE = new StringFlag("greeting");
     public static final StringFlag FAREWELL_MESSAGE = new StringFlag("farewell");
     public static final BooleanFlag NOTIFY_ENTER = new BooleanFlag("notify-enter");
@@ -138,7 +139,7 @@ public final class DefaultFlag {
             TNT, LIGHTER, RIDE, USE, INTERACT, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
             MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
-            DENY_MESSAGE, ENTRY_DENY_MESSAGE, EXIT_DENY_MESSAGE, EXIT_OVERRIDE,
+            DENY_MESSAGE, ENTRY_DENY_MESSAGE, EXIT_DENY_MESSAGE, EXIT_OVERRIDE, EXIT_VIA_TELEPORT,
             GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
             EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,
             ENTITY_ITEM_FRAME_DESTROY, ITEM_PICKUP, ITEM_DROP, /*MAX_PLAYERS, MAX_PLAYERS_MESSAGE,*/
