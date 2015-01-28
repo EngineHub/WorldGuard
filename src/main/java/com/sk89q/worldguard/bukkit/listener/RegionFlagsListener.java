@@ -30,12 +30,16 @@ import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import javax.annotation.Nullable;
 
@@ -104,6 +108,21 @@ public class RegionFlagsListener extends AbstractListener {
                 event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
             }
 
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onEntityDamage(EntityDamageEvent event) {
+        Entity entity = event.getEntity();
+        World world = entity.getWorld();
+
+        if (!isRegionSupportEnabled(world)) return; // Region support disabled
+        RegionQuery query = getPlugin().getRegionContainer().createQuery();
+
+        if (entity instanceof Player && event.getCause() == DamageCause.FALL) {
+            if (!query.testState(entity.getLocation(), (Player) entity, DefaultFlag.FALL_DAMAGE)) {
+                event.setCancelled(true);
+            }
         }
     }
 
