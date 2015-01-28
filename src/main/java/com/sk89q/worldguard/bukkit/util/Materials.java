@@ -683,6 +683,7 @@ public final class Materials {
             case FENCE_GATE: return true;
             case WORKBENCH: return true;
             case ENCHANTMENT_TABLE: return true;
+            case ENDER_CHEST: return true;
             case BEACON: return true;
             case ANVIL: return true;
             case WOOD_PLATE: return true;
