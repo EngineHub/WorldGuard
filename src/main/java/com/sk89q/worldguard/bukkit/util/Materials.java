@@ -677,6 +677,7 @@ public final class Materials {
             case LEVER: return true;
             case STONE_BUTTON: return true;
             case WOOD_BUTTON: return true;
+            case TRIPWIRE: return true;
             case WOODEN_DOOR: return true;
             case TRAP_DOOR: return true;
             case FENCE_GATE: return true;
