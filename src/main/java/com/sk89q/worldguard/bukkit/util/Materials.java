@@ -46,7 +46,15 @@ public final class Materials {
     private static final Map<Material, Integer> MATERIAL_FLAGS = new HashMap<Material, Integer>();
     private static final Set<PotionEffectType> DAMAGE_EFFECTS = new HashSet<PotionEffectType>();
 
+    public static Material ARMOR_STAND;
+
     static {
+        try {
+            ARMOR_STAND = Material.ARMOR_STAND;
+        } catch (NoSuchFieldError ignored) {
+            ARMOR_STAND = null;
+        }
+
         ENTITY_ITEMS.put(EntityType.PAINTING, Material.PAINTING);
         ENTITY_ITEMS.put(EntityType.ARROW, Material.ARROW);
         ENTITY_ITEMS.put(EntityType.SNOWBALL, Material.SNOW_BALL);
@@ -68,7 +76,7 @@ public final class Materials {
         ENTITY_ITEMS.put(EntityType.EGG, Material.EGG);
         try {
             ENTITY_ITEMS.put(EntityType.ARMOR_STAND, Material.ARMOR_STAND);
-        } catch (Exception ignored) {}
+        } catch (NoSuchFieldError ignored) {}
 
         MATERIAL_FLAGS.put(Material.AIR, 0);
         MATERIAL_FLAGS.put(Material.STONE, 0);
