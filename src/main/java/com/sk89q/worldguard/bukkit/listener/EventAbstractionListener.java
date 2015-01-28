@@ -619,7 +619,13 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         if (event instanceof EntityDamageByBlockEvent) {
-            Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityDamageByBlockEvent) event).getDamager()), event.getEntity()));
+            @Nullable Block attacker = ((EntityDamageByBlockEvent) event).getDamager();
+
+            // The attacker should NOT be null, but sometimes it is
+            // See WORLDGUARD-3350
+            if (attacker != null) {
+                Events.fireToCancel(event, new DamageEntityEvent(event, create(attacker), event.getEntity()));
+            }
 
         } else if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) event;
