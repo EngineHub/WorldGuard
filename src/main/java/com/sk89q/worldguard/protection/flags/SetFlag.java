@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.google.common.collect.Sets;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.command.CommandSender;
 
@@ -56,13 +57,17 @@ public class SetFlag<T> extends Flag<Set<T>> {
 
     @Override
     public Set<T> parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        Set<T> items = new HashSet<T>();
+        if (input.isEmpty()) {
+            return Sets.newHashSet();
+        } else {
+            Set<T> items = Sets.newHashSet();
 
-        for (String str : input.split(",")) {
-            items.add(subFlag.parseInput(plugin, sender, str.trim()));
+            for (String str : input.split(",")) {
+                items.add(subFlag.parseInput(plugin, sender, str.trim()));
+            }
+
+            return items;
         }
-
-        return new HashSet<T>(items);
     }
 
     @Override
