@@ -380,7 +380,7 @@ public class WorldGuardBlockListener implements Listener {
             return;
         }
 
-        int id = event.getChangedTypeId();
+        int id = event.getBlock().getTypeId();
 
         if (id == 13 && wcfg.noPhysicsGravel) {
             event.setCancelled(true);
