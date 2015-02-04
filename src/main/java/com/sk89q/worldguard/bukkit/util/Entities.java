@@ -150,7 +150,7 @@ public final class Entities {
      * @return true if an NPC
      */
     public static boolean isNPC(Entity entity) {
-        return entity instanceof NPC;
+        return entity instanceof NPC || entity.hasMetadata("NPC");
     }
 
     /**
