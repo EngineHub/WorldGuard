@@ -92,6 +92,13 @@
 
     <dependency>
       <groupId>com.sk89q.spigot</groupId>
+      <artifactId>bukkit-classloader-check</artifactId>
+      <version>1.8-R0.1-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sk89q.spigot</groupId>
       <artifactId>bukkit</artifactId>
       <version>1.8-R0.1-SNAPSHOT</version>
       <scope>compile</scope>
