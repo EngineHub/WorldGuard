@@ -73,7 +73,7 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
 
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
-        if (allowed && !lastAllowed && !(moveType.isTeleport() && exitViaTeleport)) {
+        if (allowed && !lastAllowed && !(moveType.isTeleport() && exitViaTeleport) && moveType.isCancellable()) {
             Boolean override = toSet.queryValue(localPlayer, DefaultFlag.EXIT_OVERRIDE);
             if (override == null || !override) {
                 sendMessage(player);
@@ -93,7 +93,7 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
 
         boolean lastAllowed = StateFlag.test(lastValue);
 
-        if (!lastAllowed) {
+        if (!lastAllowed && moveType.isCancellable()) {
             Boolean override = toSet.queryValue(getPlugin().wrapPlayer(player), DefaultFlag.EXIT_OVERRIDE);
             if (override == null || !override) {
                 sendMessage(player);
