@@ -223,12 +223,6 @@ public class Session {
             lastRegionSet = toSet.getRegions();
         }
 
-        // Some handlers (see: exit flag) store 'last position data' that
-        // becomes invalid if we're going to let the player move anyway
-        if (moveType.isCancellable()) {
-            resetState(player);
-        }
-
         return null;
     }
 
