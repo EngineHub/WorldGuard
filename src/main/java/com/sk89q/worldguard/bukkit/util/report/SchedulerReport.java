@@ -77,7 +77,8 @@ public class SchedulerReport extends DataReport {
             for (Class<?> type : classes) {
                 Optional<Field> field = taskFieldCache.getUnchecked(type);
                 if (field.isPresent()) {
-                    return field.get().get(task).getClass();
+                    Object res = field.get().get(task);
+                    return res == null ? null : res.getClass();
                 }
             }
         } catch (IllegalAccessException ignored) {
