@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.flags;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.WeatherType;
 import org.bukkit.entity.EntityType;
 
 /**
@@ -118,6 +119,7 @@ public final class DefaultFlag {
     public static final SetFlag<EntityType> DENY_SPAWN = new SetFlag<EntityType>("deny-spawn", new EntityTypeFlag(null));
     public static final EnumFlag<GameMode> GAME_MODE = new EnumFlag<GameMode>("game-mode", GameMode.class);
     public static final StringFlag TIME_LOCK = new StringFlag("time-lock");
+    public static final EnumFlag<WeatherType> WEATHER_LOCK = new EnumFlag<WeatherType>("weather-lock", WeatherType.class);
     public static final IntegerFlag HEAL_DELAY = new IntegerFlag("heal-delay");
     public static final IntegerFlag HEAL_AMOUNT = new IntegerFlag("heal-amount");
     public static final DoubleFlag MIN_HEAL = new DoubleFlag("heal-min-health");
@@ -150,7 +152,7 @@ public final class DefaultFlag {
             SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, SOIL_DRY, GAME_MODE,
             MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, VINE_GROWTH,
             SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
-            TELE_LOC, SPAWN_LOC, POTION_SPLASH, TIME_LOCK,
+            TELE_LOC, SPAWN_LOC, POTION_SPLASH, TIME_LOCK, WEATHER_LOCK,
             BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
     };
 

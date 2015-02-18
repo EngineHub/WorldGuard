@@ -148,6 +148,7 @@ public class SessionManager implements Runnable, Listener {
         session.register(new GameModeFlag(session));
         session.register(new InvincibilityFlag(session));
         session.register(new TimeLockFlag(session));
+        session.register(new WeatherLockFlag(session));
         session.register(new GodMode(session));
         session.register(new WaterBreathing(session));
         session.initialize(player);
