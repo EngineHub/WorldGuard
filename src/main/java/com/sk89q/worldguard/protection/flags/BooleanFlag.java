@@ -37,8 +37,8 @@ public class BooleanFlag extends Flag<Boolean> {
     }
 
     @Override
-    public Boolean parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        input = input.trim();
+    public Boolean parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getUserInput();
         
         if (input.equalsIgnoreCase("true") || input.equalsIgnoreCase("yes")
                 || input.equalsIgnoreCase("on")

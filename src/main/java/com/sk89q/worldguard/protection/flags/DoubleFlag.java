@@ -37,8 +37,8 @@ public class DoubleFlag extends Flag<Double> {
     }
 
     @Override
-    public Double parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        input = input.trim();
+    public Double parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getUserInput(); // TODO getDouble
 
         try {
             return Double.parseDouble(input);

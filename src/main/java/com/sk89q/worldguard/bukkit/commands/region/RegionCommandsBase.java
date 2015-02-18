@@ -35,6 +35,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.FlagContext;
+import com.sk89q.worldguard.protection.flags.FlagContext.FlagContextBuilder;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
@@ -391,7 +393,8 @@ class RegionCommandsBase {
      * @throws InvalidFlagFormat thrown if the value is invalid
      */
     protected static <V> void setFlag(ProtectedRegion region, Flag<V> flag, CommandSender sender, String value) throws InvalidFlagFormat {
-        region.setFlag(flag, flag.parseInput(WorldGuardPlugin.inst(), sender, value));
+        region.setFlag(flag, flag.parseInput(FlagContext.create().setPlugin(WorldGuardPlugin.inst()).setRegion(region)
+                                                .setSender(sender).setInput(value).build()));
     }
 
 }

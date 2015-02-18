@@ -42,12 +42,12 @@ public class LocationFlag extends Flag<Location> {
     }
 
     @Override
-    public Location parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        input = input.trim();
+    public Location parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getUserInput(); // todo make a getLocation
 
         final Player player;
         try {
-            player = plugin.checkPlayer(sender);
+            player = WorldGuardPlugin.inst().checkPlayer(((CommandSender) context.get("sender")));
         } catch (CommandException e) {
             throw new InvalidFlagFormat(e.getMessage());
         }

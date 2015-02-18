@@ -78,7 +78,8 @@ public class EnumFlag<T extends Enum<T>> extends Flag<T> {
     }
 
     @Override
-    public T parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
+    public T parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getString("input");
         try {
             return findValue(input);
         } catch (IllegalArgumentException e) {
