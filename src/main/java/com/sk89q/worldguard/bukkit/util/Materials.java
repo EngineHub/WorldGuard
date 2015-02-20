@@ -680,6 +680,8 @@ public final class Materials {
             case TRIPWIRE: return true;
             case DIODE_BLOCK_OFF: return true;
             case DIODE_BLOCK_ON: return true;
+            case REDSTONE_COMPARATOR_OFF: return true;
+            case REDSTONE_COMPARATOR_ON: return true;
             case WOODEN_DOOR: return true;
             case TRAP_DOOR: return true;
             case FENCE_GATE: return true;
