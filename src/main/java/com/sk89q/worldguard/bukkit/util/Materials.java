@@ -678,6 +678,8 @@ public final class Materials {
             case STONE_BUTTON: return true;
             case WOOD_BUTTON: return true;
             case TRIPWIRE: return true;
+            case DIODE_BLOCK_OFF: return true;
+            case DIODE_BLOCK_ON: return true;
             case WOODEN_DOOR: return true;
             case TRAP_DOOR: return true;
             case FENCE_GATE: return true;
