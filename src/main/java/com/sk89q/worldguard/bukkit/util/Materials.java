@@ -252,7 +252,7 @@ public final class Materials {
         try {
             MATERIAL_FLAGS.put(Material.STANDING_BANNER, 0);
             MATERIAL_FLAGS.put(Material.WALL_BANNER, 0);
-            MATERIAL_FLAGS.put(Material.DAYLIGHT_DETECTOR_INVERTED, 0);
+            MATERIAL_FLAGS.put(Material.DAYLIGHT_DETECTOR_INVERTED, MODIFIED_ON_RIGHT);
             MATERIAL_FLAGS.put(Material.RED_SANDSTONE, 0);
             MATERIAL_FLAGS.put(Material.RED_SANDSTONE_STAIRS, 0);
             MATERIAL_FLAGS.put(Material.DOUBLE_STONE_SLAB2, 0);
