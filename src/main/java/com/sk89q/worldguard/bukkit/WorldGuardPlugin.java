@@ -195,6 +195,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new ChestProtectionListener(this)).registerEvents();
         (new RegionProtectionListener(this)).registerEvents();
         (new RegionFlagsListener(this)).registerEvents();
+        (new WorldRulesListener(this)).registerEvents();
         (new BlockedPotionsListener(this)).registerEvents();
         (new EventAbstractionListener(this)).registerEvents();
         (new PlayerModesListener(this)).registerEvents();
