@@ -402,7 +402,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.CAULDRON_ITEM, 0);
         MATERIAL_FLAGS.put(Material.EYE_OF_ENDER, 0);
         MATERIAL_FLAGS.put(Material.SPECKLED_MELON, 0);
-        MATERIAL_FLAGS.put(Material.MONSTER_EGG, 0);
+        MATERIAL_FLAGS.put(Material.MONSTER_EGG, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.EXP_BOTTLE, 0);
         MATERIAL_FLAGS.put(Material.FIREBALL, 0);
         MATERIAL_FLAGS.put(Material.BOOK_AND_QUILL, 0);
