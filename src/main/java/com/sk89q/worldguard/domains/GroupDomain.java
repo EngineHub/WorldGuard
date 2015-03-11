@@ -51,7 +51,6 @@ public class GroupDomain implements Domain, ChangeTracked {
     public GroupDomain(GroupDomain domain) {
         checkNotNull(domain, "domain");
         groups.addAll(domain.getGroups());
-        dirty = true;
     }
 
     /**
@@ -128,6 +127,7 @@ public class GroupDomain implements Domain, ChangeTracked {
 
     @Override
     public void clear() {
+        setDirty(true);
         groups.clear();
     }
 

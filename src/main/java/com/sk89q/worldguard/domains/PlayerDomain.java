@@ -125,6 +125,7 @@ public class PlayerDomain implements Domain, ChangeTracked {
      */
     public void removePlayer(UUID uuid) {
         checkNotNull(uuid);
+        setDirty(true);
         uniqueIds.remove(uuid);
     }
 
@@ -136,6 +137,7 @@ public class PlayerDomain implements Domain, ChangeTracked {
      */
     public void removePlayer(LocalPlayer player) {
         checkNotNull(player);
+        setDirty(true);
         removePlayer(player.getName());
         removePlayer(player.getUniqueId());
     }
@@ -183,6 +185,7 @@ public class PlayerDomain implements Domain, ChangeTracked {
 
     @Override
     public void clear() {
+        setDirty(true);
         uniqueIds.clear();
         names.clear();
     }
