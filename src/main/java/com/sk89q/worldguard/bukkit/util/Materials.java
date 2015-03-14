@@ -678,10 +678,6 @@ public final class Materials {
             case STONE_BUTTON: return true;
             case WOOD_BUTTON: return true;
             case TRIPWIRE: return true;
-            case DIODE_BLOCK_OFF: return true;
-            case DIODE_BLOCK_ON: return true;
-            case REDSTONE_COMPARATOR_OFF: return true;
-            case REDSTONE_COMPARATOR_ON: return true;
             case WOODEN_DOOR: return true;
             case TRAP_DOOR: return true;
             case FENCE_GATE: return true;
@@ -759,7 +755,11 @@ public final class Materials {
      * @return true to be considered as used
      */
     public static boolean isConsideredBuildingIfUsed(Material type) {
-        return type == Material.SAPLING;
+        return type == Material.SAPLING
+            || type == Material.DIODE_BLOCK_OFF
+            || type == Material.DIODE_BLOCK_ON
+            || type == Material.REDSTONE_COMPARATOR_OFF
+            || type == Material.REDSTONE_COMPARATOR_ON;
     }
 
     /**
