@@ -430,7 +430,9 @@ public class EventAbstractionListener extends AbstractListener {
         Events.fireToCancel(event, new PlaceBlockEvent(event, create(player), blockAffected.getLocation(), blockMaterial).setAllowed(allowed));
         Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item).setAllowed(allowed));
 
-        playDenyEffect(event.getPlayer(), blockAffected.getLocation().add(0.5, 0.5, 0.5));
+        if (event.isCancelled()) {
+            playDenyEffect(event.getPlayer(), blockAffected.getLocation().add(0.5, 0.5, 0.5));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -448,7 +450,9 @@ public class EventAbstractionListener extends AbstractListener {
         Events.fireToCancel(event, new BreakBlockEvent(event, create(player), blockAffected).setAllowed(allowed));
         Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item).setAllowed(allowed));
 
-        playDenyEffect(event.getPlayer(), blockAffected.getLocation().add(0.5, 1, 0.5));
+        if (event.isCancelled()) {
+            playDenyEffect(event.getPlayer(), blockAffected.getLocation().add(0.5, 0.5, 0.5));
+        }
     }
 
     // TODO: Handle EntityPortalEnterEvent
