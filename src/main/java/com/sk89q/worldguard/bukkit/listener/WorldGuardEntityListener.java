@@ -540,6 +540,11 @@ public class WorldGuardEntityListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
+        
+        //Allow spawning of Armor Stands
+        if(event.getEntity() instanceof ArmorStand) {
+            return;
+        }
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
