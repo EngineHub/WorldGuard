@@ -693,7 +693,7 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDamage(VehicleDamageEvent event) {
         Entity attacker = event.getAttacker();
-        Events.fireToCancel(event, new DestroyEntityEvent(event, create(attacker), event.getVehicle()));
+        Events.fireToCancel(event, new DamageEntityEvent(event, create(attacker), event.getVehicle()));
     }
 
     @EventHandler(ignoreCancelled = true)

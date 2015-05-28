@@ -49,6 +49,7 @@ public final class DefaultFlag {
     public static final StateFlag BLOCK_PLACE = new StateFlag("block-place", false);
     public static final StateFlag USE = new StateFlag("use", false);
     public static final StateFlag INTERACT = new StateFlag("interact", false);
+    public static final StateFlag DAMAGE_ANIMALS = new StateFlag("damage-animals", false);
     public static final StateFlag PVP = new StateFlag("pvp", false);
     public static final StateFlag SLEEP = new StateFlag("sleep", false);
     public static final StateFlag TNT = new StateFlag("tnt", false);
@@ -140,7 +141,7 @@ public final class DefaultFlag {
 
     public static final Flag<?>[] flagsList = new Flag<?>[] {
             PASSTHROUGH, BUILD, CONSTRUCT, BLOCK_BREAK, BLOCK_PLACE, PVP, CHEST_ACCESS, PISTONS,
-            TNT, LIGHTER, RIDE, USE, INTERACT, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
+            TNT, LIGHTER, RIDE, USE, INTERACT, PLACE_VEHICLE, DESTROY_VEHICLE, DAMAGE_ANIMALS, SLEEP,
             MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
             DENY_MESSAGE, ENTRY_DENY_MESSAGE, EXIT_DENY_MESSAGE, EXIT_OVERRIDE, EXIT_VIA_TELEPORT,
