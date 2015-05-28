@@ -922,6 +922,12 @@ public class EventAbstractionListener extends AbstractListener {
         public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event){
             onPlayerInteractEntity(event);
         }
+
+        @EventHandler(ignoreCancelled = true)
+        public void onBlockExplode(BlockExplodeEvent event) {
+            Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(event.getBlock()),
+                    event.getBlock().getLocation().getWorld(), event.blockList(), Material.AIR));
+        }
     }
 
 }
