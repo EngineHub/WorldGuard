@@ -19,10 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.debug.*;
 import com.sk89q.worldguard.util.report.CancelReport;
@@ -58,45 +55,45 @@ public class DebuggingCommands {
         this.plugin = plugin;
     }
 
-    @Command(aliases = {"testbreak"}, usage = "[player]", desc = "Simulate a block break", min = 1, max = 1, flags = "t")
+    @Command(aliases = {"testbreak"}, usage = "[player]", desc = "Simulate a block break", min = 1, max = 1, flags = "ts")
     @CommandPermissions("worldguard.debug.event")
     public void fireBreakEvent(CommandContext args, final CommandSender sender) throws CommandException {
         Player target = plugin.matchSinglePlayer(sender, args.getString(0));
         Block block = traceBlock(sender, target, args.hasFlag('t'));
         sender.sendMessage(ChatColor.AQUA + "Testing BLOCK BREAK at " + ChatColor.DARK_AQUA + block);
         LoggingBlockBreakEvent event = new LoggingBlockBreakEvent(block, target);
-        testEvent(sender, target, event);
+        testEvent(sender, target, event, args.hasFlag('s'));
     }
 
 
-    @Command(aliases = {"testplace"}, usage = "[player]", desc = "Simulate a block place", min = 1, max = 1, flags = "t")
+    @Command(aliases = {"testplace"}, usage = "[player]", desc = "Simulate a block place", min = 1, max = 1, flags = "ts")
     @CommandPermissions("worldguard.debug.event")
     public void firePlaceEvent(CommandContext args, final CommandSender sender) throws CommandException {
         Player target = plugin.matchSinglePlayer(sender, args.getString(0));
         Block block = traceBlock(sender, target, args.hasFlag('t'));
         sender.sendMessage(ChatColor.AQUA + "Testing BLOCK PLACE at " + ChatColor.DARK_AQUA + block);
         LoggingBlockPlaceEvent event = new LoggingBlockPlaceEvent(block, block.getState(), block.getRelative(BlockFace.DOWN), target.getItemInHand(), target, true);
-        testEvent(sender, target, event);
+        testEvent(sender, target, event, args.hasFlag('s'));
     }
 
-    @Command(aliases = {"testinteract"}, usage = "[player]", desc = "Simulate a block interact", min = 1, max = 1, flags = "t")
+    @Command(aliases = {"testinteract"}, usage = "[player]", desc = "Simulate a block interact", min = 1, max = 1, flags = "ts")
     @CommandPermissions("worldguard.debug.event")
     public void fireInteractEvent(CommandContext args, final CommandSender sender) throws CommandException {
         Player target = plugin.matchSinglePlayer(sender, args.getString(0));
         Block block = traceBlock(sender, target, args.hasFlag('t'));
         sender.sendMessage(ChatColor.AQUA + "Testing BLOCK INTERACT at " + ChatColor.DARK_AQUA + block);
         LoggingPlayerInteractEvent event = new LoggingPlayerInteractEvent(target, Action.RIGHT_CLICK_BLOCK, target.getItemInHand(), block, BlockFace.SOUTH);
-        testEvent(sender, target, event);
+        testEvent(sender, target, event, args.hasFlag('s'));
     }
 
-    @Command(aliases = {"testdamage"}, usage = "[player]", desc = "Simulate an entity damage", min = 1, max = 1, flags = "t")
+    @Command(aliases = {"testdamage"}, usage = "[player]", desc = "Simulate an entity damage", min = 1, max = 1, flags = "ts")
     @CommandPermissions("worldguard.debug.event")
     public void fireDamageEvent(CommandContext args, final CommandSender sender) throws CommandException {
         Player target = plugin.matchSinglePlayer(sender, args.getString(0));
         Entity entity = traceEntity(sender, target, args.hasFlag('t'));
         sender.sendMessage(ChatColor.AQUA + "Testing ENTITY DAMAGE on " + ChatColor.DARK_AQUA + entity);
         LoggingEntityDamageByEntityEvent event = new LoggingEntityDamageByEntityEvent(target, entity, DamageCause.ENTITY_ATTACK, 1);
-        testEvent(sender, target, event);
+        testEvent(sender, target, event, args.hasFlag('s'));
     }
 
     /**
@@ -104,10 +101,11 @@ public class DebuggingCommands {
      *
      * @param receiver The receiver of the messages
      * @param target The target
-     * @param event THe event
+     * @param event The event
+     * @param stacktraceMode Whether stack traces should be generated and posted
      * @param <T> The type of event
      */
-    private <T extends Event & CancelLogging> void testEvent(CommandSender receiver, Player target, T event) {
+    private <T extends Event & CancelLogging> void testEvent(CommandSender receiver, Player target, T event, boolean stacktraceMode) throws CommandPermissionsException {
         boolean isConsole = receiver instanceof ConsoleCommandSender;
 
         if (!receiver.equals(target)) {
@@ -122,12 +120,22 @@ public class DebuggingCommands {
         Bukkit.getPluginManager().callEvent(event);
         int start = new Exception().getStackTrace().length;
         CancelReport report = new CancelReport(event, event.getCancels(), start);
+        report.setDetectingPlugin(!stacktraceMode);
         String result = report.toString();
-        receiver.sendMessage(result.replaceAll("(?m)^", ChatColor.AQUA.toString()));
 
-        if (result.length() >= 500 && !isConsole) {
-            receiver.sendMessage(ChatColor.GRAY + "The report was also printed to console.");
+        if (stacktraceMode) {
+            receiver.sendMessage(ChatColor.GRAY + "The report was printed to console.");
             log.info("Event report for " + receiver.getName() + ":\n\n" + result);
+
+            plugin.checkPermission(receiver, "worldguard.debug.pastebin");
+            CommandUtils.pastebin(plugin, receiver, result, "Event debugging report: %s.txt");
+        } else {
+            receiver.sendMessage(result.replaceAll("(?m)^", ChatColor.AQUA.toString()));
+
+            if (result.length() >= 500 && !isConsole) {
+                receiver.sendMessage(ChatColor.GRAY + "The report was also printed to console.");
+                log.info("Event report for " + receiver.getName() + ":\n\n" + result);
+            }
         }
     }
 
