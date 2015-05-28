@@ -31,6 +31,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.MoveType;
+import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GameModeFlag;
 import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
@@ -84,12 +85,15 @@ public class WorldGuardPlayerListener implements Listener {
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
-        GameModeFlag handler = plugin.getSessionManager().get(player).getHandler(GameModeFlag.class);
-        if (handler != null && wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())) {
-            GameMode expected = handler.getSetGameMode();
-            if (handler.getOriginalGameMode() != null && expected != null && expected != event.getNewGameMode()) {
-                log.info("Game mode change on " + player.getName() + " has been blocked due to the region GAMEMODE flag");
-                event.setCancelled(true);
+        Session session = plugin.getSessionManager().getIfPresent(player);
+        if (session != null) {
+            GameModeFlag handler = session.getHandler(GameModeFlag.class);
+            if (handler != null && wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())) {
+                GameMode expected = handler.getSetGameMode();
+                if (handler.getOriginalGameMode() != null && expected != null && expected != event.getNewGameMode()) {
+                    log.info("Game mode change on " + player.getName() + " has been blocked due to the region GAMEMODE flag");
+                    event.setCancelled(true);
+                }
             }
         }
     }
