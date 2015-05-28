@@ -49,6 +49,7 @@ public final class DefaultFlag {
     public static final StateFlag BLOCK_PLACE = new StateFlag("block-place", false);
     public static final StateFlag USE = new StateFlag("use", false);
     public static final StateFlag INTERACT = new StateFlag("interact", false);
+    public static final StateFlag ENTITY_DAMAGE = new StateFlag("entity-damage", true);
     public static final StateFlag PVP = new StateFlag("pvp", false);
     public static final StateFlag SLEEP = new StateFlag("sleep", false);
     public static final StateFlag TNT = new StateFlag("tnt", false);
@@ -153,7 +154,7 @@ public final class DefaultFlag {
             MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, VINE_GROWTH,
             SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
             TELE_LOC, SPAWN_LOC, POTION_SPLASH, TIME_LOCK, WEATHER_LOCK,
-            BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
+            BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP, ENTITY_DAMAGE
     };
 
     private DefaultFlag() {
