@@ -20,9 +20,13 @@
 package com.sk89q.worldguard.bukkit.util;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.material.Bed;
+import org.bukkit.material.Chest;
 import org.bukkit.material.MaterialData;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +47,8 @@ public final class Blocks {
      * @return a list of connected blocks, not including the given block
      */
     public static List<Block> getConnected(Block block) {
-        MaterialData data = block.getState().getData();
+        BlockState state = block.getState();
+        MaterialData data = state.getData();
 
         if (data instanceof Bed) {
             Bed bed = (Bed) data;
@@ -52,6 +57,28 @@ public final class Blocks {
             } else {
                 return Arrays.asList(block.getRelative(bed.getFacing()));
             }
+        } else if (data instanceof Chest) {
+            BlockFace facing = ((Chest) data).getFacing();
+            ArrayList<Block> chests = new ArrayList<Block>();
+            if (facing == BlockFace.NORTH || facing == BlockFace.SOUTH) {
+                if (block.getRelative(BlockFace.EAST).getState().getData() instanceof Chest) {
+                    chests.add(block.getRelative(BlockFace.EAST));
+                }
+                if (block.getRelative(BlockFace.WEST).getState().getData() instanceof Chest) {
+                    chests.add(block.getRelative(BlockFace.WEST));
+                }
+            } else if (facing == BlockFace.EAST || facing == BlockFace.WEST) {
+                if (block.getRelative(BlockFace.NORTH).getState().getData() instanceof Chest) {
+                    chests.add(block.getRelative(BlockFace.NORTH));
+                }
+                if (block.getRelative(BlockFace.SOUTH).getState().getData() instanceof Chest) {
+                    chests.add(block.getRelative(BlockFace.SOUTH));
+                }
+            } else {
+                // don't know how to handle diagonal chests
+                return Collections.emptyList();
+            }
+            return chests;
         } else {
             return Collections.emptyList();
         }
