@@ -29,6 +29,7 @@ import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
@@ -364,6 +365,33 @@ public class WorldGuardPlayerListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onPlayerPortal(PlayerPortalEvent event) {
+        // hackily estimate the area that could be effected by this event, since the server refuses to tell us
+        int radius;
+        if (event.getPortalTravelAgent() != null) {
+            radius = event.getPortalTravelAgent().getCreationRadius();
+        } else {
+            radius = 16; // from CraftTravelAgent
+        }
+        Location min = event.getTo().clone().subtract(radius, radius, radius);
+        Location max = event.getTo().clone().add(radius, radius, radius);
+        World world = event.getTo().getWorld();
+
+        ProtectedRegion check = new ProtectedCuboidRegion("__portalcheck__", BukkitUtil.toVector(min.getBlock()), BukkitUtil.toVector(max.getBlock()));
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(event.getPlayer(), world)) {
+            ApplicableRegionSet set = plugin.getRegionContainer().get(event.getTo().getWorld()).getApplicableRegions(check);
+            if (!set.testState(plugin.wrapPlayer(event.getPlayer()), DefaultFlag.BUILD)) {
+                event.getPlayer().sendMessage(ChatColor.RED + "Destination is in a protected area.");
+                event.setCancelled(true);
+                return;
             }
         }
     }
