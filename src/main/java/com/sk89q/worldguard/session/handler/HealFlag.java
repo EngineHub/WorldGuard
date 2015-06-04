@@ -38,46 +38,48 @@ public class HealFlag extends Handler {
     public void tick(Player player, ApplicableRegionSet set) {
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
-        if (!getSession().isInvincible(player) && player.getGameMode() != GameMode.CREATIVE) {
-            if (player.getHealth() <= 0) {
-                return;
-            }
+        if (player.getHealth() <= 0) {
+            return;
+        }
 
-            long now = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
 
-            Integer healAmount = set.queryValue(localPlayer, DefaultFlag.HEAL_AMOUNT);
-            Integer healDelay = set.queryValue(localPlayer, DefaultFlag.HEAL_DELAY);
-            Double minHealth = set.queryValue(localPlayer, DefaultFlag.MIN_HEAL);
-            Double maxHealth = set.queryValue(localPlayer, DefaultFlag.MAX_HEAL);
+        Integer healAmount = set.queryValue(localPlayer, DefaultFlag.HEAL_AMOUNT);
+        Integer healDelay = set.queryValue(localPlayer, DefaultFlag.HEAL_DELAY);
+        Double minHealth = set.queryValue(localPlayer, DefaultFlag.MIN_HEAL);
+        Double maxHealth = set.queryValue(localPlayer, DefaultFlag.MAX_HEAL);
 
-            if (healAmount == null || healDelay == null || healAmount == 0 || healDelay < 0) {
-                return;
-            }
+        if (healAmount == null || healDelay == null || healAmount == 0 || healDelay < 0) {
+            return;
+        }
+        if (healAmount < 0
+                && (getSession().isInvincible(player)
+                || (player.getGameMode() != GameMode.SURVIVAL && player.getGameMode() != GameMode.ADVENTURE))) {
+            // don't damage invincible players
+            return;
+        }
+        if (minHealth == null) {
+            minHealth = 0.0;
+        }
+        if (maxHealth == null) {
+            maxHealth = player.getMaxHealth();
+        }
 
-            if (minHealth == null) {
-                minHealth = 0.0;
-            }
+        // Apply a cap to prevent possible exceptions
+        minHealth = Math.min(player.getMaxHealth(), minHealth);
+        maxHealth = Math.min(player.getMaxHealth(), maxHealth);
 
-            if (maxHealth == null) {
-                maxHealth = player.getMaxHealth();
-            }
+        if (player.getHealth() >= maxHealth && healAmount > 0) {
+            return;
+        }
 
-            // Apply a cap to prevent possible exceptions
-            minHealth = Math.min(player.getMaxHealth(), minHealth);
-            maxHealth = Math.min(player.getMaxHealth(), maxHealth);
-
-            if (player.getHealth() >= maxHealth && healAmount > 0) {
-                return;
-            }
-
-            if (healDelay <= 0) {
-                player.setHealth(healAmount > 0 ? maxHealth : minHealth); // this will insta-kill if the flag is unset
-                lastHeal = now;
-            } else if (now - lastHeal > healDelay * 1000) {
-                // clamp health between minimum and maximum
-                player.setHealth(Math.min(maxHealth, Math.max(minHealth, player.getHealth() + healAmount)));
-                lastHeal = now;
-            }
+        if (healDelay <= 0) {
+            player.setHealth(healAmount > 0 ? maxHealth : minHealth); // this will insta-kill if the flag is unset
+            lastHeal = now;
+        } else if (now - lastHeal > healDelay * 1000) {
+            // clamp health between minimum and maximum
+            player.setHealth(Math.min(maxHealth, Math.max(minHealth, player.getHealth() + healAmount)));
+            lastHeal = now;
         }
     }
 
