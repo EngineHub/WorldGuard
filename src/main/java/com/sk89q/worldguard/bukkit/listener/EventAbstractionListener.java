@@ -64,9 +64,8 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.*;
 import org.bukkit.material.Dispenser;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.SpawnEgg;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
@@ -243,18 +242,28 @@ public class EventAbstractionListener extends AbstractListener {
         Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR));
     }
 
+    @SuppressWarnings("deprecation")
     @EventHandler(ignoreCancelled = true)
     public void onBlockPistonRetract(BlockPistonRetractEvent event) {
         if (event.isSticky()) {
             EventDebounce.Entry entry = pistonRetractDebounce.getIfNotPresent(new BlockPistonRetractKey(event), event);
             if (entry != null) {
-                Cause cause = create(event.getBlock());
-                Events.fireToCancel(event, new BreakBlockEvent(event, cause, event.getRetractLocation(), Material.AIR));
-                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getRelative(event.getDirection())));
+                Block piston = event.getBlock();
+                Cause cause = create(piston);
+
+                // Workaround for incorrect piston events
+                BlockFace direction = event.getDirection();
+                if (piston.getType() == Material.PISTON_MOVING_PIECE) {
+                    direction = new PistonExtensionMaterial(Material.PISTON_STICKY_BASE.getId(), piston.getData()).getFacing();
+                }
+                Location retractLocation = piston.getRelative(direction, 2).getLocation();
+
+                Events.fireToCancel(event, new BreakBlockEvent(event, cause, retractLocation, Material.AIR));
+                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, piston.getRelative(direction)));
                 entry.setCancelled(event.isCancelled());
 
                 if (event.isCancelled()) {
-                    playDenyEffect(event.getBlock().getLocation().add(0.5, 1, 0.5));
+                    playDenyEffect(piston.getLocation().add(0.5, 1, 0.5));
                 }
             }
         }
