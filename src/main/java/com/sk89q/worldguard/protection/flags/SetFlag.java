@@ -56,14 +56,17 @@ public class SetFlag<T> extends Flag<Set<T>> {
     }
 
     @Override
-    public Set<T> parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
+    public Set<T> parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getUserInput();
         if (input.isEmpty()) {
             return Sets.newHashSet();
         } else {
             Set<T> items = Sets.newHashSet();
 
             for (String str : input.split(",")) {
-                items.add(subFlag.parseInput(plugin, sender, str.trim()));
+                FlagContext copy = context.copy();
+                copy.put("input", str);
+                items.add(subFlag.parseInput(copy));
             }
 
             return items;

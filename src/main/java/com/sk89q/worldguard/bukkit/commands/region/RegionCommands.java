@@ -44,11 +44,7 @@ import com.sk89q.worldguard.bukkit.commands.task.RegionRemover;
 import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
 import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import com.sk89q.worldguard.protection.flags.RegionGroup;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
+import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.managers.migration.DriverMigration;
@@ -536,7 +532,7 @@ public final class RegionCommands extends RegionCommandsBase {
             // Parse the [-g group] separately so entire command can abort if parsing
             // the [value] part throws an error.
             try {
-                groupValue = groupFlag.parseInput(plugin, sender, group);
+                groupValue = groupFlag.parseInput(FlagContext.create().setPlugin(plugin).setSender(sender).setInput(group).build());
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }

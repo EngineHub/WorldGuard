@@ -42,12 +42,12 @@ public class VectorFlag extends Flag<Vector> {
     }
 
     @Override
-    public Vector parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        input = input.trim();
+    public Vector parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getUserInput(); // todo make a getLocation
 
         if ("here".equalsIgnoreCase(input)) {
             try {
-                return BukkitUtil.toVector(plugin.checkPlayer(sender).getLocation());
+                return BukkitUtil.toVector(WorldGuardPlugin.inst().checkPlayer(((CommandSender) context.get("sender"))).getLocation());
             } catch (CommandException e) {
                 throw new InvalidFlagFormat(e.getMessage());
             }
