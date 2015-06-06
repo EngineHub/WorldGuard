@@ -455,7 +455,8 @@ public class RegionProtectionListener extends AbstractListener {
             Player defender = (Player) event.getEntity();
 
             canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.PVP))
-                    && query.queryState(playerAttacker.getLocation(), playerAttacker, combine(event, DefaultFlag.PVP)) != State.DENY;
+                    && query.queryState(playerAttacker.getLocation(), playerAttacker, combine(event, DefaultFlag.PVP)) != State.DENY
+                    && query.queryState(target, playerAttacker, combine(event, DefaultFlag.PVP)) != State.DENY;
 
             // Fire the disallow PVP event
             if (!canDamage && Events.fireAndTestCancel(new DisallowedPVPEvent(playerAttacker, defender, event.getOriginalEvent()))) {
