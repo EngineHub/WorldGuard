@@ -38,6 +38,7 @@ import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.TravelAgent;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -371,13 +372,27 @@ public class WorldGuardPlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerPortal(PlayerPortalEvent event) {
-        // hackily estimate the area that could be effected by this event, since the server refuses to tell us
-        int radius;
-        if (event.getPortalTravelAgent() != null) {
-            radius = event.getPortalTravelAgent().getCreationRadius();
-        } else {
-            radius = 16; // from CraftTravelAgent
+        if (event.getCause() != TeleportCause.NETHER_PORTAL) {
+            return;
         }
+        if (event.getTo() == null) { // apparently this counts as a cancelled event, implementation specific though
+            return;
+        }
+        if (!event.useTravelAgent()) { // either end travel (even though we checked cause) or another plugin is fucking with us, shouldn't create a portal though
+            return;
+        }
+        TravelAgent pta = event.getPortalTravelAgent();
+        if (pta == null) { // possible, but shouldn't create a portal
+            return;
+        }
+        if (pta.findPortal(event.getTo()) != null) {
+            return; // portal exists...it shouldn't make a new one
+        }
+        // HOPEFULLY covered everything the server can throw at us...proceed protection checking
+        // a lot of that is implementation specific though
+
+        // hackily estimate the area that could be effected by this event, since the server refuses to tell us
+        int radius = pta.getCreationRadius();
         Location min = event.getTo().clone().subtract(radius, radius, radius);
         Location max = event.getTo().clone().add(radius, radius, radius);
         World world = event.getTo().getWorld();
