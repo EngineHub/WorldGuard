@@ -1,5 +1,40 @@
 # Changelog
 
+## 6.1
+
+* Added `exit-via-teleport` flag (default allow) to control exiting an exit=deny region via teleportation.
+* Added a `fall-damage` flag to control player damage caused by falling.
+* Added a `time-lock` flag to lock players' time of day. Valid values are from 0 to 24000 for absolute time, or +- any number for relative time.
+* Added a `weather-lock` flag to lock players' weather. Valid values are "clear" or "downfall". Unset to restore to normal world weather.
+* Added `-s` to the event debugging commands to show a stack trace rather than attempt to detect the causing plugin.
+* Added support for using the `-e` argument (sets an empty value for the flag) in the flag set command when the type of flag is of the 'set' type.
+* Added NPCs from the Citizens plugin to a whitelist so they are not protected.
+* Added support for Spigot's BlockExplodeEvent.
+* Changed tripwire to fall under the `use` flag.
+* Changed enderchests to fall under the `use` flag.
+* Changed vehicles and animals so they are not included in the `interact` flag.
+* Changed the display of custom blacklist messages to no longer include a period at the end.
+* Changed protection logic to consider connected chests.
+* Changed the heal and feed flags to increase values for players who are invincible (or in creative mode) but not decrease them.
+* Changed PvP protection to consider both attacker and defender locations.
+* Fixed missing protection data for some 1.8-added blocks.
+* Fixed compatibility issues with MC 1.7.
+* Fixed inverted daylight detectors not being protected.
+* Fixed spawn eggs not being included in protection.
+* Fixed piston blocking not working due to a bug in Spigot.
+* Fixed the blocking of certain invalid entity damage events.
+* Fixed creeper explosions not being blocked in certain situations with explosion related flags set.
+* Fixed "stickiness" with some position-related flags, sometimes resulting in rubber banding in the exit flags.
+* Fixed armor stands so that they are treated more like item frames than mobs.
+* Fixed blocks (e.g. sugar canes) adjacent to physics blocks (e.g. sand) not updating.
+* Fixed a NullPointerException that occurred sometimes when generating the scheduler section of the report function (`/wg report`).
+* Fixed the "no XP drops" configuration not functioning following a previous release.
+* Fixed changes to region ownership sometimes not triggering a region database save.
+* Fixed bucket protection displaying the "deny effect" even if bucket use was not prevented.
+* Fixed CommandFilter matching emoticons and other unwanted characters.
+* Fixed an exception occurring sometimes during game mode changes.
+* Fixed primed TNT being checked twice for TNT flags.
+
 ## 6.0 beta 5
 
 MC 1.7.9, 1.7.10 and 1.8 (Spigot only) are supported.
