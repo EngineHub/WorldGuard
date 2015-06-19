@@ -130,7 +130,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.OBSIDIAN, 0);
         MATERIAL_FLAGS.put(Material.TORCH, 0);
         MATERIAL_FLAGS.put(Material.FIRE, 0);
-        MATERIAL_FLAGS.put(Material.MOB_SPAWNER, 0);
+        MATERIAL_FLAGS.put(Material.MOB_SPAWNER, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.WOOD_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.CHEST, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.REDSTONE_WIRE, 0);
@@ -402,7 +402,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.CAULDRON_ITEM, 0);
         MATERIAL_FLAGS.put(Material.EYE_OF_ENDER, 0);
         MATERIAL_FLAGS.put(Material.SPECKLED_MELON, 0);
-        MATERIAL_FLAGS.put(Material.MONSTER_EGG, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.MONSTER_EGG, 0);
         MATERIAL_FLAGS.put(Material.EXP_BOTTLE, 0);
         MATERIAL_FLAGS.put(Material.FIREBALL, 0);
         MATERIAL_FLAGS.put(Material.BOOK_AND_QUILL, 0);
@@ -755,8 +755,7 @@ public final class Materials {
      * @return true to be considered as used
      */
     public static boolean isConsideredBuildingIfUsed(Material type) {
-        return type == Material.SAPLING
-            || type == Material.DIODE_BLOCK_OFF
+        return type == Material.DIODE_BLOCK_OFF
             || type == Material.DIODE_BLOCK_ON
             || type == Material.REDSTONE_COMPARATOR_OFF
             || type == Material.REDSTONE_COMPARATOR_ON;
