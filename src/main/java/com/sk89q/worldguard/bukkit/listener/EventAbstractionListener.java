@@ -451,7 +451,7 @@ public class EventAbstractionListener extends AbstractListener {
         boolean allowed = false;
 
         // Milk buckets can't be emptied as of writing
-        if (event.getBucket() == Material.MILK_BUCKET) {
+        if (event.getItemStack().getType() == Material.MILK_BUCKET) {
             allowed = true;
         }
 
