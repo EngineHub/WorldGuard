@@ -372,6 +372,9 @@ public class WorldGuardPlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerPortal(PlayerPortalEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getTo().getWorld());
+        if (!wcfg.regionNetherPortalProtection) return;
         if (event.getCause() != TeleportCause.NETHER_PORTAL) {
             return;
         }
@@ -398,8 +401,6 @@ public class WorldGuardPlayerListener implements Listener {
         World world = event.getTo().getWorld();
 
         ProtectedRegion check = new ProtectedCuboidRegion("__portalcheck__", BukkitUtil.toVector(min.getBlock()), BukkitUtil.toVector(max.getBlock()));
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(event.getPlayer(), world)) {
             ApplicableRegionSet set = plugin.getRegionContainer().get(event.getTo().getWorld()).getApplicableRegions(check);
