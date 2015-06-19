@@ -174,6 +174,7 @@ public class WorldConfiguration {
     public boolean disableSoilDehydration;
     public Set<Integer> allowedSnowFallOver;
     public boolean regionInvinciblityRemovesMobs;
+    public boolean regionNetherPortalProtection;
     public boolean fakePlayerBuildOverride;
     public boolean explosionFlagCancellation;
     public boolean disableDeathMessages;
@@ -453,6 +454,7 @@ public class WorldConfiguration {
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
+        regionNetherPortalProtection = getBoolean("region.nether-portal-protection", false);
         fakePlayerBuildOverride = getBoolean("regions.fake-player-build-override", true);
         explosionFlagCancellation = getBoolean("regions.explosion-flags-block-entity-damage", true);
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
