@@ -60,6 +60,7 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
 import com.sk89q.worldguard.util.Enums;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -201,9 +202,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"claim"},
-             usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
+             usage = "<id>",
              desc = "Claim a region",
-             min = 1)
+             min = 1, max = 1)
     public void claim(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -279,9 +280,9 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        region.getOwners().addPlayer(player.getName());
-
         RegionAdder task = new RegionAdder(plugin, manager, region);
+        task.setLocatorPolicy(UserLocatorPolicy.UUID_ONLY);
+        task.setOwnersInput(new String[]{player.getName()});
         ListenableFuture<?> future = plugin.getExecutorService().submit(task);
 
         AsyncCommandHelper.wrap(future, plugin, player)
