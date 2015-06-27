@@ -80,7 +80,7 @@ class RegionCommandsBase {
             if (sender instanceof Player) {
                 return WorldGuardPlugin.inst().checkPlayer(sender).getWorld();
             } else {
-                throw new CommandException("Please specify " + "the world with -" + flag + " world_name.");
+                throw new CommandException("Пожалуйста, используйте " + "мир с -" + flag + " название мира.");
             }
         }
     }
@@ -96,12 +96,12 @@ class RegionCommandsBase {
     protected static String checkRegionId(String id, boolean allowGlobal) throws CommandException {
         if (!ProtectedRegion.isValidId(id)) {
             throw new CommandException(
-                    "The region name of '" + id + "' contains characters that are not allowed.");
+                    "Название региона '" + id + "' содержит недопустимые символы.");
         }
 
         if (!allowGlobal && id.equalsIgnoreCase("__global__")) { // Sorry, no global
             throw new CommandException(
-                    "Sorry, you can't use __global__ here.");
+                    "Вы не моежете использовать __global__ здесь.");
         }
 
         return id;
@@ -134,7 +134,7 @@ class RegionCommandsBase {
             }
 
             throw new CommandException(
-                    "No region could be found with the name of '" + id + "'.");
+                    "Невозможно найти регион '" + id + "'.");
         }
 
         return region;
@@ -177,12 +177,12 @@ class RegionCommandsBase {
         if (set.size() == 0) {
             if (allowGlobal) {
                 ProtectedRegion global = checkExistingRegion(regionManager, "__global__", true);
-                player.sendMessage(ChatColor.GRAY + "You're not standing in any " +
-                        "regions. Using the global region for this world instead.");
+                player.sendMessage(ChatColor.GRAY + "Вы не стоите ни на одном из регионов. " +
+                        "Показана информация о глобальном регионе.");
                 return global;
             }
             throw new CommandException(
-                    "You're not standing in a region." +
+                    "Вы не стоите на регионе." +
                             "Specify an ID if you want to select a specific region.");
         } else if (set.size() > 1) {
             StringBuilder builder = new StringBuilder();
@@ -197,7 +197,7 @@ class RegionCommandsBase {
             }
 
             throw new CommandException(
-                    "You're standing in several regions (please pick one).\nYou're in: " + builder.toString());
+                    "Вы стоите на нескольких регионах, пожалуйста, выберите один из них).\nВы стоите на: " + builder.toString());
         }
 
         return set.iterator().next();
@@ -217,9 +217,7 @@ class RegionCommandsBase {
 
         if (selection == null) {
             throw new CommandException(
-                    "Please select an area first. " +
-                            "Use WorldEdit to make a selection! " +
-                            "(wiki: http://wiki.sk89q.com/wiki/WorldEdit).");
+                    "Сперва необходимо выделить регион. Используйте //wand для получения инструмента выделения.");
         }
 
         return selection;
@@ -234,8 +232,8 @@ class RegionCommandsBase {
      */
     protected static void checkRegionDoesNotExist(RegionManager manager, String id, boolean mayRedefine) throws CommandException {
         if (manager.hasRegion(id)) {
-            throw new CommandException("A region with that name already exists. Please choose another name." +
-                    (mayRedefine ? " To change the shape, use /region redefine " + id + "." : ""));
+            throw new CommandException("Регион с таким именем уже существует." +
+                    (mayRedefine ? " Чтобы переназначить регион, используйте /region redefine " + id + "." : ""));
         }
     }
 
