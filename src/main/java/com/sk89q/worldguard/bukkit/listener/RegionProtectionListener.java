@@ -179,12 +179,12 @@ public class RegionProtectionListener extends AbstractListener {
                 /* Flint and steel, fire charge, etc. */
                 if (type == Material.FIRE) {
                     canPlace = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_PLACE, DefaultFlag.LIGHTER));
-                    what = "place fire";
+                    what = "поджигать";
 
                 /* Everything else */
                 } else {
                     canPlace = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_PLACE));
-                    what = "place that block";
+                    what = "ставить блоки";
                 }
 
                 if (!canPlace) {
@@ -217,12 +217,12 @@ public class RegionProtectionListener extends AbstractListener {
                     /* TNT */
                     if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.MINECART_TNT) != null) {
                         canBreak = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_BREAK, DefaultFlag.TNT));
-                        what = "use dynamite";
+                        what = "использовать динамит";
 
                     /* Everything else */
                     } else {
                         canBreak = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_BREAK));
-                        what = "break that block";
+                        what = "ломать блоки";
                     }
 
                     if (!canBreak) {
@@ -255,32 +255,32 @@ public class RegionProtectionListener extends AbstractListener {
                 /* Saplings, etc. */
                 if (Materials.isConsideredBuildingIfUsed(type)) {
                     canUse = query.testBuild(target, associable, combine(event));
-                    what = "use that";
+                    what = "использовать это";
 
                 /* Inventory */
                 } else if (Materials.isInventoryBlock(type)) {
                     canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT, DefaultFlag.CHEST_ACCESS));
-                    what = "open that";
+                    what = "открыть это";
 
                 /* Beds */
                 } else if (type == Material.BED_BLOCK) {
                     canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT, DefaultFlag.SLEEP));
-                    what = "sleep";
+                    what = "спать";
 
                 /* TNT */
                 } else if (type == Material.TNT) {
                     canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT, DefaultFlag.TNT));
-                    what = "use explosives";
+                    what = "использовать взрывчатку";
 
                 /* Legacy USE flag */
                 } else if (Materials.isUseFlagApplicable(type)) {
                     canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT, DefaultFlag.USE));
-                    what = "use that";
+                    what = "использовать это";
 
                 /* Everything else */
                 } else {
                     canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT));
-                    what = "use that";
+                    what = "использовать это";
                 }
 
                 if (!canUse) {
@@ -311,26 +311,26 @@ public class RegionProtectionListener extends AbstractListener {
         /* Vehicles */
         if (Entities.isVehicle(type)) {
             canSpawn = query.testBuild(target, associable, combine(event, DefaultFlag.PLACE_VEHICLE));
-            what = "place vehicles";
+            what = "ставить вагонетки";
 
         /* Item pickup */
         } else if (event.getEntity() instanceof Item) {
             canSpawn = query.testBuild(target, associable, combine(event, DefaultFlag.ITEM_DROP));
-            what = "drop items";
+            what = "выкидывать вещи";
 
         /* XP drops */
         } else if (event.getEffectiveType() == EntityType.EXPERIENCE_ORB) {
             canSpawn = query.testBuild(target, associable, combine(event, DefaultFlag.EXP_DROPS));
-            what = "drop XP";
+            what = "выкидывать опыт";
 
         /* Everything else */
         } else {
             canSpawn = query.testBuild(target, associable, combine(event));
 
             if (event.getEntity() instanceof Item) {
-                what = "drop items";
+                what = "выкидывать вещи";
             } else {
-                what = "place things";
+                what = "делать это";
             }
         }
 
@@ -357,17 +357,17 @@ public class RegionProtectionListener extends AbstractListener {
         /* Vehicles */
         if (Entities.isVehicle(type)) {
             canDestroy = query.testBuild(target, associable, combine(event, DefaultFlag.DESTROY_VEHICLE));
-            what = "break vehicles";
+            what = "ломать вагонетки";
 
         /* Item pickup */
         } else if (event.getEntity() instanceof Item || event.getEntity() instanceof ExperienceOrb) {
             canDestroy = query.testBuild(target, associable, combine(event, DefaultFlag.ITEM_PICKUP));
-            what = "pick up items";
+            what = "поднимать предметы";
 
         /* Everything else */
         } else {
             canDestroy = query.testBuild(target, associable, combine(event));
-            what = "break things";
+            what = "ломать вещи";
         }
 
         if (!canDestroy) {
@@ -393,22 +393,22 @@ public class RegionProtectionListener extends AbstractListener {
         if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())
                 || Entities.isNPC(event.getEntity()) || Entities.isVehicle(event.getEntity().getType())) {
             canUse = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
-            what = "use that";
+            what = "использовать это";
 
         /* Paintings, item frames, etc. */
         } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
             canUse = query.testBuild(target, associable, combine(event));
-            what = "change that";
+            what = "изменять это";
 
         /* Ridden on use */
         } else if (Entities.isRiddenOnUse(event.getEntity())) {
             canUse = query.testBuild(target, associable, combine(event, DefaultFlag.RIDE, DefaultFlag.INTERACT));
-            what = "ride that";
+            what = "ездить на этом";
 
         /* Everything else */
         } else {
             canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT));
-            what = "use that";
+            what = "использовать это";
         }
 
         if (!canUse) {
@@ -443,12 +443,12 @@ public class RegionProtectionListener extends AbstractListener {
         if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())
                 || Entities.isVehicle(event.getEntity().getType())) {
             canDamage = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
-            what = "hit that";
+            what = "ударять это";
 
         /* Paintings, item frames, etc. */
         } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
             canDamage = query.testBuild(target, associable, combine(event));
-            what = "change that";
+            what = "изменять это";
 
         /* PVP */
         } else if (pvp) {
@@ -463,22 +463,22 @@ public class RegionProtectionListener extends AbstractListener {
                 canDamage = true;
             }
 
-            what = "PvP";
+            what = "драться";
 
         /* Player damage not caused  by another player */
         } else if (event.getEntity() instanceof Player) {
             canDamage = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
-            what = "damage that";
+            what = "ударять это";
 
         /* damage to non-hostile mobs (e.g. animals) */
         } else if (Entities.isNonHostile(event.getEntity())) {
             canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.DAMAGE_ANIMALS));
-            what = "harm that";
+            what = "наносить вред";
 
         /* Everything else */
         } else {
             canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT));
-            what = "hit that";
+            what = "ударять это";
         }
 
         if (!canDamage) {
