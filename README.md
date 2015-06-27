@@ -1,31 +1,32 @@
-# ![WorldGuard](http://static.sk89q.com/readme/worldguard-new.png)
+# ![WorldGuardRus](http://static.sk89q.com/readme/worldguard-new.png)
 
-WorldGuard lets you and players guard areas of land against griefers and undesirables, as well as tweak and disable various gameplay features of Minecraft.
+Русифицированная версия от RainbowKiwiFOX.
 
-* Block creeper and wither block damage, falling damage, etc.;
-* Disable fire spread, lava fire spread, ice formation, Endermen picking up blocks, etc.;
-* Blacklist certain items and blocks so they can't be used;
-* Warn moderators when certain items and blocks are used;
-* Protect areas of your world so only certain people can build in them;
-* Set areas where PVP, TNT, mob damage, and other features are disabled;
-* Protect your server from various 'exploits' like magical obsidian creation machines;
-* Disable, or enable, various Minecraft features, like sponges from classic;
-* Add useful commands like an immediate "STOP ALL FIRE SPREAD" command.
-* Enable only features you want! Everything is off by default.
+WorldGuard позволяет игрокам защитить свою территорию, а так же настроить и отключить различные особенности геймплея Майнкрафт.
+* Отключения урона блокам от взрыва крипера и иссушителя, отключение урона от падения и т.д.;
+* Запрет распространения огня, формирования льда, гриферства эндерменами и т.д.;
+* Запрет использования определёных блоков и предметов;
+* Уведомление администрации о использовании запрещёных блоков;
+* Защита территории, возможность ограничения строительства на ней только определеным игрокам;
+* Установка зон, где выключен/выключен PVP-, TNT-, mob-урон;
+* Защита сервера от "эксплойтов", таких как генератор обсидиана и т.д.;
+* Включение/выключение Minecraft-фич, таких как губка;
+* Дополнительные команды, такие как остановка распространения огня и т.д.;
+* Включите только необходимые функции! Всё по умолчанию выключено.
 
-WorldGuard is open source and is available under the GNU Lesser
+WorldGuard проект с открытым исходным кодом и распространяется по GNU Lesser
 General Public License v3.
 
 Currently, Bukkit is required to use WorldGuard. You can get a release copy of WorldGuard from the [BukkitDev site](http://dev.bukkit.org/bukkit-plugins/worldguard/).
 
-Compiling
+Компиляция
 ---------
 
-The project is written for Java 6 and our build process makes use of
-[Maven](http://maven.apache.org). Detailed compilation information
-[can be found on the wiki](http://wiki.sk89q.com/wiki/WorldGuard/Development#Compiling).
+Проект написан на Java 6 и использует 
+[Maven](http://maven.apache.org). Подробнее о компиляции
+[можно почитать в вики](http://wiki.sk89q.com/wiki/WorldGuard/Development#Compiling).
 
-Dependencies are automatically handled by Maven.
+Зависимостей осуществляется автоматически с помощью Maven.
 
 Contributing
 ------------
@@ -36,7 +37,7 @@ Please read CONTRIBUTING.md for important guidelines to follow.
 
 Submissions must be licensed under the GNU Lesser General Public License v3.
 
-Links
+Ссылки
 -----
 
 * [Homepage](http://enginehub.org/worldguard)
