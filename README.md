@@ -1,6 +1,6 @@
 # ![WorldGuardRus](http://static.sk89q.com/readme/worldguard-new.png)
 
-Русифицированная версия от RainbowKiwiFOX.
+Русифицированная версия от RainbowKiwiFOX. О найденых недорусификациях пишите в ВК: vk.com/id87401066
 
 WorldGuard позволяет игрокам защитить свою территорию, а так же настроить и отключить различные особенности геймплея Майнкрафт.
 * Отключения урона блокам от взрыва крипера и иссушителя, отключение урона от падения и т.д.;
@@ -26,7 +26,7 @@ Currently, Bukkit is required to use WorldGuard. You can get a release copy of W
 [Maven](http://maven.apache.org). Подробнее о компиляции
 [можно почитать в вики](http://wiki.sk89q.com/wiki/WorldGuard/Development#Compiling).
 
-Зависимостей осуществляется автоматически с помощью Maven.
+Зависимости осуществляются автоматически с помощью Maven.
 
 Contributing
 ------------
