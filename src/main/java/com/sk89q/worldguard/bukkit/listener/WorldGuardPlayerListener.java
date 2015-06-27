@@ -372,13 +372,13 @@ public class WorldGuardPlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerPortal(PlayerPortalEvent event) {
+        if (event.getTo() == null) { // apparently this counts as a cancelled event, implementation specific though
+            return;
+        }
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(event.getTo().getWorld());
         if (!wcfg.regionNetherPortalProtection) return;
         if (event.getCause() != TeleportCause.NETHER_PORTAL) {
-            return;
-        }
-        if (event.getTo() == null) { // apparently this counts as a cancelled event, implementation specific though
             return;
         }
         if (!event.useTravelAgent()) { // either end travel (even though we checked cause) or another plugin is fucking with us, shouldn't create a portal though
