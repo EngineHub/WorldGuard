@@ -40,7 +40,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
 
     /**
      * Construct a new instance of this cuboid region.
-     * transience will be set to false, and this region can be saved.
+     * <code>transience</code> will be set to false, and this region can be saved.
      *
      * @param id the region id
      * @param pt1 the first point of this region

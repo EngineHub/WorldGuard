@@ -40,7 +40,7 @@ public class GlobalProtectedRegion extends ProtectedRegion {
 
     /**
      * Create a new instance.
-     * transience will be set to false, and this region can be saved.
+     * <code>transience</code> will be set to false, and this region can be saved.
      *
      * @param id the ID
      */
