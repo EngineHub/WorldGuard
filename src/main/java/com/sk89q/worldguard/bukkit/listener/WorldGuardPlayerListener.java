@@ -29,13 +29,16 @@ import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.MoveType;
+import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GameModeFlag;
 import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.TravelAgent;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -84,12 +87,15 @@ public class WorldGuardPlayerListener implements Listener {
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
-        GameModeFlag handler = plugin.getSessionManager().get(player).getHandler(GameModeFlag.class);
-        if (handler != null && wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())) {
-            GameMode expected = handler.getSetGameMode();
-            if (handler.getOriginalGameMode() != null && expected != null && expected != event.getNewGameMode()) {
-                log.info("Game mode change on " + player.getName() + " has been blocked due to the region GAMEMODE flag");
-                event.setCancelled(true);
+        Session session = plugin.getSessionManager().getIfPresent(player);
+        if (session != null) {
+            GameModeFlag handler = session.getHandler(GameModeFlag.class);
+            if (handler != null && wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, player.getWorld())) {
+                GameMode expected = handler.getSetGameMode();
+                if (handler.getOriginalGameMode() != null && expected != null && expected != event.getNewGameMode()) {
+                    log.info("Game mode change on " + player.getName() + " has been blocked due to the region GAMEMODE flag");
+                    event.setCancelled(true);
+                }
             }
         }
     }
@@ -360,6 +366,48 @@ public class WorldGuardPlayerListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onPlayerPortal(PlayerPortalEvent event) {
+        if (event.getTo() == null) { // apparently this counts as a cancelled event, implementation specific though
+            return;
+        }
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(event.getTo().getWorld());
+        if (!wcfg.regionNetherPortalProtection) return;
+        if (event.getCause() != TeleportCause.NETHER_PORTAL) {
+            return;
+        }
+        if (!event.useTravelAgent()) { // either end travel (even though we checked cause) or another plugin is fucking with us, shouldn't create a portal though
+            return;
+        }
+        TravelAgent pta = event.getPortalTravelAgent();
+        if (pta == null) { // possible, but shouldn't create a portal
+            return;
+        }
+        if (pta.findPortal(event.getTo()) != null) {
+            return; // portal exists...it shouldn't make a new one
+        }
+        // HOPEFULLY covered everything the server can throw at us...proceed protection checking
+        // a lot of that is implementation specific though
+
+        // hackily estimate the area that could be effected by this event, since the server refuses to tell us
+        int radius = pta.getCreationRadius();
+        Location min = event.getTo().clone().subtract(radius, radius, radius);
+        Location max = event.getTo().clone().add(radius, radius, radius);
+        World world = event.getTo().getWorld();
+
+        ProtectedRegion check = new ProtectedCuboidRegion("__portalcheck__", BukkitUtil.toVector(min.getBlock()), BukkitUtil.toVector(max.getBlock()));
+
+        if (wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(event.getPlayer(), world)) {
+            ApplicableRegionSet set = plugin.getRegionContainer().get(event.getTo().getWorld()).getApplicableRegions(check);
+            if (!set.testState(plugin.wrapPlayer(event.getPlayer()), DefaultFlag.BUILD)) {
+                event.getPlayer().sendMessage(ChatColor.RED + "Destination is in a protected area.");
+                event.setCancelled(true);
+                return;
             }
         }
     }

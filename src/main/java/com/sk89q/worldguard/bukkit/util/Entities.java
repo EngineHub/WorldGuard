@@ -134,6 +134,17 @@ public final class Entities {
     }
 
     /**
+     * Test whether an entity is a non-hostile creature.
+     *
+     * @param entity
+     * @return true if non-hostile
+     */
+    public static boolean isNonHostile(Entity entity) {
+        return !isHostile(entity)
+                && (entity instanceof Creature || entity instanceof WaterMob);
+    }
+
+    /**
      * Test whether an entity is ambient.
      *
      * @param entity the entity

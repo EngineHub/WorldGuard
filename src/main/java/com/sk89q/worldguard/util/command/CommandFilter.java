@@ -64,7 +64,7 @@ public class CommandFilter implements Predicate<String> {
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean apply(String command) {
-        command = command.toLowerCase().replaceAll("^/([^:]*:)?", "/");
+        command = command.toLowerCase().replaceAll("^/([^ :]*:)?", "/");
 
          /*
          * denied      used        allow?

@@ -390,7 +390,8 @@ public class RegionProtectionListener extends AbstractListener {
         String what;
 
         /* Hostile / ambient mob override */
-        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity()) || Entities.isNPC(event.getEntity())) {
+        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())
+                || Entities.isNPC(event.getEntity()) || Entities.isVehicle(event.getEntity().getType())) {
             canUse = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
             what = "use that";
 
@@ -439,7 +440,8 @@ public class RegionProtectionListener extends AbstractListener {
         }
 
         /* Hostile / ambient mob override */
-        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())) {
+        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())
+                || Entities.isVehicle(event.getEntity().getType())) {
             canDamage = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
             what = "hit that";
 
@@ -453,7 +455,8 @@ public class RegionProtectionListener extends AbstractListener {
             Player defender = (Player) event.getEntity();
 
             canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.PVP))
-                    && query.queryState(playerAttacker.getLocation(), playerAttacker, combine(event, DefaultFlag.PVP)) != State.DENY;
+                    && query.queryState(playerAttacker.getLocation(), playerAttacker, combine(event, DefaultFlag.PVP)) != State.DENY
+                    && query.queryState(target, playerAttacker, combine(event, DefaultFlag.PVP)) != State.DENY;
 
             // Fire the disallow PVP event
             if (!canDamage && Events.fireAndTestCancel(new DisallowedPVPEvent(playerAttacker, defender, event.getOriginalEvent()))) {
@@ -466,6 +469,11 @@ public class RegionProtectionListener extends AbstractListener {
         } else if (event.getEntity() instanceof Player) {
             canDamage = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
             what = "damage that";
+
+        /* damage to non-hostile mobs (e.g. animals) */
+        } else if (Entities.isNonHostile(event.getEntity())) {
+            canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.DAMAGE_ANIMALS));
+            what = "harm that";
 
         /* Everything else */
         } else {

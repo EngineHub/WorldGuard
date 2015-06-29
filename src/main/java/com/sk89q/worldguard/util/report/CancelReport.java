@@ -40,6 +40,7 @@ public class CancelReport implements Report {
     private final List<CancelAttempt> cancels;
     private final HandlerTracer tracer;
     private final int stackTruncateLength;
+    private boolean detectingPlugin = true;
 
     public <T extends Event & Cancellable> CancelReport(T event, List<CancelAttempt> cancels, int stackTruncateLength) {
         checkNotNull(event, "event");
@@ -49,6 +50,14 @@ public class CancelReport implements Report {
         this.cancels = cancels;
         this.tracer = new HandlerTracer(event);
         this.stackTruncateLength = stackTruncateLength;
+    }
+
+    public boolean isDetectingPlugin() {
+        return detectingPlugin;
+    }
+
+    public void setDetectingPlugin(boolean detectingPlugin) {
+        this.detectingPlugin = detectingPlugin;
     }
 
     private StackTraceElement[] truncateStackTrace(StackTraceElement[] elements) {
@@ -87,7 +96,7 @@ public class CancelReport implements Report {
                 builder.append(getCancelText(cancel.getAfter()));
                 builder.append(" by ");
 
-                if (cause != null) {
+                if (detectingPlugin && cause != null) {
                     builder.append(cause.getName());
                 } else {
                     builder.append(" (NOT KNOWN - use the stack trace below)");
