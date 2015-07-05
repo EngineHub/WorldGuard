@@ -249,7 +249,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
     private void appendRegionInformation() {
         builder.append(ChatColor.GRAY);
         builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
-        builder.append(" Region Info ");
+        builder.append(" Информация о регионе ");
         builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
         newLine();
         appendBasics();
@@ -259,7 +259,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
         appendBounds();
 
         if (cache != null) {
-            builder.append(ChatColor.GRAY).append("Имена помеченые звёздочкой являются последними именами на этом UUID.");
+            builder.append(ChatColor.GRAY).append("Имена, помеченые звёздочкой, являются последними именами на этом UUID.");
             newLine();
         }
     }

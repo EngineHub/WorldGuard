@@ -197,7 +197,7 @@ class RegionCommandsBase {
             }
 
             throw new CommandException(
-                    "Вы стоите на нескольких регионах, пожалуйста, выберите один из них).\nВы стоите на: " + builder.toString());
+                    "Вы стоите на нескольких регионах, пожалуйста, выберите один из них.\nВы стоите на: " + builder.toString());
         }
 
         return set.iterator().next();
