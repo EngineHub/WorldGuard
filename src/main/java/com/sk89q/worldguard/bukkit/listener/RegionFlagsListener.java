@@ -32,9 +32,8 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -90,25 +89,22 @@ public class RegionFlagsListener extends AbstractListener {
             }
         }
 
-        Entity entity;
-        if ((entity = event.getCause().getFirstNonPlayerEntity()) != null) {
-            // ================================================================
-            // CREEPER_EXPLOSION flag
-            // ================================================================
+        // ================================================================
+        // CREEPER_EXPLOSION flag
+        // ================================================================
 
-            if (entity instanceof Creeper) { // Creeper
-                event.filter(testState(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
-            }
-
-            // ================================================================
-            // ENDERDRAGON_BLOCK_DAMAGE flag
-            // ================================================================
-
-            if (entity instanceof EnderDragon) { // Enderdragon
-                event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
-            }
-
+        if (event.getCause().find(EntityType.CREEPER) != null) { // Creeper
+            event.filter(testState(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
         }
+
+        // ================================================================
+        // ENDERDRAGON_BLOCK_DAMAGE flag
+        // ================================================================
+
+        if (event.getCause().find(EntityType.ENDER_DRAGON) != null) { // Enderdragon
+            event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
+        }
+
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
