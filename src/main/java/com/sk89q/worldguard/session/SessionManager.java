@@ -143,8 +143,8 @@ public class SessionManager implements Runnable, Listener {
         session.register(new NotifyExitFlag(session));
         session.register(new EntryFlag(session));
         session.register(new ExitFlag(session));
-        session.register(new GreetingFlag(session));
         session.register(new FarewellFlag(session));
+        session.register(new GreetingFlag(session));
         session.register(new GameModeFlag(session));
         session.register(new InvincibilityFlag(session));
         session.register(new TimeLockFlag(session));
