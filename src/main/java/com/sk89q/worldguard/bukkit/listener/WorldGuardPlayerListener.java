@@ -164,7 +164,7 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
 
-        String hostKey = cfg.hostKeys.get(player.getName().toLowerCase());
+        String hostKey = cfg.hostKeys.get(player.getUniqueId().toString());
         if (hostKey != null) {
             String hostname = event.getHostname();
             int colonIndex = hostname.indexOf(':');
