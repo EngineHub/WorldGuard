@@ -96,9 +96,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"define", "def", "d", "create"},
-             usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
+             usage = "<название> [<владелец1> [<владелец2> [<владелецы...>]]]",
              flags = "ng",
-             desc = "Defines a region",
+             desc = "Назначить регион",
              min = 1)
     public void define(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -131,11 +131,11 @@ public final class RegionCommands extends RegionCommandsBase {
 
         AsyncCommandHelper.wrap(future, plugin, player)
                 .formatUsing(id)
-                .registerWithSupervisor("Adding the region '%s'...")
-                .sendMessageAfterDelay("(Please wait... adding '%s'...)")
+                .registerWithSupervisor("Добавление региона '%s'...")
+                .sendMessageAfterDelay("(Пожалуйста, подождите... Добавление '%s'...)")
                 .thenRespondWith(
-                        "A new region has been made named '%s'.",
-                        "Failed to add the region '%s'");
+                        "Новый регион назван '%s'.",
+                        "Ошибка при создании региона '%s'");
     }
 
     /**
@@ -146,8 +146,8 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"redefine", "update", "move"},
-             usage = "<id>",
-             desc = "Re-defines the shape of a region",
+             usage = "<название>",
+             desc = "Переназначить существующий регион",
              flags = "g",
              min = 1, max = 1)
     public void redefine(CommandContext args, CommandSender sender) throws CommandException {
@@ -184,11 +184,11 @@ public final class RegionCommands extends RegionCommandsBase {
 
         AsyncCommandHelper.wrap(future, plugin, player)
                 .formatUsing(id)
-                .registerWithSupervisor("Updating the region '%s'...")
-                .sendMessageAfterDelay("(Please wait... updating '%s'...)")
+                .registerWithSupervisor("Обновление региона '%s'...")
+                .sendMessageAfterDelay("(Пожалуйста, подождите... Обновление '%s'...)")
                 .thenRespondWith(
-                        "Region '%s' has been updated with a new area.",
-                        "Failed to update the region '%s'");
+                        "Регион '%s' переназначен на выделеную территорию.",
+                        "Ошибка при создании региона '%s'");
     }
 
     /**
@@ -202,8 +202,8 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"claim"},
-             usage = "<id>",
-             desc = "Claim a region",
+             usage = "<название>",
+             desc = "Заприватить регион",
              min = 1, max = 1)
     public void claim(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -232,7 +232,7 @@ public final class RegionCommands extends RegionCommandsBase {
             if (maxRegionCount >= 0
                     && manager.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
                 throw new CommandException(
-                        "You own too many regions, delete one first to claim a new one.");
+                        "У вас слишком много регионов, удалите старые прежде чем создать новый.");
             }
         }
 
@@ -242,7 +242,7 @@ public final class RegionCommands extends RegionCommandsBase {
         if (existing != null) {
             if (!existing.getOwners().contains(localPlayer)) {
                 throw new CommandException(
-                        "This region already exists and you don't own it.");
+                        "Такой регион уже есть и вы не его владелец.");
             }
         }
 
@@ -252,7 +252,7 @@ public final class RegionCommands extends RegionCommandsBase {
         // Check if this region overlaps any other region
         if (regions.size() > 0) {
             if (!regions.isOwnerOfAll(localPlayer)) {
-                throw new CommandException("This region overlaps with someone else's region.");
+                throw new CommandException("Этот регион пересекается с другии.");
             }
         } else {
             if (wcfg.claimOnlyInsideExistingRegions) {
@@ -273,9 +273,9 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             if (region.volume() > wcfg.maxClaimVolume) {
-                player.sendMessage(ChatColor.RED + "This region is too large to claim.");
+                player.sendMessage(ChatColor.RED + "Вы выделили слишком большой участок.");
                 player.sendMessage(ChatColor.RED +
-                        "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
+                        "Максимальный размер: " + wcfg.maxClaimVolume + ", вы выделили размер: " + region.volume());
                 return;
             }
         }
@@ -287,11 +287,11 @@ public final class RegionCommands extends RegionCommandsBase {
 
         AsyncCommandHelper.wrap(future, plugin, player)
                 .formatUsing(id)
-                .registerWithSupervisor("Claiming the region '%s'...")
-                .sendMessageAfterDelay("(Please wait... claiming '%s'...)")
+                .registerWithSupervisor("Создание региона '%s'...")
+                .sendMessageAfterDelay("(Пожалуйста, подождите... создание '%s'...)")
                 .thenRespondWith(
-                        "A new region has been claimed named '%s'.",
-                        "Failed to claim the region '%s'");
+                        "Регион '%s' создан!",
+                        "Ошибка при создании региона '%s'");
     }
 
     /**
@@ -302,8 +302,8 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"select", "sel", "s"},
-             usage = "[id]",
-             desc = "Load a region as a WorldEdit selection",
+             usage = "[название]",
+             desc = "Загрузка выделения из WorldEdit",
              min = 0, max = 1)
     public void select(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
@@ -335,9 +335,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"info", "i"},
-             usage = "[id]",
+             usage = "[название]",
              flags = "usw:",
-             desc = "Get information about a region",
+             desc = "Получить информацию о регионе",
              min = 0, max = 1)
     public void info(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -351,8 +351,8 @@ public final class RegionCommands extends RegionCommandsBase {
 
         if (args.argsLength() == 0) { // Get region from where the player is
             if (!(sender instanceof Player)) {
-                throw new CommandException("Please specify " +
-                        "the region with /region info -w world_name region_name.");
+                throw new CommandException("Пожалуйста, используйте " +
+                        "/region info -w <название мира> <название региона>.");
             }
             
             existing = checkRegionStandingIn(manager, (Player) sender, true);
@@ -383,12 +383,12 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // If it takes too long...
         FutureProgressListener.addProgressListener(
-                future, sender, "(Please wait... fetching region information...)");
+                future, sender, "(Пожалуйста, подождите... получение информации о регионах...)");
 
         // Send a response message
         Futures.addCallback(future,
                 new Builder(plugin, sender)
-                        .onFailure("Failed to fetch region information")
+                        .onFailure("Не удалось получить информацию")
                         .build());
     }
 
@@ -400,8 +400,8 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"list"},
-             usage = "[page]",
-             desc = "Get a list of regions",
+             usage = "[страница]",
+             desc = "Получение списка ваших регионов",
              flags = "np:w:",
              max = 1)
     public void list(CommandContext args, CommandSender sender) throws CommandException {
@@ -442,9 +442,9 @@ public final class RegionCommands extends RegionCommandsBase {
         ListenableFuture<?> future = plugin.getExecutorService().submit(task);
 
         AsyncCommandHelper.wrap(future, plugin, sender)
-                .registerWithSupervisor("Getting list of regions...")
-                .sendMessageAfterDelay("(Please wait... fetching region list...)")
-                .thenTellErrorsOnly("Failed to fetch region list");
+                .registerWithSupervisor("Получение списка регионов...")
+                .sendMessageAfterDelay("(Пожалуйста, подождите... Получение списка регионов...)")
+                .thenTellErrorsOnly("Не удалось получить список регионов");
     }
 
     /**
@@ -455,9 +455,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"flag", "f"},
-             usage = "<id> <flag> [-w world] [-g group] [value]",
+             usage = "<название> <флаг> [-w мир] [-g группа] [значение]",
              flags = "g:w:e",
-             desc = "Set flags",
+             desc = "Установить флаг на регион",
              min = 2)
     public void flag(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -470,7 +470,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         if (args.hasFlag('e')) {
             if (value != null) {
-                throw new CommandException("You cannot use -e(mpty) with a flag value.");
+                throw new CommandException("Вы не можнте установить пустое значение флага.");
             }
 
             value = "";
@@ -511,8 +511,8 @@ public final class RegionCommands extends RegionCommandsBase {
                 list.append(flag.getName());
             }
 
-            sender.sendMessage(ChatColor.RED + "Unknown flag specified: " + flagName);
-            sender.sendMessage(ChatColor.RED + "Available " + "flags: " + list);
+            sender.sendMessage(ChatColor.RED + "Неизвестный флаг: " + flagName);
+            sender.sendMessage(ChatColor.RED + "Доступные " + "флаги: " + list);
             
             return;
         }
@@ -530,8 +530,8 @@ public final class RegionCommands extends RegionCommandsBase {
             RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
             
             if (groupFlag == null) {
-                throw new CommandException("Region flag '" + foundFlag.getName()
-                        + "' does not have a group flag!");
+                throw new CommandException("Флаг '" + foundFlag.getName()
+                        + "' не может быть групповым флагом!");
             }
 
             // Parse the [-g group] separately so entire command can abort if parsing
@@ -554,8 +554,8 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag " + foundFlag.getName() + " set on '" +
-                    existing.getId() + "' to '" + ChatColor.stripColor(value) + "'.");
+                    + "Флаг '" + foundFlag.getName() + "' установлен на регион' " +
+                    existing.getId() + "' в значении '" + ChatColor.stripColor(value) + "'.");
         
         // No value? Clear the flag, if -g isn't specified
         } else if (!args.hasFlag('g')) {
@@ -569,7 +569,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag " + foundFlag.getName() + " removed from '" +
+                    + "Флаг '" + foundFlag.getName() + "' удалён с региона '" +
                     existing.getId() + "'. (Any -g(roups) were also removed.)");
         }
 
@@ -581,19 +581,19 @@ public final class RegionCommands extends RegionCommandsBase {
             if (groupValue == groupFlag.getDefault()) {
                 existing.setFlag(groupFlag, null);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' reset to " +
-                                "default.");
+                        + "Групповой флаг '" + foundFlag.getName() + "' сброшен " +
+                                "в стандартное значение.");
             } else {
                 existing.setFlag(groupFlag, groupValue);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' set.");
+                        + "Групповой флаг '" + foundFlag.getName() + "' установлен.");
             }
         }
 
         // Print region information
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, null);
         printout.append(ChatColor.GRAY);
-        printout.append("(Current flags: ");
+        printout.append("(Текущие флаги: ");
         printout.appendFlagsList(false);
         printout.append(")");
         printout.send(sender);
@@ -607,9 +607,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"setpriority", "priority", "pri"},
-             usage = "<id> <priority>",
+             usage = "<название> <приоритет>",
              flags = "w:",
-             desc = "Set the priority of a region",
+             desc = "Установить приоритет региона",
              min = 2, max = 2)
     public void setPriority(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -629,7 +629,7 @@ public final class RegionCommands extends RegionCommandsBase {
         existing.setPriority(priority);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Priority of '" + existing.getId() + "' set to "
+                + "Приоритет '" + existing.getId() + "' установлен на регион "
                 + priority + " (higher numbers override).");
     }
 
@@ -641,9 +641,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"setparent", "parent", "par"},
-             usage = "<id> [parent-id]",
+             usage = "<название> [родительский регион]",
              flags = "w:",
-             desc = "Set the parent of a region",
+             desc = "Установить родительский регион",
              min = 1, max = 2)
     public void setParent(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -708,9 +708,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"remove", "delete", "del", "rem"},
-             usage = "<id>",
+             usage = "<название>",
              flags = "fuw:",
-             desc = "Remove a region",
+             desc = "Удалить регион",
              min = 1, max = 1)
     public void remove(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -740,11 +740,11 @@ public final class RegionCommands extends RegionCommandsBase {
 
         AsyncCommandHelper.wrap(plugin.getExecutorService().submit(task), plugin, sender)
                 .formatUsing(existing.getId())
-                .registerWithSupervisor("Removing the region '%s'...")
-                .sendMessageAfterDelay("(Please wait... removing '%s'...)")
+                .registerWithSupervisor("Удаление региона '%s'...")
+                .sendMessageAfterDelay("(Пожалуйста, подождите... Удаление региона '%s'...)")
                 .thenRespondWith(
-                        "The region named '%s' has been removed.",
-                        "Failed to remove the region '%s'");
+                        "Регион '%s' успешно удалён.",
+                        "Ошибка при удалении региона '%s'");
     }
 
     /**
@@ -755,8 +755,8 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"load", "reload"},
-            usage = "[world]",
-            desc = "Reload regions from file",
+            usage = "[мир]",
+            desc = "Перезагрузить конфиги",
             flags = "w:")
     public void load(CommandContext args, final CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -798,11 +798,11 @@ public final class RegionCommands extends RegionCommandsBase {
             ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerReloader(managers));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
-                    .registerWithSupervisor("Loading regions for all worlds")
-                    .sendMessageAfterDelay("(Please wait... loading region data for all worlds...)")
+                    .registerWithSupervisor("Загрузка регионов")
+                    .sendMessageAfterDelay("(Пожалуйста, подождите... загрузка регионов с диска...)")
                     .thenRespondWith(
-                            "Successfully load the region data for all worlds.",
-                            "Failed to load regions for all worlds");
+                            "Регионы успешно загружены!",
+                            "Ошибка при загрузке регионов");
         }
     }
 
@@ -814,8 +814,8 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"save", "write"},
-            usage = "[world]",
-            desc = "Re-save regions to file",
+            usage = "[мир]",
+            desc = "Пересохранить все регионы на диск",
             flags = "w:")
     public void save(CommandContext args, final CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -857,11 +857,11 @@ public final class RegionCommands extends RegionCommandsBase {
             ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerSaver(managers));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
-                    .registerWithSupervisor("Saving regions for all worlds")
-                    .sendMessageAfterDelay("(Please wait... saving region data for all worlds...)")
+                    .registerWithSupervisor("Сохранение регионов")
+                    .sendMessageAfterDelay("(Пожалуйста, подождите... сохранение на диск всех регионов...)")
                     .thenRespondWith(
-                            "Successfully saved the region data for all worlds.",
-                            "Failed to save regions for all worlds");
+                            "Все регионы успешно сохранены!",
+                            "Ошибка при сохранении регионов.");
         }
     }
 
@@ -995,9 +995,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"teleport", "tp"},
-             usage = "<id>",
+             usage = "<название>",
              flags = "s",
-             desc = "Teleports you to the location associated with the region.",
+             desc = "Телепортация  в регион.",
              min = 1, max = 1)
     public void teleport(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
@@ -1018,18 +1018,18 @@ public final class RegionCommands extends RegionCommandsBase {
             
             if (teleportLocation == null) {
                 throw new CommandException(
-                        "The region has no spawn point associated.");
+                        "В регионе не установлена точка спауна.");
             }
         } else {
             teleportLocation = existing.getFlag(DefaultFlag.TELE_LOC);
             
             if (teleportLocation == null) {
                 throw new CommandException(
-                        "The region has no teleport point associated.");
+                        "В регионе не установлена точка спауна.");
             }
         }
 
         player.teleport(BukkitUtil.toLocation(teleportLocation));
-        sender.sendMessage("Teleported you to the region '" + existing.getId() + "'.");
+        sender.sendMessage("Телепортация в регион '" + existing.getId() + "'.");
     }
 }

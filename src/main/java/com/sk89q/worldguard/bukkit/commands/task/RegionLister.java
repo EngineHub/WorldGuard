@@ -177,8 +177,8 @@ public class RegionLister implements Callable<Integer> {
         final int pages = (int) Math.ceil(totalSize / (float) pageSize);
 
         sender.sendMessage(ChatColor.RED
-                + (ownerMatcher == null ? "Regions (page " : "Regions for " + ownerMatcher.getName() + " (page ")
-                + (page + 1) + " of " + pages + "):");
+                + (ownerMatcher == null ? "Список регионов (лист " : "Регионы  " + ownerMatcher.getName() + " (страница ")
+                + (page + 1) + " из " + pages + "):");
 
         if (page < pages) {
             // Print
