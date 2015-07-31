@@ -22,7 +22,9 @@ package com.sk89q.worldguard.bukkit.util.report;
 import com.google.common.collect.Maps;
 import com.sk89q.worldguard.util.report.DataReport;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 
 import java.util.List;
@@ -46,6 +48,23 @@ public class PerformanceReport extends DataReport {
             report.append("Chunk Count", loadedChunkCount);
 
             Map<Class<? extends Entity>, Integer> entityCounts = Maps.newHashMap();
+            Map<Class<? extends BlockState>, Integer> tileEntityCounts = Maps.newHashMap();
+
+            // Collect tile entities
+            int teCount = 0;
+            for (Chunk chunk : world.getLoadedChunks()) {
+                teCount += chunk.getTileEntities().length;
+                for (BlockState state : chunk.getTileEntities()) {
+                    Class<? extends BlockState> cls = state.getClass();
+
+                    if (tileEntityCounts.containsKey(cls)) {
+                        tileEntityCounts.put(cls, tileEntityCounts.get(cls) + 1);
+                    } else {
+                        tileEntityCounts.put(cls, 1);
+                    }
+                }
+            }
+            report.append("Tile Entity Count", teCount);
 
             // Collect entities
             for (Entity entity : world.getEntities()) {
@@ -66,6 +85,15 @@ public class PerformanceReport extends DataReport {
                         (float) (entry.getValue() / (double) loadedChunkCount));
             }
             report.append(entities.getTitle(), entities);
+
+            // Print tile entities
+            DataReport tileEntities = new DataReport("Tile Entity Distribution");
+            for (Map.Entry<Class<? extends BlockState>, Integer> entry : tileEntityCounts.entrySet()) {
+                tileEntities.append(entry.getKey().getSimpleName(), "%d [%f/chunk]",
+                        entry.getValue(),
+                        (float) (entry.getValue() / (double) loadedChunkCount));
+            }
+            report.append(tileEntities.getTitle(), tileEntities);
 
             append(report.getTitle(), report);
         }
