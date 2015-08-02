@@ -540,7 +540,7 @@ public final class RegionCommands extends RegionCommandsBase {
             // Parse the [-g group] separately so entire command can abort if parsing
             // the [value] part throws an error.
             try {
-                groupValue = groupFlag.parseInput(FlagContext.create().setSender(sender).setInput(group).build());
+                groupValue = groupFlag.parseInput(FlagContext.create().setSender(sender).setInput(group).setObject("region", existing).build());
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }

@@ -22,6 +22,10 @@ package com.sk89q.worldguard.protection.flags;
 import com.sk89q.worldedit.Location;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -43,8 +47,9 @@ public class LocationFlag extends Flag<Location> {
         String input = context.getUserInput();
         Player player = context.getPlayerSender();
 
+        Location loc = null;
         if ("here".equalsIgnoreCase(input)) {
-            return toLazyLocation(player.getLocation());
+            loc = toLazyLocation(player.getLocation());
         } else if ("none".equalsIgnoreCase(input)) {
             return null;
         } else {
@@ -58,13 +63,29 @@ public class LocationFlag extends Flag<Location> {
                     final float yaw = split.length < 4 ? 0 : Float.parseFloat(split[3]);
                     final float pitch = split.length < 5 ? 0 : Float.parseFloat(split[4]);
 
-                    return new LazyLocation(world.getName(), new Vector(x, y, z), yaw, pitch);
+                    loc = new LazyLocation(world.getName(), new Vector(x, y, z), yaw, pitch);
                 } catch (NumberFormatException ignored) {
                 }
             }
-
-            throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
         }
+        if (loc != null) {
+            Object obj = context.get("region");
+            if (obj instanceof ProtectedRegion) {
+                ProtectedRegion rg = (ProtectedRegion) obj;
+                if (WorldGuardPlugin.inst().getGlobalStateManager().get(player.getWorld()).boundedLocationFlags) {
+                    if (!rg.contains(loc.getPosition()) && new RegionPermissionModel(WorldGuardPlugin.inst(), player).mayOverrideLocationFlagBounds(rg)) {
+                        player.sendMessage(ChatColor.GRAY + "WARNING: Flag location is outside of region.");
+                    } else {
+                        // no permission
+                        throw new InvalidFlagFormat("You can't set that flag outside of the region boundaries.");
+                    }
+                    // clamp height to world limits
+                    loc.setPosition(loc.getPosition().clampY(0, player.getWorld().getMaxHeight()));
+                    return loc;
+                }
+            }
+        }
+        throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
     }
 
     private Location toLazyLocation(org.bukkit.Location location) {
