@@ -19,10 +19,6 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import org.bukkit.command.CommandSender;
-
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-
 /**
  * Stores an enum value.
  */
@@ -78,7 +74,8 @@ public class EnumFlag<T extends Enum<T>> extends Flag<T> {
     }
 
     @Override
-    public T parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
+    public T parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getUserInput();
         try {
             return findValue(input);
         } catch (IllegalArgumentException e) {

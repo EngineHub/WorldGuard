@@ -19,10 +19,6 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import org.bukkit.command.CommandSender;
-
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-
 /**
  * Stores an integer.
  */
@@ -37,14 +33,8 @@ public class IntegerFlag extends Flag<Integer> {
     }
 
     @Override
-    public Integer parseInput(WorldGuardPlugin plugin, CommandSender sender,String input) throws InvalidFlagFormat {
-        input = input.trim();
-
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
-        }
+    public Integer parseInput(FlagContext context) throws InvalidFlagFormat {
+        return context.getUserInputAsInt();
     }
 
     @Override

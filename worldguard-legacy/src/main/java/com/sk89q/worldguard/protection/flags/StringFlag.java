@@ -59,8 +59,8 @@ public class StringFlag extends Flag<String> {
     }
 
     @Override
-    public String parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        return input.replaceAll("(?!\\\\)\\\\n", "\n").replaceAll("\\\\\\\\n", "\\n");
+    public String parseInput(FlagContext context) throws InvalidFlagFormat {
+        return context.getUserInput().replaceAll("(?!\\\\)\\\\n", "\n").replaceAll("\\\\\\\\n", "\\n");
     }
 
     @Override
