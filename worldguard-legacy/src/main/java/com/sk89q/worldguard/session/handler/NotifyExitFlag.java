@@ -29,6 +29,14 @@ import org.bukkit.entity.Player;
 
 public class NotifyExitFlag extends FlagValueChangeHandler<Boolean> {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<NotifyExitFlag> {
+        @Override
+        public NotifyExitFlag create(Session session) {
+            return new NotifyExitFlag(session);
+        }
+    }
+
     private Boolean notifiedForLeave = false;
 
     public NotifyExitFlag(Session session) {

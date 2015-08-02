@@ -32,6 +32,14 @@ import org.bukkit.entity.Player;
 
 public class ExitFlag extends FlagValueChangeHandler<State> {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<ExitFlag> {
+        @Override
+        public ExitFlag create(Session session) {
+            return new ExitFlag(session);
+        }
+    }
+
     private static final long MESSAGE_THRESHOLD = 1000 * 2;
     private String storedMessage;
     private boolean exitViaTeleport = false;

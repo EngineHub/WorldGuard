@@ -29,6 +29,14 @@ import javax.annotation.Nullable;
 
 public class GodMode extends Handler {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<GodMode> {
+        @Override
+        public GodMode create(Session session) {
+            return new GodMode(session);
+        }
+    }
+
     private boolean godMode;
 
     public GodMode(Session session) {

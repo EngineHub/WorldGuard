@@ -35,6 +35,14 @@ import java.util.Set;
 
 public class GreetingFlag extends Handler {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<GreetingFlag> {
+        @Override
+        public GreetingFlag create(Session session) {
+            return new GreetingFlag(session);
+        }
+    }
+
     private Set<String> lastMessageStack = Collections.emptySet();
 
     public GreetingFlag(Session session) {

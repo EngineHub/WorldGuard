@@ -24,7 +24,22 @@ import com.sk89q.guavabackport.cache.CacheLoader;
 import com.sk89q.guavabackport.cache.LoadingCache;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.session.handler.*;
+import com.sk89q.worldguard.session.handler.EntryFlag;
+import com.sk89q.worldguard.session.handler.ExitFlag;
+import com.sk89q.worldguard.session.handler.FarewellFlag;
+import com.sk89q.worldguard.session.handler.FeedFlag;
+import com.sk89q.worldguard.session.handler.GameModeFlag;
+import com.sk89q.worldguard.session.handler.GodMode;
+import com.sk89q.worldguard.session.handler.GreetingFlag;
+import com.sk89q.worldguard.session.handler.Handler;
+import com.sk89q.worldguard.session.handler.Handler.Factory;
+import com.sk89q.worldguard.session.handler.HealFlag;
+import com.sk89q.worldguard.session.handler.InvincibilityFlag;
+import com.sk89q.worldguard.session.handler.NotifyEntryFlag;
+import com.sk89q.worldguard.session.handler.NotifyExitFlag;
+import com.sk89q.worldguard.session.handler.TimeLockFlag;
+import com.sk89q.worldguard.session.handler.WaterBreathing;
+import com.sk89q.worldguard.session.handler.WeatherLockFlag;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,6 +49,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -77,6 +93,7 @@ public class SessionManager implements Runnable, Listener {
     public SessionManager(WorldGuardPlugin plugin) {
         checkNotNull(plugin, "plugin");
         this.plugin = plugin;
+        registerDefaultHandlers();
     }
 
     /**
@@ -129,6 +146,56 @@ public class SessionManager implements Runnable, Listener {
         }
     }
 
+    private LinkedList<Factory<? extends Handler>> handlers = new LinkedList<Factory<? extends Handler>>();
+
+    private void registerDefaultHandlers() {
+        // our list shouldn't be getting concurrently modified
+        // so we can safely order by providing null for 'after'
+        registerHandler(HealFlag.FACTORY, null);
+        registerHandler(FeedFlag.FACTORY, null);
+        registerHandler(NotifyEntryFlag.FACTORY, null);
+        registerHandler(NotifyExitFlag.FACTORY, null);
+        registerHandler(EntryFlag.FACTORY, null);
+        registerHandler(ExitFlag.FACTORY, null);
+        registerHandler(FarewellFlag.FACTORY, null);
+        registerHandler(GreetingFlag.FACTORY, null);
+        registerHandler(GameModeFlag.FACTORY, null);
+        registerHandler(InvincibilityFlag.FACTORY, null);
+        registerHandler(TimeLockFlag.FACTORY, null);
+        registerHandler(WeatherLockFlag.FACTORY, null);
+        registerHandler(GodMode.FACTORY, null);
+        registerHandler(WaterBreathing.FACTORY, null);
+    }
+
+    /**
+     * Register a handler with the SessionManager.
+     *
+     * You may specify another handler class to ensure your handler is always registered after that class.
+     * If that class is not already registered, this method will return false.
+     *
+     * For example, flags that always act on a player in a region (like {@link HealFlag} and {@link FeedFlag})
+     * should be registered earlier, whereas flags that only take effect when a player leaves the region (like
+     * {@link FarewellFlag} and {@link GreetingFlag}) should be registered after the {@link ExitFlag.Factory}.class handler factory.
+     *
+     * @param factory a factory which takes a session and returns an instance of your handler
+     * @param after the handler factory to insert the first handler after, to ensure a specific order when creating new sessions
+     *
+     * @return {@code true} (as specified by {@link Collection#add})
+     *          {@code false} if {@param after} is not registered
+     */
+    public boolean registerHandler(Factory<? extends Handler> factory, @Nullable Factory<? extends Handler> after) {
+        if (factory == null) return false;
+        if (after == null) {
+            handlers.add(factory);
+        } else {
+            int index = handlers.indexOf(after);
+            if (index == -1) return false;
+
+            handlers.add(index, factory); // shifts "after" right one, and everything after "after" right one
+        }
+        return true;
+    }
+
     /**
      * Create a session for a player.
      *
@@ -137,20 +204,9 @@ public class SessionManager implements Runnable, Listener {
      */
     private Session createSession(Player player) {
         Session session = new Session(this);
-        session.register(new HealFlag(session));
-        session.register(new FeedFlag(session));
-        session.register(new NotifyEntryFlag(session));
-        session.register(new NotifyExitFlag(session));
-        session.register(new EntryFlag(session));
-        session.register(new ExitFlag(session));
-        session.register(new FarewellFlag(session));
-        session.register(new GreetingFlag(session));
-        session.register(new GameModeFlag(session));
-        session.register(new InvincibilityFlag(session));
-        session.register(new TimeLockFlag(session));
-        session.register(new WeatherLockFlag(session));
-        session.register(new GodMode(session));
-        session.register(new WaterBreathing(session));
+        for (Factory<? extends Handler> factory : handlers) {
+            session.register(factory.create(session));
+        }
         session.initialize(player);
         return session;
     }
