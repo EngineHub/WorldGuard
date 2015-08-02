@@ -28,6 +28,14 @@ import org.bukkit.entity.Player;
 
 public class FeedFlag extends Handler {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<FeedFlag> {
+        @Override
+        public FeedFlag create(Session session) {
+            return new FeedFlag(session);
+        }
+    }
+
     private long lastFeed = 0;
 
     public FeedFlag(Session session) {

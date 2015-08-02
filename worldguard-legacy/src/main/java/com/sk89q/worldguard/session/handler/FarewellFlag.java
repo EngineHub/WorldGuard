@@ -34,6 +34,14 @@ import java.util.Set;
 
 public class FarewellFlag extends Handler {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<FarewellFlag> {
+        @Override
+        public FarewellFlag create(Session session) {
+            return new FarewellFlag(session);
+        }
+    }
+
     private Set<String> lastMessageStack = Collections.emptySet();
 
     public FarewellFlag(Session session) {

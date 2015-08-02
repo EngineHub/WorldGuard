@@ -32,6 +32,7 @@ import com.sk89q.worldguard.session.handler.GameModeFlag;
 import com.sk89q.worldguard.session.handler.GodMode;
 import com.sk89q.worldguard.session.handler.GreetingFlag;
 import com.sk89q.worldguard.session.handler.Handler;
+import com.sk89q.worldguard.session.handler.Handler.Factory;
 import com.sk89q.worldguard.session.handler.HealFlag;
 import com.sk89q.worldguard.session.handler.InvincibilityFlag;
 import com.sk89q.worldguard.session.handler.NotifyEntryFlag;
@@ -47,8 +48,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.UUID;
@@ -147,66 +146,52 @@ public class SessionManager implements Runnable, Listener {
         }
     }
 
-    private LinkedList<Constructor<? extends Handler>> handlers = new LinkedList<Constructor<? extends Handler>>();
-
-    private static Constructor<? extends Handler> getHandlerConstructor(Class<? extends Handler> cls) {
-        if (cls == null) return null;
-        try {
-            return cls.getConstructor(Session.class);
-        } catch (NoSuchMethodException ignored) {
-        }
-        return null;
-    }
+    private LinkedList<Factory<? extends Handler>> handlers = new LinkedList<Factory<? extends Handler>>();
 
     private void registerDefaultHandlers() {
         // our list shouldn't be getting concurrently modified
         // so we can safely order by providing null for 'after'
-        registerHandler(HealFlag.class, null);
-        registerHandler(FeedFlag.class, null);
-        registerHandler(NotifyEntryFlag.class, null);
-        registerHandler(NotifyExitFlag.class, null);
-        registerHandler(EntryFlag.class, null);
-        registerHandler(ExitFlag.class, null);
-        registerHandler(FarewellFlag.class, null);
-        registerHandler(GreetingFlag.class, null);
-        registerHandler(GameModeFlag.class, null);
-        registerHandler(InvincibilityFlag.class, null);
-        registerHandler(TimeLockFlag.class, null);
-        registerHandler(WeatherLockFlag.class, null);
-        registerHandler(GodMode.class, null);
-        registerHandler(WaterBreathing.class, null);
+        registerHandler(HealFlag.FACTORY, null);
+        registerHandler(FeedFlag.FACTORY, null);
+        registerHandler(NotifyEntryFlag.FACTORY, null);
+        registerHandler(NotifyExitFlag.FACTORY, null);
+        registerHandler(EntryFlag.FACTORY, null);
+        registerHandler(ExitFlag.FACTORY, null);
+        registerHandler(FarewellFlag.FACTORY, null);
+        registerHandler(GreetingFlag.FACTORY, null);
+        registerHandler(GameModeFlag.FACTORY, null);
+        registerHandler(InvincibilityFlag.FACTORY, null);
+        registerHandler(TimeLockFlag.FACTORY, null);
+        registerHandler(WeatherLockFlag.FACTORY, null);
+        registerHandler(GodMode.FACTORY, null);
+        registerHandler(WaterBreathing.FACTORY, null);
     }
 
     /**
      * Register a handler with the SessionManager.
+     *
      * You may specify another handler class to ensure your handler is always registered after that class.
      * If that class is not already registered, this method will return false.
      *
      * For example, flags that always act on a player in a region (like {@link HealFlag} and {@link FeedFlag})
      * should be registered earlier, whereas flags that only take effect when a player leaves the region (like
-     * {@link FarewellFlag} and {@link GreetingFlag}) should be registered after the {@link ExitFlag}.class handler.
+     * {@link FarewellFlag} and {@link GreetingFlag}) should be registered after the {@link ExitFlag.Factory}.class handler factory.
      *
-     * @param handler the class of the handler to register to the manager
-     * @param after the class handler to insert the first handler after, to ensure a specific order when creating new sessions
+     * @param factory a factory which takes a session and returns an instance of your handler
+     * @param after the handler factory to insert the first handler after, to ensure a specific order when creating new sessions
      *
      * @return {@code true} (as specified by {@link Collection#add})
      *          {@code false} if {@param after} is not registered
      */
-    public boolean registerHandler(Class<? extends Handler> handler, @Nullable Class<? extends Handler> after) {
-        Constructor<? extends Handler> con;
-        con = getHandlerConstructor(handler);
-        if (con == null) return false;
+    public boolean registerHandler(Factory<? extends Handler> factory, @Nullable Factory<? extends Handler> after) {
+        if (factory == null) return false;
         if (after == null) {
-            handlers.add(con);
+            handlers.add(factory);
         } else {
-            Constructor<? extends Handler> conAfter;
-            conAfter = getHandlerConstructor(after);
-            if (conAfter == null) return false;
-
-            int index = handlers.indexOf(conAfter);
+            int index = handlers.indexOf(after);
             if (index == -1) return false;
 
-            handlers.add(index, con); // shifts "after" right one, and everything after "after" right one
+            handlers.add(index, factory); // shifts "after" right one, and everything after "after" right one
         }
         return true;
     }
@@ -219,13 +204,8 @@ public class SessionManager implements Runnable, Listener {
      */
     private Session createSession(Player player) {
         Session session = new Session(this);
-        for (Constructor<? extends Handler> con : handlers) {
-            try {
-                session.register(con.newInstance(session));
-            } catch (InvocationTargetException ignored) {
-            } catch (InstantiationException ignored) {
-            } catch (IllegalAccessException ignored) {
-            }
+        for (Factory<? extends Handler> factory : handlers) {
+            session.register(factory.create(session));
         }
         session.initialize(player);
         return session;

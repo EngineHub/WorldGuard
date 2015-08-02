@@ -28,6 +28,14 @@ import org.bukkit.entity.Player;
 
 public class HealFlag extends Handler {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<HealFlag> {
+        @Override
+        public HealFlag create(Session session) {
+            return new HealFlag(session);
+        }
+    }
+
     private long lastHeal = 0;
 
     public HealFlag(Session session) {

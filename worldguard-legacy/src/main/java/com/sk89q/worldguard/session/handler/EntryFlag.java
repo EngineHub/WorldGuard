@@ -33,6 +33,14 @@ import java.util.Set;
 
 public class EntryFlag extends Handler {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<EntryFlag> {
+        @Override
+        public EntryFlag create(Session session) {
+            return new EntryFlag(session);
+        }
+    }
+
     private static final long MESSAGE_THRESHOLD = 1000 * 2;
     private long lastMessage;
 

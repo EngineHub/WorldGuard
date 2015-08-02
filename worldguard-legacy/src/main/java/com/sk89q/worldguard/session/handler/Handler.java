@@ -39,6 +39,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class Handler {
 
+    public static abstract class Factory<T extends Handler> {
+        public abstract T create(Session session);
+    }
+
     private final Session session;
 
     /**
