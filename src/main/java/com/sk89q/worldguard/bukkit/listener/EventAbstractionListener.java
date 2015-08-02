@@ -251,15 +251,19 @@ public class EventAbstractionListener extends AbstractListener {
                 Block piston = event.getBlock();
                 Cause cause = create(piston);
 
-                // Workaround for incorrect piston events
                 BlockFace direction = event.getDirection();
-                if (piston.getType() == Material.PISTON_MOVING_PIECE) {
-                    direction = new PistonExtensionMaterial(Material.PISTON_STICKY_BASE.getId(), piston.getData()).getFacing();
-                }
-                Location retractLocation = piston.getRelative(direction, 2).getLocation();
 
-                Events.fireToCancel(event, new BreakBlockEvent(event, cause, retractLocation, Material.AIR));
-                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, piston.getRelative(direction)));
+                ArrayList<Block> blocks = new ArrayList<Block>(event.getBlocks());
+                int originalSize = blocks.size();
+                Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, cause, event.getBlock().getWorld(), blocks, Material.AIR));
+                if (originalSize != blocks.size()) {
+                    event.setCancelled(true);
+                }
+                for (Block b : event.getBlocks()) {
+                    Location loc = b.getRelative(direction).getLocation();
+                    Events.fireToCancel(event, new PlaceBlockEvent(event, cause, loc, b.getType()));
+                }
+
                 entry.setCancelled(event.isCancelled());
 
                 if (event.isCancelled()) {
@@ -273,11 +277,12 @@ public class EventAbstractionListener extends AbstractListener {
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
         EventDebounce.Entry entry = pistonExtendDebounce.getIfNotPresent(new BlockPistonExtendKey(event), event);
         if (entry != null) {
-            // A hack for now
             List<Block> blocks = new ArrayList<Block>(event.getBlocks());
-            Block lastBlock = event.getBlock().getRelative(event.getDirection(), event.getLength() + 1);
-            blocks.add(lastBlock);
             int originalLength = blocks.size();
+            BlockFace dir = event.getDirection();
+            for (int i = 0; i < blocks.size(); i++) {
+                blocks.set(i, blocks.get(i).getRelative(dir));
+            }
             Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getBlock()), event.getBlock().getWorld(), blocks, Material.STONE));
             if (blocks.size() != originalLength) {
                 event.setCancelled(true);
