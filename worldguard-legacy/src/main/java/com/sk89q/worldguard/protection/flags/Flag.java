@@ -180,13 +180,11 @@ public abstract class Flag<T> {
     /**
      * Parse a given input to coerce it to a type compatible with the flag.
      *
-     * @param plugin The plugin
-     * @param sender The sender
-     * @param input THe input
+     * @param context the {@link FlagContext}
      * @return The coerced type
      * @throws InvalidFlagFormat Raised if the input is invalid
      */
-    public abstract T parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat;
+    public abstract T parseInput(FlagContext context) throws InvalidFlagFormat;
 
     /**
      * Convert a raw type that was loaded (from a YAML file, for example)

@@ -19,13 +19,10 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.Location;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -42,15 +39,9 @@ public class LocationFlag extends Flag<Location> {
     }
 
     @Override
-    public Location parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        input = input.trim();
-
-        final Player player;
-        try {
-            player = plugin.checkPlayer(sender);
-        } catch (CommandException e) {
-            throw new InvalidFlagFormat(e.getMessage());
-        }
+    public Location parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getUserInput();
+        Player player = context.getPlayerSender();
 
         if ("here".equalsIgnoreCase(input)) {
             return toLazyLocation(player.getLocation());

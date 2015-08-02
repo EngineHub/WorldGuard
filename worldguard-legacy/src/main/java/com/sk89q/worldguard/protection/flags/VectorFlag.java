@@ -19,11 +19,8 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import org.bukkit.command.CommandSender;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,15 +39,11 @@ public class VectorFlag extends Flag<Vector> {
     }
 
     @Override
-    public Vector parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        input = input.trim();
+    public Vector parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getUserInput();
 
         if ("here".equalsIgnoreCase(input)) {
-            try {
-                return BukkitUtil.toVector(plugin.checkPlayer(sender).getLocation());
-            } catch (CommandException e) {
-                throw new InvalidFlagFormat(e.getMessage());
-            }
+            return BukkitUtil.toVector(context.getPlayerSender().getLocation());
         } else {
             String[] split = input.split(",");
             if (split.length == 3) {
