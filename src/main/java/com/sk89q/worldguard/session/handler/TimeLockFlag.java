@@ -31,12 +31,10 @@ import java.util.regex.Pattern;
 
 public class TimeLockFlag extends FlagValueChangeHandler<String> {
 
-    private Long time;
-    private boolean relative;
     private Long initialTime;
     private boolean initialRelative;
 
-    Pattern timePattern = Pattern.compile("(\\+|-)?\\d+");
+    private static Pattern timePattern = Pattern.compile("(\\+|-)?\\d+");
 
     public TimeLockFlag(Session session) {
         super(session, DefaultFlag.TIME_LOCK);
@@ -45,27 +43,26 @@ public class TimeLockFlag extends FlagValueChangeHandler<String> {
     private void updatePlayerTime(Player player, @Nullable String value) {
         // store settings, regardless of if we change anything
         initialRelative = player.isPlayerTimeRelative();
-        initialTime = player.getPlayerTime();
+        initialTime = player.getPlayerTimeOffset();
         if (value == null || !timePattern.matcher(value).matches()) {
             // invalid input
             return;
         }
+        boolean relative;
         if (value.startsWith("+") || value.startsWith("-")) {
             relative = true;
         } else {
             relative = false;
         }
-        time = Long.valueOf(value);
-        if (!relative && (time < 0L || time > 24000L)) { // invalid time, reset to 0
-            time = 0L;
-        }
+        Long time = Long.valueOf(value);
+//        if (!relative && (time < 0L || time > 24000L)) { // invalid time, reset to 0
+//            time = 0L;
+//        }
         player.setPlayerTime(time, relative);
     }
 
     @Override
     protected void onInitialValue(Player player, ApplicableRegionSet set, String value) {
-        initialTime = player.getPlayerTime();
-        initialRelative = player.isPlayerTimeRelative();
         updatePlayerTime(player, value);
     }
 
