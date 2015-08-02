@@ -31,6 +31,14 @@ import javax.annotation.Nullable;
 
 public class WeatherLockFlag extends FlagValueChangeHandler<WeatherType> {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<WeatherLockFlag> {
+        @Override
+        public WeatherLockFlag create(Session session) {
+            return new WeatherLockFlag(session);
+        }
+    }
+
     private WeatherType initialWeather;
 
     public WeatherLockFlag(Session session) {

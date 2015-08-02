@@ -32,6 +32,14 @@ import javax.annotation.Nullable;
 
 public class GameModeFlag extends FlagValueChangeHandler<GameMode> {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<GameModeFlag> {
+        @Override
+        public GameModeFlag create(Session session) {
+            return new GameModeFlag(session);
+        }
+    }
+
     private GameMode originalGameMode;
     private GameMode setGameMode;
 

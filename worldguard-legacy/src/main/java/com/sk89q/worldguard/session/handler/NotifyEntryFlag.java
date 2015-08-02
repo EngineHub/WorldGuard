@@ -30,6 +30,14 @@ import org.bukkit.entity.Player;
 
 public class NotifyEntryFlag extends FlagValueChangeHandler<Boolean> {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<NotifyEntryFlag> {
+        @Override
+        public NotifyEntryFlag create(Session session) {
+            return new NotifyEntryFlag(session);
+        }
+    }
+
     public NotifyEntryFlag(Session session) {
         super(session, DefaultFlag.NOTIFY_ENTER);
     }

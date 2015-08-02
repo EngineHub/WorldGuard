@@ -31,6 +31,14 @@ import java.util.regex.Pattern;
 
 public class TimeLockFlag extends FlagValueChangeHandler<String> {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<TimeLockFlag> {
+        @Override
+        public TimeLockFlag create(Session session) {
+            return new TimeLockFlag(session);
+        }
+    }
+
     private Long initialTime;
     private boolean initialRelative;
 

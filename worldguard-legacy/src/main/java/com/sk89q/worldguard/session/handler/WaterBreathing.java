@@ -24,6 +24,14 @@ import org.bukkit.entity.Player;
 
 public class WaterBreathing extends Handler {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<WaterBreathing> {
+        @Override
+        public WaterBreathing create(Session session) {
+            return new WaterBreathing(session);
+        }
+    }
+
     public boolean waterBreathing;
 
     public WaterBreathing(Session session) {

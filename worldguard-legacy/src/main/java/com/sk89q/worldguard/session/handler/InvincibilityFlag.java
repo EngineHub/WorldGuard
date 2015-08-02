@@ -31,6 +31,14 @@ import javax.annotation.Nullable;
 
 public class InvincibilityFlag extends FlagValueChangeHandler<State> {
 
+    public static final Factory FACTORY = new Factory();
+    public static class Factory extends Handler.Factory<InvincibilityFlag> {
+        @Override
+        public InvincibilityFlag create(Session session) {
+            return new InvincibilityFlag(session);
+        }
+    }
+
     @Nullable
     private State invincibility;
 
