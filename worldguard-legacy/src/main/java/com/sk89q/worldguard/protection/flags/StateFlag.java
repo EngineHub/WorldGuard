@@ -81,8 +81,8 @@ public class StateFlag extends Flag<StateFlag.State> {
     }
 
     @Override
-    public State parseInput(WorldGuardPlugin plugin, CommandSender sender, String input) throws InvalidFlagFormat {
-        input = input.trim();
+    public State parseInput(FlagContext context) throws InvalidFlagFormat {
+        String input = context.getUserInput();
 
         if (input.equalsIgnoreCase("allow")) {
             return State.ALLOW;
