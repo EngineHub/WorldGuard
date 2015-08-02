@@ -145,6 +145,7 @@ public class WorldConfiguration {
     public int maxClaimVolume;
     public boolean claimOnlyInsideExistingRegions;
     public int maxRegionCountPerPlayer;
+    public boolean boundedLocationFlags;
     public boolean antiWolfDumbness;
     public boolean signChestProtection;
     public boolean disableSignChestProtectionCheck;
@@ -462,6 +463,7 @@ public class WorldConfiguration {
         regionWand = getInt("regions.wand", 334);
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
+        boundedLocationFlags = getBoolean("regions.location-flags-only-inside-regions", false);
 
         maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player.default", 7);
         maxRegionCounts = new HashMap<String, Integer>();
