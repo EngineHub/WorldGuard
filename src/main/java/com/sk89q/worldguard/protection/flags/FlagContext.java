@@ -110,7 +110,9 @@ public final class FlagContext {
      */
     @Nullable
     public Object get(String name, Object defaultValue) {
-        return context.getOrDefault(name, defaultValue);
+        Object obj;
+        return (((obj = context.get(name)) != null) || context.containsKey(name)
+            ? obj : defaultValue);
     }
 
     /**
