@@ -250,6 +250,10 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.PACKED_ICE, 0);
         MATERIAL_FLAGS.put(Material.DOUBLE_PLANT, 0);
         try {
+            MATERIAL_FLAGS.put(Material.PRISMARINE, 0);
+            MATERIAL_FLAGS.put(Material.SEA_LANTERN, 0);
+            MATERIAL_FLAGS.put(Material.SLIME_BLOCK, 0);
+            MATERIAL_FLAGS.put(Material.IRON_TRAPDOOR, 0);
             MATERIAL_FLAGS.put(Material.STANDING_BANNER, 0);
             MATERIAL_FLAGS.put(Material.WALL_BANNER, 0);
             MATERIAL_FLAGS.put(Material.DAYLIGHT_DETECTOR_INVERTED, MODIFIED_ON_RIGHT);
