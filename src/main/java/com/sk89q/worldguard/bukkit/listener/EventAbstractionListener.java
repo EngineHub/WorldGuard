@@ -253,7 +253,15 @@ public class EventAbstractionListener extends AbstractListener {
 
                 BlockFace direction = event.getDirection();
 
-                ArrayList<Block> blocks = new ArrayList<Block>(event.getBlocks());
+                ArrayList<Block> blocks;
+                try {
+                    blocks = new ArrayList<Block>(event.getBlocks());
+                } catch (NoSuchMethodError e) {
+                    blocks = Lists.newArrayList(event.getRetractLocation().getBlock());
+                    if (piston.getType() == Material.PISTON_MOVING_PIECE) {
+                        direction = new PistonExtensionMaterial(Material.PISTON_STICKY_BASE.getId(), piston.getData()).getFacing();
+                    }
+                }
                 int originalSize = blocks.size();
                 Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, cause, event.getBlock().getWorld(), blocks, Material.AIR));
                 if (originalSize != blocks.size()) {
