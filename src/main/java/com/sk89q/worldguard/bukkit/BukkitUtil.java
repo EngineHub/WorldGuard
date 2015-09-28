@@ -29,6 +29,7 @@ import com.sk89q.worldguard.blacklist.target.MaterialTarget;
 import com.sk89q.worldguard.blacklist.target.Target;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.Enums;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -276,6 +277,9 @@ public class BukkitUtil {
         return str;
     }
 
+    private static final org.bukkit.entity.EntityType armorStandType =
+        Enums.findByValue(org.bukkit.entity.EntityType.class, "ARMOR_STAND");
+
     /**
      * Returns whether an entity should be removed for the halt activity mode.
      *
@@ -289,7 +293,8 @@ public class BukkitUtil {
                 || entity instanceof FallingBlock
                 || (entity instanceof LivingEntity
                     && !(entity instanceof Tameable)
-                    && !(entity instanceof Player));
+                    && !(entity instanceof Player)
+                    && !(entity.getType() == armorStandType));
     }
 
     /**
@@ -299,7 +304,9 @@ public class BukkitUtil {
      * @param enumType enum class
      * @param values values to test
      * @return a value in the enum or null
+     * @deprecated use {@link Enums#findByValue(Class, String...)}
      */
+    @Deprecated
     public static <T extends Enum<T>> T tryEnum(Class<T> enumType, String ... values) {
         for (String val : values) {
             try {
