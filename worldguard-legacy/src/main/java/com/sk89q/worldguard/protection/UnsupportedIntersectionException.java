@@ -1,5 +1,5 @@
 /*
- * WorldGuard
+ * WorldGuard, a suite of tools for Minecraft
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldGuard team and contributors
  *
@@ -16,3 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+package com.sk89q.worldguard.protection;
+
+/**
+ * Thrown when an intersection between two different types of regions is not
+ * supported.
+ *
+ * @deprecated no longer utilized
+ */
+@Deprecated
+public class UnsupportedIntersectionException extends Exception {
+}
