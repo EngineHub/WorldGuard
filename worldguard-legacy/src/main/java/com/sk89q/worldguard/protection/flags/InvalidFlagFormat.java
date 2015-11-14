@@ -1,5 +1,5 @@
 /*
- * WorldGuard
+ * WorldGuard, a suite of tools for Minecraft
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldGuard team and contributors
  *
@@ -16,3 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+package com.sk89q.worldguard.protection.flags;
+
+public class InvalidFlagFormat extends Exception {
+    
+    private static final long serialVersionUID = 8101615074524004172L;
+
+    public InvalidFlagFormat(String msg) {
+        super(msg);
+    }
+}
