@@ -37,8 +37,10 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     private final int maxY;
 
     /**
-     * Construct a new instance of this polygonal region.
-     * transience will be set to false, and this region can be saved.
+     * Construct a new instance of this polygonal region.<br>
+     * Equivalent to {@link #ProtectedPolygonalRegion(String, boolean, List, int, int)
+     * ProtectedPolygonalRegion(id, false, points, minY, maxY)}<br>
+     * <code>transientRegion</code> will be set to false, and this region can be saved.
      *
      * @param id the region id
      * @param points a {@link List} of points that this region should contain
@@ -53,13 +55,13 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * Construct a new instance of this polygonal region.
      *
      * @param id the region id
-     * @param transience whether this region should only be kept in memory and not be saved
+     * @param transientRegion whether this region should only be kept in memory and not be saved
      * @param points a {@link List} of points that this region should contain
      * @param minY the minimum y coordinate
      * @param maxY the maximum y coordinate
      */
-    public ProtectedPolygonalRegion(String id, boolean transience, List<BlockVector2D> points, int minY, int maxY) {
-        super(id, transience);
+    public ProtectedPolygonalRegion(String id, boolean transientRegion, List<BlockVector2D> points, int minY, int maxY) {
+        super(id, transientRegion);
         ImmutableList<BlockVector2D> immutablePoints = ImmutableList.copyOf(points);
         setMinMaxPoints(immutablePoints, minY, maxY);
         this.points = immutablePoints;
