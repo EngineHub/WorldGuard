@@ -22,10 +22,10 @@ Compiling
 ---------
 
 The project is written for Java 6 and our build process makes use of
-[Maven](http://maven.apache.org). Detailed compilation information
+[Gradle](http://gradle.org). Detailed compilation information
 [can be found on the wiki](http://wiki.sk89q.com/wiki/WorldGuard/Development#Compiling).
 
-Dependencies are automatically handled by Maven.
+Dependencies are automatically handled by Gradle.
 
 Contributing
 ------------

@@ -1,0 +1,16 @@
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+dependencies {
+    compile project(':worldguard-core')
+    compile 'org.spongepowered:spongeapi:2.1-SNAPSHOT'
+}
+
+shadowJar {
+    dependencies {
+        include(dependency(':worldguard-core'))
+    }
+
+}
+
+build.dependsOn(shadowJar)

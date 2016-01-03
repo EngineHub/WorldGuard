@@ -4,10 +4,14 @@
 /target
 
 .DS_Store
-/*.iml
-/.idea
+
+**/*.iml
+**/.idea
 
 /bin
 /dependency-reduced-pom.xml
 *-private.sh
+
+/.gradle
+**/build
 
