@@ -197,29 +197,6 @@ public class WorldGuardEntityListener implements Listener {
                     }
                 }
 
-                if (attacker instanceof Fireball) {
-                    if (attacker instanceof WitherSkull) {
-                        if (wcfg.blockWitherSkullExplosions) {
-                            event.setCancelled(true);
-                            return;
-                        }
-                    } else {
-                        if (wcfg.blockFireballExplosions) {
-                            event.setCancelled(true);
-                            return;
-                        }
-                    }
-                    if (wcfg.useRegions) {
-                        Fireball fireball = (Fireball) attacker;
-                        RegionQuery query = plugin.getRegionContainer().createQuery();
-                        if (!query.testState(defender.getLocation(), (Player) defender, DefaultFlag.GHAST_FIREBALL) && wcfg.explosionFlagCancellation) {
-                            event.setCancelled(true);
-                            return;
-                        }
-
-                    }
-                }
-
                 if (attacker instanceof LivingEntity && !(attacker instanceof Player)) {
                     if (attacker instanceof Creeper && wcfg.blockCreeperExplosions) {
                         event.setCancelled(true);
@@ -279,6 +256,28 @@ public class WorldGuardEntityListener implements Listener {
                     if (!plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation()).allows(DefaultFlag.MOB_DAMAGE, localPlayer)) {
                         event.setCancelled(true);
                         return;
+                    }
+                }
+                if (event.getDamager() instanceof Fireball) {
+                    Fireball fireball = (Fireball) event.getDamager();
+                    if (fireball instanceof WitherSkull) {
+                        if (wcfg.blockWitherSkullExplosions) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    } else {
+                        if (wcfg.blockFireballExplosions) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                    if (wcfg.useRegions) {
+                        RegionQuery query = plugin.getRegionContainer().createQuery();
+                        if (!query.testState(defender.getLocation(), (Player) defender, DefaultFlag.GHAST_FIREBALL) && wcfg.explosionFlagCancellation) {
+                            event.setCancelled(true);
+                            return;
+                        }
+
                     }
                 }
             }
