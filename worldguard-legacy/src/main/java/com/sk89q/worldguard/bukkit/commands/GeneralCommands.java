@@ -158,6 +158,8 @@ public class GeneralCommands {
         for (Player player : targets) {
             player.setHealth(player.getMaxHealth());
             player.setFoodLevel(20);
+            player.setSaturation(20);
+            player.setExhaustion(0);
             
             // Tell the user
             if (player.equals(sender)) {
