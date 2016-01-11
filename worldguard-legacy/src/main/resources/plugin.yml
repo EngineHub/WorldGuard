@@ -1,4 +1,4 @@
 name: WorldGuard
 main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
-version: "${project.version}"
+version: "${project.internalVersion}"
 softdepend: [WorldEdit, CommandBook]
