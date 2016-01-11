@@ -1,7 +1,8 @@
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-version '6.1.2-SNAPSHOT'
+project.version = '6.1.2-SNAPSHOT'
+ext.internalVersion = project.version + ";" + gitCommitHash
 
 checkstyle.configFile = new File(projectDir, "config/checkstyle/checkstyle.xml")
 
@@ -18,6 +19,17 @@ dependencies {
     compile 'com.google.code.findbugs:jsr305:1.3.9'
     testCompile 'junit:junit:4.11'
     testCompile 'org.hamcrest:hamcrest-library:1.2.1'
+}
+
+processResources {
+    from (sourceSets.main.resources.srcDirs) {
+        expand project.properties
+        include 'plugin.yml'
+    }
+
+    from (sourceSets.main.resources.srcDirs) {
+        exclude 'plugin.yml'
+    }
 }
 
 shadowJar {
