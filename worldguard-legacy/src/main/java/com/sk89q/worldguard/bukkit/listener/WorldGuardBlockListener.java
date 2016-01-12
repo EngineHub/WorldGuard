@@ -152,6 +152,25 @@ public class WorldGuardBlockListener implements Listener {
                 }
             }
         }
+        
+        if (wcfg.simulateSponge && isLava) {
+            int ox = blockTo.getX();
+            int oy = blockTo.getY();
+            int oz = blockTo.getZ();
+
+            for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
+                for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
+                    for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
+                        Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
+                        if (sponge.getTypeId() == 19
+                                && (!wcfg.redstoneSponges || !sponge.isBlockIndirectlyPowered())) {
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
 
         /*if (plugin.classicWater && isWater) {
         int blockBelow = blockFrom.getRelative(0, -1, 0).getTypeId();
@@ -426,6 +445,7 @@ public class WorldGuardBlockListener implements Listener {
             int oz = target.getZ();
 
             SpongeUtil.clearSpongeWater(plugin, world, ox, oy, oz);
+            SpongeUtil.clearSpongeLava(plugin, world, ox, oy, oz);
         }
     }
 
@@ -451,6 +471,7 @@ public class WorldGuardBlockListener implements Listener {
                         Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
                         if (sponge.getTypeId() == 19
                                 && sponge.isBlockIndirectlyPowered()) {
+                            SpongeUtil.clearSpongeLava(plugin, world, ox + cx, oy + cy, oz + cz);
                             SpongeUtil.clearSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
                         } else if (sponge.getTypeId() == 19
                                 && !sponge.isBlockIndirectlyPowered()) {
