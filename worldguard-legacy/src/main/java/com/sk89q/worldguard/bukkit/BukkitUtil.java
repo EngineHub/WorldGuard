@@ -184,13 +184,13 @@ public class BukkitUtil {
     }
     
     /**
-     * Checks if the given block is water
+     * Checks if the given block is lava
      *
      * @param world the world
      * @param ox x
      * @param oy y
      * @param oz z
-     * @return true if it's water
+     * @return true if it's lava
      */
     public static boolean isBlockLava(World world, int ox, int oy, int oz) {
         Block block = world.getBlockAt(ox, oy, oz);
