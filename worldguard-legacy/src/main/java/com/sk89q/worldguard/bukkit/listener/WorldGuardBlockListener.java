@@ -145,6 +145,9 @@ public class WorldGuardBlockListener implements Listener {
                         Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
                         if (sponge.getTypeId() == 19
                                 && (!wcfg.redstoneSponges || !sponge.isBlockIndirectlyPowered())) {
+                            if (wcfg.convertWetSpongesToDry && sponge.getTypeId() == 19 && sponge.getData() == 1) {
+                                sponge.setData((byte) 0);
+                            }
                             event.setCancelled(true);
                             return;
                         }
@@ -164,6 +167,9 @@ public class WorldGuardBlockListener implements Listener {
                         Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
                         if (sponge.getTypeId() == 19
                                 && (!wcfg.redstoneSponges || !sponge.isBlockIndirectlyPowered())) {
+                            if (wcfg.convertWetSpongesToDry && sponge.getTypeId() == 19 && sponge.getData() == 1) {
+                                sponge.setData((byte) 0);
+                            }
                             event.setCancelled(true);
                             return;
                         }
@@ -450,6 +456,10 @@ public class WorldGuardBlockListener implements Listener {
 
             if (wcfg.spongeWorksOnLava) {
                 SpongeUtil.clearSpongeLava(plugin, world, ox, oy, oz);
+            }
+            
+            if (wcfg.convertWetSpongesToDry && target.getTypeId() == 19 && target.getData() == 1) {
+                target.setData((byte) 0);
             }
         }
     }

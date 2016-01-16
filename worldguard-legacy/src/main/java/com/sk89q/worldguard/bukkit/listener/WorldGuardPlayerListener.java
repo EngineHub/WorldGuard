@@ -277,6 +277,10 @@ public class WorldGuardPlayerListener implements Listener {
                 event.setCancelled(true);
             }
         }
+
+        if (wcfg.simulateSponge && wcfg.convertWetSpongesToDry && block.getTypeId() == 19 && block.getData() == 1) {
+            block.setData((byte) 0);
+        }
     }
 
     /**
@@ -328,14 +332,19 @@ public class WorldGuardPlayerListener implements Listener {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(player.getWorld());
 
+        int newSlot = event.getNewSlot();
+        ItemStack heldItem = player.getInventory().getItem(newSlot);
+
         if (wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
-            int newSlot = event.getNewSlot();
-            ItemStack heldItem = player.getInventory().getItem(newSlot);
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(newSlot, null);
                 player.sendMessage(ChatColor.RED + "Infinite stack removed.");
             }
+        }
+
+        if (wcfg.simulateSponge && wcfg.convertWetSpongesToDry && heldItem.getTypeId() == 19 && heldItem.getDurability() == 1) {
+            heldItem.setDurability((byte) 0);
         }
     }
 

@@ -184,6 +184,7 @@ public class WorldConfiguration {
     public TargetMatcherSet blockUseAtFeet;
     public boolean spongeWorksOnWater;
     public boolean spongeWorksOnLava;
+    public boolean convertWetSpongesToDry;
 
     private Map<String, Integer> maxRegionCounts;
 
@@ -373,8 +374,9 @@ public class WorldConfiguration {
         simulateSponge = getBoolean("simulation.sponge.enable", false);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
-        spongeWorksOnWater = getBoolean("simulation.sponge.absorbs-water", true);
         spongeWorksOnLava = getBoolean("simulation.sponge.absorbs-lava", false);
+        convertWetSpongesToDry = getBoolean("simulation.sponge.convert-wet-to-dry", false);
+        spongeWorksOnWater = getBoolean("simulation.sponge.override-vanilla-water-behaviour", true);
 
         pumpkinScuba = getBoolean("default.pumpkin-scuba", false);
         disableHealthRegain = getBoolean("default.disable-health-regain", false);
