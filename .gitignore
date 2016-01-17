@@ -15,9 +15,3 @@
 /.gradle
 **/build
 
-target/
-/target/*
-
-.classpath
-.project
-.settings
