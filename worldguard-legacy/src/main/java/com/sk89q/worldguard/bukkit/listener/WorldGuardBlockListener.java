@@ -102,6 +102,7 @@ public class WorldGuardBlockListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Block target = event.getBlock();
+        World world = event.getBlock().getWorld();
         WorldConfiguration wcfg = getWorldConfig(player);
 
         if (!wcfg.itemDurability) {
@@ -109,6 +110,23 @@ public class WorldGuardBlockListener implements Listener {
             if (held.getType() != Material.AIR && !(ItemType.usesDamageValue(held.getTypeId())|| BlockType.usesData(held.getTypeId()))) {
                 held.setDurability((short) 0);
                 player.setItemInHand(held);
+            }
+        }
+
+        if (wcfg.forceUpdateOnSpongeBreak) {
+            int ox = target.getX();
+            int oy = target.getY();
+            int oz = target.getZ();
+            for (int cx = -wcfg.spongeRadius - 1; cx <= wcfg.spongeRadius + 1; cx++) {
+                for (int cy = -wcfg.spongeRadius - 1; cy <= wcfg.spongeRadius + 1; cy++) {
+                    for (int cz = -wcfg.spongeRadius - 1; cz <= wcfg.spongeRadius + 1; cz++) {
+                        Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
+                        int id = sponge.getTypeId(); 
+                        byte data = sponge.getData(); 
+                        sponge.setTypeIdAndData(0, (byte) 0, false); 
+                        sponge.setTypeIdAndData(id, data, true); 
+                    }
+                }
             }
         }
     }

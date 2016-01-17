@@ -185,6 +185,7 @@ public class WorldConfiguration {
     public boolean spongeWorksOnWater;
     public boolean spongeWorksOnLava;
     public boolean convertWetSpongesToDry;
+    public boolean forceUpdateOnSpongeBreak;
 
     private Map<String, Integer> maxRegionCounts;
 
@@ -374,6 +375,7 @@ public class WorldConfiguration {
         simulateSponge = getBoolean("simulation.sponge.enable", false);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
+        forceUpdateOnSpongeBreak = getBoolean("simulation.sponge.force-update-on-sponge-break", false);
         spongeWorksOnLava = getBoolean("simulation.sponge.absorbs-lava", false);
         convertWetSpongesToDry = getBoolean("simulation.sponge.convert-wet-to-dry", false);
         spongeWorksOnWater = getBoolean("simulation.sponge.override-vanilla-water-behaviour", true);
