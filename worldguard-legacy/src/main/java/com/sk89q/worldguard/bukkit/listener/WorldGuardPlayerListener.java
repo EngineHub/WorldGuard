@@ -35,9 +35,11 @@ import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GameModeFlag;
 import com.sk89q.worldguard.util.command.CommandFilter;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.TravelAgent;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -343,8 +345,13 @@ public class WorldGuardPlayerListener implements Listener {
             }
         }
 
-        if (wcfg.simulateSponge && wcfg.convertWetSpongesToDry && heldItem.getTypeId() == 19 && heldItem.getDurability() == 1) {
-            heldItem.setDurability((byte) 0);
+        if (wcfg.simulateSponge 
+                && wcfg.convertWetSpongesToDry 
+                && heldItem != null) {
+            if (heldItem.getType() == Material.SPONGE 
+                    && heldItem.getDurability() == 1) {
+                heldItem.setDurability((short) 0);
+            }
         }
     }
 
