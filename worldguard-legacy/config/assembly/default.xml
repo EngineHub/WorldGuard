@@ -34,13 +34,12 @@
       <outputDirectory>/</outputDirectory>
       <filtered>false</filtered>
     </file>
-    <!--
     <file>
       <source>${project.build.directory}/CHANGELOG.html</source>
+      <destName>CHANGELOG.html</destName>
       <outputDirectory>/</outputDirectory>
       <filtered>true</filtered>
     </file>
-    -->
     <file>
       <source>${project.build.directory}/INSTALL.html</source>
       <destName>README.html</destName>
