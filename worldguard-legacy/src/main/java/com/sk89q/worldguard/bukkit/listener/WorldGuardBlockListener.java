@@ -27,9 +27,11 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.EventHandler;
@@ -113,18 +115,29 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        if (wcfg.forceUpdateOnSpongeBreak) {
+        if ((target.getType() == Material.SPONGE)
+                && wcfg.forceUpdateOnSpongeBreak) {
             int ox = target.getX();
             int oy = target.getY();
             int oz = target.getZ();
             for (int cx = -wcfg.spongeRadius - 1; cx <= wcfg.spongeRadius + 1; cx++) {
                 for (int cy = -wcfg.spongeRadius - 1; cy <= wcfg.spongeRadius + 1; cy++) {
                     for (int cz = -wcfg.spongeRadius - 1; cz <= wcfg.spongeRadius + 1; cz++) {
-                        Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
-                        int id = sponge.getTypeId(); 
-                        byte data = sponge.getData(); 
-                        sponge.setTypeIdAndData(0, (byte) 0, false); 
-                        sponge.setTypeIdAndData(id, data, true); 
+                        Block loc = world.getBlockAt(ox + cx, oy + cy, oz + cz);
+                        int id = loc.getTypeId();
+                        byte data = loc.getData();
+                        if (id == BlockID.WATER
+                                || id == BlockID.STATIONARY_WATER
+                                || id == BlockID.AIR) {
+                            loc.setTypeIdAndData(0, (byte) 0, false);
+                            loc.setTypeIdAndData(id, data, true);
+                        }
+                        if ((wcfg.spongeWorksOnLava) 
+                                && (id == BlockID.LAVA
+                                || id == BlockID.STATIONARY_LAVA)) {
+                            loc.setTypeIdAndData(0, (byte) 0, false);
+                            loc.setTypeIdAndData(id, data, true);
+                        }
                     }
                 }
             }
