@@ -267,7 +267,7 @@ public class EventAbstractionListener extends AbstractListener {
                 if (originalSize != blocks.size()) {
                     event.setCancelled(true);
                 }
-                for (Block b : event.getBlocks()) {
+                for (Block b : blocks) {
                     Location loc = b.getRelative(direction).getLocation();
                     Events.fireToCancel(event, new PlaceBlockEvent(event, cause, loc, b.getType()));
                 }
