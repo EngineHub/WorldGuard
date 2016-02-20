@@ -44,7 +44,12 @@ import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.*;
-import org.bukkit.block.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.block.Hopper;
 import org.bukkit.entity.*;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -907,8 +912,8 @@ public class EventAbstractionListener extends AbstractListener {
         } else if (holder instanceof BlockState) {
             Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) holder).getBlock()));
         } else if (holder instanceof DoubleChest) {
-            Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) ((DoubleChest) holder).getLeftSide()).getBlock()));
-            Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) ((DoubleChest) holder).getRightSide()).getBlock()));
+            Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, (((Chest) ((DoubleChest) holder).getLeftSide()).getBlock())));
+            Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, (((Chest) ((DoubleChest) holder).getRightSide()).getBlock())));
         }
     }
 
