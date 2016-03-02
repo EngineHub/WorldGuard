@@ -4,6 +4,9 @@ apply plugin: 'idea'
 project.version = '6.1.2-SNAPSHOT'
 ext.internalVersion = project.version + ";" + gitCommitHash
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 checkstyle.configFile = new File(projectDir, "config/checkstyle/checkstyle.xml")
 
 dependencies {
