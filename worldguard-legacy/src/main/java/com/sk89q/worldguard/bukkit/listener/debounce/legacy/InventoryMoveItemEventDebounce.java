@@ -23,6 +23,7 @@ import com.sk89q.worldguard.bukkit.listener.debounce.legacy.InventoryMoveItemEve
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.InventoryHolder;
@@ -52,7 +53,7 @@ public class InventoryMoveItemEventDebounce extends AbstractEventDebounce<Key> {
             if (holder instanceof BlockState) {
                 return new BlockMaterialKey(((BlockState) holder).getBlock());
             } else if (holder instanceof DoubleChest) {
-                return new BlockMaterialKey(((BlockState) ((DoubleChest) holder).getLeftSide()).getBlock());
+                return new BlockMaterialKey((((Chest) ((DoubleChest) holder).getLeftSide())).getBlock());
             } else {
                 return holder;
             }
