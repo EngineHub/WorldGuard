@@ -2,6 +2,7 @@
 
 ## 6.1
 
+* Added experimental custom flag support
 * Added `exit-via-teleport` flag (default allow) to control exiting an exit=deny region via teleportation.
 * Added a `fall-damage` flag to control player damage caused by falling.
 * Added a `time-lock` flag to lock players' time of day. Valid values are from 0 to 24000 for absolute time, or +- any number for relative time.
