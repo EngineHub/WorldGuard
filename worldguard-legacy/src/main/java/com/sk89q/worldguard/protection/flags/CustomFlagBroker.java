@@ -21,10 +21,14 @@ package com.sk89q.worldguard.protection.flags;
 
 /**
  * Use this object to add custom flags to world guard.
- * 
- * @author Challenger2
  *
  */
 public interface CustomFlagBroker {
+    
+    /**
+     * Add a custom flag to WorldGuard
+     * 
+     * @param flag A flag to add
+     */
     public void addFlag(Flag<?> flag);
 }

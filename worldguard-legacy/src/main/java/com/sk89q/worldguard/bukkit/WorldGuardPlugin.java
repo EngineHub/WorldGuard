@@ -131,20 +131,20 @@ public class WorldGuardPlugin extends JavaPlugin {
     public void onEnable() {
         configureLogger();
 
-        getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
-        
         // Load in custom flags
+        CustomFlagBroker broker = new CustomFlagBrokerImpl();
         for (Plugin plugin : this.getServer().getPluginManager().getPlugins()) {
-            CustomFlagBroker broker = new CustomFlagBrokerImpl();
             if (plugin instanceof CustomFlagProvider) {
                 CustomFlagProvider provider = (CustomFlagProvider)plugin;
                 try {
                     provider.addCustomFlags(broker);
                 } catch (Exception e) {
-                    // Ignore
+                    log.log(Level.WARNING, "Unhandled exception from plugin \"" + plugin + "\"", e);
                 }
             }
         }
+
+        getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
 
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
 

@@ -19,10 +19,44 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-public class CustomFlagBrokerImpl implements CustomFlagBroker {
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+
+public class CustomFlagBrokerImpl implements CustomFlagBroker {
+    
+    private Logger log = Logger.getLogger(DefaultFlag.class.getCanonicalName());
+
+    /**
+     * Add a new custom flag to the flags list
+     *
+     * @param flag The flag to add
+     */
     @Override
     public void addFlag(Flag<?> flag) {
-        DefaultFlag.addFlag(flag);
+        Flag<?> match = DefaultFlag.fuzzyMatchFlag(flag.getName());
+        if (match != null) {
+            throw new IllegalArgumentException("Duplicate flag");
+        }
+        Flag<?>[] newList = Arrays.copyOf(DefaultFlag.flagsList, DefaultFlag.flagsList.length + 1);
+        newList[DefaultFlag.flagsList.length] = flag;
+
+        // Force update the flagsList
+        // flagsList has to be public to allow other packages to access it, yet
+        // we have to be able to change it too :/
+        try {
+            java.lang.reflect.Field field = DefaultFlag.class.getField("flagsList");
+            java.lang.reflect.Field modifiersField = java.lang.reflect.Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(field, field.getModifiers() & ~java.lang.reflect.Modifier.FINAL);
+            field.set(null, newList);
+        } catch (SecurityException e) {
+            log.log(Level.WARNING, "A Security Policy prevented setting the custom flag", e);
+        } catch (IllegalAccessException e) {
+            log.log(Level.WARNING, "Failed to overwrite DefaultFlag.flagsList", e);
+        } catch (NoSuchFieldException e) {
+            log.log(Level.WARNING, "Failed to find a field", e);
+        }
     }
 }

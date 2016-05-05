@@ -19,16 +19,10 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.EntityType;
-
-import com.sk89q.worldguard.bukkit.commands.region.RegionCommands;
 
 /**
  * The flags that are used in WorldGuard.
@@ -162,10 +156,6 @@ public final class DefaultFlag {
             TELE_LOC, SPAWN_LOC, POTION_SPLASH, TIME_LOCK, WEATHER_LOCK,
             BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
     };
-    
-    
-    // Remember if we have unlocked the flag field with reflection
-    private static boolean addFlagsUnlocked = false;
 
     private DefaultFlag() {
     }
@@ -188,37 +178,5 @@ public final class DefaultFlag {
         }
 
         return null;
-    }
-
-    /**
-     * Add a new custom flag to the flags list
-     *
-     * @param flag The flag to add
-     */
-    static void addFlag(Flag<?> flag) {
-        Flag<?> match = fuzzyMatchFlag(flag.getName());
-        if (match != null) {
-            throw new IllegalArgumentException("Duplicate flag");
-        }
-        Flag<?>[] newList = Arrays.copyOf(flagsList, flagsList.length + 1);
-        newList[flagsList.length] = flag;
-
-        // Force update the flagsList
-        // flagsList has to be public to allow other packages to access it, yet
-        // we have to be able to change it too :/
-        try {
-            java.lang.reflect.Field field = DefaultFlag.class.getField("flagsList");
-            if (!addFlagsUnlocked) {
-                addFlagsUnlocked = true;
-                java.lang.reflect.Field modifiersField = java.lang.reflect.Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                modifiersField.setInt(field, field.getModifiers() & ~java.lang.reflect.Modifier.FINAL);
-            }
-            field.set(null, newList);
-        } catch (Exception e) {
-            Logger log = Logger.getLogger(DefaultFlag.class.getCanonicalName());
-            log.log(Level.WARNING, "Failed to add a custom flag", e);
-            throw new RuntimeException("Internel Error", e);
-        }
     }
 }

@@ -36,5 +36,12 @@ package com.sk89q.worldguard.protection.flags;
  */
 public interface CustomFlagProvider {
 
+    /**
+     * addCustomFlags is called just after WorldGuard first loads. All plugins
+     * implementing this interface will be notified to add customfalgs
+     * at this time.
+     * 
+     * @param broker An object that can be used to add custom flags.
+     */
     public void addCustomFlags(CustomFlagBroker broker);
 }
