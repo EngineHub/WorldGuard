@@ -120,6 +120,10 @@ public final class Entities {
         return entity;
     }
 
+
+    private static final EntityType shulkerType =
+            Enums.findByValue(EntityType.class, "SHULKER");
+
     /**
      * Test whether an entity is hostile.
      *
@@ -130,7 +134,8 @@ public final class Entities {
         return entity instanceof Monster
                 || entity instanceof Slime
                 || entity instanceof Flying
-                || entity instanceof EnderDragon;
+                || entity instanceof EnderDragon
+                || entity.getType() == shulkerType;
     }
 
     /**
@@ -175,8 +180,8 @@ public final class Entities {
         return entity instanceof LivingEntity && !(entity instanceof Player);
     }
 
-    private static final org.bukkit.entity.EntityType armorStandType =
-            Enums.findByValue(org.bukkit.entity.EntityType.class, "ARMOR_STAND");
+    private static final EntityType armorStandType =
+            Enums.findByValue(EntityType.class, "ARMOR_STAND");
 
     /**
      * Test whether using the given entity should be considered "building"

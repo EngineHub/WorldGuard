@@ -11,7 +11,7 @@ checkstyle.configFile = new File(projectDir, "config/checkstyle/checkstyle.xml")
 
 dependencies {
     compile 'org.khelekore:prtree:1.5.0'
-    compile 'org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT'
+    compile 'org.bukkit:bukkit:1.9.4-R0.1-SNAPSHOT'
     compile 'com.sk89q.worldedit:worldedit-bukkit:6.1.1-SNAPSHOT'
     compile 'com.sk89q:squirrelid:0.1.0'
     compile 'com.sk89q:guavabackport:1.1'

@@ -55,6 +55,7 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Handle events that need to be processed by region protection.
@@ -184,6 +185,9 @@ public class RegionProtectionListener extends AbstractListener {
                 /* Everything else */
                 } else {
                     canPlace = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_PLACE));
+                    try {
+                        event.setSilent(type == Material.FROSTED_ICE);
+                    } catch (NoSuchElementException ignored) {} // back compat
                     what = "place that block";
                 }
 

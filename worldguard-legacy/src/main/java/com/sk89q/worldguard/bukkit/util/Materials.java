@@ -276,10 +276,28 @@ public final class Materials {
             MATERIAL_FLAGS.put(Material.JUNGLE_DOOR, MODIFIED_ON_RIGHT);
             MATERIAL_FLAGS.put(Material.ACACIA_DOOR, MODIFIED_ON_RIGHT);
             MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR, MODIFIED_ON_RIGHT);
+
+            MATERIAL_FLAGS.put(Material.GRASS_PATH, 0);
+            MATERIAL_FLAGS.put(Material.CHORUS_PLANT, 0);
+            MATERIAL_FLAGS.put(Material.CHORUS_FLOWER, 0);
+            MATERIAL_FLAGS.put(Material.BEETROOT_BLOCK, 0);
+            MATERIAL_FLAGS.put(Material.END_ROD, 0);
+            MATERIAL_FLAGS.put(Material.END_BRICKS, 0);
+            MATERIAL_FLAGS.put(Material.END_GATEWAY, 0);
+            MATERIAL_FLAGS.put(Material.FROSTED_ICE, 0);
+            MATERIAL_FLAGS.put(Material.GRASS_PATH, 0);
+            MATERIAL_FLAGS.put(Material.PURPUR_BLOCK, 0);
+            MATERIAL_FLAGS.put(Material.PURPUR_STAIRS, 0);
+            MATERIAL_FLAGS.put(Material.PURPUR_PILLAR, 0);
+            MATERIAL_FLAGS.put(Material.PURPUR_SLAB, 0);
+            MATERIAL_FLAGS.put(Material.STRUCTURE_BLOCK, MODIFIED_ON_LEFT | MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.COMMAND_REPEATING, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.COMMAND_CHAIN , MODIFIED_ON_RIGHT);
+
         } catch (NoSuchFieldError ignored) {
         }
 
-        MATERIAL_FLAGS.put(Material.IRON_SPADE, 0);
+        MATERIAL_FLAGS.put(Material.IRON_SPADE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.IRON_PICKAXE, 0);
         MATERIAL_FLAGS.put(Material.IRON_AXE, 0);
         MATERIAL_FLAGS.put(Material.FLINT_AND_STEEL, 0);
@@ -292,22 +310,22 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.GOLD_INGOT, 0);
         MATERIAL_FLAGS.put(Material.IRON_SWORD, 0);
         MATERIAL_FLAGS.put(Material.WOOD_SWORD, 0);
-        MATERIAL_FLAGS.put(Material.WOOD_SPADE, 0);
+        MATERIAL_FLAGS.put(Material.WOOD_SPADE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.WOOD_PICKAXE, 0);
         MATERIAL_FLAGS.put(Material.WOOD_AXE, 0);
         MATERIAL_FLAGS.put(Material.STONE_SWORD, 0);
-        MATERIAL_FLAGS.put(Material.STONE_SPADE, 0);
+        MATERIAL_FLAGS.put(Material.STONE_SPADE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.STONE_PICKAXE, 0);
         MATERIAL_FLAGS.put(Material.STONE_AXE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_SWORD, 0);
-        MATERIAL_FLAGS.put(Material.DIAMOND_SPADE, 0);
+        MATERIAL_FLAGS.put(Material.DIAMOND_SPADE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.DIAMOND_PICKAXE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_AXE, 0);
         MATERIAL_FLAGS.put(Material.STICK, 0);
         MATERIAL_FLAGS.put(Material.BOWL, 0);
         MATERIAL_FLAGS.put(Material.MUSHROOM_SOUP, 0);
         MATERIAL_FLAGS.put(Material.GOLD_SWORD, 0);
-        MATERIAL_FLAGS.put(Material.GOLD_SPADE, 0);
+        MATERIAL_FLAGS.put(Material.GOLD_SPADE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.GOLD_PICKAXE, 0);
         MATERIAL_FLAGS.put(Material.GOLD_AXE, 0);
         MATERIAL_FLAGS.put(Material.STRING, 0);
@@ -458,6 +476,24 @@ public final class Materials {
             MATERIAL_FLAGS.put(Material.JUNGLE_DOOR_ITEM, 0);
             MATERIAL_FLAGS.put(Material.ACACIA_DOOR_ITEM, 0);
             MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR_ITEM, 0);
+
+            MATERIAL_FLAGS.put(Material.BOAT_SPRUCE, 0);
+            MATERIAL_FLAGS.put(Material.BOAT_BIRCH, 0);
+            MATERIAL_FLAGS.put(Material.BOAT_ACACIA, 0);
+            MATERIAL_FLAGS.put(Material.BOAT_DARK_OAK, 0);
+            MATERIAL_FLAGS.put(Material.BEETROOT, 0);
+            MATERIAL_FLAGS.put(Material.BEETROOT_SOUP, 0);
+            MATERIAL_FLAGS.put(Material.BEETROOT_SEEDS, MODIFIES_BLOCKS);
+            MATERIAL_FLAGS.put(Material.CHORUS_FRUIT, 0);
+            MATERIAL_FLAGS.put(Material.CHORUS_FRUIT_POPPED, 0);
+            MATERIAL_FLAGS.put(Material.SHIELD, 0);
+            MATERIAL_FLAGS.put(Material.SPECTRAL_ARROW, 0);
+            MATERIAL_FLAGS.put(Material.TIPPED_ARROW, 0);
+            MATERIAL_FLAGS.put(Material.DRAGONS_BREATH, 0);
+            MATERIAL_FLAGS.put(Material.LINGERING_POTION, 0);
+            MATERIAL_FLAGS.put(Material.ELYTRA, 0);
+            MATERIAL_FLAGS.put(Material.END_CRYSTAL, 0);
+
         } catch (NoSuchFieldError ignored) {
         }
         MATERIAL_FLAGS.put(Material.GOLD_RECORD, 0);
@@ -496,6 +532,10 @@ public final class Materials {
         //DAMAGE_EFFECTS.add(PotionEffectType.WATER_BREATHING);
         DAMAGE_EFFECTS.add(PotionEffectType.WEAKNESS);
         DAMAGE_EFFECTS.add(PotionEffectType.WITHER);
+
+        DAMAGE_EFFECTS.add(PotionEffectType.LEVITATION); // considered by game so I guess
+        DAMAGE_EFFECTS.add(PotionEffectType.UNLUCK);
+
     }
 
     private Materials() {
@@ -646,6 +686,19 @@ public final class Materials {
                 || material == Material.HOPPER_MINECART
                 || material == Material.POWERED_MINECART
                 || material == Material.STORAGE_MINECART;
+    }
+    /**
+     * Test whether the given material is a Boat.
+     *
+     * @param material the material
+     * @return true if a Boat item
+     */
+    public static boolean isBoat(Material material) {
+        return material == Material.BOAT
+                || material == Material.BOAT_ACACIA
+                || material == Material.BOAT_SPRUCE
+                || material == Material.BOAT_DARK_OAK
+                || material == Material.BOAT_JUNGLE;
     }
 
     /**
