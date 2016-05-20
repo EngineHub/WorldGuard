@@ -326,7 +326,7 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        @Nullable ItemStack item = player.getItemInHand();
+        @Nullable ItemStack item = event.getItem();
         Block clicked = event.getClickedBlock();
         Block placed;
         boolean silent = false;
@@ -398,6 +398,15 @@ public class EventAbstractionListener extends AbstractListener {
                 }
 
                 break;
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityBlockForm(EntityBlockFormEvent event) {
+        if (event.getEntity() instanceof Player) {
+            // should just be frostwalker...other uses of EntityBlockForm are in BlockListener
+            Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getEntity()),
+                    event.getBlock().getLocation(), event.getNewState().getType()));
         }
     }
 
@@ -866,7 +875,8 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         // Handle created boats
-        if (item != null && item.getType() == Material.BOAT) {
+        if (item != null && Materials.isBoat(item.getType())) {
+            // TODO as above
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.BOAT));
         }
 

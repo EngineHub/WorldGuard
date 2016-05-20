@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -29,8 +28,12 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.NoSuchElementException;
 
 /**
  * Handles blocked potions.
@@ -52,21 +55,46 @@ public class BlockedPotionsListener extends AbstractListener {
         WorldConfiguration wcfg = cfg.get(event.getWorld());
         ItemStack item = event.getItemStack();
 
-        // We only care about portions
-        if (item.getType() != Material.POTION || BukkitUtil.isWaterPotion(item)) {
-            return;
+        // We only care about potions
+        boolean oldPotions = false;
+        try {
+            if (item.getType() != Material.POTION
+                    && item.getType() != Material.SPLASH_POTION
+                    && item.getType() != Material.LINGERING_POTION) {
+                return;
+            }
+        } catch (NoSuchElementException ignored) {
+            // PotionMeta technically has been around since 1.7, so the code below
+            // *should* work still. we just have different materials now.
+            if (item.getType() != Material.POTION) {
+                return;
+            }
+            oldPotions = true;
         }
 
-        if (!wcfg.blockPotions.isEmpty()) {
-            PotionEffect blockedEffect = null;
 
-            Potion potion = Potion.fromDamage(BukkitUtil.getPotionEffectBits(item));
+        if (!wcfg.blockPotions.isEmpty()) {
+            PotionEffectType blockedEffect = null;
+
+            PotionMeta meta;
+            if (item.getItemMeta() instanceof PotionMeta) {
+                meta = ((PotionMeta) item.getItemMeta());
+            } else {
+                return; // ok...?
+            }
 
             // Find the first blocked effect
-            for (PotionEffect effect : potion.getEffects()) {
-                if (wcfg.blockPotions.contains(effect.getType())) {
-                    blockedEffect = effect;
-                    break;
+            PotionEffectType baseEffect = meta.getBasePotionData().getType().getEffectType();
+            if (wcfg.blockPotions.contains(baseEffect)) {
+                blockedEffect = baseEffect;
+            }
+
+            if (blockedEffect == null && meta.hasCustomEffects()) {
+                for (PotionEffect effect : meta.getCustomEffects()) {
+                    if (wcfg.blockPotions.contains(effect.getType())) {
+                        blockedEffect = effect.getType();
+                        break;
+                    }
                 }
             }
 
@@ -75,16 +103,22 @@ public class BlockedPotionsListener extends AbstractListener {
 
                 if (player != null) {
                     if (getPlugin().hasPermission(player, "worldguard.override.potions")) {
-                        if (potion.isSplash() && wcfg.blockPotionsAlways) {
+                        boolean isSplash = false;
+                        try {
+                            isSplash = (!oldPotions && (item.getType() == Material.SPLASH_POTION || item.getType() == Material.LINGERING_POTION));
+                        } catch (NoSuchElementException ignored) {
+                        }
+                        isSplash |= (oldPotions && (Potion.fromItemStack(item).isSplash()));
+                        if (isSplash && wcfg.blockPotionsAlways) {
                             player.sendMessage(ChatColor.RED + "Sorry, potions with " +
-                                    blockedEffect.getType().getName() + " can't be thrown, " +
+                                    blockedEffect.getName() + " can't be thrown, " +
                                     "even if you have a permission to bypass it, " +
                                     "due to limitations (and because overly-reliable potion blocking is on).");
                             event.setCancelled(true);
                         }
                     } else {
                         player.sendMessage(ChatColor.RED + "Sorry, potions with "
-                                + blockedEffect.getType().getName() + " are presently disabled.");
+                                + blockedEffect.getName() + " are presently disabled.");
                         event.setCancelled(true);
                     }
                 } else {
