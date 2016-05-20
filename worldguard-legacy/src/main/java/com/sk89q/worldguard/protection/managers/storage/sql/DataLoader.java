@@ -223,7 +223,11 @@ class DataLoader {
             PreparedStatement stmt = closer.register(conn.prepareStatement(
                     "SELECT region_id, flag, value " +
                     "FROM " + config.getTablePrefix() + "region_flag " +
-                    "WHERE world_id = " + worldId));
+                    "WHERE world_id = " + worldId +
+                    "AND region_id IN " +
+                        "(SELECT id FROM " +
+                        config.getTablePrefix() + "region WHERE" +
+                        "world_id=" + worldId + ")"));
 
             ResultSet rs = closer.register(stmt.executeQuery());
 
