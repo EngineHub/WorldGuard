@@ -53,6 +53,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -367,6 +368,16 @@ public class WorldGuardPlayerListener implements Listener {
                     return;
                 }
             }
+            try {
+                if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
+                    if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
+                            && !(setFrom.allows(DefaultFlag.CHORUS_TELEPORT, localPlayer))) {
+                        player.sendMessage(ChatColor.DARK_RED + "You're not allowed to teleport from here.");
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            } catch (NoSuchElementException ignored) {}
         }
     }
 

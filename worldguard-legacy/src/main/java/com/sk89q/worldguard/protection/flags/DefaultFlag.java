@@ -100,6 +100,7 @@ public final class DefaultFlag {
     public static final StateFlag ENTRY = new StateFlag("entry", true, RegionGroup.NON_MEMBERS);
     public static final StateFlag EXIT = new StateFlag("exit", true, RegionGroup.NON_MEMBERS);
     public static final StateFlag ENDERPEARL = new StateFlag("enderpearl", true);
+    public static final StateFlag CHORUS_TELEPORT = new StateFlag("chorus-fruit-teleport", true);
     public static final StateFlag ENTITY_PAINTING_DESTROY = new StateFlag("entity-painting-destroy", true);
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = new StateFlag("entity-item-frame-destroy", true);
     public static final StateFlag FALL_DAMAGE = new StateFlag("fall-damage", true);
@@ -146,7 +147,7 @@ public final class DefaultFlag {
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
             DENY_MESSAGE, ENTRY_DENY_MESSAGE, EXIT_DENY_MESSAGE, EXIT_OVERRIDE, EXIT_VIA_TELEPORT,
             GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
-            EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL,
+            EXIT, ENTRY, LIGHTNING, ENTITY_PAINTING_DESTROY, ENDERPEARL, CHORUS_TELEPORT,
             ENTITY_ITEM_FRAME_DESTROY, FALL_DAMAGE, ITEM_PICKUP, ITEM_DROP, /*MAX_PLAYERS, MAX_PLAYERS_MESSAGE,*/
             HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
             FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
