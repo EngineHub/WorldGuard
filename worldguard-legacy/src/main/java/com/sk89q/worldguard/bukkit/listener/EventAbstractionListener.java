@@ -122,7 +122,18 @@ public class EventAbstractionListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
+    public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
+        List<Block> blocks = new ArrayList<Block>();
+        for (BlockState bs : event.getReplacedBlockStates()) {
+            blocks.add(bs.getBlock());
+        }
+        Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()),
+                event.getBlock().getWorld(), blocks, event.getBlock().getType()));
+    }
+
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
+        if (event instanceof BlockMultiPlaceEvent) return;
         BlockState previousState = event.getBlockReplacedState();
 
         // Some blocks, like tall grass and fire, get replaced
