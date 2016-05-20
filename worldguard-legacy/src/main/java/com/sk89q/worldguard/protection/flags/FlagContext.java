@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection.flags;
 import com.google.common.collect.Maps;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -156,8 +157,17 @@ public final class FlagContext {
             return this;
         }
 
+        protected boolean tryAddToMap(String key, Object value) {
+            if (map.containsKey(key)) return false;
+            this.map.put(key, value);
+            return true;
+        }
+
         public FlagContext build() {
+            Bukkit.getServer().getPluginManager().callEvent(new FlagContextCreateEvent(this));
+
             return new FlagContext(sender, input, map);
         }
     }
+
 }
