@@ -224,10 +224,10 @@ class DataLoader {
                     "SELECT region_id, flag, value " +
                     "FROM " + config.getTablePrefix() + "region_flag " +
                     "WHERE world_id = " + worldId +
-                    "AND region_id IN " +
+                    " AND region_id IN " +
                         "(SELECT id FROM " +
-                        config.getTablePrefix() + "region WHERE" +
-                        "world_id=" + worldId + ")"));
+                        config.getTablePrefix() + "region " +
+                        "WHERE world_id = " + worldId + ")"));
 
             ResultSet rs = closer.register(stmt.executeQuery());
 
