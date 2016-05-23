@@ -64,7 +64,6 @@ import org.bukkit.plugin.PluginManager;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -388,7 +387,7 @@ public class WorldGuardPlayerListener implements Listener {
                         return;
                     }
                 }
-            } catch (NoSuchElementException ignored) {}
+            } catch (NoSuchFieldError ignored) {}
         }
     }
 
