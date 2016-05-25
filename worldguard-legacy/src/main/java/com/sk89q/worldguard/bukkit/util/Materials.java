@@ -533,9 +533,11 @@ public final class Materials {
         DAMAGE_EFFECTS.add(PotionEffectType.WEAKNESS);
         DAMAGE_EFFECTS.add(PotionEffectType.WITHER);
 
-        DAMAGE_EFFECTS.add(PotionEffectType.LEVITATION); // considered by game so I guess
-        DAMAGE_EFFECTS.add(PotionEffectType.UNLUCK);
-
+        try {
+            DAMAGE_EFFECTS.add(PotionEffectType.LEVITATION); // considered by game so I guess
+            DAMAGE_EFFECTS.add(PotionEffectType.UNLUCK);
+        } catch (NoSuchFieldError ignored) {
+        }
     }
 
     private Materials() {
