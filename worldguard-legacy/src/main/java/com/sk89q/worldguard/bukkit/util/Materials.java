@@ -696,11 +696,15 @@ public final class Materials {
      * @return true if a Boat item
      */
     public static boolean isBoat(Material material) {
-        return material == Material.BOAT
-                || material == Material.BOAT_ACACIA
-                || material == Material.BOAT_SPRUCE
-                || material == Material.BOAT_DARK_OAK
-                || material == Material.BOAT_JUNGLE;
+        try {
+            return material == Material.BOAT
+                    || material == Material.BOAT_ACACIA
+                    || material == Material.BOAT_SPRUCE
+                    || material == Material.BOAT_DARK_OAK
+                    || material == Material.BOAT_JUNGLE;
+        } catch (NoSuchFieldError ignored) {
+            return material == Material.BOAT;
+        }
     }
 
     /**
