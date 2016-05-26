@@ -37,8 +37,8 @@ import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
 import com.sk89q.worldguard.bukkit.protection.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
-import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.bukkit.util.InteropUtils;
+import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
@@ -46,16 +46,24 @@ import com.sk89q.worldguard.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Tameable;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * Handle events that need to be processed by region protection.
@@ -187,7 +195,7 @@ public class RegionProtectionListener extends AbstractListener {
                     canPlace = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_PLACE));
                     try {
                         event.setSilent(type == Material.FROSTED_ICE);
-                    } catch (NoSuchElementException ignored) {} // back compat
+                    } catch (NoSuchFieldError ignored) {} // back compat
                     what = "place that block";
                 }
 

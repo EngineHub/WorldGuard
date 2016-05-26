@@ -33,8 +33,6 @@ import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.NoSuchElementException;
-
 /**
  * Handles blocked potions.
  */
@@ -63,7 +61,7 @@ public class BlockedPotionsListener extends AbstractListener {
                     && item.getType() != Material.LINGERING_POTION) {
                 return;
             }
-        } catch (NoSuchElementException ignored) {
+        } catch (NoSuchFieldError ignored) {
             // PotionMeta technically has been around since 1.7, so the code below
             // *should* work still. we just have different materials now.
             if (item.getType() != Material.POTION) {
@@ -106,7 +104,7 @@ public class BlockedPotionsListener extends AbstractListener {
                         boolean isSplash = false;
                         try {
                             isSplash = (!oldPotions && (item.getType() == Material.SPLASH_POTION || item.getType() == Material.LINGERING_POTION));
-                        } catch (NoSuchElementException ignored) {
+                        } catch (NoSuchFieldError ignored) {
                         }
                         isSplash |= (oldPotions && (Potion.fromItemStack(item).isSplash()));
                         if (isSplash && wcfg.blockPotionsAlways) {
