@@ -386,6 +386,12 @@ public class WorldGuardPlayerListener implements Listener {
                         event.setCancelled(true);
                         return;
                     }
+                    if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
+                            && !(set.allows(DefaultFlag.CHORUS_TELEPORT, localPlayer))) {
+                        player.sendMessage(ChatColor.DARK_RED + "You're not allowed to teleport there.");
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
             } catch (NoSuchFieldError ignored) {}
         }
