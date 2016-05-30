@@ -380,11 +380,15 @@ public class WorldGuardPlayerListener implements Listener {
             }
             try {
                 if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
-                    if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
-                            && !(setFrom.allows(DefaultFlag.CHORUS_TELEPORT, localPlayer))) {
-                        player.sendMessage(ChatColor.DARK_RED + "You're not allowed to teleport from here.");
-                        event.setCancelled(true);
-                        return;
+                    if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)) {
+                        boolean allowFrom = setFrom.allows(DefaultFlag.CHORUS_TELEPORT, localPlayer);
+                        boolean allowTo = set.allows(DefaultFlag.CHORUS_TELEPORT, localPlayer);
+                        if (!allowFrom || !allowTo) {
+                            player.sendMessage(ChatColor.DARK_RED + "You're not allowed to teleport " +
+                                    (!allowFrom ? "from here." : "there."));
+                            event.setCancelled(true);
+                            return;
+                        }
                     }
                 }
             } catch (NoSuchFieldError ignored) {}
