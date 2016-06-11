@@ -22,11 +22,16 @@ package com.sk89q.worldguard.bukkit.listener;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SpectralArrow;
+import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
@@ -45,6 +50,47 @@ public class BlockedPotionsListener extends AbstractListener {
      */
     public BlockedPotionsListener(WorldGuardPlugin plugin) {
         super(plugin);
+    }
+
+    @EventHandler
+    public void onProjectile(DamageEntityEvent event) {
+        if (event.getOriginalEvent() instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent originalEvent = (EntityDamageByEntityEvent) event.getOriginalEvent();
+            if (Entities.isPotionArrow(originalEvent.getDamager())) { // should take care of backcompat
+                ConfigurationManager cfg = getPlugin().getGlobalStateManager();
+                WorldConfiguration wcfg = cfg.get(event.getWorld());
+                PotionEffectType blockedEffect = null;
+                if (originalEvent.getDamager() instanceof SpectralArrow) {
+                    if (wcfg.blockPotions.contains(PotionEffectType.GLOWING)) {
+                        blockedEffect = PotionEffectType.GLOWING;
+                    }
+                } else if (originalEvent.getDamager() instanceof TippedArrow) {
+                    TippedArrow tippedArrow = (TippedArrow) originalEvent.getDamager();
+                    PotionEffectType baseEffect = tippedArrow.getBasePotionData().getType().getEffectType();
+                    if (wcfg.blockPotions.contains(baseEffect)) {
+                        blockedEffect = baseEffect;
+                    } else {
+                        for (PotionEffect potionEffect : tippedArrow.getCustomEffects()) {
+                            if (wcfg.blockPotions.contains(potionEffect.getType())) {
+                                blockedEffect = potionEffect.getType();
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (blockedEffect != null) {
+                    Player player = event.getCause().getFirstPlayer();
+                    if (player != null) {
+                        if (getPlugin().hasPermission(player, "worldguard.override.potions")) {
+                            return;
+                        }
+                        player.sendMessage(ChatColor.RED + "Sorry, arrows with "
+                                + blockedEffect.getName() + " are presently disabled.");
+                    }
+                    event.setCancelled(true);
+                }
+            }
+        }
     }
 
     @EventHandler
