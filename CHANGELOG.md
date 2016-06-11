@@ -1,5 +1,20 @@
 # Changelog
 
+## 6.1.2
+* Added support for new blocks in 1.8, 1.9, and 1.10.
+* Added protection from nether portals being created in protected region (enable via config `nether-portal-protection`).
+* Added protection from slime block piston contraptions pushing into or pulling from regions.
+* Added `chorus-fruit-teleport` flag, works similar to `enderpearl` to prevent teleportation.
+* Added protection from pulling armor stands, items, and entities from protected regions.
+* Changed order of greeting and farewell flags on adjacent regions. When leaving a region with a farewell flag and entering one with a greeting flag, the farewell message will be shown first now.
+* Changed /heal command to also fill food/saturation meters.
+* Changed fall damage prevention to also prevent flying into walls with elytra being fatal.
+* Fixed fire-spread flag only preventing destruction, now prevents spreading too as per its name.
+* Fixed creepers targeting players being able to blow things up in certain cases.
+* Fixed armor stands being removed by /stoplag.
+* Fixed some issues with fireballs being able to explode when ghast-fireball was set to deny.
+* Fixed a lot of other minor issues.
+
 ## 6.1
 
 * Added `exit-via-teleport` flag (default allow) to control exiting an exit=deny region via teleportation.
