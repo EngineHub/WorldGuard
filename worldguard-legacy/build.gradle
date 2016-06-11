@@ -1,7 +1,7 @@
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-project.version = '6.1.2-SNAPSHOT'
+project.version = '6.1.2'
 ext.internalVersion = project.version + ";" + gitCommitHash
 
 sourceCompatibility = 1.7
