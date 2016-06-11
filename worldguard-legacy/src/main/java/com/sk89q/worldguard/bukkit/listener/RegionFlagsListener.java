@@ -119,6 +119,15 @@ public class RegionFlagsListener extends AbstractListener {
             if (!query.testState(entity.getLocation(), (Player) entity, DefaultFlag.FALL_DAMAGE)) {
                 event.setCancelled(true);
             }
+        } else {
+            try {
+                if (entity instanceof Player && event.getCause() == DamageCause.FLY_INTO_WALL) {
+                    if (!query.testState(entity.getLocation(), (Player) entity, DefaultFlag.FALL_DAMAGE)) {
+                        event.setCancelled(true);
+                    }
+                }
+            } catch (NoSuchFieldError ignored) {
+            }
         }
     }
 
