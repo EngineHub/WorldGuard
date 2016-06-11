@@ -40,6 +40,7 @@ import com.sk89q.worldguard.bukkit.listener.debounce.legacy.BlockEntityEventDebo
 import com.sk89q.worldguard.bukkit.listener.debounce.legacy.EntityEntityEventDebounce;
 import com.sk89q.worldguard.bukkit.listener.debounce.legacy.InventoryMoveItemEventDebounce;
 import com.sk89q.worldguard.bukkit.util.Blocks;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -622,8 +623,20 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerFish(PlayerFishEvent event) {
-        if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getPlayer(), event.getHook()), event.getHook().getLocation(), EntityType.EXPERIENCE_ORB))) {
-            event.setExpToDrop(0);
+        if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
+            if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getPlayer(), event.getHook()), event.getHook().getLocation(), EntityType.EXPERIENCE_ORB))) {
+                event.setExpToDrop(0);
+            }
+        } else if (event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
+            Entity caught = event.getCaught();
+            if (caught == null) return;
+            if (caught instanceof Item) {
+                Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getPlayer(), event.getHook()), caught));
+            } else if (Entities.isConsideredBuildingIfUsed(caught)) {
+                Events.fireToCancel(event, new UseEntityEvent(event, create(event.getPlayer(), event.getHook()), caught));
+            } else if (Entities.isNonHostile(caught)) {
+                Events.fireToCancel(event, new DamageEntityEvent(event, create(event.getPlayer(), event.getHook()), caught));
+            }
         }
     }
 
