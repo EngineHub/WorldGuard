@@ -40,6 +40,9 @@ import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.*;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.flags.CustomFlagBroker;
+import com.sk89q.worldguard.protection.flags.CustomFlagBrokerImpl;
+import com.sk89q.worldguard.protection.flags.CustomFlagProvider;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
@@ -127,6 +130,19 @@ public class WorldGuardPlugin extends JavaPlugin {
     @SuppressWarnings("deprecation")
     public void onEnable() {
         configureLogger();
+
+        // Load in custom flags
+        CustomFlagBroker broker = new CustomFlagBrokerImpl();
+        for (Plugin plugin : this.getServer().getPluginManager().getPlugins()) {
+            if (plugin instanceof CustomFlagProvider) {
+                CustomFlagProvider provider = (CustomFlagProvider)plugin;
+                try {
+                    provider.addCustomFlags(broker);
+                } catch (Exception e) {
+                    log.log(Level.WARNING, "Unhandled exception from plugin \"" + plugin + "\"", e);
+                }
+            }
+        }
 
         getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
 
