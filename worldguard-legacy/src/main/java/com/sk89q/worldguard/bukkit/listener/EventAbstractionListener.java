@@ -431,7 +431,6 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent event) {
         Block block = event.getBlock();
-        Material type = block.getType();
         Cause cause;
 
         // Find the cause
