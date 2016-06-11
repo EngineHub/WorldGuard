@@ -12,11 +12,14 @@ checkstyle.configFile = new File(projectDir, "config/checkstyle/checkstyle.xml")
 dependencies {
     compile 'org.khelekore:prtree:1.5.0'
     compile 'org.bukkit:bukkit:1.9.4-R0.1-SNAPSHOT'
-    compile 'com.sk89q.worldedit:worldedit-bukkit:6.1.1-SNAPSHOT'
+    compile 'com.sk89q.worldedit:worldedit-bukkit:6.1.3-SNAPSHOT'
     compile 'com.sk89q:squirrelid:0.1.0'
     compile 'com.sk89q:guavabackport:1.1'
     compile 'org.flywaydb:flyway-core:3.0'
-    compile 'com.sk89q:commandbook:2.3'
+    compile ('com.sk89q:commandbook:2.3') {
+        exclude group: 'com.sk89q', module: 'worldedit'
+        exclude group: 'com.zachsthings.libcomponents'
+    }
     compile 'net.sf.opencsv:opencsv:2.0'
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'com.google.code.findbugs:jsr305:1.3.9'
@@ -44,7 +47,7 @@ shadowJar {
         include(dependency('com.googlecode.json-simple:json-simple:1.1.1'))
         include(dependency('net.sf.opencsv:opencsv:2.0'))
     }
-                                                                   
+
     relocate('com.sk89q.guavabackport', 'com.sk89q.worldguard.internal.guava')
     relocate('org.flywaydb', 'com.sk89q.worldguard.internal.flywaydb')
     relocate('com.sk89q.squirrelid', 'com.sk89q.worldguard.util.profile')
