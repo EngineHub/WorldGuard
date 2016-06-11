@@ -195,4 +195,10 @@ public final class Entities {
                 || entity.getType() == armorStandType;
     }
 
+    private static final EntityType tippedArrow = Enums.findByValue(EntityType.class, "TIPPED_ARROW");
+    private static final EntityType spectralArrow = Enums.findByValue(EntityType.class, "SPECTRAL_ARROW");
+    public static boolean isPotionArrow(Entity entity) {
+        return (entity != null &&
+                (entity.getType() == tippedArrow || entity.getType() == spectralArrow));
+    }
 }
