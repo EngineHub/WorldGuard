@@ -62,6 +62,7 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -187,7 +188,15 @@ public class RegionProtectionListener extends AbstractListener {
 
                 /* Flint and steel, fire charge, etc. */
                 if (type == Material.FIRE) {
-                    canPlace = query.testBuild(target, associable, combine(event, DefaultFlag.BLOCK_PLACE, DefaultFlag.LIGHTER));
+                    Block block = event.getCause().getFirstBlock();
+                    boolean fire = block != null && block.getType() == Material.FIRE;
+                    boolean lava = block != null && Materials.isLava(block.getType());
+                    List<StateFlag> flags = new ArrayList<StateFlag>();
+                    flags.add(DefaultFlag.BLOCK_PLACE);
+                    flags.add(DefaultFlag.LIGHTER);
+                    if (fire) flags.add(DefaultFlag.FIRE_SPREAD);
+                    if (lava) flags.add(DefaultFlag.LAVA_FIRE);
+                    canPlace = query.testBuild(target, associable, combine(event, flags.toArray(new StateFlag[flags.size()])));
                     what = "place fire";
 
                 /* Everything else */
