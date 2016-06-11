@@ -107,7 +107,7 @@ public final class RegionManager {
      */
     public void save() throws StorageException {
         index.setDirty(false);
-        store.saveAll(new HashSet<ProtectedRegion>(getValuesCopy()));
+        store.saveAll(new HashSet<ProtectedRegion>(getFilteredValuesCopy()));
     }
 
     /**
@@ -424,12 +424,18 @@ public final class RegionManager {
     }
 
     /**
-     * Get an {@link ArrayList} copy of regions in the index.
+     * Get an {@link ArrayList} copy of regions in the index with transient regions filtered.
      *
      * @return a list
      */
-    private List<ProtectedRegion> getValuesCopy() {
-        return new ArrayList<ProtectedRegion>(index.values());
+    private List<ProtectedRegion> getFilteredValuesCopy() {
+        List<ProtectedRegion> filteredValues = new ArrayList<ProtectedRegion>();
+        for (ProtectedRegion region : index.values()) {
+            if (!region.isTransient()) {
+                filteredValues.add(region);
+            }
+        }
+        return filteredValues;
     }
 
     // =============== HELPER METHODS ===============
