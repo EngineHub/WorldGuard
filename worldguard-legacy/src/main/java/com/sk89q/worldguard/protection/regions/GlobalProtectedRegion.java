@@ -39,12 +39,24 @@ import java.util.List;
 public class GlobalProtectedRegion extends ProtectedRegion {
 
     /**
-     * Create a new instance.
+     * Create a new instance.<br>
+     * Equivalent to {@link #GlobalProtectedRegion(String, boolean) GlobalProtectedRegion(id, false)}<br>
+     * <code>transientRegion</code> will be set to false, and this region can be saved.
      *
      * @param id the ID
      */
     public GlobalProtectedRegion(String id) {
-        super(id);
+        this(id, false);
+    }
+
+    /**
+     * Create a new instance.
+     *
+     * @param id the ID
+     * @param transientRegion whether this region should only be kept in memory and not be saved
+     */
+    public GlobalProtectedRegion(String id, boolean transientRegion) {
+        super(id, transientRegion);
         min = new BlockVector(0, 0, 0);
         max = new BlockVector(0, 0, 0);
     }
