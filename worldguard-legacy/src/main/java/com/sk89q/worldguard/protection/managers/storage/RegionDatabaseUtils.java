@@ -19,11 +19,9 @@
 
 package com.sk89q.worldguard.protection.managers.storage;
 
-import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.logging.Logger;
 
