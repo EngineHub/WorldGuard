@@ -20,10 +20,8 @@
 package com.sk89q.worldguard.protection.flags;
 
 import com.google.common.collect.Iterators;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.FlagValueCalculator;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
-import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nullable;
 import java.util.Collection;

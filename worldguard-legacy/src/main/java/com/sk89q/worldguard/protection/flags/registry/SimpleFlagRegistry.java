@@ -115,7 +115,13 @@ public class SimpleFlagRegistry implements FlagRegistry {
         checkNotNull(rawValues, "rawValues");
 
         ConcurrentMap<Flag<?>, Object> values = Maps.newConcurrentMap();
+        ConcurrentMap<String, Object> regionFlags = Maps.newConcurrentMap();
+
         for (Entry<String, Object> entry : rawValues.entrySet()) {
+            if (entry.getKey().endsWith("-group")) {
+                regionFlags.put(entry.getKey(), entry.getValue());
+                continue;
+            }
             Flag<?> flag = createUnknown ? getOrCreate(entry.getKey()) : get(entry.getKey());
 
             if (flag != null) {
@@ -130,6 +136,15 @@ public class SimpleFlagRegistry implements FlagRegistry {
                 } catch (Exception e) {
                     log.log(Level.WARNING, "Failed to unmarshal flag value for " + flag, e);
                 }
+            }
+        }
+        for (Entry<String, Object> entry : regionFlags.entrySet()) {
+            String parentName = entry.getKey().replaceAll("-group", "");
+            Flag<?> parent = get(parentName);
+            if (parent == null || parent instanceof UnknownFlag) {
+                forceRegister(new UnknownFlag(entry.getKey()));
+            } else {
+                parent.getRegionGroupFlag().unmarshal(entry.getValue());
             }
         }
 
