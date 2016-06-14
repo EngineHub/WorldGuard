@@ -633,7 +633,7 @@ public class EventAbstractionListener extends AbstractListener {
                 Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getPlayer(), event.getHook()), caught));
             } else if (Entities.isConsideredBuildingIfUsed(caught)) {
                 Events.fireToCancel(event, new UseEntityEvent(event, create(event.getPlayer(), event.getHook()), caught));
-            } else if (Entities.isNonHostile(caught)) {
+            } else if (Entities.isNonHostile(caught) || caught instanceof Player) {
                 Events.fireToCancel(event, new DamageEntityEvent(event, create(event.getPlayer(), event.getHook()), caught));
             }
         }
