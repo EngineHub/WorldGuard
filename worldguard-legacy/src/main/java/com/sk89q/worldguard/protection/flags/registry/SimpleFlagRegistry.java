@@ -142,9 +142,9 @@ public class SimpleFlagRegistry implements FlagRegistry {
             String parentName = entry.getKey().replaceAll("-group", "");
             Flag<?> parent = get(parentName);
             if (parent == null || parent instanceof UnknownFlag) {
-                forceRegister(new UnknownFlag(entry.getKey()));
+                if (createUnknown) forceRegister(new UnknownFlag(entry.getKey()));
             } else {
-                parent.getRegionGroupFlag().unmarshal(entry.getValue());
+                values.put(parent.getRegionGroupFlag(), parent.getRegionGroupFlag().unmarshal(entry.getValue()));
             }
         }
 
