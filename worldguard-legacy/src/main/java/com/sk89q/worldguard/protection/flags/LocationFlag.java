@@ -73,17 +73,20 @@ public class LocationFlag extends Flag<Location> {
             if (obj instanceof ProtectedRegion) {
                 ProtectedRegion rg = (ProtectedRegion) obj;
                 if (WorldGuardPlugin.inst().getGlobalStateManager().get(player.getWorld()).boundedLocationFlags) {
-                    if (!rg.contains(loc.getPosition()) && new RegionPermissionModel(WorldGuardPlugin.inst(), player).mayOverrideLocationFlagBounds(rg)) {
-                        player.sendMessage(ChatColor.GRAY + "WARNING: Flag location is outside of region.");
-                    } else {
-                        // no permission
-                        throw new InvalidFlagFormat("You can't set that flag outside of the region boundaries.");
+                    if (!rg.contains(loc.getPosition())) {
+                        if (new RegionPermissionModel(WorldGuardPlugin.inst(), player).mayOverrideLocationFlagBounds(rg)) {
+                            player.sendMessage(ChatColor.GRAY + "WARNING: Flag location is outside of region.");
+                        } else {
+                            // no permission
+                            throw new InvalidFlagFormat("You can't set that flag outside of the region boundaries.");
+                        }
                     }
                     // clamp height to world limits
                     loc.setPosition(loc.getPosition().clampY(0, player.getWorld().getMaxHeight()));
                     return loc;
                 }
             }
+            return loc;
         }
         throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
     }
