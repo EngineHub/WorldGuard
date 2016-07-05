@@ -276,7 +276,9 @@ public final class Materials {
             MATERIAL_FLAGS.put(Material.JUNGLE_DOOR, MODIFIED_ON_RIGHT);
             MATERIAL_FLAGS.put(Material.ACACIA_DOOR, MODIFIED_ON_RIGHT);
             MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR, MODIFIED_ON_RIGHT);
-
+        } catch (NoSuchFieldError ignored) {
+        }
+        try {
             MATERIAL_FLAGS.put(Material.GRASS_PATH, 0);
             MATERIAL_FLAGS.put(Material.CHORUS_PLANT, 0);
             MATERIAL_FLAGS.put(Material.CHORUS_FLOWER, 0);
@@ -293,7 +295,14 @@ public final class Materials {
             MATERIAL_FLAGS.put(Material.STRUCTURE_BLOCK, MODIFIED_ON_LEFT | MODIFIED_ON_RIGHT);
             MATERIAL_FLAGS.put(Material.COMMAND_REPEATING, MODIFIED_ON_RIGHT);
             MATERIAL_FLAGS.put(Material.COMMAND_CHAIN , MODIFIED_ON_RIGHT);
-
+        } catch (NoSuchFieldError ignored) {
+        }
+        try {
+            MATERIAL_FLAGS.put(Material.MAGMA, 0);
+            MATERIAL_FLAGS.put(Material.NETHER_WART_BLOCK, 0);
+            MATERIAL_FLAGS.put(Material.RED_NETHER_BRICK, 0);
+            MATERIAL_FLAGS.put(Material.BONE_BLOCK, 0);
+            MATERIAL_FLAGS.put(Material.STRUCTURE_VOID, 0);
         } catch (NoSuchFieldError ignored) {
         }
 
