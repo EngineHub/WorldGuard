@@ -710,7 +710,8 @@ public final class Materials {
                     || material == Material.BOAT_ACACIA
                     || material == Material.BOAT_SPRUCE
                     || material == Material.BOAT_DARK_OAK
-                    || material == Material.BOAT_JUNGLE;
+                    || material == Material.BOAT_JUNGLE
+                    || material == Material.BOAT_BIRCH;
         } catch (NoSuchFieldError ignored) {
             return material == Material.BOAT;
         }
