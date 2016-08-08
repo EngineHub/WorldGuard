@@ -182,6 +182,8 @@ public final class Entities {
 
     private static final EntityType armorStandType =
             Enums.findByValue(EntityType.class, "ARMOR_STAND");
+    public static final EntityType enderCrystalType =
+            Enums.findByValue(EntityType.class, "ENDER_CRYSTAL");
 
     /**
      * Test whether using the given entity should be considered "building"
@@ -192,7 +194,8 @@ public final class Entities {
      */
     public static boolean isConsideredBuildingIfUsed(Entity entity) {
         return entity instanceof Hanging
-                || entity.getType() == armorStandType;
+                || entity.getType() == armorStandType
+                || entity.getType() == enderCrystalType;
     }
 
     private static final EntityType tippedArrow = Enums.findByValue(EntityType.class, "TIPPED_ARROW");

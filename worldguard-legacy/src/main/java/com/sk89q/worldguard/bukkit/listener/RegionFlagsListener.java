@@ -25,6 +25,7 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
+import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
@@ -61,10 +62,6 @@ public class RegionFlagsListener extends AbstractListener {
 
         Block block;
         if ((block = event.getCause().getFirstBlock()) != null) {
-            // ================================================================
-            // PISTONS flag
-            // ================================================================
-
             if (Materials.isPistonBlock(block.getType())) {
                 event.filter(testState(query, DefaultFlag.PISTONS), false);
             }
@@ -80,31 +77,22 @@ public class RegionFlagsListener extends AbstractListener {
 
         Block block;
         if ((block = event.getCause().getFirstBlock()) != null) {
-            // ================================================================
-            // PISTONS flag
-            // ================================================================
-
             if (Materials.isPistonBlock(block.getType())) {
                 event.filter(testState(query, DefaultFlag.PISTONS), false);
             }
         }
 
-        // ================================================================
-        // CREEPER_EXPLOSION flag
-        // ================================================================
-
         if (event.getCause().find(EntityType.CREEPER) != null) { // Creeper
             event.filter(testState(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
         }
-
-        // ================================================================
-        // ENDERDRAGON_BLOCK_DAMAGE flag
-        // ================================================================
 
         if (event.getCause().find(EntityType.ENDER_DRAGON) != null) { // Enderdragon
             event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
         }
 
+        if (event.getCause().find(Entities.enderCrystalType) != null) { // should be nullsafe even if enderCrystalType field is null
+            event.filter(testState(query, DefaultFlag.OTHER_EXPLOSION), config.explosionFlagCancellation);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
