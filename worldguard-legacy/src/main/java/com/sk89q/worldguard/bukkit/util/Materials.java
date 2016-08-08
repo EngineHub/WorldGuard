@@ -47,12 +47,16 @@ public final class Materials {
     private static final Set<PotionEffectType> DAMAGE_EFFECTS = new HashSet<PotionEffectType>();
 
     public static Material ARMOR_STAND;
+    public static Material END_CRYSTAL;
 
     static {
         try {
+            // for backwards compatible access to material enum
             ARMOR_STAND = Material.ARMOR_STAND;
+            END_CRYSTAL = Material.END_CRYSTAL;
         } catch (NoSuchFieldError ignored) {
             ARMOR_STAND = null;
+            END_CRYSTAL = null;
         }
 
         ENTITY_ITEMS.put(EntityType.PAINTING, Material.PAINTING);
