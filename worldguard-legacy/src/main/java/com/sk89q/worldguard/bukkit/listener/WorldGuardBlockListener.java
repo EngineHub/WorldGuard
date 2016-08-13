@@ -624,6 +624,7 @@ public class WorldGuardBlockListener implements Listener {
 
         switch (event.getBlock().getTypeId()) {
         case BlockID.ICE:
+        case BlockID.FROSTED_ICE:
             if (wcfg.disableIceMelting) {
                 event.setCancelled(true);
                 return;
