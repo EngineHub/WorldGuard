@@ -167,6 +167,19 @@ public class WorldGuardEntityListener implements Listener {
             }
         }
 
+        if (attacker.getType() == Entities.enderCrystalType) {
+            // this isn't handled elsewhere because ender crystal explosions don't carry a player cause
+            // in the same way that creepers or tnt can
+            WorldConfiguration wcfg = plugin.getGlobalStateManager().get(defender.getWorld());
+            if (wcfg.useRegions && wcfg.explosionFlagCancellation) {
+                if (!plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation())
+                        .testState(null, DefaultFlag.OTHER_EXPLOSION)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+
         if (defender instanceof Player) {
             Player player = (Player) defender;
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
