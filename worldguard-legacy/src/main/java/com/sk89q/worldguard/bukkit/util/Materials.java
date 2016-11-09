@@ -54,10 +54,7 @@ public final class Materials {
             // for backwards compatible access to material enum
             ARMOR_STAND = Material.ARMOR_STAND;
             END_CRYSTAL = Material.END_CRYSTAL;
-        } catch (NoSuchFieldError ignored) {
-            ARMOR_STAND = null;
-            END_CRYSTAL = null;
-        }
+        } catch (NoSuchFieldError ignored) {}
 
         ENTITY_ITEMS.put(EntityType.PAINTING, Material.PAINTING);
         ENTITY_ITEMS.put(EntityType.ARROW, Material.ARROW);
