@@ -204,4 +204,9 @@ public final class Entities {
         return (entity != null &&
                 (entity.getType() == tippedArrow || entity.getType() == spectralArrow));
     }
+
+    private static final EntityType aoeCloud = Enums.findByValue(EntityType.class, "AREA_EFFECT_CLOUD");
+    public static boolean isAoECloud(EntityType type) {
+        return type == aoeCloud;
+    }
 }

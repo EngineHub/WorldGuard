@@ -340,9 +340,13 @@ public class RegionProtectionListener extends AbstractListener {
             what = "drop items";
 
         /* XP drops */
-        } else if (event.getEffectiveType() == EntityType.EXPERIENCE_ORB) {
+        } else if (type == EntityType.EXPERIENCE_ORB) {
             canSpawn = query.testBuild(target, associable, combine(event, DefaultFlag.EXP_DROPS));
             what = "drop XP";
+
+        } else if (Entities.isAoECloud(type)) {
+            canSpawn = query.testBuild(target, associable, combine(event, DefaultFlag.POTION_SPLASH));
+            what = "use lingering potions";
 
         /* Everything else */
         } else {
