@@ -713,8 +713,9 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityCombust(EntityCombustEvent event) {
         if (event instanceof EntityCombustByBlockEvent) {
-            Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityCombustByBlockEvent) event).getCombuster()), event.getEntity()));
-
+            // at the time of writing, spigot is throwing null for the event's combuster. this causes lots of issues downstream.
+            // whenever (i mean if ever) it is fixed, use getCombuster again instead of the current block
+            Events.fireToCancel(event, new DamageEntityEvent(event, create(event.getEntity().getLocation().getBlock()), event.getEntity()));
         } else if (event instanceof EntityCombustByEntityEvent) {
             Events.fireToCancel(event, new DamageEntityEvent(event, create(((EntityCombustByEntityEvent) event).getCombuster()), event.getEntity()));
         }
