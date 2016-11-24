@@ -49,12 +49,34 @@ public final class Materials {
     public static Material ARMOR_STAND;
     public static Material END_CRYSTAL;
 
+    private static Set<Material> shulkerBoxes = new HashSet<>();
+
     static {
         try {
             // for backwards compatible access to material enum
             ARMOR_STAND = Material.ARMOR_STAND;
             END_CRYSTAL = Material.END_CRYSTAL;
         } catch (NoSuchFieldError ignored) {}
+
+        try {
+            shulkerBoxes.add(Material.WHITE_SHULKER_BOX);
+            shulkerBoxes.add(Material.ORANGE_SHULKER_BOX);
+            shulkerBoxes.add(Material.MAGENTA_SHULKER_BOX);
+            shulkerBoxes.add(Material.LIGHT_BLUE_SHULKER_BOX);
+            shulkerBoxes.add(Material.YELLOW_SHULKER_BOX);
+            shulkerBoxes.add(Material.LIME_SHULKER_BOX);
+            shulkerBoxes.add(Material.PINK_SHULKER_BOX);
+            shulkerBoxes.add(Material.GRAY_SHULKER_BOX);
+            shulkerBoxes.add(Material.SILVER_SHULKER_BOX); // who called this silver?
+            shulkerBoxes.add(Material.CYAN_SHULKER_BOX);
+            shulkerBoxes.add(Material.PURPLE_SHULKER_BOX);
+            shulkerBoxes.add(Material.BLUE_SHULKER_BOX);
+            shulkerBoxes.add(Material.BROWN_SHULKER_BOX);
+            shulkerBoxes.add(Material.GREEN_SHULKER_BOX);
+            shulkerBoxes.add(Material.RED_SHULKER_BOX);
+            shulkerBoxes.add(Material.BLACK_SHULKER_BOX);
+        } catch (NoSuchFieldError ignored) {
+        }
 
         ENTITY_ITEMS.put(EntityType.PAINTING, Material.PAINTING);
         ENTITY_ITEMS.put(EntityType.ARROW, Material.ARROW);
@@ -298,13 +320,16 @@ public final class Materials {
             MATERIAL_FLAGS.put(Material.COMMAND_CHAIN , MODIFIED_ON_RIGHT);
         } catch (NoSuchFieldError ignored) {
         }
-        try {
+        try { // 1.10
             MATERIAL_FLAGS.put(Material.MAGMA, 0);
             MATERIAL_FLAGS.put(Material.NETHER_WART_BLOCK, 0);
             MATERIAL_FLAGS.put(Material.RED_NETHER_BRICK, 0);
             MATERIAL_FLAGS.put(Material.BONE_BLOCK, 0);
             MATERIAL_FLAGS.put(Material.STRUCTURE_VOID, 0);
         } catch (NoSuchFieldError ignored) {
+        }
+        for (Material m : shulkerBoxes) {
+            MATERIAL_FLAGS.put(m, MODIFIED_ON_RIGHT);
         }
 
         MATERIAL_FLAGS.put(Material.IRON_SPADE, MODIFIES_BLOCKS);
@@ -466,7 +491,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.LEASH, 0);
         MATERIAL_FLAGS.put(Material.NAME_TAG, 0);
         MATERIAL_FLAGS.put(Material.COMMAND_MINECART, 0);
-        try {
+        try { // 1.8
             MATERIAL_FLAGS.put(Material.PRISMARINE_SHARD, 0);
             MATERIAL_FLAGS.put(Material.PRISMARINE_CRYSTALS, 0);
             MATERIAL_FLAGS.put(Material.RABBIT, 0);
@@ -486,7 +511,9 @@ public final class Materials {
             MATERIAL_FLAGS.put(Material.JUNGLE_DOOR_ITEM, 0);
             MATERIAL_FLAGS.put(Material.ACACIA_DOOR_ITEM, 0);
             MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR_ITEM, 0);
-
+        } catch (NoSuchFieldError ignored) {
+        }
+        try { // 1.9 + 1.10 (oops)
             MATERIAL_FLAGS.put(Material.BOAT_SPRUCE, 0);
             MATERIAL_FLAGS.put(Material.BOAT_BIRCH, 0);
             MATERIAL_FLAGS.put(Material.BOAT_ACACIA, 0);
@@ -503,7 +530,11 @@ public final class Materials {
             MATERIAL_FLAGS.put(Material.LINGERING_POTION, 0);
             MATERIAL_FLAGS.put(Material.ELYTRA, 0);
             MATERIAL_FLAGS.put(Material.END_CRYSTAL, 0);
-
+        } catch (NoSuchFieldError ignored) {
+        }
+        try { // 1.11
+            MATERIAL_FLAGS.put(Material.TOTEM, 0);
+            MATERIAL_FLAGS.put(Material.SHULKER_SHELL, 0);
         } catch (NoSuchFieldError ignored) {
         }
         MATERIAL_FLAGS.put(Material.GOLD_RECORD, 0);
@@ -733,7 +764,8 @@ public final class Materials {
                 || material == Material.BREWING_STAND
                 || material == Material.TRAPPED_CHEST
                 || material == Material.HOPPER
-                || material == Material.DROPPER;
+                || material == Material.DROPPER
+                || shulkerBoxes.contains(material);
     }
 
     /**
