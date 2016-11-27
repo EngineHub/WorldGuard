@@ -36,13 +36,6 @@ public final class DefaultFlag {
     // Overrides membership check
     public static final StateFlag PASSTHROUGH = new StateFlag("passthrough", false);
 
-    /**
-     * @deprecated This flag is being removed because group flags can now be
-     *             set on all flags.
-     */
-    @Deprecated
-    public static final RegionGroupFlag CONSTRUCT = new RegionGroupFlag("construct", RegionGroup.MEMBERS);
-
     // This flag is unlike the others. It forces the checking of region membership
     public static final StateFlag BUILD = new BuildFlag("build", true);
 
@@ -138,14 +131,19 @@ public final class DefaultFlag {
     // public static final StringFlag MAX_PLAYERS_MESSAGE = new StringFlag("max-players-reject-message");
     public static final LocationFlag TELE_LOC = new LocationFlag("teleport", RegionGroup.MEMBERS);
     public static final LocationFlag SPAWN_LOC = new LocationFlag("spawn", RegionGroup.MEMBERS);
-    public static final StateFlag ENABLE_SHOP = new StateFlag("allow-shop", false);
-    public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
-    public static final DoubleFlag PRICE = new DoubleFlag("price");
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", new CommandStringFlag(null));
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", new CommandStringFlag(null));
 
+    // these 3 are not used by worldguard and should be re-implemented in plugins that may use them using custom flag api
+    @Deprecated
+    public static final StateFlag ENABLE_SHOP = new StateFlag("allow-shop", false);
+    @Deprecated
+    public static final BooleanFlag BUYABLE = new BooleanFlag("buyable");
+    @Deprecated
+    public static final DoubleFlag PRICE = new DoubleFlag("price");
+
     public static final Flag<?>[] flagsList = new Flag<?>[] {
-            PASSTHROUGH, BUILD, CONSTRUCT, BLOCK_BREAK, BLOCK_PLACE, PVP, CHEST_ACCESS, PISTONS,
+            PASSTHROUGH, BUILD, BLOCK_BREAK, BLOCK_PLACE, PVP, CHEST_ACCESS, PISTONS,
             TNT, LIGHTER, RIDE, USE, INTERACT, PLACE_VEHICLE, DESTROY_VEHICLE, DAMAGE_ANIMALS, SLEEP,
             MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,

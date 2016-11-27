@@ -23,8 +23,6 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.RegionGroup;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 
@@ -40,14 +38,6 @@ public abstract class AbstractRegionSet implements ApplicableRegionSet {
     public boolean canBuild(LocalPlayer player) {
         checkNotNull(player);
         return test(queryState(player, DefaultFlag.BUILD));
-    }
-
-    @Override
-    @Deprecated
-    public boolean canConstruct(LocalPlayer player) {
-        checkNotNull(player);
-        final RegionGroup flag = getFlag(DefaultFlag.CONSTRUCT, player);
-        return RegionGroupFlag.isMember(this, flag, player);
     }
 
     @Override
