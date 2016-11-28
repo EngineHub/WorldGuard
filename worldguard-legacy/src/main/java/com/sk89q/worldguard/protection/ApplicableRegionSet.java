@@ -150,17 +150,6 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
     <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag);
 
     /**
-     * Test whether the construct flag evaluates true for the given player.
-     *
-     * @param player the player
-     * @return true if true
-     * @deprecated The {@code CONSTRUCT} flag is being removed and is no longer
-     *             needed because flags now support groups assigned to them.
-     */
-    @Deprecated
-    boolean canConstruct(LocalPlayer player);
-
-    /**
      * Gets the state of a state flag. This cannot be used for the build flag.
      *
      * @param flag flag to check
