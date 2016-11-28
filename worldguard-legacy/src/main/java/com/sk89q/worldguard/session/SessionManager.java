@@ -24,22 +24,8 @@ import com.sk89q.guavabackport.cache.CacheLoader;
 import com.sk89q.guavabackport.cache.LoadingCache;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.session.handler.EntryFlag;
-import com.sk89q.worldguard.session.handler.ExitFlag;
-import com.sk89q.worldguard.session.handler.FarewellFlag;
-import com.sk89q.worldguard.session.handler.FeedFlag;
-import com.sk89q.worldguard.session.handler.GameModeFlag;
-import com.sk89q.worldguard.session.handler.GodMode;
-import com.sk89q.worldguard.session.handler.GreetingFlag;
-import com.sk89q.worldguard.session.handler.Handler;
+import com.sk89q.worldguard.session.handler.*;
 import com.sk89q.worldguard.session.handler.Handler.Factory;
-import com.sk89q.worldguard.session.handler.HealFlag;
-import com.sk89q.worldguard.session.handler.InvincibilityFlag;
-import com.sk89q.worldguard.session.handler.NotifyEntryFlag;
-import com.sk89q.worldguard.session.handler.NotifyExitFlag;
-import com.sk89q.worldguard.session.handler.TimeLockFlag;
-import com.sk89q.worldguard.session.handler.WaterBreathing;
-import com.sk89q.worldguard.session.handler.WeatherLockFlag;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,10 +34,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -93,7 +83,7 @@ public class SessionManager implements Runnable, Listener {
     public SessionManager(WorldGuardPlugin plugin) {
         checkNotNull(plugin, "plugin");
         this.plugin = plugin;
-        registerDefaultHandlers();
+        handlers.addAll(defaultHandlers);
     }
 
     /**
@@ -148,23 +138,25 @@ public class SessionManager implements Runnable, Listener {
 
     private LinkedList<Factory<? extends Handler>> handlers = new LinkedList<Factory<? extends Handler>>();
 
-    private void registerDefaultHandlers() {
-        // our list shouldn't be getting concurrently modified
-        // so we can safely order by providing null for 'after'
-        registerHandler(HealFlag.FACTORY, null);
-        registerHandler(FeedFlag.FACTORY, null);
-        registerHandler(NotifyEntryFlag.FACTORY, null);
-        registerHandler(NotifyExitFlag.FACTORY, null);
-        registerHandler(EntryFlag.FACTORY, null);
-        registerHandler(ExitFlag.FACTORY, null);
-        registerHandler(FarewellFlag.FACTORY, null);
-        registerHandler(GreetingFlag.FACTORY, null);
-        registerHandler(GameModeFlag.FACTORY, null);
-        registerHandler(InvincibilityFlag.FACTORY, null);
-        registerHandler(TimeLockFlag.FACTORY, null);
-        registerHandler(WeatherLockFlag.FACTORY, null);
-        registerHandler(GodMode.FACTORY, null);
-        registerHandler(WaterBreathing.FACTORY, null);
+    private static final Set<Factory<? extends Handler>> defaultHandlers = new HashSet<Factory<? extends Handler>>();
+    static {
+        Factory<?>[] factories = {
+            FeedFlag.FACTORY,
+            FeedFlag.FACTORY,
+            NotifyEntryFlag.FACTORY,
+            NotifyExitFlag.FACTORY,
+            EntryFlag.FACTORY,
+            ExitFlag.FACTORY,
+            FarewellFlag.FACTORY,
+            GreetingFlag.FACTORY,
+            GameModeFlag.FACTORY,
+            InvincibilityFlag.FACTORY,
+            TimeLockFlag.FACTORY,
+            WeatherLockFlag.FACTORY,
+            GodMode.FACTORY,
+            WaterBreathing.FACTORY
+        };
+        defaultHandlers.addAll(Arrays.asList(factories));
     }
 
     /**
@@ -181,10 +173,12 @@ public class SessionManager implements Runnable, Listener {
      * @param after the handler factory to insert the first handler after, to ensure a specific order when creating new sessions
      *
      * @return {@code true} (as specified by {@link Collection#add})
-     *          {@code false} if {@param after} is not registered
+     *          {@code false} if {@param after} is not registered, or {@param factory} is null
      */
     public boolean registerHandler(Factory<? extends Handler> factory, @Nullable Factory<? extends Handler> after) {
         if (factory == null) return false;
+        WorldGuardPlugin.inst().getLogger().log(Level.INFO, "Registering session handler "
+                + factory.getClass().getEnclosingClass().getName());
         if (after == null) {
             handlers.add(factory);
         } else {
@@ -194,6 +188,28 @@ public class SessionManager implements Runnable, Listener {
             handlers.add(index, factory); // shifts "after" right one, and everything after "after" right one
         }
         return true;
+    }
+
+    /**
+     * Unregister a handler.
+     *
+     * This will prevent it from being added to newly created sessions only. Existing
+     * sessions with the handler will continue to use it.
+     *
+     * Will return false if the handler was not registered to begin with.
+     *
+     * @param factory the handler factory to unregister
+     * @return true if the handler was registered and is now unregistered, false otherwise
+     */
+    public boolean unregisterHandler(Factory<? extends Handler> factory) {
+        if (defaultHandlers.contains(factory)) {
+            WorldGuardPlugin.inst().getLogger().log(Level.WARNING, "Someone is unregistering a default WorldGuard handler: "
+                    + factory.getClass().getEnclosingClass().getName() + ". This may cause parts of WorldGuard to stop functioning");
+        } else {
+            WorldGuardPlugin.inst().getLogger().log(Level.INFO, "Unregistering session handler "
+                    + factory.getClass().getEnclosingClass().getName());
+        }
+        return handlers.remove(factory);
     }
 
     /**
