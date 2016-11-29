@@ -109,6 +109,10 @@ public class EventAbstractionListener extends AbstractListener {
             getPlugin().getServer().getPluginManager().registerEvents(new SpigotCompatListener(), getPlugin());
         } catch (LinkageError ignored) {
         }
+        try {
+            getPlugin().getServer().getPluginManager().registerEvents(new LingeringPotionListener(), getPlugin());
+        } catch (NoClassDefFoundError ignored) {
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -859,23 +863,6 @@ public class EventAbstractionListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onLingeringSplash(LingeringPotionSplashEvent event) {
-        AreaEffectCloud aec = event.getAreaEffectCloud();
-        LingeringPotion potion = event.getEntity();
-        World world = potion.getWorld();
-        Cause cause = create(event.getEntity());
-
-        // Fire item interaction event
-        Events.fireToCancel(event, new UseItemEvent(event, cause, world, potion.getItem()));
-
-        // Fire entity spawn event
-        if (!event.isCancelled()) {
-            // radius unfortunately doesn't go through with this, so only a single location is tested
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, aec.getLocation().add(0.5, 0, 0.5), EntityType.AREA_EFFECT_CLOUD));
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true)
     public void onBlockDispense(BlockDispenseEvent event) {
         Cause cause = create(event.getBlock());
         Block dispenserBlock = event.getBlock();
@@ -1021,4 +1008,22 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
+    public class LingeringPotionListener implements Listener {
+        @EventHandler(ignoreCancelled = true)
+        public void onLingeringSplash(LingeringPotionSplashEvent event) {
+            AreaEffectCloud aec = event.getAreaEffectCloud();
+            LingeringPotion potion = event.getEntity();
+            World world = potion.getWorld();
+            Cause cause = create(event.getEntity());
+
+            // Fire item interaction event
+            Events.fireToCancel(event, new UseItemEvent(event, cause, world, potion.getItem()));
+
+            // Fire entity spawn event
+            if (!event.isCancelled()) {
+                // radius unfortunately doesn't go through with this, so only a single location is tested
+                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, aec.getLocation().add(0.5, 0, 0.5), EntityType.AREA_EFFECT_CLOUD));
+            }
+        }
+    }
 }
