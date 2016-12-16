@@ -141,7 +141,7 @@ public class SessionManager implements Runnable, Listener {
     private static final Set<Factory<? extends Handler>> defaultHandlers = new HashSet<Factory<? extends Handler>>();
     static {
         Factory<?>[] factories = {
-            FeedFlag.FACTORY,
+            HealFlag.FACTORY,
             FeedFlag.FACTORY,
             NotifyEntryFlag.FACTORY,
             NotifyExitFlag.FACTORY,
