@@ -160,17 +160,23 @@ public class WorldGuardEntityListener implements Listener {
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
 
+        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(defender.getWorld());
+
         if (defender instanceof ItemFrame) {
             if (checkItemFrameProtection(attacker, (ItemFrame) defender)) {
                 event.setCancelled(true);
                 return;
             }
+        } else if (defender.getType() == Entities.armorStandType && Entities.isNonPlayerCreature(attacker)) {
+            if (wcfg.blockEntityArmorStandDestroy) {
+                event.setCancelled(true);
+                return;
+            }
         }
 
-        if (attacker.getType() == Entities.enderCrystalType) {
+        if (attacker != null && attacker.getType() == Entities.enderCrystalType) {
             // this isn't handled elsewhere because ender crystal explosions don't carry a player cause
             // in the same way that creepers or tnt can
-            WorldConfiguration wcfg = plugin.getGlobalStateManager().get(defender.getWorld());
             if (wcfg.useRegions && wcfg.explosionFlagCancellation) {
                 if (!plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation())
                         .testState(null, DefaultFlag.OTHER_EXPLOSION)) {
@@ -183,9 +189,6 @@ public class WorldGuardEntityListener implements Listener {
         if (defender instanceof Player) {
             Player player = (Player) defender;
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-            ConfigurationManager cfg = plugin.getGlobalStateManager();
-            WorldConfiguration wcfg = cfg.get(player.getWorld());
 
             if (wcfg.disableLightningDamage && event.getCause() == DamageCause.LIGHTNING) {
                 event.setCancelled(true);
@@ -222,7 +225,6 @@ public class WorldGuardEntityListener implements Listener {
                     }
 
                     if (wcfg.useRegions) {
-                        RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
                         ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(defender.getLocation());
 
                         if (!set.allows(DefaultFlag.MOB_DAMAGE, localPlayer) && !(attacker instanceof Tameable)) {
@@ -252,15 +254,15 @@ public class WorldGuardEntityListener implements Listener {
             return;
         }
 
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(defender.getWorld());
         if (defender instanceof Player) {
             Player player = (Player) defender;
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-            ConfigurationManager cfg = plugin.getGlobalStateManager();
-            WorldConfiguration wcfg = cfg.get(player.getWorld());
 
             // Check Mob
-            if (attacker != null && !(attacker instanceof Player)) {
+            if (!(attacker instanceof Player)) {
                 if (wcfg.disableMobDamage) {
                     event.setCancelled(true);
                     return;
@@ -298,6 +300,10 @@ public class WorldGuardEntityListener implements Listener {
             if (checkItemFrameProtection(attacker, (ItemFrame) defender)) {
                 event.setCancelled(true);
                 return;
+            }
+        } else if (defender.getType() == Entities.armorStandType && Entities.isNonPlayerCreature(attacker)) {
+            if (wcfg.blockEntityArmorStandDestroy) {
+                event.setCancelled(true);
             }
         }
 
