@@ -806,6 +806,8 @@ public final class Materials {
             case JUNGLE_DOOR: return true;
             case ACACIA_DOOR: return true;
             case DARK_OAK_DOOR: return true;
+            case WALL_SIGN: return true;
+            case SIGN_POST: return true;
             default: return false;
         }
     }
