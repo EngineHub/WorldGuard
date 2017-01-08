@@ -462,8 +462,6 @@ public class WorldGuardEntityListener implements Listener {
             }
             // allow wither skull blocking since there is no dedicated flag atm
             if (wcfg.useRegions) {
-                RegionManager mgr = plugin.getGlobalRegionManager().get(world);
-
                 for (Block block : event.blockList()) {
                     if (!plugin.getRegionContainer().createQuery().getApplicableRegions(block.getLocation()).allows(DefaultFlag.GHAST_FIREBALL)) {
                         event.blockList().clear();
@@ -480,6 +478,15 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.blockWitherBlockDamage) {
                 event.blockList().clear();
                 return;
+            }
+            if (wcfg.useRegions) {
+                for (Block block : event.blockList()) {
+                    if (!plugin.getGlobalRegionManager().allows(DefaultFlag.WITHER_DAMAGE, block.getLocation())) {
+                        event.blockList().clear();
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
         } else {
             // unhandled entity
@@ -690,6 +697,12 @@ public class WorldGuardEntityListener implements Listener {
             if (wcfg.blockWitherBlockDamage || wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
                 return;
+            }
+            if (wcfg.useRegions) {
+                if (!plugin.getGlobalRegionManager().allows(DefaultFlag.WITHER_DAMAGE, location)) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
         } else if (/*ent instanceof Zombie && */event instanceof EntityBreakDoorEvent) {
             if (wcfg.blockZombieDoorDestruction) {
