@@ -75,6 +75,7 @@ public final class DefaultFlag {
     public static final StateFlag GHAST_FIREBALL = new StateFlag("ghast-fireball", true);
     public static final StateFlag FIREWORK_DAMAGE = new StateFlag("firework-damage", true);
     public static final StateFlag OTHER_EXPLOSION = new StateFlag("other-explosion", true);
+    public static final StateFlag WITHER_DAMAGE = new StateFlag("wither-damage", true);
     public static final StateFlag FIRE_SPREAD = new StateFlag("fire-spread", true);
     public static final StateFlag LAVA_FIRE = new StateFlag("lava-fire", true);
     public static final StateFlag LIGHTNING = new StateFlag("lightning", true);
@@ -146,7 +147,7 @@ public final class DefaultFlag {
     public static final Flag<?>[] flagsList = new Flag<?>[] {
             PASSTHROUGH, BUILD, BLOCK_BREAK, BLOCK_PLACE, PVP, CHEST_ACCESS, PISTONS,
             TNT, LIGHTER, RIDE, USE, INTERACT, PLACE_VEHICLE, DESTROY_VEHICLE, DAMAGE_ANIMALS, SLEEP,
-            MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS, FIREWORK_DAMAGE,
+            MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS, FIREWORK_DAMAGE, WITHER_DAMAGE,
             CREEPER_EXPLOSION, OTHER_EXPLOSION, ENDERDRAGON_BLOCK_DAMAGE, GHAST_FIREBALL, ENDER_BUILD,
             DENY_MESSAGE, ENTRY_DENY_MESSAGE, EXIT_DENY_MESSAGE, EXIT_OVERRIDE, EXIT_VIA_TELEPORT,
             GREET_MESSAGE, FAREWELL_MESSAGE, NOTIFY_ENTER, NOTIFY_LEAVE,
