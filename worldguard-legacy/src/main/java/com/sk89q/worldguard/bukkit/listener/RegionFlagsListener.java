@@ -124,7 +124,7 @@ public class RegionFlagsListener extends AbstractListener {
         if (event instanceof EntityDamageByEntityEvent) {
             Entity damager = (((EntityDamageByEntityEvent) event)).getDamager();
             if (damager != null && damager.getType() == EntityType.FIREWORK) {
-                if (!query.testState(entity.getLocation(), (RegionAssociable) null, DefaultFlag.OTHER_EXPLOSION)) {
+                if (!query.testState(entity.getLocation(), (RegionAssociable) null, DefaultFlag.FIREWORK_DAMAGE)) {
                     event.setCancelled(true);
                     return;
                 }
