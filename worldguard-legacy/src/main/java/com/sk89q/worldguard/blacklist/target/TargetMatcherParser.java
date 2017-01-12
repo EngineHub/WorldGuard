@@ -53,14 +53,14 @@ public class TargetMatcherParser {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            int id = getItemID(input);
-            if (id > 0) {
-                return id;
-            }
-            
             Material material = Enums.findFuzzyByValue(Material.class, input);
             if (material != null) {
                 return material.getId();
+            }
+
+            int id = getItemID(input);
+            if (id > 0) {
+                return id;
             }
 
             throw new TargetMatcherParseException("Unknown block or item name: " + input);
