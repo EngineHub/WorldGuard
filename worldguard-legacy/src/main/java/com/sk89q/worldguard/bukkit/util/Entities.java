@@ -180,7 +180,7 @@ public final class Entities {
         return entity instanceof LivingEntity && !(entity instanceof Player);
     }
 
-    private static final EntityType armorStandType =
+    public static final EntityType armorStandType =
             Enums.findByValue(EntityType.class, "ARMOR_STAND");
     public static final EntityType enderCrystalType =
             Enums.findByValue(EntityType.class, "ENDER_CRYSTAL");

@@ -118,6 +118,7 @@ public class WorldConfiguration {
     public boolean blockOtherExplosions;
     public boolean blockEntityPaintingDestroy;
     public boolean blockEntityItemFrameDestroy;
+    public boolean blockEntityArmorStandDestroy;
     public boolean blockPluginSpawning;
     public boolean blockGroundSlimes;
     public boolean blockZombieDoorDestruction;
@@ -182,8 +183,8 @@ public class WorldConfiguration {
     public boolean disableObsidianGenerators;
     public boolean strictEntitySpawn;
     public TargetMatcherSet allowAllInteract;
-    public TargetMatcherSet blockUseAtFeet;
 
+    public TargetMatcherSet blockUseAtFeet;
     private Map<String, Integer> maxRegionCounts;
 
     /* Configuration data end */
@@ -407,6 +408,7 @@ public class WorldConfiguration {
         disableSnowmanTrails = getBoolean("mobs.disable-snowman-trails", false);
         blockEntityPaintingDestroy = getBoolean("mobs.block-painting-destroy", false);
         blockEntityItemFrameDestroy = getBoolean("mobs.block-item-frame-destroy", false);
+        blockEntityArmorStandDestroy = getBoolean("mobs.block-armor-stand-destroy", false);
         blockPluginSpawning = getBoolean("mobs.block-plugin-spawning", true);
         blockGroundSlimes = getBoolean("mobs.block-above-ground-slimes", false);
         blockOtherExplosions = getBoolean("mobs.block-other-explosions", false);

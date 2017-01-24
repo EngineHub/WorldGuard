@@ -91,6 +91,7 @@ public class ConfigurationManager {
     public boolean keepUnresolvedNames;
 
     @Unreported public Map<String, String> hostKeys = new HashMap<String, String>();
+    public boolean hostKeysAllowFMLClients;
 
     /**
      * Region Storage Configuration method, and config values
@@ -169,6 +170,7 @@ public class ConfigurationManager {
                 hostKeys.put(key.toLowerCase(), value);
             }
         }
+        hostKeysAllowFMLClients = config.getBoolean("security.host-keys-allow-forge-clients", false);
 
         // ====================================================================
         // Region store drivers

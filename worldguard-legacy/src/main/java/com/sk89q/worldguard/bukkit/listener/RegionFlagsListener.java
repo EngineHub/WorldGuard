@@ -39,6 +39,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import javax.annotation.Nullable;
@@ -106,15 +107,27 @@ public class RegionFlagsListener extends AbstractListener {
         if (entity instanceof Player && event.getCause() == DamageCause.FALL) {
             if (!query.testState(entity.getLocation(), (Player) entity, DefaultFlag.FALL_DAMAGE)) {
                 event.setCancelled(true);
+                return;
             }
         } else {
             try {
                 if (entity instanceof Player && event.getCause() == DamageCause.FLY_INTO_WALL) {
                     if (!query.testState(entity.getLocation(), (Player) entity, DefaultFlag.FALL_DAMAGE)) {
                         event.setCancelled(true);
+                        return;
                     }
                 }
             } catch (NoSuchFieldError ignored) {
+            }
+        }
+
+        if (event instanceof EntityDamageByEntityEvent) {
+            Entity damager = (((EntityDamageByEntityEvent) event)).getDamager();
+            if (damager != null && damager.getType() == EntityType.FIREWORK) {
+                if (!query.testState(entity.getLocation(), (RegionAssociable) null, DefaultFlag.FIREWORK_DAMAGE)) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
     }

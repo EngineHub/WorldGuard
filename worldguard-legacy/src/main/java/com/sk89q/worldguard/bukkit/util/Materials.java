@@ -864,7 +864,8 @@ public final class Materials {
         return type == Material.DIODE_BLOCK_OFF
             || type == Material.DIODE_BLOCK_ON
             || type == Material.REDSTONE_COMPARATOR_OFF
-            || type == Material.REDSTONE_COMPARATOR_ON;
+            || type == Material.REDSTONE_COMPARATOR_ON
+            || type == Material.FLOWER_POT;
     }
 
     /**
