@@ -167,7 +167,7 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        } else if (defender.getType() == Entities.armorStandType && Entities.isNonPlayerCreature(attacker)) {
+        } else if (defender.getType() == Entities.armorStandType && !(attacker instanceof Player)) {
             if (wcfg.blockEntityArmorStandDestroy) {
                 event.setCancelled(true);
                 return;
