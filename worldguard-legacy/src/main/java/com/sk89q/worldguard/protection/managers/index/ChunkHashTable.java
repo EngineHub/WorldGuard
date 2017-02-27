@@ -299,7 +299,7 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
 
         private EnumerateRegions(List<Vector2D> positions) {
             checkNotNull(positions);
-            checkArgument(!positions.isEmpty(), "List of positions can't be empty");
+            checkArgument(!positions.isEmpty(), "Список позиций не может быть пустым");
             this.positions = positions;
         }
 

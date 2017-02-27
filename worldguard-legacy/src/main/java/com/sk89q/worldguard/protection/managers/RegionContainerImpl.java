@@ -108,7 +108,7 @@ public class RegionContainerImpl {
                     failingLoads.remove(normal);
                     return manager;
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Failed to load the region data for '" + name + "' (periodic attempts will be made to load the data until success)", e);
+                    log.log(Level.WARNING, "Не удалось загрузить данные региона для '" + name + "' (будут предприняты периодические попытки загрузки данных до успеха)", e);
                     failingLoads.add(normal);
                     return null;
                 }
@@ -149,7 +149,7 @@ public class RegionContainerImpl {
                 try {
                     manager.save();
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Failed to save the region data for '" + name + "'", e);
+                    log.log(Level.WARNING, "Не удалось сохранить данные региона для '" + name + "'", e);
                 }
 
                 mapping.remove(normal);
@@ -172,7 +172,7 @@ public class RegionContainerImpl {
                 try {
                     manager.saveChanges();
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Failed to save the region data for '" + name + "' while unloading the data for all worlds", e);
+                    log.log(Level.WARNING, "Не удалось сохранить данные региона для '" + name + "' при выгрузке данных для всех миров", e);
                 }
             }
 
@@ -226,15 +226,15 @@ public class RegionContainerImpl {
                     RegionManager manager = entry.getValue();
                     try {
                         if (manager.saveChanges()) {
-                            log.info("Region data changes made in '" + name + "' have been background saved");
+                            log.info("Данные изменения в регионе '" + name + "' были сохранены в фоне");
                         }
                         failingSaves.remove(manager);
                     } catch (StorageException e) {
                         failingSaves.add(manager);
-                        log.log(Level.WARNING, "Failed to save the region data for '" + name + "' during a periodical save", e);
+                        log.log(Level.WARNING, "Не удалось сохранить данные региона для '" + name + "' во время периодического сохранения", e);
                     } catch (Exception e) {
                         failingSaves.add(manager);
-                        log.log(Level.WARNING, "An expected error occurred during a periodical save", e);
+                        log.log(Level.WARNING, "Произошла ошибка во время ожидания периодического сохранения", e);
                     }
                 }
             }
@@ -250,7 +250,7 @@ public class RegionContainerImpl {
         public void run() {
             synchronized (lock) {
                 if (!failingLoads.isEmpty()) {
-                    log.info("Attempting to load region data that has previously failed to load...");
+                    log.info("Попытка загрузить данные региона, которые ранее не удалось загрузить...");
 
                     Iterator<Normal> it = failingLoads.iterator();
                     while (it.hasNext()) {
@@ -259,9 +259,9 @@ public class RegionContainerImpl {
                             RegionManager manager = createAndLoad(normal.toString());
                             mapping.put(normal, manager);
                             it.remove();
-                            log.info("Successfully loaded region data for '" + normal.toString() + "'");
+                            log.info("Успешно загружены данные региона для '" + normal.toString() + "'");
                         } catch (StorageException e) {
-                            log.log(Level.WARNING, "Region data is still failing to load, at least for the world named '" + normal.toString() + "'", e);
+                            log.log(Level.WARNING, "Данные региона по-прежнему не в состоянии загрузить, по крайней мере в мире по имени '" + normal.toString() + "'", e);
                             break;
                         }
                     }

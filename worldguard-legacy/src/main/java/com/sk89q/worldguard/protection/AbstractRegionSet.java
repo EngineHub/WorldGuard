@@ -66,7 +66,7 @@ public abstract class AbstractRegionSet implements ApplicableRegionSet {
         checkNotNull(flag);
 
         if (flag == DefaultFlag.BUILD) {
-            throw new IllegalArgumentException("Can't use build flag with allows()");
+            throw new IllegalArgumentException("Нельзя использовать флаг построения с allows()");
         }
 
         return test(queryState(null, flag));
@@ -78,7 +78,7 @@ public abstract class AbstractRegionSet implements ApplicableRegionSet {
         checkNotNull(flag);
 
         if (flag == DefaultFlag.BUILD) {
-            throw new IllegalArgumentException("Can't use build flag with allows()");
+            throw new IllegalArgumentException("Нельзя использовать флаг построения с allows()");
         }
 
         return test(queryState(player, flag));

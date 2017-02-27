@@ -68,7 +68,7 @@ public class WorldGuardWorldListener implements Listener {
             }
 
             if (removed > 50) {
-                log.info("Halt-Act: " + removed + " entities (>50) auto-removed from " + event.getChunk().toString());
+                log.info("Блокировка активности: " + removed + " (>50) было удалено в мире " + event.getChunk().toString());
             }
         }
     }

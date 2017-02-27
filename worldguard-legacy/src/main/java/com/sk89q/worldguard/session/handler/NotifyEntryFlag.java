@@ -61,7 +61,7 @@ public class NotifyEntryFlag extends FlagValueChangeHandler<Boolean> {
 
         getPlugin().broadcastNotification(ChatColor.GRAY + "WG: "
                 + ChatColor.LIGHT_PURPLE + player.getName()
-                + ChatColor.GOLD + " entered NOTIFY region: "
+                + ChatColor.GOLD + " вошел в регион: "
                 + ChatColor.WHITE
                 + regionList);
 

@@ -126,15 +126,15 @@ public class RegionLister implements Callable<Integer> {
                     try {
                         profile = plugin.getProfileService().findByName(name);
                     } catch (IOException e) {
-                        log.log(Level.WARNING, "Failed UUID lookup of '" + name + "'", e);
-                        throw new CommandException("Failed to lookup the UUID of '" + name + "'");
+                        log.log(Level.WARNING, "Ошибка поиска UUID из '" + name + "'", e);
+                        throw new CommandException("Не удалось найти UUID из '" + name + "'");
                     } catch (InterruptedException e) {
-                        log.log(Level.WARNING, "Failed UUID lookup of '" + name + "'", e);
-                        throw new CommandException("The lookup the UUID of '" + name + "' was interrupted");
+                        log.log(Level.WARNING, "Ошибка поиска UUID из '" + name + "'", e);
+                        throw new CommandException("Поиск UUID из '" + name + "' была прервана");
                     }
 
                     if (profile == null) {
-                        throw new CommandException("A user by the name of '" + name + "' does not seem to exist.");
+                        throw new CommandException("Игрок '" + name + "' не найден.");
                     }
 
                     uniqueId = profile.getUniqueId();
@@ -177,8 +177,8 @@ public class RegionLister implements Callable<Integer> {
         final int pages = (int) Math.ceil(totalSize / (float) pageSize);
 
         sender.sendMessage(ChatColor.RED
-                + (ownerMatcher == null ? "Regions (page " : "Regions for " + ownerMatcher.getName() + " (page ")
-                + (page + 1) + " of " + pages + "):");
+                + (ownerMatcher == null ? "Регионы (страница " : "Регионы игрока " + ownerMatcher.getName() + " (страница ")
+                + (page + 1) + " из " + pages + "):");
 
         if (page < pages) {
             // Print

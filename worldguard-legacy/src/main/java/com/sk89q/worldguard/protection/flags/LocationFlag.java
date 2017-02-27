@@ -75,10 +75,10 @@ public class LocationFlag extends Flag<Location> {
                 if (WorldGuardPlugin.inst().getGlobalStateManager().get(player.getWorld()).boundedLocationFlags) {
                     if (!rg.contains(loc.getPosition())) {
                         if (new RegionPermissionModel(WorldGuardPlugin.inst(), player).mayOverrideLocationFlagBounds(rg)) {
-                            player.sendMessage(ChatColor.GRAY + "WARNING: Flag location is outside of region.");
+                            player.sendMessage(ChatColor.GRAY + "WARNING: Флаг находится вне региона.");
                         } else {
                             // no permission
-                            throw new InvalidFlagFormat("You can't set that flag outside of the region boundaries.");
+                            throw new InvalidFlagFormat("Вы не можете установить этот флаг за пределами границ региона.");
                         }
                     }
                     // clamp height to world limits
@@ -88,7 +88,7 @@ public class LocationFlag extends Flag<Location> {
             }
             return loc;
         }
-        throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
+        throw new InvalidFlagFormat("Значение может быть только 'here' или x,y,z.");
     }
 
     private Location toLazyLocation(org.bukkit.Location location) {

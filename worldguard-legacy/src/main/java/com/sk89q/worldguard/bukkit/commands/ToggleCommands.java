@@ -41,8 +41,8 @@ public class ToggleCommands {
         this.plugin = plugin;
     }
 
-    @Command(aliases = {"stopfire"}, usage = "[<world>]",
-            desc = "Disables all fire spread temporarily", max = 1)
+    @Command(aliases = {"stopfire"}, usage = "[<мир>]",
+            desc = "Отключить распространение огня", max = 1)
     @CommandPermissions({"worldguard.fire-toggle.stop"})
     public void stopFire(CommandContext args, CommandSender sender) throws CommandException {
         
@@ -59,19 +59,19 @@ public class ToggleCommands {
         if (!wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(
                     ChatColor.YELLOW
-                    + "Fire spread has been globally disabled for '" + world.getName() + "' by "
+                    + "Распространение огня в мире '" + world.getName() + "' было запрещено игроком "
                     + plugin.toName(sender) + ".");
         } else {
             sender.sendMessage(
                     ChatColor.YELLOW
-                    + "Fire spread was already globally disabled.");
+                    + "Распространение огня запрещено во всех мирах.");
         }
 
         wcfg.fireSpreadDisableToggle = true;
     }
 
-    @Command(aliases = {"allowfire"}, usage = "[<world>]",
-            desc = "Allows all fire spread temporarily", max = 1)
+    @Command(aliases = {"allowfire"}, usage = "[<мир>]",
+            desc = "Разрешить распространение огня", max = 1)
     @CommandPermissions({"worldguard.fire-toggle.stop"})
     public void allowFire(CommandContext args, CommandSender sender) throws CommandException {
         
@@ -87,18 +87,18 @@ public class ToggleCommands {
 
         if (wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "Fire spread has been globally for '" + world.getName() + "' re-enabled by "
+                    + "Распространение огня в мире '" + world.getName() + "' было разрешено игроком "
                     + plugin.toName(sender) + ".");
         } else {
             sender.sendMessage(ChatColor.YELLOW
-                    + "Fire spread was already globally enabled.");
+                    + "Распространение огня разрешено во всех мирах.");
         }
 
         wcfg.fireSpreadDisableToggle = false;
     }
 
     @Command(aliases = {"halt-activity", "stoplag", "haltactivity"},
-            desc = "Attempts to cease as much activity in order to stop lag", flags = "cis", max = 0)
+            desc = "Остановить//Возобновить всю активность на сервере", flags = "cis", max = 0)
     @CommandPermissions({"worldguard.halt-activity"})
     public void stopLag(CommandContext args, CommandSender sender) throws CommandException {
 
@@ -107,10 +107,10 @@ public class ToggleCommands {
         if (args.hasFlag('i')) {
             if (configManager.activityHaltToggle) {
                  sender.sendMessage(ChatColor.YELLOW
-                         + "ALL intensive server activity is not allowed.");
+                         + "ВСЯ активность на сервере была остановлена.");
             } else {
                  sender.sendMessage(ChatColor.YELLOW
-                         + "ALL intensive server activity is allowed.");
+                         + "ВСЯ активность на сервере была возобновлена.");
             }
         } else {
             configManager.activityHaltToggle = !args.hasFlag('c');
@@ -118,16 +118,16 @@ public class ToggleCommands {
             if (configManager.activityHaltToggle) {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(ChatColor.YELLOW
-                            + "ALL intensive server activity halted.");
+                            + "ВСЯ активность на сервере была остановлена.");
                 }
 
                 if (!args.hasFlag('s')) {
                     plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                             + "ALL intensive server activity halted by "
+                             + "ВСЯ активность на сервере была возобновлена игроком "
                              + plugin.toName(sender) + ".");
                 } else {
                     sender.sendMessage(ChatColor.YELLOW
-                        + "(Silent) ALL intensive server activity halted by "
+                        + "(Бесшумно) ВСЯ активность на сервере была возобновлена игроком "
                         + plugin.toName(sender) + ".");
                 }
 
@@ -142,22 +142,22 @@ public class ToggleCommands {
                     }
 
                     if (removed > 10) {
-                        sender.sendMessage("" + removed + " entities (>10) auto-removed from "
+                        sender.sendMessage("" + removed + " (>10) было удалено в мире "
                                 + world.getName());
                     }
                 }
             } else {
                 if (!args.hasFlag('s')) {
                     plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                            + "ALL intensive server activity is now allowed.");
+                            + "Вся интенсивная активность на сервере теперь возобновлена.");
                     
                     if (!(sender instanceof Player)) {
                         sender.sendMessage(ChatColor.YELLOW
-                                + "ALL intensive server activity is now allowed.");
+                                + "Вся интенсивная активность на сервере теперь возобновлена.");
                     }
                 } else {
                     sender.sendMessage(ChatColor.YELLOW
-                            + "(Silent) ALL intensive server activity is now allowed.");
+                            + "(Бесшумно) Вся интенсивная активность на сервере теперь возобновлена.");
                 }
             }
         }

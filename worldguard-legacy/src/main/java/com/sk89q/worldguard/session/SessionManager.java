@@ -177,7 +177,7 @@ public class SessionManager implements Runnable, Listener {
      */
     public boolean registerHandler(Factory<? extends Handler> factory, @Nullable Factory<? extends Handler> after) {
         if (factory == null) return false;
-        WorldGuardPlugin.inst().getLogger().log(Level.INFO, "Registering session handler "
+        WorldGuardPlugin.inst().getLogger().log(Level.INFO, "Регистрация обработчика сессии "
                 + factory.getClass().getEnclosingClass().getName());
         if (after == null) {
             handlers.add(factory);
@@ -203,10 +203,10 @@ public class SessionManager implements Runnable, Listener {
      */
     public boolean unregisterHandler(Factory<? extends Handler> factory) {
         if (defaultHandlers.contains(factory)) {
-            WorldGuardPlugin.inst().getLogger().log(Level.WARNING, "Someone is unregistering a default WorldGuard handler: "
-                    + factory.getClass().getEnclosingClass().getName() + ". This may cause parts of WorldGuard to stop functioning");
+            WorldGuardPlugin.inst().getLogger().log(Level.WARNING, "Кто-то отменяет регистрацию обработчика WorldGuard по умолчанию: "
+                    + factory.getClass().getEnclosingClass().getName() + ". Это может привести к прекращению функционирования некоторой части WorldGuard ");
         } else {
-            WorldGuardPlugin.inst().getLogger().log(Level.INFO, "Unregistering session handler "
+            WorldGuardPlugin.inst().getLogger().log(Level.INFO, "Отмена регистрации сессии обработчика "
                     + factory.getClass().getEnclosingClass().getName());
         }
         return handlers.remove(factory);

@@ -49,7 +49,7 @@ public class BooleanFlag extends Flag<Boolean> {
                 || input.equalsIgnoreCase("0")) {
             return false;
         } else {
-            throw new InvalidFlagFormat("Not a yes/no value: " + input);
+            throw new InvalidFlagFormat("Значение может быть только yes или no: " + input);
         }
     }
 

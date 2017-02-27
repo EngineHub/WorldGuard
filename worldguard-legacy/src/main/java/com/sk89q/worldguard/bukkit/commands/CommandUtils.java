@@ -176,8 +176,8 @@ public final class CommandUtils {
         ListenableFuture<URL> future = new EngineHubPaste().paste(content);
 
         AsyncCommandHelper.wrap(future, plugin, sender)
-                .registerWithSupervisor("Submitting content to a pastebin service...")
-                .sendMessageAfterDelay("(Please wait... sending output to pastebin...)");
+                .registerWithSupervisor("Передача контента в сервис Pastebin...")
+                .sendMessageAfterDelay("(Пожалуйста, подождите... отправка вывода на Pastebin...)");
 
         Futures.addCallback(future, new FutureCallback<URL>() {
             @Override
@@ -187,8 +187,8 @@ public final class CommandUtils {
 
             @Override
             public void onFailure(Throwable throwable) {
-                log.log(Level.WARNING, "Failed to submit pastebin", throwable);
-                sender.sendMessage(ChatColor.RED + "Failed to submit to a pastebin. Please see console for the error.");
+                log.log(Level.WARNING, "Не удалось отправить на Pastebin", throwable);
+                sender.sendMessage(ChatColor.RED + "Не удалось отправить на Pastebin. Пожалуйста, посмотрите в консоли ошибки.");
             }
         });
     }

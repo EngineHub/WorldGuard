@@ -59,14 +59,14 @@ public class WorldConfiguration {
     private static final TargetMatcherParser matcherParser = new TargetMatcherParser();
 
     public static final String CONFIG_HEADER = "#\r\n" +
-            "# WorldGuard's world configuration file\r\n" +
+            "# Файл конфигурации мира WorldGuard\r\n" +
             "#\r\n" +
-            "# This is a world configuration file. Anything placed into here will only\r\n" +
-            "# affect this world. If you don't put anything in this file, then the\r\n" +
-            "# settings will be inherited from the main configuration file.\r\n" +
+            "# Это файл конфигурации мира. Все, что помещается здесь будет влиять\r\n" +
+            "# только на этот мир. Если вы ничего не помещали в этот файл, то\r\n" +
+            "# настройки будут унаследованы от основного файла конфигурации.\r\n" +
             "#\r\n" +
-            "# If you see {} below, that means that there are NO entries in this file.\r\n" +
-            "# Remove the {} and add your own entries.\r\n" +
+            "# Если вы видите {} ниже, это означает, что записей в этом файле нет.\r\n" +
+            "# Удалите {} и добавьте свои собственные записи.\r\n" +
             "#\r\n";
 
     @Unreported private WorldGuardPlugin plugin;
@@ -212,7 +212,7 @@ public class WorldConfiguration {
         loadConfiguration();
 
         if (summaryOnStart) {
-            log.info("Loaded configuration for world '" + worldName + "'");
+            log.info("Загрузка конфигурации для мира '" + worldName + "'");
         }
     }
 
@@ -284,7 +284,7 @@ public class WorldConfiguration {
             try {
                 set.add(matcherParser.fromInput(input));
             } catch (TargetMatcherParseException e) {
-                log.warning("Failed to parse the block / item type specified as '" + input + "'");
+                log.warning("Невозможно разобрать тип блока/предмета, указанный в качестве '" + input + "'");
             }
         }
 
@@ -335,10 +335,10 @@ public class WorldConfiguration {
         try {
             config.load();
         } catch (IOException e) {
-            log.severe("Error reading configuration for world " + worldName + ": ");
+            log.severe("Ошибка чтения конфигурации для мира " + worldName + ": ");
             e.printStackTrace();
         } catch (ParserException e) {
-            log.severe("Error parsing configuration for world " + worldName + ". ");
+            log.severe("Ошибка при разборе конфигурации для мира " + worldName + ". ");
             throw e;
         }
 
@@ -347,7 +347,7 @@ public class WorldConfiguration {
 
         buildPermissions = getBoolean("build-permission-nodes.enable", false);
         buildPermissionDenyMessage = CommandUtils.replaceColorMacros(
-                getString("build-permission-nodes.deny-message", "&eSorry, but you are not permitted to do that here."));
+                getString("build-permission-nodes.deny-message", "&7&l[&c&l!&7&l] &7Вы не можете сделать это здесь."));
 
         strictEntitySpawn = getBoolean("event-handling.block-entity-spawns-with-untraceable-cause", false);
         allowAllInteract = getTargetMatchers("event-handling.interaction-whitelist");
@@ -363,7 +363,7 @@ public class WorldConfiguration {
             PotionEffectType effect = PotionEffectType.getByName(potionName);
 
             if (effect == null) {
-                log.warning("Unknown potion effect type '" + potionName + "'");
+                log.warning("Неизвестный тип эффекта зелья '" + potionName + "'");
             } else {
                 blockPotions.add(effect);
             }
@@ -489,9 +489,9 @@ public class WorldConfiguration {
             EntityType creature = EntityType.fromName(creatureName);
 
             if (creature == null) {
-                log.warning("Unknown mob type '" + creatureName + "'");
+                log.warning("Неизвестный тип моба '" + creatureName + "'");
             } else if (!creature.isAlive()) {
-                log.warning("Entity type '" + creatureName + "' is not a creature");
+                log.warning("Тип сущности '" + creatureName + "' не является существом");
             } else {
                 blockCreatureSpawn.add(creature);
             }
@@ -532,7 +532,7 @@ public class WorldConfiguration {
             } else {
                 this.blacklist = blist;
                 if (summaryOnStart) {
-                    log.log(Level.INFO, "Blacklist loaded.");
+                    log.log(Level.INFO, "Черный список загружен.");
                 }
 
                 BlacklistLoggerHandler blacklistLogger = blist.getLogger();
@@ -552,34 +552,34 @@ public class WorldConfiguration {
                 }
             }
         } catch (FileNotFoundException e) {
-            log.log(Level.WARNING, "WorldGuard blacklist does not exist.");
+            log.log(Level.WARNING, "Черный список WorldGuard не существует.");
         } catch (IOException e) {
-            log.log(Level.WARNING, "Could not load WorldGuard blacklist: "
+            log.log(Level.WARNING, "Не удалось загрузить черный список WorldGuard: "
                     + e.getMessage());
         }
 
         // Print an overview of settings
         if (summaryOnStart) {
             log.log(Level.INFO, blockTNTExplosions
-                    ? "(" + worldName + ") TNT ignition is blocked."
-                    : "(" + worldName + ") TNT ignition is PERMITTED.");
+                    ? "(" + worldName + ") Поджигание TNT отключено."
+                    : "(" + worldName + ") Поджигание TNT РАЗРЕШЕНО.");
             log.log(Level.INFO, blockLighter
-                    ? "(" + worldName + ") Lighters are blocked."
-                    : "(" + worldName + ") Lighters are PERMITTED.");
+                    ? "(" + worldName + ") Зажигалки отключены."
+                    : "(" + worldName + ") Зажигалки РАЗРЕШЕНЫ.");
             log.log(Level.INFO, preventLavaFire
-                    ? "(" + worldName + ") Lava fire is blocked."
-                    : "(" + worldName + ") Lava fire is PERMITTED.");
+                    ? "(" + worldName + ") Огонь лавы отключен."
+                    : "(" + worldName + ") Огонь лавы РАЗРЕШЕН.");
 
             if (disableFireSpread) {
-                log.log(Level.INFO, "(" + worldName + ") All fire spread is disabled.");
+                log.log(Level.INFO, "(" + worldName + ") Все распространение огня отключено.");
             } else {
                 if (disableFireSpreadBlocks.size() > 0) {
                     log.log(Level.INFO, "(" + worldName
-                            + ") Fire spread is limited to "
-                            + disableFireSpreadBlocks.size() + " block types.");
+                            + ") Распространение огня ограничено к "
+                            + disableFireSpreadBlocks.size() + " типов блоков.");
                 } else {
                     log.log(Level.INFO, "(" + worldName
-                            + ") Fire spread is UNRESTRICTED.");
+                            + ") Распространение огня НЕОГРАНИЧЕНО.");
                 }
             }
         }

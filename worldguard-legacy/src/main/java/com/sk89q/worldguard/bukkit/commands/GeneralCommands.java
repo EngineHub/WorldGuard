@@ -41,8 +41,8 @@ public class GeneralCommands {
     }
     
     @SuppressWarnings("deprecation")
-    @Command(aliases = {"god"}, usage = "[player]",
-            desc = "Enable godmode on a player", flags = "s", max = 1)
+    @Command(aliases = {"god"}, usage = "[игрок]",
+            desc = "Включить режим бога для игрока", flags = "s", max = 1)
     public void god(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
         
@@ -70,12 +70,12 @@ public class GeneralCommands {
 
                 // Tell the user
                 if (player.equals(sender)) {
-                    player.sendMessage(ChatColor.YELLOW + "God mode enabled! Use /ungod to disable.");
+                    player.sendMessage(ChatColor.YELLOW + "Режим бога включен! Используйте /ungod для отключения.");
 
                     // Keep track of this
                     included = true;
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + "God enabled by "
+                    player.sendMessage(ChatColor.YELLOW + "Режим бога включен игроком "
                             + plugin.toName(sender) + ".");
 
                 }
@@ -85,13 +85,13 @@ public class GeneralCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW + "Players now have god mode.");
+            sender.sendMessage(ChatColor.YELLOW + "Все игроки теперь в режиме бога.");
         }
     }
     
     @SuppressWarnings("deprecation")
-    @Command(aliases = {"ungod"}, usage = "[player]",
-            desc = "Disable godmode on a player", flags = "s", max = 1)
+    @Command(aliases = {"ungod"}, usage = "[игрок]",
+            desc = "Отключить режим бога для игрока", flags = "s", max = 1)
     public void ungod(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
         
@@ -117,12 +117,12 @@ public class GeneralCommands {
             if (GodMode.set(player, session, false)) {
                 // Tell the user
                 if (player.equals(sender)) {
-                    player.sendMessage(ChatColor.YELLOW + "God mode disabled!");
+                    player.sendMessage(ChatColor.YELLOW + "Режим бога выключен!");
 
                     // Keep track of this
                     included = true;
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + "God disabled by "
+                    player.sendMessage(ChatColor.YELLOW + "Режим бога выключен игроком "
                             + plugin.toName(sender) + ".");
 
                 }
@@ -132,11 +132,11 @@ public class GeneralCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW + "Players no longer have god mode.");
+            sender.sendMessage(ChatColor.YELLOW + "Режим бога выключен у всех игроков.");
         }
     }
     
-    @Command(aliases = {"heal"}, usage = "[player]", desc = "Heal a player", flags = "s", max = 1)
+    @Command(aliases = {"heal"}, usage = "[игрок]", desc = "Вылечить игрока", flags = "s", max = 1)
     public void heal(CommandContext args,CommandSender sender) throws CommandException {
 
         Iterable<? extends Player> targets = null;
@@ -163,13 +163,13 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Healed!");
+                player.sendMessage(ChatColor.YELLOW + "Вылечен!");
                 
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Healed by "
-                        + plugin.toName(sender) + ".");
+                player.sendMessage(ChatColor.YELLOW + ""
+                        + plugin.toName(sender) + " вылечил вас.");
                 
             }
         }
@@ -177,11 +177,11 @@ public class GeneralCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Все игроки вылечены.");
         }
     }
     
-    @Command(aliases = {"slay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
+    @Command(aliases = {"slay"}, usage = "[игрок]", desc = "Убить игрока", flags = "s", max = 1)
     public void slay(CommandContext args, CommandSender sender) throws CommandException {
         
         Iterable<? extends Player> targets = null;
@@ -205,12 +205,12 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Slain!");
+                player.sendMessage(ChatColor.YELLOW + "Убит!");
                 
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Slain by "
+                player.sendMessage(ChatColor.YELLOW + "Вы были убиты игроком "
                         + plugin.toName(sender) + ".");
                 
             }
@@ -219,11 +219,11 @@ public class GeneralCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Все игроки убиты.");
         }
     }
     
-    @Command(aliases = {"locate"}, usage = "[player]", desc = "Locate a player", max = 1)
+    @Command(aliases = {"locate"}, usage = "[игрок]", desc = "Найти игрока", max = 1)
     @CommandPermissions({"worldguard.locate"})
     public void locate(CommandContext args, CommandSender sender) throws CommandException {
         
@@ -232,16 +232,16 @@ public class GeneralCommands {
         if (args.argsLength() == 0) {
             player.setCompassTarget(player.getWorld().getSpawnLocation());
             
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Compass reset to spawn.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Компас теперь указывает на спавн.");
         } else {
             Player target = plugin.matchSinglePlayer(sender, args.getString(0));
             player.setCompassTarget(target.getLocation());
             
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Компас теперь указывает на игрока.");
         }
     }
     
-    @Command(aliases = {"stack", ";"}, usage = "", desc = "Stack items", max = 0)
+    @Command(aliases = {"stack", ";"}, usage = "", desc = "Стаковать предметы", max = 0)
     @CommandPermissions({"worldguard.stack"})
     public void stack(CommandContext args, CommandSender sender) throws CommandException {
         
@@ -308,6 +308,6 @@ public class GeneralCommands {
             player.getInventory().setContents(items);
         }
 
-        player.sendMessage(ChatColor.YELLOW + "Items compacted into stacks!");
+        player.sendMessage(ChatColor.YELLOW + "Предметы были собраны в стаки!");
     }
 }

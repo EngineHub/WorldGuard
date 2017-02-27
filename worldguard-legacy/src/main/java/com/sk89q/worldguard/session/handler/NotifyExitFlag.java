@@ -57,7 +57,7 @@ public class NotifyExitFlag extends FlagValueChangeHandler<Boolean> {
     protected boolean onAbsentValue(Player player, Location from, Location to, ApplicableRegionSet toSet, Boolean lastValue, MoveType moveType) {
         getPlugin().broadcastNotification(ChatColor.GRAY + "WG: "
                 + ChatColor.LIGHT_PURPLE + player.getName()
-                + ChatColor.GOLD + " left NOTIFY region");
+                + ChatColor.GOLD + " вышел из региона");
         return true;
     }
 }

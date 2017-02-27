@@ -53,7 +53,7 @@ public class MessageFutureCallback<V> implements FutureCallback<V> {
 
     @Override
     public void onFailure(@Nullable Throwable throwable) {
-        String failure = this.failure != null ? this.failure : "An error occurred";
+        String failure = this.failure != null ? this.failure : "Произошла ошибка";
         sender.sendMessage(ChatColor.RED + failure + ": " + plugin.convertThrowable(throwable));
     }
 
@@ -90,13 +90,13 @@ public class MessageFutureCallback<V> implements FutureCallback<V> {
 
     public static <V> MessageFutureCallback<V> createRegionLoadCallback(WorldGuardPlugin plugin, CommandSender sender) {
         return new Builder(plugin, sender)
-                .onSuccess("Successfully load the region data.")
+                .onSuccess("Регион успешно загружен.")
                 .build();
     }
 
     public static <V> MessageFutureCallback<V> createRegionSaveCallback(WorldGuardPlugin plugin, CommandSender sender) {
         return new Builder(plugin, sender)
-                .onSuccess("Successfully saved the region data.")
+                .onSuccess("Регион успешно сохранен.")
                 .build();
     }
 

@@ -273,7 +273,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
         List<String> output = new ArrayList<String>();
 
         for (String name : playerDomain.getPlayers()) {
-            output.add("name:" + name);
+            output.add("" + name);
         }
 
         if (cache != null) {
@@ -281,7 +281,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
             for (UUID uuid : playerDomain.getUniqueIds()) {
                 Profile profile = results.get(uuid);
                 if (profile != null) {
-                    output.add(profile.getName() + "*");
+                    output.add(profile.getName() + "");
                 } else {
                     output.add("uuid:" + uuid);
                 }
@@ -363,8 +363,8 @@ public class DefaultDomain implements Domain, ChangeTracked {
 
     @Override
     public String toString() {
-        return "{players=" + playerDomain +
-                ", groups=" + groupDomain +
+        return "{игроки=" + playerDomain +
+                ", группы=" + groupDomain +
                 '}';
     }
 

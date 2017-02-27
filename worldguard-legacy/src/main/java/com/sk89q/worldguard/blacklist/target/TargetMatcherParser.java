@@ -63,7 +63,7 @@ public class TargetMatcherParser {
                 return id;
             }
 
-            throw new TargetMatcherParseException("Unknown block or item name: " + input);
+            throw new TargetMatcherParseException("Неизвестный блок или название предмета: " + input);
         }
     }
 
@@ -101,7 +101,7 @@ public class TargetMatcherParser {
             short s = Short.parseShort(input);
             return Range.closed(s, s);
         } catch (NumberFormatException e) {
-            throw new TargetMatcherParseException("Unknown data value range: " + input);
+            throw new TargetMatcherParseException("Неизвестный диапазон значений данных: " + input);
         }
     }
 

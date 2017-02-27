@@ -91,7 +91,7 @@ public class StateFlag extends Flag<StateFlag.State> {
         } else if (input.equalsIgnoreCase("none")) {
             return null;
         } else {
-            throw new InvalidFlagFormat("Expected none/allow/deny but got '" + input + "'");
+            throw new InvalidFlagFormat("Значение может быть только none/allow/deny, а указано '" + input + "'");
         }
     }
 

@@ -58,10 +58,10 @@ public final class RegionDatabaseUtils {
                 try {
                     target.setParent(parent);
                 } catch (CircularInheritanceException e) {
-                    log.warning("Circular inheritance detected! Can't set the parent of '" + target + "' to parent '" + parent.getId() + "'");
+                    log.warning("Обнаружено круговое наследование! Невозможно установить родительский '" + target + "' для родителей '" + parent.getId() + "'");
                 }
             } else {
-                log.warning("Unknown region parent: " + entry.getValue());
+                log.warning("Неизвестный родительский регион: " + entry.getValue());
             }
         }
     }

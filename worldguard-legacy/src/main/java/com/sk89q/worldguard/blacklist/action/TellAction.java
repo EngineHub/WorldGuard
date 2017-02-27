@@ -46,7 +46,7 @@ public class TellAction extends RepeatGuardedAction {
             if (message != null) {
                 event.getPlayer().printRaw(ChatColor.YELLOW + String.format(message, event.getTarget().getFriendlyName()));
             } else {
-                event.getPlayer().printRaw(ChatColor.YELLOW + "You're not allowed to " + event.getDescription() + " " +
+                event.getPlayer().printRaw(ChatColor.YELLOW + "Вам не разрешено " + event.getDescription() + " " +
                         event.getTarget().getFriendlyName() + ".");
             }
         }

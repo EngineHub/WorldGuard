@@ -52,24 +52,23 @@ public class ConfigurationManager {
     private static final Logger log = Logger.getLogger(ConfigurationManager.class.getCanonicalName());
 
     private static final String CONFIG_HEADER = "#\r\n" +
-            "# WorldGuard's main configuration file\r\n" +
+            "# Конфигурационный файл WorldGuard.\r\n" +
             "#\r\n" +
-            "# This is the global configuration file. Anything placed into here will\r\n" +
-            "# be applied to all worlds. However, each world has its own configuration\r\n" +
-            "# file to allow you to replace most settings in here for that world only.\r\n" +
+            "# Это файл конфигурации мира. Все, что помещается здесь будет влиять\r\n" +
+            "# только на этот мир. Если вы ничего не помещали в этот файл, то\r\n" +
+            "# настройки будут унаследованы от основного файла конфигурации.\r\n" +
             "#\r\n" +
-            "# About editing this file:\r\n" +
-            "# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If\r\n" +
-            "#   you use an editor like Notepad++ (recommended for Windows users), you\r\n" +
-            "#   must configure it to \"replace tabs with spaces.\" In Notepad++, this can\r\n" +
-            "#   be changed in Settings > Preferences > Language Menu.\r\n" +
-            "# - Don't get rid of the indents. They are indented so some entries are\r\n" +
-            "#   in categories (like \"enforce-single-session\" is in the \"protection\"\r\n" +
-            "#   category.\r\n" +
-            "# - If you want to check the format of this file before putting it\r\n" +
-            "#   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/\r\n" +
-            "#   and see if it gives \"ERROR:\".\r\n" +
-            "# - Lines starting with # are comments and so they are ignored.\r\n" +
+            "# О редактировании этого файла:\r\n" +
+            "# - НЕ ИСПОЛЬЗОВАТЬ ТАБУЛЯЦИЮ. Вы должны использовать пробелы, иначе Bukkit будет выдавать ошибку. Если\r\n" +
+            "#   вы используете редактор, такой как Notepad++ (рекомендуется для пользователей Windows), вы\r\n" +
+            "#   должны настроить его на \"заменить TAB на пробелы.\" В Notepad++, это можно\r\n" +
+            "#   изменить в Опции > Настройки > Настройки табуляци.\r\n" +
+            "# - Не избавиляйтесь от отступов. Они смещены, поэтому некоторые записи\r\n" +
+            "#   в категориях (как \"enforce-single-session\" находится в категории \"protection\")\r\n" +
+            "# - Если вы хотите проверить формат этого файла, прежде чем положить его\r\n" +
+            "#   в WorldGuard, вставьте его в http://yaml-online-parser.appspot.com/\r\n" +
+            "#   и посмотрите полученные \"ОШИБКА:\".\r\n" +
+            "# - Строки, начинающие с # называются комментариями, поэтому они игнорируются.\r\n" +
             "#\r\n";
 
     @Unreported private WorldGuardPlugin plugin;
@@ -141,7 +140,7 @@ public class ConfigurationManager {
         try {
             config.load();
         } catch (IOException e) {
-            log.severe("Error reading configuration for global config: ");
+            log.severe("Ошибка чтения глобальной конфигурации: ");
             e.printStackTrace();
         }
 
@@ -210,7 +209,7 @@ public class ConfigurationManager {
     public void disableUuidMigration() {
         config.setProperty("regions.uuid-migration.perform-on-next-start", false);
         if (!config.save()) {
-            log.severe("Error saving configuration!");
+            log.severe("Ошибка сохранения конфигурации!");
         }
     }
 

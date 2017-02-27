@@ -110,7 +110,7 @@ public class HttpRequest implements Closeable {
 
         try {
             if (conn != null) {
-                throw new IllegalArgumentException("Connection already executed");
+                throw new IllegalArgumentException("Подключение уже выполняется");
             }
 
             conn = (HttpURLConnection) reformat(url).openConnection();
@@ -171,7 +171,7 @@ public class HttpRequest implements Closeable {
         }
 
         close();
-        throw new IOException("Did not get expected response code, got " + responseCode + " for " + url);
+        throw new IOException("Не получить ожидаемый код ответа, получил " + responseCode + " для " + url);
     }
 
     /**
@@ -182,7 +182,7 @@ public class HttpRequest implements Closeable {
      */
     public int getResponseCode() throws IOException {
         if (conn == null) {
-            throw new IllegalArgumentException("No connection has been made");
+            throw new IllegalArgumentException("Никакой связи не было сделано");
         }
 
         return conn.getResponseCode();
@@ -206,7 +206,7 @@ public class HttpRequest implements Closeable {
      */
     public BufferedResponse returnContent() throws IOException, InterruptedException {
         if (inputStream == null) {
-            throw new IllegalArgumentException("No input stream available");
+            throw new IllegalArgumentException("Нет входной поток доступен");
         }
 
         try {

@@ -196,7 +196,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
         } catch (IOException e) {
-            log.log(Level.WARNING, "Failed to initialize SQLite profile cache");
+            log.log(Level.WARNING, "Не удалось инициализировать кэш профиля SQLite");
             profileCache = new HashMapCache();
         }
 
@@ -264,11 +264,11 @@ public class WorldGuardPlugin extends JavaPlugin {
         executorService.shutdown();
 
         try {
-            log.log(Level.INFO, "Shutting down executor and waiting for any pending tasks...");
+            log.log(Level.INFO, "Завершение работы исполнителя и ожидание каких-либо незавершенных задач...");
 
             List<Task<?>> tasks = supervisor.getTasks();
             if (!tasks.isEmpty()) {
-                StringBuilder builder = new StringBuilder("Known tasks:");
+                StringBuilder builder = new StringBuilder("Известные задачи:");
                 for (Task<?> task : tasks) {
                     builder.append("\n");
                     builder.append(task.getName());
@@ -281,7 +281,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            log.log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
+            log.log(Level.WARNING, "Некоторые задачи не удалить во время ожидания завершения оставшихся задач", e);
         }
 
         regionContainer.unload();
@@ -294,7 +294,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             commands.execute(cmd.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission.");
+            sender.sendMessage(ChatColor.RED + "У вас нет разрешения.");
         } catch (MissingNestedCommandException e) {
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (CommandUsageException e) {
@@ -317,23 +317,23 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public String convertThrowable(@Nullable Throwable throwable) {
         if (throwable instanceof NumberFormatException) {
-            return "Number expected, string received instead.";
+            return "Значение может быть только числовым.";
         } else if (throwable instanceof StorageException) {
-            log.log(Level.WARNING, "Error loading/saving regions", throwable);
-            return "Region data could not be loaded/saved: " + throwable.getMessage();
+            log.log(Level.WARNING, "Ошибка загрузки/сохранения регионов", throwable);
+            return "Данные региона не могут быть загружены/сохранены: " + throwable.getMessage();
         } else if (throwable instanceof RejectedExecutionException) {
-            return "There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.";
+            return "В настоящее время слишком много задач в очереди, чтобы добавить ваш. Используйте /wg running в список поставленных в очередь и запуска задач.";
         } else if (throwable instanceof CancellationException) {
-            return "WorldGuard: Task was cancelled";
+            return "WorldGuard: Задача была отменена";
         } else if (throwable instanceof InterruptedException) {
-            return "WorldGuard: Task was interrupted";
+            return "WorldGuard: Задача была прервана";
         } else if (throwable instanceof UnresolvedNamesException) {
             return throwable.getMessage();
         } else if (throwable instanceof CommandException) {
             return throwable.getMessage();
         } else {
-            log.log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
-            return "WorldGuard: An unexpected error occurred! Please see the server console.";
+            log.log(Level.WARNING, "Произошла непредвиденная ошибка WorldGuard", throwable);
+            return "WorldGuard: Произошла непредвиденная ошибка! Смотрите вывод в консоль.";
         }
     }
 
@@ -549,7 +549,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         if (sender instanceof Player) {
             return (Player) sender;
         } else {
-            throw new CommandException("A player is expected.");
+            throw new CommandException("Ожидается игрок.");
         }
     }
 
@@ -622,7 +622,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             throws CommandException {
         // Check to see if there were any matches
         if (players.size() == 0) {
-            throw new CommandException("No players matched query.");
+            throw new CommandException("Игроки не найдены.");
         }
 
         return players;
@@ -647,7 +647,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             throws CommandException {
 
         if (BukkitUtil.getOnlinePlayers().isEmpty()) {
-            throw new CommandException("No players matched query.");
+            throw new CommandException("Игроки не найдены.");
         }
 
         if (filter.equals("*")) {
@@ -690,7 +690,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 return checkPlayerMatch(players);
 
             } else {
-                throw new CommandException("Invalid group '" + filter + "'.");
+                throw new CommandException("Неверная группа '" + filter + "'.");
             }
         }
 
@@ -719,8 +719,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         // players were found (we don't want to just pick off the first one,
         // as that may be the wrong player)
         if (players.hasNext()) {
-            throw new CommandException("More than one player found! " +
-                        "Use @<name> for exact matching.");
+            throw new CommandException("Найдено больше одного игрока! " +
+                        "Используйте @<name> для точного поиска.");
         }
 
         return match;
@@ -792,7 +792,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     }
                 }
 
-                throw new CommandException("No normal world found.");
+                throw new CommandException("Стандартный мир не найден.");
 
             // #nether for the first nether world
             } else if (filter.equalsIgnoreCase("#nether")) {
@@ -802,7 +802,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     }
                 }
 
-                throw new CommandException("No nether world found.");
+                throw new CommandException("Нижний мир не найден.");
 
             // Handle getting a world from a player
             } else if (filter.matches("^#player$")) {
@@ -810,12 +810,12 @@ public class WorldGuardPlugin extends JavaPlugin {
 
                 // They didn't specify an argument for the player!
                 if (parts.length == 1) {
-                    throw new CommandException("Argument expected for #player.");
+                    throw new CommandException("Не хватает значений #player.");
                 }
 
                 return matchPlayers(sender, parts[1]).iterator().next().getWorld();
             } else {
-                throw new CommandException("Invalid identifier '" + filter + "'.");
+                throw new CommandException("Не правильный идентификатор '" + filter + "'.");
             }
         }
 
@@ -825,7 +825,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             }
         }
 
-        throw new CommandException("No world by that exact name found.");
+        throw new CommandException("Мир с таким имененм не найден.");
     }
 
     /**
@@ -837,13 +837,13 @@ public class WorldGuardPlugin extends JavaPlugin {
     public WorldEditPlugin getWorldEdit() throws CommandException {
         Plugin worldEdit = getServer().getPluginManager().getPlugin("WorldEdit");
         if (worldEdit == null) {
-            throw new CommandException("WorldEdit does not appear to be installed.");
+            throw new CommandException("WorldEdit не установлен.");
         }
 
         if (worldEdit instanceof WorldEditPlugin) {
             return (WorldEditPlugin) worldEdit;
         } else {
-            throw new CommandException("WorldEdit detection failed (report error).");
+            throw new CommandException("Ошибка определения WorldEdit.");
         }
     }
 
@@ -925,7 +925,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 if (copy == null) throw new FileNotFoundException();
                 input = file.getInputStream(copy);
             } catch (IOException e) {
-                log.severe("Unable to read default configuration: " + defaultName);
+                log.severe("Не удается прочитать конфигурацию по умолчанию: " + defaultName);
             }
 
         if (input != null) {
@@ -939,7 +939,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     output.write(buf, 0, length);
                 }
 
-                log.info("Default configuration file written: "
+                log.info("Конфигурационный файл записан по умолчанию: "
                         + actual.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();

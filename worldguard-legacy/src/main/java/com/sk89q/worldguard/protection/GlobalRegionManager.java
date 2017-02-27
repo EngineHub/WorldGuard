@@ -223,7 +223,7 @@ public class GlobalRegionManager {
             Player p = ((BukkitPlayer) player).getPlayer();
             return StateFlag.test(createQuery().queryState(location, p, flag));
         } else {
-            throw new IllegalArgumentException("Can't take a non-Bukkit player");
+            throw new IllegalArgumentException("Не может взять не Bukkit игрока");
         }
     }
 

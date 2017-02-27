@@ -62,12 +62,12 @@ public class TestPlayer extends LocalPlayer {
 
     @Override
     public void kick(String msg) {
-        System.out.println("TestPlayer{" + this.name + "} kicked!");
+        System.out.println("TestPlayer{" + this.name + "} кикнут!");
     }
 
     @Override
     public void ban(String msg) {
-        System.out.println("TestPlayer{" + this.name + "} banned!");
+        System.out.println("TestPlayer{" + this.name + "} забанен!");
     }
 
     @Override

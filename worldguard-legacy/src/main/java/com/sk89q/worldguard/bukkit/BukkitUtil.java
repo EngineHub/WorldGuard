@@ -390,10 +390,10 @@ public class BukkitUtil {
             } else if (result instanceof Collection<?>) {
                 return (Collection<? extends Player>) result;
             } else {
-                throw new RuntimeException("Result of getOnlinePlayers() call was not a known data type");
+                throw new RuntimeException("Результат вызова getOnlinePlayers() не был известным типом данных");
             }
         } catch (Exception e) {
-            throw new RuntimeException("WorldGuard is not compatible with this version of Bukkit", e);
+            throw new RuntimeException("WorldGuard не совместим с этой версией Bukkit", e);
         }
     }
 

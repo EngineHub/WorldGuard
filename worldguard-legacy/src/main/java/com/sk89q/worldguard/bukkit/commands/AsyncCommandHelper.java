@@ -98,14 +98,14 @@ public class AsyncCommandHelper {
         checkNotNull(world);
 
         formatUsing(world.getName());
-        registerWithSupervisor("Loading region data for '%s'");
+        registerWithSupervisor("Загрузка базы регионов для '%s'");
         if (silent) {
-            thenTellErrorsOnly("Failed to load regions '%s'");
+            thenTellErrorsOnly("Не удалось загрузить базу регионов '%s'");
         } else {
-            sendMessageAfterDelay("(Please wait... loading the region data for '%s')");
+            sendMessageAfterDelay("(Пожалуйста, подождите...)");
             thenRespondWith(
-                    "Loaded region data for '%s'",
-                    "Failed to load regions '%s'");
+                    "База регионов загружена для '%s'",
+                    "Не удалось загрузить базу регионов для '%s'");
         }
 
         return this;
@@ -115,14 +115,14 @@ public class AsyncCommandHelper {
         checkNotNull(world);
 
         formatUsing(world.getName());
-        registerWithSupervisor("Saving region data for '%s'");
+        registerWithSupervisor("Сохранение базы регионов '%s'");
         if (silent) {
-            thenTellErrorsOnly("Failed to save regions '%s'");
+            thenTellErrorsOnly("Не удалось сохранить базу регионов '%s'");
         } else {
-            sendMessageAfterDelay("(Please wait... saving the region data for '%s')");
+            sendMessageAfterDelay("(Пожалуйста, подождите...)");
             thenRespondWith(
-                    "Saved region data for '%s'",
-                    "Failed to load regions '%s'");
+                    "База регионов сохранена для '%s'",
+                    "Не удалось сохранить базу регионов для '%s'");
         }
 
         return this;

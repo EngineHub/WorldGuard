@@ -76,7 +76,7 @@ public final class FlagContext {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw new InvalidFlagFormat("Значение не числовое: " + input);
         }
     }
 
@@ -84,7 +84,7 @@ public final class FlagContext {
         try {
             return Double.parseDouble(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw new InvalidFlagFormat("Значение не числовое: " + input);
         }
     }
 

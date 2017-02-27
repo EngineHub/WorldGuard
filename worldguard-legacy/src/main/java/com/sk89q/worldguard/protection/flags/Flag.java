@@ -55,7 +55,7 @@ public abstract class Flag<T> {
      */
     protected Flag(String name, @Nullable RegionGroup defaultGroup) {
         if (name != null && !isValidName(name)) {
-            throw new IllegalArgumentException("Invalid flag name used");
+            throw new IllegalArgumentException("Используется неверное имя флага");
         }
         this.name = name;
         this.regionGroup = defaultGroup != null ? new RegionGroupFlag(name + "-group", defaultGroup) : null;
@@ -205,7 +205,7 @@ public abstract class Flag<T> {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-                "name='" + name + '\'' +
+                "имя='" + name + '\'' +
                 '}';
     }
 

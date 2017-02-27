@@ -275,11 +275,11 @@ public class RegionContainer {
 
         synchronized (lock) {
             try {
-                log.info("Unloading and saving region data that is currently loaded...");
+                log.info("Выгрузка и сохранение данных региона, которые в настоящее время загружены...");
                 unload();
                 migration.migrate();
             } finally {
-                log.info("Loading region data for loaded worlds...");
+                log.info("Загрузка данных региона для загруженных миров...");
                 loadWorlds();
             }
         }
@@ -298,12 +298,12 @@ public class RegionContainer {
             try {
                 migrate(migrator);
 
-                log.info("Regions saved after UUID migration! This won't happen again unless " +
-                        "you change the relevant configuration option in WorldGuard's config.");
+                log.info("Регионы сохраняются после миграции UUID! Это больше не повторится, если " +
+                        "вы измените соответствующий параметр в конфигурации WorldGuard.");
 
                 config.disableUuidMigration();
             } catch (MigrationException e) {
-                log.log(Level.WARNING, "Failed to execute the migration", e);
+                log.log(Level.WARNING, "Не удалось выполнить миграцию", e);
             }
         }
     }

@@ -84,8 +84,8 @@ public class BlockedPotionsListener extends AbstractListener {
                         if (getPlugin().hasPermission(player, "worldguard.override.potions")) {
                             return;
                         }
-                        player.sendMessage(ChatColor.RED + "Sorry, arrows with "
-                                + blockedEffect.getName() + " are presently disabled.");
+                        player.sendMessage(ChatColor.RED + "Стрелы с эффектами "
+                                + blockedEffect.getName() + " в настоящее время отключены.");
                     }
                     event.setCancelled(true);
                 }
@@ -154,15 +154,15 @@ public class BlockedPotionsListener extends AbstractListener {
                         }
                         isSplash |= (oldPotions && (Potion.fromItemStack(item).isSplash()));
                         if (isSplash && wcfg.blockPotionsAlways) {
-                            player.sendMessage(ChatColor.RED + "Sorry, potions with " +
-                                    blockedEffect.getName() + " can't be thrown, " +
-                                    "even if you have a permission to bypass it, " +
-                                    "due to limitations (and because overly-reliable potion blocking is on).");
+                            player.sendMessage(ChatColor.RED + "Зелья с эффектами " +
+                                    blockedEffect.getName() + " не могут быть брошены, " +
+                                    "так как у Вас нет разрешения или " +
+                                    "включены ораничения.");
                             event.setCancelled(true);
                         }
                     } else {
-                        player.sendMessage(ChatColor.RED + "Sorry, potions with "
-                                + blockedEffect.getName() + " are presently disabled.");
+                        player.sendMessage(ChatColor.RED + "Зелья с эффектами "
+                                + blockedEffect.getName() + " в настоящее время отключены.");
                         event.setCancelled(true);
                     }
                 } else {

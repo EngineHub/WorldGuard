@@ -36,11 +36,11 @@ public class ProtectionCommands {
         this.plugin = plugin;
     }
 
-    @Command(aliases = {"region", "regions", "rg"}, desc = "Region management commands")
+    @Command(aliases = {"region", "regions", "rg"}, desc = "Управление регинами")
     @NestedCommand({RegionCommands.class, MemberCommands.class})
     public void region(CommandContext args, CommandSender sender) {}
 
-    @Command(aliases = {"worldguard", "wg"}, desc = "WorldGuard commands")
+    @Command(aliases = {"worldguard", "wg"}, desc = "Команды WorldGuard")
     @NestedCommand({WorldGuardCommands.class})
     public void worldGuard(CommandContext args, CommandSender sender) {}
 }
