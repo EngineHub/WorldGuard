@@ -149,7 +149,7 @@ public class RegionContainerImpl {
                 try {
                     manager.save();
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Не удалось сохранить данные региона для '" + name + "'", e);
+                    log.log(Level.WARNING, "Изменения в регионе были сохранены в мире '" + name + "'", e);
                 }
 
                 mapping.remove(normal);
@@ -172,7 +172,7 @@ public class RegionContainerImpl {
                 try {
                     manager.saveChanges();
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Не удалось сохранить данные региона для '" + name + "' при выгрузке данных для всех миров", e);
+                    log.log(Level.WARNING, "Не удалось сохранить данные мира '" + name + "' при выгрузке данных для всех миров", e);
                 }
             }
 
@@ -226,12 +226,12 @@ public class RegionContainerImpl {
                     RegionManager manager = entry.getValue();
                     try {
                         if (manager.saveChanges()) {
-                            log.info("Данные изменения в регионе '" + name + "' были сохранены в фоне");
+                            log.info("Изменения в мире '" + name + "' были сохранены в фоне");
                         }
                         failingSaves.remove(manager);
                     } catch (StorageException e) {
                         failingSaves.add(manager);
-                        log.log(Level.WARNING, "Не удалось сохранить данные региона для '" + name + "' во время периодического сохранения", e);
+                        log.log(Level.WARNING, "Не удалось сохранить данные мира '" + name + "' во время периодического сохранения", e);
                     } catch (Exception e) {
                         failingSaves.add(manager);
                         log.log(Level.WARNING, "Произошла ошибка во время ожидания периодического сохранения", e);
@@ -261,7 +261,7 @@ public class RegionContainerImpl {
                             it.remove();
                             log.info("Успешно загружены данные региона для '" + normal.toString() + "'");
                         } catch (StorageException e) {
-                            log.log(Level.WARNING, "Данные региона по-прежнему не в состоянии загрузить, по крайней мере в мире по имени '" + normal.toString() + "'", e);
+                            log.log(Level.WARNING, "Данные региона по-прежнему не в состоянии загрузиться, по крайней мере в мире по имени '" + normal.toString() + "'", e);
                             break;
                         }
                     }
