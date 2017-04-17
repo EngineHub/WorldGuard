@@ -509,6 +509,13 @@ public class WorldGuardBlockListener implements Listener {
                     return;
                 }
             }
+
+            if (type == BlockID.FROSTED_ICE && wcfg.useRegions &&
+                    !plugin.getGlobalRegionManager().allows(
+                            DefaultFlag.FROSTED_ICE_FORM, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
             return;
         }
 
@@ -636,6 +643,13 @@ public class WorldGuardBlockListener implements Listener {
             }
             break;
 
+        case BlockID.FROSTED_ICE:
+            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
+                    DefaultFlag.FROSTED_ICE_MELT, event.getBlock().getLocation())) {
+                event.setCancelled(true);
+                return;
+            }
+            break;
         case BlockID.SNOW:
             if (wcfg.disableSnowMelting) {
                 event.setCancelled(true);

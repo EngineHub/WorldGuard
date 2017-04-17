@@ -86,6 +86,8 @@ public final class DefaultFlag {
     public static final StateFlag SNOW_MELT = new StateFlag("snow-melt", true);
     public static final StateFlag ICE_FORM = new StateFlag("ice-form", true);
     public static final StateFlag ICE_MELT = new StateFlag("ice-melt", true);
+    public static final StateFlag FROSTED_ICE_FORM = new StateFlag("frosted-ice-form", true);
+    public static final StateFlag FROSTED_ICE_MELT = new StateFlag("frosted-ice-melt", true);
     public static final StateFlag MUSHROOMS = new StateFlag("mushroom-growth", true);
     public static final StateFlag LEAF_DECAY = new StateFlag("leaf-decay", true);
     public static final StateFlag GRASS_SPREAD = new StateFlag("grass-growth", true);
@@ -155,7 +157,7 @@ public final class DefaultFlag {
             ENTITY_ITEM_FRAME_DESTROY, FALL_DAMAGE, ITEM_PICKUP, ITEM_DROP, /*MAX_PLAYERS, MAX_PLAYERS_MESSAGE,*/
             HEAL_AMOUNT, HEAL_DELAY, MIN_HEAL, MAX_HEAL,
             FEED_DELAY, FEED_AMOUNT, MIN_FOOD, MAX_FOOD,
-            SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, SOIL_DRY, GAME_MODE,
+            SNOW_FALL, SNOW_MELT, ICE_FORM, ICE_MELT, FROSTED_ICE_FORM, FROSTED_ICE_MELT, SOIL_DRY, GAME_MODE,
             MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, VINE_GROWTH,
             SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
             TELE_LOC, SPAWN_LOC, POTION_SPLASH, TIME_LOCK, WEATHER_LOCK,
