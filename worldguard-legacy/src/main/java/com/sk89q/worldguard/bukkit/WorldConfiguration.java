@@ -98,6 +98,7 @@ public class WorldConfiguration {
     public boolean ropeLadders;
     public boolean allowPortalAnywhere;
     public Set<Integer> preventWaterDamage;
+    public Set<Integer> preventLavaDamage;
     public boolean blockLighter;
     public boolean disableFireSpread;
     public Set<Integer> disableFireSpreadBlocks;
@@ -382,6 +383,7 @@ public class WorldConfiguration {
         ropeLadders = getBoolean("physics.vine-like-rope-ladders", false);
         allowPortalAnywhere = getBoolean("physics.allow-portal-anywhere", false);
         preventWaterDamage = new HashSet<Integer>(getIntList("physics.disable-water-damage-blocks", null));
+        preventLavaDamage = new HashSet<Integer>(getIntList("physics.disable-lava-damage-blocks", null));
 
         blockTNTExplosions = getBoolean("ignition.block-tnt", false);
         blockTNTBlockDamage = getBoolean("ignition.block-tnt-block-damage", false);
