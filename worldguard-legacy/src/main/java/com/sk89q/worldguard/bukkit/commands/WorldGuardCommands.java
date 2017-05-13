@@ -72,7 +72,7 @@ public class WorldGuardCommands {
         sender.sendMessage(ChatColor.GREEN
                 + "Версия WorldGuard " + plugin.getDescription().getVersion());
         sender.sendMessage(ChatColor.GREEN
-                + "https://vk.com/b_o_d_ik §7§l| §7Перевел §eMrBogdan2402");
+                + "https://vk.com/darkfortmc §7§l| §7Перевел §eDarkFort");
     }
 
     @Command(aliases = {"reload"}, desc = "Перезагрузить конфигурацию WorldGuard", max = 0)
