@@ -204,7 +204,7 @@ public class WorldGuardCommands {
                     activeSampler = null;
                 }
             }
-        }, MoreExecutors.sameThreadExecutor());
+        }, MoreExecutors.directExecutor());
 
         Futures.addCallback(sampler.getFuture(), new FutureCallback<Sampler>() {
             @Override
