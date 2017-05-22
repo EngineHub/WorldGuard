@@ -49,7 +49,7 @@ public class FutureProgressListener implements Runnable {
     }
 
     public static void addProgressListener(ListenableFuture<?> future, CommandSender sender, String message) {
-        future.addListener(new FutureProgressListener(sender, message), MoreExecutors.sameThreadExecutor());
+        future.addListener(new FutureProgressListener(sender, message), MoreExecutors.directExecutor());
     }
 
 }

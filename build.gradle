@@ -21,13 +21,13 @@ buildscript {
 
     configurations.all {
         resolutionStrategy {
-            force 'com.google.guava:guava:17.0'
+            force 'com.google.guava:guava:21.0'
         }
     }
 
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.16'
         classpath 'org.ajoberstar:gradle-git:0.12.0'
     }
 }
@@ -50,7 +50,7 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'checkstyle'
     apply plugin: 'com.github.johnrengelman.shadow'
-    apply plugin: 'com.jfrog.artifactory-upload'
+    apply plugin: 'com.jfrog.artifactory'
 
     group = 'com.sk89q.worldguard'
     version = '7.0.0-SNAPSHOT'

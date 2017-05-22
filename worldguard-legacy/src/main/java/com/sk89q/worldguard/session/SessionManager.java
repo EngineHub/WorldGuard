@@ -19,9 +19,9 @@
 
 package com.sk89q.worldguard.session;
 
-import com.sk89q.guavabackport.cache.CacheBuilder;
-import com.sk89q.guavabackport.cache.CacheLoader;
-import com.sk89q.guavabackport.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.session.handler.*;

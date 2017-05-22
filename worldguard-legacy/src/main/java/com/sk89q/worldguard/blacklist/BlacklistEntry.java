@@ -19,11 +19,11 @@
 
 package com.sk89q.worldguard.blacklist;
 
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.action.Action;
 import com.sk89q.worldguard.blacklist.action.ActionResult;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
-import com.sk89q.guavabackport.cache.LoadingCache;
 
 import javax.annotation.Nullable;
 import java.util.*;
