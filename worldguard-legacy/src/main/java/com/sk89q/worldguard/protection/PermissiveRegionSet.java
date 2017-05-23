@@ -20,12 +20,10 @@
 package com.sk89q.worldguard.protection;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -93,7 +91,7 @@ public class PermissiveRegionSet extends AbstractRegionSet {
 
     @Override
     public Iterator<ProtectedRegion> iterator() {
-        return Iterators.emptyIterator();
+        return Collections.emptyIterator();
     }
 
     /**

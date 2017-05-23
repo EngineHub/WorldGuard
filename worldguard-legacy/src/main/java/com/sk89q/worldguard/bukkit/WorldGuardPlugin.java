@@ -21,9 +21,9 @@ package com.sk89q.worldguard.bukkit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
+import com.sk89q.guavabackport.util.concurrent.Futures;
+import com.sk89q.guavabackport.util.concurrent.ListeningExecutorService;
+import com.sk89q.guavabackport.util.concurrent.MoreExecutors;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.squirrelid.cache.HashMapCache;

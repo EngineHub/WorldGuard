@@ -21,7 +21,7 @@ package com.sk89q.worldguard.blacklist.target;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.sk89q.guavabackport.collect.Range;
+import com.google.common.collect.Range;
 import com.sk89q.worldedit.blocks.ItemType;
 import com.sk89q.worldguard.util.Enums;
 import org.bukkit.Material;

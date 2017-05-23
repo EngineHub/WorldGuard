@@ -21,8 +21,8 @@ package com.sk89q.worldguard.util.profiler;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
+import com.sk89q.guavabackport.util.concurrent.ListenableFuture;
+import com.sk89q.guavabackport.util.concurrent.SettableFuture;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;

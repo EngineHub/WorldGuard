@@ -20,9 +20,9 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.google.common.base.Function;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.sk89q.guavabackport.util.concurrent.FutureCallback;
+import com.sk89q.guavabackport.util.concurrent.Futures;
+import com.sk89q.guavabackport.util.concurrent.ListenableFuture;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.util.paste.EngineHubPaste;
 import org.bukkit.ChatColor;
