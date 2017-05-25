@@ -209,7 +209,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         PermissionsResolverManager.initialize(this);
         configuration.load();
 
-        log.info("Loading region data...");
+        log.info("Загрузка данных региона...");
         regionContainer.initialize();
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, SessionManager.RUN_DELAY, SessionManager.RUN_DELAY);
