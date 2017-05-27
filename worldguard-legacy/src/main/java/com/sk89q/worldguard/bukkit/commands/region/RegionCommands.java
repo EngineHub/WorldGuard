@@ -71,6 +71,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -498,7 +500,7 @@ public final class RegionCommands extends RegionCommandsBase {
         // We didn't find the flag, so let's print a list of flags that the user
         // can use, and do nothing afterwards
         if (foundFlag == null) {
-            StringBuilder list = new StringBuilder();
+            ArrayList<String> flagList = new ArrayList<>();
 
             // Need to build a list
             for (Flag<?> flag : flagRegistry) {
@@ -507,15 +509,30 @@ public final class RegionCommands extends RegionCommandsBase {
                     continue;
                 }
 
-                if (list.length() > 0) {
+                flagList.add(flag.getName());
+            }
+
+            Collections.sort(flagList);
+
+            StringBuilder list = new StringBuilder();
+
+            for (int i = 0; i < flagList.size(); i++) {
+                String flag = flagList.get(i);
+
+                if (i % 2 == 0) {
+                    list.append(ChatColor.GRAY);
+                } else {
+                    list.append(ChatColor.RED);
+                }
+
+                list.append(flag);
+                if ((i + 1) < flagList.size()) {
                     list.append(", ");
                 }
-                
-                list.append(flag.getName());
             }
 
             sender.sendMessage(ChatColor.RED + "Unknown flag specified: " + flagName);
-            sender.sendMessage(ChatColor.RED + "Available " + "flags: " + list);
+            sender.sendMessage(ChatColor.RED + "Available flags: " + list);
             
             return;
         }
