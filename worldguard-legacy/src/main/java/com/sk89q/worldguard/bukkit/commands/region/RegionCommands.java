@@ -501,6 +501,7 @@ public final class RegionCommands extends RegionCommandsBase {
             StringBuilder list = new StringBuilder();
 
             // Need to build a list
+            int i = 0;
             for (Flag<?> flag : flagRegistry) {
                 // Can the user set this flag?
                 if (!permModel.maySetFlag(existing, flag)) {
@@ -510,13 +511,20 @@ public final class RegionCommands extends RegionCommandsBase {
                 if (list.length() > 0) {
                     list.append(", ");
                 }
-                
+
+                if (i % 2 == 0) {
+                    list.append(ChatColor.GRAY);
+                } else {
+                    list.append(ChatColor.RED);
+                }
                 list.append(flag.getName());
+
+                i++;
             }
 
             sender.sendMessage(ChatColor.RED + "Unknown flag specified: " + flagName);
-            sender.sendMessage(ChatColor.RED + "Available " + "flags: " + list);
-            
+            sender.sendMessage(ChatColor.RED + "Available flags: " + list);
+
             return;
         }
         
