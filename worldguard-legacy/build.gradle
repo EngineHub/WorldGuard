@@ -1,7 +1,7 @@
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-project.version = '6.2.1-SNAPSHOT'
+project.version = '6.2.2-SNAPSHOT'
 ext.internalVersion = project.version + ";" + gitCommitHash
 
 sourceCompatibility = 1.7
@@ -18,7 +18,7 @@ dependencies {
     compile 'org.bukkit:bukkit:1.11-R0.1-SNAPSHOT'
     compile 'com.sk89q.worldedit:worldedit-bukkit:6.1.3-SNAPSHOT'
     compile 'com.sk89q:squirrelid:0.1.0'
-    compile 'com.sk89q:guavabackport:1.1'
+    compile 'com.sk89q:guavabackport:1.2'
     compile 'org.flywaydb:flyway-core:3.0'
     compile ('com.sk89q:commandbook:2.3') {
         exclude group: 'com.sk89q', module: 'worldedit'
@@ -45,7 +45,7 @@ processResources {
 shadowJar {
     dependencies {
         include(dependency('org.khelekore:prtree:1.5.0'))
-        include(dependency('com.sk89q:guavabackport:1.1'))
+        include(dependency('com.sk89q:guavabackport:1.2'))
         include(dependency('com.sk89q:squirrelid:0.1.0'))
         include(dependency('org.flywaydb:flyway-core:3.0'))
         include(dependency('com.googlecode.json-simple:json-simple:1.1.1'))

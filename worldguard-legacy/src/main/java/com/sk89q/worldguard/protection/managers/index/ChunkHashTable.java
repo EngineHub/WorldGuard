@@ -21,8 +21,8 @@ package com.sk89q.worldguard.protection.managers.index;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
+import com.sk89q.guavabackport.util.concurrent.ListeningExecutorService;
+import com.sk89q.guavabackport.util.concurrent.MoreExecutors;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;

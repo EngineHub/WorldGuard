@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
+import com.sk89q.guavabackport.util.concurrent.ListenableFuture;
+import com.sk89q.guavabackport.util.concurrent.MoreExecutors;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 

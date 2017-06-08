@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.util.paste;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.sk89q.guavabackport.util.concurrent.ListenableFuture;
 
 import java.net.URL;
 

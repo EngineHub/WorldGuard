@@ -19,9 +19,9 @@
 
 package com.sk89q.worldguard.util.paste;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.sk89q.guavabackport.util.concurrent.FutureCallback;
+import com.sk89q.guavabackport.util.concurrent.Futures;
+import com.sk89q.guavabackport.util.concurrent.ListenableFuture;
 import com.sk89q.worldguard.util.net.HttpRequest;
 import com.sk89q.worldguard.util.net.HttpRequest.Form;
 

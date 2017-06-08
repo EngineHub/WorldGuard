@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.util.paste;
 
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
+import com.sk89q.guavabackport.util.concurrent.ListeningExecutorService;
+import com.sk89q.guavabackport.util.concurrent.MoreExecutors;
 
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;

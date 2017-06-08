@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.commands.region;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.sk89q.guavabackport.util.concurrent.Futures;
+import com.sk89q.guavabackport.util.concurrent.ListenableFuture;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -71,6 +71,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -498,7 +500,7 @@ public final class RegionCommands extends RegionCommandsBase {
         // We didn't find the flag, so let's print a list of flags that the user
         // can use, and do nothing afterwards
         if (foundFlag == null) {
-            StringBuilder list = new StringBuilder();
+            ArrayList<String> flagList = new ArrayList<>();
 
             // Need to build a list
             for (Flag<?> flag : flagRegistry) {
@@ -507,11 +509,26 @@ public final class RegionCommands extends RegionCommandsBase {
                     continue;
                 }
 
-                if (list.length() > 0) {
+                flagList.add(flag.getName());
+            }
+
+            Collections.sort(flagList);
+
+            StringBuilder list = new StringBuilder();
+
+            for (int i = 0; i < flagList.size(); i++) {
+                String flag = flagList.get(i);
+
+                if (i % 2 == 0) {
+                    list.append(ChatColor.GRAY);
+                } else {
+                    list.append(ChatColor.RED);
+                }
+
+                list.append(flag);
+                if ((i + 1) < flagList.size()) {
                     list.append(", ");
                 }
-                
-                list.append(flag.getName());
             }
 
             sender.sendMessage(ChatColor.RED + "Неизвестный флаг: " + flagName);
@@ -644,7 +661,7 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"setparent", "parent", "par"},
-             usage = "<id> [id-родительский]",
+             usage = "<id> [родительский-id]",
              flags = "w:",
              desc = "Установить родительский регион",
              min = 1, max = 2)
@@ -901,7 +918,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         if (!args.hasFlag('y')) {
             throw new CommandException("Эта команда потенциально опасна.\n" +
-                    "Пожалуйста, удостовертесь что вы сделали резервные копии перед тем как запускать миграцию.");
+                    "Пожалуйста, удостовертесь что вы сделали резервные копии перед тем как запускать миграцию..");
         }
 
         ConfigurationManager config = plugin.getGlobalStateManager();

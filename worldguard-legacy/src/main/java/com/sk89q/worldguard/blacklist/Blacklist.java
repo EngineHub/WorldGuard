@@ -26,9 +26,9 @@ import com.sk89q.worldguard.blacklist.event.EventType;
 import com.sk89q.worldguard.blacklist.target.TargetMatcher;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
-import com.sk89q.guavabackport.cache.CacheBuilder;
-import com.sk89q.guavabackport.cache.CacheLoader;
-import com.sk89q.guavabackport.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import org.bukkit.ChatColor;
 

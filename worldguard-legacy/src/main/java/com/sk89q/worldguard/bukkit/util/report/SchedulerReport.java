@@ -21,9 +21,9 @@ package com.sk89q.worldguard.bukkit.util.report;
 
 import com.google.common.base.Optional;
 import com.google.common.reflect.TypeToken;
-import com.sk89q.guavabackport.cache.CacheBuilder;
-import com.sk89q.guavabackport.cache.CacheLoader;
-import com.sk89q.guavabackport.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldguard.util.report.DataReport;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
