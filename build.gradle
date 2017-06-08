@@ -81,14 +81,21 @@ subprojects {
         from sourceSets.main.allSource
     }
 
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
     artifacts {
         archives jar
         archives sourcesJar
+        archives javadocJar
     }
 
     build.dependsOn(checkstyleMain)
     build.dependsOn(checkstyleTest)
     build.dependsOn(sourcesJar)
+    build.dependsOn(javadocJar)
 
     shadowJar {
         classifier 'dist'
