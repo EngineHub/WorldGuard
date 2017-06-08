@@ -9,6 +9,10 @@ targetCompatibility = 1.7
 
 checkstyle.configFile = new File(projectDir, "config/checkstyle/checkstyle.xml")
 
+compileJava {
+  options.encoding = "UTF-8"
+}
+
 dependencies {
     compile 'org.khelekore:prtree:1.5.0'
     compile 'org.bukkit:bukkit:1.11-R0.1-SNAPSHOT'
