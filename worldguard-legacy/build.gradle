@@ -7,6 +7,12 @@ ext.internalVersion = project.version + ";" + gitCommitHash
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 checkstyle.configFile = new File(projectDir, "config/checkstyle/checkstyle.xml")
 
 dependencies {
