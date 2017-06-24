@@ -45,7 +45,7 @@ public class MaterialTarget implements Target {
     public String getFriendlyName() {
         ItemType type = ItemType.fromID(id);
         if (type != null) {
-            return type.getName() + " (#" + id + ":" + data + ")";
+            return type.getName() + " (" + id + ":" + data + ")";
         } else {
             return "#" + id + ":" + data;
         }

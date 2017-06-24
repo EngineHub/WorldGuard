@@ -133,7 +133,7 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
         }
 
         if (!namesToQuery.isEmpty()) {
-            throw new UnresolvedNamesException("Unable to resolve the names " + Joiner.on(", ").join(namesToQuery));
+            throw new UnresolvedNamesException("Не удалось определить ник(и): " + Joiner.on(", ").join(namesToQuery));
         }
 
         return domain;

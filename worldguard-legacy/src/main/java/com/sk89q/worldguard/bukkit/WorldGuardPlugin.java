@@ -294,7 +294,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             commands.execute(cmd.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission.");
+            sender.sendMessage(ChatColor.RED + "Вы не имеете прав на выполнение данной команды.");
         } catch (MissingNestedCommandException e) {
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (CommandUsageException e) {
@@ -317,7 +317,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public String convertThrowable(@Nullable Throwable throwable) {
         if (throwable instanceof NumberFormatException) {
-            return "Number expected, string received instead.";
+            return "Значение данного параметра должно быть числовым.";
         } else if (throwable instanceof StorageException) {
             log.log(Level.WARNING, "Error loading/saving regions", throwable);
             return "Region data could not be loaded/saved: " + throwable.getMessage();

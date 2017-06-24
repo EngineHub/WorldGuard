@@ -123,12 +123,12 @@ public class ToggleCommands {
 
                 if (!args.hasFlag('s')) {
                     plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                             + "ALL intensive server activity halted by "
-                             + plugin.toName(sender) + ".");
+                             + ""
+                             + plugin.toName(sender) + " §cактивировал режим аварийной работы сервера, некоторые функции могут быть временно недоступны.");
                 } else {
                     sender.sendMessage(ChatColor.YELLOW
-                        + "(Silent) ALL intensive server activity halted by "
-                        + plugin.toName(sender) + ".");
+                        + ""
+                        + plugin.toName(sender) + " §cактивировал режим аварийной работы сервера, некоторые функции могут быть временно недоступны.");
                 }
 
                 for (World world : plugin.getServer().getWorlds()) {
@@ -142,18 +142,18 @@ public class ToggleCommands {
                     }
 
                     if (removed > 10) {
-                        sender.sendMessage("" + removed + " entities (>10) auto-removed from "
+                        sender.sendMessage("" + removed + " объектов (>10) было удалено в "
                                 + world.getName());
                     }
                 }
             } else {
                 if (!args.hasFlag('s')) {
                     plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                            + "ALL intensive server activity is now allowed.");
+                            + "Аварийный режим работы сервера деактивирован.");
                     
                     if (!(sender instanceof Player)) {
                         sender.sendMessage(ChatColor.YELLOW
-                                + "ALL intensive server activity is now allowed.");
+                                + "Аварийный режим работы сервера деактивирован.");
                     }
                 } else {
                     sender.sendMessage(ChatColor.YELLOW

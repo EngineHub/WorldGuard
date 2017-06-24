@@ -51,14 +51,14 @@ public class PlayerMoveListener implements Listener {
         }
     }
 
-    @EventHandler
+/*    @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
 
         Session session = plugin.getSessionManager().get(player);
         session.testMoveTo(player, event.getRespawnLocation(), MoveType.RESPAWN, true);
     }
-
+*/
     @EventHandler
     public void onVehicleEnter(VehicleEnterEvent event) {
         Entity entity = event.getEntered();

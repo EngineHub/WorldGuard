@@ -121,7 +121,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (cfg.activityHaltToggle) {
             player.sendMessage(ChatColor.YELLOW
-                    + "Intensive server activity has been HALTED.");
+                    + "Сервер работает в аварийном режиме, некоторые функции могут быть временно недоступны.");
 
             int removed = 0;
 
@@ -154,7 +154,7 @@ public class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SEND_CHAT, player.getLocation())) {
-                player.sendMessage(ChatColor.RED + "You don't have permission to chat in this region!");
+                player.sendMessage(ChatColor.RED + "Вам не разрешено отправлять сообщения в данной зоне.");
                 event.setCancelled(true);
                 return;
             }
@@ -270,8 +270,8 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (item != null && item.getTypeId() == wcfg.regionWand && plugin.hasPermission(player, "worldguard.region.wand")) {
                 if (set.size() > 0) {
-                    player.sendMessage(ChatColor.YELLOW + "Can you build? "
-                            + (set.canBuild(localPlayer) ? "Yes" : "No"));
+                    player.sendMessage(ChatColor.YELLOW + "Вы "
+                            + (set.canBuild(localPlayer) ? "§aможете" : "§cне можете") + " §eздесь строить.");
 
                     StringBuilder str = new StringBuilder();
                     for (Iterator<ProtectedRegion> it = set.iterator(); it.hasNext();) {
@@ -281,9 +281,9 @@ public class WorldGuardPlayerListener implements Listener {
                         }
                     }
 
-                    player.sendMessage(ChatColor.YELLOW + "Applicable regions: " + str.toString());
+                    player.sendMessage(ChatColor.YELLOW + "Обнаруженные здесь регионы: " + str.toString());
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + "WorldGuard: No defined regions here!");
+                    player.sendMessage(ChatColor.YELLOW + "Здесь не обнаружено ни одного региона.");
                 }
 
                 event.setCancelled(true);
@@ -374,7 +374,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
                         && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
                                 && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
-                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
+                    player.sendMessage(ChatColor.DARK_RED + "Вам не разрешено использовать эндер-жемчуг здесь.");
                     event.setCancelled(true);
                     return;
                 }
@@ -456,7 +456,7 @@ public class WorldGuardPlayerListener implements Listener {
             CommandFilter test = new CommandFilter(allowedCommands, blockedCommands);
 
             if (!test.apply(event.getMessage())) {
-                player.sendMessage(ChatColor.RED + event.getMessage() + " is not allowed in this area.");
+                player.sendMessage(ChatColor.RED + "Команда " + event.getMessage() + " не разрешена в данной зоне.");
                 event.setCancelled(true);
                 return;
             }

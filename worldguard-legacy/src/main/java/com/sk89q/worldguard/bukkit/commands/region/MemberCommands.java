@@ -80,7 +80,7 @@ public class MemberCommands extends RegionCommandsBase {
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Adding members to the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with new members.", "Failed to add new members");
+                .thenRespondWith("Регион '%s' обновлён после изменения списка участников.", "Ошибка");
     }
 
     @Command(aliases = {"addowner", "addowner", "ao"},
@@ -117,7 +117,7 @@ public class MemberCommands extends RegionCommandsBase {
                     int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
                     if (maxRegionCount >= 0 && manager.getRegionCountOfPlayer(localPlayer)
                             >= maxRegionCount) {
-                        throw new CommandException("You already own the maximum allowed amount of regions.");
+                        throw new CommandException("Вы владеете максимально допустимим количеством регионов.");
                     }
                 }
                 plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
@@ -143,7 +143,7 @@ public class MemberCommands extends RegionCommandsBase {
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Adding owners to the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with new owners.", "Failed to add new owners");
+                .thenRespondWith("Регион '%s' обновлён после изменения списка владельцев.", "Ошибка");
     }
 
     @Command(aliases = {"removemember", "remmember", "removemem", "remmem", "rm"},
@@ -190,7 +190,7 @@ public class MemberCommands extends RegionCommandsBase {
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Removing members from the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with members removed.", "Failed to remove members");
+                .thenRespondWith("Регион '%s' обновлён после изменения списка участников.", "Ошибка");
     }
 
     @Command(aliases = {"removeowner", "remowner", "ro"},
@@ -237,6 +237,6 @@ public class MemberCommands extends RegionCommandsBase {
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Removing owners from the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with owners removed.", "Failed to remove owners");
+                .thenRespondWith("Регион '%s' обновлён после изменения списка владельцев.", "Не удалось удалить владельцев");
     }
 }
