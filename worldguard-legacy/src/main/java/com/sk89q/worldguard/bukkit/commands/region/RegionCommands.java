@@ -1037,14 +1037,14 @@ public final class RegionCommands extends RegionCommandsBase {
             
             if (teleportLocation == null) {
                 throw new CommandException(
-                        "В данном регионе нету точки спавна.");
+                        "В данном регионе нет точки спавна.");
             }
         } else {
             teleportLocation = existing.getFlag(DefaultFlag.TELE_LOC);
             
             if (teleportLocation == null) {
                 throw new CommandException(
-                        "В данном регионе нету точки телепорта.");
+                        "В данном регионе нет точки телепорта.");
             }
         }
 

@@ -144,7 +144,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
             if (useColors) {
                 builder.append(ChatColor.RED);
             }
-            builder.append("(нету)");
+            builder.append("(нет)");
         }
     }
     
@@ -229,7 +229,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
             builder.append(domain.toUserFriendlyString(cache));
         } else {
             builder.append(ChatColor.RED);
-            builder.append("(нету)");
+            builder.append("(нет)");
         }
     }
     
