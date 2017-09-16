@@ -918,12 +918,12 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         // Handle created armor stands
-        if (item != null && item.getType() == Materials.ARMOR_STAND) {
+        if (item != null && item.getType() == Material.ARMOR_STAND) {
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ARMOR_STAND));
             return;
         }
 
-        if (item != null && item.getType() == Materials.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
+        if (item != null && item.getType() == Material.END_CRYSTAL) { /*&& placed.getType() == Material.BEDROCK) {*/ // in vanilla you can only place them on bedrock but who knows what plugins will add
                                                                                                                         // may be overprotective as a result, but better than being underprotective
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.ENDER_CRYSTAL));
             return;
