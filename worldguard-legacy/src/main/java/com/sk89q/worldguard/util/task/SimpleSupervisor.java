@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.util.task;
 
-import com.sk89q.guavabackport.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.MoreExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class SimpleSupervisor implements Supervisor {
                     monitored.remove(task);
                 }
             }
-        }, MoreExecutors.sameThreadExecutor());
+        }, MoreExecutors.directExecutor());
     }
 
 }

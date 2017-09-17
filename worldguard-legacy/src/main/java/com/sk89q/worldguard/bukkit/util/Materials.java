@@ -46,37 +46,26 @@ public final class Materials {
     private static final Map<Material, Integer> MATERIAL_FLAGS = new HashMap<Material, Integer>();
     private static final Set<PotionEffectType> DAMAGE_EFFECTS = new HashSet<PotionEffectType>();
 
-    public static Material ARMOR_STAND;
-    public static Material END_CRYSTAL;
 
     private static Set<Material> shulkerBoxes = new HashSet<>();
 
     static {
-        try {
-            // for backwards compatible access to material enum
-            ARMOR_STAND = Material.ARMOR_STAND;
-            END_CRYSTAL = Material.END_CRYSTAL;
-        } catch (NoSuchFieldError ignored) {}
-
-        try {
-            shulkerBoxes.add(Material.WHITE_SHULKER_BOX);
-            shulkerBoxes.add(Material.ORANGE_SHULKER_BOX);
-            shulkerBoxes.add(Material.MAGENTA_SHULKER_BOX);
-            shulkerBoxes.add(Material.LIGHT_BLUE_SHULKER_BOX);
-            shulkerBoxes.add(Material.YELLOW_SHULKER_BOX);
-            shulkerBoxes.add(Material.LIME_SHULKER_BOX);
-            shulkerBoxes.add(Material.PINK_SHULKER_BOX);
-            shulkerBoxes.add(Material.GRAY_SHULKER_BOX);
-            shulkerBoxes.add(Material.SILVER_SHULKER_BOX); // who called this silver?
-            shulkerBoxes.add(Material.CYAN_SHULKER_BOX);
-            shulkerBoxes.add(Material.PURPLE_SHULKER_BOX);
-            shulkerBoxes.add(Material.BLUE_SHULKER_BOX);
-            shulkerBoxes.add(Material.BROWN_SHULKER_BOX);
-            shulkerBoxes.add(Material.GREEN_SHULKER_BOX);
-            shulkerBoxes.add(Material.RED_SHULKER_BOX);
-            shulkerBoxes.add(Material.BLACK_SHULKER_BOX);
-        } catch (NoSuchFieldError ignored) {
-        }
+        shulkerBoxes.add(Material.WHITE_SHULKER_BOX);
+        shulkerBoxes.add(Material.ORANGE_SHULKER_BOX);
+        shulkerBoxes.add(Material.MAGENTA_SHULKER_BOX);
+        shulkerBoxes.add(Material.LIGHT_BLUE_SHULKER_BOX);
+        shulkerBoxes.add(Material.YELLOW_SHULKER_BOX);
+        shulkerBoxes.add(Material.LIME_SHULKER_BOX);
+        shulkerBoxes.add(Material.PINK_SHULKER_BOX);
+        shulkerBoxes.add(Material.GRAY_SHULKER_BOX);
+        shulkerBoxes.add(Material.SILVER_SHULKER_BOX); // who called this silver?
+        shulkerBoxes.add(Material.CYAN_SHULKER_BOX);
+        shulkerBoxes.add(Material.PURPLE_SHULKER_BOX);
+        shulkerBoxes.add(Material.BLUE_SHULKER_BOX);
+        shulkerBoxes.add(Material.BROWN_SHULKER_BOX);
+        shulkerBoxes.add(Material.GREEN_SHULKER_BOX);
+        shulkerBoxes.add(Material.RED_SHULKER_BOX);
+        shulkerBoxes.add(Material.BLACK_SHULKER_BOX);
 
         ENTITY_ITEMS.put(EntityType.PAINTING, Material.PAINTING);
         ENTITY_ITEMS.put(EntityType.ARROW, Material.ARROW);
@@ -97,9 +86,7 @@ public final class Materials {
         ENTITY_ITEMS.put(EntityType.MINECART_HOPPER, Material.HOPPER_MINECART);
         ENTITY_ITEMS.put(EntityType.SPLASH_POTION, Material.POTION);
         ENTITY_ITEMS.put(EntityType.EGG, Material.EGG);
-        try {
-            ENTITY_ITEMS.put(EntityType.ARMOR_STAND, Material.ARMOR_STAND);
-        } catch (NoSuchFieldError ignored) {}
+        ENTITY_ITEMS.put(EntityType.ARMOR_STAND, Material.ARMOR_STAND);
 
         MATERIAL_FLAGS.put(Material.AIR, 0);
         MATERIAL_FLAGS.put(Material.STONE, 0);
@@ -272,65 +259,79 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.COAL_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.PACKED_ICE, 0);
         MATERIAL_FLAGS.put(Material.DOUBLE_PLANT, 0);
-        try {
-            MATERIAL_FLAGS.put(Material.PRISMARINE, 0);
-            MATERIAL_FLAGS.put(Material.SEA_LANTERN, 0);
-            MATERIAL_FLAGS.put(Material.SLIME_BLOCK, 0);
-            MATERIAL_FLAGS.put(Material.IRON_TRAPDOOR, 0);
-            MATERIAL_FLAGS.put(Material.STANDING_BANNER, 0);
-            MATERIAL_FLAGS.put(Material.WALL_BANNER, 0);
-            MATERIAL_FLAGS.put(Material.DAYLIGHT_DETECTOR_INVERTED, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.RED_SANDSTONE, 0);
-            MATERIAL_FLAGS.put(Material.RED_SANDSTONE_STAIRS, 0);
-            MATERIAL_FLAGS.put(Material.DOUBLE_STONE_SLAB2, 0);
-            MATERIAL_FLAGS.put(Material.STONE_SLAB2, 0);
-            MATERIAL_FLAGS.put(Material.SPRUCE_FENCE_GATE, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.BIRCH_FENCE_GATE, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.JUNGLE_FENCE_GATE, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.DARK_OAK_FENCE_GATE, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.ACACIA_FENCE_GATE, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.SPRUCE_FENCE, 0);
-            MATERIAL_FLAGS.put(Material.BIRCH_FENCE, 0);
-            MATERIAL_FLAGS.put(Material.JUNGLE_FENCE, 0);
-            MATERIAL_FLAGS.put(Material.DARK_OAK_FENCE, 0);
-            MATERIAL_FLAGS.put(Material.ACACIA_FENCE, 0);
-            MATERIAL_FLAGS.put(Material.SPRUCE_DOOR, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.BIRCH_DOOR, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.JUNGLE_DOOR, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.ACACIA_DOOR, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR, MODIFIED_ON_RIGHT);
-        } catch (NoSuchFieldError ignored) {
-        }
-        try {
-            MATERIAL_FLAGS.put(Material.GRASS_PATH, 0);
-            MATERIAL_FLAGS.put(Material.CHORUS_PLANT, 0);
-            MATERIAL_FLAGS.put(Material.CHORUS_FLOWER, 0);
-            MATERIAL_FLAGS.put(Material.BEETROOT_BLOCK, 0);
-            MATERIAL_FLAGS.put(Material.END_ROD, 0);
-            MATERIAL_FLAGS.put(Material.END_BRICKS, 0);
-            MATERIAL_FLAGS.put(Material.END_GATEWAY, 0);
-            MATERIAL_FLAGS.put(Material.FROSTED_ICE, 0);
-            MATERIAL_FLAGS.put(Material.GRASS_PATH, 0);
-            MATERIAL_FLAGS.put(Material.PURPUR_BLOCK, 0);
-            MATERIAL_FLAGS.put(Material.PURPUR_STAIRS, 0);
-            MATERIAL_FLAGS.put(Material.PURPUR_PILLAR, 0);
-            MATERIAL_FLAGS.put(Material.PURPUR_SLAB, 0);
-            MATERIAL_FLAGS.put(Material.STRUCTURE_BLOCK, MODIFIED_ON_LEFT | MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.COMMAND_REPEATING, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.COMMAND_CHAIN , MODIFIED_ON_RIGHT);
-        } catch (NoSuchFieldError ignored) {
-        }
-        try { // 1.10
-            MATERIAL_FLAGS.put(Material.MAGMA, 0);
-            MATERIAL_FLAGS.put(Material.NETHER_WART_BLOCK, 0);
-            MATERIAL_FLAGS.put(Material.RED_NETHER_BRICK, 0);
-            MATERIAL_FLAGS.put(Material.BONE_BLOCK, 0);
-            MATERIAL_FLAGS.put(Material.STRUCTURE_VOID, 0);
-        } catch (NoSuchFieldError ignored) {
-        }
+
+        MATERIAL_FLAGS.put(Material.PRISMARINE, 0);
+        MATERIAL_FLAGS.put(Material.SEA_LANTERN, 0);
+        MATERIAL_FLAGS.put(Material.SLIME_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.IRON_TRAPDOOR, 0);
+        MATERIAL_FLAGS.put(Material.STANDING_BANNER, 0);
+        MATERIAL_FLAGS.put(Material.WALL_BANNER, 0);
+        MATERIAL_FLAGS.put(Material.DAYLIGHT_DETECTOR_INVERTED, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.RED_SANDSTONE, 0);
+        MATERIAL_FLAGS.put(Material.RED_SANDSTONE_STAIRS, 0);
+        MATERIAL_FLAGS.put(Material.DOUBLE_STONE_SLAB2, 0);
+        MATERIAL_FLAGS.put(Material.STONE_SLAB2, 0);
+        MATERIAL_FLAGS.put(Material.SPRUCE_FENCE_GATE, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.BIRCH_FENCE_GATE, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.JUNGLE_FENCE_GATE, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.DARK_OAK_FENCE_GATE, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.ACACIA_FENCE_GATE, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.SPRUCE_FENCE, 0);
+        MATERIAL_FLAGS.put(Material.BIRCH_FENCE, 0);
+        MATERIAL_FLAGS.put(Material.JUNGLE_FENCE, 0);
+        MATERIAL_FLAGS.put(Material.DARK_OAK_FENCE, 0);
+        MATERIAL_FLAGS.put(Material.ACACIA_FENCE, 0);
+        MATERIAL_FLAGS.put(Material.SPRUCE_DOOR, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.BIRCH_DOOR, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.JUNGLE_DOOR, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.ACACIA_DOOR, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR, MODIFIED_ON_RIGHT);
+
+        MATERIAL_FLAGS.put(Material.GRASS_PATH, 0);
+        MATERIAL_FLAGS.put(Material.CHORUS_PLANT, 0);
+        MATERIAL_FLAGS.put(Material.CHORUS_FLOWER, 0);
+        MATERIAL_FLAGS.put(Material.BEETROOT_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.END_ROD, 0);
+        MATERIAL_FLAGS.put(Material.END_BRICKS, 0);
+        MATERIAL_FLAGS.put(Material.END_GATEWAY, 0);
+        MATERIAL_FLAGS.put(Material.FROSTED_ICE, 0);
+        MATERIAL_FLAGS.put(Material.GRASS_PATH, 0);
+        MATERIAL_FLAGS.put(Material.PURPUR_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.PURPUR_STAIRS, 0);
+        MATERIAL_FLAGS.put(Material.PURPUR_PILLAR, 0);
+        MATERIAL_FLAGS.put(Material.PURPUR_SLAB, 0);
+        MATERIAL_FLAGS.put(Material.STRUCTURE_BLOCK, MODIFIED_ON_LEFT | MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.COMMAND_REPEATING, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.COMMAND_CHAIN , MODIFIED_ON_RIGHT);
+
+        MATERIAL_FLAGS.put(Material.MAGMA, 0);
+        MATERIAL_FLAGS.put(Material.NETHER_WART_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.RED_NETHER_BRICK, 0);
+        MATERIAL_FLAGS.put(Material.BONE_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.STRUCTURE_VOID, 0);
         for (Material m : shulkerBoxes) {
             MATERIAL_FLAGS.put(m, MODIFIED_ON_RIGHT);
         }
+        // 1.12
+        MATERIAL_FLAGS.put(Material.CONCRETE, 0);
+        MATERIAL_FLAGS.put(Material.CONCRETE_POWDER, 0);
+
+        MATERIAL_FLAGS.put(Material.WHITE_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.ORANGE_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.MAGENTA_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT_BLUE_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.YELLOW_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.LIME_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.PINK_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.GRAY_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.SILVER_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.CYAN_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.PURPLE_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.BLUE_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.BROWN_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.GREEN_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.RED_GLAZED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.BLACK_GLAZED_TERRACOTTA, 0);
 
         MATERIAL_FLAGS.put(Material.IRON_SPADE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.IRON_PICKAXE, 0);
@@ -491,52 +492,48 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.LEASH, 0);
         MATERIAL_FLAGS.put(Material.NAME_TAG, 0);
         MATERIAL_FLAGS.put(Material.COMMAND_MINECART, 0);
-        try { // 1.8
-            MATERIAL_FLAGS.put(Material.PRISMARINE_SHARD, 0);
-            MATERIAL_FLAGS.put(Material.PRISMARINE_CRYSTALS, 0);
-            MATERIAL_FLAGS.put(Material.RABBIT, 0);
-            MATERIAL_FLAGS.put(Material.COOKED_RABBIT, 0);
-            MATERIAL_FLAGS.put(Material.RABBIT_STEW, 0);
-            MATERIAL_FLAGS.put(Material.RABBIT_FOOT, 0);
-            MATERIAL_FLAGS.put(Material.RABBIT_HIDE, 0);
-            MATERIAL_FLAGS.put(Material.ARMOR_STAND, 0);
-            MATERIAL_FLAGS.put(Material.IRON_BARDING, 0);
-            MATERIAL_FLAGS.put(Material.GOLD_BARDING, 0);
-            MATERIAL_FLAGS.put(Material.DIAMOND_BARDING, 0);;
-            MATERIAL_FLAGS.put(Material.MUTTON, 0);
-            MATERIAL_FLAGS.put(Material.COOKED_MUTTON, 0);
-            MATERIAL_FLAGS.put(Material.BANNER, 0);
-            MATERIAL_FLAGS.put(Material.SPRUCE_DOOR_ITEM, 0);
-            MATERIAL_FLAGS.put(Material.BIRCH_DOOR_ITEM, 0);
-            MATERIAL_FLAGS.put(Material.JUNGLE_DOOR_ITEM, 0);
-            MATERIAL_FLAGS.put(Material.ACACIA_DOOR_ITEM, 0);
-            MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR_ITEM, 0);
-        } catch (NoSuchFieldError ignored) {
-        }
-        try { // 1.9 + 1.10 (oops)
-            MATERIAL_FLAGS.put(Material.BOAT_SPRUCE, 0);
-            MATERIAL_FLAGS.put(Material.BOAT_BIRCH, 0);
-            MATERIAL_FLAGS.put(Material.BOAT_ACACIA, 0);
-            MATERIAL_FLAGS.put(Material.BOAT_DARK_OAK, 0);
-            MATERIAL_FLAGS.put(Material.BEETROOT, 0);
-            MATERIAL_FLAGS.put(Material.BEETROOT_SOUP, 0);
-            MATERIAL_FLAGS.put(Material.BEETROOT_SEEDS, MODIFIES_BLOCKS);
-            MATERIAL_FLAGS.put(Material.CHORUS_FRUIT, 0);
-            MATERIAL_FLAGS.put(Material.CHORUS_FRUIT_POPPED, 0);
-            MATERIAL_FLAGS.put(Material.SHIELD, 0);
-            MATERIAL_FLAGS.put(Material.SPECTRAL_ARROW, 0);
-            MATERIAL_FLAGS.put(Material.TIPPED_ARROW, 0);
-            MATERIAL_FLAGS.put(Material.DRAGONS_BREATH, 0);
-            MATERIAL_FLAGS.put(Material.LINGERING_POTION, 0);
-            MATERIAL_FLAGS.put(Material.ELYTRA, 0);
-            MATERIAL_FLAGS.put(Material.END_CRYSTAL, 0);
-        } catch (NoSuchFieldError ignored) {
-        }
-        try { // 1.11
-            MATERIAL_FLAGS.put(Material.TOTEM, 0);
-            MATERIAL_FLAGS.put(Material.SHULKER_SHELL, 0);
-        } catch (NoSuchFieldError ignored) {
-        }
+
+        MATERIAL_FLAGS.put(Material.PRISMARINE_SHARD, 0);
+        MATERIAL_FLAGS.put(Material.PRISMARINE_CRYSTALS, 0);
+        MATERIAL_FLAGS.put(Material.RABBIT, 0);
+        MATERIAL_FLAGS.put(Material.COOKED_RABBIT, 0);
+        MATERIAL_FLAGS.put(Material.RABBIT_STEW, 0);
+        MATERIAL_FLAGS.put(Material.RABBIT_FOOT, 0);
+        MATERIAL_FLAGS.put(Material.RABBIT_HIDE, 0);
+        MATERIAL_FLAGS.put(Material.ARMOR_STAND, 0);
+        MATERIAL_FLAGS.put(Material.IRON_BARDING, 0);
+        MATERIAL_FLAGS.put(Material.GOLD_BARDING, 0);
+        MATERIAL_FLAGS.put(Material.DIAMOND_BARDING, 0);;
+        MATERIAL_FLAGS.put(Material.MUTTON, 0);
+        MATERIAL_FLAGS.put(Material.COOKED_MUTTON, 0);
+        MATERIAL_FLAGS.put(Material.BANNER, 0);
+        MATERIAL_FLAGS.put(Material.SPRUCE_DOOR_ITEM, 0);
+        MATERIAL_FLAGS.put(Material.BIRCH_DOOR_ITEM, 0);
+        MATERIAL_FLAGS.put(Material.JUNGLE_DOOR_ITEM, 0);
+        MATERIAL_FLAGS.put(Material.ACACIA_DOOR_ITEM, 0);
+        MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR_ITEM, 0);
+
+        MATERIAL_FLAGS.put(Material.BOAT_SPRUCE, 0);
+        MATERIAL_FLAGS.put(Material.BOAT_BIRCH, 0);
+        MATERIAL_FLAGS.put(Material.BOAT_ACACIA, 0);
+        MATERIAL_FLAGS.put(Material.BOAT_DARK_OAK, 0);
+        MATERIAL_FLAGS.put(Material.BEETROOT, 0);
+        MATERIAL_FLAGS.put(Material.BEETROOT_SOUP, 0);
+        MATERIAL_FLAGS.put(Material.BEETROOT_SEEDS, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.CHORUS_FRUIT, 0);
+        MATERIAL_FLAGS.put(Material.CHORUS_FRUIT_POPPED, 0);
+        MATERIAL_FLAGS.put(Material.SHIELD, 0);
+        MATERIAL_FLAGS.put(Material.SPECTRAL_ARROW, 0);
+        MATERIAL_FLAGS.put(Material.TIPPED_ARROW, 0);
+        MATERIAL_FLAGS.put(Material.DRAGONS_BREATH, 0);
+        MATERIAL_FLAGS.put(Material.LINGERING_POTION, 0);
+        MATERIAL_FLAGS.put(Material.ELYTRA, 0);
+        MATERIAL_FLAGS.put(Material.END_CRYSTAL, 0);
+
+        MATERIAL_FLAGS.put(Material.TOTEM, 0);
+        MATERIAL_FLAGS.put(Material.SHULKER_SHELL, 0);
+        MATERIAL_FLAGS.put(Material.KNOWLEDGE_BOOK, 0);
+
         MATERIAL_FLAGS.put(Material.GOLD_RECORD, 0);
         MATERIAL_FLAGS.put(Material.GREEN_RECORD, 0);
         MATERIAL_FLAGS.put(Material.RECORD_3, 0);
@@ -574,11 +571,9 @@ public final class Materials {
         DAMAGE_EFFECTS.add(PotionEffectType.WEAKNESS);
         DAMAGE_EFFECTS.add(PotionEffectType.WITHER);
 
-        try {
-            DAMAGE_EFFECTS.add(PotionEffectType.LEVITATION); // considered by game so I guess
-            DAMAGE_EFFECTS.add(PotionEffectType.UNLUCK);
-        } catch (NoSuchFieldError ignored) {
-        }
+        DAMAGE_EFFECTS.add(PotionEffectType.LEVITATION); // considered by game so I guess
+        DAMAGE_EFFECTS.add(PotionEffectType.UNLUCK);
+
     }
 
     private Materials() {
@@ -737,16 +732,12 @@ public final class Materials {
      * @return true if a Boat item
      */
     public static boolean isBoat(Material material) {
-        try {
             return material == Material.BOAT
                     || material == Material.BOAT_ACACIA
                     || material == Material.BOAT_SPRUCE
                     || material == Material.BOAT_DARK_OAK
                     || material == Material.BOAT_JUNGLE
                     || material == Material.BOAT_BIRCH;
-        } catch (NoSuchFieldError ignored) {
-            return material == Material.BOAT;
-        }
     }
 
     /**

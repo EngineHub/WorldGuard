@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.commands.region;
 
-import com.sk89q.guavabackport.util.concurrent.Futures;
-import com.sk89q.guavabackport.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;

@@ -4,8 +4,8 @@ apply plugin: 'idea'
 project.version = '6.2.2-SNAPSHOT'
 ext.internalVersion = project.version + ";" + gitCommitHash
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 checkstyle.configFile = new File(projectDir, "config/checkstyle/checkstyle.xml")
 
@@ -15,10 +15,9 @@ compileJava {
 
 dependencies {
     compile 'org.khelekore:prtree:1.5.0'
-    compile 'org.bukkit:bukkit:1.11-R0.1-SNAPSHOT'
+    compile 'org.bukkit:bukkit:1.12-R0.1-SNAPSHOT'
     compile 'com.sk89q.worldedit:worldedit-bukkit:6.1.3-SNAPSHOT'
     compile 'com.sk89q:squirrelid:0.1.0'
-    compile 'com.sk89q:guavabackport:1.2'
     compile 'org.flywaydb:flyway-core:3.0'
     compile ('com.sk89q:commandbook:2.3') {
         exclude group: 'com.sk89q', module: 'worldedit'
@@ -45,14 +44,12 @@ processResources {
 shadowJar {
     dependencies {
         include(dependency('org.khelekore:prtree:1.5.0'))
-        include(dependency('com.sk89q:guavabackport:1.2'))
         include(dependency('com.sk89q:squirrelid:0.1.0'))
         include(dependency('org.flywaydb:flyway-core:3.0'))
         include(dependency('com.googlecode.json-simple:json-simple:1.1.1'))
         include(dependency('net.sf.opencsv:opencsv:2.0'))
     }
 
-    relocate('com.sk89q.guavabackport', 'com.sk89q.worldguard.internal.guava')
     relocate('org.flywaydb', 'com.sk89q.worldguard.internal.flywaydb')
     relocate('com.sk89q.squirrelid', 'com.sk89q.worldguard.util.profile')
     relocate('org.json.simple', 'com.sk89q.worldguard.util.jsonsimple')
