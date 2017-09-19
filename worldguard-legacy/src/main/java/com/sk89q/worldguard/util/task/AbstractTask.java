@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.util.task;
 
-import com.sk89q.guavabackport.util.concurrent.AbstractFuture;
+import com.google.common.util.concurrent.AbstractFuture;
 
 import javax.annotation.Nullable;
 import java.util.Date;

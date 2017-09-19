@@ -22,9 +22,9 @@ package com.sk89q.worldguard.bukkit.commands;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.io.Files;
-import com.sk89q.guavabackport.util.concurrent.FutureCallback;
-import com.sk89q.guavabackport.util.concurrent.Futures;
-import com.sk89q.guavabackport.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldguard.bukkit.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -204,7 +204,7 @@ public class WorldGuardCommands {
                     activeSampler = null;
                 }
             }
-        }, MoreExecutors.sameThreadExecutor());
+        }, MoreExecutors.directExecutor());
 
         Futures.addCallback(sampler.getFuture(), new FutureCallback<Sampler>() {
             @Override
