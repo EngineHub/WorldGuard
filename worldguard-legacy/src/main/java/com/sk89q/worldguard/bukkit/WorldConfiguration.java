@@ -347,7 +347,7 @@ public class WorldConfiguration {
 
         buildPermissions = getBoolean("build-permission-nodes.enable", false);
         buildPermissionDenyMessage = CommandUtils.replaceColorMacros(
-                getString("build-permission-nodes.deny-message", "&c&l[!] &7Вы не можете сделать это здесь."));
+                getString("build-permission-nodes.deny-message", "&c&l[!] &7Извините, но Вы не можете сделать это в этом месте."));
 
         strictEntitySpawn = getBoolean("event-handling.block-entity-spawns-with-untraceable-cause", false);
         allowAllInteract = getTargetMatchers("event-handling.interaction-whitelist");

@@ -291,7 +291,7 @@ public class RegionProtectionListener extends AbstractListener {
                 /* TNT */
                 } else if (type == Material.TNT) {
                     canUse = query.testBuild(target, associable, combine(event, DefaultFlag.INTERACT, DefaultFlag.TNT));
-                    what = "использовать взрывчатку";
+                    what = "взрывать";
 
                 /* Legacy USE flag */
                 } else if (Materials.isUseFlagApplicable(type)) {
@@ -488,7 +488,7 @@ public class RegionProtectionListener extends AbstractListener {
                 canDamage = true;
             }
 
-            what = "PvP";
+            what = "драться";
 
         /* Player damage not caused  by another player */
         } else if (event.getEntity() instanceof Player) {

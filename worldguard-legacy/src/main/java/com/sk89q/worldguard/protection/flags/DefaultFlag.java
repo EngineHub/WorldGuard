@@ -106,7 +106,7 @@ public final class DefaultFlag {
 
     // Flags that adjust behaviors that aren't state flags
     public static final StringFlag DENY_MESSAGE = new StringFlag("deny-message",
-            "" + ChatColor.RED + ChatColor.BOLD + "§c§l[!]" + ChatColor.GRAY + " Извините, но Вы не можете %what% здесь.");
+            "" + ChatColor.RED + ChatColor.BOLD + "§c§l[!]" + ChatColor.GRAY + " Извините, но Вы не можете %what% в этом месте.");
     public static final StringFlag ENTRY_DENY_MESSAGE = new StringFlag("entry-deny-message",
             "" + ChatColor.RED + ChatColor.BOLD + "§c§l[!]" + ChatColor.GRAY + " Извините, но Вам не разрешено входить в эту область.");
     public static final StringFlag EXIT_DENY_MESSAGE = new StringFlag("exit-deny-message",
