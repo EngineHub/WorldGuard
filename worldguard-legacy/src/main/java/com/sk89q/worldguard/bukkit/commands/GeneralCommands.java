@@ -75,8 +75,8 @@ public class GeneralCommands {
                     // Keep track of this
                     included = true;
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + "Режим бога включен игроком "
-                            + plugin.toName(sender) + ".");
+                    player.sendMessage(ChatColor.YELLOW + "Режим бога включен администратором "
+                            + plugin.toName(sender) + " ");
 
                 }
             }
@@ -122,8 +122,8 @@ public class GeneralCommands {
                     // Keep track of this
                     included = true;
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + "Режим бога выключен игроком "
-                            + plugin.toName(sender) + ".");
+                    player.sendMessage(ChatColor.YELLOW + "Режим бога выключен администратором "
+                            + plugin.toName(sender) + " ");
 
                 }
             }
@@ -210,8 +210,8 @@ public class GeneralCommands {
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Вы были убиты игроком "
-                        + plugin.toName(sender) + ".");
+                player.sendMessage(ChatColor.YELLOW + "Вы были убиты администратором "
+                        + plugin.toName(sender) + " ");
                 
             }
         }

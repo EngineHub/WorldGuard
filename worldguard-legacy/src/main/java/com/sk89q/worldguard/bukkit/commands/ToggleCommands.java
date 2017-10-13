@@ -59,8 +59,8 @@ public class ToggleCommands {
         if (!wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(
                     ChatColor.YELLOW
-                    + "Распространение огня в мире '" + world.getName() + "' было запрещено игроком "
-                    + plugin.toName(sender) + ".");
+                    + "Распространение огня в мире '" + world.getName() + "' было запрещено администратором "
+                    + plugin.toName(sender) + " ");
         } else {
             sender.sendMessage(
                     ChatColor.YELLOW
@@ -87,8 +87,8 @@ public class ToggleCommands {
 
         if (wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                    + "Распространение огня в мире '" + world.getName() + "' было разрешено игроком "
-                    + plugin.toName(sender) + ".");
+                    + "Распространение огня в мире '" + world.getName() + "' было разрешено администратором "
+                    + plugin.toName(sender) + " ");
         } else {
             sender.sendMessage(ChatColor.YELLOW
                     + "Распространение огня разрешено во всех мирах.");
@@ -107,10 +107,10 @@ public class ToggleCommands {
         if (args.hasFlag('i')) {
             if (configManager.activityHaltToggle) {
                  sender.sendMessage(ChatColor.YELLOW
-                         + "ВСЯ активность на сервере была остановлена.");
+                         + "Вся активность на сервере была остановлена.");
             } else {
                  sender.sendMessage(ChatColor.YELLOW
-                         + "ВСЯ активность на сервере была возобновлена.");
+                         + "Вся активность на сервере была возобновлена.");
             }
         } else {
             configManager.activityHaltToggle = !args.hasFlag('c');
@@ -118,17 +118,17 @@ public class ToggleCommands {
             if (configManager.activityHaltToggle) {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(ChatColor.YELLOW
-                            + "ВСЯ активность на сервере была остановлена.");
+                            + "Вся активность на сервере была остановлена.");
                 }
 
                 if (!args.hasFlag('s')) {
                     plugin.getServer().broadcastMessage(ChatColor.YELLOW
-                             + "ВСЯ активность на сервере была возобновлена игроком "
-                             + plugin.toName(sender) + ".");
+                             + "Вся активность на сервере была возобновлена администратором "
+                             + plugin.toName(sender) + " ");
                 } else {
                     sender.sendMessage(ChatColor.YELLOW
-                        + "(Бесшумно) ВСЯ активность на сервере была возобновлена игроком "
-                        + plugin.toName(sender) + ".");
+                        + "(Бесшумно) Вся активность на сервере была возобновлена администратором "
+                        + plugin.toName(sender) + " ");
                 }
 
                 for (World world : plugin.getServer().getWorlds()) {
