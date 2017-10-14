@@ -794,6 +794,10 @@ public class EventAbstractionListener extends AbstractListener {
         InventoryHolder sourceHolder = event.getSource().getHolder();
         InventoryHolder targetHolder = event.getDestination().getHolder();
 
+        if (causeHolder instanceof Hopper && getPlugin().getGlobalStateManager().get(((Hopper) causeHolder).getWorld()).ignoreHopperMoveEvents) {
+            return;
+        }
+
         Entry entry;
 
         if ((entry = moveItemDebounce.tryDebounce(event)) != null) {
