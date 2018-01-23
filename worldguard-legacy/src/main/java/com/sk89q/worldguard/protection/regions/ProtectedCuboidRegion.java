@@ -125,9 +125,9 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         final double x = pt.getX();
         final double y = pt.getY();
         final double z = pt.getZ();
-        return x >= min.getBlockX() && x < max.getBlockX()+1
-                && y >= min.getBlockY() && y < max.getBlockY()+1
-                && z >= min.getBlockZ() && z < max.getBlockZ()+1;
+        return x >= min.getBlockX() && x < max.getBlockX() + 1
+                && y >= min.getBlockY() && y < max.getBlockY() + 1
+                && z >= min.getBlockZ() && z < max.getBlockZ() + 1;
     }
 
     @Override
@@ -139,8 +139,8 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     Area toArea() {
         int x = getMinimumPoint().getBlockX();
         int z = getMinimumPoint().getBlockZ();
-        int width = getMaximumPoint().getBlockX() - x;
-        int height = getMaximumPoint().getBlockZ() - z;
+        int width = getMaximumPoint().getBlockX() - x + 1;
+        int height = getMaximumPoint().getBlockZ() - z + 1;
         return new Area(new Rectangle(x, z, width, height));
     }
 
