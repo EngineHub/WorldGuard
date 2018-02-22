@@ -1,7 +1,6 @@
 package com.sk89q.worldguard.protection.flags;
 
 import com.google.common.collect.Maps;
-import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class MapFlag<K, V> extends Flag<Map<K, V>> {
         for (final String str : input.split(",")) {
 
             final char split = str.indexOf('=') == -1 ? ':' : '=';
-            final String[] keyVal = StringUtils.split(str, split);
+            final String[] keyVal = str.split(String.valueOf(split));
             if (keyVal.length != 2) {
                 throw new InvalidFlagFormat("Input must be in a 'key:value,key1=value1' format. Either ':' or '=' can be used.");
             }
