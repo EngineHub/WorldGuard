@@ -153,14 +153,16 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
         WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SEND_CHAT, player.getLocation())) {
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SEND_CHAT, player.getLocation(), localPlayer)) {
                 player.sendMessage(ChatColor.RED + "You don't have permission to chat in this region!");
                 event.setCancelled(true);
                 return;
             }
 
             for (Iterator<Player> i = event.getRecipients().iterator(); i.hasNext();) {
-                if (!plugin.getGlobalRegionManager().allows(DefaultFlag.RECEIVE_CHAT, i.next().getLocation())) {
+                Player rPlayer = i.next();
+                if (!plugin.getGlobalRegionManager().allows(DefaultFlag.RECEIVE_CHAT, rPlayer.getLocation(), plugin.wrapPlayer(rPlayer))) {
                     i.remove();
                 }
             }
