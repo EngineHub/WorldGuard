@@ -508,6 +508,12 @@ public class WorldGuardBlockListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+                if (wcfg.useRegions) {
+                    if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SNOWMAN_TRAILS, event.getBlock().getLocation())) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
             }
             return;
         }

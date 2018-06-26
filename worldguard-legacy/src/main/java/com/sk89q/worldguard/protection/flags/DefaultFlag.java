@@ -84,6 +84,7 @@ public final class DefaultFlag {
     public static final StateFlag PISTONS = new StateFlag("pistons", true);
     public static final StateFlag SNOW_FALL = new StateFlag("snow-fall", true);
     public static final StateFlag SNOW_MELT = new StateFlag("snow-melt", true);
+    public static final StateFlag SNOWMAN_TRAILS = new StateFlag("snowman-trails", true);
     public static final StateFlag ICE_FORM = new StateFlag("ice-form", true);
     public static final StateFlag ICE_MELT = new StateFlag("ice-melt", true);
     public static final StateFlag MUSHROOMS = new StateFlag("mushroom-growth", true);
@@ -159,7 +160,7 @@ public final class DefaultFlag {
             MUSHROOMS, LEAF_DECAY, GRASS_SPREAD, MYCELIUM_SPREAD, VINE_GROWTH,
             SEND_CHAT, RECEIVE_CHAT, FIRE_SPREAD, LAVA_FIRE, LAVA_FLOW, WATER_FLOW,
             TELE_LOC, SPAWN_LOC, POTION_SPLASH, TIME_LOCK, WEATHER_LOCK,
-            BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP
+            BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE, ENABLE_SHOP, SNOWMAN_TRAILS
     };
 
     private DefaultFlag() {
