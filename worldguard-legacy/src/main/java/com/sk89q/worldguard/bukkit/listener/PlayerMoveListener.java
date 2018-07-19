@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
@@ -55,7 +56,7 @@ public class PlayerMoveListener implements Listener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
 
-        Session session = plugin.getSessionManager().get(player);
+        Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
         session.testMoveTo(player, event.getRespawnLocation(), MoveType.RESPAWN, true);
     }
 
@@ -64,7 +65,7 @@ public class PlayerMoveListener implements Listener {
         Entity entity = event.getEntered();
         if (entity instanceof Player) {
             Player player = (Player) entity;
-            Session session = plugin.getSessionManager().get(player);
+            Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
             if (null != session.testMoveTo(player, event.getVehicle().getLocation(), MoveType.EMBARK, true)) {
                 event.setCancelled(true);
             }
@@ -75,7 +76,7 @@ public class PlayerMoveListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         final Player player = event.getPlayer();
 
-        Session session = plugin.getSessionManager().get(player);
+        Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
         final Location override = session.testMoveTo(player, event.getTo(), MoveType.MOVE);
 
         if (override != null) {
@@ -105,12 +106,7 @@ public class PlayerMoveListener implements Listener {
 
                 player.teleport(override.clone().add(0, 1, 0));
 
-                Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        player.teleport(override.clone().add(0, 1, 0));
-                    }
-                }, 1);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> player.teleport(override.clone().add(0, 1, 0)), 1);
             }
         }
     }

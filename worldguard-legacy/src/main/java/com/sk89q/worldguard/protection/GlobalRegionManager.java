@@ -19,25 +19,24 @@
 
 package com.sk89q.worldguard.protection;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.BukkitPlayer;
-import com.sk89q.worldguard.bukkit.RegionContainer;
-import com.sk89q.worldguard.bukkit.RegionQuery;
+import com.sk89q.worldguard.bukkit.BukkitRegionContainer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 
 /**
  * This is the legacy class for accessing region data.
@@ -47,19 +46,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Deprecated
 public class GlobalRegionManager {
 
-    private final WorldGuardPlugin plugin;
-    private final RegionContainer container;
+    private final BukkitRegionContainer container;
 
     /**
      * Create a new instance.
      *
-     * @param plugin the plugin
      * @param container the container
      */
-    public GlobalRegionManager(WorldGuardPlugin plugin, RegionContainer container) {
-        checkNotNull(plugin);
+    public GlobalRegionManager(BukkitRegionContainer container) {
         checkNotNull(container);
-        this.plugin = plugin;
         this.container = container;
     }
 
@@ -75,7 +70,7 @@ public class GlobalRegionManager {
      */
     @Nullable
     public RegionManager get(World world) {
-        return container.get(world);
+        return container.get(BukkitAdapter.adapt(world));
     }
 
     /**
@@ -102,7 +97,7 @@ public class GlobalRegionManager {
      * @param player the player
      * @param world the world
      * @return true if a bypass is permitted
-     * @deprecated use {@link RegionContainer#createQuery()}
+     * @deprecated use {@link BukkitRegionContainer#createQuery()}
      */
     @Deprecated
     public boolean hasBypass(LocalPlayer player, World world) {
@@ -110,40 +105,6 @@ public class GlobalRegionManager {
     }
 
     /**
-     * Test whether the given player has region protection bypass permission.
-     *
-     * @param player the player
-     * @param world the world
-     * @return true if a bypass is permitted
-     * @deprecated use {@link RegionContainer#createQuery()}
-     */
-    @Deprecated
-    public boolean hasBypass(Player player, World world) {
-        return plugin.hasPermission(player, "worldguard.region.bypass." + world.getName());
-    }
-
-    /**
-     * Test whether the player can build (place, use, destroy blocks and
-     * entities) at the given position, considering only the build flag
-     * and the region's members.
-     *
-     * <p>This method is not an absolute test as to whether WorldGuard
-     * would allow or block an event because this method doesn't
-     * consider flags (i.e. chest-access flags when concerning a chest) or
-     * other modules in WorldGuard (i.e chest protection).</p>
-     *
-     * @param player the player
-     * @param block the block
-     * @return true if a bypass is permitted
-     * @deprecated use {@link RegionContainer#createQuery()}
-     */
-    @SuppressWarnings("deprecation")
-    @Deprecated
-    public boolean canBuild(Player player, Block block) {
-        return canBuild(player, block.getLocation());
-    }
-
-    /**
      * Test whether the player can build (place, use, destroy blocks and
      * entities) at the given position, considering only the build flag
      * and the region's members.
@@ -156,26 +117,12 @@ public class GlobalRegionManager {
      * @param player the player
      * @param location the location
      * @return true if a bypass is permitted
-     * @deprecated use {@link RegionContainer#createQuery()}
+     * @deprecated use {@link BukkitRegionContainer#createQuery()}
      */
     @Deprecated
-    public boolean canBuild(Player player, Location location) {
-        return hasBypass(player, location.getWorld()) || createQuery().testState(location, player, DefaultFlag.BUILD);
+    public boolean canBuild(LocalPlayer player, Location location) {
+        return hasBypass(player, (World) location.getExtent()) || createQuery().testState(location, player, Flags.BUILD);
 
-    }
-
-    /**
-     * Test whether the player can place blocks at the given position.
-     *
-     * @param player the player
-     * @param block the block
-     * @return true if permitted
-     * @deprecated the construct flag is being removed
-     */
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public boolean canConstruct(Player player, Block block) {
-        return canBuild(player, block.getLocation());
     }
 
     /**
@@ -187,7 +134,7 @@ public class GlobalRegionManager {
      * @deprecated the construct flag is being removed
      */
     @Deprecated
-    public boolean canConstruct(Player player, Location location) {
+    public boolean canConstruct(LocalPlayer player, Location location) {
         return canBuild(player, location);
     }
 
@@ -197,7 +144,7 @@ public class GlobalRegionManager {
      * @param flag the flag
      * @param location the location
      * @return true if set to true
-     * @deprecated use {@link RegionContainer#createQuery()}
+     * @deprecated use {@link BukkitRegionContainer#createQuery()}
      */
     @Deprecated
     @SuppressWarnings("deprecation")
@@ -213,17 +160,14 @@ public class GlobalRegionManager {
      * @param location the location
      * @param player the actor
      * @return true if set to true
-     * @deprecated use {@link RegionContainer#createQuery()}
+     * @deprecated use {@link BukkitRegionContainer#createQuery()}
      */
     @Deprecated
     public boolean allows(StateFlag flag, Location location, @Nullable LocalPlayer player) {
         if (player == null) {
             return StateFlag.test(createQuery().queryState(location, (RegionAssociable) null, flag));
-        } else if (player instanceof BukkitPlayer) {
-            Player p = ((BukkitPlayer) player).getPlayer();
-            return StateFlag.test(createQuery().queryState(location, p, flag));
         } else {
-            throw new IllegalArgumentException("Can't take a non-Bukkit player");
+            return StateFlag.test(createQuery().queryState(location, player, flag));
         }
     }
 

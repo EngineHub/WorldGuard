@@ -19,10 +19,10 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.util.Locations;
+import com.sk89q.worldguard.util.Locations;
 import com.sk89q.worldguard.session.MoveType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -59,7 +59,7 @@ public class WorldGuardVehicleListener implements Listener {
         Player player = (Player) vehicle.getPassenger();
         World world = vehicle.getWorld();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             // Did we move a block?

@@ -23,7 +23,7 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
@@ -57,7 +57,6 @@ public abstract class RegionEntryExitTest {
 
     protected FlagRegistry getFlagRegistry() {
         FlagRegistry registry = new SimpleFlagRegistry();
-        registry.registerAll(DefaultFlag.getDefaultFlags());
         return registry;
     }
 
@@ -102,8 +101,8 @@ public abstract class RegionEntryExitTest {
         // this is the way it's supposed to work
         // whatever the group flag is set to is the group that the flag APPLIES to
         // in this case, non members (esskay) should be DENIED entry
-        entryRegion.setFlag(DefaultFlag.ENTRY, StateFlag.State.DENY);
-        entryRegion.setFlag(DefaultFlag.ENTRY.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
+        entryRegion.setFlag(Flags.ENTRY, StateFlag.State.DENY);
+        entryRegion.setFlag(Flags.ENTRY.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
     }
 
     void setUpExitRegion() throws Exception {
@@ -117,8 +116,8 @@ public abstract class RegionEntryExitTest {
 
         entryRegion = region;
         // same as above
-        entryRegion.setFlag(DefaultFlag.EXIT, StateFlag.State.DENY);
-        entryRegion.setFlag(DefaultFlag.EXIT.getRegionGroupFlag(), RegionGroup.NON_OWNERS);
+        entryRegion.setFlag(Flags.EXIT, StateFlag.State.DENY);
+        entryRegion.setFlag(Flags.EXIT.getRegionGroupFlag(), RegionGroup.NON_OWNERS);
     }
 
     @Test
@@ -129,11 +128,11 @@ public abstract class RegionEntryExitTest {
 //        ProtectedRegion rg = appl.iterator().next();
 //        System.out.println("rg   " + rg.getId());
 //        System.out.println("mem  " + rg.getMembers().toGroupsString());
-//        System.out.println("flag " + appl.getFlag(DefaultFlag.ENTRY));
-//        System.out.println("grp  " + appl.getFlag(DefaultFlag.ENTRY.getRegionGroupFlag()));
+//        System.out.println("flag " + appl.getFlag(Flags.ENTRY));
+//        System.out.println("grp  " + appl.getFlag(Flags.ENTRY.getRegionGroupFlag()));
 //        System.out.println("===");
-        assertTrue("Allowed Entry", appl.allows(DefaultFlag.ENTRY, vipPlayer));
-        assertFalse("Forbidden Entry", appl.allows(DefaultFlag.ENTRY, builderPlayer));
+        assertTrue("Allowed Entry", appl.allows(Flags.ENTRY, vipPlayer));
+        assertFalse("Forbidden Entry", appl.allows(Flags.ENTRY, builderPlayer));
     }
 
     @Test
@@ -144,11 +143,11 @@ public abstract class RegionEntryExitTest {
 //        ProtectedRegion rg = appl.iterator().next();
 //        System.out.println("rg   " + rg.getId());
 //        System.out.println("own  " + rg.getOwners().toGroupsString());
-//        System.out.println("flag " + appl.getFlag(DefaultFlag.EXIT));
-//        System.out.println("grp  " + appl.getFlag(DefaultFlag.EXIT.getRegionGroupFlag()));
+//        System.out.println("flag " + appl.getFlag(Flags.EXIT));
+//        System.out.println("grp  " + appl.getFlag(Flags.EXIT.getRegionGroupFlag()));
 //        System.out.println("===");
-        assertTrue("Allowed Exit", appl.allows(DefaultFlag.EXIT, builderPlayer));
-        assertFalse("Forbidden Exit", appl.allows(DefaultFlag.EXIT, vipPlayer));
+        assertTrue("Allowed Exit", appl.allows(Flags.EXIT, builderPlayer));
+        assertFalse("Forbidden Exit", appl.allows(Flags.EXIT, vipPlayer));
     }
 
 }

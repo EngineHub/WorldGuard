@@ -14,6 +14,8 @@
   <subpackage name="worldguard">
     <allow pkg="org.khelekore"/>
     <allow pkg="org.flywaydb"/>
+    <allow pkg="org.yaml"/>
+    <allow pkg="org.json"/>
 
     <subpackage name="bukkit">
       <allow pkg="org.bukkit"/>

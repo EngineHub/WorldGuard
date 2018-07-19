@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.protection;
 
-import com.sk89q.worldguard.bukkit.RegionQuery;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;

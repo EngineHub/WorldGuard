@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.google.common.collect.Lists;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.DelegateEvent;
@@ -43,7 +43,7 @@ import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -516,7 +516,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent event) {
-        WorldConfiguration config = getWorldConfig(event.getBlock().getWorld());
+        BukkitWorldConfiguration config = getWorldConfig(event.getBlock().getWorld());
 
         // This only applies to regions but nothing else cares about high
         // frequency events at the moment
@@ -852,7 +852,7 @@ public class EventAbstractionListener extends AbstractListener {
                         new UseEntityEvent(event, cause, affected);
 
                 // Consider the potion splash flag
-                delegate.getRelevantFlags().add(DefaultFlag.POTION_SPLASH);
+                delegate.getRelevantFlags().add(Flags.POTION_SPLASH);
 
                 if (Events.fireAndTestCancel(delegate)) {
                     event.setIntensity(affected, 0);

@@ -20,8 +20,8 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -80,15 +80,15 @@ public class WorldGuardWorldListener implements Listener {
 
     /**
      * Initialize the settings for the specified world
-     * @see WorldConfiguration#alwaysRaining
-     * @see WorldConfiguration#disableWeather
-     * @see WorldConfiguration#alwaysThundering
-     * @see WorldConfiguration#disableThunder
+     * @see BukkitWorldConfiguration#alwaysRaining
+     * @see BukkitWorldConfiguration#disableWeather
+     * @see BukkitWorldConfiguration#alwaysThundering
+     * @see BukkitWorldConfiguration#disableThunder
      * @param world The specified world
      */
     public void initWorld(World world) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
         if (wcfg.alwaysRaining && !wcfg.disableWeather) {
             world.setStorm(true);
         } else if (wcfg.disableWeather && !wcfg.alwaysRaining) {

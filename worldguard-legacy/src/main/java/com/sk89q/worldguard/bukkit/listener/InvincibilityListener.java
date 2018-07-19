@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -55,7 +55,7 @@ public class InvincibilityListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
         Entity victim = event.getEntity();
-        WorldConfiguration worldConfig = getPlugin().getGlobalStateManager().get(victim.getWorld());
+        BukkitWorldConfiguration worldConfig = getPlugin().getGlobalStateManager().get(victim.getWorld());
 
         if (victim instanceof Player) {
             Player player = (Player) victim;

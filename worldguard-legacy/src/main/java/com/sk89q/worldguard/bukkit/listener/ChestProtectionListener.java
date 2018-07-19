@@ -21,7 +21,7 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.google.common.base.Predicate;
 import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.DelegateEvent;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
@@ -58,7 +58,7 @@ public class ChestProtectionListener extends AbstractListener {
         final Player player = event.getCause().getFirstPlayer();
 
         if (player != null) {
-            final WorldConfiguration wcfg = getWorldConfig(player);
+            final BukkitWorldConfiguration wcfg = getWorldConfig(player);
 
             // Early guard
             if (!wcfg.signChestProtection) {
@@ -83,7 +83,7 @@ public class ChestProtectionListener extends AbstractListener {
     public void onBreakBlock(final BreakBlockEvent event) {
         final Player player = event.getCause().getFirstPlayer();
 
-        final WorldConfiguration wcfg = getWorldConfig(event.getWorld());
+        final BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
 
         // Early guard
         if (!wcfg.signChestProtection) {
@@ -117,7 +117,7 @@ public class ChestProtectionListener extends AbstractListener {
     public void onUseBlock(final UseBlockEvent event) {
         final Player player = event.getCause().getFirstPlayer();
 
-        final WorldConfiguration wcfg = getWorldConfig(event.getWorld());
+        final BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
 
         // Early guard
         if (!wcfg.signChestProtection) {
@@ -150,7 +150,7 @@ public class ChestProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
-        WorldConfiguration wcfg = getWorldConfig(player);
+        BukkitWorldConfiguration wcfg = getWorldConfig(player);
 
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {

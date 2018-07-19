@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.World;
 
@@ -43,7 +43,7 @@ public final class SpongeUtil {
      */
     public static void clearSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
 
         for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
             for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
@@ -67,7 +67,7 @@ public final class SpongeUtil {
      */
     public static void addSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
 
         // The negative x edge
         int cx = ox - wcfg.spongeRadius - 1;

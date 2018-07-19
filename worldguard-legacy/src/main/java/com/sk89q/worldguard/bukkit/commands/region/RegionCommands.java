@@ -19,18 +19,20 @@
 
 package com.sk89q.worldguard.bukkit.commands.region;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.worldedit.Location;
-import com.sk89q.worldedit.bukkit.BukkitUtil;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.RegionContainer;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.BukkitRegionContainer;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.AsyncCommandHelper;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
@@ -41,10 +43,10 @@ import com.sk89q.worldguard.bukkit.commands.task.RegionLister;
 import com.sk89q.worldguard.bukkit.commands.task.RegionManagerReloader;
 import com.sk89q.worldguard.bukkit.commands.task.RegionManagerSaver;
 import com.sk89q.worldguard.bukkit.commands.task.RegionRemover;
-import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
+import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
@@ -75,8 +77,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Implements the /region commands for WorldGuard.
@@ -227,7 +227,7 @@ public final class RegionCommands extends RegionCommandsBase {
         checkRegionDoesNotExist(manager, id, false);
         ProtectedRegion region = checkRegionFromSelection(player, id);
 
-        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
+        BukkitWorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
 
         // Check whether the player has created too many regions
         if (!permModel.mayClaimRegionsUnbounded()) {
@@ -382,7 +382,7 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, args.hasFlag('u') ? null : plugin.getProfileCache());
         ListenableFuture<?> future = Futures.transform(
                 plugin.getExecutorService().submit(printout),
-                CommandUtils.messageFunction(sender));
+                CommandUtils.messageFunction(sender)::apply);
 
         // If it takes too long...
         FutureProgressListener.addProgressListener(
@@ -494,7 +494,7 @@ public final class RegionCommands extends RegionCommandsBase {
             throw new CommandPermissionsException();
         }
 
-        Flag<?> foundFlag = DefaultFlag.fuzzyMatchFlag(flagRegistry, flagName);
+        Flag<?> foundFlag = Flags.fuzzyMatchFlag(flagRegistry, flagName);
 
         // We didn't find the flag, so let's print a list of flags that the user
         // can use, and do nothing afterwards
@@ -945,7 +945,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         try {
-            RegionContainer container = plugin.getRegionContainer();
+            BukkitRegionContainer container = plugin.getRegionContainer();
             sender.sendMessage(ChatColor.YELLOW + "Now performing migration... this may take a while.");
             container.migrate(migration);
             sender.sendMessage(ChatColor.YELLOW +
@@ -989,7 +989,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         try {
             ConfigurationManager config = plugin.getGlobalStateManager();
-            RegionContainer container = plugin.getRegionContainer();
+            BukkitRegionContainer container = plugin.getRegionContainer();
             RegionDriver driver = container.getDriver();
             UUIDMigration migration = new UUIDMigration(driver, plugin.getProfileService(), plugin.getFlagRegistry());
             migration.setKeepUnresolvedNames(config.keepUnresolvedNames);
@@ -1033,14 +1033,14 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // -s for spawn location
         if (args.hasFlag('s')) {
-            teleportLocation = existing.getFlag(DefaultFlag.SPAWN_LOC);
+            teleportLocation = existing.getFlag(Flags.SPAWN_LOC);
             
             if (teleportLocation == null) {
                 throw new CommandException(
                         "The region has no spawn point associated.");
             }
         } else {
-            teleportLocation = existing.getFlag(DefaultFlag.TELE_LOC);
+            teleportLocation = existing.getFlag(Flags.TELE_LOC);
             
             if (teleportLocation == null) {
                 throw new CommandException(
@@ -1048,7 +1048,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        player.teleport(BukkitUtil.toLocation(teleportLocation));
+        player.teleport(BukkitAdapter.adapt(teleportLocation));
         sender.sendMessage("Teleported you to the region '" + existing.getId() + "'.");
     }
 }

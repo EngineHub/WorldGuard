@@ -24,7 +24,7 @@ import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
@@ -62,7 +62,7 @@ public abstract class RegionOverlapTest {
 
     protected FlagRegistry getFlagRegistry() {
         FlagRegistry registry = new SimpleFlagRegistry();
-        registry.registerAll(DefaultFlag.getDefaultFlags());
+        registry.registerAll(Flags.getDefaultFlags());
         return registry;
     }
     
@@ -123,14 +123,14 @@ public abstract class RegionOverlapTest {
 
         fountain = region;
         fountain.setParent(courtyard);
-        fountain.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
+        fountain.setFlag(Flags.FIRE_SPREAD, StateFlag.State.DENY);
     }
 
     void setUpNoFireRegion() throws Exception {
         ProtectedRegion region = new ProtectedCuboidRegion(NO_FIRE_ID,
                 new BlockVector(100, 100, 100), new BlockVector(200, 200, 200));
         manager.addRegion(region);
-        region.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
+        region.setFlag(Flags.FIRE_SPREAD, StateFlag.State.DENY);
     }
 
     @Test
@@ -139,17 +139,17 @@ public abstract class RegionOverlapTest {
 
         // Outside
         appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertTrue(appl.allows(Flags.FIRE_SPREAD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertTrue(appl.allows(Flags.FIRE_SPREAD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertFalse(appl.allows(Flags.FIRE_SPREAD));
 
         // Inside no fire zone
         appl = manager.getApplicableRegions(inNoFire);
-        assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertFalse(appl.allows(Flags.FIRE_SPREAD));
     }
 
     @Test

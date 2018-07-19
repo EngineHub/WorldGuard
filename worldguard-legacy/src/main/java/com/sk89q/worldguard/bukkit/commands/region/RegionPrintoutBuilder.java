@@ -23,10 +23,8 @@ import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -92,7 +90,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
      */
     public void appendFlags() {
         builder.append(ChatColor.BLUE);
-        builder.append("Flags: ");
+        builder.append("FlagUtil: ");
         
         appendFlagsList(true);
         
@@ -100,7 +98,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
     }
     
     /**
-     * Append just the list of flags (without "Flags:"), including colors.
+     * Append just the list of flags (without "FlagUtil:"), including colors.
      *
      * @param useColors true to use colors
      */

@@ -20,15 +20,15 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.google.common.base.Predicate;
-import com.sk89q.worldguard.bukkit.RegionQuery;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -64,7 +64,7 @@ public class RegionFlagsListener extends AbstractListener {
         Block block;
         if ((block = event.getCause().getFirstBlock()) != null) {
             if (Materials.isPistonBlock(block.getType())) {
-                event.filter(testState(query, DefaultFlag.PISTONS), false);
+                event.filter(testState(query, Flags.PISTONS), false);
             }
         }
     }
@@ -73,26 +73,26 @@ public class RegionFlagsListener extends AbstractListener {
     public void onBreakBlock(final BreakBlockEvent event) {
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
 
-        WorldConfiguration config = getWorldConfig(event.getWorld());
+        BukkitWorldConfiguration config = getWorldConfig(event.getWorld());
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
 
         Block block;
         if ((block = event.getCause().getFirstBlock()) != null) {
             if (Materials.isPistonBlock(block.getType())) {
-                event.filter(testState(query, DefaultFlag.PISTONS), false);
+                event.filter(testState(query, Flags.PISTONS), false);
             }
         }
 
         if (event.getCause().find(EntityType.CREEPER) != null) { // Creeper
-            event.filter(testState(query, DefaultFlag.CREEPER_EXPLOSION), config.explosionFlagCancellation);
+            event.filter(testState(query, Flags.CREEPER_EXPLOSION), config.explosionFlagCancellation);
         }
 
         if (event.getCause().find(EntityType.ENDER_DRAGON) != null) { // Enderdragon
-            event.filter(testState(query, DefaultFlag.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
+            event.filter(testState(query, Flags.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
         }
 
         if (event.getCause().find(Entities.enderCrystalType) != null) { // should be nullsafe even if enderCrystalType field is null
-            event.filter(testState(query, DefaultFlag.OTHER_EXPLOSION), config.explosionFlagCancellation);
+            event.filter(testState(query, Flags.OTHER_EXPLOSION), config.explosionFlagCancellation);
         }
     }
 
@@ -105,14 +105,14 @@ public class RegionFlagsListener extends AbstractListener {
         RegionQuery query = getPlugin().getRegionContainer().createQuery();
 
         if (entity instanceof Player && event.getCause() == DamageCause.FALL) {
-            if (!query.testState(entity.getLocation(), (Player) entity, DefaultFlag.FALL_DAMAGE)) {
+            if (!query.testState(entity.getLocation(), (Player) entity, Flags.FALL_DAMAGE)) {
                 event.setCancelled(true);
                 return;
             }
         } else {
             try {
                 if (entity instanceof Player && event.getCause() == DamageCause.FLY_INTO_WALL) {
-                    if (!query.testState(entity.getLocation(), (Player) entity, DefaultFlag.FALL_DAMAGE)) {
+                    if (!query.testState(entity.getLocation(), (Player) entity, Flags.FALL_DAMAGE)) {
                         event.setCancelled(true);
                         return;
                     }
@@ -124,7 +124,7 @@ public class RegionFlagsListener extends AbstractListener {
         if (event instanceof EntityDamageByEntityEvent) {
             Entity damager = (((EntityDamageByEntityEvent) event)).getDamager();
             if (damager != null && damager.getType() == EntityType.FIREWORK) {
-                if (!query.testState(entity.getLocation(), (RegionAssociable) null, DefaultFlag.FIREWORK_DAMAGE)) {
+                if (!query.testState(entity.getLocation(), (RegionAssociable) null, Flags.FIREWORK_DAMAGE)) {
                     event.setCancelled(true);
                     return;
                 }
