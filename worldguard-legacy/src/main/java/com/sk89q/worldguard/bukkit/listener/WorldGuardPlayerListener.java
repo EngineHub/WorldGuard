@@ -22,13 +22,13 @@ package com.sk89q.worldguard.bukkit.listener;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -97,7 +97,7 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
-        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
+        BukkitWorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         Session session = plugin.getSessionManager().getIfPresent(player);
         if (session != null) {
             GameModeFlag handler = session.getHandler(GameModeFlag.class);
@@ -117,7 +117,7 @@ public class WorldGuardPlayerListener implements Listener {
         World world = player.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
 
         if (cfg.activityHaltToggle) {
             player.sendMessage(ChatColor.YELLOW
@@ -151,10 +151,10 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        WorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
+        BukkitWorldConfiguration wcfg = plugin.getGlobalStateManager().get(player.getWorld());
         if (wcfg.useRegions) {
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
-            if (!plugin.getGlobalRegionManager().allows(DefaultFlag.SEND_CHAT, player.getLocation(), localPlayer)) {
+            if (!plugin.getGlobalRegionManager().allows(Flags.SEND_CHAT, player.getLocation(), localPlayer)) {
                 player.sendMessage(ChatColor.RED + "You don't have permission to chat in this region!");
                 event.setCancelled(true);
                 return;
@@ -162,7 +162,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             for (Iterator<Player> i = event.getRecipients().iterator(); i.hasNext();) {
                 Player rPlayer = i.next();
-                if (!plugin.getGlobalRegionManager().allows(DefaultFlag.RECEIVE_CHAT, rPlayer.getLocation(), plugin.wrapPlayer(rPlayer))) {
+                if (!plugin.getGlobalRegionManager().allows(Flags.RECEIVE_CHAT, rPlayer.getLocation(), plugin.wrapPlayer(rPlayer))) {
                     i.remove();
                 }
             }
@@ -217,7 +217,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
@@ -247,7 +247,7 @@ public class WorldGuardPlayerListener implements Listener {
         @Nullable ItemStack item = event.getItem();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
 
         // Infinite stack removal
         if ((type == BlockID.CHEST
@@ -311,7 +311,7 @@ public class WorldGuardPlayerListener implements Listener {
         World world = player.getWorld();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
 
         if (block.getTypeId() == BlockID.SOIL && wcfg.disablePlayerCropTrampling) {
             event.setCancelled(true);
@@ -325,13 +325,13 @@ public class WorldGuardPlayerListener implements Listener {
         Location location = player.getLocation();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        BukkitWorldConfiguration wcfg = cfg.get(player.getWorld());
 
         if (wcfg.useRegions) {
             ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(location);
 
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
-            com.sk89q.worldedit.Location spawn = set.getFlag(DefaultFlag.SPAWN_LOC, localPlayer);
+            com.sk89q.worldedit.Location spawn = set.getFlag(Flags.SPAWN_LOC, localPlayer);
 
             if (spawn != null) {
                 event.setRespawnLocation(com.sk89q.worldedit.bukkit.BukkitUtil.toLocation(spawn));
@@ -344,7 +344,7 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
 
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(player.getWorld());
+        BukkitWorldConfiguration wcfg = cfg.get(player.getWorld());
 
         if (wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
@@ -362,7 +362,7 @@ public class WorldGuardPlayerListener implements Listener {
         World world = event.getFrom().getWorld();
         Player player = event.getPlayer();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions) {
             ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(event.getTo());
@@ -378,8 +378,8 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (event.getCause() == TeleportCause.ENDER_PEARL) {
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
-                        && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
-                                && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
+                        && !(set.allows(Flags.ENDERPEARL, localPlayer)
+                                && setFrom.allows(Flags.ENDERPEARL, localPlayer))) {
                     player.sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
                     event.setCancelled(true);
                     return;
@@ -388,8 +388,8 @@ public class WorldGuardPlayerListener implements Listener {
             try {
                 if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
                     if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)) {
-                        boolean allowFrom = setFrom.allows(DefaultFlag.CHORUS_TELEPORT, localPlayer);
-                        boolean allowTo = set.allows(DefaultFlag.CHORUS_TELEPORT, localPlayer);
+                        boolean allowFrom = setFrom.allows(Flags.CHORUS_TELEPORT, localPlayer);
+                        boolean allowTo = set.allows(Flags.CHORUS_TELEPORT, localPlayer);
                         if (!allowFrom || !allowTo) {
                             player.sendMessage(ChatColor.DARK_RED + "You're not allowed to teleport " +
                                     (!allowFrom ? "from here." : "there."));
@@ -408,7 +408,7 @@ public class WorldGuardPlayerListener implements Listener {
             return;
         }
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getTo().getWorld());
+        BukkitWorldConfiguration wcfg = cfg.get(event.getTo().getWorld());
         if (!wcfg.regionNetherPortalProtection) return;
         if (event.getCause() != TeleportCause.NETHER_PORTAL) {
             return;
@@ -438,7 +438,7 @@ public class WorldGuardPlayerListener implements Listener {
             RegionManager mgr = plugin.getRegionContainer().get(event.getTo().getWorld());
             if (mgr == null) return;
             ApplicableRegionSet set = mgr.getApplicableRegions(check);
-            if (!set.testState(plugin.wrapPlayer(event.getPlayer()), DefaultFlag.BUILD)) {
+            if (!set.testState(plugin.wrapPlayer(event.getPlayer()), Flags.BUILD)) {
                 event.getPlayer().sendMessage(ChatColor.RED + "Destination is in a protected area.");
                 event.setCancelled(true);
                 return;
@@ -452,13 +452,13 @@ public class WorldGuardPlayerListener implements Listener {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         World world = player.getWorld();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        BukkitWorldConfiguration wcfg = cfg.get(world);
 
         if (wcfg.useRegions && !plugin.getGlobalRegionManager().hasBypass(player, world)) {
             ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(player.getLocation());
 
-            Set<String> allowedCommands = set.queryValue(localPlayer, DefaultFlag.ALLOWED_CMDS);
-            Set<String> blockedCommands = set.queryValue(localPlayer, DefaultFlag.BLOCKED_CMDS);
+            Set<String> allowedCommands = set.queryValue(localPlayer, Flags.ALLOWED_CMDS);
+            Set<String> blockedCommands = set.queryValue(localPlayer, Flags.BLOCKED_CMDS);
             CommandFilter test = new CommandFilter(allowedCommands, blockedCommands);
 
             if (!test.apply(event.getMessage())) {

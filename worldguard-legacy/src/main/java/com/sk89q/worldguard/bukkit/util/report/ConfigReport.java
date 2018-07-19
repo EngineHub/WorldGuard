@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.util.report;
 
 import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -42,7 +42,7 @@ public class ConfigReport extends DataReport {
         append("Configuration", new ShallowObjectReport("Configuration", plugin.getGlobalStateManager()));
 
         for (World world : worlds) {
-            WorldConfiguration config = plugin.getGlobalStateManager().get(world);
+            BukkitWorldConfiguration config = plugin.getGlobalStateManager().get(world);
 
             DataReport report = new DataReport("World: " + world.getName());
             report.append("UUID", world.getUID());

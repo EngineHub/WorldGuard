@@ -21,7 +21,7 @@ package com.sk89q.worldguard.bukkit.util;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -761,7 +761,7 @@ public final class Materials {
 
     /**
      * Test whether the given material is affected by
-     * {@link DefaultFlag#USE}.
+     * {@link Flags#USE}.
      *
      * <p>Generally, materials that are considered by this method are those
      * that are not inventories but can be used.</p>

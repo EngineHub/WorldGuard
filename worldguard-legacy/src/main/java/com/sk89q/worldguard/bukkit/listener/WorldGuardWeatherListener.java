@@ -19,11 +19,11 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -55,7 +55,7 @@ public class WorldGuardWeatherListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onWeatherChange(WeatherChangeEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getWorld());
+        BukkitWorldConfiguration wcfg = cfg.get(event.getWorld());
 
         if (event.toWeatherState()) {
             if (wcfg.disableWeather) {
@@ -71,7 +71,7 @@ public class WorldGuardWeatherListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onThunderChange(ThunderChangeEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getWorld());
+        BukkitWorldConfiguration wcfg = cfg.get(event.getWorld());
 
         if (event.toThunderState()) {
             if (wcfg.disableThunder) {
@@ -87,7 +87,7 @@ public class WorldGuardWeatherListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLightningStrike(LightningStrikeEvent event) {
         ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getWorld());
+        BukkitWorldConfiguration wcfg = cfg.get(event.getWorld());
 
         if (wcfg.disallowedLightningBlocks.size() > 0) {
             int targetId = event.getLightning().getLocation().getBlock().getTypeId();
@@ -100,7 +100,7 @@ public class WorldGuardWeatherListener implements Listener {
         if (wcfg.useRegions) {
             ApplicableRegionSet set = plugin.getRegionContainer().createQuery().getApplicableRegions(loc);
 
-            if (!set.allows(DefaultFlag.LIGHTNING)) {
+            if (!set.allows(Flags.LIGHTNING)) {
                 event.setCancelled(true);
             }
         }

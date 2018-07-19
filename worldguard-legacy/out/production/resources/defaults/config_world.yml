@@ -1,0 +1,21 @@
+#
+# WorldGuard's configuration file.
+#
+# This is the a per-world configuration file. It only affects one
+# corresponding world.
+#
+# About editing this file:
+# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If
+#   you use an editor like Notepad++ (recommended for Windows users), you
+#   must configure it to "replace tabs with spaces." In Notepad++, this can
+#   be changed in Settings > Preferences > Language Menu.
+# - Don't get rid of the indents. They are indented so some entries are
+#   in categories (like "enforce-single-session" is in the "protection"
+#   category.
+# - If you want to check the format of this file before putting it
+#   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/
+#   and see if it gives "ERROR:".
+# - Lines starting with # are comments and so they are ignored.
+#
+
+# -- This should be automatically replaced by the plugin in-game --

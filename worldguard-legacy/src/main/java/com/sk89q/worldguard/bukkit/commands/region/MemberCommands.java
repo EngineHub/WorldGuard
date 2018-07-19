@@ -31,7 +31,7 @@ import com.sk89q.worldguard.bukkit.commands.AsyncCommandHelper;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.util.DomainInputResolver;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.World;
@@ -107,7 +107,7 @@ public class MemberCommands extends RegionCommandsBase {
 
         id = region.getId();
 
-        Boolean flag = region.getFlag(DefaultFlag.BUYABLE);
+        Boolean flag = region.getFlag(Flags.BUYABLE);
         DefaultDomain owners = region.getOwners();
 
         if (localPlayer != null) {

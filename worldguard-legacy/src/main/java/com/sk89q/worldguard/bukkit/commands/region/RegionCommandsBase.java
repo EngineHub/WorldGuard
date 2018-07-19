@@ -30,9 +30,9 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Polygonal2DSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.sk89q.worldguard.bukkit.RegionContainer;
+import com.sk89q.worldguard.bukkit.BukkitRegionContainer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.permission.RegionPermissionModel;
+import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
@@ -48,6 +48,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 class RegionCommandsBase {
 
@@ -61,7 +62,7 @@ class RegionCommandsBase {
      * @return the permission model
      */
     protected static RegionPermissionModel getPermissionModel(CommandSender sender) {
-        return new RegionPermissionModel(WorldGuardPlugin.inst(), sender);
+        return new RegionPermissionModel(sender);
     }
 
     /**
@@ -294,16 +295,11 @@ class RegionCommandsBase {
      * @param sender the sender to send the message to
      */
     protected static void warnAboutSaveFailures(CommandSender sender) {
-        RegionContainer container = WorldGuardPlugin.inst().getRegionContainer();
+        BukkitRegionContainer container = WorldGuardPlugin.inst().getRegionContainer();
         Set<RegionManager> failures = container.getSaveFailures();
 
         if (failures.size() > 0) {
-            String failingList = Joiner.on(", ").join(Iterables.transform(failures, new Function<RegionManager, String>() {
-                @Override
-                public String apply(RegionManager regionManager) {
-                    return "'" + regionManager.getName() + "'";
-                }
-            }));
+            String failingList = Joiner.on(", ").join(failures.stream().map(regionManager -> "'" + regionManager.getName() + "'").collect(Collectors.toList()));
 
             sender.sendMessage(ChatColor.GOLD +
                     "(Warning: The background saving of region data is failing for these worlds: " + failingList + ". " +
