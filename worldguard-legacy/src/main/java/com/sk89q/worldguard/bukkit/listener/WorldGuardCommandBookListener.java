@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.commandbook.InfoComponent;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -43,8 +44,9 @@ public class WorldGuardCommandBookListener implements Listener {
         if (event.getPlayer() instanceof Player) {
             Player player = (Player) event.getPlayer();
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
-            if (plugin.getGlobalStateManager().get(player.getWorld()).useRegions) {
-                ApplicableRegionSet regions = plugin.getRegionContainer().createQuery().getApplicableRegions(player.getLocation());
+            if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld()).useRegions) {
+                ApplicableRegionSet regions =
+                        WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(localPlayer.getLocation());
                 
                 // Current regions
                 StringBuilder regionStr = new StringBuilder();

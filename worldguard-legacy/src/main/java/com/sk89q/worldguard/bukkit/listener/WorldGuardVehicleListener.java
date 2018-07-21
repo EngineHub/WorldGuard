@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -58,13 +60,13 @@ public class WorldGuardVehicleListener implements Listener {
         if (vehicle.getPassenger() == null || !(vehicle.getPassenger() instanceof Player)) return;
         Player player = (Player) vehicle.getPassenger();
         World world = vehicle.getWorld();
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = cfg.get(world);
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
 
         if (wcfg.useRegions) {
             // Did we move a block?
             if (Locations.isDifferentBlock(event.getFrom(), event.getTo())) {
-                if (null != plugin.getSessionManager().get(player).testMoveTo(player, event.getTo(), MoveType.RIDE)) {
+                if (null != WorldGuard.getInstance().getPlatform().getSessionManager().get(player).testMoveTo(player, event.getTo(), MoveType.RIDE)) {
                     vehicle.setVelocity(new Vector(0,0,0));
                     vehicle.teleport(event.getFrom());
                 }

@@ -23,11 +23,10 @@ import com.google.common.base.Function;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import javax.annotation.Nullable;
 
 public final class InteropUtils {
 

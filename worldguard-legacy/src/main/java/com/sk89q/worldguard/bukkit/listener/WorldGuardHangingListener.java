@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -69,8 +71,8 @@ public class WorldGuardHangingListener implements Listener {
     public void onHangingBreak(HangingBreakEvent event) {
         Hanging hanging = event.getEntity();
         World world = hanging.getWorld();
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = cfg.get(world);
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
 
         if (event instanceof HangingBreakByEntityEvent) {
             HangingBreakByEntityEvent entityEvent = (HangingBreakByEntityEvent) event;
@@ -87,7 +89,8 @@ public class WorldGuardHangingListener implements Listener {
                         event.setCancelled(true);
                         return;
                     }
-                    if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(Flags.CREEPER_EXPLOSION, hanging.getLocation())) {
+                    if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(Flags.CREEPER_EXPLOSION,
+                            BukkitAdapter.adapt(hanging.getLocation()))) {
                         event.setCancelled(true);
                         return;
                     }
@@ -98,12 +101,12 @@ public class WorldGuardHangingListener implements Listener {
                 if (hanging instanceof Painting
                         && (wcfg.blockEntityPaintingDestroy
                         || (wcfg.useRegions
-                        && !plugin.getGlobalRegionManager().allows(Flags.ENTITY_PAINTING_DESTROY, hanging.getLocation())))) {
+                        && !plugin.getGlobalRegionManager().allows(Flags.ENTITY_PAINTING_DESTROY, BukkitAdapter.adapt(hanging.getLocation()))))) {
                     event.setCancelled(true);
                 } else if (hanging instanceof ItemFrame
                         && (wcfg.blockEntityItemFrameDestroy
                         || (wcfg.useRegions
-                        && !plugin.getGlobalRegionManager().allows(Flags.ENTITY_ITEM_FRAME_DESTROY, hanging.getLocation())))) {
+                        && !plugin.getGlobalRegionManager().allows(Flags.ENTITY_ITEM_FRAME_DESTROY, BukkitAdapter.adapt(hanging.getLocation()))))) {
                     event.setCancelled(true);
                 }
             }
