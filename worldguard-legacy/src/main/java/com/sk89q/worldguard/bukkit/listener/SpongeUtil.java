@@ -19,9 +19,12 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.isBlockWater;
@@ -42,14 +45,14 @@ public final class SpongeUtil {
      * @param oz The z coordinate of the 'sponge' block
      */
     public static void clearSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = cfg.get(world);
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
 
         for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
             for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
                 for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
                     if (isBlockWater(world, ox + cx, oy + cy, oz + cz)) {
-                        world.getBlockAt(ox + cx, oy + cy, oz + cz).setTypeId(0);
+                        world.getBlockAt(ox + cx, oy + cy, oz + cz).setType(Material.AIR);
                     }
                 }
             }
@@ -66,8 +69,8 @@ public final class SpongeUtil {
      * @param oz The z coordinate of the 'sponge' block
      */
     public static void addSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = cfg.get(world);
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
 
         // The negative x edge
         int cx = ox - wcfg.spongeRadius - 1;

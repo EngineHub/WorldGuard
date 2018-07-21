@@ -26,6 +26,9 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.minecraft.util.commands.*;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
@@ -95,13 +98,13 @@ public class WorldGuardCommands {
         }
 
         try {
-            ConfigurationManager config = plugin.getGlobalStateManager();
+            ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
             config.unload();
             config.load();
             for (World world : Bukkit.getServer().getWorlds()) {
-                config.get(world);
+                config.get(BukkitAdapter.adapt(world));
             }
-            plugin.getRegionContainer().reload();
+            WorldGuard.getInstance().getPlatform().getRegionContainer().reload();
             // WGBukkit.cleanCache();
             sender.sendMessage("WorldGuard configuration reloaded.");
         } catch (Throwable t) {
@@ -250,12 +253,13 @@ public class WorldGuardCommands {
     @CommandPermissions("worldguard.flushstates")
     public void flushStates(CommandContext args, CommandSender sender) throws CommandException {
         if (args.argsLength() == 0) {
-            plugin.getSessionManager().resetAllStates();
+            WorldGuard.getInstance().getPlatform().getSessionManager().resetAllStates();
             sender.sendMessage("Cleared all states.");
         } else {
             Player player = plugin.getServer().getPlayer(args.getString(0));
             if (player != null) {
-                plugin.getSessionManager().resetState(player);
+                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                WorldGuard.getInstance().getPlatform().getSessionManager().resetState(localPlayer);
                 sender.sendMessage("Cleared states for player \"" + player.getName() + "\".");
             }
         }

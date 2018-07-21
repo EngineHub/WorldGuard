@@ -130,7 +130,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
-        List<Block> blocks = new ArrayList<Block>();
+        List<Block> blocks = new ArrayList<>();
         for (BlockState bs : event.getReplacedBlockStates()) {
             blocks.add(bs.getBlock());
         }
@@ -219,7 +219,7 @@ public class EventAbstractionListener extends AbstractListener {
         Material to = event.getTo();
 
         // Forget about Redstone ore, especially since we handle it in INTERACT
-        if (Materials.isRedstoneOre(block.getType()) && Materials.isRedstoneOre(to)) {
+        if (block.getType() == Material.REDSTONE_ORE && to == Material.REDSTONE_ORE) {
             return;
         }
 
@@ -278,7 +278,7 @@ public class EventAbstractionListener extends AbstractListener {
 
                 ArrayList<Block> blocks;
                 try {
-                    blocks = new ArrayList<Block>(event.getBlocks());
+                    blocks = new ArrayList<>(event.getBlocks());
                 } catch (NoSuchMethodError e) {
                     blocks = Lists.newArrayList(event.getRetractLocation().getBlock());
                     if (piston.getType() == Material.PISTON_MOVING_PIECE) {
@@ -308,7 +308,7 @@ public class EventAbstractionListener extends AbstractListener {
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
         EventDebounce.Entry entry = pistonExtendDebounce.getIfNotPresent(new BlockPistonExtendKey(event), event);
         if (entry != null) {
-            List<Block> blocks = new ArrayList<Block>(event.getBlocks());
+            List<Block> blocks = new ArrayList<>(event.getBlocks());
             int originalLength = blocks.size();
             BlockFace dir = event.getDirection();
             for (int i = 0; i < blocks.size(); i++) {
@@ -336,7 +336,7 @@ public class EventAbstractionListener extends AbstractListener {
 
         // Previously, and perhaps still, the only way to catch cake eating
         // events was through here
-        if (target.getType() == Material.CAKE_BLOCK) {
+        if (target.getType() == Material.CAKE) {
             Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), target));
         }
     }
@@ -354,7 +354,7 @@ public class EventAbstractionListener extends AbstractListener {
         switch (event.getAction()) {
             case PHYSICAL:
                 // Forget about Redstone ore
-                if (Materials.isRedstoneOre(clicked.getType()) || clicked.getType() == Material.SOIL) {
+                if (clicked.getType() == Material.REDSTONE_ORE || clicked.getType() == Material.FARMLAND) {
                     silent = true;
                 }
 
@@ -947,7 +947,7 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         // Handle cocoa beans
-        if (item != null && item.getType() == Material.INK_SACK && Materials.isDyeColor(item.getData(), DyeColor.BROWN)) {
+        if (item != null && item.getType() == Material.COCOA_BEANS) {
             // CraftBukkit doesn't or didn't throw a clicked place for this
             if (!(faceClicked == BlockFace.DOWN || faceClicked == BlockFace.UP)) {
                 Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(), Material.COCOA));

@@ -46,7 +46,7 @@ public class PlayerMoveListener implements Listener {
     }
 
     public void registerEvents() {
-        if (plugin.getGlobalStateManager().usePlayerMove) {
+        if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().usePlayerMove) {
             PluginManager pm = plugin.getServer().getPluginManager();
             pm.registerEvents(this, plugin);
         }
