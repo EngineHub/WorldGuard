@@ -43,6 +43,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
      */
     public BukkitConfigurationManager(WorldGuardPlugin plugin) {
         super();
+        this.plugin = plugin;
     }
 
     @Override

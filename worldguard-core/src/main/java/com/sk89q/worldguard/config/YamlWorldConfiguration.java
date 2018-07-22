@@ -27,8 +27,8 @@ import java.util.List;
 
 public abstract class YamlWorldConfiguration extends WorldConfiguration {
 
-    @Unreported private YAMLProcessor parentConfig;
-    @Unreported private YAMLProcessor config;
+    @Unreported protected YAMLProcessor parentConfig;
+    @Unreported protected YAMLProcessor config;
 
     public boolean getBoolean(String node, boolean def) {
         boolean val = parentConfig.getBoolean(node, def);

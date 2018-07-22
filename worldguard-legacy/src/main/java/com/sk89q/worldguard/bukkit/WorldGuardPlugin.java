@@ -126,7 +126,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     private static WorldGuardPlugin inst;
     private static BukkitWorldGuardPlatform platform;
     private final CommandsManager<CommandSender> commands;
-    private final GlobalRegionManager globalRegionManager = new GlobalRegionManager((BukkitRegionContainer) WorldGuard.getInstance().getPlatform().getRegionContainer());
+    private GlobalRegionManager globalRegionManager;
     private final Supervisor supervisor = new SimpleSupervisor();
     private ListeningExecutorService executorService;
     private ProfileService profileService;
@@ -168,7 +168,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
 
         WorldGuard.getInstance().setPlatform(platform = new BukkitWorldGuardPlatform()); // Initialise WorldGuard
+        WorldGuard.getInstance().setup();
         BukkitSessionManager sessionManager = (BukkitSessionManager) platform.getSessionManager();
+        globalRegionManager = new GlobalRegionManager(WorldGuard.getInstance().getPlatform().getRegionContainer());
 
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(this));

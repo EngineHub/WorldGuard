@@ -80,9 +80,10 @@ public class PlayerMoveListener implements Listener {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer);
-        final Location override = BukkitAdapter.adapt(session.testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.MOVE));
+        com.sk89q.worldedit.util.Location weLocation = session.testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.MOVE);
 
-        if (override != null) {
+        if (weLocation != null) {
+            final Location override = BukkitAdapter.adapt(weLocation);
             override.setX(override.getBlockX() + 0.5);
             override.setY(override.getBlockY());
             override.setZ(override.getBlockZ() + 0.5);

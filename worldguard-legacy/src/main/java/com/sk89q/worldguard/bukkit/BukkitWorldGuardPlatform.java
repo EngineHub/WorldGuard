@@ -42,14 +42,10 @@ import java.util.Set;
 public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
 
     private SessionManager sessionManager;
-    private final BukkitConfigurationManager configuration;
-    private final BukkitRegionContainer regionContainer;
+    private BukkitConfigurationManager configuration;
+    private BukkitRegionContainer regionContainer;
 
     public BukkitWorldGuardPlatform() {
-        sessionManager = new BukkitSessionManager(WorldGuardPlugin.inst());
-        configuration = new BukkitConfigurationManager(WorldGuardPlugin.inst());
-        regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());
-        regionContainer.initialize();
     }
 
     @Override
@@ -106,6 +102,15 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
             }
         }
         WorldGuard.logger.info(message);
+    }
+
+    @Override
+    public void load() {
+        sessionManager = new BukkitSessionManager(WorldGuardPlugin.inst());
+        configuration = new BukkitConfigurationManager(WorldGuardPlugin.inst());
+        configuration.load();
+        regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());
+        regionContainer.initialize();
     }
 
     @Override
