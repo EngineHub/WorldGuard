@@ -11,7 +11,7 @@ checkstyle.configFile = new File(projectDir, "config/checkstyle/checkstyle.xml")
 
 dependencies {
     compile project(':worldguard-core')
-    compile 'org.bukkit:bukkit:1.13-pre7-R0.1-SNAPSHOT'
+    compile 'org.bukkit:bukkit:1.13-R0.1-SNAPSHOT'
     compile 'com.sk89q.worldedit:worldedit-bukkit:7.0.0-SNAPSHOT'
     compile ('com.sk89q:commandbook:2.3') {
         exclude group: 'com.sk89q', module: 'worldedit'
