@@ -97,6 +97,11 @@ public interface WorldGuardPlatform {
     void broadcastNotification(String message);
 
     /**
+     * Load the platform
+     */
+    void load();
+
+    /**
      * Unload the platform
      */
     void unload();

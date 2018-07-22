@@ -66,8 +66,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
     @Unreported private WorldGuardPlugin plugin;
 
     @Unreported private String worldName;
-    @Unreported private YAMLProcessor parentConfig;
-    @Unreported private YAMLProcessor config;
 
     @Unreported private ChestProtection chestProtection = new SignChestProtection();
 

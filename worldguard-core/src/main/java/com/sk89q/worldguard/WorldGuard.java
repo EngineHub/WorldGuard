@@ -40,7 +40,11 @@ public class WorldGuard {
         return instance;
     }
 
-    public WorldGuard() {
+    private WorldGuard() {
+    }
+
+    public void setup() {
+        getPlatform().load();
         Flags.registerAll();
     }
 
