@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.blacklist.BlacklistLoggerHandler;
@@ -127,7 +128,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
     public boolean disableMobDamage;
     public boolean highFreqFlags;
     public boolean checkLiquidFlow;
-    public int regionWand;
+    public String regionWand;
     public Set<EntityType> blockCreatureSpawn;
     public boolean allowTamedSpawns;
     // public boolean useiConomy;
@@ -361,7 +362,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         explosionFlagCancellation = getBoolean("regions.explosion-flags-block-entity-damage", true);
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
         checkLiquidFlow = getBoolean("regions.protect-against-liquid-flow", false);
-        regionWand = getInt("regions.wand", 334);
+        regionWand = convertLegacyItem(getString("regions.wand", ItemTypes.LEATHER.getId()));
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
         boundedLocationFlags = getBoolean("regions.location-flags-only-inside-regions", false);

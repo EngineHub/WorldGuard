@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.BukkitConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,14 +47,14 @@ public class WorldGuardServerListener implements Listener {
     @EventHandler
     public void onPluginEnable(PluginEnableEvent event) {
         if (event.getPlugin().getDescription().getName().equalsIgnoreCase("CommandBook")) {
-            WorldGuard.getInstance().getPlatform().getGlobalStateManager().updateCommandBookGodMode();
+            ((BukkitConfigurationManager) WorldGuard.getInstance().getPlatform().getGlobalStateManager()).updateCommandBookGodMode();
         }
     }
 
     @EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
         if (event.getPlugin().getDescription().getName().equalsIgnoreCase("CommandBook")) {
-            WorldGuard.getInstance().getPlatform().getGlobalStateManager().updateCommandBookGodMode();
+            ((BukkitConfigurationManager) WorldGuard.getInstance().getPlatform().getGlobalStateManager()).updateCommandBookGodMode();
         }
     }
 }

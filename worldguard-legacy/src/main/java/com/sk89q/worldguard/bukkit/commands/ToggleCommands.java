@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -54,7 +56,8 @@ public class ToggleCommands {
             world = plugin.matchWorld(sender, args.getString(0));
         }
         
-        BukkitWorldConfiguration wcfg = plugin.getGlobalStateManager().get(world);
+        BukkitWorldConfiguration wcfg =
+                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(world));
 
         if (!wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(
@@ -83,7 +86,8 @@ public class ToggleCommands {
             world = plugin.matchWorld(sender, args.getString(0));
         }
         
-        BukkitWorldConfiguration wcfg = plugin.getGlobalStateManager().get(world);
+        BukkitWorldConfiguration wcfg =
+                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(world));
 
         if (wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(ChatColor.YELLOW
@@ -102,7 +106,7 @@ public class ToggleCommands {
     @CommandPermissions({"worldguard.halt-activity"})
     public void stopLag(CommandContext args, CommandSender sender) throws CommandException {
 
-        ConfigurationManager configManager = plugin.getGlobalStateManager();
+        ConfigurationManager configManager = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
 
         if (args.hasFlag('i')) {
             if (configManager.activityHaltToggle) {

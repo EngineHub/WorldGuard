@@ -112,7 +112,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getItemInHand();
-            if (held.getType() != Material.AIR && !(ItemType.usesDamageValue(held.getTypeId())|| BlockType.usesData(held.getTypeId()))) {
+            if (held.getType() != Material.AIR) {
                 held.setDurability((short) 0);
                 player.setItemInHand(held);
             }
@@ -198,8 +198,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.highFreqFlags && isLava
-                && !plugin.getGlobalRegionManager().allows(Flags.LAVA_FLOW,
-                BukkitAdapter.adapt(blockFrom.getLocation()))) {
+                && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(blockFrom.getLocation()), (RegionAssociable) null, Flags.LAVA_FLOW))) {
             event.setCancelled(true);
             return;
         }
@@ -485,8 +484,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().allows(Flags.LEAF_DECAY,
-                    BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.LEAF_DECAY))) {
                 event.setCancelled(true);
             }
         }

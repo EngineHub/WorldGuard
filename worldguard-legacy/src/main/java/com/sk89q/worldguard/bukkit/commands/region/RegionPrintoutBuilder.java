@@ -21,7 +21,7 @@ package com.sk89q.worldguard.bukkit.commands.region;
 
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
@@ -29,11 +29,12 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.Callable;
+
+import javax.annotation.Nullable;
 
 /**
  * Create a region printout, as used in /region info to show information about
@@ -105,7 +106,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
     public void appendFlagsList(boolean useColors) {
         boolean hasFlags = false;
         
-        for (Flag<?> flag : WorldGuardPlugin.inst().getFlagRegistry()) {
+        for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry()) {
             Object val = region.getFlag(flag), group = null;
             
             // No value

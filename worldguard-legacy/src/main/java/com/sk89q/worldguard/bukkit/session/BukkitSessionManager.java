@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.session;
+package com.sk89q.worldguard.bukkit.session;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -26,6 +26,9 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.session.SessionManager;
+import com.sk89q.worldguard.session.WorldPlayerTuple;
 import com.sk89q.worldguard.session.handler.*;
 import com.sk89q.worldguard.session.handler.Handler.Factory;
 import org.bukkit.Bukkit;
@@ -64,7 +67,7 @@ public class BukkitSessionManager implements SessionManager, Runnable, Listener 
             .build(new CacheLoader<WorldPlayerTuple, Boolean>() {
                 @Override
                 public Boolean load(WorldPlayerTuple tuple) throws Exception {
-                    return plugin.getGlobalRegionManager().hasBypass(tuple.player, tuple.world);
+                    return tuple.getPlayer().hasPermission("worldguard.region.bypass." + tuple.getWorld().getName());
                 }
             });
 

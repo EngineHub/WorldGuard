@@ -64,7 +64,7 @@ public class Session {
      *
      * @param handler A new handler
      */
-    void register(Handler handler) {
+    public void register(Handler handler) {
         handlers.put(handler.getClass(), handler);
     }
 
@@ -95,7 +95,7 @@ public class Session {
      *
      * @param player The player
      */
-    void initialize(LocalPlayer player) {
+    public void initialize(LocalPlayer player) {
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         Location location = player.getLocation();
         ApplicableRegionSet set = query.getApplicableRegions(location);
@@ -113,7 +113,7 @@ public class Session {
      *
      * @param player The player
      */
-    void tick(LocalPlayer player) {
+    public void tick(LocalPlayer player) {
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         Location location = player.getLocation();
         ApplicableRegionSet set = query.getApplicableRegions(location);
@@ -128,7 +128,7 @@ public class Session {
      *
      * @param player The player
      */
-    void resetState(LocalPlayer player) {
+    public void resetState(LocalPlayer player) {
         initialize(player);
         needRefresh.set(true);
     }

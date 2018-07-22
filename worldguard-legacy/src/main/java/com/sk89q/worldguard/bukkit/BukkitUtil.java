@@ -208,6 +208,6 @@ public class BukkitUtil {
      */
     public static Target createTarget(Material material) {
         checkNotNull(material);
-        return new ItemTarget(BukkitAdapter.adapt(material));
+        return new ItemTarget(BukkitAdapter.asItemType(material));
     }
 }

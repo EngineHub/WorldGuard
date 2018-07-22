@@ -22,12 +22,12 @@ package com.sk89q.worldguard.session;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 
-class WorldPlayerTuple {
+public class WorldPlayerTuple {
 
-    final World world;
-    final LocalPlayer player;
+    private final World world;
+    private final LocalPlayer player;
 
-    WorldPlayerTuple(World world, LocalPlayer player) {
+    public WorldPlayerTuple(World world, LocalPlayer player) {
         this.world = world;
         this.player = player;
     }
@@ -43,6 +43,14 @@ class WorldPlayerTuple {
         if (!world.equals(that.world)) return false;
 
         return true;
+    }
+
+    public LocalPlayer getPlayer() {
+        return player;
+    }
+
+    public World getWorld() {
+        return world;
     }
 
     @Override

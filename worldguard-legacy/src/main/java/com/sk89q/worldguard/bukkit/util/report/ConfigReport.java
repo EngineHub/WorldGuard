@@ -19,9 +19,11 @@
 
 package com.sk89q.worldguard.bukkit.util.report;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.report.DataReport;
@@ -39,10 +41,11 @@ public class ConfigReport extends DataReport {
 
         List<World> worlds = Bukkit.getServer().getWorlds();
 
-        append("Configuration", new ShallowObjectReport("Configuration", plugin.getGlobalStateManager()));
+        append("Configuration", new ShallowObjectReport("Configuration", WorldGuard.getInstance().getPlatform().getGlobalStateManager()));
 
         for (World world : worlds) {
-            BukkitWorldConfiguration config = plugin.getGlobalStateManager().get(world);
+            com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
+            WorldConfiguration config = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(weWorld);
 
             DataReport report = new DataReport("World: " + world.getName());
             report.append("UUID", world.getUID());
@@ -58,7 +61,7 @@ public class ConfigReport extends DataReport {
                 report.append("Blacklist", "<Disabled>");
             }
 
-            RegionManager regions = plugin.getRegionContainer().get(world);
+            RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(weWorld);
             if (regions != null) {
                 DataReport section = new DataReport("Regions");
                 section.append("Region Count", regions.size());

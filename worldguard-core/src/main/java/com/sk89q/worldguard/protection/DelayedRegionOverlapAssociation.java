@@ -17,14 +17,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.protection;
+package com.sk89q.worldguard.protection;
 
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.Location;
 
 import javax.annotation.Nullable;
 import java.util.List;

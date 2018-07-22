@@ -66,7 +66,7 @@ public class ChestProtectionListener extends AbstractListener {
             }
 
             event.filter(target -> {
-                if (wcfg.getChestProtection().isChest(BukkitAdapter.adapt(event.getEffectiveMaterial())) && wcfg.isChestProtected(BukkitAdapter.adapt(target.getBlock().getLocation()),
+                if (wcfg.getChestProtection().isChest(BukkitAdapter.asBlockType(event.getEffectiveMaterial())) && wcfg.isChestProtected(BukkitAdapter.adapt(target.getBlock().getLocation()),
                         WorldGuardPlugin.inst().wrapPlayer(player))) {
                     sendMessage(event, player, ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
                     return false;

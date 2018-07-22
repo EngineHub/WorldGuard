@@ -73,11 +73,12 @@ import com.sk89q.worldguard.bukkit.listener.WorldRulesListener;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
-import com.sk89q.worldguard.session.BukkitSessionManager;
+import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
 import com.sk89q.worldguard.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
@@ -255,6 +256,8 @@ public class WorldGuardPlugin extends JavaPlugin {
             ProcessPlayerEvent event = new ProcessPlayerEvent(player);
             Events.fire(event);
         }
+
+        ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
     }
 
     @Override
