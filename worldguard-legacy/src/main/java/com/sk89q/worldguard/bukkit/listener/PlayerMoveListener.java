@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.session.MoveType;
@@ -54,19 +56,19 @@ public class PlayerMoveListener implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
+        LocalPlayer player = plugin.wrapPlayer(event.getPlayer());
 
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
-        session.testMoveTo(player, event.getRespawnLocation(), MoveType.RESPAWN, true);
+        session.testMoveTo(player, BukkitAdapter.adapt(event.getRespawnLocation()), MoveType.RESPAWN, true);
     }
 
     @EventHandler
     public void onVehicleEnter(VehicleEnterEvent event) {
         Entity entity = event.getEntered();
         if (entity instanceof Player) {
-            Player player = (Player) entity;
+            LocalPlayer player = plugin.wrapPlayer((Player) entity);
             Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
-            if (null != session.testMoveTo(player, event.getVehicle().getLocation(), MoveType.EMBARK, true)) {
+            if (null != session.testMoveTo(player, BukkitAdapter.adapt(event.getVehicle().getLocation()), MoveType.EMBARK, true)) {
                 event.setCancelled(true);
             }
         }
@@ -75,9 +77,10 @@ public class PlayerMoveListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerMove(PlayerMoveEvent event) {
         final Player player = event.getPlayer();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
-        Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
-        final Location override = session.testMoveTo(player, event.getTo(), MoveType.MOVE);
+        Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer);
+        final Location override = BukkitAdapter.adapt(session.testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.MOVE));
 
         if (override != null) {
             override.setX(override.getBlockX() + 0.5);

@@ -35,7 +35,7 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.internal.WGMetadata;
-import com.sk89q.worldguard.bukkit.protection.DelayedRegionOverlapAssociation;
+import com.sk89q.worldguard.protection.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
@@ -104,12 +104,13 @@ public class RegionProtectionListener extends AbstractListener {
 
         if (rootCause instanceof Player) {
             Player player = (Player) rootCause;
+            LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
             long now = System.currentTimeMillis();
             Long lastTime = WGMetadata.getIfPresent(player, DENY_MESSAGE_KEY, Long.class);
             if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
                 RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-                String message = query.queryValue(location, player, Flags.DENY_MESSAGE);
+                String message = query.queryValue(BukkitAdapter.adapt(location), localPlayer, Flags.DENY_MESSAGE);
                 if (message != null && !message.isEmpty()) {
                     player.sendMessage(message.replace("%what%", what));
                 }
@@ -158,10 +159,10 @@ public class RegionProtectionListener extends AbstractListener {
             return getPlugin().wrapOfflinePlayer((OfflinePlayer) rootCause);
         } else if (rootCause instanceof Entity) {
             RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-            return new DelayedRegionOverlapAssociation(query, ((Entity) rootCause).getLocation());
+            return new DelayedRegionOverlapAssociation(query, BukkitAdapter.adapt(((Entity) rootCause).getLocation()));
         } else if (rootCause instanceof Block) {
             RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-            return new DelayedRegionOverlapAssociation(query, ((Block) rootCause).getLocation());
+            return new DelayedRegionOverlapAssociation(query, BukkitAdapter.adapt(((Block) rootCause).getLocation()));
         } else {
             return Associables.constant(Association.NON_MEMBER);
         }
@@ -170,7 +171,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (!isRegionSupportEnabled(BukkitAdapter.adapt(event.getWorld()))) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         final Material type = event.getEffectiveMaterial();
@@ -180,52 +181,49 @@ public class RegionProtectionListener extends AbstractListener {
         // Don't check liquid flow unless it's enabled
         if (event.getCause().getRootCause() instanceof Block
                 && Materials.isLiquid(type)
-                && !getWorldConfig(event.getWorld()).checkLiquidFlow) {
+                && !getWorldConfig(BukkitAdapter.adapt(event.getWorld())).checkLiquidFlow) {
             return;
         }
 
-        event.filter(new Predicate<Location>() {
-            @Override
-            public boolean apply(Location target) {
-                boolean canPlace;
-                String what;
+        event.filter((Predicate<Location>) target -> {
+            boolean canPlace;
+            String what;
 
-                /* Flint and steel, fire charge, etc. */
-                if (type == Material.FIRE) {
-                    Block block = event.getCause().getFirstBlock();
-                    boolean fire = block != null && block.getType() == Material.FIRE;
-                    boolean lava = block != null && Materials.isLava(block.getType());
-                    List<StateFlag> flags = new ArrayList<StateFlag>();
-                    flags.add(Flags.BLOCK_PLACE);
-                    flags.add(Flags.LIGHTER);
-                    if (fire) flags.add(Flags.FIRE_SPREAD);
-                    if (lava) flags.add(Flags.LAVA_FIRE);
-                    canPlace = query.testBuild(target, associable, combine(event, flags.toArray(new StateFlag[flags.size()])));
-                    what = "place fire";
+            /* Flint and steel, fire charge, etc. */
+            if (type == Material.FIRE) {
+                Block block = event.getCause().getFirstBlock();
+                boolean fire = block != null && block.getType() == Material.FIRE;
+                boolean lava = block != null && Materials.isLava(block.getType());
+                List<StateFlag> flags = new ArrayList<>();
+                flags.add(Flags.BLOCK_PLACE);
+                flags.add(Flags.LIGHTER);
+                if (fire) flags.add(Flags.FIRE_SPREAD);
+                if (lava) flags.add(Flags.LAVA_FIRE);
+                canPlace = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, flags.toArray(new StateFlag[flags.size()])));
+                what = "place fire";
 
-                /* Everything else */
-                } else {
-                    canPlace = query.testBuild(target, associable, combine(event, Flags.BLOCK_PLACE));
-                    try {
-                        event.setSilent(type == Material.FROSTED_ICE);
-                    } catch (NoSuchFieldError ignored) {} // back compat
-                    what = "place that block";
-                }
-
-                if (!canPlace) {
-                    tellErrorMessage(event, event.getCause(), target, what);
-                    return false;
-                }
-
-                return true;
+            /* Everything else */
+            } else {
+                canPlace = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_PLACE));
+                try {
+                    event.setSilent(type == Material.FROSTED_ICE);
+                } catch (NoSuchFieldError ignored) {} // back compat
+                what = "place that block";
             }
+
+            if (!canPlace) {
+                tellErrorMessage(event, event.getCause(), target, what);
+                return false;
+            }
+
+            return true;
         });
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (!isRegionSupportEnabled(BukkitAdapter.adapt(event.getWorld()))) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         final RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
@@ -233,30 +231,27 @@ public class RegionProtectionListener extends AbstractListener {
         if (!event.isCancelled()) {
             final RegionAssociable associable = createRegionAssociable(event.getCause());
 
-            event.filter(new Predicate<Location>() {
-                @Override
-                public boolean apply(Location target) {
-                    boolean canBreak;
-                    String what;
+            event.filter((Predicate<Location>) target -> {
+                boolean canBreak;
+                String what;
 
-                    /* TNT */
-                    if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.MINECART_TNT) != null) {
-                        canBreak = query.testBuild(target, associable, combine(event, Flags.BLOCK_BREAK, Flags.TNT));
-                        what = "use dynamite";
+                /* TNT */
+                if (event.getCause().find(EntityType.PRIMED_TNT, EntityType.MINECART_TNT) != null) {
+                    canBreak = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_BREAK, Flags.TNT));
+                    what = "use dynamite";
 
-                    /* Everything else */
-                    } else {
-                        canBreak = query.testBuild(target, associable, combine(event, Flags.BLOCK_BREAK));
-                        what = "break that block";
-                    }
-
-                    if (!canBreak) {
-                        tellErrorMessage(event, event.getCause(), target, what);
-                        return false;
-                    }
-
-                    return true;
+                /* Everything else */
+                } else {
+                    canBreak = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_BREAK));
+                    what = "break that block";
                 }
+
+                if (!canBreak) {
+                    tellErrorMessage(event, event.getCause(), target, what);
+                    return false;
+                }
+
+                return true;
             });
         }
     }
@@ -264,64 +259,61 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (!isRegionSupportEnabled(BukkitAdapter.adapt(event.getWorld()))) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         final Material type = event.getEffectiveMaterial();
         final RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         final RegionAssociable associable = createRegionAssociable(event.getCause());
 
-        event.filter(new Predicate<Location>() {
-            @Override
-            public boolean apply(Location target) {
-                boolean canUse;
-                String what;
+        event.filter((Predicate<Location>) target -> {
+            boolean canUse;
+            String what;
 
-                /* Saplings, etc. */
-                if (Materials.isConsideredBuildingIfUsed(type)) {
-                    canUse = query.testBuild(target, associable, combine(event));
-                    what = "use that";
+            /* Saplings, etc. */
+            if (Materials.isConsideredBuildingIfUsed(type)) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
+                what = "use that";
 
-                /* Inventory */
-                } else if (Materials.isInventoryBlock(type)) {
-                    canUse = query.testBuild(target, associable, combine(event, Flags.INTERACT, Flags.CHEST_ACCESS));
-                    what = "open that";
+            /* Inventory */
+            } else if (Materials.isInventoryBlock(type)) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.CHEST_ACCESS));
+                what = "open that";
 
-                /* Beds */
-                } else if (type == Material.BED_BLOCK) {
-                    canUse = query.testBuild(target, associable, combine(event, Flags.INTERACT, Flags.SLEEP));
-                    what = "sleep";
+            /* Beds */
+            } else if (Materials.isBed(type)) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.SLEEP));
+                what = "sleep";
 
-                /* TNT */
-                } else if (type == Material.TNT) {
-                    canUse = query.testBuild(target, associable, combine(event, Flags.INTERACT, Flags.TNT));
-                    what = "use explosives";
+            /* TNT */
+            } else if (type == Material.TNT) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.TNT));
+                what = "use explosives";
 
-                /* Legacy USE flag */
-                } else if (Materials.isUseFlagApplicable(type)) {
-                    canUse = query.testBuild(target, associable, combine(event, Flags.INTERACT, Flags.USE));
-                    what = "use that";
+            /* Legacy USE flag */
+            } else if (Materials.isUseFlagApplicable(type)) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.USE));
+                what = "use that";
 
-                /* Everything else */
-                } else {
-                    canUse = query.testBuild(target, associable, combine(event, Flags.INTERACT));
-                    what = "use that";
-                }
-
-                if (!canUse) {
-                    tellErrorMessage(event, event.getCause(), target, what);
-                    return false;
-                }
-
-                return true;
+            /* Everything else */
+            } else {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT));
+                what = "use that";
             }
+
+            if (!canUse) {
+                tellErrorMessage(event, event.getCause(), target, what);
+                return false;
+            }
+
+            return true;
         });
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (!isRegionSupportEnabled(BukkitAdapter.adapt(event.getWorld()))) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         Location target = event.getTarget();
@@ -335,26 +327,26 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Vehicles */
         if (Entities.isVehicle(type)) {
-            canSpawn = query.testBuild(target, associable, combine(event, Flags.PLACE_VEHICLE));
+            canSpawn = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.PLACE_VEHICLE));
             what = "place vehicles";
 
         /* Item pickup */
         } else if (event.getEntity() instanceof Item) {
-            canSpawn = query.testBuild(target, associable, combine(event, Flags.ITEM_DROP));
+            canSpawn = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_DROP));
             what = "drop items";
 
         /* XP drops */
         } else if (type == EntityType.EXPERIENCE_ORB) {
-            canSpawn = query.testBuild(target, associable, combine(event, Flags.EXP_DROPS));
+            canSpawn = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.EXP_DROPS));
             what = "drop XP";
 
         } else if (Entities.isAoECloud(type)) {
-            canSpawn = query.testBuild(target, associable, combine(event, Flags.POTION_SPLASH));
+            canSpawn = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.POTION_SPLASH));
             what = "use lingering potions";
 
         /* Everything else */
         } else {
-            canSpawn = query.testBuild(target, associable, combine(event));
+            canSpawn = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
 
             if (event.getEntity() instanceof Item) {
                 what = "drop items";
@@ -372,7 +364,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (!isRegionSupportEnabled(BukkitAdapter.adapt(event.getWorld()))) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         Location target = event.getTarget();
@@ -385,17 +377,17 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Vehicles */
         if (Entities.isVehicle(type)) {
-            canDestroy = query.testBuild(target, associable, combine(event, Flags.DESTROY_VEHICLE));
+            canDestroy = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.DESTROY_VEHICLE));
             what = "break vehicles";
 
         /* Item pickup */
         } else if (event.getEntity() instanceof Item || event.getEntity() instanceof ExperienceOrb) {
-            canDestroy = query.testBuild(target, associable, combine(event, Flags.ITEM_PICKUP));
+            canDestroy = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_PICKUP));
             what = "pick up items";
 
         /* Everything else */
         } else {
-            canDestroy = query.testBuild(target, associable, combine(event));
+            canDestroy = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
             what = "break things";
         }
 
@@ -408,7 +400,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (!isRegionSupportEnabled(BukkitAdapter.adapt(event.getWorld()))) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
 
         Location target = event.getTarget();
@@ -421,22 +413,22 @@ public class RegionProtectionListener extends AbstractListener {
         /* Hostile / ambient mob override */
         if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())
                 || Entities.isNPC(event.getEntity()) || Entities.isVehicle(event.getEntity().getType())) {
-            canUse = event.getRelevantFlags().isEmpty() || query.queryState(target, associable, combine(event)) != State.DENY;
+            canUse = event.getRelevantFlags().isEmpty() || query.queryState(BukkitAdapter.adapt(target), associable, combine(event)) != State.DENY;
             what = "use that";
 
         /* Paintings, item frames, etc. */
         } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
-            canUse = query.testBuild(target, associable, combine(event));
+            canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
             what = "change that";
 
         /* Ridden on use */
         } else if (Entities.isRiddenOnUse(event.getEntity())) {
-            canUse = query.testBuild(target, associable, combine(event, Flags.RIDE, Flags.INTERACT));
+            canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.RIDE, Flags.INTERACT));
             what = "ride that";
 
         /* Everything else */
         } else {
-            canUse = query.testBuild(target, associable, combine(event, Flags.INTERACT));
+            canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT));
             what = "use that";
         }
 
@@ -449,7 +441,7 @@ public class RegionProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onDamageEntity(DamageEntityEvent event) {
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
+        if (!isRegionSupportEnabled(BukkitAdapter.adapt(event.getWorld()))) return; // Region support disabled
         // Whitelist check is below
 
         com.sk89q.worldedit.util.Location target = BukkitAdapter.adapt(event.getTarget());

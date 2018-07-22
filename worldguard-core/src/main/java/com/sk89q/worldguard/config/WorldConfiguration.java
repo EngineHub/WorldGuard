@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.config;
 
+import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.util.report.Unreported;
 
@@ -65,5 +66,24 @@ public abstract class WorldConfiguration {
 
     public String getWorldName() {
         return this.worldName;
+    }
+
+    public String convertLegacyItem(String legacy) {
+        String item = legacy;
+        try {
+            String[] splitter = item.split(":", 2);
+            int id = 0;
+            byte data = 0;
+            if (splitter.length == 1) {
+                id = Integer.parseInt(item);
+            } else {
+                id = Integer.parseInt(splitter[0]);
+                data = Byte.parseByte(splitter[1]);
+            }
+            item = LegacyMapper.getInstance().getItemFromLegacy(id, data).getId();
+        } catch (Throwable e) {
+        }
+
+        return item;
     }
 }

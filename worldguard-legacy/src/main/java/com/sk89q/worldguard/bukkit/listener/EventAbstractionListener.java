@@ -20,6 +20,8 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.google.common.collect.Lists;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
@@ -70,6 +72,8 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.material.Dispenser;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.PistonExtensionMaterial;
@@ -247,7 +251,7 @@ public class EventAbstractionListener extends AbstractListener {
 
                 if (event.isCancelled() && !wasCancelled && entity instanceof FallingBlock) {
                     FallingBlock fallingBlock = (FallingBlock) entity;
-                    ItemStack itemStack = new ItemStack(fallingBlock.getMaterial(), 1, fallingBlock.getBlockData());
+                    ItemStack itemStack = new ItemStack(fallingBlock.getBlockData().getMaterial(), 1);
                     Item item = block.getWorld().dropItem(fallingBlock.getLocation(), itemStack);
                     item.setVelocity(new Vector());
                     if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(block, entity), item))) {
@@ -281,8 +285,8 @@ public class EventAbstractionListener extends AbstractListener {
                     blocks = new ArrayList<>(event.getBlocks());
                 } catch (NoSuchMethodError e) {
                     blocks = Lists.newArrayList(event.getRetractLocation().getBlock());
-                    if (piston.getType() == Material.PISTON_MOVING_PIECE) {
-                        direction = new PistonExtensionMaterial(Material.PISTON_STICKY_BASE.getId(), piston.getData()).getFacing();
+                    if (piston.getType() == Material.MOVING_PISTON) {
+                        direction = new PistonExtensionMaterial(Material.STICKY_PISTON, piston.getData()).getFacing();
                     }
                 }
                 int originalSize = blocks.size();
@@ -409,7 +413,7 @@ public class EventAbstractionListener extends AbstractListener {
                 // emit a "use block here" event where the player is
                 // standing, which is a hack to protect items that don't
                 // throw events
-                if (item != null && getWorldConfig(player.getWorld()).blockUseAtFeet.test(item)) {
+                if (item != null && getWorldConfig(BukkitAdapter.adapt(player.getWorld())).blockUseAtFeet.test(item)) {
                     if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, player.getLocation().getBlock()))) {
                         event.setCancelled(true);
                     }
@@ -516,7 +520,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent event) {
-        BukkitWorldConfiguration config = getWorldConfig(event.getBlock().getWorld());
+        BukkitWorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getBlock().getWorld()));
 
         // This only applies to regions but nothing else cares about high
         // frequency events at the moment
@@ -562,7 +566,7 @@ public class EventAbstractionListener extends AbstractListener {
             case DISPENSE_EGG:
             case EGG:
             case SPAWNER_EGG:
-                if (getWorldConfig(event.getEntity().getWorld()).strictEntitySpawn) {
+                if (getWorldConfig(BukkitAdapter.adapt(event.getEntity().getWorld())).strictEntitySpawn) {
                     Events.fireToCancel(event, new SpawnEntityEvent(event, Cause.unknown(), event.getEntity()));
                 }
                 break;
@@ -655,7 +659,7 @@ public class EventAbstractionListener extends AbstractListener {
             if (shooter instanceof Player) {
                 Player player = (Player) shooter;
                 if (player.getGameMode() != GameMode.CREATIVE) {
-                    player.getInventory().addItem(new ItemStack(Material.EXP_BOTTLE, 1));
+                    player.getInventory().addItem(new ItemStack(Material.EXPERIENCE_BOTTLE, 1));
                 }
             }
         }
@@ -794,7 +798,8 @@ public class EventAbstractionListener extends AbstractListener {
         InventoryHolder sourceHolder = event.getSource().getHolder();
         InventoryHolder targetHolder = event.getDestination().getHolder();
 
-        if (causeHolder instanceof Hopper && getPlugin().getGlobalStateManager().get(((Hopper) causeHolder).getWorld()).ignoreHopperMoveEvents) {
+        if (causeHolder instanceof Hopper
+                && ((BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(((Hopper) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
             return;
         }
 
@@ -934,10 +939,10 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         // Handle created spawn eggs
-        if (item != null && item.getType() == Material.MONSTER_EGG) {
-            MaterialData data = item.getData();
-            if (data instanceof SpawnEgg) {
-                @Nullable EntityType type = ((SpawnEgg) data).getSpawnedType();
+        if (item != null && Materials.isSpawnEgg(item.getType())) {
+            ItemMeta data = item.getItemMeta();
+            if (data instanceof SpawnEggMeta) {
+                @Nullable EntityType type = ((SpawnEggMeta) data).getSpawnedType();
                 if (type == null) {
                     type = EntityType.SHEEP; // Haven't investigated why it's sometimes null
                 }
@@ -979,11 +984,11 @@ public class EventAbstractionListener extends AbstractListener {
     }
 
     private boolean hasInteractBypass(Block block) {
-        return getWorldConfig(block.getWorld()).allowAllInteract.test(block);
+        return getWorldConfig(BukkitAdapter.adapt(block.getWorld())).allowAllInteract.test(block);
     }
 
     private boolean hasInteractBypass(World world, ItemStack item) {
-        return getWorldConfig(world).allowAllInteract.test(item);
+        return getWorldConfig(BukkitAdapter.adapt(world)).allowAllInteract.test(item);
     }
 
     private boolean isBlockModifiedOnClick(Block block, boolean rightClick) {

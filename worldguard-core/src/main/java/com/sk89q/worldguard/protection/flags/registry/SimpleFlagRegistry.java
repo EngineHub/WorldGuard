@@ -21,12 +21,14 @@ package com.sk89q.worldguard.protection.flags.registry;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.worldguard.protection.flags.Flag;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
@@ -41,7 +43,7 @@ public class SimpleFlagRegistry implements FlagRegistry {
 
     private final Object lock = new Object();
     private final ConcurrentMap<String, Flag<?>> flags = Maps.newConcurrentMap();
-    private boolean initialized;
+    private boolean initialized = false;
 
     public boolean isInitialized() {
         return initialized;
@@ -96,6 +98,11 @@ public class SimpleFlagRegistry implements FlagRegistry {
     public Flag<?> get(String name) {
         checkNotNull(name, "name");
         return flags.get(name.toLowerCase());
+    }
+
+    @Override
+    public List<Flag<?>> getAll() {
+        return Lists.newArrayList(this.flags.values());
     }
 
     private Flag<?> getOrCreate(String name) {

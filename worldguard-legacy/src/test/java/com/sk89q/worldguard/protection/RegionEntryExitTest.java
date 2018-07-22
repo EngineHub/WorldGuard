@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
@@ -56,8 +57,7 @@ public abstract class RegionEntryExitTest {
     TestPlayer builderPlayer;
 
     protected FlagRegistry getFlagRegistry() {
-        FlagRegistry registry = new SimpleFlagRegistry();
-        return registry;
+        return WorldGuard.getInstance().getFlagRegistry();
     }
 
     protected abstract RegionManager createRegionManager() throws Exception;

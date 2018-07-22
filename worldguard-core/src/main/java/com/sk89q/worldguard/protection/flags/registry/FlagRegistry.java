@@ -23,6 +23,7 @@ import com.sk89q.worldguard.protection.flags.Flag;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,6 +65,13 @@ public interface FlagRegistry extends Iterable<Flag<?>> {
      */
     @Nullable
     Flag<?> get(String name);
+
+    /**
+     * Get all flags
+     *
+     * @return All flags
+     */
+    List<Flag<?>> getAll();
 
     /**
      * Unmarshal a raw map of values into a map of flags with their

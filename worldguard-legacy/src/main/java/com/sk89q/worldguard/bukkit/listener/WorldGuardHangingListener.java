@@ -24,7 +24,9 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.World;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -89,8 +91,7 @@ public class WorldGuardHangingListener implements Listener {
                         event.setCancelled(true);
                         return;
                     }
-                    if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(Flags.CREEPER_EXPLOSION,
-                            BukkitAdapter.adapt(hanging.getLocation()))) {
+                    if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(hanging.getLocation()), (RegionAssociable) null, Flags.CREEPER_EXPLOSION))) {
                         event.setCancelled(true);
                         return;
                     }
@@ -101,12 +102,12 @@ public class WorldGuardHangingListener implements Listener {
                 if (hanging instanceof Painting
                         && (wcfg.blockEntityPaintingDestroy
                         || (wcfg.useRegions
-                        && !plugin.getGlobalRegionManager().allows(Flags.ENTITY_PAINTING_DESTROY, BukkitAdapter.adapt(hanging.getLocation()))))) {
+                        && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(hanging.getLocation()), (RegionAssociable) null, Flags.ENTITY_PAINTING_DESTROY))))) {
                     event.setCancelled(true);
                 } else if (hanging instanceof ItemFrame
                         && (wcfg.blockEntityItemFrameDestroy
                         || (wcfg.useRegions
-                        && !plugin.getGlobalRegionManager().allows(Flags.ENTITY_ITEM_FRAME_DESTROY, BukkitAdapter.adapt(hanging.getLocation()))))) {
+                        && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(hanging.getLocation()), (RegionAssociable) null, Flags.ENTITY_ITEM_FRAME_DESTROY))))) {
                     event.setCancelled(true);
                 }
             }

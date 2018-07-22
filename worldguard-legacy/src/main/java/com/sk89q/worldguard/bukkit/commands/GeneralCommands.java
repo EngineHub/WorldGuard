@@ -23,11 +23,10 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GodMode;
 import org.bukkit.ChatColor;
@@ -65,9 +64,10 @@ public class GeneralCommands {
         }
 
         for (Player player : targets) {
-            Session session = plugin.getSessionManager().get(player);
+            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+            Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer);
 
-            if (GodMode.set(player, session, true)) {
+            if (GodMode.set(localPlayer, session, true)) {
                 player.setFireTicks(0);
 
                 // Tell the user
@@ -284,8 +284,7 @@ public class GeneralCommands {
                     // Same type?
                     // Blocks store their color in the damage value
                     if (item2.getType() == item.getType() &&
-                            ((!ItemType.usesDamageValue(item.getTypeId()) && ignoreDamaged)
-                                    || item.getDurability() == item2.getDurability()) &&
+                            (ignoreDamaged || item.getDurability() == item2.getDurability()) &&
                                     ((item.getItemMeta() == null && item2.getItemMeta() == null)
                                             || (item.getItemMeta() != null &&
                                                 item.getItemMeta().equals(item2.getItemMeta())))) {

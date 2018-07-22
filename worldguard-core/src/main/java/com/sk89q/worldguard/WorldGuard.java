@@ -22,6 +22,7 @@ package com.sk89q.worldguard;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 
@@ -40,7 +41,7 @@ public class WorldGuard {
     }
 
     public WorldGuard() {
-        flagRegistry.setInitialized(true);
+        Flags.registerAll();
     }
 
     /**
