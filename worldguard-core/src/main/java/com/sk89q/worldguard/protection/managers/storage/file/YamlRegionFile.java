@@ -103,13 +103,13 @@ public class YamlRegionFile implements RegionDatabase {
 
     @Override
     public Set<ProtectedRegion> loadAll(FlagRegistry flagRegistry) throws StorageException {
-        Map<String, ProtectedRegion> loaded = new HashMap<String, ProtectedRegion>();
+        Map<String, ProtectedRegion> loaded = new HashMap<>();
 
         YAMLProcessor config = createYamlProcessor(file);
         try {
             config.load();
         } catch (FileNotFoundException e) {
-            return new HashSet<ProtectedRegion>(loaded.values());
+            return new HashSet<>(loaded.values());
         } catch (IOException e) {
             throw new StorageException("Failed to load region data from '" + file + "'", e);
         }
@@ -120,7 +120,7 @@ public class YamlRegionFile implements RegionDatabase {
             return Collections.emptySet(); // No regions are even configured
         }
 
-        Map<ProtectedRegion, String> parentSets = new LinkedHashMap<ProtectedRegion, String>();
+        Map<ProtectedRegion, String> parentSets = new LinkedHashMap<>();
 
         for (Map.Entry<String, YAMLNode> entry : regionData.entrySet()) {
             String id = entry.getKey();
@@ -176,7 +176,7 @@ public class YamlRegionFile implements RegionDatabase {
         // Relink parents
         RegionDatabaseUtils.relinkParents(loaded, parentSets);
 
-        return new HashSet<ProtectedRegion>(loaded.values());
+        return new HashSet<>(loaded.values());
     }
 
     @Override
@@ -192,7 +192,7 @@ public class YamlRegionFile implements RegionDatabase {
         Map<String, Object> map = regionsNode.getMap();
 
         for (ProtectedRegion region : regions) {
-            Map<String, Object> nodeMap = new HashMap<String, Object>();
+            Map<String, Object> nodeMap = new HashMap<>();
             map.put(region.getId(), nodeMap);
             YAMLNode node = new YAMLNode(nodeMap, false);
 
@@ -207,9 +207,9 @@ public class YamlRegionFile implements RegionDatabase {
                 node.setProperty("min-y", poly.getMinimumPoint().getBlockY());
                 node.setProperty("max-y", poly.getMaximumPoint().getBlockY());
 
-                List<Map<String, Object>> points = new ArrayList<Map<String, Object>>();
+                List<Map<String, Object>> points = new ArrayList<>();
                 for (BlockVector2D point : poly.getPoints()) {
-                    Map<String, Object> data = new HashMap<String, Object>();
+                    Map<String, Object> data = new HashMap<>();
                     data.put("x", point.getBlockX());
                     data.put("z", point.getBlockZ());
                     points.add(data);
@@ -290,7 +290,7 @@ public class YamlRegionFile implements RegionDatabase {
     }
 
     private Map<String, Object> getDomainData(DefaultDomain domain) {
-        Map<String, Object> domainData = new HashMap<String, Object>();
+        Map<String, Object> domainData = new HashMap<>();
 
         //noinspection deprecation
         setDomainData(domainData, "players", domain.getPlayers());
@@ -305,7 +305,7 @@ public class YamlRegionFile implements RegionDatabase {
             return;
         }
 
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
 
         for (Object str : domain) {
             list.add(String.valueOf(str));

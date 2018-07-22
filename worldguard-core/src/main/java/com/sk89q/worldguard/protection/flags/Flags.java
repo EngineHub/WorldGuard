@@ -179,5 +179,8 @@ public final class Flags {
         return null;
     }
 
+    /**
+     * Dummy method to call that initialises the class.
+     */
     public static void registerAll() {}
 }
