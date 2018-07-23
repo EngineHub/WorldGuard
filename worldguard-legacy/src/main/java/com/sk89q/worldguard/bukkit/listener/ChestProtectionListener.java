@@ -80,9 +80,8 @@ public class ChestProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
         final Player player = event.getCause().getFirstPlayer();
-        final LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
-        final BukkitWorldConfiguration wcfg = getWorldConfig(localPlayer);
+        final BukkitWorldConfiguration wcfg = getWorldConfig(BukkitAdapter.adapt(event.getWorld()));
 
         // Early guard
         if (!wcfg.signChestProtection) {
@@ -90,6 +89,7 @@ public class ChestProtectionListener extends AbstractListener {
         }
 
         if (player != null) {
+            final LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
             event.filter(target -> {
                 if (wcfg.isChestProtected(BukkitAdapter.adapt(target.getBlock().getLocation()), localPlayer)) {
                     sendMessage(event, player, ChatColor.DARK_RED + "This chest is protected.");
