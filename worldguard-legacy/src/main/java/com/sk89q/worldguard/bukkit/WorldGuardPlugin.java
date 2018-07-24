@@ -167,6 +167,23 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
 
+        File cacheDir = new File(getDataFolder(), "cache");
+        cacheDir.mkdirs();
+        try {
+            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
+        } catch (IOException e) {
+            WorldGuard.logger.log(Level.WARNING, "Failed to initialize SQLite profile cache");
+            profileCache = new HashMapCache();
+        }
+
+        profileService = new CacheForwardingService(
+                new CombinedProfileService(
+                        BukkitPlayerService.getInstance(),
+                        HttpRepositoryService.forMinecraft()),
+                profileCache);
+
+        PermissionsResolverManager.initialize(this);
+
         WorldGuard.getInstance().setPlatform(platform = new BukkitWorldGuardPlatform()); // Initialise WorldGuard
         WorldGuard.getInstance().setup();
         BukkitSessionManager sessionManager = (BukkitSessionManager) platform.getSessionManager();
@@ -185,31 +202,11 @@ public class WorldGuardPlugin extends JavaPlugin {
         reg.register(ToggleCommands.class);
         reg.register(ProtectionCommands.class);
 
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if (!platform.getGlobalStateManager().hasCommandBookGodMode()) {
-                    reg.register(GeneralCommands.class);
-                }
+        getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
+            if (!platform.getGlobalStateManager().hasCommandBookGodMode()) {
+                reg.register(GeneralCommands.class);
             }
         }, 0L);
-
-        File cacheDir = new File(getDataFolder(), "cache");
-        cacheDir.mkdirs();
-        try {
-            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
-        } catch (IOException e) {
-            WorldGuard.logger.log(Level.WARNING, "Failed to initialize SQLite profile cache");
-            profileCache = new HashMapCache();
-        }
-
-        profileService = new CacheForwardingService(
-                new CombinedProfileService(
-                        BukkitPlayerService.getInstance(),
-                        HttpRepositoryService.forMinecraft()),
-                profileCache);
-
-        PermissionsResolverManager.initialize(this);
 
         WorldGuard.logger.info("Loading region data...");
 
