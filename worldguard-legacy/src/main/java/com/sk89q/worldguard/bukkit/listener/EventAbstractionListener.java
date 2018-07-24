@@ -940,9 +940,9 @@ public class EventAbstractionListener extends AbstractListener {
 
         // Handle created spawn eggs
         if (item != null && Materials.isSpawnEgg(item.getType())) {
-            ItemMeta data = item.getItemMeta();
-            if (data instanceof SpawnEggMeta) {
-                @Nullable EntityType type = ((SpawnEggMeta) data).getSpawnedType();
+            String spawnerEggName = item.getType().name();
+            if (spawnerEggName != null && spawnerEggName != "") {
+                @Nullable EntityType type = Materials.getRelatedEntity(spawnerEggName);
                 if (type == null) {
                     type = EntityType.SHEEP; // Haven't investigated why it's sometimes null
                 }

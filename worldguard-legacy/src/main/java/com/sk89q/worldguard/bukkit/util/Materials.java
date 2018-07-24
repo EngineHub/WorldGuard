@@ -51,6 +51,7 @@ public final class Materials {
     private static final BiMap<EntityType, Material> ENTITY_ITEMS = HashBiMap.create();
     private static final Map<Material, Integer> MATERIAL_FLAGS = new HashMap<>();
     private static final Set<PotionEffectType> DAMAGE_EFFECTS = new HashSet<>();
+    private static final Map<String, EntityType> SPAWNER_ENTITIES = new HashMap<>();
 
 
     private static Set<Material> shulkerBoxes = new HashSet<>();
@@ -649,6 +650,54 @@ public final class Materials {
         DAMAGE_EFFECTS.add(PotionEffectType.LEVITATION); // considered by game so I guess
         DAMAGE_EFFECTS.add(PotionEffectType.UNLUCK);
 
+        SPAWNER_ENTITIES.put("ELDER_GUARDIAN_SPAWN_EGG", EntityType.ELDER_GUARDIAN);
+        SPAWNER_ENTITIES.put("BAT_SPAWN_EGG", EntityType.BAT);
+        SPAWNER_ENTITIES.put("BLAZE_SPAWN_EGG", EntityType.BLAZE);
+        SPAWNER_ENTITIES.put("CAVE_SPIDER_SPAWN_EGG", EntityType.CAVE_SPIDER);
+        SPAWNER_ENTITIES.put("CREEPER_SPAWN_EGG", EntityType.CREEPER);
+        SPAWNER_ENTITIES.put("DOLPHIN_SPAWN_EGG", EntityType.DOLPHIN);
+        SPAWNER_ENTITIES.put("DROWNED_SPAWN_EGG", EntityType.DROWNED);
+        SPAWNER_ENTITIES.put("ENDERMAN_SPAWN_EGG", EntityType.ENDERMAN);
+        SPAWNER_ENTITIES.put("ENDERMITE_SPAWN_EGG", EntityType.ENDERMITE);
+        SPAWNER_ENTITIES.put("EVOKER_SPAWN_EGG", EntityType.EVOKER);
+        SPAWNER_ENTITIES.put("GHAST_SPAWN_EGG", EntityType.GHAST);
+        SPAWNER_ENTITIES.put("GUARDIAN_SPAWN_EGG", EntityType.GUARDIAN);
+        SPAWNER_ENTITIES.put("HUSK_SPAWN_EGG", EntityType.HUSK);
+        SPAWNER_ENTITIES.put("LLAMA_SPAWN_EGG", EntityType.LLAMA);
+        SPAWNER_ENTITIES.put("MAGMA_CUBE_SPAWN_EGG", EntityType.MAGMA_CUBE);
+        SPAWNER_ENTITIES.put("PHANTOM_SPAWN_EGG", EntityType.PHANTOM);
+        SPAWNER_ENTITIES.put("POLAR_BEAR_SPAWN_EGG", EntityType.POLAR_BEAR);
+        SPAWNER_ENTITIES.put("SHULKER_SPAWN_EGG", EntityType.SHULKER);
+        SPAWNER_ENTITIES.put("SILVERFISH_SPAWN_EGG", EntityType.SILVERFISH);
+        SPAWNER_ENTITIES.put("SKELETON_SPAWN_EGG", EntityType.SKELETON);
+        SPAWNER_ENTITIES.put("SLIME_SPAWN_EGG", EntityType.SLIME);
+        SPAWNER_ENTITIES.put("SPIDER_SPAWN_EGG", EntityType.SPIDER);
+        SPAWNER_ENTITIES.put("STRAY_SPAWN_EGG", EntityType.STRAY);
+        SPAWNER_ENTITIES.put("VEX_SPAWN_EGG", EntityType.VEX);
+        SPAWNER_ENTITIES.put("VINDICATOR_SPAWN_EGG", EntityType.VINDICATOR);
+        SPAWNER_ENTITIES.put("WITCH_SPAWN_EGG", EntityType.WITCH);
+        SPAWNER_ENTITIES.put("WITHER_SKELETON_SPAWN_EGG", EntityType.WITHER_SKELETON);
+        SPAWNER_ENTITIES.put("WOLF_SPAWN_EGG", EntityType.WOLF);
+        SPAWNER_ENTITIES.put("ZOMBIE_SPAWN_EGG", EntityType.ZOMBIE);
+        SPAWNER_ENTITIES.put("ZOMBIE_PIGMAN_SPAWN_EGG", EntityType.PIG_ZOMBIE);
+        SPAWNER_ENTITIES.put("ZOMBIE_VILLAGER_SPAWN_EGG", EntityType.ZOMBIE_VILLAGER);
+        SPAWNER_ENTITIES.put("CHICKEN_SPAWN_EGG", EntityType.CHICKEN);
+        SPAWNER_ENTITIES.put("COD_SPAWN_EGG", EntityType.COD);
+        SPAWNER_ENTITIES.put("COW_SPAWN_EGG", EntityType.COW);
+        SPAWNER_ENTITIES.put("MOOSHROOM_SPAWN_EGG", EntityType.MUSHROOM_COW);
+        SPAWNER_ENTITIES.put("OCELOT_SPAWN_EGG", EntityType.OCELOT);
+        SPAWNER_ENTITIES.put("PARROT_SPAWN_EGG", EntityType.PARROT);
+        SPAWNER_ENTITIES.put("PIG_SPAWN_EGG", EntityType.PIG);
+        SPAWNER_ENTITIES.put("PUFFERFISH_SPAWN_EGG", EntityType.PUFFERFISH);
+        SPAWNER_ENTITIES.put("RABBIT_SPAWN_EGG", EntityType.RABBIT);
+        SPAWNER_ENTITIES.put("SALMON_SPAWN_EGG", EntityType.SALMON);
+        SPAWNER_ENTITIES.put("SHEEP_SPAWN_EGG", EntityType.SHEEP);
+        SPAWNER_ENTITIES.put("SKELETON_HORSE_SPAWN_EGG", EntityType.SKELETON_HORSE);
+        SPAWNER_ENTITIES.put("SQUID_SPAWN_EGG", EntityType.SQUID);
+        SPAWNER_ENTITIES.put("TROPICAL_FISH_SPAWN_EGG", EntityType.TROPICAL_FISH);
+        SPAWNER_ENTITIES.put("TURTLE_SPAWN_EGG", EntityType.TURTLE);
+        SPAWNER_ENTITIES.put("VILLAGER_SPAWN_EGG", EntityType.VILLAGER);
+        SPAWNER_ENTITIES.put("ZOMBIE_HORSE_SPAWN_EGG", EntityType.ZOMBIE_HORSE);
     }
 
     private Materials() {
@@ -811,6 +860,16 @@ public final class Materials {
                 || material == Material.HOPPER
                 || material == Material.DROPPER
                 || shulkerBoxes.contains(material);
+    }
+
+    /**
+     * Get the related EntityType based upon the name of a spawner egg.
+     *
+     * @param spawnerEggName The name of the spawner egg
+     * @return the related EntityType
+     */
+    public static EntityType getRelatedEntity(String spawnerEggName) {
+        return SPAWNER_ENTITIES.get(spawnerEggName);
     }
 
     public static boolean isSpawnEgg(Material material) {
