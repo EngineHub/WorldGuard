@@ -449,7 +449,6 @@ public class RegionProtectionListener extends AbstractListener {
 
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         Player playerAttacker = event.getCause().getFirstPlayer();
-        LocalPlayer localAttacker = WorldGuardPlugin.inst().wrapPlayer(playerAttacker);
         boolean canDamage;
         String what;
 
@@ -474,6 +473,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* PVP */
         } else if (pvp) {
+            LocalPlayer localAttacker = WorldGuardPlugin.inst().wrapPlayer(playerAttacker);
             Player defender = (Player) event.getEntity();
 
             canDamage = query.testBuild(target, associable, combine(event, Flags.PVP))
