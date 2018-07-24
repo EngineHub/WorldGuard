@@ -52,7 +52,7 @@ public class RegionContainerImpl {
     private final ConcurrentMap<Normal, RegionManager> mapping = new ConcurrentHashMap<>();
     private final Object lock = new Object();
     private final RegionDriver driver;
-    private final Supplier<? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
+    private final Supplier<? extends ConcurrentRegionIndex> indexFactory = (Supplier<ChunkHashTable>) new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
     private final Timer timer = new Timer();
     private final FlagRegistry flagRegistry;
 
