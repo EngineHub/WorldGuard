@@ -872,6 +872,115 @@ public final class Materials {
         }
     }
 
+    public static EntityType getEntitySpawnEgg(Material material) {
+        switch (material) {
+            case SPIDER_SPAWN_EGG:
+                return EntityType.SPIDER;
+            case BAT_SPAWN_EGG:
+                return EntityType.BAT;
+            case BLAZE_SPAWN_EGG:
+                return EntityType.BLAZE;
+            case CAVE_SPIDER_SPAWN_EGG:
+                return EntityType.CAVE_SPIDER;
+            case CHICKEN_SPAWN_EGG:
+                return EntityType.CHICKEN;
+            case COD_SPAWN_EGG:
+                return EntityType.COD;
+            case COW_SPAWN_EGG:
+                return EntityType.COW;
+            case CREEPER_SPAWN_EGG:
+                return EntityType.CREEPER;
+            case DOLPHIN_SPAWN_EGG:
+                return EntityType.DOLPHIN;
+            case DONKEY_SPAWN_EGG:
+                return EntityType.DONKEY;
+            case DROWNED_SPAWN_EGG:
+                return EntityType.DROWNED;
+            case ELDER_GUARDIAN_SPAWN_EGG:
+                return EntityType.ELDER_GUARDIAN;
+            case ENDERMAN_SPAWN_EGG:
+                return EntityType.ENDERMAN;
+            case ENDERMITE_SPAWN_EGG:
+                return EntityType.ENDERMITE;
+            case EVOKER_SPAWN_EGG:
+                return EntityType.EVOKER;
+            case GHAST_SPAWN_EGG:
+                return EntityType.GHAST;
+            case GUARDIAN_SPAWN_EGG:
+                return EntityType.GUARDIAN;
+            case HORSE_SPAWN_EGG:
+                return EntityType.HORSE;
+            case HUSK_SPAWN_EGG:
+                return EntityType.HUSK;
+            case LLAMA_SPAWN_EGG:
+                return EntityType.LLAMA;
+            case MAGMA_CUBE_SPAWN_EGG:
+                return EntityType.MAGMA_CUBE;
+            case MOOSHROOM_SPAWN_EGG:
+                return EntityType.MUSHROOM_COW;
+            case MULE_SPAWN_EGG:
+                return EntityType.MULE;
+            case OCELOT_SPAWN_EGG:
+                return EntityType.OCELOT;
+            case PARROT_SPAWN_EGG:
+                return EntityType.PARROT;
+            case PHANTOM_SPAWN_EGG:
+                return EntityType.PHANTOM;
+            case PIG_SPAWN_EGG:
+                return EntityType.PIG;
+            case POLAR_BEAR_SPAWN_EGG:
+                return EntityType.POLAR_BEAR;
+            case PUFFERFISH_SPAWN_EGG:
+                return EntityType.PUFFERFISH;
+            case RABBIT_SPAWN_EGG:
+                return EntityType.RABBIT;
+            case SALMON_SPAWN_EGG:
+                return EntityType.SALMON;
+            case SHEEP_SPAWN_EGG:
+                return EntityType.SHEEP;
+            case SHULKER_SPAWN_EGG:
+                return EntityType.SHULKER;
+            case SILVERFISH_SPAWN_EGG:
+                return EntityType.SILVERFISH;
+            case SKELETON_HORSE_SPAWN_EGG:
+                return EntityType.SKELETON_HORSE;
+            case SKELETON_SPAWN_EGG:
+                return EntityType.SKELETON;
+            case SLIME_SPAWN_EGG:
+                return EntityType.SLIME;
+            case SQUID_SPAWN_EGG:
+                return EntityType.SQUID;
+            case STRAY_SPAWN_EGG:
+                return EntityType.STRAY;
+            case TROPICAL_FISH_SPAWN_EGG:
+                return EntityType.TROPICAL_FISH;
+            case TURTLE_SPAWN_EGG:
+                return EntityType.TURTLE;
+            case VEX_SPAWN_EGG:
+                return EntityType.VEX;
+            case VILLAGER_SPAWN_EGG:
+                return EntityType.VILLAGER;
+            case VINDICATOR_SPAWN_EGG:
+                return EntityType.VINDICATOR;
+            case WITCH_SPAWN_EGG:
+                return EntityType.WITCH;
+            case WITHER_SKELETON_SPAWN_EGG:
+                return EntityType.WITHER_SKELETON;
+            case WOLF_SPAWN_EGG:
+                return EntityType.WOLF;
+            case ZOMBIE_HORSE_SPAWN_EGG:
+                return EntityType.ZOMBIE_HORSE;
+            case ZOMBIE_PIGMAN_SPAWN_EGG:
+                return EntityType.PIG_ZOMBIE;
+            case ZOMBIE_SPAWN_EGG:
+                return EntityType.ZOMBIE;
+            case ZOMBIE_VILLAGER_SPAWN_EGG:
+                return EntityType.ZOMBIE_VILLAGER;
+            default:
+                return EntityType.PIG; // Uhhh
+        }
+    }
+
     public static boolean isBed(Material material) {
         switch (material) {
             case BLACK_BED:
