@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit.internal;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.blacklist.target.BlockTarget;
 import com.sk89q.worldguard.blacklist.target.ItemTarget;
 import com.sk89q.worldguard.blacklist.target.Target;
 import com.sk89q.worldguard.blacklist.target.TargetMatcher;
@@ -56,15 +57,19 @@ public class TargetMatcherSet {
     }
 
     public boolean test(Material material) {
-        return test(new ItemTarget(BukkitAdapter.asItemType(material)));
+        if (material.isBlock()) {
+            return test(new BlockTarget(BukkitAdapter.asBlockType(material)));
+        } else {
+            return test(new ItemTarget(BukkitAdapter.asItemType(material)));
+        }
     }
 
     public boolean test(Block block) {
-        return test(new ItemTarget(BukkitAdapter.asItemType(block.getType())));
+        return test(new BlockTarget(BukkitAdapter.asBlockType(block.getType())));
     }
 
     public boolean test(BlockState state) {
-        return test(new ItemTarget(BukkitAdapter.asItemType(state.getType())));
+        return test(new BlockTarget(BukkitAdapter.asBlockType(state.getType())));
     }
 
     public boolean test(ItemStack itemStack) {
