@@ -65,7 +65,7 @@ public class MemberCommands extends RegionCommandsBase {
         id = region.getId();
 
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).mayAddMembers(region)) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayAddMembers(region)) {
             throw new CommandPermissionsException();
         }
 
@@ -164,7 +164,7 @@ public class MemberCommands extends RegionCommandsBase {
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).mayRemoveMembers(region)) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayRemoveMembers(region)) {
             throw new CommandPermissionsException();
         }
 
@@ -211,7 +211,7 @@ public class MemberCommands extends RegionCommandsBase {
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).mayRemoveOwners(region)) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayRemoveOwners(region)) {
             throw new CommandPermissionsException();
         }
 

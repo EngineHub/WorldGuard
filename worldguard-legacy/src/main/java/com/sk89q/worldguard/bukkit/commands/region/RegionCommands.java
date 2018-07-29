@@ -351,7 +351,7 @@ public final class RegionCommands extends RegionCommandsBase {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
-        Actor actor = plugin.getWorldEdit().wrapCommandSender(sender);
+        Actor actor = plugin.wrapCommandSender(sender);
         RegionPermissionModel permModel = getPermissionModel(actor);
 
         // Lookup the existing region
@@ -418,7 +418,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String ownedBy;
-        Actor actor = plugin.getWorldEdit().wrapCommandSender(sender);
+        Actor actor = plugin.wrapCommandSender(sender);
         
         // Get page
         int page = args.getInteger(0, 1) - 1;
@@ -477,7 +477,7 @@ public final class RegionCommands extends RegionCommandsBase {
         String value = args.argsLength() >= 3 ? args.getJoinedStrings(2) : null;
         RegionGroup groupValue = null;
         FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
-        Actor actor = plugin.getWorldEdit().wrapCommandSender(sender);
+        Actor actor = plugin.wrapCommandSender(sender);
         RegionPermissionModel permModel = getPermissionModel(actor);
 
         if (args.hasFlag('e')) {
@@ -649,7 +649,7 @@ public final class RegionCommands extends RegionCommandsBase {
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), false);
 
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).maySetPriority(existing)) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).maySetPriority(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -691,7 +691,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).maySetParent(child, parent)) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).maySetParent(child, parent)) {
             throw new CommandPermissionsException();
         }
 
@@ -751,7 +751,7 @@ public final class RegionCommands extends RegionCommandsBase {
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), true);
 
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).mayDelete(existing)) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayDelete(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -796,7 +796,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).mayForceLoadRegions()) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayForceLoadRegions()) {
             throw new CommandPermissionsException();
         }
 
@@ -855,7 +855,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).mayForceSaveRegions()) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayForceSaveRegions()) {
             throw new CommandPermissionsException();
         }
 
@@ -904,7 +904,7 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Migrate from one Protection Database to another.", min = 2, max = 2)
     public void migrateDB(CommandContext args, CommandSender sender) throws CommandException {
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).mayMigrateRegionStore()) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayMigrateRegionStore()) {
             throw new CommandPermissionsException();
         }
 
@@ -981,7 +981,7 @@ public final class RegionCommands extends RegionCommandsBase {
             desc = "Migrate loaded databases to use UUIDs", max = 0)
     public void migrateUuid(CommandContext args, CommandSender sender) throws CommandException {
         // Check permissions
-        if (!getPermissionModel(plugin.getWorldEdit().wrapCommandSender(sender)).mayMigrateRegionNames()) {
+        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayMigrateRegionNames()) {
             throw new CommandPermissionsException();
         }
 

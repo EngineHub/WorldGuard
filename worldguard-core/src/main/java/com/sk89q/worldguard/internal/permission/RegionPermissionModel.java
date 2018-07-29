@@ -19,10 +19,10 @@
 
 package com.sk89q.worldguard.internal.permission;
 
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.internal.permission.AbstractPermissionModel;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -170,7 +170,7 @@ public class RegionPermissionModel extends AbstractPermissionModel {
      * @param region the region
      */
     private boolean hasPatternPermission(String perm, ProtectedRegion region) {
-        if (!(getSender() instanceof LocalPlayer)) {
+        if (!(getSender() instanceof Player)) {
             return true; // Non-players (i.e. console, command blocks, etc.) have full power
         }
         

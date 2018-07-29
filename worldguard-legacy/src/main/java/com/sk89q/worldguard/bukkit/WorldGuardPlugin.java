@@ -42,7 +42,9 @@ import com.sk89q.squirrelid.resolver.HttpRepositoryService;
 import com.sk89q.squirrelid.resolver.ProfileService;
 import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitCommandSender;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
@@ -817,6 +819,19 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     public LocalPlayer wrapPlayer(Player player, boolean silenced) {
         return new BukkitPlayer(this, player, silenced);
+    }
+
+    public Actor wrapCommandSender(CommandSender sender) {
+        if (sender instanceof Player) {
+            return wrapPlayer((Player) sender);
+        }
+
+        try {
+            return new BukkitCommandSender(getWorldEdit(), sender);
+        } catch (CommandException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

@@ -27,7 +27,6 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
@@ -220,10 +219,9 @@ class RegionCommandsBase {
      * @throws CommandException thrown on an error
      */
     protected static Region checkSelection(Player player) throws CommandException {
-        WorldEditPlugin worldEdit = WorldGuardPlugin.inst().getWorldEdit();
-        com.sk89q.worldedit.entity.Player wePlayer = worldEdit.wrapPlayer(player);
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
         try {
-            return WorldEdit.getInstance().getSessionManager().get(wePlayer).getRegionSelector(wePlayer.getWorld()).getRegion();
+            return WorldEdit.getInstance().getSessionManager().get(localPlayer).getRegionSelector(localPlayer.getWorld()).getRegion();
         } catch (IncompleteRegionException e) {
             throw new CommandException(
                     "Please select an area first. " +
@@ -350,10 +348,9 @@ class RegionCommandsBase {
      * @throws CommandException thrown on a command error
      */
     protected static void setPlayerSelection(Player player, ProtectedRegion region) throws CommandException {
-        WorldEditPlugin worldEdit = WorldGuardPlugin.inst().getWorldEdit();
-        com.sk89q.worldedit.entity.Player wePlayer = worldEdit.wrapPlayer(player);
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
-        LocalSession session = WorldEdit.getInstance().getSessionManager().get(wePlayer);
+        LocalSession session = WorldEdit.getInstance().getSessionManager().get(localPlayer);
 
         // Set selection
         if (region instanceof ProtectedCuboidRegion) {
@@ -361,16 +358,16 @@ class RegionCommandsBase {
             Vector pt1 = cuboid.getMinimumPoint();
             Vector pt2 = cuboid.getMaximumPoint();
 
-            session.setRegionSelector(wePlayer.getWorld(), new CuboidRegionSelector(wePlayer.getWorld(), pt1, pt2));
+            session.setRegionSelector(localPlayer.getWorld(), new CuboidRegionSelector(localPlayer.getWorld(), pt1, pt2));
             player.sendMessage(ChatColor.YELLOW + "Region selected as a cuboid.");
 
         } else if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
             Polygonal2DRegionSelector selector = new Polygonal2DRegionSelector(
-                    wePlayer.getWorld(), poly2d.getPoints(),
+                    localPlayer.getWorld(), poly2d.getPoints(),
                     poly2d.getMinimumPoint().getBlockY(),
                     poly2d.getMaximumPoint().getBlockY() );
-            session.setRegionSelector(wePlayer.getWorld(), selector);
+            session.setRegionSelector(localPlayer.getWorld(), selector);
             player.sendMessage(ChatColor.YELLOW + "Region selected as a polygon.");
 
         } else if (region instanceof GlobalProtectedRegion) {
