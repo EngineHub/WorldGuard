@@ -40,10 +40,7 @@ public class EntityTypeFlag extends Flag<EntityType> {
     @Override
     public EntityType parseInput(FlagContext context) throws InvalidFlagFormat {
         String input = context.getUserInput();
-        input = input.trim();
-        if (!input.startsWith("/")) {
-            input = "/" + input;
-        }
+        input = input.trim().toLowerCase();
         EntityType entityType = unmarshal(input);
         if (entityType == null) {
             throw new InvalidFlagFormat("Unknown entity type: " + input);
