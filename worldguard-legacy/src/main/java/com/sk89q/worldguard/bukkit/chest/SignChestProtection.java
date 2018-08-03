@@ -102,7 +102,7 @@ public class SignChestProtection implements ChestProtection {
     }
     
     private Boolean isProtectedSignAndChest(Location block, LocalPlayer player) {
-        if (!isChest(player.getExtent().getBlock(block.setY(block.getY() + 1).toVector()).getBlockType())) {
+        if (!isChest(block.getExtent().getBlock(block.setY(block.getY() + 1).toVector()).getBlockType())) {
             return null;
         }
         return isProtectedSign(block, player);
