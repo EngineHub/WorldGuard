@@ -87,12 +87,12 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
     public boolean noPhysicsSand;
     public boolean ropeLadders;
     public boolean allowPortalAnywhere;
-    public Set<Integer> preventWaterDamage;
+    public Set<String> preventWaterDamage;
     public boolean blockLighter;
     public boolean disableFireSpread;
-    public Set<Integer> disableFireSpreadBlocks;
+    public Set<String> disableFireSpreadBlocks;
     public boolean preventLavaFire;
-    public Set<Integer> allowedLavaSpreadOver;
+    public Set<String> allowedLavaSpreadOver;
     public boolean blockTNTExplosions;
     public boolean blockTNTBlockDamage;
     public boolean blockCreeperExplosions;
@@ -142,7 +142,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
     public boolean disableCreatureCropTrampling;
     public boolean disablePlayerCropTrampling;
     public boolean preventLightningFire;
-    public Set<Integer> disallowedLightningBlocks;
+    public Set<String> disallowedLightningBlocks;
     public boolean disableThunder;
     public boolean disableWeather;
     public boolean alwaysRaining;
@@ -162,7 +162,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
     public boolean disableEndermanGriefing;
     public boolean disableSnowmanTrails;
     public boolean disableSoilDehydration;
-    public Set<Integer> allowedSnowFallOver;
+    public Set<String> allowedSnowFallOver;
     public boolean regionInvinciblityRemovesMobs;
     public boolean regionNetherPortalProtection;
     public boolean fakePlayerBuildOverride;
@@ -279,7 +279,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         noPhysicsSand = getBoolean("physics.no-physics-sand", false);
         ropeLadders = getBoolean("physics.vine-like-rope-ladders", false);
         allowPortalAnywhere = getBoolean("physics.allow-portal-anywhere", false);
-        preventWaterDamage = new HashSet<>(getIntList("physics.disable-water-damage-blocks", null));
+        preventWaterDamage = new HashSet<>(convertLegacyBlocks(getStringList("physics.disable-water-damage-blocks", null)));
 
         blockTNTExplosions = getBoolean("ignition.block-tnt", false);
         blockTNTBlockDamage = getBoolean("ignition.block-tnt-block-damage", false);
@@ -287,8 +287,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         preventLavaFire = getBoolean("fire.disable-lava-fire-spread", true);
         disableFireSpread = getBoolean("fire.disable-all-fire-spread", false);
-        disableFireSpreadBlocks = new HashSet<>(getIntList("fire.disable-fire-spread-blocks", null));
-        allowedLavaSpreadOver = new HashSet<>(getIntList("fire.lava-spread-blocks", null));
+        disableFireSpreadBlocks = new HashSet<>(convertLegacyBlocks(getStringList("fire.disable-fire-spread-blocks", null)));
+        allowedLavaSpreadOver = new HashSet<>(convertLegacyBlocks(getStringList("fire.lava-spread-blocks", null)));
 
         blockCreeperExplosions = getBoolean("mobs.block-creeper-explosions", false);
         blockCreeperBlockDamage = getBoolean("mobs.block-creeper-block-damage", false);
@@ -332,7 +332,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableCreatureCropTrampling = getBoolean("crops.disable-creature-trampling", false);
         disablePlayerCropTrampling = getBoolean("crops.disable-player-trampling", false);
 
-        disallowedLightningBlocks = new HashSet<>(getIntList("weather.prevent-lightning-strike-blocks", null));
+        disallowedLightningBlocks = new HashSet<>(convertLegacyBlocks(getStringList("weather.prevent-lightning-strike-blocks", null)));
         preventLightningFire = getBoolean("weather.disable-lightning-strike-fire", false);
         disableThunder = getBoolean("weather.disable-thunderstorm", false);
         disableWeather = getBoolean("weather.disable-weather", false);
@@ -351,7 +351,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableMyceliumSpread = getBoolean("dynamics.disable-mycelium-spread", false);
         disableVineGrowth = getBoolean("dynamics.disable-vine-growth", false);
         disableSoilDehydration = getBoolean("dynamics.disable-soil-dehydration", false);
-        allowedSnowFallOver = new HashSet<>(getIntList("dynamics.snow-fall-blocks", null));
+        allowedSnowFallOver = new HashSet<>(convertLegacyBlocks(getStringList("dynamics.snow-fall-blocks", null)));
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);

@@ -21,11 +21,12 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -94,17 +95,14 @@ public class WorldGuardWeatherListener implements Listener {
 
         if (wcfg.disallowedLightningBlocks.size() > 0) {
             Material targetId = event.getLightning().getLocation().getBlock().getType();
-            if (wcfg.disallowedLightningBlocks.contains(targetId)) {
+            if (wcfg.disallowedLightningBlocks.contains(BukkitAdapter.asBlockType(targetId).getId())) {
                 event.setCancelled(true);
             }
         }
 
         Location loc = event.getLightning().getLocation();
         if (wcfg.useRegions) {
-            ApplicableRegionSet set =
-                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(loc));
-
-            if (!set.allows(Flags.LIGHTNING)) {
+            if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(loc), (RegionAssociable) null, Flags.LIGHTNING))) {
                 event.setCancelled(true);
             }
         }

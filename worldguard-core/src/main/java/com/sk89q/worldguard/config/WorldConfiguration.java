@@ -24,7 +24,9 @@ import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.util.report.Unreported;
 
 import java.io.File;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Holds the configuration for individual worlds.
@@ -68,6 +70,10 @@ public abstract class WorldConfiguration {
         return this.worldName;
     }
 
+    public List<String> convertLegacyItems(List<String> legacyItems) {
+        return legacyItems.stream().map(this::convertLegacyItem).collect(Collectors.toList());
+    }
+
     public String convertLegacyItem(String legacy) {
         String item = legacy;
         try {
@@ -85,5 +91,28 @@ public abstract class WorldConfiguration {
         }
 
         return item;
+    }
+
+    public List<String> convertLegacyBlocks(List<String> legacyBlocks) {
+        return legacyBlocks.stream().map(this::convertLegacyBlock).collect(Collectors.toList());
+    }
+
+    public String convertLegacyBlock(String legacy) {
+        String block = legacy;
+        try {
+            String[] splitter = block.split(":", 2);
+            int id = 0;
+            byte data = 0;
+            if (splitter.length == 1) {
+                id = Integer.parseInt(block);
+            } else {
+                id = Integer.parseInt(splitter[0]);
+                data = Byte.parseByte(splitter[1]);
+            }
+            block = LegacyMapper.getInstance().getBlockFromLegacy(id, data).getBlockType().getId();
+        } catch (Throwable e) {
+        }
+
+        return block;
     }
 }

@@ -72,15 +72,14 @@ import com.sk89q.worldguard.bukkit.listener.WorldGuardVehicleListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
 import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
 import com.sk89q.worldguard.bukkit.listener.WorldRulesListener;
+import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.bukkit.util.Events;
-import com.sk89q.worldguard.protection.GlobalRegionManager;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
-import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
 import com.sk89q.worldguard.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
@@ -128,7 +127,6 @@ public class WorldGuardPlugin extends JavaPlugin {
     private static WorldGuardPlugin inst;
     private static BukkitWorldGuardPlatform platform;
     private final CommandsManager<CommandSender> commands;
-    private GlobalRegionManager globalRegionManager;
     private final Supervisor supervisor = new SimpleSupervisor();
     private ListeningExecutorService executorService;
     private ProfileService profileService;
@@ -189,7 +187,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         WorldGuard.getInstance().setPlatform(platform = new BukkitWorldGuardPlatform()); // Initialise WorldGuard
         WorldGuard.getInstance().setup();
         BukkitSessionManager sessionManager = (BukkitSessionManager) platform.getSessionManager();
-        globalRegionManager = new GlobalRegionManager(WorldGuard.getInstance().getPlatform().getRegionContainer());
 
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(this));
@@ -336,17 +333,6 @@ public class WorldGuardPlugin extends JavaPlugin {
             WorldGuard.logger.log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
             return "WorldGuard: An unexpected error occurred! Please see the server console.";
         }
-    }
-
-    /**
-     * Get the GlobalRegionManager.
-     *
-     * @return the plugin's global region manager
-     * @deprecated use #getRegionContainer()
-     */
-    @Deprecated
-    public GlobalRegionManager getGlobalRegionManager() {
-        return globalRegionManager;
     }
 
     /**

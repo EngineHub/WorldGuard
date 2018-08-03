@@ -168,7 +168,8 @@ public class WorldGuardEntityListener implements Listener {
             if (type == DamageCause.BLOCK_EXPLOSION
                     && (wcfg.disableExplosionDamage || wcfg.blockOtherExplosions
                             || (wcfg.explosionFlagCancellation
-                                && !plugin.getGlobalRegionManager().allows(Flags.OTHER_EXPLOSION, localPlayer.getLocation())))) {
+                                && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(localPlayer.getLocation(), (RegionAssociable) null, Flags.OTHER_EXPLOSION))))) {
                 event.setCancelled(true);
                 return;
             }
@@ -179,9 +180,11 @@ public class WorldGuardEntityListener implements Listener {
             if (type == DamageCause.BLOCK_EXPLOSION
                     && (wcfg.blockOtherExplosions
                             || (wcfg.explosionFlagCancellation
-                                && !plugin.getGlobalRegionManager().allows(Flags.OTHER_EXPLOSION, BukkitAdapter.adapt(defender.getLocation()))))) {
+                                && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(defender.getLocation()), (RegionAssociable) null, Flags.OTHER_EXPLOSION))))) {
                 event.setCancelled(true);
                 return;
+
             }
         }
     }

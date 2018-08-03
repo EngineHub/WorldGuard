@@ -19,10 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -176,7 +173,7 @@ public class WorldGuardBlockListener implements Listener {
             Material targetId = blockTo.getType();
 
             if ((isAir || isWater) &&
-                    wcfg.preventWaterDamage.contains(targetId)) {
+                    wcfg.preventWaterDamage.contains(BukkitAdapter.asBlockType(targetId).getId())) {
                 event.setCancelled(true);
                 return;
             }
@@ -185,7 +182,7 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.allowedLavaSpreadOver.size() > 0 && isLava) {
             Material targetId = blockTo.getRelative(0, -1, 0).getType();
 
-            if (!wcfg.allowedLavaSpreadOver.contains(targetId)) {
+            if (!wcfg.allowedLavaSpreadOver.contains(BukkitAdapter.asBlockType(targetId).getId())) {
                 event.setCancelled(true);
                 return;
             }
@@ -261,11 +258,11 @@ public class WorldGuardBlockListener implements Listener {
             int y = block.getY();
             int z = block.getZ();
 
-            if (wcfg.disableFireSpreadBlocks.contains(world.getBlockAt(x, y - 1, z).getType())
-                    || wcfg.disableFireSpreadBlocks.contains(world.getBlockAt(x + 1, y, z).getType())
-                    || wcfg.disableFireSpreadBlocks.contains(world.getBlockAt(x - 1, y, z).getType())
-                    || wcfg.disableFireSpreadBlocks.contains(world.getBlockAt(x, y, z - 1).getType())
-                    || wcfg.disableFireSpreadBlocks.contains(world.getBlockAt(x, y, z + 1).getType())) {
+            if (wcfg.disableFireSpreadBlocks.contains(BukkitAdapter.asBlockType(world.getBlockAt(x, y - 1, z).getType()).getId())
+                    || wcfg.disableFireSpreadBlocks.contains(BukkitAdapter.asBlockType(world.getBlockAt(x + 1, y, z).getType()).getId())
+                    || wcfg.disableFireSpreadBlocks.contains(BukkitAdapter.asBlockType(world.getBlockAt(x - 1, y, z).getType()).getId())
+                    || wcfg.disableFireSpreadBlocks.contains(BukkitAdapter.asBlockType(world.getBlockAt(x, y, z - 1).getType()).getId())
+                    || wcfg.disableFireSpreadBlocks.contains(BukkitAdapter.asBlockType(world.getBlockAt(x, y, z + 1).getType()).getId())) {
                 event.setCancelled(true);
                 return;
             }
@@ -330,7 +327,7 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.disableFireSpreadBlocks.size() > 0) {
             Block block = event.getBlock();
 
-            if (wcfg.disableFireSpreadBlocks.contains(block.getType())) {
+            if (wcfg.disableFireSpreadBlocks.contains(BukkitAdapter.asBlockType(block.getType()).getId())) {
                 event.setCancelled(true);
                 checkAndDestroyAround(block.getWorld(), block.getX(), block.getY(), block.getZ(), Material.FIRE);
                 return;
@@ -520,8 +517,8 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    Flags.ICE_FORM, BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.ICE_FORM))) {
                 event.setCancelled(true);
                 return;
             }
@@ -535,13 +532,13 @@ public class WorldGuardBlockListener implements Listener {
             if (wcfg.allowedSnowFallOver.size() > 0) {
                 Material targetId = event.getBlock().getRelative(0, -1, 0).getType();
 
-                if (!wcfg.allowedSnowFallOver.contains(targetId)) {
+                if (!wcfg.allowedSnowFallOver.contains(BukkitAdapter.asBlockType(targetId).getId())) {
                     event.setCancelled(true);
                     return;
                 }
             }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    Flags.SNOW_FALL, BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.SNOW_FALL))) {
                 event.setCancelled(true);
                 return;
             }
@@ -568,8 +565,8 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    Flags.MUSHROOMS, BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.MUSHROOMS))) {
                 event.setCancelled(true);
                 return;
             }
@@ -580,8 +577,8 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    Flags.GRASS_SPREAD, BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.GRASS_SPREAD))) {
                 event.setCancelled(true);
                 return;
             }
@@ -593,9 +590,8 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
 
-            if (wcfg.useRegions
-                    && !plugin.getGlobalRegionManager().allows(
-                            Flags.MYCELIUM_SPREAD, BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.MYCELIUM_SPREAD))) {
                 event.setCancelled(true);
                 return;
             }
@@ -607,9 +603,8 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
 
-            if (wcfg.useRegions
-                    && !plugin.getGlobalRegionManager().allows(
-                            Flags.VINE_GROWTH, BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.VINE_GROWTH))) {
                 event.setCancelled(true);
                 return;
             }
@@ -630,8 +625,8 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
 
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    Flags.ICE_MELT, BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.ICE_MELT))) {
                 event.setCancelled(true);
                 return;
             }
@@ -641,8 +636,8 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
 
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    Flags.SNOW_MELT, BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.SNOW_MELT))) {
                 event.setCancelled(true);
                 return;
             }
@@ -651,8 +646,8 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(
-                    Flags.SOIL_DRY, BukkitAdapter.adapt(event.getBlock().getLocation()))) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.SOIL_DRY))) {
                 event.setCancelled(true);
                 return;
             }
