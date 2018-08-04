@@ -40,7 +40,7 @@ public class EntityTypeFlag extends Flag<EntityType> {
     @Override
     public EntityType parseInput(FlagContext context) throws InvalidFlagFormat {
         String input = context.getUserInput();
-        input = input.trim().toLowerCase();
+        input = input.trim();
         EntityType entityType = unmarshal(input);
         if (entityType == null) {
             throw new InvalidFlagFormat("Unknown entity type: " + input);
@@ -50,7 +50,7 @@ public class EntityTypeFlag extends Flag<EntityType> {
 
     @Override
     public EntityType unmarshal(@Nullable Object o) {
-        return EntityTypes.get(String.valueOf(o));
+        return EntityTypes.get(String.valueOf(o).toLowerCase());
     }
 
     @Override
