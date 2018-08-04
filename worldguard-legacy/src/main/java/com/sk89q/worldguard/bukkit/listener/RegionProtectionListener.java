@@ -479,6 +479,11 @@ public class RegionProtectionListener extends AbstractListener {
         } else if (pvp) {
             Player defender = (Player) event.getEntity();
 
+            // if defender is an NPC
+            if (defender.hasMetadata("NPC")) {
+                return;
+            }
+
             canDamage = query.testBuild(target, associable, combine(event, DefaultFlag.PVP))
                     && query.queryState(playerAttacker.getLocation(), playerAttacker, combine(event, DefaultFlag.PVP)) != State.DENY
                     && query.queryState(target, playerAttacker, combine(event, DefaultFlag.PVP)) != State.DENY;
