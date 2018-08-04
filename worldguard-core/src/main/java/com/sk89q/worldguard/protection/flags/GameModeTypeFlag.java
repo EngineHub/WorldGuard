@@ -38,9 +38,6 @@ public class GameModeTypeFlag extends Flag<GameMode> {
     public GameMode parseInput(FlagContext context) throws InvalidFlagFormat {
         String input = context.getUserInput();
         input = input.trim();
-        if (!input.startsWith("/")) {
-            input = "/" + input;
-        }
         GameMode gamemode = unmarshal(input);
         if (gamemode == null) {
             throw new InvalidFlagFormat("Unknown game mode: " + input);
@@ -50,7 +47,7 @@ public class GameModeTypeFlag extends Flag<GameMode> {
 
     @Override
     public GameMode unmarshal(@Nullable Object o) {
-        return GameModes.get(String.valueOf(o));
+        return GameModes.get(String.valueOf(o).toLowerCase());
     }
 
     @Override
