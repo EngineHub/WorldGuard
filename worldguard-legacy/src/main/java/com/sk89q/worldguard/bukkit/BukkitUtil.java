@@ -22,6 +22,7 @@ package com.sk89q.worldguard.bukkit;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.blacklist.target.BlockTarget;
 import com.sk89q.worldguard.blacklist.target.ItemTarget;
 import com.sk89q.worldguard.blacklist.target.Target;
 import org.bukkit.ChatColor;
@@ -186,7 +187,7 @@ public class BukkitUtil {
      */
     public static Target createTarget(Block block) {
         checkNotNull(block);
-        return new ItemTarget(BukkitAdapter.adapt(block.getBlockData()).getBlockType().getItemType());
+        return new BlockTarget(BukkitAdapter.adapt(block.getBlockData()).getBlockType());
     }
 
     /**
@@ -208,6 +209,10 @@ public class BukkitUtil {
      */
     public static Target createTarget(Material material) {
         checkNotNull(material);
-        return new ItemTarget(BukkitAdapter.asItemType(material));
+        if (material.isBlock()) {
+            return new BlockTarget(BukkitAdapter.asBlockType(material));
+        } else {
+            return new ItemTarget(BukkitAdapter.asItemType(material));
+        }
     }
 }
