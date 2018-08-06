@@ -137,8 +137,8 @@ public final class RegionCommands extends RegionCommandsBase {
                 .registerWithSupervisor("Adding the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... adding '%s'...)")
                 .thenRespondWith(
-                        "A new region has been made named '%s'.",
-                        "Failed to add the region '%s'");
+                        "Вы заприватили новый регион '%s'.",
+                        "Не удалось заприватить новый регион '%s'");
     }
 
     /**
@@ -190,8 +190,8 @@ public final class RegionCommands extends RegionCommandsBase {
                 .registerWithSupervisor("Updating the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... updating '%s'...)")
                 .thenRespondWith(
-                        "Region '%s' has been updated with a new area.",
-                        "Failed to update the region '%s'");
+                        "Регион '%s' обновлён с новым рамером.",
+                        "Не удалось обновить регион '%s'");
     }
 
     /**
@@ -235,7 +235,7 @@ public final class RegionCommands extends RegionCommandsBase {
             if (maxRegionCount >= 0
                     && manager.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
                 throw new CommandException(
-                        "You own too many regions, delete one first to claim a new one.");
+                        "У Вас слишком много регионов, удалите один из них перед тем как заприватить новый.");
             }
         }
 
@@ -245,7 +245,7 @@ public final class RegionCommands extends RegionCommandsBase {
         if (existing != null) {
             if (!existing.getOwners().contains(localPlayer)) {
                 throw new CommandException(
-                        "This region already exists and you don't own it.");
+                        "Такой регион уже существует.");
             }
         }
 
@@ -255,12 +255,11 @@ public final class RegionCommands extends RegionCommandsBase {
         // Check if this region overlaps any other region
         if (regions.size() > 0) {
             if (!regions.isOwnerOfAll(localPlayer)) {
-                throw new CommandException("This region overlaps with someone else's region.");
+                throw new CommandException("Выделенная область пересекает уже существующий регион.");
             }
         } else {
             if (wcfg.claimOnlyInsideExistingRegions) {
-                throw new CommandException("You may only claim regions inside " +
-                        "existing regions that you or your group own.");
+                throw new CommandException("Вы можете приватить только внутри своих регионов.");
             }
         }
 
@@ -272,13 +271,13 @@ public final class RegionCommands extends RegionCommandsBase {
         // Check claim volume
         if (!permModel.mayClaimRegionsUnbounded()) {
             if (region instanceof ProtectedPolygonalRegion) {
-                throw new CommandException("Polygons are currently not supported for /rg claim.");
+                throw new CommandException("Полигональные регионы не поддерживаются.");
             }
 
             if (region.volume() > wcfg.maxClaimVolume) {
-                player.sendMessage(ChatColor.RED + "This region is too large to claim.");
+                player.sendMessage(ChatColor.RED + "Вы не можете заприватить регион такого размера.");
                 player.sendMessage(ChatColor.RED +
-                        "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
+                        "Максимальный размер: " + wcfg.maxClaimVolume + ", выделено блоков: " + region.volume());
                 return;
             }
         }
@@ -293,8 +292,8 @@ public final class RegionCommands extends RegionCommandsBase {
                 .registerWithSupervisor("Claiming the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... claiming '%s'...)")
                 .thenRespondWith(
-                        "A new region has been claimed named '%s'.",
-                        "Failed to claim the region '%s'");
+                        "Новый регион '%s' успешно запривачен.",
+                        "Не удалось заприватить новый регион '%s'.");
     }
 
     /**
@@ -391,7 +390,7 @@ public final class RegionCommands extends RegionCommandsBase {
         // Send a response message
         Futures.addCallback(future,
                 new Builder(plugin, sender)
-                        .onFailure("Failed to fetch region information")
+                        .onFailure("Не удалось получить информацию о регионе")
                         .build());
     }
 
@@ -447,7 +446,7 @@ public final class RegionCommands extends RegionCommandsBase {
         AsyncCommandHelper.wrap(future, plugin, sender)
                 .registerWithSupervisor("Getting list of regions...")
                 .sendMessageAfterDelay("(Please wait... fetching region list...)")
-                .thenTellErrorsOnly("Failed to fetch region list");
+                .thenTellErrorsOnly("Не удалось получить список регионов");
     }
 
     /**
@@ -530,9 +529,9 @@ public final class RegionCommands extends RegionCommandsBase {
                 }
             }
 
-            sender.sendMessage(ChatColor.RED + "Unknown flag specified: " + flagName);
-            sender.sendMessage(ChatColor.RED + "Available flags: " + list);
-            
+            sender.sendMessage(ChatColor.RED + "Флаг " + flagName + " не найден.");
+            sender.sendMessage(ChatColor.RED + "Список доступных " + "флагов: " + list);
+
             return;
         }
         
@@ -549,8 +548,8 @@ public final class RegionCommands extends RegionCommandsBase {
             RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
             
             if (groupFlag == null) {
-                throw new CommandException("Region flag '" + foundFlag.getName()
-                        + "' does not have a group flag!");
+                throw new CommandException("Флаг '" + foundFlag.getName()
+                        + "' не является групповым.");
             }
 
             // Parse the [-g group] separately so entire command can abort if parsing
@@ -573,8 +572,8 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag " + foundFlag.getName() + " set on '" +
-                    existing.getId() + "' to '" + ChatColor.stripColor(value) + "'.");
+                    + "Флаг " + foundFlag.getName() + " установлен на регион '" +
+                    existing.getId() + "' в '" + ChatColor.stripColor(value) + "'.");
         
         // No value? Clear the flag, if -g isn't specified
         } else if (!args.hasFlag('g')) {
@@ -588,8 +587,8 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag " + foundFlag.getName() + " removed from '" +
-                    existing.getId() + "'. (Any -g(roups) were also removed.)");
+                    + "Флаг " + foundFlag.getName() + " удалён из региона '" +
+                    existing.getId() + "'");
         }
 
         // Now set the group
@@ -600,19 +599,19 @@ public final class RegionCommands extends RegionCommandsBase {
             if (groupValue == groupFlag.getDefault()) {
                 existing.setFlag(groupFlag, null);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' reset to " +
-                                "default.");
+                        + "Группа флагов '" + foundFlag.getName() + "' сброшена " +
+                                "по умолчанию.");
             } else {
                 existing.setFlag(groupFlag, groupValue);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' set.");
+                        + "Группа флагов '" + foundFlag.getName() + "' установлена.");
             }
         }
 
         // Print region information
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, null);
         printout.append(ChatColor.GRAY);
-        printout.append("(Current flags: ");
+        printout.append("(Текущие флаги: ");
         printout.appendFlagsList(false);
         printout.append(")");
         printout.send(sender);
@@ -628,7 +627,7 @@ public final class RegionCommands extends RegionCommandsBase {
     @Command(aliases = {"setpriority", "priority", "pri"},
              usage = "<id> <priority>",
              flags = "w:",
-             desc = "Set the priority of a region",
+             desc = "Установить приоритет для региона.",
              min = 2, max = 2)
     public void setPriority(CommandContext args, CommandSender sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -648,8 +647,8 @@ public final class RegionCommands extends RegionCommandsBase {
         existing.setPriority(priority);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Priority of '" + existing.getId() + "' set to "
-                + priority + " (higher numbers override).");
+                + "Приоритет региона '" + existing.getId() + "' установлен на "
+                + priority + ".");
     }
 
     /**
@@ -762,8 +761,8 @@ public final class RegionCommands extends RegionCommandsBase {
                 .registerWithSupervisor("Removing the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... removing '%s'...)")
                 .thenRespondWith(
-                        "The region named '%s' has been removed.",
-                        "Failed to remove the region '%s'");
+                        "Регион '%s' успешно удалён.",
+                        "Не удалось удалить регион '%s'");
     }
 
     /**

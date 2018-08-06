@@ -40,7 +40,7 @@ public final class BlockInteractBlacklistEvent extends BlockBlacklistEvent {
 
     @Override
     public String getDescription() {
-        return "interact with";
+        return "взаимодействовать с";
     }
 
     @Override

@@ -134,7 +134,7 @@ public class RegionLister implements Callable<Integer> {
                     }
 
                     if (profile == null) {
-                        throw new CommandException("A user by the name of '" + name + "' does not seem to exist.");
+                        throw new CommandException("\u0418\u0433\u0440\u043E\u043A '" + name + "' \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D.");
                     }
 
                     uniqueId = profile.getUniqueId();
@@ -177,8 +177,8 @@ public class RegionLister implements Callable<Integer> {
         final int pages = (int) Math.ceil(totalSize / (float) pageSize);
 
         sender.sendMessage(ChatColor.RED
-                + (ownerMatcher == null ? "Regions (page " : "Regions for " + ownerMatcher.getName() + " (page ")
-                + (page + 1) + " of " + pages + "):");
+                + (ownerMatcher == null ? "Список регионов (страница " : "Список регионов " + ownerMatcher.getName() + " (страница ")
+                + (page + 1) + " из " + pages + "):");
 
         if (page < pages) {
             // Print

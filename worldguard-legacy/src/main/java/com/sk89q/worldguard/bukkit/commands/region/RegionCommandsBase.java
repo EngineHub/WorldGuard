@@ -102,7 +102,7 @@ class RegionCommandsBase {
 
         if (!allowGlobal && id.equalsIgnoreCase("__global__")) { // Sorry, no global
             throw new CommandException(
-                    "Sorry, you can't use __global__ here.");
+                    "Вы не можете использовать глобальный регион здесь.");
         }
 
         return id;
@@ -135,7 +135,7 @@ class RegionCommandsBase {
             }
 
             throw new CommandException(
-                    "No region could be found with the name of '" + id + "'.");
+                    "Регион '" + id + "' не найден.");
         }
 
         return region;
@@ -178,8 +178,8 @@ class RegionCommandsBase {
         if (set.size() == 0) {
             if (allowGlobal) {
                 ProtectedRegion global = checkExistingRegion(regionManager, "__global__", true);
-                player.sendMessage(ChatColor.GRAY + "You're not standing in any " +
-                        "regions. Using the global region for this world instead.");
+                player.sendMessage(ChatColor.GRAY + "Регионы не обнаружены. " +
+                        "Выводим информацию о глобальном регионе:");
                 return global;
             }
             throw new CommandException(
@@ -198,7 +198,7 @@ class RegionCommandsBase {
             }
 
             throw new CommandException(
-                    "You're standing in several regions (please pick one).\nYou're in: " + builder.toString());
+                    "Здесь расположены несколько регионов, выберите один: " + builder.toString());
         }
 
         return set.iterator().next();
@@ -217,10 +217,7 @@ class RegionCommandsBase {
         Selection selection = worldEdit.getSelection(player);
 
         if (selection == null) {
-            throw new CommandException(
-                    "Please select an area first. " +
-                            "Use WorldEdit to make a selection! " +
-                            "(wiki: http://wiki.sk89q.com/wiki/WorldEdit).");
+            throw new CommandException("Вы не выделили область для привата региона.");
         }
 
         return selection;
@@ -235,7 +232,7 @@ class RegionCommandsBase {
      */
     protected static void checkRegionDoesNotExist(RegionManager manager, String id, boolean mayRedefine) throws CommandException {
         if (manager.hasRegion(id)) {
-            throw new CommandException("A region with that name already exists. Please choose another name." +
+            throw new CommandException("Регион с таким именем уже существует." +
                     (mayRedefine ? " To change the shape, use /region redefine " + id + "." : ""));
         }
     }
