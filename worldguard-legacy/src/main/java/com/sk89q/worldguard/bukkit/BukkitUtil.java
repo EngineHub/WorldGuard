@@ -187,7 +187,8 @@ public class BukkitUtil {
      */
     public static Target createTarget(Block block) {
         checkNotNull(block);
-        return new BlockTarget(BukkitAdapter.adapt(block.getBlockData()).getBlockType());
+        checkNotNull(block.getType());
+        return new BlockTarget(BukkitAdapter.asBlockType(block.getType()));
     }
 
     /**
@@ -198,7 +199,8 @@ public class BukkitUtil {
      */
     public static Target createTarget(ItemStack item) {
         checkNotNull(item);
-        return new ItemTarget(BukkitAdapter.adapt(item).getType());
+        checkNotNull(item.getType());
+        return new ItemTarget(BukkitAdapter.asItemType(item.getType()));
     }
 
     /**
