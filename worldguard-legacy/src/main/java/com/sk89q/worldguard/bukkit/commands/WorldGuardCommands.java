@@ -26,7 +26,9 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.config.ConfigurationManager;
@@ -41,9 +43,7 @@ import com.sk89q.worldguard.util.report.ReportList;
 import com.sk89q.worldguard.util.report.SystemInfoReport;
 import com.sk89q.worldguard.util.task.Task;
 import com.sk89q.worldguard.util.task.TaskStateComparator;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -101,8 +101,8 @@ public class WorldGuardCommands {
             ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
             config.unload();
             config.load();
-            for (World world : Bukkit.getServer().getWorlds()) {
-                config.get(BukkitAdapter.adapt(world));
+            for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
+                config.get(world);
             }
             WorldGuard.getInstance().getPlatform().getRegionContainer().reload();
             // WGBukkit.cleanCache();
@@ -200,12 +200,9 @@ public class WorldGuardCommands {
                 .sendMessageAfterDelay("(Please wait... profiling for %d minute(s)...)")
                 .thenTellErrorsOnly("CPU profiling failed.");
 
-        sampler.getFuture().addListener(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (WorldGuardCommands.this) {
-                    activeSampler = null;
-                }
+        sampler.getFuture().addListener(() -> {
+            synchronized (WorldGuardCommands.this) {
+                activeSampler = null;
             }
         }, MoreExecutors.directExecutor());
 
@@ -260,7 +257,7 @@ public class WorldGuardCommands {
             if (player != null) {
                 LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
                 WorldGuard.getInstance().getPlatform().getSessionManager().resetState(localPlayer);
-                sender.sendMessage("Cleared states for player \"" + player.getName() + "\".");
+                sender.sendMessage("Cleared states for player \"" + localPlayer.getName() + "\".");
             }
         }
     }

@@ -20,27 +20,22 @@
 package com.sk89q.worldguard.blacklist.target;
 
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 
-public class TargetMatcherParser {
+public class ItemBlockMatcher implements TargetMatcher {
 
-    public TargetMatcher fromInput(String input) throws TargetMatcherParseException {
-        input = input.toLowerCase().trim();
-        BlockType blockType = BlockTypes.get(input);
-        if (blockType != null) {
-            if (blockType.hasItemType()) {
-                return new ItemBlockMatcher(blockType);
-            } else {
-                return new BlockMatcher(blockType);
-            }
-        } else {
-            ItemType itemType = ItemTypes.get(input);
-            if (itemType == null) {
-                throw new TargetMatcherParseException("Unknown block or item name: " + input);
-            }
-            return new ItemMatcher(itemType);
-        }
+    private final BlockType type;
+
+    public ItemBlockMatcher(BlockType type) {
+        this.type = type;
+    }
+
+    @Override
+    public String getMatchedTypeId() {
+        return this.type.getId();
+    }
+
+    @Override
+    public boolean test(Target target) {
+        return target.getTypeId().equals(getMatchedTypeId());
     }
 }
