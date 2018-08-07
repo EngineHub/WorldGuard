@@ -81,7 +81,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
-import com.sk89q.worldguard.util.logging.ClassSourceValidator;
+import com.sk89q.worldguard.bukkit.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
 import com.sk89q.worldguard.util.task.SimpleSupervisor;
 import com.sk89q.worldguard.util.task.Supervisor;

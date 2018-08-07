@@ -28,7 +28,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.flags.FlagContext;
-import com.sk89q.worldguard.protection.flags.FlagContextCreateEvent;
+import com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.session.SessionManager;

@@ -17,10 +17,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.chest;
+package com.sk89q.worldguard.chest;
 
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.LocalPlayer;
 
 /**
@@ -62,6 +63,12 @@ public interface ChestProtection {
      * @param blockType The blockType to check
      * @return Whether a type is a 'chest' (protectable block)
      */
-    boolean isChest(BlockType blockType);
+    default boolean isChest(BlockType blockType) {
+        return blockType == BlockTypes.CHEST
+                || blockType == BlockTypes.DISPENSER
+                || blockType == BlockTypes.FURNACE
+                || blockType == BlockTypes.TRAPPED_CHEST
+                || blockType == BlockTypes.DROPPER;
+    }
 
 }

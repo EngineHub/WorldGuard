@@ -19,16 +19,12 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
-import com.sk89q.worldguard.config.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import org.bukkit.Material;
-import org.bukkit.World;
-
-import static com.sk89q.worldguard.bukkit.BukkitUtil.isBlockWater;
-import static com.sk89q.worldguard.bukkit.BukkitUtil.setBlockToWater;
+import com.sk89q.worldguard.config.WorldConfiguration;
 
 public final class SpongeUtil {
 
@@ -38,21 +34,24 @@ public final class SpongeUtil {
     /**
      * Remove water around a sponge.
      *
-     * @param plugin The plugin instace
      * @param world The world the sponge isin
      * @param ox The x coordinate of the 'sponge' block
      * @param oy The y coordinate of the 'sponge' block
      * @param oz The z coordinate of the 'sponge' block
      */
-    public static void clearSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+    public static void clearSpongeWater(World world, int ox, int oy, int oz) {
+        WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
         for (int cx = -wcfg.spongeRadius; cx <= wcfg.spongeRadius; cx++) {
             for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
                 for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
-                    if (isBlockWater(world, ox + cx, oy + cy, oz + cz)) {
-                        world.getBlockAt(ox + cx, oy + cy, oz + cz).setType(Material.AIR);
+                    BlockVector vector = new BlockVector(ox + cx, oy + cy, oz + cz);
+                    if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                        try {
+                            world.setBlock(vector, BlockTypes.AIR.getDefaultState());
+                        } catch (WorldEditException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -60,24 +59,43 @@ public final class SpongeUtil {
     }
 
     /**
+     * Sets the given block to fluid water.
+     * Used by addSpongeWater()
+     *
+     * @param world the world
+     * @param ox x
+     * @param oy y
+     * @param oz z
+     */
+    private static void setBlockToWater(World world, int ox, int oy, int oz) throws WorldEditException {
+        BlockVector vector = new BlockVector(ox, oy, oz);
+        if (world.getBlock(vector).getBlockType() == BlockTypes.AIR) {
+            world.setBlock(vector, BlockTypes.WATER.getDefaultState());
+        }
+    }
+
+    /**
      * Add water around a sponge.
      * 
-     * @param plugin The plugin instance
      * @param world The world the sponge is located in
      * @param ox The x coordinate of the 'sponge' block
      * @param oy The y coordinate of the 'sponge' block
      * @param oz The z coordinate of the 'sponge' block
      */
-    public static void addSpongeWater(WorldGuardPlugin plugin, World world, int ox, int oy, int oz) {
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+    public static void addSpongeWater(World world, int ox, int oy, int oz) {
+        WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
         // The negative x edge
         int cx = ox - wcfg.spongeRadius - 1;
         for (int cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
             for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx + 1, cy, cz);
+                BlockVector vector = new BlockVector(cx, cy, cz);
+                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                    try {
+                        setBlockToWater(world, cx + 1, cy, cz);
+                    } catch (WorldEditException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -86,8 +104,13 @@ public final class SpongeUtil {
         cx = ox + wcfg.spongeRadius + 1;
         for (int cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
             for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx - 1, cy, cz);
+                BlockVector vector = new BlockVector(cx, cy, cz);
+                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                    try {
+                        setBlockToWater(world, cx - 1, cy, cz);
+                    } catch (WorldEditException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -96,8 +119,13 @@ public final class SpongeUtil {
         int cy = oy - wcfg.spongeRadius - 1;
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
             for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx, cy + 1, cz);
+                BlockVector vector = new BlockVector(cx, cy, cz);
+                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                    try {
+                        setBlockToWater(world, cx, cy + 1, cz);
+                    } catch (WorldEditException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -106,8 +134,13 @@ public final class SpongeUtil {
         cy = oy + wcfg.spongeRadius + 1;
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
             for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx, cy - 1, cz);
+                BlockVector vector = new BlockVector(cx, cy, cz);
+                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                    try {
+                        setBlockToWater(world, cx, cy - 1, cz);
+                    } catch (WorldEditException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -116,8 +149,13 @@ public final class SpongeUtil {
         int cz = oz - wcfg.spongeRadius - 1;
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
             for (cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx, cy, cz + 1);
+                BlockVector vector = new BlockVector(cx, cy, cz);
+                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                    try {
+                        setBlockToWater(world, cx, cy, cz + 1);
+                    } catch (WorldEditException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -126,8 +164,13 @@ public final class SpongeUtil {
         cz = oz + wcfg.spongeRadius + 1;
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
             for (cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
-                if (isBlockWater(world, cx, cy, cz)) {
-                    setBlockToWater(world, cx, cy, cz - 1);
+                BlockVector vector = new BlockVector(cx, cy, cz);
+                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                    try {
+                        setBlockToWater(world, cx, cy, cz - 1);
+                    } catch (WorldEditException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

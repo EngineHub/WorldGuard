@@ -31,8 +31,8 @@ import com.sk89q.worldguard.blacklist.logger.DatabaseHandler;
 import com.sk89q.worldguard.blacklist.logger.FileHandler;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
-import com.sk89q.worldguard.bukkit.chest.ChestProtection;
-import com.sk89q.worldguard.bukkit.chest.SignChestProtection;
+import com.sk89q.worldguard.chest.ChestProtection;
+import com.sk89q.worldguard.bukkit.chest.BukkitSignChestProtection;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.bukkit.internal.TargetMatcherSet;
 import com.sk89q.worldguard.config.YamlWorldConfiguration;
@@ -67,7 +67,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
     @Unreported private String worldName;
 
-    @Unreported private ChestProtection chestProtection = new SignChestProtection();
+    @Unreported private ChestProtection chestProtection = new BukkitSignChestProtection();
 
     /* Configuration data start */
     public boolean summaryOnStart;
@@ -76,13 +76,10 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
     public String buildPermissionDenyMessage = "";
     public boolean fireSpreadDisableToggle;
     public boolean itemDurability;
-    public boolean simulateSponge;
-    public int spongeRadius;
     public boolean disableExpDrops;
     public Set<PotionEffectType> blockPotions;
     public boolean blockPotionsAlways;
     public boolean pumpkinScuba;
-    public boolean redstoneSponges;
     public boolean noPhysicsGravel;
     public boolean noPhysicsSand;
     public boolean ropeLadders;

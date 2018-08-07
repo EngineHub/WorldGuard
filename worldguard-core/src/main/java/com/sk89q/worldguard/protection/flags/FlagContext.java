@@ -156,7 +156,7 @@ public final class FlagContext {
             return this;
         }
 
-        protected boolean tryAddToMap(String key, Object value) {
+        public boolean tryAddToMap(String key, Object value) {
             if (map.containsKey(key)) return false;
             this.map.put(key, value);
             return true;

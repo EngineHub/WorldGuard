@@ -56,6 +56,9 @@ public abstract class WorldConfiguration {
 
     public boolean boundedLocationFlags;
     public boolean useRegions;
+    public boolean simulateSponge;
+    public int spongeRadius;
+    public boolean redstoneSponges;
 
     /**
      * Load the configuration.

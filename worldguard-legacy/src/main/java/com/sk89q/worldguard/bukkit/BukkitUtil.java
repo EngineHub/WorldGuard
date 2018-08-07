@@ -28,7 +28,6 @@ import com.sk89q.worldguard.blacklist.target.Target;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -63,36 +62,6 @@ public class BukkitUtil {
             return null;
         }
         return players.get(0);
-    }
-
-    /**
-     * Sets the given block to fluid water.
-     * Used by addSpongeWater()
-     *
-     * @param world
-     * @param ox
-     * @param oy
-     * @param oz
-     */
-    public static void setBlockToWater(World world, int ox, int oy, int oz) {
-        Block block = world.getBlockAt(ox, oy, oz);
-        if (block.getType() == Material.AIR) {
-            block.setType(Material.WATER);
-        }
-    }
-
-    /**
-     * Checks if the given block is water
-     *
-     * @param world the world
-     * @param ox x
-     * @param oy y
-     * @param oz z
-     * @return true if it's water
-     */
-    public static boolean isBlockWater(World world, int ox, int oy, int oz) {
-        Block block = world.getBlockAt(ox, oy, oz);
-        return block.getType() == Material.WATER;
     }
 
     /**

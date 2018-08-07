@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.util.logging;
+package com.sk89q.worldguard.bukkit.util.logging;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;

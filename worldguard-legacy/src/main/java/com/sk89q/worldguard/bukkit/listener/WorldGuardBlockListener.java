@@ -427,7 +427,7 @@ public class WorldGuardBlockListener implements Listener {
             int oy = target.getY();
             int oz = target.getZ();
 
-            SpongeUtil.clearSpongeWater(plugin, world, ox, oy, oz);
+            SpongeUtil.clearSpongeWater(BukkitAdapter.adapt(world), ox, oy, oz);
         }
     }
 
@@ -452,10 +452,10 @@ public class WorldGuardBlockListener implements Listener {
                         Block sponge = world.getBlockAt(ox + cx, oy + cy, oz + cz);
                         if (sponge.getType() == Material.SPONGE
                                 && sponge.isBlockIndirectlyPowered()) {
-                            SpongeUtil.clearSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
+                            SpongeUtil.clearSpongeWater(BukkitAdapter.adapt(world), ox + cx, oy + cy, oz + cz);
                         } else if (sponge.getType() == Material.SPONGE
                                 && !sponge.isBlockIndirectlyPowered()) {
-                            SpongeUtil.addSpongeWater(plugin, world, ox + cx, oy + cy, oz + cz);
+                            SpongeUtil.addSpongeWater(BukkitAdapter.adapt(world), ox + cx, oy + cy, oz + cz);
                         }
                     }
                 }
