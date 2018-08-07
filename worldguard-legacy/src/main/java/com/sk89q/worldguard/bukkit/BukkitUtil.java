@@ -169,7 +169,7 @@ public class BukkitUtil {
     public static Target createTarget(ItemStack item) {
         checkNotNull(item);
         checkNotNull(item.getType());
-        return new ItemTarget(BukkitAdapter.asItemType(item.getType()));
+        return createTarget(item.getType()); // Delegate it, ItemStacks can contain both Blocks and Items in Spigot
     }
 
     /**
