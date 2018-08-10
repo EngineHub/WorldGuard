@@ -27,6 +27,8 @@ import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.session.SessionManager;
 
+import java.nio.file.Path;
+
 /**
  * A platform for implementing.
  */
@@ -119,4 +121,11 @@ public interface WorldGuardPlatform {
      * @return The default game mode
      */
     GameMode getDefaultGameMode();
+
+    /**
+     * Gets the configuration directory.
+     *
+     * @return The config directory
+     */
+    Path getConfigDir();
 }

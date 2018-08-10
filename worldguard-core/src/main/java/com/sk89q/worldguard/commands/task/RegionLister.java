@@ -17,17 +17,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands.task;
+package com.sk89q.worldguard.commands.task;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.squirrelid.Profile;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,24 +40,19 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class RegionLister implements Callable<Integer> {
 
     private static final Logger log = Logger.getLogger(RegionLister.class.getCanonicalName());
 
-    private final WorldGuardPlugin plugin;
-    private final CommandSender sender;
+    private final Actor sender;
     private final RegionManager manager;
     private OwnerMatcher ownerMatcher;
     private int page;
 
-    public RegionLister(WorldGuardPlugin plugin, RegionManager manager, CommandSender sender) {
-        checkNotNull(plugin);
+    public RegionLister(RegionManager manager, Actor sender) {
         checkNotNull(manager);
         checkNotNull(sender);
 
-        this.plugin = plugin;
         this.manager = manager;
         this.sender = sender;
     }
@@ -124,7 +120,7 @@ public class RegionLister implements Callable<Integer> {
                     Profile profile;
 
                     try {
-                        profile = plugin.getProfileService().findByName(name);
+                        profile = WorldGuard.getInstance().getProfileService().findByName(name);
                     } catch (IOException e) {
                         log.log(Level.WARNING, "Failed UUID lookup of '" + name + "'", e);
                         throw new CommandException("Failed to lookup the UUID of '" + name + "'");
@@ -150,7 +146,7 @@ public class RegionLister implements Callable<Integer> {
         Map<String, ProtectedRegion> regions = manager.getRegions();
 
         // Build a list of regions to show
-        List<RegionListEntry> entries = new ArrayList<RegionListEntry>();
+        List<RegionListEntry> entries = new ArrayList<>();
 
         int index = 0;
         for (String id : regions.keySet()) {
@@ -176,8 +172,8 @@ public class RegionLister implements Callable<Integer> {
         final int pageSize = 10;
         final int pages = (int) Math.ceil(totalSize / (float) pageSize);
 
-        sender.sendMessage(ChatColor.RED
-                + (ownerMatcher == null ? "Regions (page " : "Regions for " + ownerMatcher.getName() + " (page ")
+        sender.printError(
+                (ownerMatcher == null ? "Regions (page " : "Regions for " + ownerMatcher.getName() + " (page ")
                 + (page + 1) + " of " + pages + "):");
 
         if (page < pages) {
@@ -187,17 +183,17 @@ public class RegionLister implements Callable<Integer> {
                     break;
                 }
 
-                sender.sendMessage(ChatColor.YELLOW.toString() + entries.get(i));
+                sender.print(String.valueOf(entries.get(i)));
             }
         }
 
         return page;
     }
 
-    private static interface OwnerMatcher {
-        public String getName();
+    private interface OwnerMatcher {
+        String getName();
 
-        public boolean isContainedWithin(DefaultDomain domain) throws CommandException;
+        boolean isContainedWithin(DefaultDomain domain) throws CommandException;
     }
 
     private class RegionListEntry implements Comparable<RegionListEntry> {

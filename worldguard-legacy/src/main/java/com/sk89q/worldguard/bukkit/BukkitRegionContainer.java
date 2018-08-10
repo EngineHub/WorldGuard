@@ -229,7 +229,7 @@ public class BukkitRegionContainer extends RegionContainer {
 
         if (config.migrateRegionsToUuid) {
             RegionDriver driver = getDriver();
-            UUIDMigration migrator = new UUIDMigration(driver, plugin.getProfileService(), WorldGuard.getInstance().getFlagRegistry());
+            UUIDMigration migrator = new UUIDMigration(driver, WorldGuard.getInstance().getProfileService(), WorldGuard.getInstance().getFlagRegistry());
             migrator.setKeepUnresolvedNames(config.keepUnresolvedNames);
             try {
                 migrate(migrator);

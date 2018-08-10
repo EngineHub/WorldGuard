@@ -71,12 +71,12 @@ public class MemberCommands extends RegionCommandsBase {
 
         // Resolve members asynchronously
         DomainInputResolver resolver = new DomainInputResolver(
-                plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
+                WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
         resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
 
         // Then add it to the members
         ListenableFuture<DefaultDomain> future = Futures.transform(
-                plugin.getExecutorService().submit(resolver),
+                WorldGuard.getInstance().getExecutorService().submit(resolver),
                 resolver.createAddAllFunction(region.getMembers()));
 
         AsyncCommandHelper.wrap(future, plugin, sender)
@@ -135,12 +135,12 @@ public class MemberCommands extends RegionCommandsBase {
 
         // Resolve owners asynchronously
         DomainInputResolver resolver = new DomainInputResolver(
-                plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
+                WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
         resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
 
         // Then add it to the owners
         ListenableFuture<DefaultDomain> future = Futures.transform(
-                plugin.getExecutorService().submit(resolver),
+                WorldGuard.getInstance().getExecutorService().submit(resolver),
                 resolver.createAddAllFunction(region.getOwners()));
 
         AsyncCommandHelper.wrap(future, plugin, sender)
@@ -181,12 +181,12 @@ public class MemberCommands extends RegionCommandsBase {
 
             // Resolve members asynchronously
             DomainInputResolver resolver = new DomainInputResolver(
-                    plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
+                    WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
             resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
 
             // Then remove it from the members
             future = Futures.transform(
-                    plugin.getExecutorService().submit(resolver),
+                    WorldGuard.getInstance().getExecutorService().submit(resolver),
                     resolver.createRemoveAllFunction(region.getMembers()));
         }
 
@@ -228,12 +228,12 @@ public class MemberCommands extends RegionCommandsBase {
 
             // Resolve owners asynchronously
             DomainInputResolver resolver = new DomainInputResolver(
-                    plugin.getProfileService(), args.getParsedPaddedSlice(1, 0));
+                    WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
             resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
 
             // Then remove it from the owners
             future = Futures.transform(
-                    plugin.getExecutorService().submit(resolver),
+                    WorldGuard.getInstance().getExecutorService().submit(resolver),
                     resolver.createRemoveAllFunction(region.getOwners()));
         }
 

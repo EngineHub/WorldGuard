@@ -21,9 +21,6 @@ package com.sk89q.worldguard.bukkit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -32,14 +29,6 @@ import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
-import com.sk89q.squirrelid.cache.HashMapCache;
-import com.sk89q.squirrelid.cache.ProfileCache;
-import com.sk89q.squirrelid.cache.SQLiteCache;
-import com.sk89q.squirrelid.resolver.BukkitPlayerService;
-import com.sk89q.squirrelid.resolver.CacheForwardingService;
-import com.sk89q.squirrelid.resolver.CombinedProfileService;
-import com.sk89q.squirrelid.resolver.HttpRepositoryService;
-import com.sk89q.squirrelid.resolver.ProfileService;
 import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitCommandSender;
@@ -74,18 +63,14 @@ import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
 import com.sk89q.worldguard.bukkit.listener.WorldRulesListener;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.bukkit.util.Events;
+import com.sk89q.worldguard.bukkit.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
-import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
-import com.sk89q.worldguard.bukkit.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
-import com.sk89q.worldguard.util.task.SimpleSupervisor;
-import com.sk89q.worldguard.util.task.Supervisor;
-import com.sk89q.worldguard.util.task.Task;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -109,9 +94,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -127,10 +110,6 @@ public class WorldGuardPlugin extends JavaPlugin {
     private static WorldGuardPlugin inst;
     private static BukkitWorldGuardPlatform platform;
     private final CommandsManager<CommandSender> commands;
-    private final Supervisor supervisor = new SimpleSupervisor();
-    private ListeningExecutorService executorService;
-    private ProfileService profileService;
-    private ProfileCache profileCache;
     private PlayerMoveListener playerMoveListener;
 
     /**
@@ -164,23 +143,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         configureLogger();
 
         getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
-
-        executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
-
-        File cacheDir = new File(getDataFolder(), "cache");
-        cacheDir.mkdirs();
-        try {
-            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
-        } catch (IOException e) {
-            WorldGuard.logger.log(Level.WARNING, "Failed to initialize SQLite profile cache");
-            profileCache = new HashMapCache();
-        }
-
-        profileService = new CacheForwardingService(
-                new CombinedProfileService(
-                        BukkitPlayerService.getInstance(),
-                        HttpRepositoryService.forMinecraft()),
-                profileCache);
 
         PermissionsResolverManager.initialize(this);
 
@@ -260,30 +222,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        executorService.shutdown();
-
-        try {
-            WorldGuard.logger.log(Level.INFO, "Shutting down executor and waiting for any pending tasks...");
-
-            List<Task<?>> tasks = supervisor.getTasks();
-            if (!tasks.isEmpty()) {
-                StringBuilder builder = new StringBuilder("Known tasks:");
-                for (Task<?> task : tasks) {
-                    builder.append("\n");
-                    builder.append(task.getName());
-                }
-                WorldGuard.logger.log(Level.INFO, builder.toString());
-            }
-
-            Futures.successfulAsList(tasks).get();
-            executorService.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            WorldGuard.logger.log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
-        }
-
-        platform.unload();
+        WorldGuard.getInstance().disable();
         this.getServer().getScheduler().cancelTasks(this);
     }
 
@@ -333,43 +272,6 @@ public class WorldGuardPlugin extends JavaPlugin {
             WorldGuard.logger.log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
             return "WorldGuard: An unexpected error occurred! Please see the server console.";
         }
-    }
-
-    /**
-     * Get the supervisor.
-     *
-     * @return the supervisor
-     */
-    public Supervisor getSupervisor() {
-        return supervisor;
-    }
-
-    /**
-     * Get the global executor service for internal usage (please use your
-     * own executor service).
-     *
-     * @return the global executor service
-     */
-    public ListeningExecutorService getExecutorService() {
-        return executorService;
-    }
-
-    /**
-     * Get the profile lookup service.
-     *
-     * @return the profile lookup service
-     */
-    public ProfileService getProfileService() {
-        return profileService;
-    }
-
-    /**
-     * Get the profile cache.
-     *
-     * @return the profile cache
-     */
-    public ProfileCache getProfileCache() {
-        return profileCache;
     }
 
     /**

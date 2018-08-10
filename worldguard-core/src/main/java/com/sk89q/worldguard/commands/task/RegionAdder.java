@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands.task;
+package com.sk89q.worldguard.commands.task;
 
 import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -37,7 +37,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RegionAdder implements Callable<ProtectedRegion> {
 
-    private final WorldGuardPlugin plugin;
     private final RegionManager manager;
     private final ProtectedRegion region;
     @Nullable
@@ -47,16 +46,13 @@ public class RegionAdder implements Callable<ProtectedRegion> {
     /**
      * Create a new instance.
      *
-     * @param plugin the plugin
      * @param manager the manage
      * @param region the region
      */
-    public RegionAdder(WorldGuardPlugin plugin, RegionManager manager, ProtectedRegion region) {
-        checkNotNull(plugin);
+    public RegionAdder(RegionManager manager, ProtectedRegion region) {
         checkNotNull(manager);
         checkNotNull(region);
 
-        this.plugin = plugin;
         this.manager = manager;
         this.region = region;
     }
@@ -77,7 +73,7 @@ public class RegionAdder implements Callable<ProtectedRegion> {
     @Override
     public ProtectedRegion call() throws Exception {
         if (ownersInput != null) {
-            DomainInputResolver resolver = new DomainInputResolver(plugin.getProfileService(), ownersInput);
+            DomainInputResolver resolver = new DomainInputResolver(WorldGuard.getInstance().getProfileService(), ownersInput);
             resolver.setLocatorPolicy(locatorPolicy);
             DefaultDomain domain = resolver.call();
             region.getOwners().addAll(domain);

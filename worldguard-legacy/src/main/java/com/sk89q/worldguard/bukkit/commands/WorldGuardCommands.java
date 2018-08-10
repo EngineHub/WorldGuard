@@ -82,7 +82,7 @@ public class WorldGuardCommands {
     @CommandPermissions({"worldguard.reload"})
     public void reload(CommandContext args, CommandSender sender) throws CommandException {
         // TODO: This is subject to a race condition, but at least other commands are not being processed concurrently
-        List<Task<?>> tasks = plugin.getSupervisor().getTasks();
+        List<Task<?>> tasks = WorldGuard.getInstance().getSupervisor().getTasks();
         if (!tasks.isEmpty()) {
             throw new CommandException("There are currently pending tasks. Use /wg running to monitor these tasks first.");
         }
@@ -265,7 +265,7 @@ public class WorldGuardCommands {
     @Command(aliases = {"running", "queue"}, desc = "List running tasks", max = 0)
     @CommandPermissions("worldguard.running")
     public void listRunningTasks(CommandContext args, CommandSender sender) throws CommandException {
-        List<Task<?>> tasks = plugin.getSupervisor().getTasks();
+        List<Task<?>> tasks = WorldGuard.getInstance().getSupervisor().getTasks();
 
         if (!tasks.isEmpty()) {
             Collections.sort(tasks, new TaskStateComparator());

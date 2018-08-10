@@ -40,11 +40,11 @@ import com.sk89q.worldguard.bukkit.commands.AsyncCommandHelper;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.bukkit.commands.FutureProgressListener;
 import com.sk89q.worldguard.bukkit.commands.MessageFutureCallback.Builder;
-import com.sk89q.worldguard.bukkit.commands.task.RegionAdder;
-import com.sk89q.worldguard.bukkit.commands.task.RegionLister;
-import com.sk89q.worldguard.bukkit.commands.task.RegionManagerReloader;
-import com.sk89q.worldguard.bukkit.commands.task.RegionManagerSaver;
-import com.sk89q.worldguard.bukkit.commands.task.RegionRemover;
+import com.sk89q.worldguard.commands.task.RegionAdder;
+import com.sk89q.worldguard.commands.task.RegionLister;
+import com.sk89q.worldguard.commands.task.RegionManagerReloader;
+import com.sk89q.worldguard.commands.task.RegionManagerSaver;
+import com.sk89q.worldguard.commands.task.RegionRemover;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -131,9 +131,9 @@ public final class RegionCommands extends RegionCommandsBase {
             informNewUser(player, manager, region);
         }
 
-        RegionAdder task = new RegionAdder(plugin, manager, region);
+        RegionAdder task = new RegionAdder(manager, region);
         task.addOwnersFromCommand(args, 2);
-        ListenableFuture<?> future = plugin.getExecutorService().submit(task);
+        ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
         AsyncCommandHelper.wrap(future, plugin, player)
                 .formatUsing(id)
@@ -186,8 +186,8 @@ public final class RegionCommands extends RegionCommandsBase {
 
         region.copyFrom(existing);
 
-        RegionAdder task = new RegionAdder(plugin, manager, region);
-        ListenableFuture<?> future = plugin.getExecutorService().submit(task);
+        RegionAdder task = new RegionAdder(manager, region);
+        ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
         AsyncCommandHelper.wrap(future, plugin, player)
                 .formatUsing(id)
@@ -288,10 +288,10 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        RegionAdder task = new RegionAdder(plugin, manager, region);
+        RegionAdder task = new RegionAdder(manager, region);
         task.setLocatorPolicy(UserLocatorPolicy.UUID_ONLY);
         task.setOwnersInput(new String[]{player.getName()});
-        ListenableFuture<?> future = plugin.getExecutorService().submit(task);
+        ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
         AsyncCommandHelper.wrap(future, plugin, player)
                 .formatUsing(id)
@@ -385,9 +385,9 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Print region information
-        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, args.hasFlag('u') ? null : plugin.getProfileCache());
+        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, args.hasFlag('u') ? null : WorldGuard.getInstance().getProfileCache());
         ListenableFuture<?> future = Futures.transform(
-                plugin.getExecutorService().submit(printout),
+                WorldGuard.getInstance().getExecutorService().submit(printout),
                 CommandUtils.messageFunction(sender)::apply);
 
         // If it takes too long...
@@ -443,13 +443,13 @@ public final class RegionCommands extends RegionCommandsBase {
 
         RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
 
-        RegionLister task = new RegionLister(plugin, manager, sender);
+        RegionLister task = new RegionLister(manager, actor);
         task.setPage(page);
         if (ownedBy != null) {
             task.filterOwnedByName(ownedBy, args.hasFlag('n'));
         }
 
-        ListenableFuture<?> future = plugin.getExecutorService().submit(task);
+        ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
         AsyncCommandHelper.wrap(future, plugin, sender)
                 .registerWithSupervisor("Getting list of regions...")
@@ -765,7 +765,7 @@ public final class RegionCommands extends RegionCommandsBase {
             task.setRemovalStrategy(RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
         }
 
-        AsyncCommandHelper.wrap(plugin.getExecutorService().submit(task), plugin, sender)
+        AsyncCommandHelper.wrap(WorldGuard.getInstance().getExecutorService().submit(task), plugin, sender)
                 .formatUsing(existing.getId())
                 .registerWithSupervisor("Removing the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... removing '%s'...)")
@@ -807,7 +807,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
             }
 
-            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerReloader(manager));
+            ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerReloader(manager));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .forRegionDataLoad(world, false);
@@ -822,7 +822,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 }
             }
 
-            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerReloader(managers));
+            ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerReloader(managers));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .registerWithSupervisor("Loading regions for all worlds")
@@ -866,7 +866,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
             }
 
-            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerSaver(manager));
+            ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerSaver(manager));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .forRegionDataSave(world, false);
@@ -881,7 +881,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 }
             }
 
-            ListenableFuture<?> future = plugin.getExecutorService().submit(new RegionManagerSaver(managers));
+            ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerSaver(managers));
 
             AsyncCommandHelper.wrap(future, plugin, sender)
                     .registerWithSupervisor("Saving regions for all worlds")
@@ -999,7 +999,7 @@ public final class RegionCommands extends RegionCommandsBase {
             ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
             BukkitRegionContainer container = (BukkitRegionContainer) WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionDriver driver = container.getDriver();
-            UUIDMigration migration = new UUIDMigration(driver, plugin.getProfileService(), WorldGuard.getInstance().getFlagRegistry());
+            UUIDMigration migration = new UUIDMigration(driver, WorldGuard.getInstance().getProfileService(), WorldGuard.getInstance().getFlagRegistry());
             migration.setKeepUnresolvedNames(config.keepUnresolvedNames);
             sender.sendMessage(ChatColor.YELLOW + "Now performing migration... this may take a while.");
             container.migrate(migration);

@@ -36,6 +36,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 
@@ -127,5 +128,10 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     @Override
     public GameMode getDefaultGameMode() {
         return GameModes.get(Bukkit.getServer().getDefaultGameMode().name().toLowerCase());
+    }
+
+    @Override
+    public Path getConfigDir() {
+        return WorldGuardPlugin.inst().getDataFolder().toPath();
     }
 }
