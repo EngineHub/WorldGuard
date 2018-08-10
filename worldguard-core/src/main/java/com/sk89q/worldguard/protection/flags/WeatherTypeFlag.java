@@ -38,9 +38,6 @@ public class WeatherTypeFlag extends Flag<WeatherType> {
     public WeatherType parseInput(FlagContext context) throws InvalidFlagFormat {
         String input = context.getUserInput();
         input = input.trim();
-        if (!input.startsWith("/")) {
-            input = "/" + input;
-        }
         WeatherType weatherType = unmarshal(input);
         if (weatherType == null) {
             throw new InvalidFlagFormat("Unknown game mode: " + input);
@@ -50,7 +47,7 @@ public class WeatherTypeFlag extends Flag<WeatherType> {
 
     @Override
     public WeatherType unmarshal(@Nullable Object o) {
-        return WeatherTypes.get(String.valueOf(o));
+        return WeatherTypes.get(String.valueOf(o).toLowerCase());
     }
 
     @Override
