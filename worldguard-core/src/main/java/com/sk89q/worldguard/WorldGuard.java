@@ -71,9 +71,6 @@ public class WorldGuard {
     public void setup() {
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
 
-        getPlatform().load();
-        Flags.registerAll();
-
         File cacheDir = new File(getPlatform().getConfigDir().toFile(), "cache");
         cacheDir.mkdirs();
 
@@ -89,6 +86,9 @@ public class WorldGuard {
                         BukkitPlayerService.getInstance(),
                         HttpRepositoryService.forMinecraft()),
                 profileCache);
+
+        getPlatform().load();
+        Flags.registerAll();
     }
 
     /**
