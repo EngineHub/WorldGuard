@@ -61,17 +61,6 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
     boolean isVirtual();
 
     /**
-     * Tests whether the {@link Flags#BUILD} flag or membership
-     * requirements permit the given player.
-     *
-     * @param player the player to check
-     * @return true if permitted
-     * @deprecated use {@link #testState(RegionAssociable, StateFlag...)}
-     */
-    @Deprecated
-    boolean canBuild(LocalPlayer player);
-
-    /**
      * Test whether the (effective) value for a list of state flags equals
      * {@code ALLOW}.
      *
@@ -149,29 +138,6 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
     <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag);
 
     /**
-     * Gets the state of a state flag. This cannot be used for the build flag.
-     *
-     * @param flag flag to check
-     * @return whether it is allowed
-     * @throws IllegalArgumentException if the build flag is given
-     * @deprecated use {@link #queryState(RegionAssociable, StateFlag...)} instead
-     */
-    @Deprecated
-    boolean allows(StateFlag flag);
-
-    /**
-     * Gets the state of a state flag. This cannot be used for the build flag.
-     *
-     * @param flag flag to check
-     * @param player player (used by some flags)
-     * @return whether the state is allows for it
-     * @throws IllegalArgumentException if the build flag is given
-     * @deprecated use {@link #queryState(RegionAssociable, StateFlag...)} instead
-     */
-    @Deprecated
-    boolean allows(StateFlag flag, @Nullable LocalPlayer player);
-
-    /**
      * Test whether a player is an owner of all regions in this set.
      *
      * @param player the player
@@ -186,34 +152,6 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
      * @return whether the player is a member of all regions
      */
     boolean isMemberOfAll(LocalPlayer player);
-
-    /**
-     * Gets the value of a flag. Do not use this for state flags
-     * (use {@link #allows(StateFlag, LocalPlayer)} for that).
-     *
-     * @param flag the flag to check
-     * @return value of the flag, which may be null
-     * @deprecated Use {@link #queryValue(RegionAssociable, Flag)} instead. There
-     *             is no difference in functionality.
-     */
-    @Deprecated
-    @Nullable
-    <T extends Flag<V>, V> V getFlag(T flag);
-
-    /**
-     * Gets the value of a flag. Do not use this for state flags
-     * (use {@link #allows(StateFlag, LocalPlayer)} for that).
-     *
-     * @param flag flag to check
-     * @param groupPlayer player to check {@link RegionGroup}s against
-     * @return value of the flag, which may be null
-     * @throws IllegalArgumentException if a StateFlag is given
-     * @deprecated Use {@link #queryValue(RegionAssociable, Flag)} instead. There
-     *             is no difference in functionality.
-     */
-    @Deprecated
-    @Nullable
-    <T extends Flag<V>, V> V getFlag(T flag, @Nullable LocalPlayer groupPlayer);
 
     /**
      * Get the number of regions that are included.

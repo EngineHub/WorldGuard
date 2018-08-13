@@ -163,9 +163,9 @@ public class ApplicableRegionSetTest {
         region.setFlag(state3, StateFlag.State.ALLOW);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.allows(state1));
-        assertFalse(set.allows(state2));
-        assertTrue(set.allows(state3));
+        assertFalse(set.testState(null, state1));
+        assertFalse(set.testState(null, state2));
+        assertTrue(set.testState(null, state3));
     }
 
     @Test
@@ -187,10 +187,10 @@ public class ApplicableRegionSetTest {
         region.setFlag(string3, "Bananas");
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertEquals(set.getFlag(string1), "Cats");
-        assertEquals(set.getFlag(string2), "Apples");
-        assertEquals(set.getFlag(string3), "Bananas");
-        assertEquals(set.getFlag(string4), null);
+        assertEquals(set.queryValue(null, string1), "Cats");
+        assertEquals(set.queryValue(null, string2), "Apples");
+        assertEquals(set.queryValue(null, string3), "Bananas");
+        assertNull(set.queryValue(null, string4));
     }
 
     @Test
@@ -216,10 +216,10 @@ public class ApplicableRegionSetTest {
         region.setFlag(string3, "Strings");
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertEquals(set.getFlag(string1), "Cats");
-        assertEquals(set.getFlag(string2), "Apples");
-        assertEquals(set.getFlag(string3), "Strings");
-        assertEquals(set.getFlag(string4), null);
+        assertEquals(set.queryValue(null, string1), "Cats");
+        assertEquals(set.queryValue(null, string2), "Apples");
+        assertEquals(set.queryValue(null, string3), "Strings");
+        assertNull(set.queryValue(null, string4));
     }
 
     @Test
@@ -241,12 +241,12 @@ public class ApplicableRegionSetTest {
         region.setFlag(state5, StateFlag.State.DENY);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.allows(state1));
-        assertFalse(set.allows(state2));
-        assertFalse(set.allows(state3));
-        assertTrue(set.allows(state4));
-        assertFalse(set.allows(state5));
-        assertTrue(set.allows(state6));
+        assertTrue(set.testState(null, state1));
+        assertFalse(set.testState(null, state2));
+        assertFalse(set.testState(null, state3));
+        assertTrue(set.testState(null, state4));
+        assertFalse(set.testState(null, state5));
+        assertTrue(set.testState(null, state6));
     }
 
     @Test
@@ -277,12 +277,12 @@ public class ApplicableRegionSetTest {
         region.setFlag(state5, StateFlag.State.ALLOW);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.allows(state1));
-        assertFalse(set.allows(state2));
-        assertFalse(set.allows(state3));
-        assertFalse(set.allows(state4));
-        assertTrue(set.allows(state5));
-        assertTrue(set.allows(state6));
+        assertFalse(set.testState(null, state1));
+        assertFalse(set.testState(null, state2));
+        assertFalse(set.testState(null, state3));
+        assertFalse(set.testState(null, state4));
+        assertTrue(set.testState(null, state5));
+        assertTrue(set.testState(null, state6));
     }
 
     @Test
@@ -297,8 +297,8 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -317,9 +317,9 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(upperMember);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(upperMember));
-        assertFalse(set.canBuild(lowerMember));
-        assertFalse(set.canBuild(nonMember));
+        assertTrue(set.testState(upperMember, Flags.BUILD));
+        assertFalse(set.testState(lowerMember, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -335,8 +335,8 @@ public class ApplicableRegionSetTest {
         region.setFlag(Flags.BUILD, StateFlag.State.DENY);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertFalse(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -352,8 +352,8 @@ public class ApplicableRegionSetTest {
         region.setFlag(Flags.BUILD, StateFlag.State.ALLOW);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertTrue(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertTrue(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -372,8 +372,8 @@ public class ApplicableRegionSetTest {
         region.setFlag(Flags.BUILD, StateFlag.State.ALLOW);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertTrue(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertTrue(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -391,8 +391,8 @@ public class ApplicableRegionSetTest {
         region = mock.add(1);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertFalse(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -410,8 +410,8 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -428,8 +428,8 @@ public class ApplicableRegionSetTest {
         region = mock.add(1);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertFalse(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -447,8 +447,8 @@ public class ApplicableRegionSetTest {
         region.setFlag(Flags.BUILD, StateFlag.State.DENY);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertFalse(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -459,8 +459,8 @@ public class ApplicableRegionSetTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertTrue(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertTrue(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -473,8 +473,8 @@ public class ApplicableRegionSetTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertTrue(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertTrue(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -489,8 +489,8 @@ public class ApplicableRegionSetTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertTrue(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertTrue(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -505,8 +505,8 @@ public class ApplicableRegionSetTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertFalse(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -524,8 +524,8 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -543,8 +543,8 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -559,8 +559,8 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -576,8 +576,8 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertTrue(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -593,8 +593,8 @@ public class ApplicableRegionSetTest {
         region.getOwners().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertFalse(set.canBuild(member));
-        assertFalse(set.canBuild(nonMember));
+        assertFalse(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -605,13 +605,13 @@ public class ApplicableRegionSetTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         region = mock.global();
-        Set<String> blocked = new HashSet<String>();
+        Set<String> blocked = new HashSet<>();
         blocked.add("/deny");
         blocked.add("/strange");
         region.setFlag(Flags.BLOCKED_CMDS, blocked);
 
         region = mock.add(0);
-        Set<String> allowed = new HashSet<String>();
+        Set<String> allowed = new HashSet<>();
         allowed.add("/permit");
         allowed.add("/strange");
         region.setFlag(Flags.ALLOWED_CMDS, allowed);
@@ -621,8 +621,8 @@ public class ApplicableRegionSetTest {
 
         set = mock.getApplicableSet();
         test = new CommandFilter(
-                set.getFlag(Flags.ALLOWED_CMDS, nonMember),
-                set.getFlag(Flags.BLOCKED_CMDS, nonMember));
+                set.queryValue(nonMember, Flags.ALLOWED_CMDS),
+                set.queryValue(nonMember, Flags.BLOCKED_CMDS));
         assertThat(test.apply("/permit"), is(true));
         assertThat(test.apply("/strange"), is(true));
         assertThat(test.apply("/other"), is(false));
@@ -630,8 +630,8 @@ public class ApplicableRegionSetTest {
 
         set = mock.getApplicableSetInWilderness();
         test = new CommandFilter(
-                set.getFlag(Flags.ALLOWED_CMDS, nonMember),
-                set.getFlag(Flags.BLOCKED_CMDS, nonMember));
+                set.queryValue(nonMember, Flags.ALLOWED_CMDS),
+                set.queryValue(nonMember, Flags.BLOCKED_CMDS));
         assertThat(test.apply("/permit"), is(true));
         assertThat(test.apply("/strange"), is(false));
         assertThat(test.apply("/other"), is(true));

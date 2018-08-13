@@ -267,13 +267,13 @@ public class WorldGuardEntityListener implements Listener {
                     if (wcfg.useRegions) {
                         ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(localPlayer.getLocation());
 
-                        if (!set.allows(Flags.MOB_DAMAGE, localPlayer) && !(attacker instanceof Tameable)) {
+                        if (!set.testState(localPlayer, Flags.MOB_DAMAGE) && !(attacker instanceof Tameable)) {
                             event.setCancelled(true);
                             return;
                         }
 
                         if (attacker instanceof Creeper) {
-                            if (!set.allows(Flags.CREEPER_EXPLOSION, localPlayer) && wcfg.explosionFlagCancellation) {
+                            if (!set.testState(localPlayer, Flags.CREEPER_EXPLOSION) && wcfg.explosionFlagCancellation) {
                                 event.setCancelled(true);
                                 return;
                             }
@@ -308,7 +308,7 @@ public class WorldGuardEntityListener implements Listener {
                     return;
                 }
                 if (wcfg.useRegions) {
-                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(localPlayer.getLocation()).allows(Flags.MOB_DAMAGE, localPlayer)) {
+                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(localPlayer.getLocation()).testState(localPlayer, Flags.MOB_DAMAGE)) {
                         event.setCancelled(true);
                         return;
                     }
@@ -385,7 +385,7 @@ public class WorldGuardEntityListener implements Listener {
                 if (wcfg.useRegions) {
                     ApplicableRegionSet set = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(localPlayer.getLocation());
 
-                    if (!set.allows(Flags.MOB_DAMAGE, plugin.wrapPlayer(player))) {
+                    if (!set.testState(plugin.wrapPlayer(player), Flags.MOB_DAMAGE)) {
                         event.setCancelled(true);
                         return;
                     }
@@ -504,7 +504,7 @@ public class WorldGuardEntityListener implements Listener {
             // allow wither skull blocking since there is no dedicated flag atm
             if (wcfg.useRegions) {
                 for (Block block : event.blockList()) {
-                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation())).allows(Flags.GHAST_FIREBALL)) {
+                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation())).testState(null, Flags.GHAST_FIREBALL)) {
                         event.blockList().clear();
                         if (wcfg.explosionFlagCancellation) event.setCancelled(true);
                         return;
@@ -538,7 +538,7 @@ public class WorldGuardEntityListener implements Listener {
             }
             if (wcfg.useRegions) {
                 for (Block block : event.blockList()) {
-                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation())).allows(Flags.OTHER_EXPLOSION)) {
+                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation())).testState(null, Flags.OTHER_EXPLOSION)) {
                         event.blockList().clear();
                         if (wcfg.explosionFlagCancellation) event.setCancelled(true);
                         return;
@@ -643,13 +643,14 @@ public class WorldGuardEntityListener implements Listener {
             ApplicableRegionSet set =
                     WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(eventLoc));
 
-            if (!set.allows(Flags.MOB_SPAWNING)) {
+            if (!set.testState(null, Flags.MOB_SPAWNING)) {
                 event.setCancelled(true);
                 return;
             }
 
-            Set<com.sk89q.worldedit.world.entity.EntityType> entityTypes = set.getFlag(Flags.DENY_SPAWN);
-            if (entityTypes != null && entityTypes.contains(entityType)) {
+            Set<com.sk89q.worldedit.world.entity.EntityType> entityTypes = set.queryValue(null, Flags.DENY_SPAWN);
+            com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
+            if (entityTypes != null && weEntityType != null && entityTypes.contains(weEntityType)) {
                 event.setCancelled(true);
                 return;
             }

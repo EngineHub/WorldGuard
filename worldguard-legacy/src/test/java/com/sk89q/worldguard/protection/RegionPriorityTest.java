@@ -132,11 +132,11 @@ public abstract class RegionPriorityTest {
         fountain.setPriority(0);
         
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(Flags.FIRE_SPREAD));
-        assertFalse(appl.allows(Flags.MOB_SPAWNING));
+        assertTrue(appl.testState(null, Flags.FIRE_SPREAD));
+        assertFalse(appl.testState(null, Flags.MOB_SPAWNING));
         appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allows(Flags.FIRE_SPREAD));
-        assertTrue(appl.allows(Flags.MOB_SPAWNING));
+        assertFalse(appl.testState(null, Flags.FIRE_SPREAD));
+        assertTrue(appl.testState(null, Flags.MOB_SPAWNING));
     }
     
     @Test
@@ -147,9 +147,9 @@ public abstract class RegionPriorityTest {
         fountain.setPriority(0);
         
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(Flags.FIRE_SPREAD));
+        assertTrue(appl.testState(null, Flags.FIRE_SPREAD));
         appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allows(Flags.FIRE_SPREAD));
+        assertFalse(appl.testState(null, Flags.FIRE_SPREAD));
     }
     
     @Test
@@ -160,8 +160,8 @@ public abstract class RegionPriorityTest {
         fountain.setPriority(5);
         
         appl = manager.getApplicableRegions(inCourtyard);
-        assertFalse(appl.allows(Flags.MOB_SPAWNING));
+        assertFalse(appl.testState(null, Flags.MOB_SPAWNING));
         appl = manager.getApplicableRegions(inFountain);
-        assertTrue(appl.allows(Flags.MOB_SPAWNING));
+        assertTrue(appl.testState(null, Flags.MOB_SPAWNING));
     }
 }

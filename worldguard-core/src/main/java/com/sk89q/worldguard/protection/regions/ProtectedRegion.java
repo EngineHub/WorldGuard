@@ -566,17 +566,6 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     public abstract RegionType getType();
 
     /**
-     * Return the type of region as a user-friendly, lowercase name.
-     *
-     * @return type of region
-     * @deprecated use {@link #getType()}
-     */
-    @Deprecated
-    public final String getTypeName() {
-        return getType().getName();
-    }
-
-    /**
      * Return a list of regions from the given list of regions that intersect
      * with this region.
      *

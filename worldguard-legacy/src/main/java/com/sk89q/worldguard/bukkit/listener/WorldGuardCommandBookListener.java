@@ -24,6 +24,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -71,7 +72,7 @@ public class WorldGuardCommandBookListener implements Listener {
                 if (regions.size() > 0) {
                     event.addWhoisInformation("Current Regions", regionStr);
                 }
-                event.addWhoisInformation("Can build", regions.canBuild(localPlayer));
+                event.addWhoisInformation("Can build", regions.testState(localPlayer, Flags.BUILD));
             }
         }
     }

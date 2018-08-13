@@ -19,26 +19,15 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.sk89q.worldguard.LocalPlayer;
+import static com.sk89q.worldguard.protection.flags.StateFlag.test;
+
 import com.sk89q.worldguard.protection.association.RegionAssociable;
-import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldguard.protection.flags.StateFlag.test;
-
 public abstract class AbstractRegionSet implements ApplicableRegionSet {
-
-    @Override
-    @Deprecated
-    public boolean canBuild(LocalPlayer player) {
-        checkNotNull(player);
-        return test(queryState(player, Flags.BUILD));
-    }
 
     @Override
     public boolean testState(@Nullable RegionAssociable subject, StateFlag... flags) {
@@ -58,44 +47,6 @@ public abstract class AbstractRegionSet implements ApplicableRegionSet {
         }
 
         return value;
-    }
-
-    @Override
-    @Deprecated
-    public boolean allows(StateFlag flag) {
-        checkNotNull(flag);
-
-        if (flag == Flags.BUILD) {
-            throw new IllegalArgumentException("Can't use build flag with allows()");
-        }
-
-        return test(queryState(null, flag));
-    }
-
-    @Override
-    @Deprecated
-    public boolean allows(StateFlag flag, @Nullable LocalPlayer player) {
-        checkNotNull(flag);
-
-        if (flag == Flags.BUILD) {
-            throw new IllegalArgumentException("Can't use build flag with allows()");
-        }
-
-        return test(queryState(player, flag));
-    }
-
-    @Override
-    @Deprecated
-    @Nullable
-    public <T extends Flag<V>, V> V getFlag(T flag, @Nullable LocalPlayer groupPlayer) {
-        return queryValue(groupPlayer, flag);
-    }
-
-    @Override
-    @Deprecated
-    @Nullable
-    public <T extends Flag<V>, V> V getFlag(T flag) {
-        return getFlag(flag, null);
     }
 
 }

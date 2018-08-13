@@ -288,8 +288,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (item != null && item.getType().getKey().toString().equals(wcfg.regionWand) && plugin.hasPermission(player, "worldguard.region.wand")) {
                 if (set.size() > 0) {
-                    player.sendMessage(ChatColor.YELLOW + "Can you build? "
-                            + (set.canBuild(localPlayer) ? "Yes" : "No"));
+                    player.sendMessage(ChatColor.YELLOW + "Can you build? " + (set.testState(localPlayer, Flags.BUILD) ? "Yes" : "No"));
 
                     StringBuilder str = new StringBuilder();
                     for (Iterator<ProtectedRegion> it = set.iterator(); it.hasNext();) {
@@ -299,9 +298,9 @@ public class WorldGuardPlayerListener implements Listener {
                         }
                     }
 
-                    player.sendMessage(ChatColor.YELLOW + "Applicable regions: " + str.toString());
+                    localPlayer.print("Applicable regions: " + str.toString());
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + "WorldGuard: No defined regions here!");
+                    localPlayer.print("WorldGuard: No defined regions here!");
                 }
 
                 event.setCancelled(true);
@@ -334,17 +333,16 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        Location location = player.getLocation();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(player.getWorld()));
+        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(localPlayer.getWorld());
 
         if (wcfg.useRegions) {
             ApplicableRegionSet set =
-                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(location));
+                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(localPlayer.getLocation());
 
-            LocalPlayer localPlayer = plugin.wrapPlayer(player);
-            com.sk89q.worldedit.util.Location spawn = set.getFlag(Flags.SPAWN_LOC, localPlayer);
+            com.sk89q.worldedit.util.Location spawn = set.queryValue(localPlayer, Flags.SPAWN_LOC);
 
             if (spawn != null) {
                 event.setRespawnLocation(BukkitAdapter.adapt(spawn));
@@ -395,8 +393,8 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (event.getCause() == TeleportCause.ENDER_PEARL) {
                 if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())
-                        && !(set.allows(Flags.ENDERPEARL, localPlayer)
-                                && setFrom.allows(Flags.ENDERPEARL, localPlayer))) {
+                        && !(set.testState(localPlayer, Flags.ENDERPEARL)
+                                && setFrom.testState(localPlayer, Flags.ENDERPEARL))) {
                     player.sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
                     event.setCancelled(true);
                     return;
@@ -405,8 +403,8 @@ public class WorldGuardPlayerListener implements Listener {
             try {
                 if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
                     if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
-                        boolean allowFrom = setFrom.allows(Flags.CHORUS_TELEPORT, localPlayer);
-                        boolean allowTo = set.allows(Flags.CHORUS_TELEPORT, localPlayer);
+                        boolean allowFrom = setFrom.testState(localPlayer, Flags.CHORUS_TELEPORT);
+                        boolean allowTo = set.testState(localPlayer, Flags.CHORUS_TELEPORT);
                         if (!allowFrom || !allowTo) {
                             player.sendMessage(ChatColor.DARK_RED + "You're not allowed to teleport " +
                                     (!allowFrom ? "from here." : "there."));

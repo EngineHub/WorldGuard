@@ -273,26 +273,26 @@ public class WorldGuardBlockListener implements Listener {
                     WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation()));
 
             if (wcfg.highFreqFlags && isFireSpread
-                    && !set.allows(Flags.FIRE_SPREAD)) {
+                    && !set.testState(null, Flags.FIRE_SPREAD)) {
                 event.setCancelled(true);
                 return;
             }
 
             if (wcfg.highFreqFlags && cause == IgniteCause.LAVA
-                    && !set.allows(Flags.LAVA_FIRE)) {
+                    && !set.testState(null, Flags.LAVA_FIRE)) {
                 event.setCancelled(true);
                 return;
             }
 
             if (cause == IgniteCause.FIREBALL && event.getPlayer() == null) {
                 // wtf bukkit, FIREBALL is supposed to be reserved to players
-                if (!set.allows(Flags.GHAST_FIREBALL)) {
+                if (!set.testState(null, Flags.GHAST_FIREBALL)) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if (cause == IgniteCause.LIGHTNING && !set.allows(Flags.LIGHTNING)) {
+            if (cause == IgniteCause.LIGHTNING && !set.testState(null, Flags.LIGHTNING)) {
                 event.setCancelled(true);
                 return;
             }
@@ -347,7 +347,7 @@ public class WorldGuardBlockListener implements Listener {
             ApplicableRegionSet set =
                     WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation()));
 
-            if (!set.allows(Flags.FIRE_SPREAD)) {
+            if (!set.testState(null, Flags.FIRE_SPREAD)) {
                 checkAndDestroyAround(block.getWorld(), x, y, z, Material.FIRE);
                 event.setCancelled(true);
             }

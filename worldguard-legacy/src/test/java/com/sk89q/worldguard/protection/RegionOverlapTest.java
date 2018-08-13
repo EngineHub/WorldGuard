@@ -138,17 +138,17 @@ public abstract class RegionOverlapTest {
 
         // Outside
         appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.allows(Flags.FIRE_SPREAD));
+        assertTrue(appl.testState(null, Flags.FIRE_SPREAD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(Flags.FIRE_SPREAD));
+        assertTrue(appl.testState(null, Flags.FIRE_SPREAD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allows(Flags.FIRE_SPREAD));
+        assertFalse(appl.testState(null, Flags.FIRE_SPREAD));
 
         // Inside no fire zone
         appl = manager.getApplicableRegions(inNoFire);
-        assertFalse(appl.allows(Flags.FIRE_SPREAD));
+        assertFalse(appl.testState(null, Flags.FIRE_SPREAD));
     }
 
     @Test
@@ -157,31 +157,31 @@ public abstract class RegionOverlapTest {
 
         // Outside
         appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.canBuild(player1));
+        assertTrue(appl.testState(player1, Flags.BUILD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.canBuild(player1));
+        assertTrue(appl.testState(player1, Flags.BUILD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        assertTrue(appl.canBuild(player1));
+        assertTrue(appl.testState(player1, Flags.BUILD));
     }
 
     @Test
     public void testPlayer2BuildAccess() {
         ApplicableRegionSet appl;
 
-        HashSet<ProtectedRegion> test = new HashSet<ProtectedRegion>();
+        HashSet<ProtectedRegion> test = new HashSet<>();
         test.add(courtyard);
         test.add(fountain);
 
         // Outside
         appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.canBuild(player2));
+        assertTrue(appl.testState(player2, Flags.BUILD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertFalse(appl.canBuild(player2));
+        assertFalse(appl.testState(player2, Flags.BUILD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        assertTrue(appl.canBuild(player2));
+        assertTrue(appl.testState(player2, Flags.BUILD));
     }
 }

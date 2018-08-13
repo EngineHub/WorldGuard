@@ -27,7 +27,6 @@ import com.sk89q.worldguard.blacklist.target.ItemTarget;
 import com.sk89q.worldguard.blacklist.target.Target;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -40,28 +39,9 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-
 public class BukkitUtil {
 
     private BukkitUtil() {
-    }
-
-    /**
-     * Matches one player based on name.
-     *
-     * @param server The server to check
-     * @param name The name to attempt to match
-     * @deprecated see {@link WorldGuardPlugin#matchSinglePlayer(org.bukkit.command.CommandSender, String)}
-     * @return The matched player if any, otherwise null
-     */
-    @Deprecated
-    public static Player matchSinglePlayer(Server server, String name) {
-        List<Player> players = server.matchPlayer(name);
-        if (players.size() == 0) {
-            return null;
-        }
-        return players.get(0);
     }
 
     /**

@@ -131,8 +131,8 @@ public abstract class RegionEntryExitTest {
 //        System.out.println("flag " + appl.getFlag(Flags.ENTRY));
 //        System.out.println("grp  " + appl.getFlag(Flags.ENTRY.getRegionGroupFlag()));
 //        System.out.println("===");
-        assertTrue("Allowed Entry", appl.allows(Flags.ENTRY, vipPlayer));
-        assertFalse("Forbidden Entry", appl.allows(Flags.ENTRY, builderPlayer));
+        assertTrue("Allowed Entry", appl.testState(vipPlayer, Flags.ENTRY));
+        assertFalse("Forbidden Entry", appl.testState(builderPlayer, Flags.ENTRY));
     }
 
     @Test
@@ -146,8 +146,8 @@ public abstract class RegionEntryExitTest {
 //        System.out.println("flag " + appl.getFlag(Flags.EXIT));
 //        System.out.println("grp  " + appl.getFlag(Flags.EXIT.getRegionGroupFlag()));
 //        System.out.println("===");
-        assertTrue("Allowed Exit", appl.allows(Flags.EXIT, builderPlayer));
-        assertFalse("Forbidden Exit", appl.allows(Flags.EXIT, vipPlayer));
+        assertTrue("Allowed Exit", appl.testState(builderPlayer, Flags.EXIT));
+        assertFalse("Forbidden Exit", appl.testState(vipPlayer, Flags.EXIT));
     }
 
 }
