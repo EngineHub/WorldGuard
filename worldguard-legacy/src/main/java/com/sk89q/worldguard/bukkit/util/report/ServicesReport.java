@@ -19,13 +19,11 @@
 
 package com.sk89q.worldguard.bukkit.util.report;
 
-import com.sk89q.worldguard.util.report.DataReport;
+import com.sk89q.worldedit.util.report.DataReport;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicesManager;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collection;
-import java.util.List;
 
 public class ServicesReport extends DataReport {
 

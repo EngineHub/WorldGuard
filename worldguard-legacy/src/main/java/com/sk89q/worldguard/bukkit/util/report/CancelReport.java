@@ -21,8 +21,8 @@ package com.sk89q.worldguard.bukkit.util.report;
 
 import com.sk89q.worldguard.bukkit.event.debug.CancelAttempt;
 import com.sk89q.worldguard.bukkit.util.HandlerTracer;
-import com.sk89q.worldguard.util.report.Report;
-import com.sk89q.worldguard.util.report.StackTraceReport;
+import com.sk89q.worldedit.util.report.Report;
+import com.sk89q.worldedit.util.report.StackTraceReport;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;

@@ -23,7 +23,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.config.YamlConfigurationManager;
-import com.sk89q.worldguard.util.report.Unreported;
+import com.sk89q.worldedit.util.report.Unreported;
 
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;

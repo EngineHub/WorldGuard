@@ -26,7 +26,7 @@ import com.sk89q.worldguard.protection.managers.storage.DriverType;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
-import com.sk89q.worldguard.util.report.Unreported;
+import com.sk89q.worldedit.util.report.Unreported;
 import com.sk89q.worldguard.util.sql.DataSourceConfig;
 
 import java.io.File;

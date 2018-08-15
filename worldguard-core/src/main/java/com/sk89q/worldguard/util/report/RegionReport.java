@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.util.report;
 
+import com.sk89q.worldedit.util.report.DataReport;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 /**

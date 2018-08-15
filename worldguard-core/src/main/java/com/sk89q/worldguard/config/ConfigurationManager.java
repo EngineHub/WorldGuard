@@ -25,7 +25,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.storage.DriverType;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.session.handler.WaterBreathing;
-import com.sk89q.worldguard.util.report.Unreported;
+import com.sk89q.worldedit.util.report.Unreported;
 
 import java.io.File;
 import java.util.HashMap;

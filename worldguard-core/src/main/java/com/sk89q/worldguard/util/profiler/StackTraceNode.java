@@ -40,13 +40,7 @@ public class StackTraceNode extends StackNode {
 
     @Override
     public int compareTo(StackNode o) {
-        if (getTotalTime() == o.getTotalTime()) {
-            return 0;
-        } else if (getTotalTime()> o.getTotalTime()) {
-            return -1;
-        } else {
-            return 1;
-        }
+        return Long.compare(o.getTotalTime(), getTotalTime());
     }
 
 }

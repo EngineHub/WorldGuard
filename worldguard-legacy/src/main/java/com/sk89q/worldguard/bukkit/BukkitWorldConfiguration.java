@@ -22,6 +22,9 @@ package com.sk89q.worldguard.bukkit;
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.report.Unreported;
+import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
@@ -31,13 +34,11 @@ import com.sk89q.worldguard.blacklist.logger.DatabaseHandler;
 import com.sk89q.worldguard.blacklist.logger.FileHandler;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
-import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.bukkit.chest.BukkitSignChestProtection;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.bukkit.internal.TargetMatcherSet;
+import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.config.YamlWorldConfiguration;
-import com.sk89q.worldguard.util.report.Unreported;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.yaml.snakeyaml.parser.ParserException;
@@ -49,7 +50,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -70,108 +70,9 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
     @Unreported private ChestProtection chestProtection = new BukkitSignChestProtection();
 
     /* Configuration data start */
-    public boolean summaryOnStart;
-    public boolean opPermissions;
-    public boolean buildPermissions;
-    public String buildPermissionDenyMessage = "";
-    public boolean fireSpreadDisableToggle;
-    public boolean itemDurability;
-    public boolean disableExpDrops;
     public Set<PotionEffectType> blockPotions;
-    public boolean blockPotionsAlways;
-    public boolean pumpkinScuba;
-    public boolean noPhysicsGravel;
-    public boolean noPhysicsSand;
-    public boolean ropeLadders;
-    public boolean allowPortalAnywhere;
-    public Set<String> preventWaterDamage;
-    public boolean blockLighter;
-    public boolean disableFireSpread;
-    public Set<String> disableFireSpreadBlocks;
-    public boolean preventLavaFire;
-    public Set<String> allowedLavaSpreadOver;
-    public boolean blockTNTExplosions;
-    public boolean blockTNTBlockDamage;
-    public boolean blockCreeperExplosions;
-    public boolean blockCreeperBlockDamage;
-    public boolean blockWitherExplosions;
-    public boolean blockWitherBlockDamage;
-    public boolean blockWitherSkullExplosions;
-    public boolean blockWitherSkullBlockDamage;
-    public boolean blockEnderDragonBlockDamage;
-    public boolean blockEnderDragonPortalCreation;
-    public boolean blockFireballExplosions;
-    public boolean blockFireballBlockDamage;
-    public boolean blockOtherExplosions;
-    public boolean blockEntityPaintingDestroy;
-    public boolean blockEntityItemFrameDestroy;
-    public boolean blockEntityArmorStandDestroy;
-    public boolean blockPluginSpawning;
-    public boolean blockGroundSlimes;
-    public boolean blockZombieDoorDestruction;
-    public boolean disableContactDamage;
-    public boolean disableFallDamage;
-    public boolean disableLavaDamage;
-    public boolean disableFireDamage;
-    public boolean disableLightningDamage;
-    public boolean disableDrowningDamage;
-    public boolean disableSuffocationDamage;
-    public boolean teleportOnSuffocation;
-    public boolean disableVoidDamage;
-    public boolean teleportOnVoid;
-    public boolean disableExplosionDamage;
-    public boolean disableMobDamage;
-    public boolean highFreqFlags;
-    public boolean checkLiquidFlow;
-    public String regionWand;
-    public Set<EntityType> blockCreatureSpawn;
-    public boolean allowTamedSpawns;
-    // public boolean useiConomy;
-    // public boolean buyOnClaim;
-    // public double buyOnClaimPrice;
-    public int maxClaimVolume;
-    public boolean claimOnlyInsideExistingRegions;
-    public int maxRegionCountPerPlayer;
-    public boolean antiWolfDumbness;
-    public boolean signChestProtection;
-    public boolean disableSignChestProtectionCheck;
-    public boolean removeInfiniteStacks;
-    public boolean disableCreatureCropTrampling;
-    public boolean disablePlayerCropTrampling;
-    public boolean preventLightningFire;
-    public Set<String> disallowedLightningBlocks;
-    public boolean disableThunder;
-    public boolean disableWeather;
-    public boolean alwaysRaining;
-    public boolean alwaysThundering;
-    public boolean disablePigZap;
-    public boolean disableCreeperPower;
-    public boolean disableHealthRegain;
-    public boolean disableMushroomSpread;
-    public boolean disableIceMelting;
-    public boolean disableSnowMelting;
-    public boolean disableSnowFormation;
-    public boolean disableIceFormation;
-    public boolean disableLeafDecay;
-    public boolean disableGrassGrowth;
-    public boolean disableMyceliumSpread;
-    public boolean disableVineGrowth;
-    public boolean disableEndermanGriefing;
-    public boolean disableSnowmanTrails;
-    public boolean disableSoilDehydration;
-    public Set<String> allowedSnowFallOver;
-    public boolean regionInvinciblityRemovesMobs;
-    public boolean regionNetherPortalProtection;
-    public boolean fakePlayerBuildOverride;
-    public boolean explosionFlagCancellation;
-    public boolean disableDeathMessages;
-    public boolean disableObsidianGenerators;
-    public boolean strictEntitySpawn;
     public TargetMatcherSet allowAllInteract;
-    public boolean ignoreHopperMoveEvents;
     public TargetMatcherSet blockUseAtFeet;
-    private Map<String, Integer> maxRegionCounts;
-
     /* Configuration data end */
 
     /**
@@ -381,12 +282,10 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         blockCreatureSpawn = new HashSet<>();
         for (String creatureName : getStringList("mobs.block-creature-spawn", null)) {
-            EntityType creature = EntityType.fromName(creatureName);
+            EntityType creature = EntityTypes.get(creatureName.toLowerCase());
 
             if (creature == null) {
-                log.warning("Unknown mob type '" + creatureName + "'");
-            } else if (!creature.isAlive()) {
-                log.warning("Entity type '" + creatureName + "' is not a creature");
+                log.warning("Unknown entity type '" + creatureName + "'");
             } else {
                 blockCreatureSpawn.add(creature);
             }

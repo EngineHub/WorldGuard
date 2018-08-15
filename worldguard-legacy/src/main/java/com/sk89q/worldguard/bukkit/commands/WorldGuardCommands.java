@@ -19,35 +19,42 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.sk89q.minecraft.util.commands.*;
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.util.report.ReportList;
+import com.sk89q.worldedit.util.report.SystemInfoReport;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
-import com.sk89q.worldguard.bukkit.util.report.*;
+import com.sk89q.worldguard.bukkit.util.report.PerformanceReport;
+import com.sk89q.worldguard.bukkit.util.report.PluginReport;
+import com.sk89q.worldguard.bukkit.util.report.SchedulerReport;
+import com.sk89q.worldguard.bukkit.util.report.ServerReport;
+import com.sk89q.worldguard.bukkit.util.report.ServicesReport;
+import com.sk89q.worldguard.bukkit.util.report.WorldReport;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.util.profiler.SamplerBuilder;
 import com.sk89q.worldguard.util.profiler.SamplerBuilder.Sampler;
 import com.sk89q.worldguard.util.profiler.ThreadIdFilter;
 import com.sk89q.worldguard.util.profiler.ThreadNameFilter;
-import com.sk89q.worldguard.util.report.ReportList;
-import com.sk89q.worldguard.util.report.SystemInfoReport;
+import com.sk89q.worldguard.util.report.ConfigReport;
 import com.sk89q.worldguard.util.task.Task;
 import com.sk89q.worldguard.util.task.TaskStateComparator;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ThreadInfo;
@@ -55,8 +62,11 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Nullable;
 
 public class WorldGuardCommands {
 
@@ -128,7 +138,7 @@ public class WorldGuardCommands {
         report.add(new ServicesReport());
         report.add(new WorldReport());
         report.add(new PerformanceReport());
-        report.add(new ConfigReport(plugin));
+        report.add(new ConfigReport());
         String result = report.toString();
 
         try {
@@ -164,7 +174,7 @@ public class WorldGuardCommands {
         if (threadName == null) {
             threadFilter = new ThreadIdFilter(Thread.currentThread().getId());
         } else if (threadName.equals("*")) {
-            threadFilter = Predicates.alwaysTrue();
+            threadFilter = thread -> true;
         } else {
             threadFilter = new ThreadNameFilter(threadName);
         }

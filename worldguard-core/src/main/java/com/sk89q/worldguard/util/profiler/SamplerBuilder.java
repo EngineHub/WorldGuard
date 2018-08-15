@@ -19,26 +19,29 @@
 
 package com.sk89q.worldguard.util.profiler;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
-import java.util.*;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.function.Predicate;
 
 public class SamplerBuilder {
 
     private static final Timer timer = new Timer("WorldGuard Sampler", true);
     private int interval = 100;
     private long runTime = TimeUnit.MINUTES.toMillis(5);
-    private Predicate<ThreadInfo> threadFilter = Predicates.alwaysTrue();
+    private Predicate<ThreadInfo> threadFilter = thread -> true;
 
     public int getInterval() {
         return interval;
@@ -78,7 +81,7 @@ public class SamplerBuilder {
         private final Predicate<ThreadInfo> threadFilter;
         private final long endTime;
 
-        private final SortedMap<String, StackNode> nodes = new TreeMap<String, StackNode>();
+        private final SortedMap<String, StackNode> nodes = new TreeMap<>();
         private final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
         private final SettableFuture<Sampler> future = SettableFuture.create();
 
@@ -119,7 +122,7 @@ public class SamplerBuilder {
                     String threadName = threadInfo.getThreadName();
                     StackTraceElement[] stack = threadInfo.getStackTrace();
 
-                    if (threadName != null && stack != null && threadFilter.apply(threadInfo)) {
+                    if (threadName != null && stack != null && threadFilter.test(threadInfo)) {
                         StackNode node = getNode(threadName);
                         node.log(stack, interval);
                     }

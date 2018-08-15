@@ -19,9 +19,8 @@
 
 package com.sk89q.worldguard.util.profiler;
 
-import com.google.common.base.Predicate;
-
 import java.lang.management.ThreadInfo;
+import java.util.function.Predicate;
 
 public class ThreadIdFilter implements Predicate<ThreadInfo> {
 
@@ -32,7 +31,7 @@ public class ThreadIdFilter implements Predicate<ThreadInfo> {
     }
 
     @Override
-    public boolean apply(ThreadInfo threadInfo) {
+    public boolean test(ThreadInfo threadInfo) {
         return threadInfo.getThreadId() == id;
     }
 }

@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.config;
 
 import com.sk89q.util.yaml.YAMLProcessor;
-import com.sk89q.worldguard.util.report.Unreported;
+import com.sk89q.worldedit.util.report.Unreported;
 
 import java.util.ArrayList;
 import java.util.List;

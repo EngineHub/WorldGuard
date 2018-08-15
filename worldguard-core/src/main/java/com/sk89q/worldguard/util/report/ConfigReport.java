@@ -17,38 +17,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.util.report;
+package com.sk89q.worldguard.util.report;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.util.report.DataReport;
+import com.sk89q.worldedit.util.report.ShallowObjectReport;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.util.report.DataReport;
-import com.sk89q.worldguard.util.report.RegionReport;
-import com.sk89q.worldguard.util.report.ShallowObjectReport;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 
 import java.util.List;
 
 public class ConfigReport extends DataReport {
 
-    public ConfigReport(WorldGuardPlugin plugin) {
+    public ConfigReport() {
         super("WorldGuard Configuration");
 
-        List<World> worlds = Bukkit.getServer().getWorlds();
+        List<? extends World> worlds = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds();
 
         append("Configuration", new ShallowObjectReport("Configuration", WorldGuard.getInstance().getPlatform().getGlobalStateManager()));
 
         for (World world : worlds) {
-            com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
-            WorldConfiguration config = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(weWorld);
+            WorldConfiguration config = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
             DataReport report = new DataReport("World: " + world.getName());
-            report.append("UUID", world.getUID());
             report.append("Configuration", new ShallowObjectReport("Configuration", config));
 
             Blacklist blacklist = config.getBlacklist();
@@ -61,7 +57,7 @@ public class ConfigReport extends DataReport {
                 report.append("Blacklist", "<Disabled>");
             }
 
-            RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(weWorld);
+            RegionManager regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
             if (regions != null) {
                 DataReport section = new DataReport("Regions");
                 section.append("Region Count", regions.size());

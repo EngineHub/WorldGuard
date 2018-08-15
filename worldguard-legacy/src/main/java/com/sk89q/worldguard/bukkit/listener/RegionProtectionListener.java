@@ -477,7 +477,7 @@ public class RegionProtectionListener extends AbstractListener {
             Player defender = (Player) event.getEntity();
 
             // if defender is an NPC
-            if (defender.hasMetadata("NPC")) {
+            if (Entities.isNPC(defender)) {
                 return;
             }
 
