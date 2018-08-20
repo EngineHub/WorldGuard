@@ -22,13 +22,7 @@ package com.sk89q.worldguard.bukkit;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.minecraft.util.commands.CommandUsageException;
-import com.sk89q.minecraft.util.commands.CommandsManager;
-import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
-import com.sk89q.minecraft.util.commands.SimpleInjector;
-import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitCommandSender;
@@ -40,27 +34,7 @@ import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
-import com.sk89q.worldguard.bukkit.listener.BlacklistListener;
-import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
-import com.sk89q.worldguard.bukkit.listener.BuildPermissionListener;
-import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
-import com.sk89q.worldguard.bukkit.listener.DebuggingListener;
-import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
-import com.sk89q.worldguard.bukkit.listener.InvincibilityListener;
-import com.sk89q.worldguard.bukkit.listener.PlayerModesListener;
-import com.sk89q.worldguard.bukkit.listener.PlayerMoveListener;
-import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
-import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
-import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
-import com.sk89q.worldguard.bukkit.listener.WorldGuardCommandBookListener;
-import com.sk89q.worldguard.bukkit.listener.WorldGuardEntityListener;
-import com.sk89q.worldguard.bukkit.listener.WorldGuardHangingListener;
-import com.sk89q.worldguard.bukkit.listener.WorldGuardPlayerListener;
-import com.sk89q.worldguard.bukkit.listener.WorldGuardServerListener;
-import com.sk89q.worldguard.bukkit.listener.WorldGuardVehicleListener;
-import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
-import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
-import com.sk89q.worldguard.bukkit.listener.WorldRulesListener;
+import com.sk89q.worldguard.bukkit.listener.*;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.logging.ClassSourceValidator;
@@ -83,24 +57,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import javax.annotation.Nullable;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-
-import javax.annotation.Nullable;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
@@ -128,6 +93,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     /**
      * Get the current instance of WorldGuard
+     *
      * @return WorldGuardPlugin instance
      */
     public static WorldGuardPlugin inst() {
@@ -212,10 +178,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            ProcessPlayerEvent event = new ProcessPlayerEvent(player);
-            Events.fire(event);
-        }
+        Bukkit.getScheduler().runTask(this, () -> {
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                ProcessPlayerEvent event = new ProcessPlayerEvent(player);
+                Events.fire(event);
+            }
+        });
 
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
     }
@@ -279,7 +247,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * This calls the corresponding method in PermissionsResolverManager
      *
      * @param player The player to check
-     * @param group The group
+     * @param group  The group
      * @return whether {@code player} is in {@code group}
      */
     public boolean inGroup(Player player, String group) {
@@ -294,6 +262,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Get the groups of a player.
      * This calls the corresponding method in PermissionsResolverManager.
+     *
      * @param player The player to check
      * @return The names of each group the playe is in.
      */
@@ -341,7 +310,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Checks permissions.
      *
      * @param sender The sender to check the permission on.
-     * @param perm The permission to check the permission on.
+     * @param perm   The permission to check the permission on.
      * @return whether {@code sender} has {@code perm}
      */
     public boolean hasPermission(CommandSender sender, String perm) {
@@ -368,7 +337,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Checks permissions and throws an exception if permission is not met.
      *
      * @param sender The sender to check the permission on.
-     * @param perm The permission to check the permission on.
+     * @param perm   The permission to check the permission on.
      * @throws CommandPermissionsException if {@code sender} doesn't have {@code perm}
      */
     public void checkPermission(CommandSender sender, String perm)
@@ -396,14 +365,14 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     /**
      * Match player names.
-     *
+     * <p>
      * The filter string uses the following format:
-     * @[name] looks up all players with the exact {@code name}
-     * *[name] matches any player whose name contains {@code name}
-     * [name] matches any player whose name starts with {@code name}
      *
      * @param filter The filter string to check.
      * @return A {@link List} of players who match {@code filter}
+     * @[name] looks up all players with the exact {@code name}
+     * *[name] matches any player whose name contains {@code name}
+     * [name] matches any player whose name starts with {@code name}
      */
     public List<Player> matchPlayerNames(String filter) {
         Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
@@ -423,7 +392,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             }
 
             return new ArrayList<>();
-        // Allow partial name matching
+            // Allow partial name matching
         } else if (filter.charAt(0) == '*' && filter.length() >= 2) {
             filter = filter.substring(1);
 
@@ -437,7 +406,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
             return list;
 
-        // Start with name matching
+            // Start with name matching
         } else {
             List<Player> list = new ArrayList<>();
 
@@ -471,7 +440,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     /**
      * Matches players based on the specified filter string
-     *
+     * <p>
      * The filter string format is as follows:
      * * returns all the players currently online
      * If {@code sender} is a {@link Player}:
@@ -512,7 +481,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
                 return checkPlayerMatch(players);
 
-            // Handle #near, which is for nearby players.
+                // Handle #near, which is for nearby players.
             } else if (filter.equalsIgnoreCase("#near")) {
                 List<Player> players = new ArrayList<>();
                 Player sourcePlayer = checkPlayer(source);
@@ -522,8 +491,8 @@ public class WorldGuardPlugin extends JavaPlugin {
 
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     if (player.getWorld().equals(sourceWorld)
-                            && player.getLocation().toVector().distanceSquared(
-                                    sourceVector) < 900) {
+                                && player.getLocation().toVector().distanceSquared(
+                            sourceVector) < 900) {
                         players.add(player);
                     }
                 }
@@ -545,9 +514,9 @@ public class WorldGuardPlugin extends JavaPlugin {
      *
      * @param sender The {@link CommandSender} who is requesting a player match
      * @param filter The filter string.
-     * @see #matchPlayers(org.bukkit.entity.Player) for filter string syntax
      * @return The single player
      * @throws CommandException If more than one player match was found
+     * @see #matchPlayers(org.bukkit.entity.Player) for filter string syntax
      */
     public Player matchSinglePlayer(CommandSender sender, String filter)
             throws CommandException {
@@ -561,7 +530,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         // as that may be the wrong player)
         if (players.hasNext()) {
             throw new CommandException("More than one player found! " +
-                        "Use @<name> for exact matching.");
+                                               "Use @<name> for exact matching.");
         }
 
         return match;
@@ -569,10 +538,11 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     /**
      * Match only a single player or console.
-     *
+     * <p>
      * The filter string syntax is as follows:
      * #console, *console, or ! return the server console
      * All syntax from {@link #matchSinglePlayer(org.bukkit.command.CommandSender, String)}
+     *
      * @param sender The sender trying to match a CommandSender
      * @param filter The filter string
      * @return The resulting CommandSender
@@ -583,8 +553,8 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         // Let's see if console is wanted
         if (filter.equalsIgnoreCase("#console")
-                || filter.equalsIgnoreCase("*console*")
-                || filter.equalsIgnoreCase("!")) {
+                    || filter.equalsIgnoreCase("*console*")
+                    || filter.equalsIgnoreCase("!")) {
             return getServer().getConsoleSender();
         }
 
@@ -603,7 +573,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     /**
      * Match a world.
-     *
+     * <p>
      * The filter string syntax is as follows:
      * #main returns the main world
      * #normal returns the first world with a normal environment
@@ -625,7 +595,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             if (filter.equalsIgnoreCase("#main")) {
                 return worlds.get(0);
 
-            // #normal for the first normal world
+                // #normal for the first normal world
             } else if (filter.equalsIgnoreCase("#normal")) {
                 for (World world : worlds) {
                     if (world.getEnvironment() == Environment.NORMAL) {
@@ -635,7 +605,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
                 throw new CommandException("No normal world found.");
 
-            // #nether for the first nether world
+                // #nether for the first nether world
             } else if (filter.equalsIgnoreCase("#nether")) {
                 for (World world : worlds) {
                     if (world.getEnvironment() == Environment.NETHER) {
@@ -645,7 +615,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
                 throw new CommandException("No nether world found.");
 
-            // Handle getting a world from a player
+                // Handle getting a world from a player
             } else if (filter.matches("^#player$")) {
                 String parts[] = filter.split(":", 2);
 
@@ -701,7 +671,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Wrap a player as a LocalPlayer.
      *
-     * @param player The player to wrap
+     * @param player   The player to wrap
      * @param silenced True to silence messages
      * @return The wrapped player
      */
@@ -755,11 +725,11 @@ public class WorldGuardPlugin extends JavaPlugin {
     /**
      * Create a default configuration file from the .jar.
      *
-     * @param actual The destination file
+     * @param actual      The destination file
      * @param defaultName The name of the file inside the jar's defaults folder
      */
     public void createDefaultConfiguration(File actual,
-            String defaultName) {
+                                           String defaultName) {
 
         // Make parent directories
         File parent = actual.getParentFile();
@@ -772,15 +742,15 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         InputStream input =
-                    null;
-            try {
-                JarFile file = new JarFile(getFile());
-                ZipEntry copy = file.getEntry("defaults/" + defaultName);
-                if (copy == null) throw new FileNotFoundException();
-                input = file.getInputStream(copy);
-            } catch (IOException e) {
-                WorldGuard.logger.severe("Unable to read default configuration: " + defaultName);
-            }
+                null;
+        try {
+            JarFile file = new JarFile(getFile());
+            ZipEntry copy = file.getEntry("defaults/" + defaultName);
+            if (copy == null) throw new FileNotFoundException();
+            input = file.getInputStream(copy);
+        } catch (IOException e) {
+            WorldGuard.logger.severe("Unable to read default configuration: " + defaultName);
+        }
 
         if (input != null) {
             FileOutputStream output = null;
@@ -794,7 +764,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
 
                 WorldGuard.logger.info("Default configuration file written: "
-                        + actual.getAbsolutePath());
+                                               + actual.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
