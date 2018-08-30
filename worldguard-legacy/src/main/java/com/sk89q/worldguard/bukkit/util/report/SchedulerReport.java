@@ -19,18 +19,18 @@
 
 package com.sk89q.worldguard.bukkit.util.report;
 
-import com.google.common.base.Optional;
 import com.google.common.reflect.TypeToken;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.sk89q.worldguard.util.report.DataReport;
+import com.sk89q.worldedit.util.report.DataReport;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class SchedulerReport extends DataReport {
@@ -42,9 +42,9 @@ public class SchedulerReport extends DataReport {
                     try {
                         Field field = clazz.getDeclaredField("task");
                         field.setAccessible(true);
-                        return Optional.fromNullable(field);
+                        return Optional.ofNullable(field);
                     } catch (NoSuchFieldException ignored) {
-                        return Optional.absent();
+                        return Optional.empty();
                     }
                 }
             });
@@ -81,8 +81,7 @@ public class SchedulerReport extends DataReport {
                     return res == null ? null : res.getClass();
                 }
             }
-        } catch (IllegalAccessException ignored) {
-        } catch (NoClassDefFoundError ignored) {
+        } catch (IllegalAccessException | NoClassDefFoundError ignored) {
         }
 
         return null;

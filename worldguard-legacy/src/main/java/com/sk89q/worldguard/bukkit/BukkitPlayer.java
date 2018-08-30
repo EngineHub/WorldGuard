@@ -20,6 +20,16 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.session.SessionKey;
+import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.weather.WeatherType;
+import com.sk89q.worldedit.world.weather.WeatherTypes;
 import com.sk89q.worldguard.LocalPlayer;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
@@ -30,10 +40,13 @@ import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import javax.annotation.Nullable;
+
 public class BukkitPlayer extends LocalPlayer {
 
     private final WorldGuardPlugin plugin;
     private final Player player;
+    private final com.sk89q.worldedit.bukkit.BukkitPlayer worldEditPlayer;
     private final String name;
     private final boolean silenced;
 
@@ -50,6 +63,7 @@ public class BukkitPlayer extends LocalPlayer {
         // getName() takes longer than before in newer versions of Minecraft
         this.name = player.getName();
         this.silenced = silenced;
+        this.worldEditPlayer = new com.sk89q.worldedit.bukkit.BukkitPlayer((WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit"), player);
     }
 
     @Override
@@ -68,12 +82,6 @@ public class BukkitPlayer extends LocalPlayer {
     }
 
     @Override
-    public Vector getPosition() {
-        Location loc = player.getLocation();
-        return new Vector(loc.getX(), loc.getY(), loc.getZ());
-    }
-
-    @Override
     public void kick(String msg) {
         if (!silenced) {
             player.kickPlayer(msg);
@@ -89,6 +97,76 @@ public class BukkitPlayer extends LocalPlayer {
     }
 
     @Override
+    public double getHealth() {
+        return player.getHealth();
+    }
+
+    @Override
+    public void setHealth(double health) {
+        player.setHealth(health);
+    }
+
+    @Override
+    public double getMaxHealth() {
+        return player.getMaxHealth();
+    }
+
+    @Override
+    public double getFoodLevel() {
+        return player.getFoodLevel();
+    }
+
+    @Override
+    public void setFoodLevel(double foodLevel) {
+        player.setFoodLevel((int) foodLevel);
+    }
+
+    @Override
+    public double getSaturation() {
+        return player.getSaturation();
+    }
+
+    @Override
+    public void setSaturation(double saturation) {
+        player.setSaturation((float) saturation);
+    }
+
+    @Override
+    public WeatherType getPlayerWeather() {
+        return null;
+    }
+
+    @Override
+    public void setPlayerWeather(WeatherType weather) {
+        player.setPlayerWeather(weather == WeatherTypes.CLEAR ? org.bukkit.WeatherType.CLEAR : org.bukkit.WeatherType.DOWNFALL);
+    }
+
+    @Override
+    public void resetPlayerWeather() {
+        player.resetPlayerWeather();
+    }
+
+    @Override
+    public boolean isPlayerTimeRelative() {
+        return player.isPlayerTimeRelative();
+    }
+
+    @Override
+    public long getPlayerTimeOffset() {
+        return player.getPlayerTimeOffset();
+    }
+
+    @Override
+    public void setPlayerTime(long time, boolean relative) {
+        player.setPlayerTime(time, relative);
+    }
+
+    @Override
+    public void resetPlayerTime() {
+        player.resetPlayerTime();
+    }
+
+    @Override
     public String[] getGroups() {
         return plugin.getGroups(player);
     }
@@ -101,6 +179,21 @@ public class BukkitPlayer extends LocalPlayer {
     }
 
     @Override
+    public void printDebug(String msg) {
+        worldEditPlayer.printDebug(msg);
+    }
+
+    @Override
+    public void print(String msg) {
+        worldEditPlayer.print(msg);
+    }
+
+    @Override
+    public void printError(String msg) {
+        worldEditPlayer.printError(msg);
+    }
+
+    @Override
     public boolean hasPermission(String perm) {
         return plugin.hasPermission(player, perm);
     }
@@ -109,4 +202,51 @@ public class BukkitPlayer extends LocalPlayer {
         return player;
     }
 
+    @Override
+    public World getWorld() {
+        return BukkitAdapter.adapt(player.getWorld());
+    }
+
+    @Override
+    public BaseItemStack getItemInHand(HandSide handSide) {
+        return worldEditPlayer.getItemInHand(handSide);
+    }
+
+    @Override
+    public void giveItem(BaseItemStack itemStack) {
+        worldEditPlayer.giveItem(itemStack);
+    }
+
+    @Override
+    public BlockBag getInventoryBlockBag() {
+        return worldEditPlayer.getInventoryBlockBag();
+    }
+
+    @Override
+    public void setPosition(Vector pos, float pitch, float yaw) {
+        worldEditPlayer.setPosition(pos, pitch, yaw);
+    }
+
+    @Nullable
+    @Override
+    public BaseEntity getState() {
+        return worldEditPlayer.getState();
+    }
+
+    @Override
+    public com.sk89q.worldedit.util.Location getLocation() {
+        Location loc = player.getLocation();
+        return BukkitAdapter.adapt(loc);
+    }
+
+    @Override
+    public SessionKey getSessionKey() {
+        return worldEditPlayer.getSessionKey();
+    }
+
+    @Nullable
+    @Override
+    public <T> T getFacet(Class<? extends T> cls) {
+        return worldEditPlayer.getFacet(cls);
+    }
 }

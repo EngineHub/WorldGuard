@@ -23,8 +23,9 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
@@ -59,9 +60,7 @@ public abstract class RegionPriorityTest {
     TestPlayer player2;
 
     protected FlagRegistry getFlagRegistry() {
-        FlagRegistry registry = new SimpleFlagRegistry();
-        registry.registerAll(DefaultFlag.getDefaultFlags());
-        return registry;
+        return WorldGuard.getInstance().getFlagRegistry();
     }
     
     protected abstract RegionManager createRegionManager() throws Exception;
@@ -107,7 +106,7 @@ public abstract class RegionPriorityTest {
         manager.addRegion(region);
         
         courtyard = region;
-        courtyard.setFlag(DefaultFlag.MOB_SPAWNING, StateFlag.State.DENY);
+        courtyard.setFlag(Flags.MOB_SPAWNING, StateFlag.State.DENY);
     }
     
     void setUpFountainRegion() throws Exception {
@@ -121,8 +120,8 @@ public abstract class RegionPriorityTest {
 
         fountain = region;
         fountain.setParent(courtyard);
-        fountain.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
-        fountain.setFlag(DefaultFlag.MOB_SPAWNING, StateFlag.State.ALLOW);
+        fountain.setFlag(Flags.FIRE_SPREAD, StateFlag.State.DENY);
+        fountain.setFlag(Flags.MOB_SPAWNING, StateFlag.State.ALLOW);
     }
     
     @Test
@@ -133,11 +132,11 @@ public abstract class RegionPriorityTest {
         fountain.setPriority(0);
         
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
-        assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
+        assertTrue(appl.testState(null, Flags.FIRE_SPREAD));
+        assertFalse(appl.testState(null, Flags.MOB_SPAWNING));
         appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
-        assertTrue(appl.allows(DefaultFlag.MOB_SPAWNING));
+        assertFalse(appl.testState(null, Flags.FIRE_SPREAD));
+        assertTrue(appl.testState(null, Flags.MOB_SPAWNING));
     }
     
     @Test
@@ -148,9 +147,9 @@ public abstract class RegionPriorityTest {
         fountain.setPriority(0);
         
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertTrue(appl.testState(null, Flags.FIRE_SPREAD));
         appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertFalse(appl.testState(null, Flags.FIRE_SPREAD));
     }
     
     @Test
@@ -161,8 +160,8 @@ public abstract class RegionPriorityTest {
         fountain.setPriority(5);
         
         appl = manager.getApplicableRegions(inCourtyard);
-        assertFalse(appl.allows(DefaultFlag.MOB_SPAWNING));
+        assertFalse(appl.testState(null, Flags.MOB_SPAWNING));
         appl = manager.getApplicableRegions(inFountain);
-        assertTrue(appl.allows(DefaultFlag.MOB_SPAWNING));
+        assertTrue(appl.testState(null, Flags.MOB_SPAWNING));
     }
 }

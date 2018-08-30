@@ -19,32 +19,42 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.NestedCommand;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.util.report.ReportList;
+import com.sk89q.worldedit.util.report.SystemInfoReport;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
-import com.sk89q.worldguard.bukkit.util.report.*;
+import com.sk89q.worldguard.bukkit.util.report.PerformanceReport;
+import com.sk89q.worldguard.bukkit.util.report.PluginReport;
+import com.sk89q.worldguard.bukkit.util.report.SchedulerReport;
+import com.sk89q.worldguard.bukkit.util.report.ServerReport;
+import com.sk89q.worldguard.bukkit.util.report.ServicesReport;
+import com.sk89q.worldguard.bukkit.util.report.WorldReport;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.util.profiler.SamplerBuilder;
 import com.sk89q.worldguard.util.profiler.SamplerBuilder.Sampler;
 import com.sk89q.worldguard.util.profiler.ThreadIdFilter;
 import com.sk89q.worldguard.util.profiler.ThreadNameFilter;
-import com.sk89q.worldguard.util.report.ReportList;
-import com.sk89q.worldguard.util.report.SystemInfoReport;
+import com.sk89q.worldguard.util.report.ConfigReport;
 import com.sk89q.worldguard.util.task.Task;
 import com.sk89q.worldguard.util.task.TaskStateComparator;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ThreadInfo;
@@ -52,8 +62,11 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Nullable;
 
 public class WorldGuardCommands {
 
@@ -79,7 +92,7 @@ public class WorldGuardCommands {
     @CommandPermissions({"worldguard.reload"})
     public void reload(CommandContext args, CommandSender sender) throws CommandException {
         // TODO: This is subject to a race condition, but at least other commands are not being processed concurrently
-        List<Task<?>> tasks = plugin.getSupervisor().getTasks();
+        List<Task<?>> tasks = WorldGuard.getInstance().getSupervisor().getTasks();
         if (!tasks.isEmpty()) {
             throw new CommandException("There are currently pending tasks. Use /wg running to monitor these tasks first.");
         }
@@ -95,13 +108,13 @@ public class WorldGuardCommands {
         }
 
         try {
-            ConfigurationManager config = plugin.getGlobalStateManager();
+            ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
             config.unload();
             config.load();
-            for (World world : Bukkit.getServer().getWorlds()) {
+            for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
                 config.get(world);
             }
-            plugin.getRegionContainer().reload();
+            WorldGuard.getInstance().getPlatform().getRegionContainer().reload();
             // WGBukkit.cleanCache();
             sender.sendMessage("WorldGuard configuration reloaded.");
         } catch (Throwable t) {
@@ -125,7 +138,7 @@ public class WorldGuardCommands {
         report.add(new ServicesReport());
         report.add(new WorldReport());
         report.add(new PerformanceReport());
-        report.add(new ConfigReport(plugin));
+        report.add(new ConfigReport());
         String result = report.toString();
 
         try {
@@ -161,7 +174,7 @@ public class WorldGuardCommands {
         if (threadName == null) {
             threadFilter = new ThreadIdFilter(Thread.currentThread().getId());
         } else if (threadName.equals("*")) {
-            threadFilter = Predicates.alwaysTrue();
+            threadFilter = thread -> true;
         } else {
             threadFilter = new ThreadNameFilter(threadName);
         }
@@ -197,12 +210,9 @@ public class WorldGuardCommands {
                 .sendMessageAfterDelay("(Please wait... profiling for %d minute(s)...)")
                 .thenTellErrorsOnly("CPU profiling failed.");
 
-        sampler.getFuture().addListener(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (WorldGuardCommands.this) {
-                    activeSampler = null;
-                }
+        sampler.getFuture().addListener(() -> {
+            synchronized (WorldGuardCommands.this) {
+                activeSampler = null;
             }
         }, MoreExecutors.directExecutor());
 
@@ -250,13 +260,14 @@ public class WorldGuardCommands {
     @CommandPermissions("worldguard.flushstates")
     public void flushStates(CommandContext args, CommandSender sender) throws CommandException {
         if (args.argsLength() == 0) {
-            plugin.getSessionManager().resetAllStates();
+            WorldGuard.getInstance().getPlatform().getSessionManager().resetAllStates();
             sender.sendMessage("Cleared all states.");
         } else {
             Player player = plugin.getServer().getPlayer(args.getString(0));
             if (player != null) {
-                plugin.getSessionManager().resetState(player);
-                sender.sendMessage("Cleared states for player \"" + player.getName() + "\".");
+                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                WorldGuard.getInstance().getPlatform().getSessionManager().resetState(localPlayer);
+                sender.sendMessage("Cleared states for player \"" + localPlayer.getName() + "\".");
             }
         }
     }
@@ -264,7 +275,7 @@ public class WorldGuardCommands {
     @Command(aliases = {"running", "queue"}, desc = "List running tasks", max = 0)
     @CommandPermissions("worldguard.running")
     public void listRunningTasks(CommandContext args, CommandSender sender) throws CommandException {
-        List<Task<?>> tasks = plugin.getSupervisor().getTasks();
+        List<Task<?>> tasks = WorldGuard.getInstance().getSupervisor().getTasks();
 
         if (!tasks.isEmpty()) {
             Collections.sort(tasks, new TaskStateComparator());

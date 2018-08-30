@@ -21,7 +21,9 @@ package com.sk89q.worldguard.bukkit.internal;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.sk89q.worldguard.blacklist.target.MaterialTarget;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.blacklist.target.BlockTarget;
+import com.sk89q.worldguard.blacklist.target.ItemTarget;
 import com.sk89q.worldguard.blacklist.target.Target;
 import com.sk89q.worldguard.blacklist.target.TargetMatcher;
 import org.bukkit.Material;
@@ -35,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class TargetMatcherSet {
 
-    private final Multimap<Integer, TargetMatcher> entries = HashMultimap.create();
+    private final Multimap<String, TargetMatcher> entries = HashMultimap.create();
 
     public boolean add(TargetMatcher matcher) {
         checkNotNull(matcher);
@@ -55,19 +57,23 @@ public class TargetMatcherSet {
     }
 
     public boolean test(Material material) {
-        return test(new MaterialTarget(material.getId(), (short) 0));
+        if (material.isBlock()) {
+            return test(new BlockTarget(BukkitAdapter.asBlockType(material)));
+        } else {
+            return test(new ItemTarget(BukkitAdapter.asItemType(material)));
+        }
     }
 
     public boolean test(Block block) {
-        return test(new MaterialTarget(block.getTypeId(), block.getData()));
+        return test(new BlockTarget(BukkitAdapter.asBlockType(block.getType())));
     }
 
     public boolean test(BlockState state) {
-        return test(new MaterialTarget(state.getTypeId(), state.getRawData()));
+        return test(new BlockTarget(BukkitAdapter.asBlockType(state.getType())));
     }
 
     public boolean test(ItemStack itemStack) {
-        return test(new MaterialTarget(itemStack.getTypeId(), itemStack.getDurability()));
+        return test(new ItemTarget(BukkitAdapter.asItemType(itemStack.getType())));
     }
 
     @Override

@@ -22,7 +22,7 @@ package com.sk89q.worldguard.bukkit.commands;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.debug.*;
-import com.sk89q.worldguard.util.report.CancelReport;
+import com.sk89q.worldguard.bukkit.util.report.CancelReport;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

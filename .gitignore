@@ -14,4 +14,4 @@
 
 /.gradle
 **/build
-
+out/

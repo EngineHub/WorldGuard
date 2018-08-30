@@ -23,8 +23,9 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.TestPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
@@ -61,9 +62,7 @@ public abstract class RegionOverlapTest {
     TestPlayer player2;
 
     protected FlagRegistry getFlagRegistry() {
-        FlagRegistry registry = new SimpleFlagRegistry();
-        registry.registerAll(DefaultFlag.getDefaultFlags());
-        return registry;
+        return WorldGuard.getInstance().getFlagRegistry();
     }
     
     protected abstract RegionManager createRegionManager() throws Exception;
@@ -123,14 +122,14 @@ public abstract class RegionOverlapTest {
 
         fountain = region;
         fountain.setParent(courtyard);
-        fountain.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
+        fountain.setFlag(Flags.FIRE_SPREAD, StateFlag.State.DENY);
     }
 
     void setUpNoFireRegion() throws Exception {
         ProtectedRegion region = new ProtectedCuboidRegion(NO_FIRE_ID,
                 new BlockVector(100, 100, 100), new BlockVector(200, 200, 200));
         manager.addRegion(region);
-        region.setFlag(DefaultFlag.FIRE_SPREAD, StateFlag.State.DENY);
+        region.setFlag(Flags.FIRE_SPREAD, StateFlag.State.DENY);
     }
 
     @Test
@@ -139,17 +138,17 @@ public abstract class RegionOverlapTest {
 
         // Outside
         appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertTrue(appl.testState(null, Flags.FIRE_SPREAD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertTrue(appl.testState(null, Flags.FIRE_SPREAD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertFalse(appl.testState(null, Flags.FIRE_SPREAD));
 
         // Inside no fire zone
         appl = manager.getApplicableRegions(inNoFire);
-        assertFalse(appl.allows(DefaultFlag.FIRE_SPREAD));
+        assertFalse(appl.testState(null, Flags.FIRE_SPREAD));
     }
 
     @Test
@@ -158,31 +157,31 @@ public abstract class RegionOverlapTest {
 
         // Outside
         appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.canBuild(player1));
+        assertTrue(appl.testState(player1, Flags.BUILD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.canBuild(player1));
+        assertTrue(appl.testState(player1, Flags.BUILD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        assertTrue(appl.canBuild(player1));
+        assertTrue(appl.testState(player1, Flags.BUILD));
     }
 
     @Test
     public void testPlayer2BuildAccess() {
         ApplicableRegionSet appl;
 
-        HashSet<ProtectedRegion> test = new HashSet<ProtectedRegion>();
+        HashSet<ProtectedRegion> test = new HashSet<>();
         test.add(courtyard);
         test.add(fountain);
 
         // Outside
         appl = manager.getApplicableRegions(outside);
-        assertTrue(appl.canBuild(player2));
+        assertTrue(appl.testState(player2, Flags.BUILD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertFalse(appl.canBuild(player2));
+        assertFalse(appl.testState(player2, Flags.BUILD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
-        assertTrue(appl.canBuild(player2));
+        assertTrue(appl.testState(player2, Flags.BUILD));
     }
 }
