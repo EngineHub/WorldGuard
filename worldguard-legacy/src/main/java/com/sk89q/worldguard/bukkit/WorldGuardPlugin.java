@@ -212,10 +212,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            ProcessPlayerEvent event = new ProcessPlayerEvent(player);
-            Events.fire(event);
-        }
+        Bukkit.getScheduler().runTask(this, () -> {
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                ProcessPlayerEvent event = new ProcessPlayerEvent(player);
+                Events.fire(event);
+            }
+        });
 
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
     }
