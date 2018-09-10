@@ -20,17 +20,27 @@
 package com.sk89q.worldguard;
 
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.session.SessionKey;
+import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.weather.WeatherType;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 @org.junit.Ignore
 public class TestPlayer extends LocalPlayer {
 
     private final UUID uuid = UUID.randomUUID();
     private final String name;
-    private final Set<String> groups = new HashSet<String>();
+    private final Set<String> groups = new HashSet<>();
     
     public TestPlayer(String name) {
         this.name = name;
@@ -56,11 +66,6 @@ public class TestPlayer extends LocalPlayer {
     }
 
     @Override
-    public Vector getPosition() {
-        return new Vector(0, 0, 0);
-    }
-
-    @Override
     public void kick(String msg) {
         System.out.println("TestPlayer{" + this.name + "} кикнут!");
     }
@@ -71,8 +76,93 @@ public class TestPlayer extends LocalPlayer {
     }
 
     @Override
+    public double getHealth() {
+        return 0;
+    }
+
+    @Override
+    public void setHealth(double health) {
+
+    }
+
+    @Override
+    public double getMaxHealth() {
+        return 0;
+    }
+
+    @Override
+    public double getFoodLevel() {
+        return 0;
+    }
+
+    @Override
+    public void setFoodLevel(double foodLevel) {
+
+    }
+
+    @Override
+    public double getSaturation() {
+        return 0;
+    }
+
+    @Override
+    public void setSaturation(double saturation) {
+
+    }
+
+    @Override
+    public WeatherType getPlayerWeather() {
+        return null;
+    }
+
+    @Override
+    public void setPlayerWeather(WeatherType weather) {
+
+    }
+
+    @Override
+    public void resetPlayerWeather() {
+
+    }
+
+    @Override
+    public boolean isPlayerTimeRelative() {
+        return false;
+    }
+
+    @Override
+    public long getPlayerTimeOffset() {
+        return 0;
+    }
+
+    @Override
+    public void setPlayerTime(long time, boolean relative) {
+
+    }
+
+    @Override
+    public void resetPlayerTime() {
+
+    }
+
+    @Override
     public void printRaw(String msg) {
         System.out.println("-> TestPlayer{" + this.name + "}: " + msg);
+    }
+
+    @Override
+    public void printDebug(String msg) {
+
+    }
+
+    @Override
+    public void print(String msg) {
+
+    }
+
+    @Override
+    public void printError(String msg) {
+
     }
 
     @Override
@@ -83,5 +173,52 @@ public class TestPlayer extends LocalPlayer {
     @Override
     public boolean hasPermission(String perm) {
         return true;
+    }
+
+    @Override
+    public World getWorld() {
+        return null;
+    }
+
+    @Override
+    public BaseItemStack getItemInHand(HandSide handSide) {
+        return null;
+    }
+
+    @Override
+    public void giveItem(BaseItemStack itemStack) {
+
+    }
+
+    @Override
+    public BlockBag getInventoryBlockBag() {
+        return null;
+    }
+
+    @Override
+    public void setPosition(Vector pos, float pitch, float yaw) {
+
+    }
+
+    @Nullable
+    @Override
+    public BaseEntity getState() {
+        return null;
+    }
+
+    @Override
+    public Location getLocation() {
+        return null;
+    }
+
+    @Override
+    public SessionKey getSessionKey() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public <T> T getFacet(Class<? extends T> cls) {
+        return null;
     }
 }

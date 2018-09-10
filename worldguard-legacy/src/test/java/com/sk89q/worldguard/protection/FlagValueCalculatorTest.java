@@ -21,7 +21,7 @@ package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.FlagValueCalculator.Result;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
@@ -91,10 +91,10 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         region = mock.add(0);
-        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         LocalPlayer player = mock.createPlayer();
 
@@ -107,7 +107,7 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         region = mock.add(0);
 
@@ -122,7 +122,7 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         region = mock.add(0);
 
@@ -138,7 +138,7 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         region = mock.add(0);
 
@@ -162,7 +162,7 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         region = mock.add(0);
 
@@ -180,7 +180,7 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion region = mock.add(0);
-        region.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        region.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         region = mock.add(10);
 
@@ -198,7 +198,7 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion passthrough = mock.add(0);
-        passthrough.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        passthrough.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         ProtectedRegion parent = mock.add(0);
 
@@ -217,7 +217,7 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion passthrough = mock.add(0);
-        passthrough.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        passthrough.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         ProtectedRegion parent = mock.add(0);
 
@@ -236,7 +236,7 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion passthrough = mock.add(0);
-        passthrough.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        passthrough.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         ProtectedRegion parent = mock.add(0);
 
@@ -257,7 +257,7 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion passthrough = mock.add(0);
-        passthrough.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        passthrough.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         ProtectedRegion parent = mock.add(0);
 
@@ -603,7 +603,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -615,7 +615,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -625,10 +625,10 @@ public class FlagValueCalculatorTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         ProtectedRegion global = mock.global();
-        global.setFlag(DefaultFlag.BUILD, State.DENY);
+        global.setFlag(Flags.BUILD, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is(State.DENY));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.DENY));
     }
 
     @Test
@@ -638,10 +638,10 @@ public class FlagValueCalculatorTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         ProtectedRegion global = mock.global();
-        global.setFlag(DefaultFlag.BUILD, State.ALLOW);
+        global.setFlag(Flags.BUILD, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -655,8 +655,8 @@ public class FlagValueCalculatorTest {
         global.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(member, DefaultFlag.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
+        assertThat(result.queryValue(member, Flags.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
     }
 
     @Test
@@ -668,11 +668,11 @@ public class FlagValueCalculatorTest {
 
         ProtectedRegion global = mock.global();
         global.getMembers().addPlayer(member);
-        global.setFlag(DefaultFlag.BUILD, State.DENY);
+        global.setFlag(Flags.BUILD, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(member, DefaultFlag.BUILD), is(State.DENY));
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is(State.DENY));
+        assertThat(result.queryValue(member, Flags.BUILD), is(State.DENY));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.DENY));
     }
 
     @Test
@@ -684,13 +684,13 @@ public class FlagValueCalculatorTest {
 
         ProtectedRegion global = mock.global();
         global.getMembers().addPlayer(member);
-        global.setFlag(DefaultFlag.BUILD, State.ALLOW);
+        global.setFlag(Flags.BUILD, State.ALLOW);
 
         // Cannot set ALLOW on BUILD
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(member, DefaultFlag.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
+        assertThat(result.queryValue(member, Flags.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
     }
 
     @Test
@@ -704,8 +704,8 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(member, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(member, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -724,9 +724,9 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -746,9 +746,9 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -768,9 +768,9 @@ public class FlagValueCalculatorTest {
         region.setParent(parent);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -790,9 +790,9 @@ public class FlagValueCalculatorTest {
         region.setParent(parent);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -814,9 +814,9 @@ public class FlagValueCalculatorTest {
         ProtectedRegion priority = mock.add(10);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is((State) null));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is((State) null));
     }
 
     @Test
@@ -836,12 +836,12 @@ public class FlagValueCalculatorTest {
         region.setParent(parent);
 
         ProtectedRegion priority = mock.add(10);
-        priority.setFlag(DefaultFlag.PASSTHROUGH, State.ALLOW);
+        priority.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -862,9 +862,9 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -876,7 +876,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer memberBoth = mock.createPlayer();
 
         ProtectedRegion global = mock.global();
-        global.setFlag(DefaultFlag.BUILD, State.DENY);
+        global.setFlag(Flags.BUILD, State.DENY);
 
         ProtectedRegion region = mock.add(0);
         region.getMembers().addPlayer(memberOne);
@@ -884,12 +884,12 @@ public class FlagValueCalculatorTest {
 
         region = mock.add(0);
         region.getMembers().addPlayer(memberBoth);
-        region.setFlag(DefaultFlag.BUILD, State.ALLOW);
+        region.setFlag(Flags.BUILD, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -901,21 +901,21 @@ public class FlagValueCalculatorTest {
         LocalPlayer memberBoth = mock.createPlayer();
 
         ProtectedRegion global = mock.global();
-        global.setFlag(DefaultFlag.BUILD, State.DENY);
+        global.setFlag(Flags.BUILD, State.DENY);
 
         ProtectedRegion region = mock.add(0);
         region.getMembers().addPlayer(memberOne);
         region.getMembers().addPlayer(memberBoth);
-        region.setFlag(DefaultFlag.BUILD, State.DENY);
+        region.setFlag(Flags.BUILD, State.DENY);
 
         region = mock.add(0);
         region.getMembers().addPlayer(memberBoth);
-        region.setFlag(DefaultFlag.BUILD, State.ALLOW);
+        region.setFlag(Flags.BUILD, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is(State.DENY));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is(State.DENY));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.DENY));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.DENY));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.DENY));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.DENY));
     }
 
     @Test
@@ -927,7 +927,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer memberBoth = mock.createPlayer();
 
         ProtectedRegion global = mock.global();
-        global.setFlag(DefaultFlag.BUILD, State.ALLOW);
+        global.setFlag(Flags.BUILD, State.ALLOW);
 
         ProtectedRegion region = mock.add(0);
         region.getMembers().addPlayer(memberOne);
@@ -939,9 +939,9 @@ public class FlagValueCalculatorTest {
         // Disable setting ALLOW for safety reasons
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -964,10 +964,10 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(globalMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(globalMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -981,7 +981,7 @@ public class FlagValueCalculatorTest {
 
         ProtectedRegion global = mock.global();
         global.getMembers().addPlayer(globalMember);
-        global.setFlag(DefaultFlag.BUILD, State.DENY);
+        global.setFlag(Flags.BUILD, State.DENY);
 
         ProtectedRegion region = mock.add(0);
         region.getMembers().addPlayer(memberOne);
@@ -992,10 +992,10 @@ public class FlagValueCalculatorTest {
 
         FlagValueCalculator result = mock.getFlagCalculator();
         // Inconsistent due to legacy reasons
-        assertThat(result.queryValue(globalMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(globalMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     @Test
@@ -1009,7 +1009,7 @@ public class FlagValueCalculatorTest {
 
         ProtectedRegion global = mock.global();
         global.getMembers().addPlayer(globalMember);
-        global.setFlag(DefaultFlag.BUILD, State.ALLOW);
+        global.setFlag(Flags.BUILD, State.ALLOW);
 
         ProtectedRegion region = mock.add(0);
         region.getMembers().addPlayer(memberOne);
@@ -1019,10 +1019,10 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(globalMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(nonMember, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, DefaultFlag.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, DefaultFlag.BUILD), is(State.ALLOW));
+        assertThat(result.queryValue(globalMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
+        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
     }
 
     // ========================================================================
@@ -1939,7 +1939,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(global, DefaultFlag.BUILD, null), equalTo(null));
+        assertThat(result.getEffectiveFlag(global, Flags.BUILD, null), equalTo(null));
     }
 
     @Test
@@ -1947,11 +1947,11 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion global = mock.global();
-        global.setFlag(DefaultFlag.BUILD, State.DENY);
+        global.setFlag(Flags.BUILD, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
         // Cannot let users override BUILD on GLOBAL
-        assertThat(result.getEffectiveFlag(global, DefaultFlag.BUILD, null), equalTo(State.DENY));
+        assertThat(result.getEffectiveFlag(global, Flags.BUILD, null), equalTo(State.DENY));
     }
 
     @Test
@@ -1959,10 +1959,10 @@ public class FlagValueCalculatorTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
 
         ProtectedRegion global = mock.global();
-        global.setFlag(DefaultFlag.BUILD, State.ALLOW);
+        global.setFlag(Flags.BUILD, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
         // Cannot let users override BUILD on GLOBAL
-        assertThat(result.getEffectiveFlag(global, DefaultFlag.BUILD, null), equalTo(null));
+        assertThat(result.getEffectiveFlag(global, Flags.BUILD, null), equalTo(null));
     }
 }

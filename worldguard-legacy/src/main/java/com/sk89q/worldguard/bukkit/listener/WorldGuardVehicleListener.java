@@ -19,10 +19,13 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.util.Locations;
+import com.sk89q.worldguard.util.Locations;
 import com.sk89q.worldguard.session.MoveType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -31,6 +34,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class WorldGuardVehicleListener implements Listener {
 
@@ -55,18 +61,26 @@ public class WorldGuardVehicleListener implements Listener {
     @EventHandler
     public void onVehicleMove(VehicleMoveEvent event) {
         Vehicle vehicle = event.getVehicle();
-        if (vehicle.getPassenger() == null || !(vehicle.getPassenger() instanceof Player)) return;
-        Player player = (Player) vehicle.getPassenger();
+        if (vehicle.getPassengers().isEmpty()) return;
+        List<LocalPlayer> playerPassengers =
+                vehicle.getPassengers().stream().filter(ent -> ent instanceof Player).map(ent -> plugin.wrapPlayer((Player) ent)).collect(Collectors.toList());
+        if (playerPassengers.isEmpty()) {
+            return;
+        }
         World world = vehicle.getWorld();
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
 
         if (wcfg.useRegions) {
             // Did we move a block?
-            if (Locations.isDifferentBlock(event.getFrom(), event.getTo())) {
-                if (null != plugin.getSessionManager().get(player).testMoveTo(player, event.getTo(), MoveType.RIDE)) {
-                    vehicle.setVelocity(new Vector(0,0,0));
-                    vehicle.teleport(event.getFrom());
+            if (Locations.isDifferentBlock(BukkitAdapter.adapt(event.getFrom()), BukkitAdapter.adapt(event.getTo()))) {
+                for (LocalPlayer player : playerPassengers) {
+                    if (null != WorldGuard.getInstance().getPlatform().getSessionManager().get(player)
+                            .testMoveTo(player, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE)) {
+                        vehicle.setVelocity(new Vector(0, 0, 0));
+                        vehicle.teleport(event.getFrom());
+                        return;
+                    }
                 }
             }
         }

@@ -21,9 +21,6 @@ package com.sk89q.worldguard.bukkit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -32,55 +29,60 @@ import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.SimpleInjector;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
-import com.sk89q.squirrelid.cache.HashMapCache;
-import com.sk89q.squirrelid.cache.ProfileCache;
-import com.sk89q.squirrelid.cache.SQLiteCache;
-import com.sk89q.squirrelid.resolver.BukkitPlayerService;
-import com.sk89q.squirrelid.resolver.CacheForwardingService;
-import com.sk89q.squirrelid.resolver.CombinedProfileService;
-import com.sk89q.squirrelid.resolver.HttpRepositoryService;
-import com.sk89q.squirrelid.resolver.ProfileService;
 import com.sk89q.wepif.PermissionsResolverManager;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitCommandSender;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
-import com.sk89q.worldguard.bukkit.listener.*;
+import com.sk89q.worldguard.bukkit.listener.BlacklistListener;
+import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
+import com.sk89q.worldguard.bukkit.listener.BuildPermissionListener;
+import com.sk89q.worldguard.bukkit.listener.ChestProtectionListener;
+import com.sk89q.worldguard.bukkit.listener.DebuggingListener;
+import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
+import com.sk89q.worldguard.bukkit.listener.InvincibilityListener;
+import com.sk89q.worldguard.bukkit.listener.PlayerModesListener;
+import com.sk89q.worldguard.bukkit.listener.PlayerMoveListener;
+import com.sk89q.worldguard.bukkit.listener.RegionFlagsListener;
+import com.sk89q.worldguard.bukkit.listener.RegionProtectionListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardBlockListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardCommandBookListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardEntityListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardHangingListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardPlayerListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardServerListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardVehicleListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardWeatherListener;
+import com.sk89q.worldguard.bukkit.listener.WorldGuardWorldListener;
+import com.sk89q.worldguard.bukkit.listener.WorldRulesListener;
+import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.bukkit.util.Events;
-import com.sk89q.worldguard.protection.GlobalRegionManager;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.bukkit.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
-import com.sk89q.worldguard.session.SessionManager;
-import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
-import com.sk89q.worldguard.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
-import com.sk89q.worldguard.util.task.SimpleSupervisor;
-import com.sk89q.worldguard.util.task.Supervisor;
-import com.sk89q.worldguard.util.task.Task;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -91,34 +93,23 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+
+import javax.annotation.Nullable;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
  */
 public class WorldGuardPlugin extends JavaPlugin {
 
-    private static final Logger log = Logger.getLogger(WorldGuardPlugin.class.getCanonicalName());
-
     private static WorldGuardPlugin inst;
+    private static BukkitWorldGuardPlatform platform;
     private final CommandsManager<CommandSender> commands;
-    private final ConfigurationManager configuration = new ConfigurationManager(this);
-    private final RegionContainer regionContainer = new RegionContainer(this);
-    private final GlobalRegionManager globalRegionManager = new GlobalRegionManager(this, regionContainer);
-    private final SimpleFlagRegistry flagRegistry = new SimpleFlagRegistry();
-    private SessionManager sessionManager;
-    private final Supervisor supervisor = new SimpleSupervisor();
-    private ListeningExecutorService executorService;
-    private ProfileService profileService;
-    private ProfileCache profileCache;
     private PlayerMoveListener playerMoveListener;
 
     /**
@@ -133,7 +124,6 @@ public class WorldGuardPlugin extends JavaPlugin {
                 return plugin.hasPermission(player, perm);
             }
         };
-        flagRegistry.registerAll(DefaultFlag.getDefaultFlags());
     }
 
     /**
@@ -151,13 +141,14 @@ public class WorldGuardPlugin extends JavaPlugin {
     @SuppressWarnings("deprecation")
     public void onEnable() {
         configureLogger();
-        flagRegistry.setInitialized(true);
 
         getDataFolder().mkdirs(); // Need to create the plugins/WorldGuard folder
 
-        executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));
+        PermissionsResolverManager.initialize(this);
 
-        sessionManager = new SessionManager(this);
+        WorldGuard.getInstance().setPlatform(platform = new BukkitWorldGuardPlatform()); // Initialise WorldGuard
+        WorldGuard.getInstance().setup();
+        BukkitSessionManager sessionManager = (BukkitSessionManager) platform.getSessionManager();
 
         // Set the proper command injector
         commands.setInjector(new SimpleInjector(this));
@@ -165,44 +156,22 @@ public class WorldGuardPlugin extends JavaPlugin {
         // Catch bad things being done by naughty plugins that include
         // WorldGuard's classes
         ClassSourceValidator verifier = new ClassSourceValidator(this);
-        verifier.reportMismatches(ImmutableList.of(WGBukkit.class, ProtectedRegion.class, ProtectedCuboidRegion.class, Flag.class));
+        verifier.reportMismatches(ImmutableList.of(ProtectedRegion.class, ProtectedCuboidRegion.class, Flag.class));
 
         // Register command classes
         final CommandsManagerRegistration reg = new CommandsManagerRegistration(this, commands);
         reg.register(ToggleCommands.class);
         reg.register(ProtectionCommands.class);
 
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if (!getGlobalStateManager().hasCommandBookGodMode()) {
-                    reg.register(GeneralCommands.class);
-                }
+        getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
+            if (!platform.getGlobalStateManager().hasCommandBookGodMode()) {
+                reg.register(GeneralCommands.class);
             }
         }, 0L);
 
-        File cacheDir = new File(getDataFolder(), "cache");
-        cacheDir.mkdirs();
-        try {
-            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
-        } catch (IOException e) {
-            log.log(Level.WARNING, "Не удалось инициализировать кэш профиля SQLite");
-            profileCache = new HashMapCache();
-        }
+        WorldGuard.logger.info("Загрузка данных региона...");
 
-        profileService = new CacheForwardingService(
-                new CombinedProfileService(
-                        BukkitPlayerService.getInstance(),
-                        HttpRepositoryService.forMinecraft()),
-                profileCache);
-
-        PermissionsResolverManager.initialize(this);
-        configuration.load();
-
-        log.info("Загрузка данных региона...");
-        regionContainer.initialize();
-
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, SessionManager.RUN_DELAY, SessionManager.RUN_DELAY);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
 
         // Register events
         getServer().getPluginManager().registerEvents(sessionManager, this);
@@ -227,10 +196,10 @@ public class WorldGuardPlugin extends JavaPlugin {
         (new BuildPermissionListener(this)).registerEvents();
         (new InvincibilityListener(this)).registerEvents();
         if ("true".equalsIgnoreCase(System.getProperty("worldguard.debug.listener"))) {
-            (new DebuggingListener(this, log)).registerEvents();
+            (new DebuggingListener(this, WorldGuard.logger)).registerEvents();
         }
 
-        configuration.updateCommandBookGodMode();
+        platform.getGlobalStateManager().updateCommandBookGodMode();
 
         if (getServer().getPluginManager().isPluginEnabled("CommandBook")) {
             getServer().getPluginManager().registerEvents(new WorldGuardCommandBookListener(this), this);
@@ -243,14 +212,19 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-        for (Player player : BukkitUtil.getOnlinePlayers()) {
-            ProcessPlayerEvent event = new ProcessPlayerEvent(player);
-            Events.fire(event);
-        }
+        Bukkit.getScheduler().runTask(this, () -> {
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                ProcessPlayerEvent event = new ProcessPlayerEvent(player);
+                Events.fire(event);
+            }
+        });
+
+        ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
     }
 
     @Override
     public void onDisable() {
+<<<<<<< HEAD
         executorService.shutdown();
 
         try {
@@ -276,6 +250,9 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         regionContainer.unload();
         configuration.unload();
+=======
+        WorldGuard.getInstance().disable();
+>>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
         this.getServer().getScheduler().cancelTasks(this);
     }
 
@@ -309,8 +286,13 @@ public class WorldGuardPlugin extends JavaPlugin {
         if (throwable instanceof NumberFormatException) {
             return "Значение может быть только числовым.";
         } else if (throwable instanceof StorageException) {
+<<<<<<< HEAD
             log.log(Level.WARNING, "Ошибка загрузки/сохранения регионов", throwable);
             return "Данные региона не могут быть загружены/сохранены: " + throwable.getMessage();
+=======
+            WorldGuard.logger.log(Level.WARNING, "Error loading/saving regions", throwable);
+            return "Region data could not be loaded/saved: " + throwable.getMessage();
+>>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
         } else if (throwable instanceof RejectedExecutionException) {
             return "В настоящее время слишком много задач в очереди, чтобы добавить ваш. Используйте /wg running в список поставленных в очередь и запуска задач.";
         } else if (throwable instanceof CancellationException) {
@@ -322,104 +304,14 @@ public class WorldGuardPlugin extends JavaPlugin {
         } else if (throwable instanceof CommandException) {
             return throwable.getMessage();
         } else {
+<<<<<<< HEAD
             log.log(Level.WARNING, "Произошла непредвиденная ошибка WorldGuard", throwable);
             return "WorldGuard: Произошла непредвиденная ошибка! Смотрите вывод в консоль.";
+=======
+            WorldGuard.logger.log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
+            return "WorldGuard: An unexpected error occurred! Please see the server console.";
+>>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
         }
-    }
-
-    /**
-     * Get the GlobalRegionManager.
-     *
-     * @return the plugin's global region manager
-     * @deprecated use {@link #getRegionContainer()}
-     */
-    @Deprecated
-    public GlobalRegionManager getGlobalRegionManager() {
-        return globalRegionManager;
-    }
-
-    /**
-     * Get the object that manages region data.
-     *
-     * @return the region container
-     */
-    public RegionContainer getRegionContainer() {
-        return regionContainer;
-    }
-
-    /**
-     * Get the WorldGuard Configuration.
-     *
-     * @return ConfigurationManager
-     * @deprecated Use {@link #getGlobalStateManager()} instead
-     */
-    @Deprecated
-    public ConfigurationManager getGlobalConfiguration() {
-        return getGlobalStateManager();
-    }
-
-    /**
-     * Gets the flag state manager.
-     *
-     * @return The flag state manager
-     */
-    public SessionManager getSessionManager() {
-        return sessionManager;
-    }
-
-    /**
-     * Get the global ConfigurationManager.
-     * USe this to access global configuration values and per-world configuration values.
-     * @return The global ConfigurationManager
-     */
-    public ConfigurationManager getGlobalStateManager() {
-        return configuration;
-    }
-
-    /**
-     * Get the supervisor.
-     *
-     * @return the supervisor
-     */
-    public Supervisor getSupervisor() {
-        return supervisor;
-    }
-
-    /**
-     * Get the global executor service for internal usage (please use your
-     * own executor service).
-     *
-     * @return the global executor service
-     */
-    public ListeningExecutorService getExecutorService() {
-        return executorService;
-    }
-
-    /**
-     * Get the profile lookup service.
-     *
-     * @return the profile lookup service
-     */
-    public ProfileService getProfileService() {
-        return profileService;
-    }
-
-    /**
-     * Get the profile cache.
-     *
-     * @return the profile cache
-     */
-    public ProfileCache getProfileCache() {
-        return profileCache;
-    }
-
-    /**
-     * Get the flag registry.
-     *
-     * @return the flag registry
-     */
-    public FlagRegistry getFlagRegistry() {
-        return flagRegistry;
     }
 
     /**
@@ -495,8 +387,7 @@ public class WorldGuardPlugin extends JavaPlugin {
     public boolean hasPermission(CommandSender sender, String perm) {
         if (sender.isOp()) {
             if (sender instanceof Player) {
-                if (this.getGlobalStateManager().get(((Player) sender).
-                        getWorld()).opPermissions) {
+                if (platform.getGlobalStateManager().get(BukkitAdapter.adapt(((Player) sender).getWorld())).opPermissions) {
                     return true;
                 }
             } else {
@@ -555,7 +446,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return A {@link List} of players who match {@code filter}
      */
     public List<Player> matchPlayerNames(String filter) {
-        Collection<? extends Player> players = BukkitUtil.getOnlinePlayers();
+        Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
 
         filter = filter.toLowerCase();
 
@@ -565,18 +456,18 @@ public class WorldGuardPlugin extends JavaPlugin {
 
             for (Player player : players) {
                 if (player.getName().equalsIgnoreCase(filter)) {
-                    List<Player> list = new ArrayList<Player>();
+                    List<Player> list = new ArrayList<>();
                     list.add(player);
                     return list;
                 }
             }
 
-            return new ArrayList<Player>();
+            return new ArrayList<>();
         // Allow partial name matching
         } else if (filter.charAt(0) == '*' && filter.length() >= 2) {
             filter = filter.substring(1);
 
-            List<Player> list = new ArrayList<Player>();
+            List<Player> list = new ArrayList<>();
 
             for (Player player : players) {
                 if (player.getName().toLowerCase().contains(filter)) {
@@ -588,7 +479,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         // Start with name matching
         } else {
-            List<Player> list = new ArrayList<Player>();
+            List<Player> list = new ArrayList<>();
 
             for (Player player : players) {
                 if (player.getName().toLowerCase().startsWith(filter)) {
@@ -636,12 +527,17 @@ public class WorldGuardPlugin extends JavaPlugin {
     public Iterable<? extends Player> matchPlayers(CommandSender source, String filter)
             throws CommandException {
 
+<<<<<<< HEAD
         if (BukkitUtil.getOnlinePlayers().isEmpty()) {
             throw new CommandException("Игроки не найдены.");
+=======
+        if (Bukkit.getServer().getOnlinePlayers().isEmpty()) {
+            throw new CommandException("No players matched query.");
+>>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
         }
 
         if (filter.equals("*")) {
-            return checkPlayerMatch(Lists.newArrayList(BukkitUtil.getOnlinePlayers()));
+            return checkPlayerMatch(Lists.newArrayList(Bukkit.getServer().getOnlinePlayers()));
         }
 
         // Handle special hash tag groups
@@ -649,11 +545,11 @@ public class WorldGuardPlugin extends JavaPlugin {
             // Handle #world, which matches player of the same world as the
             // calling source
             if (filter.equalsIgnoreCase("#world")) {
-                List<Player> players = new ArrayList<Player>();
+                List<Player> players = new ArrayList<>();
                 Player sourcePlayer = checkPlayer(source);
                 World sourceWorld = sourcePlayer.getWorld();
 
-                for (Player player : BukkitUtil.getOnlinePlayers()) {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     if (player.getWorld().equals(sourceWorld)) {
                         players.add(player);
                     }
@@ -663,13 +559,13 @@ public class WorldGuardPlugin extends JavaPlugin {
 
             // Handle #near, which is for nearby players.
             } else if (filter.equalsIgnoreCase("#near")) {
-                List<Player> players = new ArrayList<Player>();
+                List<Player> players = new ArrayList<>();
                 Player sourcePlayer = checkPlayer(source);
                 World sourceWorld = sourcePlayer.getWorld();
                 org.bukkit.util.Vector sourceVector
                         = sourcePlayer.getLocation().toVector();
 
-                for (Player player : BukkitUtil.getOnlinePlayers()) {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     if (player.getWorld().equals(sourceWorld)
                             && player.getLocation().toVector().distanceSquared(
                                     sourceVector) < 900) {
@@ -858,6 +754,19 @@ public class WorldGuardPlugin extends JavaPlugin {
         return new BukkitPlayer(this, player, silenced);
     }
 
+    public Actor wrapCommandSender(CommandSender sender) {
+        if (sender instanceof Player) {
+            return wrapPlayer((Player) sender);
+        }
+
+        try {
+            return new BukkitCommandSender(getWorldEdit(), sender);
+        } catch (CommandException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * Wrap a player as a LocalPlayer.
      *
@@ -915,7 +824,11 @@ public class WorldGuardPlugin extends JavaPlugin {
                 if (copy == null) throw new FileNotFoundException();
                 input = file.getInputStream(copy);
             } catch (IOException e) {
+<<<<<<< HEAD
                 log.severe("Не удается прочитать конфигурацию по умолчанию: " + defaultName);
+=======
+                WorldGuard.logger.severe("Unable to read default configuration: " + defaultName);
+>>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
             }
 
         if (input != null) {
@@ -929,15 +842,17 @@ public class WorldGuardPlugin extends JavaPlugin {
                     output.write(buf, 0, length);
                 }
 
+<<<<<<< HEAD
                 log.info("Конфигурационный файл записан по умолчанию: "
+=======
+                WorldGuard.logger.info("Default configuration file written: "
+>>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
                         + actual.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (input != null) {
-                        input.close();
-                    }
+                    input.close();
                 } catch (IOException ignore) {
                 }
 
@@ -951,100 +866,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
     }
 
-    /**
-     * Notifies all with the worldguard.notify permission.
-     * This will check both superperms and WEPIF,
-     * but makes sure WEPIF checks don't result in duplicate notifications
-     *
-     * @param msg The notification to broadcast
-     */
-    public void broadcastNotification(String msg) {
-        getServer().broadcast(msg, "worldguard.notify");
-        Set<Permissible> subs = getServer().getPluginManager().getPermissionSubscriptions("worldguard.notify");
-        for (Player player : BukkitUtil.getOnlinePlayers()) {
-            if (!(subs.contains(player) && player.hasPermission("worldguard.notify")) &&
-                    hasPermission(player, "worldguard.notify")) { // Make sure the player wasn't already broadcasted to.
-                player.sendMessage(msg);
-            }
-        }
-        log.info(msg);
-    }
-
-    /**
-     * Checks to see if a player can build at a location. This will return
-     * true if region protection is disabled.
-     *
-     * @param player The player to check.
-     * @param loc The location to check at.
-     * @see GlobalRegionManager#canBuild(org.bukkit.entity.Player, org.bukkit.Location)
-     * @return whether {@code player} can build at {@code loc}
-     */
-    public boolean canBuild(Player player, Location loc) {
-        return getGlobalRegionManager().canBuild(player, loc);
-    }
-
-    /**
-     * Checks to see if a player can build at a location. This will return
-     * true if region protection is disabled.
-     *
-     * @param player The player to check
-     * @param block The block to check at.
-     * @see GlobalRegionManager#canBuild(org.bukkit.entity.Player, org.bukkit.block.Block)
-     * @return whether {@code player} can build at {@code block}'s location
-     */
-    public boolean canBuild(Player player, Block block) {
-        return getGlobalRegionManager().canBuild(player, block);
-    }
-
-    /**
-     * Gets the region manager for a world.
-     *
-     * @param world world to get the region manager for
-     * @return the region manager or null if regions are not enabled
-     */
-    public RegionManager getRegionManager(World world) {
-        if (!getGlobalStateManager().get(world).useRegions) {
-            return null;
-        }
-
-        return getGlobalRegionManager().get(world);
-    }
-
     public PlayerMoveListener getPlayerMoveListener() {
         return playerMoveListener;
-    }
-
-    /**
-     * Replace macros in the text.
-     *
-     * The macros replaced are as follows:
-     * %name%: The name of {@code sender}. See {@link #toName(org.bukkit.command.CommandSender)}
-     * %id%: The unique name of the sender. See {@link #toUniqueName(org.bukkit.command.CommandSender)}
-     * %online%: The number of players currently online on the server
-     * If {@code sender} is a Player:
-     * %world%: The name of the world {@code sender} is located in
-     * %health%: The health of {@code sender}. See {@link org.bukkit.entity.Player#getHealth()}
-     *
-     * @param sender The sender to check
-     * @param message The message to replace macros in
-     * @return The message with macros replaced
-     */
-    public String replaceMacros(CommandSender sender, String message) {
-        Collection<? extends Player> online = BukkitUtil.getOnlinePlayers();
-
-        message = message.replace("%name%", toName(sender));
-        message = message.replace("%id%", toUniqueName(sender));
-        message = message.replace("%online%", String.valueOf(online.size()));
-
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            World world = player.getWorld();
-
-            message = message.replace("%world%", world.getName());
-            message = message.replace("%health%", String.valueOf(player.getHealth()));
-        }
-
-        return message;
     }
 
 }

@@ -21,28 +21,27 @@ package com.sk89q.worldguard.bukkit.commands.region;
 
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.Callable;
+
+import javax.annotation.Nullable;
 
 /**
  * Create a region printout, as used in /region info to show information about
  * a region.
  */
 public class RegionPrintoutBuilder implements Callable<String> {
-    
+
     private final ProtectedRegion region;
     @Nullable
     private final ProfileCache cache;
@@ -65,7 +64,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
     private void newLine() {
         builder.append("\n");
     }
-    
+
     /**
      * Add region name, type, and priority.
      */
@@ -74,11 +73,11 @@ public class RegionPrintoutBuilder implements Callable<String> {
         builder.append("Регион: ");
         builder.append(ChatColor.YELLOW);
         builder.append(region.getId());
-        
+
         builder.append(ChatColor.GRAY);
         builder.append(" (тип=");
         builder.append(region.getType().getName());
-        
+
         builder.append(ChatColor.GRAY);
         builder.append(", приоритет=");
         builder.append(region.getPriority());
@@ -86,30 +85,30 @@ public class RegionPrintoutBuilder implements Callable<String> {
 
         newLine();
     }
-    
+
     /**
      * Add information about flags.
      */
     public void appendFlags() {
         builder.append(ChatColor.GREEN);
         builder.append("Флаги: ");
-        
+
         appendFlagsList(true);
-        
+
         newLine();
     }
-    
+
     /**
-     * Append just the list of flags (without "Flags:"), including colors.
+     * Append just the list of flags (without "FlagUtil:"), including colors.
      *
      * @param useColors true to use colors
      */
     public void appendFlagsList(boolean useColors) {
         boolean hasFlags = false;
-        
-        for (Flag<?> flag : WorldGuardPlugin.inst().getFlagRegistry()) {
+
+        for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry()) {
             Object val = region.getFlag(flag), group = null;
-            
+
             // No value
             if (val == null) {
                 continue;
@@ -139,7 +138,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
 
             hasFlags = true;
         }
-            
+
         if (!hasFlags) {
             if (useColors) {
                 builder.append(ChatColor.RED);
@@ -147,24 +146,24 @@ public class RegionPrintoutBuilder implements Callable<String> {
             builder.append("(нет)");
         }
     }
-    
+
     /**
      * Add information about parents.
      */
     public void appendParents() {
         appendParentTree(true);
     }
-    
+
     /**
      * Add information about parents.
-     * 
+     *
      * @param useColors true to use colors
      */
     public void appendParentTree(boolean useColors) {
         if (region.getParent() == null) {
             return;
         }
-        
+
         List<ProtectedRegion> inheritance = new ArrayList<ProtectedRegion>();
 
         ProtectedRegion r = region;
@@ -183,7 +182,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
             if (useColors) {
                 builder.append(ChatColor.GREEN);
             }
-            
+
             // Put symbol for child
             if (indent != 0) {
                 for (int i = 0; i < indent; i++) {
@@ -191,10 +190,10 @@ public class RegionPrintoutBuilder implements Callable<String> {
                 }
                 builder.append("\u2517");
             }
-            
+
             // Put name
             builder.append(cur.getId());
-            
+
             // Put (parent)
             if (!cur.equals(region)) {
                 if (useColors) {
@@ -202,12 +201,12 @@ public class RegionPrintoutBuilder implements Callable<String> {
                 }
                 builder.append(" (родитель, приоритет=").append(cur.getPriority()).append(")");
             }
-            
+
             indent++;
             newLine();
         }
     }
-    
+
     /**
      * Add information about members.
      */
@@ -232,7 +231,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
             builder.append("(нет)");
         }
     }
-    
+
     /**
      * Add information about coordinates.
      */
@@ -244,7 +243,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
         builder.append(ChatColor.YELLOW);
         builder.append(" (").append(min.getBlockX()).append(",").append(min.getBlockY()).append(",").append(min.getBlockZ()).append(")");
         builder.append(" -> (").append(max.getBlockX()).append(",").append(max.getBlockY()).append(",").append(max.getBlockZ()).append(")");
-        
+
         newLine();
 
         builder.append(ChatColor.GREEN);
@@ -342,7 +341,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
     public StringBuilder appendCodePoint(int codePoint) {
         return builder.appendCodePoint(codePoint);
     }
-    
+
     @Override
     public String toString() {
         return builder.toString().trim();

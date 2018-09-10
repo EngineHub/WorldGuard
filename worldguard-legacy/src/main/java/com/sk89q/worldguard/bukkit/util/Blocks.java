@@ -27,7 +27,6 @@ import org.bukkit.material.Chest;
 import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,13 +52,13 @@ public final class Blocks {
         if (data instanceof Bed) {
             Bed bed = (Bed) data;
             if (bed.isHeadOfBed()) {
-                return Arrays.asList(block.getRelative(bed.getFacing().getOppositeFace()));
+                return Collections.singletonList(block.getRelative(bed.getFacing().getOppositeFace()));
             } else {
-                return Arrays.asList(block.getRelative(bed.getFacing()));
+                return Collections.singletonList(block.getRelative(bed.getFacing()));
             }
         } else if (data instanceof Chest) {
             BlockFace facing = ((Chest) data).getFacing();
-            ArrayList<Block> chests = new ArrayList<Block>();
+            ArrayList<Block> chests = new ArrayList<>();
             if (facing == BlockFace.NORTH || facing == BlockFace.SOUTH) {
                 if (block.getRelative(BlockFace.EAST).getState().getData() instanceof Chest) {
                     chests.add(block.getRelative(BlockFace.EAST));

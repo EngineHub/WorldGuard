@@ -19,7 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import org.bukkit.entity.EntityType;
@@ -39,7 +40,7 @@ public class WorldRulesListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onSpawnEntity(final SpawnEntityEvent event) {
-        WorldConfiguration config = getWorldConfig(event.getWorld());
+        BukkitWorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getWorld()));
 
         // ================================================================
         // EXP_DROPS flag

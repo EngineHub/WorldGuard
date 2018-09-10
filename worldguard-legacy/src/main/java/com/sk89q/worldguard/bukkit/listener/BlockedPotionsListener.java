@@ -19,8 +19,10 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldguard.bukkit.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldConfiguration;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
@@ -57,8 +59,8 @@ public class BlockedPotionsListener extends AbstractListener {
         if (event.getOriginalEvent() instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent originalEvent = (EntityDamageByEntityEvent) event.getOriginalEvent();
             if (Entities.isPotionArrow(originalEvent.getDamager())) { // should take care of backcompat
-                ConfigurationManager cfg = getPlugin().getGlobalStateManager();
-                WorldConfiguration wcfg = cfg.get(event.getWorld());
+                ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+                BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getWorld()));
                 PotionEffectType blockedEffect = null;
                 if (originalEvent.getDamager() instanceof SpectralArrow) {
                     if (wcfg.blockPotions.contains(PotionEffectType.GLOWING)) {
@@ -95,8 +97,8 @@ public class BlockedPotionsListener extends AbstractListener {
 
     @EventHandler
     public void onItemInteract(UseItemEvent event) {
-        ConfigurationManager cfg = getPlugin().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(event.getWorld());
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getWorld()));
         ItemStack item = event.getItemStack();
 
         // We only care about potions

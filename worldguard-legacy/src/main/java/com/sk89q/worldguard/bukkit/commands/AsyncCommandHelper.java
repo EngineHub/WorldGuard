@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.commands;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.util.task.FutureForwardingTask;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.World;
@@ -62,7 +63,7 @@ public class AsyncCommandHelper {
     }
 
     public AsyncCommandHelper registerWithSupervisor(String description) {
-        plugin.getSupervisor().monitor(
+        WorldGuard.getInstance().getSupervisor().monitor(
                 FutureForwardingTask.create(
                         future, format(description), sender));
         return this;

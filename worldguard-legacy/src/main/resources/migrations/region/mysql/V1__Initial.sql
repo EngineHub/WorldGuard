@@ -87,7 +87,7 @@ CREATE  TABLE IF NOT EXISTS `${tablePrefix}region_flag` (
   `region_id` VARCHAR(128) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   `world_id` INT(10) UNSIGNED NOT NULL ,
   `flag` VARCHAR(45) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
-  `value` VARCHAR(256) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
+  `value` VARCHAR(512) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_flags_region` (`region_id` ASC, `world_id` ASC) ,
   CONSTRAINT `fk_${tablePrefix}flags_region`

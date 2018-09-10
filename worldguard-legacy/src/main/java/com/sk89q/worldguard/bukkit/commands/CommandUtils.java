@@ -31,10 +31,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Nullable;
 
 /**
  * Command-related utility methods.
@@ -153,13 +154,10 @@ public final class CommandUtils {
      * @param sender the sender
      * @return a function
      */
-    public static Function<String, ?> messageFunction(final CommandSender sender) {
-        return new Function<String, Object>() {
-            @Override
-            public Object apply(@Nullable String s) {
-                sender.sendMessage(s);
-                return null;
-            }
+    public static java.util.function.Function<String, ?> messageFunction(final CommandSender sender) {
+        return (Function<String, Object>) s -> {
+            sender.sendMessage(s);
+            return null;
         };
     }
 

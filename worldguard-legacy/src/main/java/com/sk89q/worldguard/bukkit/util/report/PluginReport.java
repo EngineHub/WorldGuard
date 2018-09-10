@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.util.report;
 
-import com.sk89q.worldguard.util.report.DataReport;
+import com.sk89q.worldedit.util.report.DataReport;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
