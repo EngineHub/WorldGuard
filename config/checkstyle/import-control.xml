@@ -19,11 +19,13 @@
 
     <subpackage name="bukkit">
       <allow pkg="org.bukkit"/>
+      <allow pkg="org.bstats.bukkit"/>
       <allow pkg="net.minecraft.server"/>
     </subpackage>
 
     <subpackage name="sponge">
       <allow pkg="org.spongepowered"/>
+      <allow pkg="org.bstats.sponge"/>
       <allow pkg="com.flowpowered"/>
     </subpackage>
 

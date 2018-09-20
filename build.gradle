@@ -32,6 +32,11 @@ buildscript {
     }
 }
 
+allprojects {
+    group = 'com.sk89q.worldguard'
+    version = '7.0.0-SNAPSHOT'
+}
+
 if (!project.hasProperty("artifactory_contextUrl")) ext.artifactory_contextUrl = "http://localhost"
 if (!project.hasProperty("artifactory_user")) ext.artifactory_user = "guest"
 if (!project.hasProperty("artifactory_password")) ext.artifactory_password = ""
@@ -45,21 +50,44 @@ if (!project.hasProperty("gitCommitHash")) {
     }
 }
 
+apply plugin: 'com.jfrog.artifactory'
+artifactory {
+    contextUrl = "${artifactory_contextUrl}"
+    publish {
+        repository {
+            repoKey = project.version.contains("SNAPSHOT") ? 'libs-snapshot-local' : 'libs-release-local'
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+            maven = true
+
+        }
+    }
+
+    resolve {
+        repository {
+            repoKey = 'repo'
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+            maven = true
+        }
+    }
+}
+artifactoryPublish.skip = true
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
-    apply plugin: 'checkstyle'
+//    apply plugin: 'checkstyle' TODO Fix
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'com.jfrog.artifactory'
 
-    group = 'com.sk89q.worldguard'
-    version = '7.0.0-SNAPSHOT'
     ext.internalVersion = version + ";" + gitCommitHash
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
-    checkstyle.configFile = new File(rootProject.projectDir, "config/checkstyle/checkstyle.xml")
+//    checkstyle.configFile = new File(rootProject.projectDir, "config/checkstyle/checkstyle.xml")
+//    checkstyle.toolVersion = '7.6.1'
 
     repositories {
         mavenLocal()
@@ -93,8 +121,8 @@ subprojects {
         archives javadocJar
     }
 
-    build.dependsOn(checkstyleMain)
-    build.dependsOn(checkstyleTest)
+//    build.dependsOn(checkstyleMain)
+//    build.dependsOn(checkstyleTest)
     build.dependsOn(sourcesJar)
     build.dependsOn(javadocJar)
 
@@ -112,25 +140,7 @@ subprojects {
         exclude 'LICENSE*'
     }
 
-    artifactory {
-        contextUrl = "${artifactory_contextUrl}"
-        publish {
-            repository {
-                repoKey = project.version.contains("SNAPSHOT") ? 'libs-snapshot-local' : 'libs-release-local'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
-                
-            }
-        }
-
-        resolve {
-            repository {
-                repoKey = 'repo'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
-            }
-        }
+    artifactoryPublish {
+        publishConfigs('archives')
     }
 }

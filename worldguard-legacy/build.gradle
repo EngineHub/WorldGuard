@@ -1,13 +1,9 @@
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-project.version = '7.0.0-SNAPSHOT'
-ext.internalVersion = project.version + ";" + gitCommitHash
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-checkstyle.configFile = new File(projectDir, "config/checkstyle/checkstyle.xml")
+repositories {
+    maven { url "http://repo.bstats.org/content/repositories/releases/" }
+}
 
 dependencies {
     compile project(':worldguard-core')
@@ -17,6 +13,7 @@ dependencies {
         exclude group: 'com.sk89q', module: 'worldedit'
         exclude group: 'com.zachsthings.libcomponents'
     }
+    compile 'org.bstats:bstats-bukkit:1.2'
     testCompile 'junit:junit:4.11'
     testCompile 'org.hamcrest:hamcrest-library:1.2.1'
 }
@@ -35,6 +32,9 @@ processResources {
 shadowJar {
     dependencies {
         include(dependency(':worldguard-core'))
+        relocate ("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
+            include(dependency("org.bstats:bstats-bukkit:1.2"))
+        }
     }
 
     relocate('org.flywaydb', 'com.sk89q.worldguard.internal.flywaydb')

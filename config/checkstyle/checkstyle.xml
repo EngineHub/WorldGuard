@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC
-    "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
-    "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 <module name="Checker">
   <!-- Tabs are strictly banned -->
   <module name="FileTabCharacter"/>
@@ -12,11 +12,11 @@
     <module name="OuterTypeFilename"/> <!-- TypeName -> TypeName.java -->
 
     <!--
-    Control package usage, so people don't insert Bukkit into WE where it shouldn't belong, etc.
+    Control package usage, so people don't insert Bukkit into WG where it shouldn't belong, etc.
     It is a bit draconian, so update as necessary!
     -->
     <module name="ImportControl">
-      <property name="file" value="config/checkstyle/import-control.xml"/>
+      <property name="file" value="${basedir}/config/checkstyle/import-control.xml"/>
     </module>
 
     <!-- Code -->
@@ -57,7 +57,7 @@
   <!-- Require the header, something that many people forget and we hate to fix -->
   <!-- You should configure the header in your IDE -->
   <module name="Header">
-    <property name="headerFile" value="config/checkstyle/header.txt"/>
+    <property name="headerFile" value="${basedir}/config/checkstyle/header.txt"/>
     <property name="fileExtensions" value="java"/>
   </module>
 </module>
