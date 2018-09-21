@@ -236,7 +236,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.COMMAND_BLOCK, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.BEACON, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.COBBLESTONE_WALL, 0);
-        MATERIAL_FLAGS.put(Material.FLOWER_POT, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.ANVIL, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.TRAPPED_CHEST, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.HEAVY_WEIGHTED_PRESSURE_PLATE, 0);
@@ -606,6 +605,9 @@ public final class Materials {
         }
         for (Material button : Tag.BUTTONS.getValues()) {
             MATERIAL_FLAGS.put(button, MODIFIED_ON_RIGHT);
+        }
+        for (Material pot : Tag.FLOWER_POTS.getValues()) {
+            MATERIAL_FLAGS.put(pot, MODIFIED_ON_RIGHT);
         }
 
         // Check for missing items/blocks
@@ -1088,9 +1090,35 @@ public final class Materials {
      * @return true to be considered as used
      */
     public static boolean isConsideredBuildingIfUsed(Material type) {
-        return type == Material.REPEATER
-            || type == Material.COMPARATOR
-            || type == Material.FLOWER_POT;
+        switch (type) {
+            case COMPARATOR:
+            case FLOWER_POT:
+            case POTTED_ACACIA_SAPLING:
+            case POTTED_ALLIUM:
+            case POTTED_AZURE_BLUET:
+            case POTTED_BIRCH_SAPLING:
+            case POTTED_BLUE_ORCHID:
+            case POTTED_BROWN_MUSHROOM:
+            case POTTED_CACTUS:
+            case POTTED_DANDELION:
+            case POTTED_DARK_OAK_SAPLING:
+            case POTTED_DEAD_BUSH:
+            case POTTED_FERN:
+            case POTTED_JUNGLE_SAPLING:
+            case POTTED_OAK_SAPLING:
+            case POTTED_ORANGE_TULIP:
+            case POTTED_OXEYE_DAISY:
+            case POTTED_PINK_TULIP:
+            case POTTED_POPPY:
+            case POTTED_RED_MUSHROOM:
+            case POTTED_RED_TULIP:
+            case POTTED_SPRUCE_SAPLING:
+            case POTTED_WHITE_TULIP:
+            case REPEATER:
+                return true;
+            default:
+                return false;
+        }
     }
 
     /**
