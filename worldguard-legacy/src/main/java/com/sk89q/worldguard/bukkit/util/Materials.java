@@ -56,6 +56,7 @@ public final class Materials {
     private static Set<Material> shulkerBoxes = new HashSet<>();
 
     static {
+        shulkerBoxes.add(Material.SHULKER_BOX);
         shulkerBoxes.add(Material.WHITE_SHULKER_BOX);
         shulkerBoxes.add(Material.ORANGE_SHULKER_BOX);
         shulkerBoxes.add(Material.MAGENTA_SHULKER_BOX);
