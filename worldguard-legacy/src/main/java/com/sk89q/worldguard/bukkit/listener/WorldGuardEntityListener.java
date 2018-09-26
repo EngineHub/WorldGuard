@@ -632,7 +632,9 @@ public class WorldGuardEntityListener implements Listener {
 
         EntityType entityType = event.getEntityType();
 
-        if (wcfg.blockCreatureSpawn.contains(entityType)) {
+        com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
+
+        if (weEntityType != null && wcfg.blockCreatureSpawn.contains(weEntityType)) {
             event.setCancelled(true);
             return;
         }
@@ -649,7 +651,6 @@ public class WorldGuardEntityListener implements Listener {
             }
 
             Set<com.sk89q.worldedit.world.entity.EntityType> entityTypes = set.queryValue(null, Flags.DENY_SPAWN);
-            com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
             if (entityTypes != null && weEntityType != null && entityTypes.contains(weEntityType)) {
                 event.setCancelled(true);
                 return;
