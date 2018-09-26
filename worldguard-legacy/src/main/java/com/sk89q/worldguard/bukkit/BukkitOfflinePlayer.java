@@ -29,18 +29,18 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
-import com.sk89q.worldguard.LocalPlayer;
 import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-class BukkitOfflinePlayer extends LocalPlayer {
+class BukkitOfflinePlayer extends BukkitPlayer {
 
     private final OfflinePlayer player;
 
     BukkitOfflinePlayer(OfflinePlayer offlinePlayer) {
+        super(null, null);
         this.player = offlinePlayer;
     }
 
