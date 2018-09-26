@@ -56,6 +56,7 @@ public final class Materials {
     private static Set<Material> shulkerBoxes = new HashSet<>();
 
     static {
+        shulkerBoxes.add(Material.SHULKER_BOX);
         shulkerBoxes.add(Material.WHITE_SHULKER_BOX);
         shulkerBoxes.add(Material.ORANGE_SHULKER_BOX);
         shulkerBoxes.add(Material.MAGENTA_SHULKER_BOX);
@@ -236,7 +237,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.COMMAND_BLOCK, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.BEACON, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.COBBLESTONE_WALL, 0);
-        MATERIAL_FLAGS.put(Material.FLOWER_POT, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.ANVIL, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.TRAPPED_CHEST, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.HEAVY_WEIGHTED_PRESSURE_PLATE, 0);
@@ -606,6 +606,9 @@ public final class Materials {
         }
         for (Material button : Tag.BUTTONS.getValues()) {
             MATERIAL_FLAGS.put(button, MODIFIED_ON_RIGHT);
+        }
+        for (Material pot : Tag.FLOWER_POTS.getValues()) {
+            MATERIAL_FLAGS.put(pot, MODIFIED_ON_RIGHT);
         }
 
         // Check for missing items/blocks
@@ -1090,7 +1093,7 @@ public final class Materials {
     public static boolean isConsideredBuildingIfUsed(Material type) {
         return type == Material.REPEATER
             || type == Material.COMPARATOR
-            || type == Material.FLOWER_POT;
+            || Tag.FLOWER_POTS.getValues().contains(type);
     }
 
     /**
