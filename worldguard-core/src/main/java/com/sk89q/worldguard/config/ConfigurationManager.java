@@ -77,6 +77,7 @@ public abstract class ConfigurationManager {
     public boolean blockInGameOp;
     public boolean migrateRegionsToUuid;
     public boolean keepUnresolvedNames;
+    public boolean particleEffects;
 
     @Unreported public Map<String, String> hostKeys = new HashMap<>();
     public boolean hostKeysAllowFMLClients;
