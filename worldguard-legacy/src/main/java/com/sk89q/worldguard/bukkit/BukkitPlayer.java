@@ -41,7 +41,7 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
         super((WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit"), player);
         this.plugin = plugin;
         // getName() takes longer than before in newer versions of Minecraft
-        this.name = player.getName();
+        this.name = player == null ? null : player.getName();
         this.silenced = silenced;
     }
 
