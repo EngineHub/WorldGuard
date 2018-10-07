@@ -78,7 +78,7 @@ import javax.annotation.Nullable;
 public class WorldGuardPlayerListener implements Listener {
 
     private static final Logger log = Logger.getLogger(WorldGuardPlayerListener.class.getCanonicalName());
-    private static final Pattern opPattern = Pattern.compile("^/(?:bukkit:)?op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern opPattern = Pattern.compile("^/(?:minecraft:)(?:bukkit:)?op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
     private WorldGuardPlugin plugin;
 
     /**
