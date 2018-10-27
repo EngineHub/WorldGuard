@@ -57,19 +57,12 @@ public class NotifyExitFlag extends FlagValueChangeHandler<Boolean> {
     }
 
     @Override
-<<<<<<< HEAD:worldguard-legacy/src/main/java/com/sk89q/worldguard/session/handler/NotifyExitFlag.java
-    protected boolean onAbsentValue(Player player, Location from, Location to, ApplicableRegionSet toSet, Boolean lastValue, MoveType moveType) {
-        getPlugin().broadcastNotification(ChatColor.GRAY + "WG: "
-                + ChatColor.LIGHT_PURPLE + player.getName()
-                + ChatColor.GOLD + " вышел из региона");
-=======
     protected boolean onAbsentValue(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Boolean lastValue, MoveType moveType) {
         WorldGuard.getInstance().getPlatform().broadcastNotification(
                 ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.GRAY).append("WG: "))
                         .append(new StyledFragment(Style.PURPLE).append(player.getName()))
-                        .append(new StyledFragment(Style.YELLOW_DARK).append(" left NOTIFY region")))
+                        .append(new StyledFragment(Style.YELLOW_DARK).append(" вышел из региона")))
         );
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90:worldguard-core/src/main/java/com/sk89q/worldguard/session/handler/NotifyExitFlag.java
         return true;
     }
 }

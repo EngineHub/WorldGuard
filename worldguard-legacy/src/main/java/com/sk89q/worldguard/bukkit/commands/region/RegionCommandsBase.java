@@ -317,11 +317,7 @@ class RegionCommandsBase {
     protected static void warnAboutDimensions(Actor sender, ProtectedRegion region) {
         int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
         if (height <= 2) {
-<<<<<<< HEAD
-            sender.sendMessage(ChatColor.GRAY + "(Внимание: Высота региона составляет " + (height + 1) + " блок(ов).)");
-=======
-            sender.printDebug("(Warning: The height of the region was " + (height + 1) + " block(s).)");
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
+            sender.printDebug("(Внимание: Высота региона составляет " + (height + 1) + " блок(ов).)");
         }
     }
 
@@ -359,15 +355,8 @@ class RegionCommandsBase {
             ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
             Vector pt1 = cuboid.getMinimumPoint();
             Vector pt2 = cuboid.getMaximumPoint();
-<<<<<<< HEAD
-            CuboidSelection selection = new CuboidSelection(world, pt1, pt2);
-            worldEdit.setSelection(player, selection);
-            player.sendMessage(ChatColor.YELLOW + "Регион выбран как кубоид.");
-=======
-
             session.setRegionSelector(localPlayer.getWorld(), new CuboidRegionSelector(localPlayer.getWorld(), pt1, pt2));
-            player.sendMessage(ChatColor.YELLOW + "Region selected as a cuboid.");
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
+            player.sendMessage(ChatColor.YELLOW + "Регион выбран как кубоид.");
 
         } else if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
@@ -375,13 +364,8 @@ class RegionCommandsBase {
                     localPlayer.getWorld(), poly2d.getPoints(),
                     poly2d.getMinimumPoint().getBlockY(),
                     poly2d.getMaximumPoint().getBlockY() );
-<<<<<<< HEAD
-            worldEdit.setSelection(player, selection);
-            player.sendMessage(ChatColor.YELLOW + "Регион выбран как полигон.");
-=======
             session.setRegionSelector(localPlayer.getWorld(), selector);
-            player.sendMessage(ChatColor.YELLOW + "Region selected as a polygon.");
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
+            player.sendMessage(ChatColor.YELLOW + "Регион выбран как полигон.");
 
         } else if (region instanceof GlobalProtectedRegion) {
             throw new CommandException(

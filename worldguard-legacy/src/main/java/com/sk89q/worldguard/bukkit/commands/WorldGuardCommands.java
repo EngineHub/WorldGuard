@@ -267,7 +267,7 @@ public class WorldGuardCommands {
             if (player != null) {
                 LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
                 WorldGuard.getInstance().getPlatform().getSessionManager().resetState(localPlayer);
-                sender.sendMessage(""Все состояния игрока \"" + localPlayer.getName() + "\" сброшены.");
+                sender.sendMessage("Все состояния игрока \"" + localPlayer.getName() + "\" сброшены.");
             }
         }
     }

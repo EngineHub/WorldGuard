@@ -62,19 +62,11 @@ public class NotifyEntryFlag extends FlagValueChangeHandler<Boolean> {
             regionList.append(region.getId());
         }
 
-<<<<<<< HEAD:worldguard-legacy/src/main/java/com/sk89q/worldguard/session/handler/NotifyEntryFlag.java
-        getPlugin().broadcastNotification(ChatColor.GRAY + "WG: "
-                + ChatColor.LIGHT_PURPLE + player.getName()
-                + ChatColor.GOLD + " вошел в регион: "
-                + ChatColor.WHITE
-                + regionList);
-=======
         WorldGuard.getInstance().getPlatform().broadcastNotification(
                 ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.GRAY).append("WG: "))
                         .append(new StyledFragment(Style.PURPLE).append(player.getName()))
-                        .append(new StyledFragment(Style.YELLOW_DARK).append(" entered NOTIFY region: " + regionList)))
+                        .append(new StyledFragment(Style.YELLOW_DARK).append(" вошел в регион: " + regionList)))
         );
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90:worldguard-core/src/main/java/com/sk89q/worldguard/session/handler/NotifyEntryFlag.java
 
         return true;
     }
