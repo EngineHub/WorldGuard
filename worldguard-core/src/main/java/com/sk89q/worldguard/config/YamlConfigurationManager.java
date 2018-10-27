@@ -62,6 +62,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         config.removeProperty("auto-invincible-permission");
         usePlayerMove = config.getBoolean("use-player-move-event", true);
         usePlayerTeleports = config.getBoolean("use-player-teleports", true);
+        particleEffects = config.getBoolean("use-particle-effects", true);
 
         deopOnJoin = config.getBoolean("security.deop-everyone-on-join", false);
         blockInGameOp = config.getBoolean("security.block-in-game-op-command", false);

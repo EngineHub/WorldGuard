@@ -256,7 +256,7 @@ public class BlacklistListener extends AbstractListener {
         Inventory inventory = event.getInventory();
         ItemStack item = event.getCurrentItem();
 
-        if (item != null && entity instanceof Player) {
+        if (item != null && inventory != null && inventory.getHolder() != null && entity instanceof Player) {
             Player player = (Player) entity;
             ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
             BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(entity.getWorld()));

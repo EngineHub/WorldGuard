@@ -71,6 +71,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -220,6 +221,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         });
 
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
+
+        // Enable metrics
+        new Metrics(this);
     }
 
     @Override
