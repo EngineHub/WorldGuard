@@ -19,9 +19,8 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 
 import java.awt.geom.Area;
 import java.util.ArrayList;
@@ -57,8 +56,8 @@ public class GlobalProtectedRegion extends ProtectedRegion {
      */
     public GlobalProtectedRegion(String id, boolean transientRegion) {
         super(id, transientRegion);
-        min = new BlockVector(0, 0, 0);
-        max = new BlockVector(0, 0, 0);
+        min = BlockVector3.ZERO;
+        max = BlockVector3.ZERO;
     }
 
     @Override
@@ -67,10 +66,10 @@ public class GlobalProtectedRegion extends ProtectedRegion {
     }
 
     @Override
-    public List<BlockVector2D> getPoints() {
+    public List<BlockVector2> getPoints() {
         // This doesn't make sense
-        List<BlockVector2D> pts = new ArrayList<BlockVector2D>();
-        pts.add(new BlockVector2D(min.getBlockX(), min.getBlockZ()));
+        List<BlockVector2> pts = new ArrayList<>();
+        pts.add(BlockVector2.at(min.getBlockX(), min.getBlockZ()));
         return pts;
     }
 
@@ -80,7 +79,7 @@ public class GlobalProtectedRegion extends ProtectedRegion {
     }
 
     @Override
-    public boolean contains(Vector pt) {
+    public boolean contains(BlockVector3 pt) {
         // Global regions are handled separately so it must not contain any positions
         return false;
     }

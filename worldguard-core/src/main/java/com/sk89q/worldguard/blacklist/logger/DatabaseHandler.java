@@ -19,18 +19,19 @@
 
 package com.sk89q.worldguard.blacklist.logger;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.event.EventType;
 
-import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Nullable;
 
 public class DatabaseHandler implements LoggerHandler {
 
@@ -84,7 +85,7 @@ public class DatabaseHandler implements LoggerHandler {
      * @param item The item used
      * @param comment The comment associated with the event
      */
-    private void logEvent(EventType eventType, @Nullable LocalPlayer player, Vector pos, String item, String comment) {
+    private void logEvent(EventType eventType, @Nullable LocalPlayer player, BlockVector3 pos, String item, String comment) {
         try {
             Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement(

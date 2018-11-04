@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.bukkit.commands.region;
 
 import com.sk89q.squirrelid.cache.ProfileCache;
-import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -236,8 +236,8 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * Add information about coordinates.
      */
     public void appendBounds() {
-        BlockVector min = region.getMinimumPoint();
-        BlockVector max = region.getMaximumPoint();
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 max = region.getMaximumPoint();
         builder.append(ChatColor.BLUE);
         builder.append("Bounds:");
         builder.append(ChatColor.YELLOW);

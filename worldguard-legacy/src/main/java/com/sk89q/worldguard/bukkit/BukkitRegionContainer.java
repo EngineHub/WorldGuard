@@ -21,8 +21,8 @@ package com.sk89q.worldguard.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -93,7 +93,7 @@ public class BukkitRegionContainer extends RegionContainer {
                 RegionManager manager = get(BukkitAdapter.adapt(event.getWorld()));
                 if (manager != null) {
                     Chunk chunk = event.getChunk();
-                    manager.loadChunk(new Vector2D(chunk.getX(), chunk.getZ()));
+                    manager.loadChunk(BlockVector2.at(chunk.getX(), chunk.getZ()));
                 }
             }
 
@@ -102,7 +102,7 @@ public class BukkitRegionContainer extends RegionContainer {
                 RegionManager manager = get(BukkitAdapter.adapt(event.getWorld()));
                 if (manager != null) {
                     Chunk chunk = event.getChunk();
-                    manager.unloadChunk(new Vector2D(chunk.getX(), chunk.getZ()));
+                    manager.unloadChunk(BlockVector2.at(chunk.getX(), chunk.getZ()));
                 }
             }
         }, plugin);
@@ -175,9 +175,9 @@ public class BukkitRegionContainer extends RegionContainer {
 
             if (manager != null) {
                 // Bias the region data for loaded chunks
-                List<Vector2D> positions = new ArrayList<>();
+                List<BlockVector2> positions = new ArrayList<>();
                 for (Chunk chunk : world.getLoadedChunks()) {
-                    positions.add(new Vector2D(chunk.getX(), chunk.getZ()));
+                    positions.add(BlockVector2.at(chunk.getX(), chunk.getZ()));
                 }
                 manager.loadChunks(positions);
             }

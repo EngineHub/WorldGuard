@@ -53,7 +53,7 @@ abstract class TableCache<V> {
     private static final int MAX_NUMBER_PER_QUERY = 100;
     private static final Object LOCK = new Object();
 
-    private final Map<V, Integer> cache = new HashMap<V, Integer>();
+    private final Map<V, Integer> cache = new HashMap<>();
     private final DataSourceConfig config;
     private final Connection conn;
     private final String tableName;
@@ -115,7 +115,7 @@ abstract class TableCache<V> {
             checkNotNull(entries);
 
             // Get a list of missing entries
-            List<V> fetchList = new ArrayList<V>();
+            List<V> fetchList = new ArrayList<>();
             for (V entry : entries) {
                 if (!cache.containsKey(toKey(entry))) {
                     fetchList.add(entry);
@@ -154,7 +154,7 @@ abstract class TableCache<V> {
                 }
             }
 
-            List<V> missing = new ArrayList<V>();
+            List<V> missing = new ArrayList<>();
             for (V entry : fetchList) {
                 if (!cache.containsKey(toKey(entry))) {
                     missing.add(entry);

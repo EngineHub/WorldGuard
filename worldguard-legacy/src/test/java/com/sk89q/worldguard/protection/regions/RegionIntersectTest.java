@@ -19,66 +19,66 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class RegionIntersectTest {
 
     @Test
     public void testCuboidGetIntersectingRegions() {
         ProtectedRegion region = new ProtectedCuboidRegion("square",
-                new BlockVector(100, 40, 0), new BlockVector(140, 128, 40));
+                BlockVector3.at(100, 40, 0), BlockVector3.at(140, 128, 40));
 
         assertIntersection(region, new ProtectedCuboidRegion("normal",
-                new BlockVector(80, 40, -20), new BlockVector(120, 128, 20)),
+                        BlockVector3.at(80, 40, -20), BlockVector3.at(120, 128, 20)),
                 true);
 
         assertIntersection(region, new ProtectedCuboidRegion("small",
-                new BlockVector(98, 45, 20), new BlockVector(103, 50, 25)),
+                        BlockVector3.at(98, 45, 20), BlockVector3.at(103, 50, 25)),
                 true);
 
         assertIntersection(region, new ProtectedCuboidRegion("large",
-                new BlockVector(-500, 0, -600), new BlockVector(1000, 128, 1000)),
+                        BlockVector3.at(-500, 0, -600), BlockVector3.at(1000, 128, 1000)),
                 true);
 
         assertIntersection(region, new ProtectedCuboidRegion("short",
-                new BlockVector(50, 40, -1), new BlockVector(150, 128, 2)),
+                        BlockVector3.at(50, 40, -1), BlockVector3.at(150, 128, 2)),
                 true);
 
         assertIntersection(region, new ProtectedCuboidRegion("long",
-                new BlockVector(0, 40, 5), new BlockVector(1000, 128, 8)),
+                        BlockVector3.at(0, 40, 5), BlockVector3.at(1000, 128, 8)),
                 true);
 
-        List<BlockVector2D> triangleOverlap = new ArrayList<BlockVector2D>();
-        triangleOverlap.add(new BlockVector2D(90, -10));
-        triangleOverlap.add(new BlockVector2D(120, -10));
-        triangleOverlap.add(new BlockVector2D(90, 20));
+        List<BlockVector2> triangleOverlap = new ArrayList<>();
+        triangleOverlap.add(BlockVector2.at(90, -10));
+        triangleOverlap.add(BlockVector2.at(120, -10));
+        triangleOverlap.add(BlockVector2.at(90, 20));
 
         assertIntersection(region, new ProtectedPolygonalRegion("triangleOverlap",
                 triangleOverlap, 0, 128),
                 true);
 
-        List<BlockVector2D> triangleNoOverlap = new ArrayList<BlockVector2D>();
-        triangleNoOverlap.add(new BlockVector2D(90, -10));
-        triangleNoOverlap.add(new BlockVector2D(105, -10));
-        triangleNoOverlap.add(new BlockVector2D(90, 5));
+        List<BlockVector2> triangleNoOverlap = new ArrayList<>();
+        triangleNoOverlap.add(BlockVector2.at(90, -10));
+        triangleNoOverlap.add(BlockVector2.at(105, -10));
+        triangleNoOverlap.add(BlockVector2.at(90, 5));
 
         assertIntersection(region, new ProtectedPolygonalRegion("triangleNoOverlap",
                 triangleNoOverlap, 0, 128),
                 false);
 
-        List<BlockVector2D> triangleOverlapNoPoints = new ArrayList<BlockVector2D>();
-        triangleOverlapNoPoints.add(new BlockVector2D(100, -10));
-        triangleOverlapNoPoints.add(new BlockVector2D(120, 50));
-        triangleOverlapNoPoints.add(new BlockVector2D(140, -20));
+        List<BlockVector2> triangleOverlapNoPoints = new ArrayList<>();
+        triangleOverlapNoPoints.add(BlockVector2.at(100, -10));
+        triangleOverlapNoPoints.add(BlockVector2.at(120, 50));
+        triangleOverlapNoPoints.add(BlockVector2.at(140, -20));
 
         assertIntersection(region, new ProtectedPolygonalRegion("triangleOverlapNoPoints",
                 triangleOverlapNoPoints, 60, 80),
@@ -87,7 +87,7 @@ public class RegionIntersectTest {
 
     private void assertIntersection(ProtectedRegion region1, ProtectedRegion region2, boolean expected) {
         boolean actual = false;
-        List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
+        List<ProtectedRegion> regions = new ArrayList<>();
         regions.add(region2);
 
         try {
@@ -99,20 +99,20 @@ public class RegionIntersectTest {
         assertEquals("Check for '" + region2.getId() + "' region failed.", expected, actual);
     }
 
-    private static final BlockVector2D[] polygon = {
-            new BlockVector2D(1, 0),
-            new BlockVector2D(4, 3),
-            new BlockVector2D(4, -3),
+    private static final BlockVector2[] polygon = {
+            BlockVector2.at(1, 0),
+            BlockVector2.at(4, 3),
+            BlockVector2.at(4, -3),
     };
 
     @Test
     public void testIntersection() throws Exception {
-        final ProtectedCuboidRegion cuboidRegion = new ProtectedCuboidRegion("cuboidRegion", new BlockVector(-3, -3, -3), new BlockVector(3, 3, 3));
+        final ProtectedCuboidRegion cuboidRegion = new ProtectedCuboidRegion("cuboidRegion", BlockVector3.at(-3, -3, -3), BlockVector3.at(3, 3, 3));
         for (int angle = 0; angle < 360; angle += 90) {
-            final BlockVector2D[] rotatedPolygon = new BlockVector2D[polygon.length];
+            final BlockVector2[] rotatedPolygon = new BlockVector2[polygon.length];
             for (int i = 0; i < polygon.length; i++) {
-                final BlockVector2D vertex = polygon[i];
-                rotatedPolygon[i] = vertex.transform2D(angle, 0, 0, 0, 0).toBlockVector2D();
+                final BlockVector2 vertex = polygon[i];
+                rotatedPolygon[i] = vertex.transform2D(angle, 0, 0, 0, 0);
             }
 
             final ProtectedPolygonalRegion polygonalRegion = new ProtectedPolygonalRegion("polygonalRegion", Arrays.asList(rotatedPolygon), -3, 3);

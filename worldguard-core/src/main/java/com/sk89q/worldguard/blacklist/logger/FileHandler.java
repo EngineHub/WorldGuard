@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.blacklist.logger;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.target.Target;
@@ -48,7 +48,7 @@ public class FileHandler implements LoggerHandler {
     private int cacheSize = 10;
     private String pathPattern;
     private String worldName;
-    private TreeMap<String,LogFileWriter> writers = new TreeMap<String,LogFileWriter>();
+    private TreeMap<String,LogFileWriter> writers = new TreeMap<>();
     
     private final Logger logger;
 
@@ -217,11 +217,11 @@ public class FileHandler implements LoggerHandler {
      * @param pos The position to get coordinates for
      * @return The position's coordinates in human-readable form
      */
-    private String getCoordinates(Vector pos) {
+    private String getCoordinates(BlockVector3 pos) {
         return "@" + pos.getBlockX() + "," + pos.getBlockY() + "," + pos.getBlockZ();
     }
 
-    private void logEvent(BlacklistEvent event, String text, Target target, Vector pos, String comment) {
+    private void logEvent(BlacklistEvent event, String text, Target target, BlockVector3 pos, String comment) {
         log(event.getPlayer(), "Tried to " + text + " " + target.getFriendlyName() + " " + getCoordinates(pos), comment);
     }
 

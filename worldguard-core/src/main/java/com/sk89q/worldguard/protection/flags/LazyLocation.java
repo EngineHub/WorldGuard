@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
@@ -38,12 +38,12 @@ class LazyLocation extends Location {
         return WorldGuard.getInstance().getPlatform().getWorldByName(worldName);
     }
 
-    public LazyLocation(String worldName, Vector position, float yaw, float pitch) {
+    public LazyLocation(String worldName, Vector3 position, float yaw, float pitch) {
         super(findWorld(worldName), position, yaw, pitch);
         this.worldName = worldName;
     }
 
-    public LazyLocation(String worldName, Vector position) {
+    public LazyLocation(String worldName, Vector3 position) {
         super(findWorld(worldName), position);
         this.worldName = worldName;
     }
@@ -56,11 +56,11 @@ class LazyLocation extends Location {
         return new LazyLocation(worldName, toVector(), yaw, pitch);
     }
 
-    public LazyLocation setPosition(Vector position) {
+    public LazyLocation setPosition(Vector3 position) {
         return new LazyLocation(worldName, position, getYaw(), getPitch());
     }
 
-    public LazyLocation add(Vector other) {
+    public LazyLocation add(Vector3 other) {
         return this.setPosition(toVector().add(other));
     }
 

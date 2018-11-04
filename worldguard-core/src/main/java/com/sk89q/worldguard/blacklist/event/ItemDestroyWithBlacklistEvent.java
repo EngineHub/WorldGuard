@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.blacklist.event;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.target.Target;
 
@@ -34,7 +34,7 @@ public final class ItemDestroyWithBlacklistEvent extends ItemBlacklistEvent {
      * @param position The position the event occurred at
      * @param target The target of the event
      */
-    public ItemDestroyWithBlacklistEvent(@Nullable LocalPlayer player, Vector position, Target target) {
+    public ItemDestroyWithBlacklistEvent(@Nullable LocalPlayer player, BlockVector3 position, Target target) {
         super(player, position, target);
     }
 
@@ -49,7 +49,7 @@ public final class ItemDestroyWithBlacklistEvent extends ItemBlacklistEvent {
     }
 
     @Override
-    public Vector getLoggedPosition() {
+    public BlockVector3 getLoggedPosition() {
         // Use the block position instead
         return getPosition();
     }

@@ -144,7 +144,7 @@ public class RegionResultSet extends AbstractRegionSet {
         if (regionSet != null) {
             return regionSet;
         }
-        regionSet = Collections.unmodifiableSet(new HashSet<ProtectedRegion>(applicable));
+        regionSet = Collections.unmodifiableSet(new HashSet<>(applicable));
         return regionSet;
     }
 

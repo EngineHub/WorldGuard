@@ -22,12 +22,11 @@ package com.sk89q.worldguard.bukkit.commands.region;
 import com.google.common.base.Joiner;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -179,7 +178,7 @@ class RegionCommandsBase {
      * @throws CommandException thrown if no region was found
      */
     protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, boolean allowGlobal) throws CommandException {
-        ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation().toVector());
+        ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation().toVector().toBlockPoint());
 
         if (set.size() == 0) {
             if (allowGlobal) {
@@ -284,8 +283,8 @@ class RegionCommandsBase {
             int maxY = polySel.getMaximumPoint().getBlockY();
             return new ProtectedPolygonalRegion(id, polySel.getPoints(), minY, maxY);
         } else if (selection instanceof CuboidRegion) {
-            BlockVector min = selection.getMinimumPoint().toBlockVector();
-            BlockVector max = selection.getMaximumPoint().toBlockVector();
+            BlockVector3 min = selection.getMinimumPoint();
+            BlockVector3 max = selection.getMaximumPoint();
             return new ProtectedCuboidRegion(id, min, max);
         } else {
             throw new CommandException("Sorry, you can only use cuboids and polygons for WorldGuard regions.");
@@ -355,8 +354,8 @@ class RegionCommandsBase {
         // Set selection
         if (region instanceof ProtectedCuboidRegion) {
             ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
-            Vector pt1 = cuboid.getMinimumPoint();
-            Vector pt2 = cuboid.getMaximumPoint();
+            BlockVector3 pt1 = cuboid.getMinimumPoint();
+            BlockVector3 pt2 = cuboid.getMaximumPoint();
 
             session.setRegionSelector(localPlayer.getWorld(), new CuboidRegionSelector(localPlayer.getWorld(), pt1, pt2));
             player.sendMessage(ChatColor.YELLOW + "Region selected as a cuboid.");

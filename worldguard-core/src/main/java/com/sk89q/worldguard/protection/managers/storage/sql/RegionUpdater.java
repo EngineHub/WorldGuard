@@ -50,16 +50,16 @@ class RegionUpdater {
     private final int worldId;
     private final DomainTableCache domainTableCache;
 
-    private final Set<String> userNames = new HashSet<String>();
-    private final Set<UUID> userUuids = new HashSet<UUID>();
-    private final Set<String> groupNames = new HashSet<String>();
+    private final Set<String> userNames = new HashSet<>();
+    private final Set<UUID> userUuids = new HashSet<>();
+    private final Set<String> groupNames = new HashSet<>();
 
     private final Yaml yaml = SQLRegionDatabase.createYaml();
 
-    private final List<ProtectedRegion> typesToUpdate = new ArrayList<ProtectedRegion>();
-    private final List<ProtectedRegion> parentsToSet = new ArrayList<ProtectedRegion>();
-    private final List<ProtectedRegion> flagsToReplace = new ArrayList<ProtectedRegion>();
-    private final List<ProtectedRegion> domainsToReplace = new ArrayList<ProtectedRegion>();
+    private final List<ProtectedRegion> typesToUpdate = new ArrayList<>();
+    private final List<ProtectedRegion> parentsToSet = new ArrayList<>();
+    private final List<ProtectedRegion> flagsToReplace = new ArrayList<>();
+    private final List<ProtectedRegion> domainsToReplace = new ArrayList<>();
 
     RegionUpdater(DataUpdater updater) {
         this.config = updater.config;

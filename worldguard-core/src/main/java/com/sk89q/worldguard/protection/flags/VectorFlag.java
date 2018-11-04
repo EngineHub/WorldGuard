@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.Vector3;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * Stores a vector.
  */
-public class VectorFlag extends Flag<Vector> {
+public class VectorFlag extends Flag<Vector3> {
     
     public VectorFlag(String name, RegionGroup defaultGroup) {
         super(name, defaultGroup);
@@ -38,7 +38,7 @@ public class VectorFlag extends Flag<Vector> {
     }
 
     @Override
-    public Vector parseInput(FlagContext context) throws InvalidFlagFormat {
+    public Vector3 parseInput(FlagContext context) throws InvalidFlagFormat {
         String input = context.getUserInput();
 
         if ("here".equalsIgnoreCase(input)) {
@@ -47,7 +47,7 @@ public class VectorFlag extends Flag<Vector> {
             String[] split = input.split(",");
             if (split.length == 3) {
                 try {
-                    return new Vector(
+                    return Vector3.at(
                             Double.parseDouble(split[0]),
                             Double.parseDouble(split[1]),
                             Double.parseDouble(split[2])
@@ -61,7 +61,7 @@ public class VectorFlag extends Flag<Vector> {
     }
 
     @Override
-    public Vector unmarshal(Object o) {
+    public Vector3 unmarshal(Object o) {
         if (o instanceof Map<?, ?>) {
             Map<?, ?> map  = (Map<?, ?>) o;
 
@@ -73,14 +73,14 @@ public class VectorFlag extends Flag<Vector> {
                 return null;
             }
 
-            return new Vector(toNumber(rawX), toNumber(rawY), toNumber(rawZ));
+            return Vector3.at(toNumber(rawX), toNumber(rawY), toNumber(rawZ));
         }
 
         return null;
     }
 
     @Override
-    public Object marshal(Vector o) {
+    public Object marshal(Vector3 o) {
         Map<String, Object> vec = new HashMap<>();
         vec.put("x", o.getX());
         vec.put("y", o.getY());
