@@ -158,53 +158,12 @@ public class BukkitUtil {
      * @param material the material
      * @return a target
      */
-    public static Target createTarget(Material material) {
+     public static Target createTarget(Material material) {
         checkNotNull(material);
-<<<<<<< HEAD
-        return new MaterialTarget(material.getId(), (short) 0);
-    }
-
-    /**
-     * Get a collection of the currently online players.
-     *
-     * @return The online players
-     */
-    @SuppressWarnings("unchecked")
-    public static Collection<? extends Player> getOnlinePlayers() {
-        try {
-            return Bukkit.getServer().getOnlinePlayers();
-        } catch (NoSuchMethodError ignored) {
-        }
-
-        try {
-            if (ONLINE_PLAYERS_METHOD == null) {
-                ONLINE_PLAYERS_METHOD = getOnlinePlayersMethod();
-            }
-
-            Object result = ONLINE_PLAYERS_METHOD.invoke(Bukkit.getServer());
-            if (result instanceof Player[]) {
-                return ImmutableList.copyOf((Player[]) result);
-            } else if (result instanceof Collection<?>) {
-                return (Collection<? extends Player>) result;
-            } else {
-                throw new RuntimeException("Результат вызова getOnlinePlayers() не был известным типом данных");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("WorldGuard не совместим с этой версией Bukkit", e);
-        }
-    }
-
-    private static Method getOnlinePlayersMethod() throws NoSuchMethodException {
-        try {
-            return Server.class.getMethod("getOnlinePlayers");
-        } catch (NoSuchMethodException e1) {
-            return Server.class.getMethod("_INVALID_getOnlinePlayers");
-=======
         if (material.isBlock()) {
             return new BlockTarget(BukkitAdapter.asBlockType(material));
         } else {
             return new ItemTarget(BukkitAdapter.asItemType(material));
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
         }
     }
 }

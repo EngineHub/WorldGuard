@@ -1,6 +1,10 @@
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
+compileJava {
+  options.encoding = "UTF-8"
+}
+
 dependencies {
     compile 'com.sk89q.worldedit:worldedit-core:7.0.0-SNAPSHOT'
     compile 'com.sk89q.intake:intake:4.2-SNAPSHOT'

@@ -22,6 +22,7 @@ package com.sk89q.worldguard;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
@@ -36,7 +37,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 @org.junit.Ignore
-public class TestPlayer extends LocalPlayer {
+public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     private final UUID uuid = UUID.randomUUID();
     private final String name;

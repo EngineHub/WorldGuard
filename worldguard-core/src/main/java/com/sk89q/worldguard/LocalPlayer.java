@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard;
 
-import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
@@ -27,7 +27,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.util.List;
 
-public abstract class LocalPlayer extends AbstractPlayerActor implements RegionAssociable {
+public interface LocalPlayer extends Player, RegionAssociable {
 
     /**
      * Returns true if this player is inside a group.
@@ -35,24 +35,24 @@ public abstract class LocalPlayer extends AbstractPlayerActor implements RegionA
      * @param group The group to check
      * @return Whether this player is in {@code group}
      */
-    public abstract boolean hasGroup(String group);
+    boolean hasGroup(String group);
 
     /**
      * Kick this player.
      * 
      * @param msg The message to kick the player with
      */
-    public abstract void kick(String msg);
+    void kick(String msg);
     
     /**
      * Ban this player.
      * 
      * @param msg The message to ban the player with
      */
-    public abstract void ban(String msg);
+    void ban(String msg);
 
     @Override
-    public Association getAssociation(List<ProtectedRegion> regions) {
+    default Association getAssociation(List<ProtectedRegion> regions) {
         boolean member = false;
 
         for (ProtectedRegion region : regions) {
@@ -71,82 +71,82 @@ public abstract class LocalPlayer extends AbstractPlayerActor implements RegionA
      *
      * @return The health
      */
-    public abstract double getHealth();
+    double getHealth();
 
     /**
      * Sets the health of this player.
      *
      * @param health The health
      */
-    public abstract void setHealth(double health);
+    void setHealth(double health);
 
     /**
      * Gets the max health of this player.
      *
      * @return The max health
      */
-    public abstract double getMaxHealth();
+    double getMaxHealth();
 
     /**
      * Gets the food level of this player.
      *
      * @return The food level
      */
-    public abstract double getFoodLevel();
+    double getFoodLevel();
 
     /**
      * Sets the food level of this player.
      *
      * @param foodLevel The food level
      */
-    public abstract void setFoodLevel(double foodLevel);
+    void setFoodLevel(double foodLevel);
 
     /**
      * Gets the saturation of this player.
      *
      * @return The saturation
      */
-    public abstract double getSaturation();
+    double getSaturation();
 
     /**
      * Sets the saturation of this player.
      *
      * @param saturation The saturation
      */
-    public abstract void setSaturation(double saturation);
+    void setSaturation(double saturation);
 
     /**
      * Gets the players weather
      *
      * @return The players weather
      */
-    public abstract WeatherType getPlayerWeather();
+    WeatherType getPlayerWeather();
 
     /**
      * Sets the players WeatherType
      *
      * @param weather The weather type
      */
-    public abstract void setPlayerWeather(WeatherType weather);
+    void setPlayerWeather(WeatherType weather);
 
     /**
      * Resets the players weather to normal.
      */
-    public abstract void resetPlayerWeather();
+    void resetPlayerWeather();
 
     /**
      * Gets if the players time is relative.
      *
      * @return If the time is relative
      */
-    public abstract boolean isPlayerTimeRelative();
+    boolean isPlayerTimeRelative();
 
     /**
      * Gets the time offset of the player.
      *
      * @return The players time offset
      */
-    public abstract long getPlayerTimeOffset();
+    long getPlayerTimeOffset();
 
     /**
      * Sets the players time.
@@ -154,10 +154,10 @@ public abstract class LocalPlayer extends AbstractPlayerActor implements RegionA
      * @param time The players time
      * @param relative If it's relative
      */
-    public abstract void setPlayerTime(long time, boolean relative);
+    void setPlayerTime(long time, boolean relative);
 
     /**
      * Resets the players time to normal.
      */
-    public abstract void resetPlayerTime();
+    void resetPlayerTime();
 }

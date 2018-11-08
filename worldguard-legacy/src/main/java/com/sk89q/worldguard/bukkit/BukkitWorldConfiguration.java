@@ -63,20 +63,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
     private static final TargetMatcherParser matcherParser = new TargetMatcherParser();
 
-<<<<<<< HEAD:worldguard-legacy/src/main/java/com/sk89q/worldguard/bukkit/WorldConfiguration.java
-    public static final String CONFIG_HEADER = "#\r\n" +
-            "# Файл конфигурации мира WorldGuard\r\n" +
-            "#\r\n" +
-            "# Это файл конфигурации мира. Все, что помещается здесь будет влиять\r\n" +
-            "# только на этот мир. Если вы ничего не помещали в этот файл, то\r\n" +
-            "# настройки будут унаследованы от основного файла конфигурации.\r\n" +
-            "#\r\n" +
-            "# Если вы видите {} ниже, это означает, что записей в этом файле нет.\r\n" +
-            "# Удалите {} и добавьте свои собственные записи.\r\n" +
-            "#\r\n";
-
-=======
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90:worldguard-legacy/src/main/java/com/sk89q/worldguard/bukkit/BukkitWorldConfiguration.java
     @Unreported private WorldGuardPlugin plugin;
 
     @Unreported private String worldName;
@@ -299,13 +285,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             EntityType creature = EntityTypes.get(creatureName.toLowerCase());
 
             if (creature == null) {
-<<<<<<< HEAD:worldguard-legacy/src/main/java/com/sk89q/worldguard/bukkit/WorldConfiguration.java
                 log.warning("Неизвестный тип моба '" + creatureName + "'");
-            } else if (!creature.isAlive()) {
-                log.warning("Тип сущности '" + creatureName + "' не является существом");
-=======
-                log.warning("Unknown entity type '" + creatureName + "'");
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90:worldguard-legacy/src/main/java/com/sk89q/worldguard/bukkit/BukkitWorldConfiguration.java
             } else {
                 blockCreatureSpawn.add(creature);
             }

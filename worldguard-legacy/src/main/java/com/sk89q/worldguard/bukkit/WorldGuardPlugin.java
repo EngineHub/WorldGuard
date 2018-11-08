@@ -71,6 +71,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -220,39 +221,14 @@ public class WorldGuardPlugin extends JavaPlugin {
         });
 
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
+
+        // Enable metrics
+        new Metrics(this);
     }
 
     @Override
     public void onDisable() {
-<<<<<<< HEAD
-        executorService.shutdown();
-
-        try {
-            log.log(Level.INFO, "Завершение работы исполнителя и ожидание каких-либо незавершенных задач...");
-
-            List<Task<?>> tasks = supervisor.getTasks();
-            if (!tasks.isEmpty()) {
-                StringBuilder builder = new StringBuilder("Известные задачи:");
-                for (Task<?> task : tasks) {
-                    builder.append("\n");
-                    builder.append(task.getName());
-                }
-                log.log(Level.INFO, builder.toString());
-            }
-
-            Futures.successfulAsList(tasks).get();
-            executorService.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            log.log(Level.WARNING, "Некоторые задачи не удалить во время ожидания завершения оставшихся задач", e);
-        }
-
-        regionContainer.unload();
-        configuration.unload();
-=======
         WorldGuard.getInstance().disable();
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
         this.getServer().getScheduler().cancelTasks(this);
     }
 
@@ -286,13 +262,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         if (throwable instanceof NumberFormatException) {
             return "Значение может быть только числовым.";
         } else if (throwable instanceof StorageException) {
-<<<<<<< HEAD
-            log.log(Level.WARNING, "Ошибка загрузки/сохранения регионов", throwable);
+            WorldGuard.logger.log(Level.WARNING, "Ошибка загрузки/сохранения регионов", throwable);
             return "Данные региона не могут быть загружены/сохранены: " + throwable.getMessage();
-=======
-            WorldGuard.logger.log(Level.WARNING, "Error loading/saving regions", throwable);
-            return "Region data could not be loaded/saved: " + throwable.getMessage();
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
         } else if (throwable instanceof RejectedExecutionException) {
             return "В настоящее время слишком много задач в очереди, чтобы добавить ваш. Используйте /wg running в список поставленных в очередь и запуска задач.";
         } else if (throwable instanceof CancellationException) {
@@ -304,13 +275,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         } else if (throwable instanceof CommandException) {
             return throwable.getMessage();
         } else {
-<<<<<<< HEAD
-            log.log(Level.WARNING, "Произошла непредвиденная ошибка WorldGuard", throwable);
+            WorldGuard.logger.log(Level.WARNING, "Произошла непредвиденная ошибка WorldGuard", throwable);
             return "WorldGuard: Произошла непредвиденная ошибка! Смотрите вывод в консоль.";
-=======
-            WorldGuard.logger.log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
-            return "WorldGuard: An unexpected error occurred! Please see the server console.";
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
         }
     }
 
@@ -527,13 +493,9 @@ public class WorldGuardPlugin extends JavaPlugin {
     public Iterable<? extends Player> matchPlayers(CommandSender source, String filter)
             throws CommandException {
 
-<<<<<<< HEAD
-        if (BukkitUtil.getOnlinePlayers().isEmpty()) {
-            throw new CommandException("Игроки не найдены.");
-=======
+
         if (Bukkit.getServer().getOnlinePlayers().isEmpty()) {
-            throw new CommandException("No players matched query.");
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
+            throw new CommandException("Игроки не найдены.");
         }
 
         if (filter.equals("*")) {
@@ -824,11 +786,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 if (copy == null) throw new FileNotFoundException();
                 input = file.getInputStream(copy);
             } catch (IOException e) {
-<<<<<<< HEAD
-                log.severe("Не удается прочитать конфигурацию по умолчанию: " + defaultName);
-=======
-                WorldGuard.logger.severe("Unable to read default configuration: " + defaultName);
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
+                WorldGuard.logger.severe("Не удается прочитать конфигурацию по умолчанию: " + defaultName);
             }
 
         if (input != null) {
@@ -842,11 +800,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     output.write(buf, 0, length);
                 }
 
-<<<<<<< HEAD
-                log.info("Конфигурационный файл записан по умолчанию: "
-=======
-                WorldGuard.logger.info("Default configuration file written: "
->>>>>>> 8e819f7a823e29fca68fca5f88d575ee7663aa90
+                WorldGuard.logger.info("Конфигурационный файл записан по умолчанию: "
                         + actual.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
