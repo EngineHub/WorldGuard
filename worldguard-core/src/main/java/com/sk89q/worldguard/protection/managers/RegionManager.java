@@ -22,8 +22,8 @@ package com.sk89q.worldguard.protection.managers;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Sets;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.RegionResultSet;
@@ -74,7 +74,7 @@ public final class RegionManager {
         checkNotNull(flagRegistry, "flagRegistry");
 
         this.store = store;
-        this.indexFactory = indexFactory::get;
+        this.indexFactory = indexFactory;
         this.index = indexFactory.get();
         this.flagRegistry = flagRegistry;
     }
@@ -154,7 +154,7 @@ public final class RegionManager {
      *
      * @param position the position
      */
-    public void loadChunk(Vector2D position) {
+    public void loadChunk(BlockVector2 position) {
         index.bias(position);
     }
 
@@ -163,7 +163,7 @@ public final class RegionManager {
      *
      * @param positions a collection of positions
      */
-    public void loadChunks(Collection<Vector2D> positions) {
+    public void loadChunks(Collection<BlockVector2> positions) {
         index.biasAll(positions);
     }
 
@@ -172,7 +172,7 @@ public final class RegionManager {
      *
      * @param position the position
      */
-    public void unloadChunk(Vector2D position) {
+    public void unloadChunk(BlockVector2 position) {
         index.forget(position);
     }
 
@@ -320,7 +320,7 @@ public final class RegionManager {
      * @param position the position
      * @return the query object
      */
-    public ApplicableRegionSet getApplicableRegions(Vector position) {
+    public ApplicableRegionSet getApplicableRegions(BlockVector3 position) {
         checkNotNull(position);
 
         Set<ProtectedRegion> regions = Sets.newHashSet();
@@ -349,7 +349,7 @@ public final class RegionManager {
      * @param position the position
      * @return a list of names
      */
-    public List<String> getApplicableRegionsIDs(Vector position) {
+    public List<String> getApplicableRegionsIDs(BlockVector3 position) {
         checkNotNull(position);
 
         final List<String> names = new ArrayList<>();

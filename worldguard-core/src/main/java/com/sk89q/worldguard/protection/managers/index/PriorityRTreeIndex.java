@@ -19,9 +19,7 @@
 
 package com.sk89q.worldguard.protection.managers.index;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegionMBRConverter;
 import org.khelekore.prtree.MBR;
@@ -32,13 +30,15 @@ import org.khelekore.prtree.SimpleMBR;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * An implementation of an index that uses {@link HashMapIndex} for queries
  * by region name and a priority R-tree for spatial queries.
  *
  * <p>At the moment, the R-tree is only utilized for the
- * {@link #applyContaining(Vector, Predicate)} method, and the underlying
+ * {@link #applyContaining(BlockVector3, Predicate)} method, and the underlying
  * hash map-based index is used for the other spatial queries. In addition,
  * every modification to the index requires the entire R-tree to be rebuilt,
  * although this operation is reasonably quick.</p>
@@ -55,29 +55,26 @@ public class PriorityRTreeIndex extends HashMapIndex {
     private PRTree<ProtectedRegion> tree;
 
     public PriorityRTreeIndex() {
-        tree = new PRTree<ProtectedRegion>(CONVERTER, BRANCH_FACTOR);
-        tree.load(Collections.<ProtectedRegion>emptyList());
+        tree = new PRTree<>(CONVERTER, BRANCH_FACTOR);
+        tree.load(Collections.emptyList());
     }
 
     @Override
     protected void rebuildIndex() {
-        PRTree<ProtectedRegion> newTree = new PRTree<ProtectedRegion>(CONVERTER, BRANCH_FACTOR);
+        PRTree<ProtectedRegion> newTree = new PRTree<>(CONVERTER, BRANCH_FACTOR);
         newTree.load(values());
         this.tree = newTree;
     }
 
     @Override
-    public void applyContaining(Vector position, Predicate<ProtectedRegion> consumer) {
-        // Floor the vector to ensure we get accurate points
-        position = position.floor();
-
-        Set<ProtectedRegion> seen = new HashSet<ProtectedRegion>();
+    public void applyContaining(BlockVector3 position, Predicate<ProtectedRegion> consumer) {
+        Set<ProtectedRegion> seen = new HashSet<>();
         MBR pointMBR = new SimpleMBR(position.getX(), position.getX(), position.getY(), position.getY(), position.getZ(), position.getZ());
 
         for (ProtectedRegion region : tree.find(pointMBR)) {
             if (region.contains(position) && !seen.contains(region)) {
                 seen.add(region);
-                if (!consumer.apply(region)) {
+                if (!consumer.test(region)) {
                     break;
                 }
             }
@@ -86,10 +83,10 @@ public class PriorityRTreeIndex extends HashMapIndex {
 
     @Override
     public void applyIntersecting(ProtectedRegion region, Predicate<ProtectedRegion> consumer) {
-        Vector min = region.getMinimumPoint().floor();
-        Vector max = region.getMaximumPoint().ceil();
+        BlockVector3 min = region.getMinimumPoint().floor();
+        BlockVector3 max = region.getMaximumPoint().ceil();
 
-        Set<ProtectedRegion> candidates = new HashSet<ProtectedRegion>();
+        Set<ProtectedRegion> candidates = new HashSet<>();
         MBR pointMBR = new SimpleMBR(min.getX(), max.getX(), min.getY(), max.getY(), min.getZ(), max.getZ());
 
         for (ProtectedRegion found : tree.find(pointMBR)) {
@@ -97,7 +94,7 @@ public class PriorityRTreeIndex extends HashMapIndex {
         }
 
         for (ProtectedRegion found : region.getIntersectingRegions(candidates)) {
-            if (!consumer.apply(found)) {
+            if (!consumer.test(found)) {
                 break;
             }
         }

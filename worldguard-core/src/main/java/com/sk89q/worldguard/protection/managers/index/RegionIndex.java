@@ -19,18 +19,19 @@
 
 package com.sk89q.worldguard.protection.managers.index;
 
-import com.google.common.base.Predicate;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.ChangeTracked;
 import com.sk89q.worldguard.util.Normal;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
 
 /**
  * An index of regions to allow for fast lookups of regions by their ID and
@@ -47,7 +48,7 @@ public interface RegionIndex extends ChangeTracked {
      *
      * @param chunkPosition the chunk position
      */
-    void bias(Vector2D chunkPosition);
+    void bias(BlockVector2 chunkPosition);
 
     /**
      * Bias the given chunk for faster lookups (put it in a hash table, etc.).
@@ -56,18 +57,18 @@ public interface RegionIndex extends ChangeTracked {
      *
      * @param chunkPosition the chunk position
      */
-    void biasAll(Collection<Vector2D> chunkPosition);
+    void biasAll(Collection<BlockVector2> chunkPosition);
 
     /**
      * No longer bias the given chunk for faster lookup.
      *
      * @param chunkPosition the chunk position
      */
-    void forget(Vector2D chunkPosition);
+    void forget(BlockVector2 chunkPosition);
 
     /**
      * Clearly all extra cache data created by any calls to
-     * {@link #bias(Vector2D)}.
+     * {@link #bias(BlockVector2)}.
      */
     void forgetAll();
 
@@ -134,7 +135,7 @@ public interface RegionIndex extends ChangeTracked {
      * @param position the position
      * @param consumer a predicate that returns true to continue iterating
      */
-    void applyContaining(Vector position, Predicate<ProtectedRegion> consumer);
+    void applyContaining(BlockVector3 position, Predicate<ProtectedRegion> consumer);
 
     /**
      * Apply the given predicate to all regions that intersect the given

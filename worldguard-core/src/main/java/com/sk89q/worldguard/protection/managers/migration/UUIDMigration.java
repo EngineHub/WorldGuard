@@ -50,8 +50,8 @@ public class UUIDMigration extends AbstractMigration {
     private final Timer timer = new Timer();
     private final ProfileService profileService;
     private final FlagRegistry flagRegistry;
-    private final ConcurrentMap<String, UUID> resolvedNames = new ConcurrentHashMap<String, UUID>();
-    private final Set<String> unresolvedNames = new HashSet<String>();
+    private final ConcurrentMap<String, UUID> resolvedNames = new ConcurrentHashMap<>();
+    private final Set<String> unresolvedNames = new HashSet<>();
     private boolean keepUnresolvedNames = true;
 
     /**
@@ -106,7 +106,7 @@ public class UUIDMigration extends AbstractMigration {
 
                 // Don't lookup names that we already looked up for previous
                 // worlds -- note: all names are lowercase in these collections
-                Set<String> lookupNames = new HashSet<String>(names);
+                Set<String> lookupNames = new HashSet<>(names);
                 lookupNames.removeAll(resolvedNames.keySet());
 
                 // Ask Mojang for names
@@ -161,7 +161,7 @@ public class UUIDMigration extends AbstractMigration {
      * @return a set of names
      */
     private static Set<String> getNames(Collection<ProtectedRegion> regions) {
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         for (ProtectedRegion region : regions) {
             // Names are already lower case
             names.addAll(region.getOwners().getPlayers());

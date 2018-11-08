@@ -19,19 +19,19 @@
 
 package com.sk89q.worldguard.blacklist.event;
 
-import com.sk89q.worldedit.Vector;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.target.Target;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 abstract class AbstractBlacklistEvent implements BlacklistEvent {
 
     @Nullable
     private final LocalPlayer player;
-    private final Vector position;
+    private final BlockVector3 position;
     private final Target target;
     
     /**
@@ -41,7 +41,7 @@ abstract class AbstractBlacklistEvent implements BlacklistEvent {
      * @param position The position the event occurred at
      * @param target The target of the event
      */
-    AbstractBlacklistEvent(@Nullable LocalPlayer player, Vector position, Target target) {
+    AbstractBlacklistEvent(@Nullable LocalPlayer player, BlockVector3 position, Target target) {
         checkNotNull(position);
         checkNotNull(target);
         this.player = player;
@@ -61,7 +61,7 @@ abstract class AbstractBlacklistEvent implements BlacklistEvent {
     }
 
     @Override
-    public Vector getPosition() {
+    public BlockVector3 getPosition() {
         return position;
     }
     

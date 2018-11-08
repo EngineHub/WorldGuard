@@ -19,10 +19,10 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -187,7 +187,7 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
-    public void setPosition(Vector pos, float pitch, float yaw) {
+    public void setPosition(Vector3 pos, float pitch, float yaw) {
 
     }
 

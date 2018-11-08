@@ -20,8 +20,8 @@
 package com.sk89q.worldguard.protection.managers.storage.sql;
 
 import com.google.common.collect.Lists;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
@@ -109,8 +109,8 @@ class RegionInserter {
 
             for (List<ProtectedCuboidRegion> partition : Lists.partition(cuboids, StatementBatch.MAX_BATCH_SIZE)) {
                 for (ProtectedCuboidRegion region : partition) {
-                    BlockVector min = region.getMinimumPoint();
-                    BlockVector max = region.getMaximumPoint();
+                    BlockVector3 min = region.getMinimumPoint();
+                    BlockVector3 max = region.getMaximumPoint();
 
                     stmt.setString(1, region.getId());
                     stmt.setInt(2, min.getBlockZ());
@@ -165,7 +165,7 @@ class RegionInserter {
             StatementBatch batch = new StatementBatch(stmt, StatementBatch.MAX_BATCH_SIZE);
 
             for (ProtectedPolygonalRegion region : polygons) {
-                for (BlockVector2D point : region.getPoints()) {
+                for (BlockVector2 point : region.getPoints()) {
                     stmt.setString(1, region.getId());
                     stmt.setInt(2, point.getBlockZ());
                     stmt.setInt(3, point.getBlockX());

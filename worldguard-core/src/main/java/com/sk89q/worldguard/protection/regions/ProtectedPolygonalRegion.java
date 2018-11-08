@@ -19,20 +19,20 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import com.google.common.collect.ImmutableList;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.awt.*;
+import com.google.common.collect.ImmutableList;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+
+import java.awt.Polygon;
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class ProtectedPolygonalRegion extends ProtectedRegion {
 
-    private final ImmutableList<BlockVector2D> points;
+    private final ImmutableList<BlockVector2> points;
     private final int minY;
     private final int maxY;
 
@@ -47,7 +47,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * @param minY the minimum y coordinate
      * @param maxY the maximum y coordinate
      */
-    public ProtectedPolygonalRegion(String id, List<BlockVector2D> points, int minY, int maxY) {
+    public ProtectedPolygonalRegion(String id, List<BlockVector2> points, int minY, int maxY) {
         this(id, false, points, minY, maxY);
     }
 
@@ -60,9 +60,9 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * @param minY the minimum y coordinate
      * @param maxY the maximum y coordinate
      */
-    public ProtectedPolygonalRegion(String id, boolean transientRegion, List<BlockVector2D> points, int minY, int maxY) {
+    public ProtectedPolygonalRegion(String id, boolean transientRegion, List<BlockVector2> points, int minY, int maxY) {
         super(id, transientRegion);
-        ImmutableList<BlockVector2D> immutablePoints = ImmutableList.copyOf(points);
+        ImmutableList<BlockVector2> immutablePoints = ImmutableList.copyOf(points);
         setMinMaxPoints(immutablePoints, minY, maxY);
         this.points = immutablePoints;
         this.minY = min.getBlockY();
@@ -76,13 +76,13 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * @param minY The minimum y coordinate
      * @param maxY The maximum y coordinate
      */
-    private void setMinMaxPoints(List<BlockVector2D> points2D, int minY, int maxY) {
+    private void setMinMaxPoints(List<BlockVector2> points2D, int minY, int maxY) {
         checkNotNull(points2D);
 
-        List<Vector> points = new ArrayList<Vector>();
+        List<BlockVector3> points = new ArrayList<>();
         int y = minY;
-        for (BlockVector2D point2D : points2D) {
-            points.add(new Vector(point2D.getBlockX(), y, point2D.getBlockZ()));
+        for (BlockVector2 point2D : points2D) {
+            points.add(BlockVector3.at(point2D.getBlockX(), y, point2D.getBlockZ()));
             y = maxY;
         }
         setMinMaxPoints(points);
@@ -94,12 +94,12 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
     }
 
     @Override
-    public List<BlockVector2D> getPoints() {
+    public List<BlockVector2> getPoints() {
         return points;
     }
 
     @Override
-    public boolean contains(Vector position) {
+    public boolean contains(BlockVector3 position) {
         checkNotNull(position);
 
         int targetX = position.getBlockX(); // Width
@@ -166,13 +166,13 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     @Override
     Area toArea() {
-        List<BlockVector2D> points = getPoints();
+        List<BlockVector2> points = getPoints();
         int numPoints = points.size();
         int[] xCoords = new int[numPoints];
         int[] yCoords = new int[numPoints];
 
         int i = 0;
-        for (BlockVector2D point : points) {
+        for (BlockVector2 point : points) {
             xCoords[i] = point.getBlockX();
             yCoords[i] = point.getBlockZ();
             i++;

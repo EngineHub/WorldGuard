@@ -22,9 +22,8 @@ package com.sk89q.worldguard.protection.regions;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -53,8 +52,8 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     public static final String GLOBAL_REGION = "__global__";
     private static final Pattern VALID_ID_PATTERN = Pattern.compile("^[A-Za-z0-9_,'\\-\\+/]{1,}$");
 
-    protected BlockVector min;
-    protected BlockVector max;
+    protected BlockVector3 min;
+    protected BlockVector3 max;
 
     private final String id;
     private final boolean transientRegion;
@@ -62,7 +61,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     private ProtectedRegion parent;
     private DefaultDomain owners = new DefaultDomain();
     private DefaultDomain members = new DefaultDomain();
-    private ConcurrentMap<Flag<?>, Object> flags = new ConcurrentHashMap<Flag<?>, Object>();
+    private ConcurrentMap<Flag<?>, Object> flags = new ConcurrentHashMap<>();
     private boolean dirty = true;
 
     /**
@@ -88,7 +87,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      *
      * @param points the points to set with at least one entry
      */
-    protected void setMinMaxPoints(List<Vector> points) {
+    protected void setMinMaxPoints(List<BlockVector3> points) {
         int minX = points.get(0).getBlockX();
         int minY = points.get(0).getBlockY();
         int minZ = points.get(0).getBlockZ();
@@ -96,7 +95,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         int maxY = minY;
         int maxZ = minZ;
 
-        for (Vector v : points) {
+        for (BlockVector3 v : points) {
             int x = v.getBlockX();
             int y = v.getBlockY();
             int z = v.getBlockZ();
@@ -111,8 +110,8 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         }
 
         setDirty(true);
-        min = new BlockVector(minX, minY, minZ);
-        max = new BlockVector(maxX, maxY, maxZ);
+        min = BlockVector3.at(minX, minY, minZ);
+        max = BlockVector3.at(maxX, maxY, maxZ);
     }
 
     /**
@@ -137,7 +136,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      *
      * @return the minimum point
      */
-    public BlockVector getMinimumPoint() {
+    public BlockVector3 getMinimumPoint() {
         return min;
     }
 
@@ -147,7 +146,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      *
      * @return the maximum point
      */
-    public BlockVector getMaximumPoint() {
+    public BlockVector3 getMaximumPoint() {
         return max;
     }
 
@@ -473,7 +472,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         checkNotNull(flags);
 
         setDirty(true);
-        this.flags = new ConcurrentHashMap<Flag<?>, Object>(flags);
+        this.flags = new ConcurrentHashMap<>(flags);
     }
 
     /**
@@ -499,7 +498,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      *
      * @return the points
      */
-    public abstract List<BlockVector2D> getPoints();
+    public abstract List<BlockVector2> getPoints();
 
     /**
      * Get the number of blocks in this region.
@@ -514,7 +513,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @param pt The point to check
      * @return Whether {@code pt} is in this region
      */
-    public abstract boolean contains(Vector pt);
+    public abstract boolean contains(BlockVector3 pt);
 
     /**
      * Check to see if a position is contained within this region.
@@ -522,9 +521,9 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @param position the position to check
      * @return whether {@code position} is in this region
      */
-    public boolean contains(BlockVector2D position) {
+    public boolean contains(BlockVector2 position) {
         checkNotNull(position);
-        return contains(new Vector(position.getBlockX(), min.getBlockY(), position.getBlockZ()));
+        return contains(BlockVector3.at(position.getBlockX(), min.getBlockY(), position.getBlockZ()));
     }
 
     /**
@@ -536,7 +535,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @return whether this region contains the point
      */
     public boolean contains(int x, int y, int z) {
-        return contains(new Vector(x, y, z));
+        return contains(BlockVector3.at(x, y, z));
     }
 
     /**
@@ -546,10 +545,10 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @param positions a list of positions
      * @return true if contained
      */
-    public boolean containsAny(List<BlockVector2D> positions) {
+    public boolean containsAny(List<BlockVector2> positions) {
         checkNotNull(positions);
 
-        for (BlockVector2D pt : positions) {
+        for (BlockVector2 pt : positions) {
             if (contains(pt)) {
                 return true;
             }
@@ -614,15 +613,15 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @return whether the given region intersects
      */
     protected boolean intersectsBoundingBox(ProtectedRegion region) {
-        BlockVector rMaxPoint = region.getMaximumPoint();
-        BlockVector min = getMinimumPoint();
+        BlockVector3 rMaxPoint = region.getMaximumPoint();
+        BlockVector3 min = getMinimumPoint();
 
         if (rMaxPoint.getBlockX() < min.getBlockX()) return false;
         if (rMaxPoint.getBlockY() < min.getBlockY()) return false;
         if (rMaxPoint.getBlockZ() < min.getBlockZ()) return false;
 
-        BlockVector rMinPoint = region.getMinimumPoint();
-        BlockVector max = getMaximumPoint();
+        BlockVector3 rMinPoint = region.getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
 
         if (rMinPoint.getBlockX() > max.getBlockX()) return false;
         if (rMinPoint.getBlockY() > max.getBlockY()) return false;
@@ -638,12 +637,12 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @return whether any edges of a region intersect
      */
     protected boolean intersectsEdges(ProtectedRegion region) {
-        List<BlockVector2D> pts1 = getPoints();
-        List<BlockVector2D> pts2 = region.getPoints();
-        BlockVector2D lastPt1 = pts1.get(pts1.size() - 1);
-        BlockVector2D lastPt2 = pts2.get(pts2.size() - 1);
-        for (BlockVector2D aPts1 : pts1) {
-            for (BlockVector2D aPts2 : pts2) {
+        List<BlockVector2> pts1 = getPoints();
+        List<BlockVector2> pts2 = region.getPoints();
+        BlockVector2 lastPt1 = pts1.get(pts1.size() - 1);
+        BlockVector2 lastPt2 = pts2.get(pts2.size() - 1);
+        for (BlockVector2 aPts1 : pts1) {
+            for (BlockVector2 aPts2 : pts2) {
 
                 Line2D line1 = new Line2D.Double(
                         lastPt1.getBlockX(),

@@ -19,15 +19,15 @@
 
 package com.sk89q.worldguard.protection.managers.index;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldguard.util.Normal.normalize;
+
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,9 +35,10 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldguard.util.Normal.normalize;
+import javax.annotation.Nullable;
 
 /**
  * An index that stores regions in a hash map, which allows for fast lookup
@@ -48,8 +49,8 @@ import static com.sk89q.worldguard.util.Normal.normalize;
  */
 public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegionIndex {
 
-    private final ConcurrentMap<String, ProtectedRegion> regions = new ConcurrentHashMap<String, ProtectedRegion>();
-    private Set<ProtectedRegion> removed = new HashSet<ProtectedRegion>();
+    private final ConcurrentMap<String, ProtectedRegion> regions = new ConcurrentHashMap<>();
+    private Set<ProtectedRegion> removed = new HashSet<>();
     private final Object lock = new Object();
 
     /**
@@ -104,17 +105,17 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
     }
 
     @Override
-    public void bias(Vector2D chunkPosition) {
+    public void bias(BlockVector2 chunkPosition) {
         // Nothing to do
     }
 
     @Override
-    public void biasAll(Collection<Vector2D> chunkPositions) {
+    public void biasAll(Collection<BlockVector2> chunkPositions) {
         // Nothing to do
     }
 
     @Override
-    public void forget(Vector2D chunkPosition) {
+    public void forget(BlockVector2 chunkPosition) {
         // Nothing to do
     }
 
@@ -137,7 +138,7 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
         checkNotNull(id);
         checkNotNull(strategy);
 
-        Set<ProtectedRegion> removedSet = new HashSet<ProtectedRegion>();
+        Set<ProtectedRegion> removedSet = new HashSet<>();
 
         synchronized (lock) {
             ProtectedRegion removed = regions.remove(normalize(id));
@@ -187,26 +188,21 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
     @Override
     public void apply(Predicate<ProtectedRegion> consumer) {
         for (ProtectedRegion region : regions.values()) {
-            if (!consumer.apply(region)) {
+            if (!consumer.test(region)) {
                 break;
             }
         }
     }
 
     @Override
-    public void applyContaining(final Vector position, final Predicate<ProtectedRegion> consumer) {
-        apply(new Predicate<ProtectedRegion>() {
-            @Override
-            public boolean apply(ProtectedRegion region) {
-                return !region.contains(position) || consumer.apply(region);
-            }
-        });
+    public void applyContaining(final BlockVector3 position, final Predicate<ProtectedRegion> consumer) {
+        apply(region -> !region.contains(position) || consumer.test(region));
     }
 
     @Override
     public void applyIntersecting(ProtectedRegion region, Predicate<ProtectedRegion> consumer) {
         for (ProtectedRegion found : region.getIntersectingRegions(regions.values())) {
-            if (!consumer.apply(found)) {
+            if (!consumer.test(found)) {
                 break;
             }
         }
@@ -220,7 +216,7 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
     @Override
     public RegionDifference getAndClearDifference() {
         synchronized (lock) {
-            Set<ProtectedRegion> changed = new HashSet<ProtectedRegion>();
+            Set<ProtectedRegion> changed = new HashSet<>();
             Set<ProtectedRegion> removed = this.removed;
 
             for (ProtectedRegion region : regions.values()) {
@@ -230,7 +226,7 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
                 }
             }
 
-            this.removed = new HashSet<ProtectedRegion>();
+            this.removed = new HashSet<>();
 
             return new RegionDifference(changed, removed);
         }

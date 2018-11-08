@@ -33,7 +33,7 @@ public abstract class SignChestProtection implements ChestProtection {
     public abstract Boolean isProtectedSign(Location block, LocalPlayer player);
 
     public boolean isProtected(Location location, LocalPlayer player) {
-        com.sk89q.worldedit.world.block.BlockState blockState = location.getExtent().getBlock(location.toVector());
+        com.sk89q.worldedit.world.block.BlockState blockState = location.getExtent().getBlock(location.toVector().toBlockPoint());
         if (isChest(blockState.getBlockType())) {
             return isProtectedSignAround(location.setY(location.getY() - 1), player);
         } else if (blockState.getBlockType() == BlockTypes.SIGN) {
@@ -77,7 +77,7 @@ public abstract class SignChestProtection implements ChestProtection {
     }
 
     private Boolean isProtectedSignAndChest(Location block, LocalPlayer player) {
-        if (!isChest(block.getExtent().getBlock(block.setY(block.getY() + 1).toVector()).getBlockType())) {
+        if (!isChest(block.getExtent().getBlock(block.setY(block.getY() + 1).toVector().toBlockPoint()).getBlockType())) {
             return null;
         }
         return isProtectedSign(block, player);

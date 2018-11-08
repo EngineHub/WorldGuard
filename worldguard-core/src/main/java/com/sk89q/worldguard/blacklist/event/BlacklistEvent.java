@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.blacklist.event;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.target.Target;
 
@@ -47,14 +47,14 @@ public interface BlacklistEvent {
      *
      * @return The position of this event
      */
-    Vector getPosition();
+    BlockVector3 getPosition();
 
     /**
      * Get the position that should be logged.
      *
      * @return The position that be logged.
      */
-    Vector getLoggedPosition();
+    BlockVector3 getLoggedPosition();
 
     /**
      * Get the item type.

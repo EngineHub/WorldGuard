@@ -35,9 +35,9 @@ class RegionRemover {
     private final DataSourceConfig config;
     private final Connection conn;
     private final int worldId;
-    private final List<String> regionQueue = new ArrayList<String>();
-    private final List<String> cuboidGeometryQueue = new ArrayList<String>();
-    private final List<String> polygonGeometryQueue = new ArrayList<String>();
+    private final List<String> regionQueue = new ArrayList<>();
+    private final List<String> cuboidGeometryQueue = new ArrayList<>();
+    private final List<String> polygonGeometryQueue = new ArrayList<>();
 
     RegionRemover(DataUpdater updater) {
         this.config = updater.config;

@@ -448,8 +448,8 @@ public class WorldGuardPlayerListener implements Listener {
         Location max = event.getTo().clone().add(radius, radius, radius);
         com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(event.getTo().getWorld());
 
-        ProtectedRegion check = new ProtectedCuboidRegion("__portalcheck__", BukkitAdapter.adapt(min.getBlock().getLocation()).toVector().toBlockVector(),
-                BukkitAdapter.adapt(max.getBlock().getLocation()).toVector().toBlockVector());
+        ProtectedRegion check = new ProtectedCuboidRegion("__portalcheck__", BukkitAdapter.adapt(min.getBlock().getLocation()).toVector().toBlockPoint(),
+                BukkitAdapter.adapt(max.getBlock().getLocation()).toVector().toBlockPoint());
 
         if (wcfg.useRegions && !WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, world)) {
             RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);

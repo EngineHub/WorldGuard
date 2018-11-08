@@ -55,7 +55,7 @@ public class QueryCache {
         CacheKey key = new CacheKey(location);
         ApplicableRegionSet result = cache.get(key);
         if (result == null) {
-            result = manager.getApplicableRegions(location.toVector());
+            result = manager.getApplicableRegions(location.toVector().toBlockPoint());
             cache.put(key, result);
         }
 

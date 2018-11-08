@@ -19,13 +19,14 @@
 
 package com.sk89q.worldguard.protection.managers.storage.sql;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Table;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabaseUtils;
@@ -52,8 +53,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 class DataLoader {
 
     private static final Logger log = Logger.getLogger(DataLoader.class.getCanonicalName());
@@ -63,8 +62,8 @@ class DataLoader {
     final int worldId;
     final FlagRegistry flagRegistry;
 
-    private final Map<String, ProtectedRegion> loaded = new HashMap<String, ProtectedRegion>();
-    private final Map<ProtectedRegion, String> parentSets = new HashMap<ProtectedRegion, String>();
+    private final Map<String, ProtectedRegion> loaded = new HashMap<>();
+    private final Map<ProtectedRegion, String> parentSets = new HashMap<>();
     private final Yaml yaml = SQLRegionDatabase.createYaml();
 
     DataLoader(SQLRegionDatabase regionStore, Connection conn, FlagRegistry flagRegistry) throws SQLException {
@@ -87,7 +86,7 @@ class DataLoader {
 
         RegionDatabaseUtils.relinkParents(loaded, parentSets);
 
-        return new HashSet<ProtectedRegion>(loaded.values());
+        return new HashSet<>(loaded.values());
     }
 
     private void loadCuboids() throws SQLException {
@@ -107,11 +106,11 @@ class DataLoader {
             ResultSet rs = closer.register(stmt.executeQuery());
 
             while (rs.next()) {
-                Vector pt1 = new Vector(rs.getInt("min_x"), rs.getInt("min_y"), rs.getInt("min_z"));
-                Vector pt2 = new Vector(rs.getInt("max_x"), rs.getInt("max_y"), rs.getInt("max_z"));
+                BlockVector3 pt1 = BlockVector3.at(rs.getInt("min_x"), rs.getInt("min_y"), rs.getInt("min_z"));
+                BlockVector3 pt2 = BlockVector3.at(rs.getInt("max_x"), rs.getInt("max_y"), rs.getInt("max_z"));
 
-                BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
-                BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
+                BlockVector3 min = pt1.getMinimum(pt2);
+                BlockVector3 max = pt1.getMaximum(pt2);
                 ProtectedRegion region = new ProtectedCuboidRegion(rs.getString("id"), min, max);
 
                 region.setPriority(rs.getInt("priority"));
@@ -158,7 +157,7 @@ class DataLoader {
     }
 
     private void loadPolygons() throws SQLException {
-        ListMultimap<String, BlockVector2D> pointsCache = ArrayListMultimap.create();
+        ListMultimap<String, BlockVector2> pointsCache = ArrayListMultimap.create();
 
         // First get all the vertices and store them in memory
         Closer closer = Closer.create();
@@ -171,7 +170,7 @@ class DataLoader {
             ResultSet rs = closer.register(stmt.executeQuery());
 
             while (rs.next()) {
-                pointsCache.put(rs.getString("region_id"), new BlockVector2D(rs.getInt("x"), rs.getInt("z")));
+                pointsCache.put(rs.getString("region_id"), BlockVector2.at(rs.getInt("x"), rs.getInt("z")));
             }
         } finally {
             closer.closeQuietly();
@@ -196,7 +195,7 @@ class DataLoader {
                 String id = rs.getString("id");
 
                 // Get the points from the cache
-                List<BlockVector2D> points = pointsCache.get(id);
+                List<BlockVector2> points = pointsCache.get(id);
 
                 if (points.size() < 3) {
                     log.log(Level.WARNING, "Invalid polygonal region '" + id + "': region has " + points.size() + " point(s) (less than the required 3). Skipping this region.");

@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
@@ -61,7 +61,7 @@ public class LocationFlag extends Flag<Location> {
                     final float yaw = split.length < 4 ? 0 : Float.parseFloat(split[3]);
                     final float pitch = split.length < 5 ? 0 : Float.parseFloat(split[4]);
 
-                    loc = new LazyLocation(world.getName(), new Vector(x, y, z), yaw, pitch);
+                    loc = new LazyLocation(world.getName(), Vector3.at(x, y, z), yaw, pitch);
                 } catch (NumberFormatException ignored) {
                 }
             }
@@ -71,7 +71,7 @@ public class LocationFlag extends Flag<Location> {
             if (obj instanceof ProtectedRegion) {
                 ProtectedRegion rg = (ProtectedRegion) obj;
                 if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(player.getWorld()).boundedLocationFlags) {
-                    if (!rg.contains(loc.toVector())) {
+                    if (!rg.contains(loc.toVector().toBlockPoint())) {
                         if (new RegionPermissionModel(player).mayOverrideLocationFlagBounds(rg)) {
                             player.printDebug("ПРЕДУПРЕЖДЕНИЕ: Флаг находится вне региона.");
                         } else {
@@ -112,7 +112,7 @@ public class LocationFlag extends Flag<Location> {
             Object rawPitch = map.get("pitch");
             if (rawPitch == null) return null;
 
-            Vector position = new Vector(toNumber(rawX), toNumber(rawY), toNumber(rawZ));
+            Vector3 position = Vector3.at(toNumber(rawX), toNumber(rawY), toNumber(rawZ));
             float yaw = (float) toNumber(rawYaw);
             float pitch = (float) toNumber(rawPitch);
 
@@ -124,7 +124,7 @@ public class LocationFlag extends Flag<Location> {
 
     @Override
     public Object marshal(Location o) {
-        Vector position = o.toVector();
+        Vector3 position = o.toVector();
         Map<String, Object> vec = new HashMap<>();
         if (o instanceof LazyLocation) {
             vec.put("world", ((LazyLocation) o).getWorldName());

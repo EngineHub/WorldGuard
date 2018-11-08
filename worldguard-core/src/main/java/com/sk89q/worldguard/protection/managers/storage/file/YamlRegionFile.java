@@ -19,12 +19,14 @@
 
 package com.sk89q.worldguard.protection.managers.storage.file;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLNode;
 import com.sk89q.util.yaml.YAMLProcessor;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.FlagUtil;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
@@ -46,11 +48,17 @@ import org.yaml.snakeyaml.representer.Representer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A store that persists regions in a YAML-encoded file.
@@ -135,15 +143,15 @@ public class YamlRegionFile implements RegionDatabase {
                             "Данные региона выглядят как:\n\n" + toYamlOutput(entry.getValue().getMap()) + "\n");
                     continue;
                 } else if (type.equals("cuboid")) {
-                    Vector pt1 = checkNotNull(node.getVector("min"));
-                    Vector pt2 = checkNotNull(node.getVector("max"));
-                    BlockVector min = Vector.getMinimum(pt1, pt2).toBlockVector();
-                    BlockVector max = Vector.getMaximum(pt1, pt2).toBlockVector();
+                    Vector3 pt1 = checkNotNull(node.getVector("min"));
+                    Vector3 pt2 = checkNotNull(node.getVector("max"));
+                    BlockVector3 min = pt1.getMinimum(pt2).toBlockPoint();
+                    BlockVector3 max = pt1.getMaximum(pt2).toBlockPoint();
                     region = new ProtectedCuboidRegion(id, min, max);
                 } else if (type.equals("poly2d")) {
                     Integer minY = checkNotNull(node.getInt("min-y"));
                     Integer maxY = checkNotNull(node.getInt("max-y"));
-                    List<BlockVector2D> points = node.getBlockVector2dList("points", null);
+                    List<BlockVector2> points = node.getBlockVector2List("points", null);
                     region = new ProtectedPolygonalRegion(id, points, minY, maxY);
                 } else if (type.equals("global")) {
                     region = new GlobalProtectedRegion(id);
@@ -208,7 +216,7 @@ public class YamlRegionFile implements RegionDatabase {
                 node.setProperty("max-y", poly.getMaximumPoint().getBlockY());
 
                 List<Map<String, Object>> points = new ArrayList<>();
-                for (BlockVector2D point : poly.getPoints()) {
+                for (BlockVector2 point : poly.getPoints()) {
                     Map<String, Object> data = new HashMap<>();
                     data.put("x", point.getBlockX());
                     data.put("z", point.getBlockZ());
@@ -248,7 +256,6 @@ public class YamlRegionFile implements RegionDatabase {
         throw new DifferenceSaveException("Not supported");
     }
 
-    @SuppressWarnings("deprecation")
     private DefaultDomain parseDomain(YAMLNode node) {
         if (node == null) {
             return new DefaultDomain();
@@ -292,7 +299,6 @@ public class YamlRegionFile implements RegionDatabase {
     private Map<String, Object> getDomainData(DefaultDomain domain) {
         Map<String, Object> domainData = new HashMap<>();
 
-        //noinspection deprecation
         setDomainData(domainData, "players", domain.getPlayers());
         setDomainData(domainData, "unique-ids", domain.getUniqueIds());
         setDomainData(domainData, "groups", domain.getGroups());

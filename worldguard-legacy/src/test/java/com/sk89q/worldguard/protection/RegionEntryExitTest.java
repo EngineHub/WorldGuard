@@ -19,8 +19,10 @@
 
 package com.sk89q.worldguard.protection;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -28,16 +30,12 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
-import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public abstract class RegionEntryExitTest {
 
@@ -46,8 +44,8 @@ public abstract class RegionEntryExitTest {
     static String BUILDER_GROUP = "builder";
     static String VIP_GROUP = "vip";
 
-    Vector inEntry = new Vector(5, 64, 5);
-    Vector inExit = new Vector(-5, 65, -5);
+    BlockVector3 inEntry = BlockVector3.at(5, 64, 5);
+    BlockVector3 inExit = BlockVector3.at(-5, 65, -5);
 
     RegionManager manager;
     ProtectedRegion globalRegion;
@@ -92,7 +90,7 @@ public abstract class RegionEntryExitTest {
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup(VIP_GROUP);
 
-        ProtectedRegion region = new ProtectedCuboidRegion(ENTRY_ID, new BlockVector(1, 0, 1), new BlockVector(10, 255, 10));
+        ProtectedRegion region = new ProtectedCuboidRegion(ENTRY_ID, BlockVector3.at(1, 0, 1), BlockVector3.at(10, 255, 10));
 
         region.setMembers(domain);
         manager.addRegion(region);
@@ -109,7 +107,7 @@ public abstract class RegionEntryExitTest {
         DefaultDomain domain = new DefaultDomain();
         domain.addGroup(BUILDER_GROUP);
 
-        ProtectedRegion region = new ProtectedCuboidRegion(EXIT_ID, new BlockVector(-1, 0, -1), new BlockVector(-10, 255, -10));
+        ProtectedRegion region = new ProtectedCuboidRegion(EXIT_ID, BlockVector3.at(-1, 0, -1), BlockVector3.at(-10, 255, -10));
 
         region.setOwners(domain);
         manager.addRegion(region);

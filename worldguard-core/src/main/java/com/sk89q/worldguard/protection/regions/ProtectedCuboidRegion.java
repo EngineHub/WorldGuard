@@ -19,17 +19,16 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.util.MathUtils;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a cuboid region that can be protected.
@@ -40,7 +39,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
 
     /**
      * Construct a new instance of this cuboid region.<br>
-     * Equivalent to {@link #ProtectedCuboidRegion(String, boolean, BlockVector, BlockVector)
+     * Equivalent to {@link #ProtectedCuboidRegion(String, boolean, BlockVector3, BlockVector3)
      * ProtectedCuboidRegion(id, false, pt1, pt2)}<br>
      * <code>transientRegion</code> will be set to false, and this region can be saved.
      *
@@ -48,7 +47,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * @param pt1 the first point of this region
      * @param pt2 the second point of this region
      */
-    public ProtectedCuboidRegion(String id, BlockVector pt1, BlockVector pt2) {
+    public ProtectedCuboidRegion(String id, BlockVector3 pt1, BlockVector3 pt2) {
         this(id, false, pt1, pt2);
     }
 
@@ -60,7 +59,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * @param pt1 the first point of this region
      * @param pt2 the second point of this region
      */
-    public ProtectedCuboidRegion(String id, boolean transientRegion, BlockVector pt1, BlockVector pt2) {
+    public ProtectedCuboidRegion(String id, boolean transientRegion, BlockVector3 pt1, BlockVector3 pt2) {
         super(id, transientRegion);
         setMinMaxPoints(pt1, pt2);
     }
@@ -71,11 +70,11 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * @param position1 the first point of this region
      * @param position2 the second point of this region
      */
-    private void setMinMaxPoints(BlockVector position1, BlockVector position2) {
+    private void setMinMaxPoints(BlockVector3 position1, BlockVector3 position2) {
         checkNotNull(position1);
         checkNotNull(position2);
 
-        List<Vector> points = new ArrayList<Vector>();
+        List<BlockVector3> points = new ArrayList<>();
         points.add(position1);
         points.add(position2);
         setMinMaxPoints(points);
@@ -86,7 +85,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      *
      * @param position the point to set as the minimum point
      */
-    public void setMinimumPoint(BlockVector position) {
+    public void setMinimumPoint(BlockVector3 position) {
         setMinMaxPoints(position, max);
     }
 
@@ -95,7 +94,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      *
      * @param position the point to set as the maximum point
      */
-    public void setMaximumPoint(BlockVector position) {
+    public void setMaximumPoint(BlockVector3 position) {
         setMinMaxPoints(min, position);
     }
 
@@ -105,23 +104,23 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
     }
 
     @Override
-    public List<BlockVector2D> getPoints() {
-        List<BlockVector2D> pts = new ArrayList<BlockVector2D>();
+    public List<BlockVector2> getPoints() {
+        List<BlockVector2> pts = new ArrayList<>();
         int x1 = min.getBlockX();
         int x2 = max.getBlockX();
         int z1 = min.getBlockZ();
         int z2 = max.getBlockZ();
 
-        pts.add(new BlockVector2D(x1, z1));
-        pts.add(new BlockVector2D(x2, z1));
-        pts.add(new BlockVector2D(x2, z2));
-        pts.add(new BlockVector2D(x1, z2));
+        pts.add(BlockVector2.at(x1, z1));
+        pts.add(BlockVector2.at(x2, z1));
+        pts.add(BlockVector2.at(x2, z2));
+        pts.add(BlockVector2.at(x1, z2));
 
         return pts;
     }
 
     @Override
-    public boolean contains(Vector pt) {
+    public boolean contains(BlockVector3 pt) {
         final double x = pt.getX();
         final double y = pt.getY();
         final double z = pt.getZ();
