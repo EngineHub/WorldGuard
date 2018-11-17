@@ -17,11 +17,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.listener;
+package com.sk89q.worldguard.util;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.config.WorldConfiguration;
@@ -29,6 +30,12 @@ import com.sk89q.worldguard.config.WorldConfiguration;
 public final class SpongeUtil {
 
     private SpongeUtil() {
+    }
+
+    private static boolean isReplacable(BlockType blockType) {
+        return blockType == BlockTypes.WATER || blockType == BlockTypes.SEAGRASS
+                || blockType == BlockTypes.TALL_SEAGRASS || blockType == BlockTypes.KELP_PLANT
+                || blockType == BlockTypes.KELP;
     }
 
     /**
@@ -46,7 +53,7 @@ public final class SpongeUtil {
             for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
                 for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
                     BlockVector3 vector = BlockVector3.at(ox + cx, oy + cy, oz + cz);
-                    if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                    if (isReplacable(world.getBlock(vector).getBlockType())) {
                         try {
                             world.setBlock(vector, BlockTypes.AIR.getDefaultState());
                         } catch (WorldEditException e) {
@@ -90,7 +97,7 @@ public final class SpongeUtil {
         for (int cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
             for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
                 BlockVector3 vector = BlockVector3.at(cx, cy, cz);
-                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                if (isReplacable(world.getBlock(vector).getBlockType())) {
                     try {
                         setBlockToWater(world, cx + 1, cy, cz);
                     } catch (WorldEditException e) {
@@ -105,7 +112,7 @@ public final class SpongeUtil {
         for (int cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
             for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
                 BlockVector3 vector = BlockVector3.at(cx, cy, cz);
-                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                if (isReplacable(world.getBlock(vector).getBlockType())) {
                     try {
                         setBlockToWater(world, cx - 1, cy, cz);
                     } catch (WorldEditException e) {
@@ -120,7 +127,7 @@ public final class SpongeUtil {
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
             for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
                 BlockVector3 vector = BlockVector3.at(cx, cy, cz);
-                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                if (isReplacable(world.getBlock(vector).getBlockType())) {
                     try {
                         setBlockToWater(world, cx, cy + 1, cz);
                     } catch (WorldEditException e) {
@@ -135,7 +142,7 @@ public final class SpongeUtil {
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
             for (int cz = oz - wcfg.spongeRadius - 1; cz <= oz + wcfg.spongeRadius + 1; cz++) {
                 BlockVector3 vector = BlockVector3.at(cx, cy, cz);
-                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                if (isReplacable(world.getBlock(vector).getBlockType())) {
                     try {
                         setBlockToWater(world, cx, cy - 1, cz);
                     } catch (WorldEditException e) {
@@ -150,7 +157,7 @@ public final class SpongeUtil {
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
             for (cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
                 BlockVector3 vector = BlockVector3.at(cx, cy, cz);
-                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                if (isReplacable(world.getBlock(vector).getBlockType())) {
                     try {
                         setBlockToWater(world, cx, cy, cz + 1);
                     } catch (WorldEditException e) {
@@ -165,7 +172,7 @@ public final class SpongeUtil {
         for (cx = ox - wcfg.spongeRadius - 1; cx <= ox + wcfg.spongeRadius + 1; cx++) {
             for (cy = oy - wcfg.spongeRadius - 1; cy <= oy + wcfg.spongeRadius + 1; cy++) {
                 BlockVector3 vector = BlockVector3.at(cx, cy, cz);
-                if (world.getBlock(vector).getBlockType() == BlockTypes.WATER) {
+                if (isReplacable(world.getBlock(vector).getBlockType())) {
                     try {
                         setBlockToWater(world, cx, cy, cz - 1);
                     } catch (WorldEditException e) {
