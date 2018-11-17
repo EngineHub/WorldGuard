@@ -164,7 +164,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
             return;
         }
         
-        List<ProtectedRegion> inheritance = new ArrayList<ProtectedRegion>();
+        List<ProtectedRegion> inheritance = new ArrayList<>();
 
         ProtectedRegion r = region;
         inheritance.add(r);

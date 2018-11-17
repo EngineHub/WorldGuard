@@ -68,4 +68,13 @@ class LazyLocation extends Location {
         return this.setPosition(toVector().add(x, y, z));
     }
 
+    @Override
+    public String toString() {
+        if (getPitch() == 0 && getYaw() == 0) {
+            return String.join(", ", "World=" + worldName, "X=" + getX(), "Y=" + getY(), "Z=" + getZ());
+        } else {
+            return String.join(", ", "World=" + worldName, "X=" + getX(), "Y=" + getY(),
+                    "Z=" + getZ(), "Pitch=" + getPitch(), "Yaw=" + getYaw());
+        }
+    }
 }

@@ -182,7 +182,7 @@ public class BukkitSessionManager implements SessionManager, Runnable, Listener 
      * @param after the handler factory to insert the first handler after, to ensure a specific order when creating new sessions
      *
      * @return {@code true} (as specified by {@link Collection#add})
-     *          {@code false} if {@param after} is not registered, or {@param factory} is null
+     *          {@code false} if after is not registered, or factory is null
      */
     @Override
     public boolean registerHandler(Factory<? extends Handler> factory, @Nullable Factory<? extends Handler> after) {
