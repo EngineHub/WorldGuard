@@ -163,8 +163,8 @@ public class RegionPrintoutBuilder implements Callable<String> {
         if (region.getParent() == null) {
             return;
         }
-
-        List<ProtectedRegion> inheritance = new ArrayList<ProtectedRegion>();
+        
+        List<ProtectedRegion> inheritance = new ArrayList<>();
 
         ProtectedRegion r = region;
         inheritance.add(r);

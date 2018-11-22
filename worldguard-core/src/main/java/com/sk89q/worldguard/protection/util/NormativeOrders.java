@@ -40,8 +40,8 @@ import java.util.*;
  * left of &lt; appear before in the sorted list):</p>
  *
  * <ul>
- *     <li>[aaa, aab, aac] < aa < a</li>
- *     <li>[ba, bc] < b</li>
+ *     <li>[aaa, aab, aac] &lt; aa &lt; a</li>
+ *     <li>[ba, bc] &lt; b</li>
  * </ul>
  *
  * <p>In the case of "[aaa, aab, aac]," the relative order between these

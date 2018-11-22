@@ -29,6 +29,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.util.SpongeUtil;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.World;
