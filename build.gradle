@@ -34,7 +34,7 @@ buildscript {
 
 allprojects {
     group = 'com.sk89q.worldguard'
-    version = '7.0.0-SNAPSHOT'
+    version = '7.0.0-beta-02'
 }
 
 if (!project.hasProperty("artifactory_contextUrl")) ext.artifactory_contextUrl = "http://localhost"
