@@ -78,7 +78,7 @@ import javax.annotation.Nullable;
 public class WorldGuardPlayerListener implements Listener {
 
     private static final Logger log = Logger.getLogger(WorldGuardPlayerListener.class.getCanonicalName());
-    private static final Pattern opPattern = Pattern.compile("^/(?:minecraft:)(?:bukkit:)?op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern opPattern = Pattern.compile("^/(?:minecraft:)?(?:bukkit:)?(?:de)?op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
     private WorldGuardPlugin plugin;
 
     /**
@@ -487,7 +487,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (cfg.blockInGameOp) {
             if (opPattern.matcher(event.getMessage()).matches()) {
-                player.sendMessage(ChatColor.RED + "/op can only be used in console (as set by a WG setting).");
+                player.sendMessage(ChatColor.RED + "/op and /deop can only be used in console (as set by a WG setting).");
                 event.setCancelled(true);
                 return;
             }
