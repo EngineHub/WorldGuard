@@ -139,7 +139,6 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Called on plugin enable.
      */
     @Override
-    @SuppressWarnings("deprecation")
     public void onEnable() {
         configureLogger();
 

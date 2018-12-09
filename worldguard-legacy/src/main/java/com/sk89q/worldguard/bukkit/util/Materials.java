@@ -454,6 +454,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.PINK_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.PURPLE_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.COCOA_BEANS, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.BONE_MEAL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.BONE, 0);
         MATERIAL_FLAGS.put(Material.SUGAR, 0);
         MATERIAL_FLAGS.put(Material.COOKIE, 0);
