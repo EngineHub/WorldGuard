@@ -86,11 +86,11 @@ import java.util.logging.Logger;
 public final class RegionCommands extends RegionCommandsBase {
 
     private static final Logger log = Logger.getLogger(RegionCommands.class.getCanonicalName());
-    private final WorldGuardPlugin plugin;
+    private final WorldGuard worldGuard;
 
-    public RegionCommands(WorldGuardPlugin plugin) {
-        checkNotNull(plugin);
-        this.plugin = plugin;
+    public RegionCommands(WorldGuard worldGuard) {
+        checkNotNull(worldGuard);
+        this.worldGuard = worldGuard;
     }
     
     /**
@@ -105,19 +105,18 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "ng",
              desc = "Defines a region",
              min = 1)
-    public void define(CommandContext args, CommandSender sender) throws CommandException {
+    public void define(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
-        Player player = plugin.checkPlayer(sender);
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+        LocalPlayer player = worldGuard.checkPlayer(sender);
 
         // Check permissions
-        if (!getPermissionModel(localPlayer).mayDefine()) {
+        if (!getPermissionModel(player).mayDefine()) {
             throw new CommandPermissionsException();
         }
 
         String id = checkRegionId(args.getString(0), false);
 
-        RegionManager manager = checkRegionManager(plugin, localPlayer.getWorld());
+        RegionManager manager = checkRegionManager(player.getWorld());
 
         checkRegionDoesNotExist(manager, id, true);
 
@@ -127,7 +126,7 @@ public final class RegionCommands extends RegionCommandsBase {
             region = new GlobalProtectedRegion(id);
         } else {
             region = checkRegionFromSelection(player, id);
-            warnAboutDimensions(localPlayer, region);
+            warnAboutDimensions(player, region);
             informNewUser(player, manager, region);
         }
 
@@ -135,7 +134,7 @@ public final class RegionCommands extends RegionCommandsBase {
         task.addOwnersFromCommand(args, 2);
         ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, plugin, player)
+        AsyncCommandHelper.wrap(future, worldGuard, player)
                 .formatUsing(id)
                 .registerWithSupervisor("Adding the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... adding '%s'...)")
@@ -156,21 +155,19 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Re-defines the shape of a region",
              flags = "g",
              min = 1, max = 1)
-    public void redefine(CommandContext args, CommandSender sender) throws CommandException {
+    public void redefine(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
-        Player player = plugin.checkPlayer(sender);
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        World world = player.getWorld();
+        LocalPlayer player = worldGuard.checkPlayer(sender);
 
         String id = checkRegionId(args.getString(0), false);
 
-        RegionManager manager = checkRegionManager(plugin, localPlayer.getWorld());
+        RegionManager manager = checkRegionManager(player.getWorld());
 
         ProtectedRegion existing = checkExistingRegion(manager, id, false);
 
         // Check permissions
-        if (!getPermissionModel(localPlayer).mayRedefine(existing)) {
+        if (!getPermissionModel(player).mayRedefine(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -180,7 +177,7 @@ public final class RegionCommands extends RegionCommandsBase {
             region = new GlobalProtectedRegion(id);
         } else {
             region = checkRegionFromSelection(player, id);
-            warnAboutDimensions(localPlayer, region);
+            warnAboutDimensions(player, region);
             informNewUser(player, manager, region);
         }
 
@@ -189,7 +186,7 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionAdder task = new RegionAdder(manager, region);
         ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, plugin, player)
+        AsyncCommandHelper.wrap(future, worldGuard, player)
                 .formatUsing(id)
                 .registerWithSupervisor("Updating the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... updating '%s'...)")
@@ -212,12 +209,11 @@ public final class RegionCommands extends RegionCommandsBase {
              usage = "<id>",
              desc = "Claim a region",
              min = 1, max = 1)
-    public void claim(CommandContext args, CommandSender sender) throws CommandException {
+    public void claim(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
-        Player player = plugin.checkPlayer(sender);
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        RegionPermissionModel permModel = getPermissionModel(localPlayer);
+        LocalPlayer player = worldGuard.checkPlayer(sender);
+        RegionPermissionModel permModel = getPermissionModel(player);
         
         // Check permissions
         if (!permModel.mayClaim()) {
@@ -226,19 +222,19 @@ public final class RegionCommands extends RegionCommandsBase {
 
         String id = checkRegionId(args.getString(0), false);
 
-        RegionManager manager = checkRegionManager(plugin, localPlayer.getWorld());
+        RegionManager manager = checkRegionManager(player.getWorld());
 
         checkRegionDoesNotExist(manager, id, false);
         ProtectedRegion region = checkRegionFromSelection(player, id);
 
         BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
+                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(player.getWorld());
 
         // Check whether the player has created too many regions
         if (!permModel.mayClaimRegionsUnbounded()) {
             int maxRegionCount = wcfg.getMaxRegionCount(player);
             if (maxRegionCount >= 0
-                    && manager.getRegionCountOfPlayer(localPlayer) >= maxRegionCount) {
+                    && manager.getRegionCountOfPlayer(player) >= maxRegionCount) {
                 throw new CommandException(
                         "You own too many regions, delete one first to claim a new one.");
             }
@@ -248,7 +244,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Check for an existing region
         if (existing != null) {
-            if (!existing.getOwners().contains(localPlayer)) {
+            if (!existing.getOwners().contains(player)) {
                 throw new CommandException(
                         "This region already exists and you don't own it.");
             }
@@ -259,7 +255,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Check if this region overlaps any other region
         if (regions.size() > 0) {
-            if (!regions.isOwnerOfAll(localPlayer)) {
+            if (!regions.isOwnerOfAll(player)) {
                 throw new CommandException("This region overlaps with someone else's region.");
             }
         } else {
@@ -281,9 +277,8 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             if (region.volume() > wcfg.maxClaimVolume) {
-                player.sendMessage(ChatColor.RED + "This region is too large to claim.");
-                player.sendMessage(ChatColor.RED +
-                        "Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
+                player.printError("This region is too large to claim.");
+                player.printError("Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
                 return;
             }
         }
@@ -291,9 +286,9 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionAdder task = new RegionAdder(manager, region);
         task.setLocatorPolicy(UserLocatorPolicy.UUID_ONLY);
         task.setOwnersInput(new String[]{player.getName()});
-        ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
+        ListenableFuture<?> future = worldGuard.getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, plugin, player)
+        AsyncCommandHelper.wrap(future, worldGuard, player)
                 .formatUsing(id)
                 .registerWithSupervisor("Claiming the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... claiming '%s'...)")
@@ -313,21 +308,20 @@ public final class RegionCommands extends RegionCommandsBase {
              usage = "[id]",
              desc = "Load a region as a WorldEdit selection",
              min = 0, max = 1)
-    public void select(CommandContext args, CommandSender sender) throws CommandException {
-        Player player = plugin.checkPlayer(sender);
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        RegionManager manager = checkRegionManager(plugin, localPlayer.getWorld());
+    public void select(CommandContext args, Actor sender) throws CommandException {
+        LocalPlayer player = worldGuard.checkPlayer(sender);
+        RegionManager manager = checkRegionManager(player.getWorld());
         ProtectedRegion existing;
         
         // If no arguments were given, get the region that the player is inside
         if (args.argsLength() == 0) {
-            existing = checkRegionStandingIn(manager, localPlayer);
+            existing = checkRegionStandingIn(manager, player);
         } else {
             existing = checkExistingRegion(manager, args.getString(0), false);
         }
 
         // Check permissions
-        if (!getPermissionModel(localPlayer).maySelect(existing)) {
+        if (!getPermissionModel(player).maySelect(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -355,7 +349,7 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionPermissionModel permModel = getPermissionModel(actor);
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
         ProtectedRegion existing;
 
         if (args.argsLength() == 0) { // Get region from where the player is
@@ -396,7 +390,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Send a response message
         Futures.addCallback(future,
-                new Builder(plugin, sender)
+                new Builder(worldGuard, sender)
                         .onFailure("Failed to fetch region information")
                         .build());
     }
@@ -413,13 +407,12 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Get a list of regions",
              flags = "np:w:",
              max = 1)
-    public void list(CommandContext args, CommandSender sender) throws CommandException {
+    public void list(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String ownedBy;
-        Actor actor = plugin.wrapCommandSender(sender);
-        
+
         // Get page
         int page = args.getInteger(0, 1) - 1;
         if (page < 0) {
@@ -434,16 +427,16 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Check permissions
-        if (!getPermissionModel(actor).mayList(ownedBy)) {
+        if (!getPermissionModel(sender).mayList(ownedBy)) {
             ownedBy = sender.getName(); // assume they only want their own
-            if (!getPermissionModel(actor).mayList(ownedBy)) {
+            if (!getPermissionModel(sender).mayList(ownedBy)) {
                 throw new CommandPermissionsException();
             }
         }
 
-        RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
 
-        RegionLister task = new RegionLister(manager, actor);
+        RegionLister task = new RegionLister(manager, sender);
         task.setPage(page);
         if (ownedBy != null) {
             task.filterOwnedByName(ownedBy, args.hasFlag('n'));
@@ -451,7 +444,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, plugin, sender)
+        AsyncCommandHelper.wrap(future, worldGuard, sender)
                 .registerWithSupervisor("Getting list of regions...")
                 .sendMessageAfterDelay("(Please wait... fetching region list...)")
                 .thenTellErrorsOnly("Failed to fetch region list");
@@ -469,7 +462,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "g:w:e",
              desc = "Set flags",
              min = 2)
-    public void flag(CommandContext args, CommandSender sender) throws CommandException {
+    public void flag(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
@@ -477,8 +470,7 @@ public final class RegionCommands extends RegionCommandsBase {
         String value = args.argsLength() >= 3 ? args.getJoinedStrings(2) : null;
         RegionGroup groupValue = null;
         FlagRegistry flagRegistry = WorldGuard.getInstance().getFlagRegistry();
-        Actor actor = plugin.wrapCommandSender(sender);
-        RegionPermissionModel permModel = getPermissionModel(actor);
+        RegionPermissionModel permModel = getPermissionModel(sender);
 
         if (args.hasFlag('e')) {
             if (value != null) {
@@ -494,7 +486,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), true);
 
         // Check permissions
@@ -538,8 +530,8 @@ public final class RegionCommands extends RegionCommandsBase {
                 }
             }
 
-            sender.sendMessage(ChatColor.RED + "Unknown flag specified: " + flagName);
-            sender.sendMessage(ChatColor.RED + "Available flags: " + list);
+            sender.printError("Unknown flag specified: " + flagName);
+            sender.printError("Available flags: " + list);
             
             return;
         }
@@ -564,7 +556,7 @@ public final class RegionCommands extends RegionCommandsBase {
             // Parse the [-g group] separately so entire command can abort if parsing
             // the [value] part throws an error.
             try {
-                groupValue = groupFlag.parseInput(FlagContext.create().setSender(actor).setInput(group).setObject("region", existing).build());
+                groupValue = groupFlag.parseInput(FlagContext.create().setSender(sender).setInput(group).setObject("region", existing).build());
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }
@@ -575,14 +567,12 @@ public final class RegionCommands extends RegionCommandsBase {
         if (value != null) {
             // Set the flag if [value] was given even if [-g group] was given as well
             try {
-                setFlag(existing, foundFlag, actor, value);
+                setFlag(existing, foundFlag, sender, value);
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }
 
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag " + foundFlag.getName() + " set on '" +
-                    existing.getId() + "' to '" + ChatColor.stripColor(value) + "'.");
+            sender.print("Region flag " + foundFlag.getName() + " set on '" + existing.getId() + "' to '" + ChatColor.stripColor(value) + "'.");
         
         // No value? Clear the flag, if -g isn't specified
         } else if (!args.hasFlag('g')) {
@@ -595,9 +585,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 existing.setFlag(groupFlag, null);
             }
 
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag " + foundFlag.getName() + " removed from '" +
-                    existing.getId() + "'. (Any -g(roups) were also removed.)");
+            sender.print("Region flag " + foundFlag.getName() + " removed from '" + existing.getId() + "'. (Any -g(roups) were also removed.)");
         }
 
         // Now set the group
@@ -607,13 +595,10 @@ public final class RegionCommands extends RegionCommandsBase {
             // If group set to the default, then clear the group flag
             if (groupValue == groupFlag.getDefault()) {
                 existing.setFlag(groupFlag, null);
-                sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' reset to " +
-                                "default.");
+                sender.print("Region group flag for '" + foundFlag.getName() + "' reset to default.");
             } else {
                 existing.setFlag(groupFlag, groupValue);
-                sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' set.");
+                sender.print("Region group flag for '" + foundFlag.getName() + "' set.");
             }
         }
 
@@ -638,26 +623,24 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "w:",
              desc = "Set the priority of a region",
              min = 2, max = 2)
-    public void setPriority(CommandContext args, CommandSender sender) throws CommandException {
+    public void setPriority(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         int priority = args.getInteger(1);
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), false);
 
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).maySetPriority(existing)) {
+        if (!getPermissionModel(sender).maySetPriority(existing)) {
             throw new CommandPermissionsException();
         }
 
         existing.setPriority(priority);
 
-        sender.sendMessage(ChatColor.YELLOW
-                + "Priority of '" + existing.getId() + "' set to "
-                + priority + " (higher numbers override).");
+        sender.print("Priority of '" + existing.getId() + "' set to " + priority + " (higher numbers override).");
     }
 
     /**
@@ -672,7 +655,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "w:",
              desc = "Set the parent of a region",
              min = 1, max = 2)
-    public void setParent(CommandContext args, CommandSender sender) throws CommandException {
+    public void setParent(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
@@ -680,7 +663,7 @@ public final class RegionCommands extends RegionCommandsBase {
         ProtectedRegion child;
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
         
         // Get parent and child
         child = checkExistingRegion(manager, args.getString(0), false);
@@ -691,7 +674,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).maySetParent(child, parent)) {
+        if (!getPermissionModel(sender).maySetParent(child, parent)) {
             throw new CommandPermissionsException();
         }
 
@@ -739,7 +722,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "fuw:",
              desc = "Remove a region",
              min = 1, max = 1)
-    public void remove(CommandContext args, CommandSender sender) throws CommandException {
+    public void remove(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
@@ -747,11 +730,11 @@ public final class RegionCommands extends RegionCommandsBase {
         boolean unsetParent = args.hasFlag('u');
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), true);
 
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayDelete(existing)) {
+        if (!getPermissionModel(sender).mayDelete(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -765,7 +748,7 @@ public final class RegionCommands extends RegionCommandsBase {
             task.setRemovalStrategy(RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
         }
 
-        AsyncCommandHelper.wrap(WorldGuard.getInstance().getExecutorService().submit(task), plugin, sender)
+        AsyncCommandHelper.wrap(WorldGuard.getInstance().getExecutorService().submit(task), worldGuard, sender)
                 .formatUsing(existing.getId())
                 .registerWithSupervisor("Removing the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... removing '%s'...)")
@@ -785,7 +768,7 @@ public final class RegionCommands extends RegionCommandsBase {
             usage = "[world]",
             desc = "Reload regions from file",
             flags = "w:")
-    public void load(CommandContext args, final CommandSender sender) throws CommandException {
+    public void load(CommandContext args, final Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = null;
@@ -796,12 +779,12 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayForceLoadRegions()) {
+        if (!getPermissionModel(sender).mayForceLoadRegions()) {
             throw new CommandPermissionsException();
         }
 
         if (world != null) {
-            RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+            RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
 
             if (manager == null) {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
@@ -809,7 +792,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerReloader(manager));
 
-            AsyncCommandHelper.wrap(future, plugin, sender)
+            AsyncCommandHelper.wrap(future, worldGuard, sender)
                     .forRegionDataLoad(world, false);
         } else {
             // Load regions for all worlds
@@ -824,7 +807,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerReloader(managers));
 
-            AsyncCommandHelper.wrap(future, plugin, sender)
+            AsyncCommandHelper.wrap(future, worldGuard, sender)
                     .registerWithSupervisor("Loading regions for all worlds")
                     .sendMessageAfterDelay("(Please wait... loading region data for all worlds...)")
                     .thenRespondWith(
@@ -844,7 +827,7 @@ public final class RegionCommands extends RegionCommandsBase {
             usage = "[world]",
             desc = "Re-save regions to file",
             flags = "w:")
-    public void save(CommandContext args, final CommandSender sender) throws CommandException {
+    public void save(CommandContext args, final Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = null;
@@ -855,12 +838,12 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayForceSaveRegions()) {
+        if (!getPermissionModel(sender).mayForceSaveRegions()) {
             throw new CommandPermissionsException();
         }
 
         if (world != null) {
-            RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+            RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
 
             if (manager == null) {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
@@ -868,7 +851,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerSaver(manager));
 
-            AsyncCommandHelper.wrap(future, plugin, sender)
+            AsyncCommandHelper.wrap(future, worldGuard, sender)
                     .forRegionDataSave(world, false);
         } else {
             // Save for all worlds
@@ -883,7 +866,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerSaver(managers));
 
-            AsyncCommandHelper.wrap(future, plugin, sender)
+            AsyncCommandHelper.wrap(future, worldGuard, sender)
                     .registerWithSupervisor("Saving regions for all worlds")
                     .sendMessageAfterDelay("(Please wait... saving region data for all worlds...)")
                     .thenRespondWith(
@@ -902,9 +885,9 @@ public final class RegionCommands extends RegionCommandsBase {
     @Command(aliases = {"migratedb"}, usage = "<from> <to>",
              flags = "y",
              desc = "Migrate from one Protection Database to another.", min = 2, max = 2)
-    public void migrateDB(CommandContext args, CommandSender sender) throws CommandException {
+    public void migrateDB(CommandContext args, Actor sender) throws CommandException {
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayMigrateRegionStore()) {
+        if (!getPermissionModel(sender).mayMigrateRegionStore()) {
             throw new CommandPermissionsException();
         }
 
@@ -945,7 +928,7 @@ public final class RegionCommands extends RegionCommandsBase {
         LoggerToChatHandler handler = null;
         Logger minecraftLogger = null;
 
-        if (sender instanceof Player) {
+        if (sender instanceof LocalPlayer) {
             handler = new LoggerToChatHandler(sender);
             handler.setLevel(Level.ALL);
             minecraftLogger = Logger.getLogger("com.sk89q.worldguard");
@@ -954,9 +937,9 @@ public final class RegionCommands extends RegionCommandsBase {
 
         try {
             BukkitRegionContainer container = (BukkitRegionContainer) WorldGuard.getInstance().getPlatform().getRegionContainer();
-            sender.sendMessage(ChatColor.YELLOW + "Now performing migration... this may take a while.");
+            sender.print("Now performing migration... this may take a while.");
             container.migrate(migration);
-            sender.sendMessage(ChatColor.YELLOW +
+            sender.print(
                     "Migration complete! This only migrated the data. If you already changed your settings to use " +
                     "the target driver, then WorldGuard is now using the new data. If not, you have to adjust your " +
                     "configuration to use the new driver and then restart your server.");
@@ -979,16 +962,16 @@ public final class RegionCommands extends RegionCommandsBase {
      */
     @Command(aliases = {"migrateuuid"},
             desc = "Migrate loaded databases to use UUIDs", max = 0)
-    public void migrateUuid(CommandContext args, CommandSender sender) throws CommandException {
+    public void migrateUuid(CommandContext args, Actor sender) throws CommandException {
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayMigrateRegionNames()) {
+        if (!getPermissionModel(sender).mayMigrateRegionNames()) {
             throw new CommandPermissionsException();
         }
 
         LoggerToChatHandler handler = null;
         Logger minecraftLogger = null;
 
-        if (sender instanceof Player) {
+        if (sender instanceof LocalPlayer) {
             handler = new LoggerToChatHandler(sender);
             handler.setLevel(Level.ALL);
             minecraftLogger = Logger.getLogger("com.sk89q.worldguard");
@@ -1001,9 +984,9 @@ public final class RegionCommands extends RegionCommandsBase {
             RegionDriver driver = container.getDriver();
             UUIDMigration migration = new UUIDMigration(driver, WorldGuard.getInstance().getProfileService(), WorldGuard.getInstance().getFlagRegistry());
             migration.setKeepUnresolvedNames(config.keepUnresolvedNames);
-            sender.sendMessage(ChatColor.YELLOW + "Now performing migration... this may take a while.");
+            sender.print("Now performing migration... this may take a while.");
             container.migrate(migration);
-            sender.sendMessage(ChatColor.YELLOW + "Migration complete!");
+            sender.print("Migration complete!");
         } catch (MigrationException e) {
             log.log(Level.WARNING, "Failed to migrate", e);
             throw new CommandException("Error encountered while migrating: " + e.getMessage());
@@ -1026,17 +1009,16 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "s",
              desc = "Teleports you to the location associated with the region.",
              min = 1, max = 1)
-    public void teleport(CommandContext args, CommandSender sender) throws CommandException {
-        Player player = plugin.checkPlayer(sender);
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+    public void teleport(CommandContext args, Actor sender) throws CommandException {
+        LocalPlayer player = worldGuard.checkPlayer(sender);
         Location teleportLocation;
 
         // Lookup the existing region
-        RegionManager regionManager = checkRegionManager(plugin, localPlayer.getWorld());
+        RegionManager regionManager = checkRegionManager(player.getWorld());
         ProtectedRegion existing = checkExistingRegion(regionManager, args.getString(0), false);
 
         // Check permissions
-        if (!getPermissionModel(localPlayer).mayTeleportTo(existing)) {
+        if (!getPermissionModel(player).mayTeleportTo(existing)) {
             throw new CommandPermissionsException();
         }
 
@@ -1058,6 +1040,6 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         player.teleport(BukkitAdapter.adapt(teleportLocation));
-        sender.sendMessage("Teleported you to the region '" + existing.getId() + "'.");
+        sender.print("Teleported you to the region '" + existing.getId() + "'.");
     }
 }

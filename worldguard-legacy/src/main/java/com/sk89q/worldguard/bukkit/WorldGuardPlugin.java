@@ -66,10 +66,8 @@ import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -94,14 +92,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-
-import javax.annotation.Nullable;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
@@ -110,7 +103,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     private static WorldGuardPlugin inst;
     private static BukkitWorldGuardPlatform platform;
-    private final CommandsManager<CommandSender> commands;
+    private final CommandsManager<Actor> commands;
     private PlayerMoveListener playerMoveListener;
 
     /**
@@ -118,11 +111,11 @@ public class WorldGuardPlugin extends JavaPlugin {
      * this merely instantiates the objects.
      */
     public WorldGuardPlugin() {
-        final WorldGuardPlugin plugin = inst = this;
-        commands = new CommandsManager<CommandSender>() {
+        inst = this;
+        commands = new CommandsManager<Actor>() {
             @Override
-            public boolean hasPermission(CommandSender player, String perm) {
-                return plugin.hasPermission(player, perm);
+            public boolean hasPermission(Actor player, String perm) {
+                return player.hasPermission(perm);
             }
         };
     }
@@ -234,7 +227,8 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         try {
-            commands.execute(cmd.getName(), args, sender, sender);
+            Actor actor = wrapCommandSender(sender);
+            commands.execute(cmd.getName(), args, actor, actor);
         } catch (CommandPermissionsException e) {
             sender.sendMessage(ChatColor.RED + "You don't have permission.");
         } catch (MissingNestedCommandException e) {
@@ -243,40 +237,12 @@ public class WorldGuardPlugin extends JavaPlugin {
             sender.sendMessage(ChatColor.RED + e.getMessage());
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (WrappedCommandException e) {
-            sender.sendMessage(ChatColor.RED + convertThrowable(e.getCause()));
+            sender.sendMessage(ChatColor.RED + WorldGuard.getInstance().convertThrowable(e.getCause()));
         } catch (CommandException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }
 
         return true;
-    }
-
-    /**
-     * Convert the throwable into a somewhat friendly message.
-     *
-     * @param throwable the throwable
-     * @return a message
-     */
-    public String convertThrowable(@Nullable Throwable throwable) {
-        if (throwable instanceof NumberFormatException) {
-            return "Number expected, string received instead.";
-        } else if (throwable instanceof StorageException) {
-            WorldGuard.logger.log(Level.WARNING, "Error loading/saving regions", throwable);
-            return "Region data could not be loaded/saved: " + throwable.getMessage();
-        } else if (throwable instanceof RejectedExecutionException) {
-            return "There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.";
-        } else if (throwable instanceof CancellationException) {
-            return "WorldGuard: Task was cancelled";
-        } else if (throwable instanceof InterruptedException) {
-            return "WorldGuard: Task was interrupted";
-        } else if (throwable instanceof UnresolvedNamesException) {
-            return throwable.getMessage();
-        } else if (throwable instanceof CommandException) {
-            return throwable.getMessage();
-        } else {
-            WorldGuard.logger.log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
-            return "WorldGuard: An unexpected error occurred! Please see the server console.";
-        }
     }
 
     /**

@@ -19,8 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.util.logging;
 
+import com.sk89q.worldedit.extension.platform.Actor;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -32,14 +32,14 @@ public class LoggerToChatHandler extends Handler {
     /**
      * Player.
      */
-    private CommandSender player;
+    private Actor player;
 
     /**
      * Construct the object.
      *
      * @param player
      */
-    public LoggerToChatHandler(CommandSender player) {
+    public LoggerToChatHandler(Actor player) {
         this.player = player;
     }
 
@@ -62,7 +62,7 @@ public class LoggerToChatHandler extends Handler {
      */
     @Override
     public void publish(LogRecord record) {
-        player.sendMessage(ChatColor.GRAY + record.getLevel().getName() + ": "
+        player.printRaw(ChatColor.GRAY + record.getLevel().getName() + ": "
                 + ChatColor.WHITE + record.getMessage());
     }
 }

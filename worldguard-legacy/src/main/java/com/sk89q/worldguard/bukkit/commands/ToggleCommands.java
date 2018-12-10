@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import org.bukkit.ChatColor;
@@ -37,23 +38,23 @@ import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class ToggleCommands {
-    private final WorldGuardPlugin plugin;
+    private final WorldGuard worldGuard;
 
-    public ToggleCommands(WorldGuardPlugin plugin) {
-        this.plugin = plugin;
+    public ToggleCommands(WorldGuard worldGuard) {
+        this.worldGuard = worldGuard;
     }
 
     @Command(aliases = {"stopfire"}, usage = "[<world>]",
             desc = "Disables all fire spread temporarily", max = 1)
     @CommandPermissions({"worldguard.fire-toggle.stop"})
-    public void stopFire(CommandContext args, CommandSender sender) throws CommandException {
+    public void stopFire(CommandContext args, Actor sender) throws CommandException {
         
         World world;
         
         if (args.argsLength() == 0) {
-            world = plugin.checkPlayer(sender).getWorld();
+            world = worldGuard.checkPlayer(sender).getWorld();
         } else {
-            world = plugin.matchWorld(sender, args.getString(0));
+            world = worldGuard.matchWorld(sender, args.getString(0));
         }
         
         BukkitWorldConfiguration wcfg =
@@ -65,9 +66,7 @@ public class ToggleCommands {
                     + "Fire spread has been globally disabled for '" + world.getName() + "' by "
                     + plugin.toName(sender) + ".");
         } else {
-            sender.sendMessage(
-                    ChatColor.YELLOW
-                    + "Fire spread was already globally disabled.");
+            sender.print("Fire spread was already globally disabled.");
         }
 
         wcfg.fireSpreadDisableToggle = true;

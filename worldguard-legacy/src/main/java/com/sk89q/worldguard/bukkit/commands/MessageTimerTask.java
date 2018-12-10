@@ -19,18 +19,18 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import org.bukkit.command.CommandSender;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.extension.platform.Actor;
 
 import java.util.TimerTask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class MessageTimerTask extends TimerTask {
 
-    private final CommandSender sender;
+    private final Actor sender;
     private final String message;
 
-    MessageTimerTask(CommandSender sender, String message) {
+    MessageTimerTask(Actor sender, String message) {
         checkNotNull(sender);
         checkNotNull(message);
 
@@ -40,7 +40,7 @@ public class MessageTimerTask extends TimerTask {
 
     @Override
     public void run() {
-        sender.sendMessage(message);
+        sender.printRaw(message);
     }
 
 }

@@ -19,26 +19,25 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.util.concurrent.FutureCallback;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldguard.WorldGuard;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class MessageFutureCallback<V> implements FutureCallback<V> {
 
-    private final WorldGuardPlugin plugin;
-    private final CommandSender sender;
+    private final WorldGuard worldGuard;
+    private final Actor sender;
     @Nullable
     private final String success;
     @Nullable
     private final String failure;
 
-    private MessageFutureCallback(WorldGuardPlugin plugin, CommandSender sender, @Nullable String success, @Nullable String failure) {
-        this.plugin = plugin;
+    private MessageFutureCallback(WorldGuard worldGuard, Actor sender, @Nullable String success, @Nullable String failure) {
+        this.worldGuard = worldGuard;
         this.sender = sender;
         this.success = success;
         this.failure = failure;
@@ -47,29 +46,29 @@ public class MessageFutureCallback<V> implements FutureCallback<V> {
     @Override
     public void onSuccess(@Nullable V v) {
         if (success != null) {
-            sender.sendMessage(ChatColor.YELLOW + success);
+            sender.print(success);
         }
     }
 
     @Override
     public void onFailure(@Nullable Throwable throwable) {
         String failure = this.failure != null ? this.failure : "An error occurred";
-        sender.sendMessage(ChatColor.RED + failure + ": " + plugin.convertThrowable(throwable));
+        sender.printError(failure + ": " + worldGuard.convertThrowable(throwable));
     }
 
     public static class Builder {
-        private final WorldGuardPlugin plugin;
-        private final CommandSender sender;
+        private final WorldGuard worldGuard;
+        private final Actor sender;
         @Nullable
         private String success;
         @Nullable
         private String failure;
 
-        public Builder(WorldGuardPlugin plugin, CommandSender sender) {
-            checkNotNull(plugin);
+        public Builder(WorldGuard worldGuard, Actor sender) {
+            checkNotNull(worldGuard);
             checkNotNull(sender);
 
-            this.plugin = plugin;
+            this.worldGuard = worldGuard;
             this.sender = sender;
         }
 
@@ -84,18 +83,18 @@ public class MessageFutureCallback<V> implements FutureCallback<V> {
         }
 
         public <V> MessageFutureCallback<V> build() {
-            return new MessageFutureCallback<V>(plugin, sender, success, failure);
+            return new MessageFutureCallback<V>(worldGuard, sender, success, failure);
         }
     }
 
-    public static <V> MessageFutureCallback<V> createRegionLoadCallback(WorldGuardPlugin plugin, CommandSender sender) {
-        return new Builder(plugin, sender)
+    public static <V> MessageFutureCallback<V> createRegionLoadCallback(WorldGuard worldGuard, Actor sender) {
+        return new Builder(worldGuard, sender)
                 .onSuccess("Successfully load the region data.")
                 .build();
     }
 
-    public static <V> MessageFutureCallback<V> createRegionSaveCallback(WorldGuardPlugin plugin, CommandSender sender) {
-        return new Builder(plugin, sender)
+    public static <V> MessageFutureCallback<V> createRegionSaveCallback(WorldGuard worldGuard, Actor sender) {
+        return new Builder(worldGuard, sender)
                 .onSuccess("Successfully saved the region data.")
                 .build();
     }

@@ -19,33 +19,32 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.util.task.FutureForwardingTask;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nullable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class AsyncCommandHelper {
 
     private final ListenableFuture<?> future;
-    private final WorldGuardPlugin plugin;
-    private final CommandSender sender;
+    private final WorldGuard worldGuard;
+    private final Actor sender;
     @Nullable
     private Object[] formatArgs;
 
-    private AsyncCommandHelper(ListenableFuture<?> future, WorldGuardPlugin plugin, CommandSender sender) {
+    private AsyncCommandHelper(ListenableFuture<?> future, WorldGuard worldGuard, Actor sender) {
         checkNotNull(future);
-        checkNotNull(plugin);
+        checkNotNull(worldGuard);
         checkNotNull(sender);
 
         this.future = future;
-        this.plugin = plugin;
+        this.worldGuard = worldGuard;
         this.sender = sender;
     }
 
@@ -78,7 +77,7 @@ public class AsyncCommandHelper {
         // Send a response message
         Futures.addCallback(
                 future,
-                new MessageFutureCallback.Builder(plugin, sender)
+                new MessageFutureCallback.Builder(worldGuard, sender)
                         .onSuccess(format(success))
                         .onFailure(format(failure))
                         .build());
@@ -89,7 +88,7 @@ public class AsyncCommandHelper {
         // Send a response message
         Futures.addCallback(
                 future,
-                new MessageFutureCallback.Builder(plugin, sender)
+                new MessageFutureCallback.Builder(worldGuard, sender)
                         .onFailure(format(failure))
                         .build());
         return this;
@@ -129,8 +128,8 @@ public class AsyncCommandHelper {
         return this;
     }
 
-    public static AsyncCommandHelper wrap(ListenableFuture<?> future, WorldGuardPlugin plugin, CommandSender sender) {
-        return new AsyncCommandHelper(future, plugin, sender);
+    public static AsyncCommandHelper wrap(ListenableFuture<?> future, WorldGuard worldGuard, Actor sender) {
+        return new AsyncCommandHelper(future, worldGuard, sender);
     }
 
 }

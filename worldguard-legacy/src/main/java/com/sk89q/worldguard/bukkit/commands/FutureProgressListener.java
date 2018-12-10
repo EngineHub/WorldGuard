@@ -19,14 +19,14 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.sk89q.worldedit.extension.platform.Actor;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 
 import java.util.Timer;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class FutureProgressListener implements Runnable {
 
@@ -35,7 +35,7 @@ public class FutureProgressListener implements Runnable {
 
     private final MessageTimerTask task;
 
-    public FutureProgressListener(CommandSender sender, String message) {
+    public FutureProgressListener(Actor sender, String message) {
         checkNotNull(sender);
         checkNotNull(message);
 
@@ -48,7 +48,7 @@ public class FutureProgressListener implements Runnable {
         task.cancel();
     }
 
-    public static void addProgressListener(ListenableFuture<?> future, CommandSender sender, String message) {
+    public static void addProgressListener(ListenableFuture<?> future, Actor sender, String message) {
         future.addListener(new FutureProgressListener(sender, message), MoreExecutors.directExecutor());
     }
 

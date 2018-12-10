@@ -23,7 +23,8 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.util.paste.EngineHubPaste;
 import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
@@ -165,28 +166,28 @@ public final class CommandUtils {
      * Submit data to a pastebin service and inform the sender of
      * success or failure.
      *
-     * @param plugin The plugin
+     * @param worldGuard The worldguard instance
      * @param sender The sender
      * @param content The content
      * @param successMessage The message, formatted with {@link String#format(String, Object...)} on success
      */
-    public static void pastebin(WorldGuardPlugin plugin, final CommandSender sender, String content, final String successMessage) {
+    public static void pastebin(WorldGuard worldGuard, final Actor sender, String content, final String successMessage) {
         ListenableFuture<URL> future = new EngineHubPaste().paste(content);
 
-        AsyncCommandHelper.wrap(future, plugin, sender)
+        AsyncCommandHelper.wrap(future, worldGuard, sender)
                 .registerWithSupervisor("Submitting content to a pastebin service...")
                 .sendMessageAfterDelay("(Please wait... sending output to pastebin...)");
 
         Futures.addCallback(future, new FutureCallback<URL>() {
             @Override
             public void onSuccess(URL url) {
-                sender.sendMessage(ChatColor.YELLOW + String.format(successMessage, url));
+                sender.print(String.format(successMessage, url));
             }
 
             @Override
             public void onFailure(Throwable throwable) {
                 log.log(Level.WARNING, "Failed to submit pastebin", throwable);
-                sender.sendMessage(ChatColor.RED + "Failed to submit to a pastebin. Please see console for the error.");
+                sender.printError("Failed to submit to a pastebin. Please see console for the error.");
             }
         });
     }

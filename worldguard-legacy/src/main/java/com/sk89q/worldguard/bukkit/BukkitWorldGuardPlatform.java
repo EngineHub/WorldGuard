@@ -107,7 +107,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
 
     @Override
     public void load() {
-        sessionManager = new BukkitSessionManager(WorldGuardPlugin.inst());
+        sessionManager = new BukkitSessionManager();
         configuration = new BukkitConfigurationManager(WorldGuardPlugin.inst());
         configuration.load();
         regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());

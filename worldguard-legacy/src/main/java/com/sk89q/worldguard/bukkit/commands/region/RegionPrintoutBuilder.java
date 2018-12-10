@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.commands.region;
 
 import com.sk89q.squirrelid.cache.ProfileCache;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -27,7 +28,6 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -272,12 +272,12 @@ public class RegionPrintoutBuilder implements Callable<String> {
     }
 
     /**
-     * Send the report to a {@link CommandSender}.
+     * Send the report to a {@link Actor}.
      *
      * @param sender the recipient
      */
-    public void send(CommandSender sender) {
-        sender.sendMessage(toString());
+    public void send(Actor sender) {
+        sender.printRaw(toString());
     }
 
     public StringBuilder append(boolean b) {
