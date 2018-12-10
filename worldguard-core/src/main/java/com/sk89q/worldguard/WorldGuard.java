@@ -75,7 +75,7 @@ public class WorldGuard {
         cacheDir.mkdirs();
 
         try {
-            profileCache = new SQLiteCache(new File(getPlatform().getConfigDir().toFile(), "profiles.sqlite"));
+            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
         } catch (IOException e) {
             WorldGuard.logger.log(Level.WARNING, "Failed to initialize SQLite profile cache");
             profileCache = new HashMapCache();
