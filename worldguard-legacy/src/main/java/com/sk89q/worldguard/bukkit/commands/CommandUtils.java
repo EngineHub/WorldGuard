@@ -20,20 +20,12 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.google.common.base.Function;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.util.paste.EngineHubPaste;
 import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
-import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.net.URL;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
@@ -160,36 +152,6 @@ public final class CommandUtils {
             sender.printRaw(s);
             return null;
         };
-    }
-
-    /**
-     * Submit data to a pastebin service and inform the sender of
-     * success or failure.
-     *
-     * @param worldGuard The worldguard instance
-     * @param sender The sender
-     * @param content The content
-     * @param successMessage The message, formatted with {@link String#format(String, Object...)} on success
-     */
-    public static void pastebin(WorldGuard worldGuard, final Actor sender, String content, final String successMessage) {
-        ListenableFuture<URL> future = new EngineHubPaste().paste(content);
-
-        AsyncCommandHelper.wrap(future, worldGuard, sender)
-                .registerWithSupervisor("Submitting content to a pastebin service...")
-                .sendMessageAfterDelay("(Please wait... sending output to pastebin...)");
-
-        Futures.addCallback(future, new FutureCallback<URL>() {
-            @Override
-            public void onSuccess(URL url) {
-                sender.print(String.format(successMessage, url));
-            }
-
-            @Override
-            public void onFailure(Throwable throwable) {
-                log.log(Level.WARNING, "Failed to submit pastebin", throwable);
-                sender.printError("Failed to submit to a pastebin. Please see console for the error.");
-            }
-        });
     }
 
 }

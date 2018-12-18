@@ -27,18 +27,20 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.command.util.AsyncCommandHelper;
+import com.sk89q.worldedit.command.util.FutureProgressListener;
+import com.sk89q.worldedit.command.util.MessageFutureCallback.Builder;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitRegionContainer;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
-import com.sk89q.worldguard.bukkit.commands.AsyncCommandHelper;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
-import com.sk89q.worldguard.bukkit.commands.FutureProgressListener;
-import com.sk89q.worldguard.commands.MessageFutureCallback.Builder;
 import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.commands.task.RegionAdder;
 import com.sk89q.worldguard.commands.task.RegionLister;
@@ -68,7 +70,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
 import com.sk89q.worldguard.util.Enums;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
@@ -131,7 +132,7 @@ public final class RegionCommands extends RegionCommandsBase {
         task.addOwnersFromCommand(args, 2);
         ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, worldGuard, player)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), player)
                 .formatUsing(id)
                 .registerWithSupervisor("Adding the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... adding '%s'...)")
@@ -183,7 +184,7 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionAdder task = new RegionAdder(manager, region);
         ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, worldGuard, player)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), player)
                 .formatUsing(id)
                 .registerWithSupervisor("Updating the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... updating '%s'...)")
@@ -285,7 +286,7 @@ public final class RegionCommands extends RegionCommandsBase {
         task.setOwnersInput(new String[]{player.getName()});
         ListenableFuture<?> future = worldGuard.getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, worldGuard, player)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), player)
                 .formatUsing(id)
                 .registerWithSupervisor("Claiming the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... claiming '%s'...)")
@@ -439,7 +440,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, worldGuard, sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
                 .registerWithSupervisor("Getting list of regions...")
                 .sendMessageAfterDelay("(Please wait... fetching region list...)")
                 .thenTellErrorsOnly("Failed to fetch region list");
@@ -743,7 +744,7 @@ public final class RegionCommands extends RegionCommandsBase {
             task.setRemovalStrategy(RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
         }
 
-        AsyncCommandHelper.wrap(WorldGuard.getInstance().getExecutorService().submit(task), worldGuard, sender)
+        AsyncCommandHelper.wrap(WorldGuard.getInstance().getExecutorService().submit(task), worldGuard.getSupervisor(), sender)
                 .formatUsing(existing.getId())
                 .registerWithSupervisor("Removing the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... removing '%s'...)")
@@ -787,14 +788,14 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerReloader(manager));
 
-            AsyncCommandHelper.wrap(future, worldGuard, sender)
+            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
                     .forRegionDataLoad(world, false);
         } else {
             // Load regions for all worlds
             List<RegionManager> managers = new ArrayList<>();
 
-            for (World w : Bukkit.getServer().getWorlds()) {
-                RegionManager manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+            for (World w : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
+                RegionManager manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(w);
                 if (manager != null) {
                     managers.add(manager);
                 }
@@ -802,7 +803,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerReloader(managers));
 
-            AsyncCommandHelper.wrap(future, worldGuard, sender)
+            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
                     .registerWithSupervisor("Loading regions for all worlds")
                     .sendMessageAfterDelay("(Please wait... loading region data for all worlds...)")
                     .thenRespondWith(
@@ -846,14 +847,14 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerSaver(manager));
 
-            AsyncCommandHelper.wrap(future, worldGuard, sender)
+            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
                     .forRegionDataSave(world, false);
         } else {
             // Save for all worlds
             List<RegionManager> managers = new ArrayList<>();
 
-            for (World w : Bukkit.getServer().getWorlds()) {
-                RegionManager manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+            for (World w : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
+                RegionManager manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(w);
                 if (manager != null) {
                     managers.add(manager);
                 }
@@ -861,7 +862,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerSaver(managers));
 
-            AsyncCommandHelper.wrap(future, worldGuard, sender)
+            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
                     .registerWithSupervisor("Saving regions for all worlds")
                     .sendMessageAfterDelay("(Please wait... saving region data for all worlds...)")
                     .thenRespondWith(

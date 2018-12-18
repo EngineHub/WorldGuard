@@ -41,9 +41,9 @@ import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
-import com.sk89q.worldguard.util.task.SimpleSupervisor;
-import com.sk89q.worldguard.util.task.Supervisor;
-import com.sk89q.worldguard.util.task.Task;
+import com.sk89q.worldedit.util.task.SimpleSupervisor;
+import com.sk89q.worldedit.util.task.Supervisor;
+import com.sk89q.worldedit.util.task.Task;
 
 import java.io.File;
 import java.io.IOException;

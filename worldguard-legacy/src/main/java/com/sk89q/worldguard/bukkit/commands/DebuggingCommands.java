@@ -20,6 +20,8 @@
 package com.sk89q.worldguard.bukkit.commands;
 
 import com.sk89q.minecraft.util.commands.*;
+import com.sk89q.worldedit.util.paste.ActorCallbackPaste;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.debug.*;
 import com.sk89q.worldguard.bukkit.util.report.CancelReport;
@@ -128,7 +130,7 @@ public class DebuggingCommands {
             log.info("Event report for " + receiver.getName() + ":\n\n" + result);
 
             plugin.checkPermission(receiver, "worldguard.debug.pastebin");
-            CommandUtils.pastebin(plugin, receiver, result, "Event debugging report: %s.txt");
+            ActorCallbackPaste.pastebin(WorldGuard.getInstance().getSupervisor(), plugin.wrapCommandSender(receiver), result, "Event debugging report: %s.txt");
         } else {
             receiver.sendMessage(result.replaceAll("(?m)^", ChatColor.AQUA.toString()));
 

@@ -29,9 +29,11 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.util.AsyncCommandHelper;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.paste.ActorCallbackPaste;
 import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.util.report.SystemInfoReport;
 import com.sk89q.worldedit.world.World;
@@ -51,8 +53,8 @@ import com.sk89q.worldguard.util.profiler.SamplerBuilder.Sampler;
 import com.sk89q.worldguard.util.profiler.ThreadIdFilter;
 import com.sk89q.worldguard.util.profiler.ThreadNameFilter;
 import com.sk89q.worldguard.util.report.ConfigReport;
-import com.sk89q.worldguard.util.task.Task;
-import com.sk89q.worldguard.util.task.TaskStateComparator;
+import com.sk89q.worldedit.util.task.Task;
+import com.sk89q.worldedit.util.task.TaskStateComparator;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -148,7 +150,7 @@ public class WorldGuardCommands {
         
         if (args.hasFlag('p')) {
             sender.checkPermission("worldguard.report.pastebin");
-            CommandUtils.pastebin(worldGuard, sender, result, "WorldGuard report: %s.report");
+            ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, result, "WorldGuard report: %s.report");
         }
     }
 
@@ -201,7 +203,7 @@ public class WorldGuardCommands {
             sampler = activeSampler = builder.start();
         }
 
-        AsyncCommandHelper.wrap(sampler.getFuture(), worldGuard, sender)
+        AsyncCommandHelper.wrap(sampler.getFuture(), worldGuard.getSupervisor(), sender)
                 .formatUsing(minutes)
                 .registerWithSupervisor("Running CPU profiler for %d minute(s)...")
                 .sendMessageAfterDelay("(Please wait... profiling for %d minute(s)...)")
@@ -227,7 +229,7 @@ public class WorldGuardCommands {
                 }
 
                 if (pastebin) {
-                    CommandUtils.pastebin(worldGuard, sender, output, "Profile result: %s.profile");
+                    ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, output, "Profile result: %s.profile");
                 }
             }
 
