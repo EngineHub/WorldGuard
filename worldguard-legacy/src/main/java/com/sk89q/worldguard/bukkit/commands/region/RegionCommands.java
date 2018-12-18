@@ -386,7 +386,8 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Send a response message
         Futures.addCallback(future,
-                new Builder(worldGuard, sender)
+                new Builder(sender)
+                        .exceptionConverter(worldGuard.getExceptionConverter())
                         .onFailure("Failed to fetch region information")
                         .build());
     }

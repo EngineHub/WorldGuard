@@ -26,16 +26,12 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.logging.Logger;
-
 import javax.annotation.Nullable;
 
 /**
  * Command-related utility methods.
  */
 public final class CommandUtils {
-
-    private static final Logger log = Logger.getLogger(CommandUtils.class.getCanonicalName());
 
     private CommandUtils() {
     }

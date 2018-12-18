@@ -228,7 +228,17 @@ public class WorldGuardPlugin extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         try {
             Actor actor = wrapCommandSender(sender);
-            commands.execute(cmd.getName(), args, actor, actor);
+            try {
+                commands.execute(cmd.getName(), args, actor, actor);
+            } catch (Throwable t) {
+                Throwable next = t;
+                do {
+                    WorldGuard.getInstance().getExceptionConverter().convert(next);
+                    next = next.getCause();
+                } while (next != null);
+
+                throw t;
+            }
         } catch (CommandPermissionsException e) {
             sender.sendMessage(ChatColor.RED + "You don't have permission.");
         } catch (MissingNestedCommandException e) {
@@ -237,7 +247,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             sender.sendMessage(ChatColor.RED + e.getMessage());
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (WrappedCommandException e) {
-            sender.sendMessage(ChatColor.RED + WorldGuard.getInstance().convertThrowable(e.getCause()));
+            sender.sendMessage(ChatColor.RED + e.getCause().getMessage());
         } catch (CommandException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }

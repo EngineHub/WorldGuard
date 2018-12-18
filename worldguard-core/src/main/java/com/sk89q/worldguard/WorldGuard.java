@@ -34,28 +34,23 @@ import com.sk89q.squirrelid.resolver.CombinedProfileService;
 import com.sk89q.squirrelid.resolver.HttpRepositoryService;
 import com.sk89q.squirrelid.resolver.ProfileService;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.task.SimpleSupervisor;
+import com.sk89q.worldedit.util.task.Supervisor;
+import com.sk89q.worldedit.util.task.Task;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
-import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
+import com.sk89q.worldguard.util.WorldGuardExceptionConverter;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
-import com.sk89q.worldedit.util.task.SimpleSupervisor;
-import com.sk89q.worldedit.util.task.Supervisor;
-import com.sk89q.worldedit.util.task.Task;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nullable;
 
 public class WorldGuard {
 
@@ -68,6 +63,7 @@ public class WorldGuard {
     private ProfileCache profileCache;
     private ProfileService profileService;
     private ListeningExecutorService executorService;
+    private WorldGuardExceptionConverter exceptionConverter = new WorldGuardExceptionConverter(this);
 
     public static WorldGuard getInstance() {
         return instance;
@@ -161,6 +157,15 @@ public class WorldGuard {
     }
 
     /**
+     * Get the exception converter
+     *
+     * @return the exception converter
+     */
+    public WorldGuardExceptionConverter getExceptionConverter() {
+        return exceptionConverter;
+    }
+
+    /**
      * Checks to see if the sender is a player, otherwise throw an exception.
      *
      * @param sender The sender
@@ -172,34 +177,6 @@ public class WorldGuard {
             return (LocalPlayer) sender;
         } else {
             throw new CommandException("A player is expected.");
-        }
-    }
-
-    /**
-     * Convert the throwable into a somewhat friendly message.
-     *
-     * @param throwable the throwable
-     * @return a message
-     */
-    public String convertThrowable(@Nullable Throwable throwable) {
-        if (throwable instanceof NumberFormatException) {
-            return "Number expected, string received instead.";
-        } else if (throwable instanceof StorageException) {
-            WorldGuard.logger.log(Level.WARNING, "Error loading/saving regions", throwable);
-            return "Region data could not be loaded/saved: " + throwable.getMessage();
-        } else if (throwable instanceof RejectedExecutionException) {
-            return "There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.";
-        } else if (throwable instanceof CancellationException) {
-            return "WorldGuard: Task was cancelled";
-        } else if (throwable instanceof InterruptedException) {
-            return "WorldGuard: Task was interrupted";
-        } else if (throwable instanceof UnresolvedNamesException) {
-            return throwable.getMessage();
-        } else if (throwable instanceof CommandException) {
-            return throwable.getMessage();
-        } else {
-            WorldGuard.logger.log(Level.WARNING, "WorldGuard encountered an unexpected error", throwable);
-            return "WorldGuard: An unexpected error occurred! Please see the server console.";
         }
     }
 
