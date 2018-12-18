@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.commands;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -83,7 +83,7 @@ public class MessageFutureCallback<V> implements FutureCallback<V> {
         }
 
         public <V> MessageFutureCallback<V> build() {
-            return new MessageFutureCallback<V>(worldGuard, sender, success, failure);
+            return new MessageFutureCallback<>(worldGuard, sender, success, failure);
         }
     }
 

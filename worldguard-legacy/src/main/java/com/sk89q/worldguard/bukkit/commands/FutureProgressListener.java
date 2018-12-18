@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldguard.commands.MessageTimerTask;
 import org.bukkit.ChatColor;
 
 import java.util.Timer;

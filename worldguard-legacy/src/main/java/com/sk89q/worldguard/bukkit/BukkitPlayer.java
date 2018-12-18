@@ -30,8 +30,8 @@ import org.bukkit.entity.Player;
 public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implements LocalPlayer {
 
     private final WorldGuardPlugin plugin;
-    private final String name;
     private final boolean silenced;
+    private String name;
 
     public BukkitPlayer(WorldGuardPlugin plugin, Player player) {
         this(plugin, player, false);
@@ -40,13 +40,15 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     BukkitPlayer(WorldGuardPlugin plugin, Player player, boolean silenced) {
         super((WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit"), player);
         this.plugin = plugin;
-        // getName() takes longer than before in newer versions of Minecraft
-        this.name = player == null ? null : player.getName();
         this.silenced = silenced;
     }
 
     @Override
     public String getName() {
+        if (this.name == null) {
+            // getName() takes longer than before in newer versions of Minecraft
+            this.name = getPlayer().getName();
+        }
         return name;
     }
 
@@ -148,7 +150,7 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     @Override
     public void printRaw(String msg) {
         if (!silenced) {
-            getPlayer().sendMessage(msg);
+            super.printRaw(msg);
         }
     }
 

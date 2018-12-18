@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
+import com.google.common.collect.Lists;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -27,12 +28,9 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GodMode;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -43,7 +41,6 @@ public class GeneralCommands {
         this.worldGuard = worldGuard;
     }
     
-    @SuppressWarnings("deprecation")
     @Command(aliases = {"god"}, usage = "[player]",
             desc = "Enable godmode on a player", flags = "s", max = 1)
     public void god(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
@@ -57,7 +54,7 @@ public class GeneralCommands {
             targets = plugin.matchPlayers(worldGuard.checkPlayer(sender));
             
             // Check permissions!
-            sender.hasPermission("worldguard.god");
+            sender.checkPermission("worldguard.god");
         } else {
             targets = plugin.matchPlayers(sender, args.getString(0));
             
@@ -78,7 +75,7 @@ public class GeneralCommands {
                     // Keep track of this
                     included = true;
                 } else {
-                    player.print("God enabled by " + plugin.toName(sender) + ".");
+                    player.print("God enabled by " + sender.getDisplayName() + ".");
 
                 }
             }
@@ -91,7 +88,6 @@ public class GeneralCommands {
         }
     }
     
-    @SuppressWarnings("deprecation")
     @Command(aliases = {"ungod"}, usage = "[player]",
             desc = "Disable godmode on a player", flags = "s", max = 1)
     public void ungod(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
@@ -124,7 +120,7 @@ public class GeneralCommands {
                     // Keep track of this
                     included = true;
                 } else {
-                    player.print("God disabled by " + plugin.toName(sender) + ".");
+                    player.print("God disabled by " + sender.getDisplayName() + ".");
 
                 }
             }
@@ -138,9 +134,9 @@ public class GeneralCommands {
     }
     
     @Command(aliases = {"heal"}, usage = "[player]", desc = "Heal a player", flags = "s", max = 1)
-    public void heal(CommandContext args,CommandSender sender) throws CommandException {
+    public void heal(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
 
-        Iterable<? extends Player> targets = null;
+        Iterable<? extends LocalPlayer> targets = null;
         boolean included = false;
         
         // Detect arguments based on the number of arguments provided
@@ -148,15 +144,15 @@ public class GeneralCommands {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
             
             // Check permissions!
-            plugin.checkPermission(sender, "worldguard.heal");
+            sender.checkPermission("worldguard.heal");
         } else if (args.argsLength() == 1) {            
             targets = plugin.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
-            plugin.checkPermission(sender, "worldguard.heal.other");
+            sender.checkPermission("worldguard.heal.other");
         }
 
-        for (Player player : targets) {
+        for (LocalPlayer player : targets) {
             player.setHealth(player.getMaxHealth());
             player.setFoodLevel(20);
             player.setSaturation(20);
@@ -164,13 +160,12 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Healed!");
+                player.print("Healed!");
                 
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Healed by "
-                        + plugin.toName(sender) + ".");
+                player.print("Healed by " + sender.getDisplayName() + ".");
                 
             }
         }
@@ -178,14 +173,14 @@ public class GeneralCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
+            sender.print("Players healed.");
         }
     }
     
     @Command(aliases = {"slay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
-    public void slay(CommandContext args, Actor sender) throws CommandException {
+    public void slay(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
         
-        Iterable<? extends LocalPlayer> targets = null;
+        Iterable<? extends LocalPlayer> targets = Lists.newArrayList();
         boolean included = false;
         
         // Detect arguments based on the number of arguments provided
@@ -193,12 +188,12 @@ public class GeneralCommands {
             targets = plugin.matchPlayers(worldGuard.checkPlayer(sender));
             
             // Check permissions!
-            sender.hasPermission("worldguard.slay");
+            sender.checkPermission("worldguard.slay");
         } else if (args.argsLength() == 1) {            
             targets = plugin.matchPlayers(sender, args.getString(0));
             
             // Check permissions!
-            sender.hasPermission("worldguard.slay.other");
+            sender.checkPermission("worldguard.slay.other");
         }
 
         for (LocalPlayer player : targets) {
@@ -211,7 +206,7 @@ public class GeneralCommands {
                 // Keep track of this
                 included = true;
             } else {
-                player.print("Slain by " + plugin.toName(sender) + ".");
+                player.print("Slain by " + sender.getDisplayName() + ".");
                 
             }
         }
@@ -219,7 +214,7 @@ public class GeneralCommands {
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
+            sender.print("Players slain.");
         }
     }
     

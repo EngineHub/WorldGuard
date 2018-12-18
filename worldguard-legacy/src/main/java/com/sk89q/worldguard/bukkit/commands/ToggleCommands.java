@@ -19,23 +19,21 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.config.ConfigurationManager;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.config.WorldConfiguration;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 
 public class ToggleCommands {
     private final WorldGuard worldGuard;
@@ -57,14 +55,13 @@ public class ToggleCommands {
             world = worldGuard.matchWorld(sender, args.getString(0));
         }
         
-        BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
         if (!wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(
                     ChatColor.YELLOW
                     + "Fire spread has been globally disabled for '" + world.getName() + "' by "
-                    + plugin.toName(sender) + ".");
+                    + sender.getDisplayName() + ".");
         } else {
             sender.print("Fire spread was already globally disabled.");
         }
@@ -75,7 +72,7 @@ public class ToggleCommands {
     @Command(aliases = {"allowfire"}, usage = "[<world>]",
             desc = "Allows all fire spread temporarily", max = 1)
     @CommandPermissions({"worldguard.fire-toggle.stop"})
-    public void allowFire(CommandContext args, CommandSender sender) throws CommandException {
+    public void allowFire(CommandContext args, Actor sender) throws CommandException {
         
         World world;
         
@@ -85,16 +82,14 @@ public class ToggleCommands {
             world = plugin.matchWorld(sender, args.getString(0));
         }
         
-        BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(ChatColor.YELLOW
                     + "Fire spread has been globally for '" + world.getName() + "' re-enabled by "
-                    + plugin.toName(sender) + ".");
+                    + sender.getDisplayName() + ".");
         } else {
-            sender.sendMessage(ChatColor.YELLOW
-                    + "Fire spread was already globally enabled.");
+            sender.print("Fire spread was already globally enabled.");
         }
 
         wcfg.fireSpreadDisableToggle = false;
@@ -103,35 +98,30 @@ public class ToggleCommands {
     @Command(aliases = {"halt-activity", "stoplag", "haltactivity"},
             desc = "Attempts to cease as much activity in order to stop lag", flags = "cis", max = 0)
     @CommandPermissions({"worldguard.halt-activity"})
-    public void stopLag(CommandContext args, CommandSender sender) throws CommandException {
+    public void stopLag(CommandContext args, Actor sender) throws CommandException {
 
         ConfigurationManager configManager = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
 
         if (args.hasFlag('i')) {
             if (configManager.activityHaltToggle) {
-                 sender.sendMessage(ChatColor.YELLOW
-                         + "ALL intensive server activity is not allowed.");
+                 sender.print("ALL intensive server activity is not allowed.");
             } else {
-                 sender.sendMessage(ChatColor.YELLOW
-                         + "ALL intensive server activity is allowed.");
+                 sender.print("ALL intensive server activity is allowed.");
             }
         } else {
             configManager.activityHaltToggle = !args.hasFlag('c');
 
             if (configManager.activityHaltToggle) {
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.YELLOW
-                            + "ALL intensive server activity halted.");
+                if (!(sender instanceof LocalPlayer)) {
+                    sender.print("ALL intensive server activity halted.");
                 }
 
                 if (!args.hasFlag('s')) {
                     plugin.getServer().broadcastMessage(ChatColor.YELLOW
                              + "ALL intensive server activity halted by "
-                             + plugin.toName(sender) + ".");
+                             + sender.getDisplayName() + ".");
                 } else {
-                    sender.sendMessage(ChatColor.YELLOW
-                        + "(Silent) ALL intensive server activity halted by "
-                        + plugin.toName(sender) + ".");
+                    sender.print("(Silent) ALL intensive server activity halted by " + sender.getDisplayName() + ".");
                 }
 
                 for (World world : plugin.getServer().getWorlds()) {
@@ -145,7 +135,7 @@ public class ToggleCommands {
                     }
 
                     if (removed > 10) {
-                        sender.sendMessage("" + removed + " entities (>10) auto-removed from "
+                        sender.printRaw("" + removed + " entities (>10) auto-removed from "
                                 + world.getName());
                     }
                 }
@@ -154,13 +144,11 @@ public class ToggleCommands {
                     plugin.getServer().broadcastMessage(ChatColor.YELLOW
                             + "ALL intensive server activity is now allowed.");
                     
-                    if (!(sender instanceof Player)) {
-                        sender.sendMessage(ChatColor.YELLOW
-                                + "ALL intensive server activity is now allowed.");
+                    if (!(sender instanceof LocalPlayer)) {
+                        sender.print("ALL intensive server activity is now allowed.");
                     }
                 } else {
-                    sender.sendMessage(ChatColor.YELLOW
-                            + "(Silent) ALL intensive server activity is now allowed.");
+                    sender.print("(Silent) ALL intensive server activity is now allowed.");
                 }
             }
         }

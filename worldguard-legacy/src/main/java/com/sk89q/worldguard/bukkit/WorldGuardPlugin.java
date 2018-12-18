@@ -278,37 +278,6 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
 
     /**
-     * Gets the name of a command sender. This is a unique name and this
-     * method should never return a "display name".
-     *
-     * @param sender The sender to get the name of
-     * @return The unique name of the sender.
-     */
-    public String toUniqueName(CommandSender sender) {
-        if (sender instanceof ConsoleCommandSender) {
-            return "*Console*";
-        } else {
-            return sender.getName();
-        }
-    }
-
-    /**
-     * Gets the name of a command sender. This play be a display name.
-     *
-     * @param sender The CommandSender to get the name of.
-     * @return The name of the given sender
-     */
-    public String toName(CommandSender sender) {
-        if (sender instanceof ConsoleCommandSender) {
-            return "*Console*";
-        } else if (sender instanceof Player) {
-            return ((Player) sender).getDisplayName();
-        } else {
-            return sender.getName();
-        }
-    }
-
-    /**
      * Checks permissions.
      *
      * @param sender The sender to check the permission on.

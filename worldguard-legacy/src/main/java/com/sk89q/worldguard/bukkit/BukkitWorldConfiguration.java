@@ -27,6 +27,7 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.blacklist.BlacklistLoggerHandler;
 import com.sk89q.worldguard.blacklist.logger.ConsoleHandler;
@@ -141,7 +142,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         opPermissions = getBoolean("op-permissions", true);
 
         buildPermissions = getBoolean("build-permission-nodes.enable", false);
-        buildPermissionDenyMessage = CommandUtils.replaceColorMacros(
+        buildPermissionDenyMessage = WorldGuard.getInstance().getPlatform().replaceColorMacros(
                 getString("build-permission-nodes.deny-message", "&eSorry, but you are not permitted to do that here."));
 
         strictEntitySpawn = getBoolean("event-handling.block-entity-spawns-with-untraceable-cause", false);
@@ -433,9 +434,9 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         return chestProtection;
     }
 
-    public int getMaxRegionCount(Player player) {
+    public int getMaxRegionCount(LocalPlayer player) {
         int max = -1;
-        for (String group : plugin.getGroups(player)) {
+        for (String group : player.getGroups()) {
             if (maxRegionCounts.containsKey(group)) {
                 int groupMax = maxRegionCounts.get(group);
                 if (max < groupMax) {

@@ -25,8 +25,9 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
@@ -37,7 +38,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.DomainInputResolver;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
-import org.bukkit.World;
 
 public class MemberCommands extends RegionCommandsBase {
 
@@ -57,7 +57,7 @@ public class MemberCommands extends RegionCommandsBase {
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
-        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         id = region.getId();
@@ -89,11 +89,10 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "nw:",
             desc = "Add an owner to a region",
             min = 2)
-    public void addOwner(CommandContext args, Actor sender) throws CommandException {
+    public void addOwner(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
-        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
 
         LocalPlayer player = null;
         if (sender instanceof LocalPlayer) {
@@ -102,7 +101,7 @@ public class MemberCommands extends RegionCommandsBase {
 
         String id = args.getString(0);
 
-        RegionManager manager = checkRegionManager(weWorld);
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         id = region.getId();
@@ -114,13 +113,13 @@ public class MemberCommands extends RegionCommandsBase {
             if (flag != null && flag && owners != null && owners.size() == 0) {
                 // TODO: Move this to an event
                 if (!sender.hasPermission("worldguard.region.unlimited")) {
-                    int maxRegionCount = ((BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(weWorld)).getMaxRegionCount(player);
+                    int maxRegionCount = ((BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world)).getMaxRegionCount(player);
                     if (maxRegionCount >= 0 && manager.getRegionCountOfPlayer(player)
                             >= maxRegionCount) {
                         throw new CommandException("You already own the maximum allowed amount of regions.");
                     }
                 }
-                sender.hasPermission("worldguard.region.addowner.unclaimed." + id.toLowerCase());
+                sender.checkPermission("worldguard.region.addowner.unclaimed." + id.toLowerCase());
             } else {
                 // Check permissions
                 if (!getPermissionModel(player).mayAddOwners(region)) {
@@ -156,7 +155,7 @@ public class MemberCommands extends RegionCommandsBase {
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
-        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         // Check permissions
@@ -203,7 +202,7 @@ public class MemberCommands extends RegionCommandsBase {
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
-        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         // Check permissions

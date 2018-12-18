@@ -30,27 +30,27 @@ import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.BukkitRegionContainer;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.commands.AsyncCommandHelper;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.bukkit.commands.FutureProgressListener;
-import com.sk89q.worldguard.bukkit.commands.MessageFutureCallback.Builder;
+import com.sk89q.worldguard.commands.MessageFutureCallback.Builder;
+import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.commands.task.RegionAdder;
 import com.sk89q.worldguard.commands.task.RegionLister;
 import com.sk89q.worldguard.commands.task.RegionManagerReloader;
 import com.sk89q.worldguard.commands.task.RegionManagerSaver;
 import com.sk89q.worldguard.commands.task.RegionRemover;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
-import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
@@ -70,9 +70,6 @@ import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolic
 import com.sk89q.worldguard.util.Enums;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -341,24 +338,22 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "usw:",
              desc = "Get information about a region",
              min = 0, max = 1)
-    public void info(CommandContext args, CommandSender sender) throws CommandException {
+    public void info(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
-        Actor actor = plugin.wrapCommandSender(sender);
-        RegionPermissionModel permModel = getPermissionModel(actor);
+        RegionPermissionModel permModel = getPermissionModel(sender);
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion existing;
 
         if (args.argsLength() == 0) { // Get region from where the player is
-            if (!(sender instanceof Player)) {
-                throw new CommandException("Please specify " +
-                        "the region with /region info -w world_name region_name.");
+            if (!(sender instanceof LocalPlayer)) {
+                throw new CommandException("Please specify the region with /region info -w world_name region_name.");
             }
             
-            existing = checkRegionStandingIn(manager, plugin.wrapPlayer((Player) sender), true);
+            existing = checkRegionStandingIn(manager, (LocalPlayer) sender, true);
         } else { // Get region from the ID
             existing = checkExistingRegion(manager, args.getString(0), true);
         }
@@ -375,7 +370,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 throw new CommandPermissionsException();
             }
 
-            setPlayerSelection(plugin.checkPlayer(sender), existing);
+            setPlayerSelection(worldGuard.checkPlayer(sender), existing);
         }
 
         // Print region information
@@ -434,7 +429,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
 
         RegionLister task = new RegionLister(manager, sender);
         task.setPage(page);
@@ -482,11 +477,11 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Add color codes
         if (value != null) {
-            value = CommandUtils.replaceColorMacros(value);
+            value = WorldGuard.getInstance().getPlatform().replaceColorMacros(value);
         }
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), true);
 
         // Check permissions
@@ -630,7 +625,7 @@ public final class RegionCommands extends RegionCommandsBase {
         int priority = args.getInteger(1);
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), false);
 
         // Check permissions
@@ -663,7 +658,7 @@ public final class RegionCommands extends RegionCommandsBase {
         ProtectedRegion child;
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         
         // Get parent and child
         child = checkExistingRegion(manager, args.getString(0), false);
@@ -730,7 +725,7 @@ public final class RegionCommands extends RegionCommandsBase {
         boolean unsetParent = args.hasFlag('u');
 
         // Lookup the existing region
-        RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), true);
 
         // Check permissions
@@ -784,7 +779,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         if (world != null) {
-            RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+            RegionManager manager = checkRegionManager(world);
 
             if (manager == null) {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
@@ -843,7 +838,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         if (world != null) {
-            RegionManager manager = checkRegionManager(BukkitAdapter.adapt(world));
+            RegionManager manager = checkRegionManager(world);
 
             if (manager == null) {
                 throw new CommandException("No region manager exists for world '" + world.getName() + "'.");

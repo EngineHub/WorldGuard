@@ -155,9 +155,9 @@ public final class CommandUtils {
      * @param sender the sender
      * @return a function
      */
-    public static java.util.function.Function<String, ?> messageFunction(final CommandSender sender) {
+    public static java.util.function.Function<String, ?> messageFunction(final Actor sender) {
         return (Function<String, Object>) s -> {
-            sender.sendMessage(s);
+            sender.printRaw(s);
             return null;
         };
     }

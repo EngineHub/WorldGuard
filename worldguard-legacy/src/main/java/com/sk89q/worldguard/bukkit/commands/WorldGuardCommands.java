@@ -31,6 +31,7 @@ import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.util.report.SystemInfoReport;
 import com.sk89q.worldedit.world.World;
@@ -125,7 +126,7 @@ public class WorldGuardCommands {
     
     @Command(aliases = {"report"}, desc = "Writes a report on WorldGuard", flags = "p", max = 0)
     @CommandPermissions({"worldguard.report"})
-    public void report(CommandContext args, final Actor sender) throws CommandException {
+    public void report(CommandContext args, final Actor sender) throws CommandException, AuthorizationException {
         ReportList report = new ReportList("Report");
         report.add(new SystemInfoReport());
         report.add(new ServerReport());
@@ -146,7 +147,7 @@ public class WorldGuardCommands {
         }
         
         if (args.hasFlag('p')) {
-            sender.hasPermission("worldguard.report.pastebin");
+            sender.checkPermission("worldguard.report.pastebin");
             CommandUtils.pastebin(worldGuard, sender, result, "WorldGuard report: %s.report");
         }
     }
@@ -155,13 +156,13 @@ public class WorldGuardCommands {
             desc = "Profile the CPU usage of the server", min = 0, max = 1,
             flags = "t:p")
     @CommandPermissions("worldguard.profile")
-    public void profile(final CommandContext args, final Actor sender) throws CommandException {
+    public void profile(final CommandContext args, final Actor sender) throws CommandException, AuthorizationException {
         Predicate<ThreadInfo> threadFilter;
         String threadName = args.getFlag('t');
         final boolean pastebin;
 
         if (args.hasFlag('p')) {
-            sender.hasPermission("worldguard.report.pastebin");
+            sender.checkPermission("worldguard.report.pastebin");
             pastebin = true;
         } else {
             pastebin = false;

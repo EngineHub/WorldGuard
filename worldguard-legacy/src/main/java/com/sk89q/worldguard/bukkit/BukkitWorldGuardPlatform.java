@@ -26,6 +26,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent;
@@ -66,7 +67,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
 
     @Override
     public String replaceColorMacros(String string) {
-        return BukkitUtil.replaceColorMacros(string);
+        return CommandUtils.replaceColorMacros(string);
     }
 
     public String replaceMacros(Actor sender, String message) {
