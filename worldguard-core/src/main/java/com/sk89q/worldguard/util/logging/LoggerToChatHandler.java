@@ -17,10 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.util.logging;
+package com.sk89q.worldguard.util.logging;
 
 import com.sk89q.worldedit.extension.platform.Actor;
-import org.bukkit.ChatColor;
+import com.sk89q.worldedit.util.formatting.Style;
 
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -62,7 +62,6 @@ public class LoggerToChatHandler extends Handler {
      */
     @Override
     public void publish(LogRecord record) {
-        player.printRaw(ChatColor.GRAY + record.getLevel().getName() + ": "
-                + ChatColor.WHITE + record.getMessage());
+        player.printDebug(record.getLevel().getName() + ": " + Style.WHITE + record.getMessage());
     }
 }

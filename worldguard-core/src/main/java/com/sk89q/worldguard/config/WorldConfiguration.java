@@ -21,6 +21,7 @@ package com.sk89q.worldguard.config;
 
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldedit.util.report.Unreported;
 
@@ -215,5 +216,21 @@ public abstract class WorldConfiguration {
         }
 
         return block;
+    }
+
+    public int getMaxRegionCount(LocalPlayer player) {
+        int max = -1;
+        for (String group : player.getGroups()) {
+            if (maxRegionCounts.containsKey(group)) {
+                int groupMax = maxRegionCounts.get(group);
+                if (max < groupMax) {
+                    max = groupMax;
+                }
+            }
+        }
+        if (max <= -1) {
+            max = maxRegionCountPerPlayer;
+        }
+        return max;
     }
 }

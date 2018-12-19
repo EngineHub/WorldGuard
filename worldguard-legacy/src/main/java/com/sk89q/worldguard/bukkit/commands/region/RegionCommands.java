@@ -35,19 +35,19 @@ import com.sk89q.worldedit.command.util.MessageFutureCallback.Builder;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitRegionContainer;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
-import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
+import com.sk89q.worldguard.commands.region.RegionPrintoutBuilder;
 import com.sk89q.worldguard.commands.task.RegionAdder;
 import com.sk89q.worldguard.commands.task.RegionLister;
 import com.sk89q.worldguard.commands.task.RegionManagerReloader;
 import com.sk89q.worldguard.commands.task.RegionManagerSaver;
 import com.sk89q.worldguard.commands.task.RegionRemover;
 import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -68,9 +68,10 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
 import com.sk89q.worldguard.util.Enums;
-import org.bukkit.ChatColor;
+import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -225,8 +226,7 @@ public final class RegionCommands extends RegionCommandsBase {
         checkRegionDoesNotExist(manager, id, false);
         ProtectedRegion region = checkRegionFromSelection(player, id);
 
-        BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(player.getWorld());
+        WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(player.getWorld());
 
         // Check whether the player has created too many regions
         if (!permModel.mayClaimRegionsUnbounded()) {
@@ -516,9 +516,9 @@ public final class RegionCommands extends RegionCommandsBase {
                 String flag = flagList.get(i);
 
                 if (i % 2 == 0) {
-                    list.append(ChatColor.GRAY);
+                    list.append(Style.GRAY);
                 } else {
-                    list.append(ChatColor.RED);
+                    list.append(Style.RED);
                 }
 
                 list.append(flag);
@@ -569,7 +569,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 throw new CommandException(e.getMessage());
             }
 
-            sender.print("Region flag " + foundFlag.getName() + " set on '" + existing.getId() + "' to '" + ChatColor.stripColor(value) + "'.");
+            sender.print("Region flag " + foundFlag.getName() + " set on '" + existing.getId() + "' to '" + Style.stripColor(value) + "'.");
         
         // No value? Clear the flag, if -g isn't specified
         } else if (!args.hasFlag('g')) {
@@ -601,7 +601,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Print region information
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, null);
-        printout.append(ChatColor.GRAY);
+        printout.append(Style.GRAY);
         printout.append("(Current flags: ");
         printout.appendFlagsList(false);
         printout.append(")");
@@ -680,14 +680,14 @@ public final class RegionCommands extends RegionCommandsBase {
         } catch (CircularInheritanceException e) {
             // Tell the user what's wrong
             RegionPrintoutBuilder printout = new RegionPrintoutBuilder(parent, null);
-            printout.append(ChatColor.RED);
+            printout.append(Style.RED);
             assert parent != null;
             printout.append("Uh oh! Setting '" + parent.getId() + "' to be the parent " +
                     "of '" + child.getId() + "' would cause circular inheritance.\n");
-            printout.append(ChatColor.GRAY);
+            printout.append(Style.GRAY);
             printout.append("(Current inheritance on '" + parent.getId() + "':\n");
             printout.appendParentTree(true);
-            printout.append(ChatColor.GRAY);
+            printout.append(Style.GRAY);
             printout.append(")");
             printout.send(sender);
             return;
@@ -695,13 +695,13 @@ public final class RegionCommands extends RegionCommandsBase {
         
         // Tell the user the current inheritance
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(child, null);
-        printout.append(ChatColor.YELLOW);
+        printout.append(Style.YELLOW);
         printout.append("Inheritance set for region '" + child.getId() + "'.\n");
         if (parent != null) {
-            printout.append(ChatColor.GRAY);
+            printout.append(Style.GRAY);
             printout.append("(Current inheritance:\n");
             printout.appendParentTree(true);
-            printout.append(ChatColor.GRAY);
+            printout.append(Style.GRAY);
             printout.append(")");
         }
         printout.send(sender);
@@ -933,7 +933,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         try {
-            BukkitRegionContainer container = (BukkitRegionContainer) WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
             sender.print("Now performing migration... this may take a while.");
             container.migrate(migration);
             sender.print(
@@ -977,7 +977,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         try {
             ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-            BukkitRegionContainer container = (BukkitRegionContainer) WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionDriver driver = container.getDriver();
             UUIDMigration migration = new UUIDMigration(driver, WorldGuard.getInstance().getProfileService(), WorldGuard.getInstance().getFlagRegistry());
             migration.setKeepUnresolvedNames(config.keepUnresolvedNames);

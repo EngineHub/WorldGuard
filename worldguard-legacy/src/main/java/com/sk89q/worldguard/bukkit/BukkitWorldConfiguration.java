@@ -36,11 +36,9 @@ import com.sk89q.worldguard.blacklist.logger.FileHandler;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
 import com.sk89q.worldguard.bukkit.chest.BukkitSignChestProtection;
-import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.bukkit.internal.TargetMatcherSet;
 import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.config.YamlWorldConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.yaml.snakeyaml.parser.ParserException;
 
@@ -384,10 +382,12 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         config.save();
     }
 
+    @Override
     public Blacklist getBlacklist() {
         return this.blacklist;
     }
 
+    @Override
     public String getWorldName() {
         return this.worldName;
     }
@@ -434,19 +434,4 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         return chestProtection;
     }
 
-    public int getMaxRegionCount(LocalPlayer player) {
-        int max = -1;
-        for (String group : player.getGroups()) {
-            if (maxRegionCounts.containsKey(group)) {
-                int groupMax = maxRegionCounts.get(group);
-                if (max < groupMax) {
-                    max = groupMax;
-                }
-            }
-        }
-        if (max <= -1) {
-            max = maxRegionCountPerPlayer;
-        }
-        return max;
-    }
 }

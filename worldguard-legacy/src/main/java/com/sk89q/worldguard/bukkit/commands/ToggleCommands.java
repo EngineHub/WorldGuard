@@ -24,13 +24,13 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 
 public class ToggleCommands {
@@ -57,7 +57,7 @@ public class ToggleCommands {
 
         if (!wcfg.fireSpreadDisableToggle) {
             plugin.getServer().broadcastMessage(
-                    ChatColor.YELLOW
+                    Style.YELLOW
                     + "Fire spread has been globally disabled for '" + world.getName() + "' by "
                     + sender.getDisplayName() + ".");
         } else {
@@ -83,7 +83,7 @@ public class ToggleCommands {
         WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
-            plugin.getServer().broadcastMessage(ChatColor.YELLOW
+            plugin.getServer().broadcastMessage(Style.YELLOW
                     + "Fire spread has been globally for '" + world.getName() + "' re-enabled by "
                     + sender.getDisplayName() + ".");
         } else {
@@ -115,7 +115,7 @@ public class ToggleCommands {
                 }
 
                 if (!args.hasFlag('s')) {
-                    plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                    plugin.getServer().broadcastMessage(Style.YELLOW
                              + "ALL intensive server activity halted by "
                              + sender.getDisplayName() + ".");
                 } else {
@@ -139,7 +139,7 @@ public class ToggleCommands {
                 }
             } else {
                 if (!args.hasFlag('s')) {
-                    plugin.getServer().broadcastMessage(ChatColor.YELLOW
+                    plugin.getServer().broadcastMessage(Style.YELLOW
                             + "ALL intensive server activity is now allowed.");
                     
                     if (!(sender instanceof LocalPlayer)) {

@@ -31,7 +31,6 @@ import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -113,7 +112,7 @@ public class MemberCommands extends RegionCommandsBase {
             if (flag != null && flag && owners != null && owners.size() == 0) {
                 // TODO: Move this to an event
                 if (!sender.hasPermission("worldguard.region.unlimited")) {
-                    int maxRegionCount = ((BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world)).getMaxRegionCount(player);
+                    int maxRegionCount = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).getMaxRegionCount(player);
                     if (maxRegionCount >= 0 && manager.getRegionCountOfPlayer(player)
                             >= maxRegionCount) {
                         throw new CommandException("You already own the maximum allowed amount of regions.");

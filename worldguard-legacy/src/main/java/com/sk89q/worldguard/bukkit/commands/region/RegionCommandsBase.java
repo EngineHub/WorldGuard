@@ -32,6 +32,7 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
+import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -47,7 +48,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import org.bukkit.ChatColor;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -299,7 +299,7 @@ class RegionCommandsBase {
         if (failures.size() > 0) {
             String failingList = Joiner.on(", ").join(failures.stream().map(regionManager -> "'" + regionManager.getName() + "'").collect(Collectors.toList()));
 
-            sender.printRaw(ChatColor.GOLD +
+            sender.printRaw(Style.YELLOW_DARK +
                     "(Warning: The background saving of region data is failing for these worlds: " + failingList + ". " +
                     "Your changes are getting lost. See the server log for more information.)");
         }
@@ -327,11 +327,11 @@ class RegionCommandsBase {
      */
     protected static void informNewUser(Actor sender, RegionManager manager, ProtectedRegion region) {
         if (manager.getRegions().size() <= 2) {
-            sender.printRaw(ChatColor.GRAY +
+            sender.printRaw(Style.GRAY +
                     "(This region is NOW PROTECTED from modification from others. " +
                     "Don't want that? Use " +
-                    ChatColor.AQUA + "/rg flag " + region.getId() + " passthrough allow" +
-                    ChatColor.GRAY + ")");
+                    Style.CYAN + "/rg flag " + region.getId() + " passthrough allow" +
+                    Style.GRAY + ")");
         }
     }
 

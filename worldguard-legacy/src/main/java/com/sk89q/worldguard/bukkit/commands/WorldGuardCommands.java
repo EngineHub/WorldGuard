@@ -33,14 +33,16 @@ import com.sk89q.worldedit.command.util.AsyncCommandHelper;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldedit.util.paste.ActorCallbackPaste;
 import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.util.report.SystemInfoReport;
+import com.sk89q.worldedit.util.task.Task;
+import com.sk89q.worldedit.util.task.TaskStateComparator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.bukkit.util.report.PerformanceReport;
 import com.sk89q.worldguard.bukkit.util.report.PluginReport;
 import com.sk89q.worldguard.bukkit.util.report.SchedulerReport;
@@ -48,14 +50,12 @@ import com.sk89q.worldguard.bukkit.util.report.ServerReport;
 import com.sk89q.worldguard.bukkit.util.report.ServicesReport;
 import com.sk89q.worldguard.bukkit.util.report.WorldReport;
 import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.util.profiler.SamplerBuilder;
 import com.sk89q.worldguard.util.profiler.SamplerBuilder.Sampler;
 import com.sk89q.worldguard.util.profiler.ThreadIdFilter;
 import com.sk89q.worldguard.util.profiler.ThreadNameFilter;
 import com.sk89q.worldguard.util.report.ConfigReport;
-import com.sk89q.worldedit.util.task.Task;
-import com.sk89q.worldedit.util.task.TaskStateComparator;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -279,18 +279,18 @@ public class WorldGuardCommands {
         if (!tasks.isEmpty()) {
             tasks.sort(new TaskStateComparator());
             StringBuilder builder = new StringBuilder();
-            builder.append(ChatColor.GRAY);
+            builder.append(Style.GRAY);
             builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
             builder.append(" Running tasks ");
             builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
-            builder.append("\n").append(ChatColor.GRAY).append("Note: Some 'running' tasks may be waiting to be start.");
+            builder.append("\n").append(Style.GRAY).append("Note: Some 'running' tasks may be waiting to be start.");
             for (Task task : tasks) {
                 builder.append("\n");
-                builder.append(ChatColor.BLUE).append("(").append(task.getState().name()).append(") ");
-                builder.append(ChatColor.YELLOW);
+                builder.append(Style.BLUE).append("(").append(task.getState().name()).append(") ");
+                builder.append(Style.YELLOW);
                 builder.append(CommandUtils.getOwnerName(task.getOwner()));
                 builder.append(": ");
-                builder.append(ChatColor.WHITE);
+                builder.append(Style.WHITE);
                 builder.append(task.getName());
             }
             sender.printRaw(builder.toString());
