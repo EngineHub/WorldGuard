@@ -27,6 +27,7 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.commands.CommandUtils;
+import com.sk89q.worldguard.internal.platform.DebugHandler;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent;
@@ -46,6 +47,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     private SessionManager sessionManager;
     private BukkitConfigurationManager configuration;
     private BukkitRegionContainer regionContainer;
+    private BukkitDebugHandler debugHandler;
 
     public BukkitWorldGuardPlatform() {
     }
@@ -113,6 +115,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
         configuration.load();
         regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());
         regionContainer.initialize();
+        debugHandler = new BukkitDebugHandler(WorldGuardPlugin.inst());
     }
 
     @Override
@@ -124,6 +127,11 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     @Override
     public RegionContainer getRegionContainer() {
         return this.regionContainer;
+    }
+
+    @Override
+    public DebugHandler getDebugHandler() {
+        return debugHandler;
     }
 
     @Override

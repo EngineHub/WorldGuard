@@ -116,6 +116,13 @@ public interface WorldGuardPlatform {
     RegionContainer getRegionContainer();
 
     /**
+     * Gets the handler for debug commands.
+     *
+     * @return The debug handler
+     */
+    DebugHandler getDebugHandler();
+
+    /**
      * Gets the servers default game mode.
      *
      * @return The default game mode

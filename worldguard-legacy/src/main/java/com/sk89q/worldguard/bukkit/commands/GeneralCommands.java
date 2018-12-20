@@ -91,9 +91,7 @@ public class GeneralCommands {
     @Command(aliases = {"ungod"}, usage = "[player]",
             desc = "Disable godmode on a player", flags = "s", max = 1)
     public void ungod(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
-        ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        
-        Iterable<? extends LocalPlayer> targets = null;
+        Iterable<? extends LocalPlayer> targets;
         boolean included = false;
         
         // Detect arguments based on the number of arguments provided

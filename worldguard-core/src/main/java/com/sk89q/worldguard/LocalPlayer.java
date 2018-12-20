@@ -116,6 +116,20 @@ public interface LocalPlayer extends Player, RegionAssociable {
     void setSaturation(double saturation);
 
     /**
+     * Gets the exhaustion of this player.
+     *
+     * @return The exhaustion
+     */
+    float getExhaustion();
+
+    /**
+     * Sets the exhaustion of this player.
+     *
+     * @param exhaustion The exhaustion
+     */
+    void setExhaustion(float exhaustion);
+
+    /**
      * Gets the players weather
      *
      * @return The players weather
@@ -160,4 +174,19 @@ public interface LocalPlayer extends Player, RegionAssociable {
      * Resets the players time to normal.
      */
     void resetPlayerTime();
+
+    // TODO Move this to WorldEdit's Entity class - honestly most of this class could be a Facet
+    /**
+     * Gets the number of ticks the player is on fire for.
+     *
+     * @return The number of fire ticks
+     */
+    int getFireTicks();
+
+    /**
+     * Sets the number of ticks the player is on fire for.
+     *
+     * @param fireTicks The fire ticks
+     */
+    void setFireTicks(int fireTicks);
 }

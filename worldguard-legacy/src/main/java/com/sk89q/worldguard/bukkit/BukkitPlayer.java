@@ -108,6 +108,16 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
+    public float getExhaustion() {
+        return getPlayer().getExhaustion();
+    }
+
+    @Override
+    public void setExhaustion(float exhaustion) {
+        getPlayer().setExhaustion(exhaustion);
+    }
+
+    @Override
     public WeatherType getPlayerWeather() {
         return null;
     }
@@ -140,6 +150,16 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     @Override
     public void resetPlayerTime() {
         getPlayer().resetPlayerTime();
+    }
+
+    @Override
+    public int getFireTicks() {
+        return getPlayer().getFireTicks();
+    }
+
+    @Override
+    public void setFireTicks(int fireTicks) {
+        getPlayer().setFireTicks(fireTicks);
     }
 
     @Override

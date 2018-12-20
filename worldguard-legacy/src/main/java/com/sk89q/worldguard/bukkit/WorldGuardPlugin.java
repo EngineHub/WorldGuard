@@ -77,7 +77,6 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -670,6 +669,16 @@ public class WorldGuardPlugin extends JavaPlugin {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public CommandSender unwrapActor(Actor sender) {
+        if (sender instanceof BukkitPlayer) {
+            return ((BukkitPlayer) sender).getPlayer();
+        } else if (sender instanceof BukkitCommandSender) {
+            return Bukkit.getConsoleSender(); // TODO Fix
+        } else {
+            throw new IllegalArgumentException("Unknown actor type. Please report");
+        }
     }
 
     /**

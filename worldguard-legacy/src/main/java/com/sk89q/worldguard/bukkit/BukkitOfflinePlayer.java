@@ -103,6 +103,16 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
+    public float getExhaustion() {
+        return 0;
+    }
+
+    @Override
+    public void setExhaustion(float exhaustion) {
+
+    }
+
+    @Override
     public WeatherType getPlayerWeather() {
         return WeatherTypes.CLEAR;
     }

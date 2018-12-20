@@ -23,15 +23,17 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
-import org.bukkit.entity.Entity;
+import com.sk89q.worldguard.util.Entities;
 
 public class ToggleCommands {
     private final WorldGuard worldGuard;
@@ -122,11 +124,11 @@ public class ToggleCommands {
                     sender.print("(Silent) ALL intensive server activity halted by " + sender.getDisplayName() + ".");
                 }
 
-                for (World world : plugin.getServer().getWorlds()) {
+                for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
                     int removed = 0;
 
                     for (Entity entity : world.getEntities()) {
-                        if (BukkitUtil.isIntensiveEntity(entity)) {
+                        if (Entities.isIntensiveEntity(entity)) {
                             entity.remove();
                             removed++;
                         }

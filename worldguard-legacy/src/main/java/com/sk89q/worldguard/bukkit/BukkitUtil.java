@@ -25,18 +25,8 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.blacklist.target.BlockTarget;
 import com.sk89q.worldguard.blacklist.target.ItemTarget;
 import com.sk89q.worldguard.blacklist.target.Target;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Tameable;
 import org.bukkit.inventory.ItemStack;
 
 public class BukkitUtil {
@@ -63,23 +53,6 @@ public class BukkitUtil {
      */
     public static int getPotionEffectBits(ItemStack item) {
         return item.getDurability() & 0x3F;
-    }
-
-    /**
-     * Returns whether an entity should be removed for the halt activity mode.
-     *
-     * @param entity The entity
-     * @return true if it's to be removed
-     */
-    public static boolean isIntensiveEntity(Entity entity) {
-        return entity instanceof Item
-                || entity instanceof TNTPrimed
-                || entity instanceof ExperienceOrb
-                || entity instanceof FallingBlock
-                || (entity instanceof LivingEntity
-                    && !(entity instanceof Tameable)
-                    && !(entity instanceof Player)
-                    && !(entity instanceof ArmorStand));
     }
 
     /**

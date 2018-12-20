@@ -36,7 +36,6 @@ import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -79,7 +78,7 @@ class RegionCommandsBase {
      */
     protected static World checkWorld(CommandContext args, Actor sender, char flag) throws CommandException {
         if (args.hasFlag(flag)) {
-            return WorldGuardPlugin.inst().matchWorld(sender, args.getFlag(flag));
+            return plugin.matchWorld(sender, args.getFlag(flag));
         } else {
             if (sender instanceof LocalPlayer) {
                 return ((LocalPlayer) sender).getWorld();

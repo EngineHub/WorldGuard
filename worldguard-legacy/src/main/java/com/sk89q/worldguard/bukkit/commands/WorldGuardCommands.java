@@ -42,7 +42,6 @@ import com.sk89q.worldedit.util.task.TaskStateComparator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.report.PerformanceReport;
 import com.sk89q.worldguard.bukkit.util.report.PluginReport;
 import com.sk89q.worldguard.bukkit.util.report.SchedulerReport;
@@ -56,7 +55,6 @@ import com.sk89q.worldguard.util.profiler.SamplerBuilder.Sampler;
 import com.sk89q.worldguard.util.profiler.ThreadIdFilter;
 import com.sk89q.worldguard.util.profiler.ThreadNameFilter;
 import com.sk89q.worldguard.util.report.ConfigReport;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -262,11 +260,10 @@ public class WorldGuardCommands {
             WorldGuard.getInstance().getPlatform().getSessionManager().resetAllStates();
             sender.print("Cleared all states.");
         } else {
-            Player player = plugin.getServer().getPlayer(args.getString(0));
+            LocalPlayer player = plugin.matchSinglePlayer(sender, args.getString(0));
             if (player != null) {
-                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-                WorldGuard.getInstance().getPlatform().getSessionManager().resetState(localPlayer);
-                sender.print("Cleared states for player \"" + localPlayer.getName() + "\".");
+                WorldGuard.getInstance().getPlatform().getSessionManager().resetState(player);
+                sender.print("Cleared states for player \"" + player.getName() + "\".");
             }
         }
     }
