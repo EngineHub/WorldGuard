@@ -131,7 +131,7 @@ public final class RegionCommands extends RegionCommandsBase {
         task.addOwnersFromCommand(args, 2);
         ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), player)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), player, worldGuard.getExceptionConverter())
                 .formatUsing(id)
                 .registerWithSupervisor("Adding the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... adding '%s'...)")
@@ -183,7 +183,7 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionAdder task = new RegionAdder(manager, region);
         ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), player)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), player, worldGuard.getExceptionConverter())
                 .formatUsing(id)
                 .registerWithSupervisor("Updating the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... updating '%s'...)")
@@ -284,7 +284,7 @@ public final class RegionCommands extends RegionCommandsBase {
         task.setOwnersInput(new String[]{player.getName()});
         ListenableFuture<?> future = worldGuard.getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), player)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), player, worldGuard.getExceptionConverter())
                 .formatUsing(id)
                 .registerWithSupervisor("Claiming the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... claiming '%s'...)")
@@ -439,7 +439,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(task);
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .registerWithSupervisor("Getting list of regions...")
                 .sendMessageAfterDelay("(Please wait... fetching region list...)")
                 .thenTellErrorsOnly("Failed to fetch region list");
@@ -743,7 +743,7 @@ public final class RegionCommands extends RegionCommandsBase {
             task.setRemovalStrategy(RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
         }
 
-        AsyncCommandHelper.wrap(WorldGuard.getInstance().getExecutorService().submit(task), worldGuard.getSupervisor(), sender)
+        AsyncCommandHelper.wrap(WorldGuard.getInstance().getExecutorService().submit(task), worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(existing.getId())
                 .registerWithSupervisor("Removing the region '%s'...")
                 .sendMessageAfterDelay("(Please wait... removing '%s'...)")
@@ -787,7 +787,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerReloader(manager));
 
-            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
+            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                     .forRegionDataLoad(world, false);
         } else {
             // Load regions for all worlds
@@ -802,7 +802,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerReloader(managers));
 
-            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
+            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                     .registerWithSupervisor("Loading regions for all worlds")
                     .sendMessageAfterDelay("(Please wait... loading region data for all worlds...)")
                     .thenRespondWith(
@@ -846,7 +846,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerSaver(manager));
 
-            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
+            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                     .forRegionDataSave(world, false);
         } else {
             // Save for all worlds
@@ -861,7 +861,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
             ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(new RegionManagerSaver(managers));
 
-            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
+            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                     .registerWithSupervisor("Saving regions for all worlds")
                     .sendMessageAfterDelay("(Please wait... saving region data for all worlds...)")
                     .thenRespondWith(

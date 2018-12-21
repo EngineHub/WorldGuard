@@ -76,7 +76,7 @@ public class MemberCommands extends RegionCommandsBase {
                 WorldGuard.getInstance().getExecutorService().submit(resolver),
                 resolver.createAddAllFunction(region.getMembers()));
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Adding members to the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
@@ -137,7 +137,7 @@ public class MemberCommands extends RegionCommandsBase {
                 WorldGuard.getInstance().getExecutorService().submit(resolver),
                 resolver.createAddAllFunction(region.getOwners()));
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Adding owners to the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
@@ -184,7 +184,7 @@ public class MemberCommands extends RegionCommandsBase {
                     resolver.createRemoveAllFunction(region.getMembers()));
         }
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Removing members from the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
@@ -231,7 +231,7 @@ public class MemberCommands extends RegionCommandsBase {
                     resolver.createRemoveAllFunction(region.getOwners()));
         }
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Removing owners from the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")

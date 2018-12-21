@@ -138,7 +138,7 @@ public class WorldGuardCommands {
         
         if (args.hasFlag('p')) {
             sender.checkPermission("worldguard.report.pastebin");
-            ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, result, "WorldGuard report: %s.report");
+            ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, result, "WorldGuard report: %s.report", worldGuard.getExceptionConverter());
         }
     }
 
@@ -191,7 +191,7 @@ public class WorldGuardCommands {
             sampler = activeSampler = builder.start();
         }
 
-        AsyncCommandHelper.wrap(sampler.getFuture(), worldGuard.getSupervisor(), sender)
+        AsyncCommandHelper.wrap(sampler.getFuture(), worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(minutes)
                 .registerWithSupervisor("Running CPU profiler for %d minute(s)...")
                 .sendMessageAfterDelay("(Please wait... profiling for %d minute(s)...)")
@@ -217,7 +217,7 @@ public class WorldGuardCommands {
                 }
 
                 if (pastebin) {
-                    ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, output, "Profile result: %s.profile");
+                    ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, output, "Profile result: %s.profile", worldGuard.getExceptionConverter());
                 }
             }
 
