@@ -223,7 +223,7 @@ public class WorldGuard {
             return version;
         }
 
-        Package p = WorldEdit.class.getPackage();
+        Package p = WorldGuard.class.getPackage();
 
         if (p == null) {
             p = Package.getPackage("com.sk89q.worldguard");
