@@ -35,7 +35,7 @@ class LazyLocation extends Location {
 
     @Nullable
     private static World findWorld(String worldName) {
-        return WorldGuard.getInstance().getPlatform().getWorldByName(worldName);
+        return WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(worldName);
     }
 
     public LazyLocation(String worldName, Vector3 position, float yaw, float pitch) {

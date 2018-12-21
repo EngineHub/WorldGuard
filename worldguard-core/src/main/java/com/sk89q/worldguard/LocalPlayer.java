@@ -20,6 +20,7 @@
 package com.sk89q.worldguard;
 
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
@@ -189,4 +190,11 @@ public interface LocalPlayer extends Player, RegionAssociable {
      * @param fireTicks The fire ticks
      */
     void setFireTicks(int fireTicks);
+
+    /**
+     * Sets the target of the compass
+     *
+     * @param location The location
+     */
+    void setCompassTarget(Location location);
 }

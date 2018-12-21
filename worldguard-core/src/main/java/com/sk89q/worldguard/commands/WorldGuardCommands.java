@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.commands;
 
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.FutureCallback;
@@ -42,12 +42,6 @@ import com.sk89q.worldedit.util.task.TaskStateComparator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.util.report.PerformanceReport;
-import com.sk89q.worldguard.bukkit.util.report.PluginReport;
-import com.sk89q.worldguard.bukkit.util.report.SchedulerReport;
-import com.sk89q.worldguard.bukkit.util.report.ServerReport;
-import com.sk89q.worldguard.bukkit.util.report.ServicesReport;
-import com.sk89q.worldguard.bukkit.util.report.WorldReport;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
 import com.sk89q.worldguard.util.profiler.SamplerBuilder;
@@ -70,8 +64,6 @@ import javax.annotation.Nullable;
 
 public class WorldGuardCommands {
 
-    private static final Logger log = Logger.getLogger(WorldGuardCommands.class.getCanonicalName());
-
     private final WorldGuard worldGuard;
     @Nullable
     private Sampler activeSampler;
@@ -82,8 +74,11 @@ public class WorldGuardCommands {
 
     @Command(aliases = {"version"}, desc = "Get the WorldGuard version", max = 0)
     public void version(CommandContext args, Actor sender) throws CommandException {
-        sender.print("WorldGuard " + plugin.getDescription().getVersion());
+        sender.print("WorldGuard " + WorldGuard.getVersion());
         sender.print("http://www.enginehub.org");
+
+        sender.printDebug("----------- Platforms -----------");
+        sender.printDebug(String.format("* %s (%s)", worldGuard.getPlatform().getPlatformName(), worldGuard.getPlatform().getPlatformVersion()));
     }
 
     @Command(aliases = {"reload"}, desc = "Reload WorldGuard configuration", max = 0)
@@ -128,13 +123,8 @@ public class WorldGuardCommands {
     @CommandPermissions({"worldguard.report"})
     public void report(CommandContext args, final Actor sender) throws CommandException, AuthorizationException {
         ReportList report = new ReportList("Report");
+        worldGuard.getPlatform().addPlatformReports(report);
         report.add(new SystemInfoReport());
-        report.add(new ServerReport());
-        report.add(new PluginReport());
-        report.add(new SchedulerReport());
-        report.add(new ServicesReport());
-        report.add(new WorldReport());
-        report.add(new PerformanceReport());
         report.add(new ConfigReport());
         String result = report.toString();
 
@@ -260,7 +250,7 @@ public class WorldGuardCommands {
             WorldGuard.getInstance().getPlatform().getSessionManager().resetAllStates();
             sender.print("Cleared all states.");
         } else {
-            LocalPlayer player = plugin.matchSinglePlayer(sender, args.getString(0));
+            LocalPlayer player = worldGuard.getPlatform().getMatcher().matchSinglePlayer(sender, args.getString(0));
             if (player != null) {
                 WorldGuard.getInstance().getPlatform().getSessionManager().resetState(player);
                 sender.print("Cleared states for player \"" + player.getName() + "\".");

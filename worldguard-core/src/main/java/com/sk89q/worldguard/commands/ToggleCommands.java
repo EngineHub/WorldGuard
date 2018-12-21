@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.commands;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -52,13 +52,13 @@ public class ToggleCommands {
         if (args.argsLength() == 0) {
             world = worldGuard.checkPlayer(sender).getWorld();
         } else {
-            world = worldGuard.matchWorld(sender, args.getString(0));
+            world = worldGuard.getPlatform().getMatcher().matchWorld(sender, args.getString(0));
         }
         
         WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
         if (!wcfg.fireSpreadDisableToggle) {
-            plugin.getServer().broadcastMessage(
+            worldGuard.getPlatform().broadcastNotification(
                     Style.YELLOW
                     + "Fire spread has been globally disabled for '" + world.getName() + "' by "
                     + sender.getDisplayName() + ".");
@@ -77,15 +77,15 @@ public class ToggleCommands {
         World world;
         
         if (args.argsLength() == 0) {
-            world = plugin.checkPlayer(sender).getWorld();
+            world = worldGuard.checkPlayer(sender).getWorld();
         } else {
-            world = plugin.matchWorld(sender, args.getString(0));
+            world = worldGuard.getPlatform().getMatcher().matchWorld(sender, args.getString(0));
         }
         
         WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
-            plugin.getServer().broadcastMessage(Style.YELLOW
+            worldGuard.getPlatform().broadcastNotification(Style.YELLOW
                     + "Fire spread has been globally for '" + world.getName() + "' re-enabled by "
                     + sender.getDisplayName() + ".");
         } else {
@@ -117,7 +117,7 @@ public class ToggleCommands {
                 }
 
                 if (!args.hasFlag('s')) {
-                    plugin.getServer().broadcastMessage(Style.YELLOW
+                    worldGuard.getPlatform().broadcastNotification(Style.YELLOW
                              + "ALL intensive server activity halted by "
                              + sender.getDisplayName() + ".");
                 } else {
@@ -141,7 +141,7 @@ public class ToggleCommands {
                 }
             } else {
                 if (!args.hasFlag('s')) {
-                    plugin.getServer().broadcastMessage(Style.YELLOW
+                    worldGuard.getPlatform().broadcastNotification(Style.YELLOW
                             + "ALL intensive server activity is now allowed.");
                     
                     if (!(sender instanceof LocalPlayer)) {

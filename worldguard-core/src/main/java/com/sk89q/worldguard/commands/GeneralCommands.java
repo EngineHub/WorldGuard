@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.commands;
 
 import com.google.common.collect.Lists;
 import com.sk89q.minecraft.util.commands.Command;
@@ -25,14 +25,12 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GodMode;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class GeneralCommands {
     private final WorldGuard worldGuard;
@@ -44,19 +42,17 @@ public class GeneralCommands {
     @Command(aliases = {"god"}, usage = "[player]",
             desc = "Enable godmode on a player", flags = "s", max = 1)
     public void god(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
-        ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        
         Iterable<? extends LocalPlayer> targets = null;
         boolean included = false;
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(worldGuard.checkPlayer(sender));
+            targets = worldGuard.getPlatform().getMatcher().matchPlayers(worldGuard.checkPlayer(sender));
             
             // Check permissions!
             sender.checkPermission("worldguard.god");
         } else {
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = worldGuard.getPlatform().getMatcher().matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             sender.checkPermission("worldguard.god.other");
@@ -96,12 +92,12 @@ public class GeneralCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(worldGuard.checkPlayer(sender));
+            targets = worldGuard.getPlatform().getMatcher().matchPlayers(worldGuard.checkPlayer(sender));
             
             // Check permissions!
             sender.checkPermission("worldguard.god");
         } else {
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = worldGuard.getPlatform().getMatcher().matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             sender.checkPermission("worldguard.god.other");
@@ -139,12 +135,12 @@ public class GeneralCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(plugin.checkPlayer(sender));
+            targets = worldGuard.getPlatform().getMatcher().matchPlayers(worldGuard.checkPlayer(sender));
             
             // Check permissions!
             sender.checkPermission("worldguard.heal");
         } else if (args.argsLength() == 1) {            
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = worldGuard.getPlatform().getMatcher().matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             sender.checkPermission("worldguard.heal.other");
@@ -183,12 +179,12 @@ public class GeneralCommands {
         
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
-            targets = plugin.matchPlayers(worldGuard.checkPlayer(sender));
+            targets = worldGuard.getPlatform().getMatcher().matchPlayers(worldGuard.checkPlayer(sender));
             
             // Check permissions!
             sender.checkPermission("worldguard.slay");
         } else if (args.argsLength() == 1) {            
-            targets = plugin.matchPlayers(sender, args.getString(0));
+            targets = worldGuard.getPlatform().getMatcher().matchPlayers(sender, args.getString(0));
             
             // Check permissions!
             sender.checkPermission("worldguard.slay.other");
@@ -222,11 +218,11 @@ public class GeneralCommands {
         LocalPlayer player = worldGuard.checkPlayer(sender);
         
         if (args.argsLength() == 0) {
-            player.setCompassTarget(player.getWorld().getSpawnLocation());
+            player.setCompassTarget(new Location(player.getWorld(), player.getWorld().getSpawnPosition().toVector3()));
             
             sender.print("Compass reset to spawn.");
         } else {
-            Player target = plugin.matchSinglePlayer(sender, args.getString(0));
+            LocalPlayer target = worldGuard.getPlatform().getMatcher().matchSinglePlayer(sender, args.getString(0));
             player.setCompassTarget(target.getLocation());
             
             sender.print("Compass repointed.");
@@ -237,66 +233,8 @@ public class GeneralCommands {
     @CommandPermissions({"worldguard.stack"})
     public void stack(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
-        boolean ignoreMax = player.hasPermission("worldguard.stack.illegitimate");
-        boolean ignoreDamaged = player.hasPermission("worldguard.stack.damaged");
 
-        ItemStack[] items = player.getInventory().getContents();
-        int len = items.length;
-
-        int affected = 0;
-        
-        for (int i = 0; i < len; i++) {
-            ItemStack item = items[i];
-
-            // Avoid infinite stacks and stacks with durability
-            if (item == null || item.getAmount() <= 0
-                    || (!ignoreMax && item.getMaxStackSize() == 1)) {
-                continue;
-            }
-
-            int max = ignoreMax ? 64 : item.getMaxStackSize();
-
-            if (item.getAmount() < max) {
-                int needed = max - item.getAmount(); // Number of needed items until max
-
-                // Find another stack of the same type
-                for (int j = i + 1; j < len; j++) {
-                    ItemStack item2 = items[j];
-
-                    // Avoid infinite stacks and stacks with durability
-                    if (item2 == null || item2.getAmount() <= 0
-                            || (!ignoreMax && item.getMaxStackSize() == 1)) {
-                        continue;
-                    }
-
-                    // Same type?
-                    // Blocks store their color in the damage value
-                    if (item2.getType() == item.getType() &&
-                            (ignoreDamaged || item.getDurability() == item2.getDurability()) &&
-                                    ((item.getItemMeta() == null && item2.getItemMeta() == null)
-                                            || (item.getItemMeta() != null &&
-                                                item.getItemMeta().equals(item2.getItemMeta())))) {
-                        // This stack won't fit in the parent stack
-                        if (item2.getAmount() > needed) {
-                            item.setAmount(max);
-                            item2.setAmount(item2.getAmount() - needed);
-                            break;
-                        // This stack will
-                        } else {
-                            items[j] = null;
-                            item.setAmount(item.getAmount() + item2.getAmount());
-                            needed = max - item.getAmount();
-                        }
-
-                        affected++;
-                    }
-                }
-            }
-        }
-
-        if (affected > 0) {
-            player.getInventory().setContents(items);
-        }
+        WorldGuard.getInstance().getPlatform().stackPlayerInventory(player);
 
         player.print("Items compacted into stacks!");
     }

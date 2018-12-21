@@ -17,15 +17,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.commands;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.commands.region.MemberCommands;
-import com.sk89q.worldguard.bukkit.commands.region.RegionCommands;
+import com.sk89q.worldguard.commands.region.MemberCommands;
+import com.sk89q.worldguard.commands.region.RegionCommands;
 
 public class ProtectionCommands {
     @SuppressWarnings("unused")

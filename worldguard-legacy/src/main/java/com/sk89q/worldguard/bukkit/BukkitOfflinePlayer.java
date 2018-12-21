@@ -213,6 +213,11 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
+    public void setCompassTarget(Location location) {
+
+    }
+
+    @Override
     public SessionKey getSessionKey() {
         return null;
     }

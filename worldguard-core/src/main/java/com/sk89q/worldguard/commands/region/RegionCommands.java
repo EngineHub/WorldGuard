@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands.region;
+package com.sk89q.worldguard.commands.region;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,7 +28,6 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.command.util.AsyncCommandHelper;
 import com.sk89q.worldedit.command.util.FutureProgressListener;
 import com.sk89q.worldedit.command.util.MessageFutureCallback.Builder;
@@ -39,8 +38,7 @@ import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.commands.CommandUtils;
-import com.sk89q.worldguard.commands.region.RegionPrintoutBuilder;
+import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.commands.task.RegionAdder;
 import com.sk89q.worldguard.commands.task.RegionLister;
 import com.sk89q.worldguard.commands.task.RegionManagerReloader;
@@ -479,7 +477,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Add color codes
         if (value != null) {
-            value = WorldGuard.getInstance().getPlatform().replaceColorMacros(value);
+            value = CommandUtils.replaceColorMacros(value);
         }
 
         // Lookup the existing region
@@ -1031,12 +1029,11 @@ public final class RegionCommands extends RegionCommandsBase {
             teleportLocation = existing.getFlag(Flags.TELE_LOC);
             
             if (teleportLocation == null) {
-                throw new CommandException(
-                        "The region has no teleport point associated.");
+                throw new CommandException("The region has no teleport point associated.");
             }
         }
 
-        player.teleport(BukkitAdapter.adapt(teleportLocation));
+        player.setLocation(teleportLocation);
         sender.print("Teleported you to the region '" + existing.getId() + "'.");
     }
 }

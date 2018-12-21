@@ -17,14 +17,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.commands;
 
 import com.google.common.base.Function;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.Style;
-import org.bukkit.command.BlockCommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 
@@ -93,12 +90,8 @@ public final class CommandUtils {
     public static String getOwnerName(@Nullable Object owner) {
         if (owner == null) {
             return "?";
-        } else if (owner instanceof Player) {
-            return ((Player) owner).getName();
-        } else if (owner instanceof ConsoleCommandSender) {
-            return "*CONSOLE*";
-        } else if (owner instanceof BlockCommandSender) {
-            return ((BlockCommandSender) owner).getBlock().getLocation().toString();
+        } else if (owner instanceof Actor) {
+            return ((Actor) owner).getName();
         } else {
             return "?";
         }

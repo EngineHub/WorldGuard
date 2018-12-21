@@ -19,8 +19,28 @@
 
 package com.sk89q.worldguard.bukkit.util;
 
-import com.sk89q.worldguard.util.Enums;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Ambient;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.EnderCrystal;
+import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Flying;
+import org.bukkit.entity.Hanging;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.NPC;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Shulker;
+import org.bukkit.entity.Slime;
+import org.bukkit.entity.SpectralArrow;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Tameable;
+import org.bukkit.entity.TippedArrow;
+import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.WaterMob;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.projectiles.ProjectileSource;
 
@@ -120,10 +140,6 @@ public final class Entities {
         return entity;
     }
 
-
-    private static final EntityType shulkerType =
-            Enums.findByValue(EntityType.class, "SHULKER");
-
     /**
      * Test whether an entity is hostile.
      *
@@ -135,7 +151,7 @@ public final class Entities {
                 || entity instanceof Slime
                 || entity instanceof Flying
                 || entity instanceof EnderDragon
-                || entity.getType() == shulkerType;
+                || entity instanceof Shulker;
     }
 
     /**
@@ -180,11 +196,6 @@ public final class Entities {
         return entity instanceof LivingEntity && !(entity instanceof Player);
     }
 
-    public static final EntityType armorStandType =
-            Enums.findByValue(EntityType.class, "ARMOR_STAND");
-    public static final EntityType enderCrystalType =
-            Enums.findByValue(EntityType.class, "ENDER_CRYSTAL");
-
     /**
      * Test whether using the given entity should be considered "building"
      * rather than merely using an entity.
@@ -194,19 +205,15 @@ public final class Entities {
      */
     public static boolean isConsideredBuildingIfUsed(Entity entity) {
         return entity instanceof Hanging
-                || entity.getType() == armorStandType
-                || entity.getType() == enderCrystalType;
+                || entity instanceof ArmorStand
+                || entity instanceof EnderCrystal;
     }
 
-    private static final EntityType tippedArrow = Enums.findByValue(EntityType.class, "TIPPED_ARROW");
-    private static final EntityType spectralArrow = Enums.findByValue(EntityType.class, "SPECTRAL_ARROW");
     public static boolean isPotionArrow(Entity entity) {
-        return (entity != null &&
-                (entity.getType() == tippedArrow || entity.getType() == spectralArrow));
+        return entity instanceof TippedArrow || entity instanceof SpectralArrow;
     }
 
-    private static final EntityType aoeCloud = Enums.findByValue(EntityType.class, "AREA_EFFECT_CLOUD");
     public static boolean isAoECloud(EntityType type) {
-        return type == aoeCloud;
+        return type == EntityType.AREA_EFFECT_CLOUD;
     }
 }

@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands.region;
+package com.sk89q.worldguard.commands.region;
 
 import com.google.common.base.Joiner;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -78,7 +78,7 @@ class RegionCommandsBase {
      */
     protected static World checkWorld(CommandContext args, Actor sender, char flag) throws CommandException {
         if (args.hasFlag(flag)) {
-            return plugin.matchWorld(sender, args.getFlag(flag));
+            return WorldGuard.getInstance().getPlatform().getMatcher().matchWorld(sender, args.getFlag(flag));
         } else {
             if (sender instanceof LocalPlayer) {
                 return ((LocalPlayer) sender).getWorld();

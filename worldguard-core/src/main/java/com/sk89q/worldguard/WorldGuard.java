@@ -33,6 +33,7 @@ import com.sk89q.squirrelid.resolver.CacheForwardingService;
 import com.sk89q.squirrelid.resolver.CombinedProfileService;
 import com.sk89q.squirrelid.resolver.HttpRepositoryService;
 import com.sk89q.squirrelid.resolver.ProfileService;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.task.SimpleSupervisor;
 import com.sk89q.worldedit.util.task.Supervisor;
@@ -56,7 +57,9 @@ public class WorldGuard {
 
     public static final Logger logger = Logger.getLogger(WorldGuard.class.getCanonicalName());
 
+    private static String version;
     private static final WorldGuard instance = new WorldGuard();
+
     private WorldGuardPlatform platform;
     private final SimpleFlagRegistry flagRegistry = new SimpleFlagRegistry();
     private final Supervisor supervisor = new SimpleSupervisor();
@@ -209,4 +212,34 @@ public class WorldGuard {
 
         platform.unload();
     }
+
+    /**
+     * Get the version.
+     *
+     * @return the version of WorldEdit
+     */
+    public static String getVersion() {
+        if (version != null) {
+            return version;
+        }
+
+        Package p = WorldEdit.class.getPackage();
+
+        if (p == null) {
+            p = Package.getPackage("com.sk89q.worldguard");
+        }
+
+        if (p == null) {
+            version = "(unknown)";
+        } else {
+            version = p.getImplementationVersion();
+
+            if (version == null) {
+                version = "(unknown)";
+            }
+        }
+
+        return version;
+    }
+
 }

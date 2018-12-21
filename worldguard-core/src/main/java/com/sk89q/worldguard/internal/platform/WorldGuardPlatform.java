@@ -19,9 +19,9 @@
 
 package com.sk89q.worldguard.internal.platform;
 
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.world.gamemode.GameMode;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -33,6 +33,20 @@ import java.nio.file.Path;
  * A platform for implementing.
  */
 public interface WorldGuardPlatform {
+
+    /**
+     * Gets the name of the platform.
+     *
+     * @return The platform name
+     */
+    String getPlatformName();
+
+    /**
+     * Gets the version of the platform.
+     *
+     * @return The platform version
+     */
+    String getPlatformVersion();
 
     /**
      * Notifies the platform when a flag context is created.
@@ -50,37 +64,12 @@ public interface WorldGuardPlatform {
     ConfigurationManager getGlobalStateManager();
 
     /**
-     * Gets a world by name, if possible.
+     * Gets an instance of the matcher, which handles matching
+     * worlds, players, colours, etc from strings.
      *
-     * @param worldName The name
-     * @return The world
+     * @return The matcher
      */
-    World getWorldByName(String worldName);
-
-    /**
-     * Replaces colour macros.
-     *
-     * @param string The string
-     * @return The replaced string
-     */
-    String replaceColorMacros(String string);
-
-    /**
-     * Replace macros in the text.
-     *
-     * The macros replaced are as follows:
-     * %name%: The name of {@code sender}.
-     * %id%: The unique name of the sender.
-     * %online%: The number of players currently online on the server
-     * If {@code sender} is a Player:
-     * %world%: The name of the world {@code sender} is located in
-     * %health%: The health of {@code sender}.
-     *
-     * @param sender The sender to check
-     * @param message The message to replace macros in
-     * @return The message with macros replaced
-     */
-    String replaceMacros(Actor sender, String message);
+    StringMatcher getMatcher();
 
     /**
      * Gets the session manager.
@@ -135,4 +124,18 @@ public interface WorldGuardPlatform {
      * @return The config directory
      */
     Path getConfigDir();
+
+    /**
+     * Stack the inventory of the player
+     *
+     * @param localPlayer The player
+     */
+    void stackPlayerInventory(LocalPlayer localPlayer);
+
+    /**
+     * Adds reports specific to this platform.
+     *
+     * @param report The reportlist
+     */
+    void addPlatformReports(ReportList report);
 }

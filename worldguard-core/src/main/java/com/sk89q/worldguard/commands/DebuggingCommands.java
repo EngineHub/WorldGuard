@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.commands;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -43,7 +43,7 @@ public class DebuggingCommands {
     @Command(aliases = {"testbreak"}, usage = "[player]", desc = "Simulate a block break", min = 1, max = 1, flags = "ts")
     @CommandPermissions("worldguard.debug.event")
     public void fireBreakEvent(CommandContext args, final Actor sender) throws CommandException {
-        LocalPlayer target = plugin.matchSinglePlayer(sender, args.getString(0));
+        LocalPlayer target = worldGuard.getPlatform().getMatcher().matchSinglePlayer(sender, args.getString(0));
         worldGuard.getPlatform().getDebugHandler().testBreak(sender, target, args.hasFlag('t'), args.hasFlag('s'));
     }
 
@@ -51,21 +51,21 @@ public class DebuggingCommands {
     @Command(aliases = {"testplace"}, usage = "[player]", desc = "Simulate a block place", min = 1, max = 1, flags = "ts")
     @CommandPermissions("worldguard.debug.event")
     public void firePlaceEvent(CommandContext args, final Actor sender) throws CommandException {
-        LocalPlayer target = plugin.matchSinglePlayer(sender, args.getString(0));
+        LocalPlayer target = worldGuard.getPlatform().getMatcher().matchSinglePlayer(sender, args.getString(0));
         worldGuard.getPlatform().getDebugHandler().testPlace(sender, target, args.hasFlag('t'), args.hasFlag('s'));
     }
 
     @Command(aliases = {"testinteract"}, usage = "[player]", desc = "Simulate a block interact", min = 1, max = 1, flags = "ts")
     @CommandPermissions("worldguard.debug.event")
     public void fireInteractEvent(CommandContext args, final Actor sender) throws CommandException {
-        LocalPlayer target = plugin.matchSinglePlayer(sender, args.getString(0));
+        LocalPlayer target = worldGuard.getPlatform().getMatcher().matchSinglePlayer(sender, args.getString(0));
         worldGuard.getPlatform().getDebugHandler().testInteract(sender, target, args.hasFlag('t'), args.hasFlag('s'));
     }
 
     @Command(aliases = {"testdamage"}, usage = "[player]", desc = "Simulate an entity damage", min = 1, max = 1, flags = "ts")
     @CommandPermissions("worldguard.debug.event")
     public void fireDamageEvent(CommandContext args, final Actor sender) throws CommandException {
-        LocalPlayer target = plugin.matchSinglePlayer(sender, args.getString(0));
+        LocalPlayer target = worldGuard.getPlatform().getMatcher().matchSinglePlayer(sender, args.getString(0));
         worldGuard.getPlatform().getDebugHandler().testDamage(sender, target, args.hasFlag('t'), args.hasFlag('s'));
     }
 }

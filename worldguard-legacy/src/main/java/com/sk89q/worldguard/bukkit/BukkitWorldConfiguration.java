@@ -27,7 +27,6 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.blacklist.BlacklistLoggerHandler;
 import com.sk89q.worldguard.blacklist.logger.ConsoleHandler;
@@ -38,6 +37,7 @@ import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
 import com.sk89q.worldguard.bukkit.chest.BukkitSignChestProtection;
 import com.sk89q.worldguard.bukkit.internal.TargetMatcherSet;
 import com.sk89q.worldguard.chest.ChestProtection;
+import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.config.YamlWorldConfiguration;
 import org.bukkit.potion.PotionEffectType;
 import org.yaml.snakeyaml.parser.ParserException;
@@ -140,7 +140,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         opPermissions = getBoolean("op-permissions", true);
 
         buildPermissions = getBoolean("build-permission-nodes.enable", false);
-        buildPermissionDenyMessage = WorldGuard.getInstance().getPlatform().replaceColorMacros(
+        buildPermissionDenyMessage = CommandUtils.replaceColorMacros(
                 getString("build-permission-nodes.deny-message", "&eSorry, but you are not permitted to do that here."));
 
         strictEntitySpawn = getBoolean("event-handling.block-entity-spawns-with-untraceable-cause", false);
