@@ -213,6 +213,11 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
+    public boolean setLocation(Location location) {
+        return false;
+    }
+
+    @Override
     public SessionKey getSessionKey() {
         return null;
     }
