@@ -26,6 +26,7 @@ import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -109,7 +110,7 @@ public class WorldGuardEntityListener implements Listener {
         Block block = event.getBlock();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(entity.getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(entity.getWorld()));
 
         if (block.getType() == Material.FARMLAND) {
             if (/* entity instanceof Creature && // catch for any entity (not thrown for players) */
@@ -121,8 +122,8 @@ public class WorldGuardEntityListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDeath(EntityDeathEvent event) {
-        BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(event.getEntity().getWorld()));
+        WorldConfiguration wcfg =
+                WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(event.getEntity().getWorld()));
 
         if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
             ((PlayerDeathEvent) event).setDeathMessage("");
@@ -134,7 +135,7 @@ public class WorldGuardEntityListener implements Listener {
         DamageCause type = event.getCause();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(defender.getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(defender.getWorld()));
 
         if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
             if (wcfg.antiWolfDumbness && !(type == DamageCause.VOID)) {
@@ -201,8 +202,8 @@ public class WorldGuardEntityListener implements Listener {
         Entity attacker = event.getDamager();
         Entity defender = event.getEntity();
 
-        BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(defender.getWorld()));
+        WorldConfiguration wcfg =
+                WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(defender.getWorld()));
 
         if (defender instanceof ItemFrame) {
             if (checkItemFrameProtection(attacker, (ItemFrame) defender)) {
@@ -297,7 +298,7 @@ public class WorldGuardEntityListener implements Listener {
         }
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(defender.getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(defender.getWorld()));
         if (defender instanceof Player) {
             Player player = (Player) defender;
             LocalPlayer localPlayer = plugin.wrapPlayer(player);
@@ -366,7 +367,7 @@ public class WorldGuardEntityListener implements Listener {
         DamageCause type = event.getCause();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(defender.getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(defender.getWorld()));
 
         if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
             if (wcfg.antiWolfDumbness) {
@@ -567,7 +568,7 @@ public class WorldGuardEntityListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onExplosionPrime(ExplosionPrimeEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
         Entity ent = event.getEntity();
 
         if (cfg.activityHaltToggle) {
@@ -614,7 +615,7 @@ public class WorldGuardEntityListener implements Listener {
             return;
         }
 
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
 
         // allow spawning of creatures from plugins
         if (!wcfg.blockPluginSpawning && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) {
@@ -670,7 +671,7 @@ public class WorldGuardEntityListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatePortal(EntityCreatePortalEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
 
         switch (event.getEntityType()) {
             case ENDER_DRAGON:
@@ -682,7 +683,7 @@ public class WorldGuardEntityListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPigZap(PigZapEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
 
         if (wcfg.disablePigZap) {
             event.setCancelled(true);
@@ -692,7 +693,7 @@ public class WorldGuardEntityListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreeperPower(CreeperPowerEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
 
         if (wcfg.disableCreeperPower) {
             event.setCancelled(true);
@@ -706,7 +707,7 @@ public class WorldGuardEntityListener implements Listener {
         World world = ent.getWorld();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         if (wcfg.disableHealthRegain) {
             event.setCancelled(true);
@@ -726,7 +727,7 @@ public class WorldGuardEntityListener implements Listener {
         Location location = block.getLocation();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(ent.getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(ent.getWorld()));
         if (ent instanceof Enderman) {
             if (wcfg.disableEndermanGriefing) {
                 event.setCancelled(true);
@@ -768,7 +769,7 @@ public class WorldGuardEntityListener implements Listener {
     private boolean checkItemFrameProtection(Entity attacker, ItemFrame defender) {
         World world = attacker.getWorld();
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
         if (wcfg.useRegions) {
             // bukkit throws this event when a player attempts to remove an item from a frame
             if (!(attacker instanceof Player)) {

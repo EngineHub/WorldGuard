@@ -21,9 +21,9 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -74,7 +74,7 @@ public class WorldGuardHangingListener implements Listener {
         Hanging hanging = event.getEntity();
         World world = hanging.getWorld();
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         if (event instanceof HangingBreakByEntityEvent) {
             HangingBreakByEntityEvent entityEvent = (HangingBreakByEntityEvent) event;

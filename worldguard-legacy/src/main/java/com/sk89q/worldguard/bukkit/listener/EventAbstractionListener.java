@@ -47,6 +47,7 @@ import com.sk89q.worldguard.bukkit.util.Blocks;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -162,10 +163,6 @@ public class EventAbstractionListener extends AbstractListener {
         try {
             getPlugin().getServer().getPluginManager().registerEvents(new SpigotCompatListener(), getPlugin());
         } catch (LinkageError ignored) {
-        }
-        try {
-            getPlugin().getServer().getPluginManager().registerEvents(new LingeringPotionListener(), getPlugin());
-        } catch (NoClassDefFoundError ignored) {
         }
     }
 
@@ -463,7 +460,7 @@ public class EventAbstractionListener extends AbstractListener {
                 // emit a "use block here" event where the player is
                 // standing, which is a hack to protect items that don't
                 // throw events
-                if (item != null && getWorldConfig(BukkitAdapter.adapt(player.getWorld())).blockUseAtFeet.test(item)) {
+                if (item != null && ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(player.getWorld()))).blockUseAtFeet.test(item)) {
                     if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, player.getLocation().getBlock()))) {
                         event.setCancelled(true);
                     }
@@ -570,7 +567,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent event) {
-        BukkitWorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getBlock().getWorld()));
+        WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getBlock().getWorld()));
 
         // This only applies to regions but nothing else cares about high
         // frequency events at the moment
@@ -939,6 +936,23 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onLingeringSplash(LingeringPotionSplashEvent event) {
+        AreaEffectCloud aec = event.getAreaEffectCloud();
+        LingeringPotion potion = event.getEntity();
+        World world = potion.getWorld();
+        Cause cause = create(event.getEntity());
+
+        // Fire item interaction event
+        Events.fireToCancel(event, new UseItemEvent(event, cause, world, potion.getItem()));
+
+        // Fire entity spawn event
+        if (!event.isCancelled()) {
+            // radius unfortunately doesn't go through with this, so only a single location is tested
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, aec.getLocation().add(0.5, 0, 0.5), EntityType.AREA_EFFECT_CLOUD));
+        }
+    }
+
     /**
      * Handle the right click of a block while an item is held.
      *
@@ -1027,11 +1041,11 @@ public class EventAbstractionListener extends AbstractListener {
     }
 
     private boolean hasInteractBypass(Block block) {
-        return getWorldConfig(BukkitAdapter.adapt(block.getWorld())).allowAllInteract.test(block);
+        return ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(block.getWorld()))).allowAllInteract.test(block);
     }
 
     private boolean hasInteractBypass(World world, ItemStack item) {
-        return getWorldConfig(BukkitAdapter.adapt(world)).allowAllInteract.test(item);
+        return ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(world))).allowAllInteract.test(item);
     }
 
     private boolean isBlockModifiedOnClick(Block block, boolean rightClick) {
@@ -1067,25 +1081,6 @@ public class EventAbstractionListener extends AbstractListener {
         public void onBlockExplode(BlockExplodeEvent event) {
             Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(event.getBlock()),
                     event.getBlock().getLocation().getWorld(), event.blockList(), Material.AIR));
-        }
-    }
-
-    public class LingeringPotionListener implements Listener {
-        @EventHandler(ignoreCancelled = true)
-        public void onLingeringSplash(LingeringPotionSplashEvent event) {
-            AreaEffectCloud aec = event.getAreaEffectCloud();
-            LingeringPotion potion = event.getEntity();
-            World world = potion.getWorld();
-            Cause cause = create(event.getEntity());
-
-            // Fire item interaction event
-            Events.fireToCancel(event, new UseItemEvent(event, cause, world, potion.getItem()));
-
-            // Fire entity spawn event
-            if (!event.isCancelled()) {
-                // radius unfortunately doesn't go through with this, so only a single location is tested
-                Events.fireToCancel(event, new SpawnEntityEvent(event, cause, aec.getLocation().add(0.5, 0, 0.5), EntityType.AREA_EFFECT_CLOUD));
-            }
         }
     }
 }

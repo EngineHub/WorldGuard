@@ -23,12 +23,11 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -103,8 +102,7 @@ public class WorldGuardPlayerListener implements Listener {
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
+        WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().getIfPresent(localPlayer);
         if (session != null) {
             GameModeFlag handler = session.getHandler(GameModeFlag.class);
@@ -126,7 +124,7 @@ public class WorldGuardPlayerListener implements Listener {
         World world = player.getWorld();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(localPlayer.getWorld());
+        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
 
         if (cfg.activityHaltToggle) {
             player.sendMessage(ChatColor.YELLOW
@@ -161,8 +159,8 @@ public class WorldGuardPlayerListener implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
+        WorldConfiguration wcfg =
+                WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
         if (wcfg.useRegions) {
             if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(localPlayer.getLocation(), localPlayer, Flags.SEND_CHAT))) {
                 player.sendMessage(ChatColor.RED + "You don't have permission to chat in this region!");
@@ -228,7 +226,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         if (wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
@@ -258,7 +256,7 @@ public class WorldGuardPlayerListener implements Listener {
         @Nullable ItemStack item = event.getItem();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         // Infinite stack removal
         if ((type == Material.CHEST
@@ -323,7 +321,7 @@ public class WorldGuardPlayerListener implements Listener {
         World world = player.getWorld();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         if (block.getType() == Material.FARMLAND && wcfg.disablePlayerCropTrampling) {
             event.setCancelled(true);
@@ -337,7 +335,7 @@ public class WorldGuardPlayerListener implements Listener {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(localPlayer.getWorld());
+        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
 
         if (wcfg.useRegions) {
             ApplicableRegionSet set =
@@ -356,7 +354,7 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(player.getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(player.getWorld()));
 
         if (wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
@@ -375,7 +373,7 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(localPlayer.getWorld());
+        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
 
         if (wcfg.useRegions) {
             ApplicableRegionSet set =
@@ -425,7 +423,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getTo().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getTo().getWorld()));
         if (!wcfg.regionNetherPortalProtection) return;
         if (event.getCause() != TeleportCause.NETHER_PORTAL) {
             return;
@@ -469,7 +467,7 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(localPlayer.getWorld());
+        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
 
         if (wcfg.useRegions && !WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
             ApplicableRegionSet set =

@@ -23,7 +23,6 @@ import com.google.common.base.Predicate;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.bukkit.event.DelegateEvent;
@@ -35,14 +34,15 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.internal.WGMetadata;
-import com.sk89q.worldguard.protection.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.bukkit.protection.events.DisallowedPVPEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.InteropUtils;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
+import com.sk89q.worldguard.protection.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -136,7 +136,7 @@ public class RegionProtectionListener extends AbstractListener {
         } else if (rootCause instanceof Player) {
             Player player = (Player) rootCause;
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-            BukkitWorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(world));
+            WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(world));
 
             if (config.fakePlayerBuildOverride && InteropUtils.isFakePlayer(player)) {
                 return true;
