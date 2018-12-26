@@ -17,17 +17,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands.region;
+package com.sk89q.worldguard.commands.region;
 
 import com.sk89q.squirrelid.cache.ProfileCache;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,16 +69,16 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * Add region name, type, and priority.
      */
     public void appendBasics() {
-        builder.append(ChatColor.BLUE);
+        builder.append(Style.BLUE);
         builder.append("Region: ");
-        builder.append(ChatColor.YELLOW);
+        builder.append(Style.YELLOW);
         builder.append(region.getId());
         
-        builder.append(ChatColor.GRAY);
+        builder.append(Style.GRAY);
         builder.append(" (type=");
         builder.append(region.getType().getName());
         
-        builder.append(ChatColor.GRAY);
+        builder.append(Style.GRAY);
         builder.append(", priority=");
         builder.append(region.getPriority());
         builder.append(")");
@@ -90,7 +90,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * Add information about flags.
      */
     public void appendFlags() {
-        builder.append(ChatColor.BLUE);
+        builder.append(Style.BLUE);
         builder.append("FlagUtil: ");
         
         appendFlagsList(true);
@@ -118,7 +118,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
                 builder.append(", ");
             } else {
                 if (useColors) {
-                    builder.append(ChatColor.YELLOW);
+                    builder.append(Style.YELLOW);
                 }
             }
 
@@ -129,11 +129,11 @@ public class RegionPrintoutBuilder implements Callable<String> {
 
             if (group == null) {
                 builder.append(flag.getName()).append(": ")
-                        .append(ChatColor.stripColor(String.valueOf(val)));
+                        .append(Style.stripColor(String.valueOf(val)));
             } else {
                 builder.append(flag.getName()).append(" -g ")
                         .append(group).append(": ")
-                        .append(ChatColor.stripColor(String.valueOf(val)));
+                        .append(Style.stripColor(String.valueOf(val)));
             }
 
             hasFlags = true;
@@ -141,7 +141,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
             
         if (!hasFlags) {
             if (useColors) {
-                builder.append(ChatColor.RED);
+                builder.append(Style.RED);
             }
             builder.append("(none)");
         }
@@ -180,7 +180,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
         while (it.hasPrevious()) {
             ProtectedRegion cur = it.previous();
             if (useColors) {
-                builder.append(ChatColor.GREEN);
+                builder.append(Style.GREEN);
             }
             
             // Put symbol for child
@@ -197,7 +197,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
             // Put (parent)
             if (!cur.equals(region)) {
                 if (useColors) {
-                    builder.append(ChatColor.GRAY);
+                    builder.append(Style.GRAY);
                 }
                 builder.append(" (parent, priority=").append(cur.getPriority()).append(")");
             }
@@ -211,12 +211,12 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * Add information about members.
      */
     public void appendDomain() {
-        builder.append(ChatColor.BLUE);
+        builder.append(Style.BLUE);
         builder.append("Owners: ");
         addDomainString(region.getOwners());
         newLine();
 
-        builder.append(ChatColor.BLUE);
+        builder.append(Style.BLUE);
         builder.append("Members: ");
         addDomainString(region.getMembers());
         newLine();
@@ -224,10 +224,10 @@ public class RegionPrintoutBuilder implements Callable<String> {
 
     private void addDomainString(DefaultDomain domain) {
         if (domain.size() != 0) {
-            builder.append(ChatColor.YELLOW);
+            builder.append(Style.YELLOW);
             builder.append(domain.toUserFriendlyString(cache));
         } else {
-            builder.append(ChatColor.RED);
+            builder.append(Style.RED);
             builder.append("(none)");
         }
     }
@@ -238,9 +238,9 @@ public class RegionPrintoutBuilder implements Callable<String> {
     public void appendBounds() {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        builder.append(ChatColor.BLUE);
+        builder.append(Style.BLUE);
         builder.append("Bounds:");
-        builder.append(ChatColor.YELLOW);
+        builder.append(Style.YELLOW);
         builder.append(" (").append(min.getBlockX()).append(",").append(min.getBlockY()).append(",").append(min.getBlockZ()).append(")");
         builder.append(" -> (").append(max.getBlockX()).append(",").append(max.getBlockY()).append(",").append(max.getBlockZ()).append(")");
         
@@ -248,7 +248,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
     }
 
     private void appendRegionInformation() {
-        builder.append(ChatColor.GRAY);
+        builder.append(Style.GRAY);
         builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
         builder.append(" Region Info ");
         builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
@@ -260,7 +260,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
         appendBounds();
 
         if (cache != null) {
-            builder.append(ChatColor.GRAY).append("Any names suffixed by * are 'last seen names' and may not be up to date.");
+            builder.append(Style.GRAY).append("Any names suffixed by * are 'last seen names' and may not be up to date.");
             newLine();
         }
     }
@@ -272,12 +272,12 @@ public class RegionPrintoutBuilder implements Callable<String> {
     }
 
     /**
-     * Send the report to a {@link CommandSender}.
+     * Send the report to a {@link Actor}.
      *
      * @param sender the recipient
      */
-    public void send(CommandSender sender) {
-        sender.sendMessage(toString());
+    public void send(Actor sender) {
+        sender.printRaw(toString());
     }
 
     public StringBuilder append(boolean b) {

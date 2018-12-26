@@ -17,28 +17,51 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.util.task;
+package com.sk89q.worldguard.util.logging;
 
-import java.util.List;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.Style;
+
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 /**
- * Manages running tasks and informs users of their progress, but does not
- * execute the task.
+ * Sends all logger messages to a player.
  */
-public interface Supervisor {
+public class LoggerToChatHandler extends Handler {
+    /**
+     * Player.
+     */
+    private Actor player;
 
     /**
-     * Get a list of running or queued tasks.
+     * Construct the object.
      *
-     * @return a list of tasks
+     * @param player
      */
-    List<Task<?>> getTasks();
+    public LoggerToChatHandler(Actor player) {
+        this.player = player;
+    }
 
     /**
-     * Monitor the given task.
-     *
-     * @param task the task
+     * Close the handler.
      */
-    void monitor(Task<?> task);
+    @Override
+    public void close() {
+    }
 
+    /**
+     * Flush the output.
+     */
+    @Override
+    public void flush() {
+    }
+
+    /**
+     * Publish a log record.
+     */
+    @Override
+    public void publish(LogRecord record) {
+        player.printDebug(record.getLevel().getName() + ": " + Style.WHITE + record.getMessage());
+    }
 }

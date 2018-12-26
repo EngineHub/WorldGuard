@@ -19,7 +19,9 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import com.sk89q.worldguard.LocalPlayer;
@@ -30,8 +32,8 @@ import org.bukkit.entity.Player;
 public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implements LocalPlayer {
 
     private final WorldGuardPlugin plugin;
-    private final String name;
     private final boolean silenced;
+    private String name;
 
     public BukkitPlayer(WorldGuardPlugin plugin, Player player) {
         this(plugin, player, false);
@@ -40,13 +42,15 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     BukkitPlayer(WorldGuardPlugin plugin, Player player, boolean silenced) {
         super((WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit"), player);
         this.plugin = plugin;
-        // getName() takes longer than before in newer versions of Minecraft
-        this.name = player == null ? null : player.getName();
         this.silenced = silenced;
     }
 
     @Override
     public String getName() {
+        if (this.name == null) {
+            // getName() takes longer than before in newer versions of Minecraft
+            this.name = getPlayer().getName();
+        }
         return name;
     }
 
@@ -106,6 +110,16 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
+    public float getExhaustion() {
+        return getPlayer().getExhaustion();
+    }
+
+    @Override
+    public void setExhaustion(float exhaustion) {
+        getPlayer().setExhaustion(exhaustion);
+    }
+
+    @Override
     public WeatherType getPlayerWeather() {
         return null;
     }
@@ -141,6 +155,21 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
+    public int getFireTicks() {
+        return getPlayer().getFireTicks();
+    }
+
+    @Override
+    public void setFireTicks(int fireTicks) {
+        getPlayer().setFireTicks(fireTicks);
+    }
+
+    @Override
+    public void setCompassTarget(Location location) {
+        getPlayer().setCompassTarget(BukkitAdapter.adapt(location));
+    }
+
+    @Override
     public String[] getGroups() {
         return plugin.getGroups(getPlayer());
     }
@@ -148,7 +177,7 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     @Override
     public void printRaw(String msg) {
         if (!silenced) {
-            getPlayer().sendMessage(msg);
+            super.printRaw(msg);
         }
     }
 

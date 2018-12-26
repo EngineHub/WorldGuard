@@ -17,30 +17,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
-
-import com.sk89q.worldguard.bukkit.commands.region.MemberCommands;
-import com.sk89q.worldguard.bukkit.commands.region.RegionCommands;
-import org.bukkit.command.CommandSender;
+package com.sk89q.worldguard.commands;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.NestedCommand;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.commands.region.MemberCommands;
+import com.sk89q.worldguard.commands.region.RegionCommands;
 
 public class ProtectionCommands {
     @SuppressWarnings("unused")
-    private final WorldGuardPlugin plugin;
+    private final WorldGuard worldGuard;
 
-    public ProtectionCommands(WorldGuardPlugin plugin) {
-        this.plugin = plugin;
+    public ProtectionCommands(WorldGuard worldGuard) {
+        this.worldGuard = worldGuard;
     }
 
     @Command(aliases = {"region", "regions", "rg"}, desc = "Region management commands")
     @NestedCommand({RegionCommands.class, MemberCommands.class})
-    public void region(CommandContext args, CommandSender sender) {}
+    public void region(CommandContext args, Actor sender) {}
 
     @Command(aliases = {"worldguard", "wg"}, desc = "WorldGuard commands")
     @NestedCommand({WorldGuardCommands.class})
-    public void worldGuard(CommandContext args, CommandSender sender) {}
+    public void worldGuard(CommandContext args, Actor sender) {}
 }

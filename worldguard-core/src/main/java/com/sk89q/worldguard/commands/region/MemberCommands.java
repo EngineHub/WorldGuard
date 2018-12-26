@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands.region;
+package com.sk89q.worldguard.commands.region;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -25,28 +25,25 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.command.util.AsyncCommandHelper;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.commands.AsyncCommandHelper;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.util.DomainInputResolver;
-import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import com.sk89q.worldguard.protection.util.DomainInputResolver;
+import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
 
 public class MemberCommands extends RegionCommandsBase {
 
-    private final WorldGuardPlugin plugin;
+    private final WorldGuard worldGuard;
 
-    public MemberCommands(WorldGuardPlugin plugin) {
-        this.plugin = plugin;
+    public MemberCommands(WorldGuard worldGuard) {
+        this.worldGuard = worldGuard;
     }
 
     @Command(aliases = {"addmember", "addmember", "addmem", "am"},
@@ -54,18 +51,18 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "nw:",
             desc = "Add a member to a region",
             min = 2)
-    public void addMember(CommandContext args, CommandSender sender) throws CommandException {
+    public void addMember(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
-        RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         id = region.getId();
 
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayAddMembers(region)) {
+        if (!getPermissionModel(sender).mayAddMembers(region)) {
             throw new CommandPermissionsException();
         }
 
@@ -79,7 +76,7 @@ public class MemberCommands extends RegionCommandsBase {
                 WorldGuard.getInstance().getExecutorService().submit(resolver),
                 resolver.createAddAllFunction(region.getMembers()));
 
-        AsyncCommandHelper.wrap(future, plugin, sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Adding members to the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
@@ -91,22 +88,19 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "nw:",
             desc = "Add an owner to a region",
             min = 2)
-    public void addOwner(CommandContext args, CommandSender sender) throws CommandException {
+    public void addOwner(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
-        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(world);
 
-        Player player = null;
-        LocalPlayer localPlayer = null;
-        if (sender instanceof Player) {
-            player = (Player) sender;
-            localPlayer = plugin.wrapPlayer(player);
+        LocalPlayer player = null;
+        if (sender instanceof LocalPlayer) {
+            player = (LocalPlayer) sender;
         }
 
         String id = args.getString(0);
 
-        RegionManager manager = checkRegionManager(plugin, weWorld);
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         id = region.getId();
@@ -114,20 +108,20 @@ public class MemberCommands extends RegionCommandsBase {
         Boolean flag = region.getFlag(Flags.BUYABLE);
         DefaultDomain owners = region.getOwners();
 
-        if (localPlayer != null) {
+        if (player != null) {
             if (flag != null && flag && owners != null && owners.size() == 0) {
                 // TODO: Move this to an event
-                if (!plugin.hasPermission(player, "worldguard.region.unlimited")) {
-                    int maxRegionCount = ((BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(weWorld)).getMaxRegionCount(player);
-                    if (maxRegionCount >= 0 && manager.getRegionCountOfPlayer(localPlayer)
+                if (!sender.hasPermission("worldguard.region.unlimited")) {
+                    int maxRegionCount = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).getMaxRegionCount(player);
+                    if (maxRegionCount >= 0 && manager.getRegionCountOfPlayer(player)
                             >= maxRegionCount) {
                         throw new CommandException("You already own the maximum allowed amount of regions.");
                     }
                 }
-                plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
+                sender.checkPermission("worldguard.region.addowner.unclaimed." + id.toLowerCase());
             } else {
                 // Check permissions
-                if (!getPermissionModel(localPlayer).mayAddOwners(region)) {
+                if (!getPermissionModel(player).mayAddOwners(region)) {
                     throw new CommandPermissionsException();
                 }
             }
@@ -143,7 +137,7 @@ public class MemberCommands extends RegionCommandsBase {
                 WorldGuard.getInstance().getExecutorService().submit(resolver),
                 resolver.createAddAllFunction(region.getOwners()));
 
-        AsyncCommandHelper.wrap(future, plugin, sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Adding owners to the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
@@ -155,16 +149,16 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "naw:",
             desc = "Remove an owner to a region",
             min = 1)
-    public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
+    public void removeMember(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
-        RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayRemoveMembers(region)) {
+        if (!getPermissionModel(sender).mayRemoveMembers(region)) {
             throw new CommandPermissionsException();
         }
 
@@ -190,7 +184,7 @@ public class MemberCommands extends RegionCommandsBase {
                     resolver.createRemoveAllFunction(region.getMembers()));
         }
 
-        AsyncCommandHelper.wrap(future, plugin, sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Removing members from the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
@@ -202,16 +196,16 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "naw:",
             desc = "Remove an owner to a region",
             min = 1)
-    public void removeOwner(CommandContext args, CommandSender sender) throws CommandException {
+    public void removeOwner(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
         String id = args.getString(0);
-        RegionManager manager = checkRegionManager(plugin, BukkitAdapter.adapt(world));
+        RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
         // Check permissions
-        if (!getPermissionModel(plugin.wrapCommandSender(sender)).mayRemoveOwners(region)) {
+        if (!getPermissionModel(sender).mayRemoveOwners(region)) {
             throw new CommandPermissionsException();
         }
 
@@ -237,7 +231,7 @@ public class MemberCommands extends RegionCommandsBase {
                     resolver.createRemoveAllFunction(region.getOwners()));
         }
 
-        AsyncCommandHelper.wrap(future, plugin, sender)
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(region.getId(), world.getName())
                 .registerWithSupervisor("Removing owners from the region '%s' on '%s'")
                 .sendMessageAfterDelay("(Please wait... querying player names...)")

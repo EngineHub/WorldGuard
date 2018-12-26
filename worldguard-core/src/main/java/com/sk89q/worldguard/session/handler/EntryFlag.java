@@ -23,6 +23,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -57,7 +58,7 @@ public class EntryFlag extends Handler {
             long now = System.currentTimeMillis();
 
             if ((now - lastMessage) > MESSAGE_THRESHOLD && message != null && !message.isEmpty()) {
-                player.printRaw(WorldGuard.getInstance().getPlatform().replaceColorMacros(message));
+                player.printRaw(CommandUtils.replaceColorMacros(message));
                 lastMessage = now;
             }
 

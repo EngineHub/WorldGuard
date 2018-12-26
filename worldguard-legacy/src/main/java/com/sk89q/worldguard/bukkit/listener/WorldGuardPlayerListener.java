@@ -38,6 +38,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GameModeFlag;
+import com.sk89q.worldguard.util.Entities;
 import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -134,7 +135,7 @@ public class WorldGuardPlayerListener implements Listener {
             int removed = 0;
 
             for (Entity entity : world.getEntities()) {
-                if (BukkitUtil.isIntensiveEntity(entity)) {
+                if (Entities.isIntensiveEntity(BukkitAdapter.adapt(entity))) {
                     entity.remove();
                     removed++;
                 }

@@ -233,7 +233,7 @@ public final class Cause {
         private boolean indirect;
 
         private Builder(int expectedSize) {
-            this.causes = new ArrayList<Object>(expectedSize);
+            this.causes = new ArrayList<>(expectedSize);
         }
 
         private void addAll(@Nullable Object... element) {
@@ -250,7 +250,7 @@ public final class Cause {
                     } else if (o instanceof Projectile) {
                         addAll(((Projectile) o).getShooter());
                     } else if (o instanceof Vehicle) {
-                        addAll(((Vehicle) o).getPassenger());
+                        addAll(((Vehicle) o).getPassengers());
                     } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
                         indirect = true;
                         addAll(((Creature) o).getTarget());

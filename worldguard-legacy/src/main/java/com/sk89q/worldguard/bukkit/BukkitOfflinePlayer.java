@@ -103,6 +103,16 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
+    public float getExhaustion() {
+        return 0;
+    }
+
+    @Override
+    public void setExhaustion(float exhaustion) {
+
+    }
+
+    @Override
     public WeatherType getPlayerWeather() {
         return WeatherTypes.CLEAR;
     }
@@ -200,6 +210,11 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     @Override
     public Location getLocation() {
         return null;
+    }
+
+    @Override
+    public void setCompassTarget(Location location) {
+
     }
 
     @Override

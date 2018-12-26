@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands.region;
+package com.sk89q.worldguard.commands.region;
 
 import com.google.common.base.Joiner;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -32,9 +32,10 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
+import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -46,10 +47,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -79,12 +76,12 @@ class RegionCommandsBase {
      * @return a world
      * @throws CommandException on error
      */
-    protected static World checkWorld(CommandContext args, CommandSender sender, char flag) throws CommandException {
+    protected static World checkWorld(CommandContext args, Actor sender, char flag) throws CommandException {
         if (args.hasFlag(flag)) {
-            return WorldGuardPlugin.inst().matchWorld(sender, args.getFlag(flag));
+            return WorldGuard.getInstance().getPlatform().getMatcher().matchWorld(sender, args.getFlag(flag));
         } else {
-            if (sender instanceof Player) {
-                return WorldGuardPlugin.inst().checkPlayer(sender).getWorld();
+            if (sender instanceof LocalPlayer) {
+                return ((LocalPlayer) sender).getWorld();
             } else {
                 throw new CommandException("Please specify " + "the world with -" + flag + " world_name.");
             }
@@ -217,10 +214,9 @@ class RegionCommandsBase {
      * @return the selection
      * @throws CommandException thrown on an error
      */
-    protected static Region checkSelection(Player player) throws CommandException {
-        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+    protected static Region checkSelection(LocalPlayer player) throws CommandException {
         try {
-            return WorldEdit.getInstance().getSessionManager().get(localPlayer).getRegionSelector(localPlayer.getWorld()).getRegion();
+            return WorldEdit.getInstance().getSessionManager().get(player).getRegionSelector(player.getWorld()).getRegion();
         } catch (IncompleteRegionException e) {
             throw new CommandException(
                     "Please select an area first. " +
@@ -246,11 +242,10 @@ class RegionCommandsBase {
     /**
      * Check that the given region manager is not null.
      *
-     * @param plugin the plugin
      * @param world the world
      * @throws CommandException thrown if the manager is null
      */
-    protected static RegionManager checkRegionManager(WorldGuardPlugin plugin, com.sk89q.worldedit.world.World world) throws CommandException {
+    protected static RegionManager checkRegionManager(com.sk89q.worldedit.world.World world) throws CommandException {
         if (!WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).useRegions) {
             throw new CommandException("Region support is disabled in the target world. " +
                     "It can be enabled per-world in WorldGuard's configuration files. " +
@@ -273,7 +268,7 @@ class RegionCommandsBase {
      * @return a new region
      * @throws CommandException thrown on an error
      */
-    protected static ProtectedRegion checkRegionFromSelection(Player player, String id) throws CommandException {
+    protected static ProtectedRegion checkRegionFromSelection(LocalPlayer player, String id) throws CommandException {
         Region selection = checkSelection(player);
 
         // Detect the type of region from WorldEdit
@@ -296,14 +291,14 @@ class RegionCommandsBase {
      *
      * @param sender the sender to send the message to
      */
-    protected static void warnAboutSaveFailures(CommandSender sender) {
+    protected static void warnAboutSaveFailures(Actor sender) {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         Set<RegionManager> failures = container.getSaveFailures();
 
         if (failures.size() > 0) {
             String failingList = Joiner.on(", ").join(failures.stream().map(regionManager -> "'" + regionManager.getName() + "'").collect(Collectors.toList()));
 
-            sender.sendMessage(ChatColor.GOLD +
+            sender.printRaw(Style.YELLOW_DARK +
                     "(Warning: The background saving of region data is failing for these worlds: " + failingList + ". " +
                     "Your changes are getting lost. See the server log for more information.)");
         }
@@ -329,13 +324,13 @@ class RegionCommandsBase {
      * @param manager the region manager
      * @param region the region
      */
-    protected static void informNewUser(CommandSender sender, RegionManager manager, ProtectedRegion region) {
+    protected static void informNewUser(Actor sender, RegionManager manager, ProtectedRegion region) {
         if (manager.getRegions().size() <= 2) {
-            sender.sendMessage(ChatColor.GRAY +
+            sender.printRaw(Style.GRAY +
                     "(This region is NOW PROTECTED from modification from others. " +
                     "Don't want that? Use " +
-                    ChatColor.AQUA + "/rg flag " + region.getId() + " passthrough allow" +
-                    ChatColor.GRAY + ")");
+                    Style.CYAN + "/rg flag " + region.getId() + " passthrough allow" +
+                    Style.GRAY + ")");
         }
     }
 
@@ -346,10 +341,8 @@ class RegionCommandsBase {
      * @param region the region
      * @throws CommandException thrown on a command error
      */
-    protected static void setPlayerSelection(Player player, ProtectedRegion region) throws CommandException {
-        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-
-        LocalSession session = WorldEdit.getInstance().getSessionManager().get(localPlayer);
+    protected static void setPlayerSelection(LocalPlayer player, ProtectedRegion region) throws CommandException {
+        LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
 
         // Set selection
         if (region instanceof ProtectedCuboidRegion) {
@@ -357,17 +350,17 @@ class RegionCommandsBase {
             BlockVector3 pt1 = cuboid.getMinimumPoint();
             BlockVector3 pt2 = cuboid.getMaximumPoint();
 
-            session.setRegionSelector(localPlayer.getWorld(), new CuboidRegionSelector(localPlayer.getWorld(), pt1, pt2));
-            player.sendMessage(ChatColor.YELLOW + "Region selected as a cuboid.");
+            session.setRegionSelector(player.getWorld(), new CuboidRegionSelector(player.getWorld(), pt1, pt2));
+            player.print("Region selected as a cuboid.");
 
         } else if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
             Polygonal2DRegionSelector selector = new Polygonal2DRegionSelector(
-                    localPlayer.getWorld(), poly2d.getPoints(),
+                    player.getWorld(), poly2d.getPoints(),
                     poly2d.getMinimumPoint().getBlockY(),
                     poly2d.getMaximumPoint().getBlockY() );
-            session.setRegionSelector(localPlayer.getWorld(), selector);
-            player.sendMessage(ChatColor.YELLOW + "Region selected as a polygon.");
+            session.setRegionSelector(player.getWorld(), selector);
+            player.print("Region selected as a polygon.");
 
         } else if (region instanceof GlobalProtectedRegion) {
             throw new CommandException(

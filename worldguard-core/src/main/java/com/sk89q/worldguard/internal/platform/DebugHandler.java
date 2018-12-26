@@ -17,27 +17,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.util.task;
+package com.sk89q.worldguard.internal.platform;
 
-import java.util.Comparator;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldguard.LocalPlayer;
 
-/**
- * Compares task states according to the order of the {@link com.sk89q.worldguard.util.task.Task.State}
- * enumeration.
- */
-public class TaskStateComparator implements Comparator<com.sk89q.worldguard.util.task.Task<?>> {
+public interface DebugHandler {
 
-    @Override
-    public int compare(com.sk89q.worldguard.util.task.Task<?> o1, Task<?> o2) {
-        int ordinal1 = o1.getState().ordinal();
-        int ordinal2 = o2.getState().ordinal();
-        if (ordinal1 < ordinal2) {
-            return -1;
-        } else if (ordinal1 > ordinal2) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
+    void testBreak(Actor sender, LocalPlayer target, boolean fromTarget, boolean stackTraceMode) throws CommandException;
 
+    void testPlace(Actor sender, LocalPlayer target, boolean fromTarget, boolean stackTraceMode) throws CommandException;
+
+    void testInteract(Actor sender, LocalPlayer target, boolean fromTarget, boolean stackTraceMode) throws CommandException;
+
+    void testDamage(Actor sender, LocalPlayer target, boolean fromTarget, boolean stackTraceMode) throws CommandException;
 }

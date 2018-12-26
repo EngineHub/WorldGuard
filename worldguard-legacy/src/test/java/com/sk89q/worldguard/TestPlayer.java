@@ -112,6 +112,16 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
+    public float getExhaustion() {
+        return 0;
+    }
+
+    @Override
+    public void setExhaustion(float exhaustion) {
+
+    }
+
+    @Override
     public WeatherType getPlayerWeather() {
         return null;
     }
@@ -143,6 +153,21 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     @Override
     public void resetPlayerTime() {
+
+    }
+
+    @Override
+    public int getFireTicks() {
+        return 0;
+    }
+
+    @Override
+    public void setFireTicks(int fireTicks) {
+
+    }
+
+    @Override
+    public void setCompassTarget(Location location) {
 
     }
 
@@ -210,6 +235,10 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     @Override
     public Location getLocation() {
         return null;
+    }
+
+    @Override public boolean setLocation(Location location) {
+        return false;
     }
 
     @Override

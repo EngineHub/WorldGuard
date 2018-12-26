@@ -32,6 +32,12 @@ processResources {
     }
 }
 
+jar {
+    manifest {
+        attributes("Implementation-Version": version)
+    }
+}
+
 shadowJar {
     dependencies {
         include(dependency(':worldguard-core'))

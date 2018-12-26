@@ -95,7 +95,7 @@ public class RegionFlagsListener extends AbstractListener {
             event.filter(testState(query, Flags.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
         }
 
-        if (event.getCause().find(Entities.enderCrystalType) != null) { // should be nullsafe even if enderCrystalType field is null
+        if (event.getCause().find(EntityType.ENDER_CRYSTAL) != null) { // EnderCrystal
             event.filter(testState(query, Flags.OTHER_EXPLOSION), config.explosionFlagCancellation);
         }
     }

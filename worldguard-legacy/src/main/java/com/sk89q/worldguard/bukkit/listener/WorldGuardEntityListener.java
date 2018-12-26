@@ -35,7 +35,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
@@ -207,14 +209,14 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        } else if (defender.getType() == Entities.armorStandType && !(attacker instanceof Player)) {
+        } else if (defender instanceof ArmorStand && !(attacker instanceof Player)) {
             if (wcfg.blockEntityArmorStandDestroy) {
                 event.setCancelled(true);
                 return;
             }
         }
 
-        if (attacker != null && attacker.getType() == Entities.enderCrystalType) {
+        if (attacker instanceof EnderCrystal) {
             // this isn't handled elsewhere because ender crystal explosions don't carry a player cause
             // in the same way that creepers or tnt can
             if (wcfg.useRegions && wcfg.explosionFlagCancellation) {
@@ -341,7 +343,7 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        } else if (defender.getType() == Entities.armorStandType && Entities.isNonPlayerCreature(attacker)) {
+        } else if (defender instanceof ArmorStand && Entities.isNonPlayerCreature(attacker)) {
             if (wcfg.blockEntityArmorStandDestroy) {
                 event.setCancelled(true);
             }

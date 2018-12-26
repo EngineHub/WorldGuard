@@ -21,10 +21,10 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.config.WorldConfiguration;
+import com.sk89q.worldguard.util.Entities;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -63,7 +63,7 @@ public class WorldGuardWorldListener implements Listener {
             int removed = 0;
 
             for (Entity entity : event.getChunk().getEntities()) {
-                if (BukkitUtil.isIntensiveEntity(entity)) {
+                if (Entities.isIntensiveEntity(BukkitAdapter.adapt(entity))) {
                     entity.remove();
                     removed++;
                 }
@@ -82,15 +82,15 @@ public class WorldGuardWorldListener implements Listener {
 
     /**
      * Initialize the settings for the specified world
-     * @see BukkitWorldConfiguration#alwaysRaining
-     * @see BukkitWorldConfiguration#disableWeather
-     * @see BukkitWorldConfiguration#alwaysThundering
-     * @see BukkitWorldConfiguration#disableThunder
+     * @see WorldConfiguration#alwaysRaining
+     * @see WorldConfiguration#disableWeather
+     * @see WorldConfiguration#alwaysThundering
+     * @see WorldConfiguration#disableThunder
      * @param world The specified world
      */
     public void initWorld(World world) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
         if (wcfg.alwaysRaining && !wcfg.disableWeather) {
             world.setStorm(true);
         } else if (wcfg.disableWeather && !wcfg.alwaysRaining) {

@@ -17,12 +17,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.bukkit.commands;
+package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.bukkit.event.debug.*;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.paste.ActorCallbackPaste;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.event.debug.CancelLogging;
+import com.sk89q.worldguard.bukkit.event.debug.LoggingBlockBreakEvent;
+import com.sk89q.worldguard.bukkit.event.debug.LoggingBlockPlaceEvent;
+import com.sk89q.worldguard.bukkit.event.debug.LoggingEntityDamageByEntityEvent;
+import com.sk89q.worldguard.bukkit.event.debug.LoggingPlayerInteractEvent;
 import com.sk89q.worldguard.bukkit.util.report.CancelReport;
+import com.sk89q.worldguard.internal.platform.DebugHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -34,66 +45,20 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.BlockIterator;
 
 import java.util.logging.Logger;
 
-public class DebuggingCommands {
+public class BukkitDebugHandler implements DebugHandler {
 
-    private static final Logger log = Logger.getLogger(DebuggingCommands.class.getCanonicalName());
+    private static final Logger log = Logger.getLogger(BukkitDebugHandler.class.getCanonicalName());
     private static final int MAX_TRACE_DISTANCE = 20;
 
     private final WorldGuardPlugin plugin;
 
-    /**
-     * Create a new instance.
-     *
-     * @param plugin The plugin instance
-     */
-    public DebuggingCommands(WorldGuardPlugin plugin) {
+    BukkitDebugHandler(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    @Command(aliases = {"testbreak"}, usage = "[player]", desc = "Simulate a block break", min = 1, max = 1, flags = "ts")
-    @CommandPermissions("worldguard.debug.event")
-    public void fireBreakEvent(CommandContext args, final CommandSender sender) throws CommandException {
-        Player target = plugin.matchSinglePlayer(sender, args.getString(0));
-        Block block = traceBlock(sender, target, args.hasFlag('t'));
-        sender.sendMessage(ChatColor.AQUA + "Testing BLOCK BREAK at " + ChatColor.DARK_AQUA + block);
-        LoggingBlockBreakEvent event = new LoggingBlockBreakEvent(block, target);
-        testEvent(sender, target, event, args.hasFlag('s'));
-    }
-
-
-    @Command(aliases = {"testplace"}, usage = "[player]", desc = "Simulate a block place", min = 1, max = 1, flags = "ts")
-    @CommandPermissions("worldguard.debug.event")
-    public void firePlaceEvent(CommandContext args, final CommandSender sender) throws CommandException {
-        Player target = plugin.matchSinglePlayer(sender, args.getString(0));
-        Block block = traceBlock(sender, target, args.hasFlag('t'));
-        sender.sendMessage(ChatColor.AQUA + "Testing BLOCK PLACE at " + ChatColor.DARK_AQUA + block);
-        LoggingBlockPlaceEvent event = new LoggingBlockPlaceEvent(block, block.getState(), block.getRelative(BlockFace.DOWN), target.getItemInHand(), target, true);
-        testEvent(sender, target, event, args.hasFlag('s'));
-    }
-
-    @Command(aliases = {"testinteract"}, usage = "[player]", desc = "Simulate a block interact", min = 1, max = 1, flags = "ts")
-    @CommandPermissions("worldguard.debug.event")
-    public void fireInteractEvent(CommandContext args, final CommandSender sender) throws CommandException {
-        Player target = plugin.matchSinglePlayer(sender, args.getString(0));
-        Block block = traceBlock(sender, target, args.hasFlag('t'));
-        sender.sendMessage(ChatColor.AQUA + "Testing BLOCK INTERACT at " + ChatColor.DARK_AQUA + block);
-        LoggingPlayerInteractEvent event = new LoggingPlayerInteractEvent(target, Action.RIGHT_CLICK_BLOCK, target.getItemInHand(), block, BlockFace.SOUTH);
-        testEvent(sender, target, event, args.hasFlag('s'));
-    }
-
-    @Command(aliases = {"testdamage"}, usage = "[player]", desc = "Simulate an entity damage", min = 1, max = 1, flags = "ts")
-    @CommandPermissions("worldguard.debug.event")
-    public void fireDamageEvent(CommandContext args, final CommandSender sender) throws CommandException {
-        Player target = plugin.matchSinglePlayer(sender, args.getString(0));
-        Entity entity = traceEntity(sender, target, args.hasFlag('t'));
-        sender.sendMessage(ChatColor.AQUA + "Testing ENTITY DAMAGE on " + ChatColor.DARK_AQUA + entity);
-        LoggingEntityDamageByEntityEvent event = new LoggingEntityDamageByEntityEvent(target, entity, DamageCause.ENTITY_ATTACK, 1);
-        testEvent(sender, target, event, args.hasFlag('s'));
     }
 
     /**
@@ -105,7 +70,8 @@ public class DebuggingCommands {
      * @param stacktraceMode Whether stack traces should be generated and posted
      * @param <T> The type of event
      */
-    private <T extends Event & CancelLogging> void testEvent(CommandSender receiver, Player target, T event, boolean stacktraceMode) throws CommandPermissionsException {
+    private <T extends Event & CancelLogging> void testEvent(CommandSender receiver, Player target, T event, boolean stacktraceMode) throws
+            CommandPermissionsException {
         boolean isConsole = receiver instanceof ConsoleCommandSender;
 
         if (!receiver.equals(target)) {
@@ -128,7 +94,9 @@ public class DebuggingCommands {
             log.info("Event report for " + receiver.getName() + ":\n\n" + result);
 
             plugin.checkPermission(receiver, "worldguard.debug.pastebin");
-            CommandUtils.pastebin(plugin, receiver, result, "Event debugging report: %s.txt");
+            ActorCallbackPaste
+                    .pastebin(WorldGuard.getInstance().getSupervisor(), plugin.wrapCommandSender(receiver), result,
+                            "Event debugging report: %s.txt", WorldGuard.getInstance().getExceptionConverter());
         } else {
             receiver.sendMessage(result.replaceAll("(?m)^", ChatColor.AQUA.toString()));
 
@@ -217,4 +185,46 @@ public class DebuggingCommands {
         throw new CommandException("Not currently looking at an entity that is close enough.");
     }
 
+    @Override
+    public void testBreak(Actor sender, LocalPlayer target, boolean fromTarget, boolean stackTraceMode) throws CommandException {
+        CommandSender bukkitSender = plugin.unwrapActor(sender);
+        Player bukkitTarget = BukkitAdapter.adapt(target);
+
+        Block block = traceBlock(bukkitSender, bukkitTarget, fromTarget);
+        sender.printRaw(Style.CYAN + "Testing BLOCK BREAK at " + Style.CYAN_DARK + block);
+        LoggingBlockBreakEvent event = new LoggingBlockBreakEvent(block, bukkitTarget);
+        testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
+    }
+
+    @Override
+    public void testPlace(Actor sender, LocalPlayer target, boolean fromTarget, boolean stackTraceMode) throws CommandException {
+        CommandSender bukkitSender = plugin.unwrapActor(sender);
+        Player bukkitTarget = BukkitAdapter.adapt(target);
+
+        Block block = traceBlock(bukkitSender, bukkitTarget, fromTarget);
+        sender.printRaw(Style.CYAN + "Testing BLOCK PLACE at " + Style.CYAN_DARK + block);
+        LoggingBlockPlaceEvent event = new LoggingBlockPlaceEvent(block, block.getState(), block.getRelative(BlockFace.DOWN), bukkitTarget.getItemInHand(), bukkitTarget, true);
+        testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
+    }
+
+    @Override
+    public void testInteract(Actor sender, LocalPlayer target, boolean fromTarget, boolean stackTraceMode) throws CommandException {
+        CommandSender bukkitSender = plugin.unwrapActor(sender);
+        Player bukkitTarget = BukkitAdapter.adapt(target);
+
+        Block block = traceBlock(bukkitSender, bukkitTarget, fromTarget);
+        sender.printRaw(Style.CYAN + "Testing BLOCK INTERACT at " + Style.CYAN_DARK + block);
+        LoggingPlayerInteractEvent event = new LoggingPlayerInteractEvent(bukkitTarget, Action.RIGHT_CLICK_BLOCK, bukkitTarget.getItemInHand(), block, BlockFace.SOUTH);
+        testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
+    }
+
+    @Override
+    public void testDamage(Actor sender, LocalPlayer target, boolean fromTarget, boolean stackTraceMode) throws CommandException {
+        CommandSender bukkitSender = plugin.unwrapActor(sender);
+        Player bukkitTarget = BukkitAdapter.adapt(target);
+        Entity entity = traceEntity(bukkitSender, bukkitTarget, fromTarget);
+        sender.printRaw(Style.CYAN + "Testing ENTITY DAMAGE on " + Style.CYAN_DARK + entity);
+        LoggingEntityDamageByEntityEvent event = new LoggingEntityDamageByEntityEvent(bukkitTarget, entity, EntityDamageEvent.DamageCause.ENTITY_ATTACK, 1);
+        testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
+    }
 }
