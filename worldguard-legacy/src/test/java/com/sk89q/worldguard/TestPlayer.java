@@ -237,10 +237,6 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
         return null;
     }
 
-    @Override public boolean setLocation(Location location) {
-        return false;
-    }
-
     @Override
     public boolean setLocation(Location location) {
         return false;
