@@ -102,13 +102,13 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
 
     @Override
     public void load() {
+        stringMatcher = new BukkitStringMatcher();
         sessionManager = new BukkitSessionManager();
         configuration = new BukkitConfigurationManager(WorldGuardPlugin.inst());
         configuration.load();
         regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());
         regionContainer.initialize();
         debugHandler = new BukkitDebugHandler(WorldGuardPlugin.inst());
-        stringMatcher = new BukkitStringMatcher();
     }
 
     @Override

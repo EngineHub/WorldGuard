@@ -28,7 +28,6 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.internal.platform.StringMatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
