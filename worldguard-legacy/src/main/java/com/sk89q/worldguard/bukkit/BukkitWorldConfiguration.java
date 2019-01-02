@@ -164,6 +164,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             }
         }
         blockPotionsAlways = getBoolean("gameplay.block-potions-overly-reliably", false);
+        disableConduitEffects = getBoolean("gameplay.disable-conduit-effects", false);
 
         simulateSponge = getBoolean("simulation.sponge.enable", false);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;

@@ -26,6 +26,7 @@ import com.sk89q.worldguard.config.WorldConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 
 public class WorldRulesListener extends AbstractListener {
 
@@ -40,14 +41,21 @@ public class WorldRulesListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onSpawnEntity(final SpawnEntityEvent event) {
-        WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getWorld()));
-
-        // ================================================================
-        // EXP_DROPS flag
-        // ================================================================
-
         if (event.getEffectiveType() == EntityType.EXPERIENCE_ORB) {
+            WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getWorld()));
+
             if (config.disableExpDrops) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPotionEffect(EntityPotionEffectEvent event) {
+        if (event.getCause() == EntityPotionEffectEvent.Cause.CONDUIT) {
+            WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getEntity().getWorld()));
+
+            if (config.disableConduitEffects) {
                 event.setCancelled(true);
             }
         }

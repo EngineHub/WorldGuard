@@ -71,6 +71,7 @@ public abstract class WorldConfiguration {
     public boolean itemDurability;
     public boolean disableExpDrops;
     public boolean blockPotionsAlways;
+    public boolean disableConduitEffects;
     public boolean pumpkinScuba;
     public boolean noPhysicsGravel;
     public boolean noPhysicsSand;
