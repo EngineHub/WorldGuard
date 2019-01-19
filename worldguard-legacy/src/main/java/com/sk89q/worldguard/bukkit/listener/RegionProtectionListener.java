@@ -39,6 +39,7 @@ import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.InteropUtils;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
@@ -111,6 +112,8 @@ public class RegionProtectionListener extends AbstractListener {
             if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
                 RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
                 String message = query.queryValue(BukkitAdapter.adapt(location), localPlayer, Flags.DENY_MESSAGE);
+                message = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(localPlayer, message);
+                message = CommandUtils.replaceColorMacros(message);
                 if (message != null && !message.isEmpty()) {
                     player.sendMessage(message.replace("%what%", what));
                 }
