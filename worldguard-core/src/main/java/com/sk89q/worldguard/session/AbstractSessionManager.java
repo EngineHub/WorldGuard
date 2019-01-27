@@ -1,6 +1,23 @@
-package com.sk89q.worldguard.session;
+/*
+ * WorldGuard, a suite of tools for Minecraft
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldGuard team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-import static com.google.common.base.Preconditions.checkNotNull;
+package com.sk89q.worldguard.session;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -8,22 +25,10 @@ import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.session.handler.EntryFlag;
-import com.sk89q.worldguard.session.handler.ExitFlag;
-import com.sk89q.worldguard.session.handler.FarewellFlag;
-import com.sk89q.worldguard.session.handler.FeedFlag;
-import com.sk89q.worldguard.session.handler.GameModeFlag;
-import com.sk89q.worldguard.session.handler.GodMode;
-import com.sk89q.worldguard.session.handler.GreetingFlag;
-import com.sk89q.worldguard.session.handler.Handler;
-import com.sk89q.worldguard.session.handler.HealFlag;
-import com.sk89q.worldguard.session.handler.InvincibilityFlag;
-import com.sk89q.worldguard.session.handler.NotifyEntryFlag;
-import com.sk89q.worldguard.session.handler.NotifyExitFlag;
-import com.sk89q.worldguard.session.handler.TimeLockFlag;
-import com.sk89q.worldguard.session.handler.WaterBreathing;
-import com.sk89q.worldguard.session.handler.WeatherLockFlag;
+import com.sk89q.worldguard.session.handler.*;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -33,8 +38,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractSessionManager implements SessionManager {
 

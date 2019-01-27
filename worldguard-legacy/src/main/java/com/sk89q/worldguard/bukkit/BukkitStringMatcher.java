@@ -221,6 +221,7 @@ public class BukkitStringMatcher implements StringMatcher {
         return BukkitAdapter.adapt(Bukkit.getServer().getWorld(worldName));
     }
 
+    @Override
     public String replaceMacros(Actor sender, String message) {
         Collection<? extends Player> online = Bukkit.getServer().getOnlinePlayers();
 

@@ -77,7 +77,7 @@ artifactoryPublish.skip = true
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
-//    apply plugin: 'checkstyle' TODO Fix
+    apply plugin: 'checkstyle'
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'com.jfrog.artifactory'
 
@@ -86,8 +86,8 @@ subprojects {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
-//    checkstyle.configFile = new File(rootProject.projectDir, "config/checkstyle/checkstyle.xml")
-//    checkstyle.toolVersion = '7.6.1'
+    checkstyle.configFile = new File(rootProject.projectDir, "config/checkstyle/checkstyle.xml")
+    checkstyle.toolVersion = '7.6.1'
 
     repositories {
         mavenLocal()
@@ -121,8 +121,8 @@ subprojects {
         archives javadocJar
     }
 
-//    build.dependsOn(checkstyleMain)
-//    build.dependsOn(checkstyleTest)
+    build.dependsOn(checkstyleMain)
+    build.dependsOn(checkstyleTest)
     build.dependsOn(sourcesJar)
     build.dependsOn(javadocJar)
 

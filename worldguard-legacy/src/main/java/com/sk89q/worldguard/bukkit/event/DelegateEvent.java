@@ -126,7 +126,7 @@ public abstract class DelegateEvent extends Event implements Cancellable, Handle
     }
 
     /**
-     * Set the event to {@link Result#ALLOW} if {@code allowed} is true.
+     * Set the event to {@link org.bukkit.event.Event.Result#ALLOW} if {@code allowed} is true.
      *
      * @param allowed true to set the result
      * @return the same event

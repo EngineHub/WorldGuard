@@ -25,7 +25,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.commands.CommandUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -53,7 +52,7 @@ public interface StringMatcher {
      * Match player names.
      *
      * The filter string uses the following format:
-     * @[name] looks up all players with the exact {@code name}
+     * \@[name] looks up all players with the exact {@code name}
      * *[name] matches any player whose name contains {@code name}
      * [name] matches any player whose name starts with {@code name}
      *
@@ -72,7 +71,7 @@ public interface StringMatcher {
      */
     default Iterable<? extends LocalPlayer> checkPlayerMatch(List<? extends LocalPlayer> players) throws CommandException {
         // Check to see if there were any matches
-        if (players.size() == 0) {
+        if (players.isEmpty()) {
             throw new CommandException("No players matched query.");
         }
 
