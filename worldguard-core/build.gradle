@@ -14,12 +14,16 @@ dependencies {
 sourceSets {
     main {
         java {
-	    srcDir 'src/main/java'
-	}
+            srcDir 'src/main/java'
+        }
         resources {
-	    srcDir 'src/main/resources'
-	}
+            srcDir 'src/main/resources'
+        }
     }
 }
 
-build.dependsOn(shadowJar)
+shadowJar {
+    relocate('com.sk89q.squirrelid', 'com.sk89q.worldguard.util.profile')
+}
+
+build.dependsOn(shadowJar { classifier = null })

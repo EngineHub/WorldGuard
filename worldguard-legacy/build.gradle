@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    compile project(':worldguard-core')
+    compile project(path: ':worldguard-core', configuration: 'shadow')
     compile 'org.bukkit:bukkit:1.13-R0.1-SNAPSHOT'
     compile 'com.sk89q.worldedit:worldedit-bukkit:7.0.0-SNAPSHOT'
     compile ('com.sk89q:commandbook:2.3') {
@@ -47,7 +47,6 @@ shadowJar {
     }
 
     relocate('org.flywaydb', 'com.sk89q.worldguard.internal.flywaydb')
-    relocate('com.sk89q.squirrelid', 'com.sk89q.worldguard.util.profile')
     relocate('org.json.simple', 'com.sk89q.worldguard.util.jsonsimple')
 
 }
