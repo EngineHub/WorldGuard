@@ -621,7 +621,7 @@ public final class Materials {
                 MATERIAL_FLAGS.put(material, MODIFIED_ON_RIGHT);
             }
             if (!MATERIAL_FLAGS.containsKey(material)) {
-                logger.fine("Missing item definition for " + material.getKey().toString());
+                logger.fine("Missing item definition for " + material.name());
                 MATERIAL_FLAGS.put(material, 0);
             }
         }
