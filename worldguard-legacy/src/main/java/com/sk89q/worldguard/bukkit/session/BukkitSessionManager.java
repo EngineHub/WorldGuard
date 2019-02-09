@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.bukkit.session;
 
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.session.AbstractSessionManager;
@@ -64,5 +67,15 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             get(new BukkitPlayer(WorldGuardPlugin.inst(), player)).tick(new BukkitPlayer(WorldGuardPlugin.inst(), player));
         }
+    }
+
+    @Override
+    public boolean hasBypass(LocalPlayer player, World world) {
+        if (player instanceof BukkitPlayer) {
+            if (((BukkitPlayer) player).getPlayer().hasMetadata("NPC")
+                && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride)
+                return true;
+        }
+        return super.hasBypass(player, world);
     }
 }
