@@ -23,6 +23,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
+import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
@@ -150,6 +151,24 @@ public class DebuggingListener extends AbstractListener {
     public void onUseEntity(UseEntityEvent event) {
         StringBuilder builder = new StringBuilder();
         builder.append("INTERACT");
+        builder.append(" ");
+        builder.append("").append(event.getEntity().getType());
+        builder.append(" ");
+        builder.append("[").append(event.getCause()).append("]");
+        builder.append(" ");
+        builder.append("@").append(toBlockString(event.getTarget()));
+        builder.append(" ");
+        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        if (event.getResult() != Result.DEFAULT) {
+            builder.append(" [").append(event.getResult()).append("]");
+        }
+        logger.info(builder.toString());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDamageEntity(DamageEntityEvent event) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("DAMAGE");
         builder.append(" ");
         builder.append("").append(event.getEntity().getType());
         builder.append(" ");
