@@ -151,8 +151,6 @@ public class WorldGuardPlayerListener implements Listener {
         }
 
         Events.fire(new ProcessPlayerEvent(player));
-
-        WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer); // Initializes a session
     }
 
     @EventHandler(ignoreCancelled = true)

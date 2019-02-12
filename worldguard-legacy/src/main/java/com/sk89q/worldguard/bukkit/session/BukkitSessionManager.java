@@ -59,13 +59,15 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         // Pre-load a session
-        get(WorldGuardPlugin.inst().wrapPlayer(event.getPlayer()));
+        LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
+        get(player).initialize(player);
     }
 
     @Override
     public void run() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            get(new BukkitPlayer(WorldGuardPlugin.inst(), player)).tick(new BukkitPlayer(WorldGuardPlugin.inst(), player));
+            LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+            get(localPlayer).tick(localPlayer);
         }
     }
 
