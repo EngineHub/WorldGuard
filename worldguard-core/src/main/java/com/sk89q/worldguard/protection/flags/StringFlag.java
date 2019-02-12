@@ -56,7 +56,7 @@ public class StringFlag extends Flag<String> {
 
     @Override
     public String parseInput(FlagContext context) throws InvalidFlagFormat {
-        return context.getUserInput().replaceAll("(?!\\\\)\\\\n", "\n").replaceAll("\\\\\\\\n", "\\n");
+        return context.getUserInput().replaceAll("(?!<\\\\)\\\\n", "\n").replaceAll("\\\\\\\\n", "\\n");
     }
 
     @Override
