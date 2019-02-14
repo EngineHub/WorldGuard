@@ -133,7 +133,6 @@ subprojects {
             include(dependency('com.sk89q:squirrelid:0.2.0'))
             include(dependency('org.flywaydb:flyway-core:3.0'))
             include(dependency('com.googlecode.json-simple:json-simple:1.1.1'))
-            include(dependency('net.sf.opencsv:opencsv:2.0'))
         }
         exclude 'GradleStart**'
         exclude '.cache'
