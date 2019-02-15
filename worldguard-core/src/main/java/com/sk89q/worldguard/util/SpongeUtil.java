@@ -19,15 +19,22 @@
 
 package com.sk89q.worldguard.util;
 
+import com.google.common.collect.Maps;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.config.WorldConfiguration;
 
+import java.util.Map;
+
 public final class SpongeUtil {
+
+    private static Map<BlockType, Property<Object>> waterloggable = Maps.newHashMap();
 
     private SpongeUtil() {
     }
@@ -41,7 +48,7 @@ public final class SpongeUtil {
     /**
      * Remove water around a sponge.
      *
-     * @param world The world the sponge isin
+     * @param world The world the sponge is in
      * @param ox The x coordinate of the 'sponge' block
      * @param oy The y coordinate of the 'sponge' block
      * @param oz The z coordinate of the 'sponge' block
@@ -53,11 +60,24 @@ public final class SpongeUtil {
             for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
                 for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
                     BlockVector3 vector = BlockVector3.at(ox + cx, oy + cy, oz + cz);
-                    if (isReplacable(world.getBlock(vector).getBlockType())) {
+                    BlockState block = world.getBlock(vector);
+                    BlockType blockType = block.getBlockType();
+                    if (isReplacable(blockType)) {
                         try {
                             world.setBlock(vector, BlockTypes.AIR.getDefaultState());
                         } catch (WorldEditException e) {
                             e.printStackTrace();
+                        }
+                    } else {
+                        @SuppressWarnings("unchecked")
+                        Property<Object> waterloggedProp = waterloggable.computeIfAbsent(blockType,
+                                (bt -> (Property<Object>) bt.getPropertyMap().get("waterlogged")));
+                        if (waterloggedProp != null) {
+                            try {
+                                world.setBlock(vector, block.with(waterloggedProp, false));
+                            } catch (WorldEditException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
