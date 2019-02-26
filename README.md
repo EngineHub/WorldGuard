@@ -21,7 +21,7 @@ Currently, Bukkit is required to use WorldGuard. You can get a release copy of W
 Compiling
 ---------
 
-The project is written for Java 6 and our build process makes use of
+The project is written for Java 8 and our build process makes use of
 [Gradle](http://gradle.org). Detailed compilation information
 [can be found on the wiki](http://wiki.sk89q.com/wiki/WorldGuard/Development#Compiling).
 
