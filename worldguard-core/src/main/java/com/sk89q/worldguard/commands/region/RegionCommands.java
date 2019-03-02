@@ -516,7 +516,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 if (i % 2 == 0) {
                     list.append(Style.GRAY);
                 } else {
-                    list.append(Style.RED);
+                    list.append(Style.WHITE);
                 }
 
                 list.append(flag);
@@ -526,7 +526,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             sender.printError("Unknown flag specified: " + flagName);
-            sender.printError("Available flags: " + list);
+            sender.print(Style.YELLOW + "Available flags: " + list);
             
             return;
         }
