@@ -151,6 +151,7 @@ public abstract class WorldConfiguration {
     public boolean disableSoilDehydration;
     public Set<String> allowedSnowFallOver;
     public boolean regionInvinciblityRemovesMobs;
+    public boolean regionCancelEmptyChatEvents;
     public boolean regionNetherPortalProtection;
     public boolean fakePlayerBuildOverride;
     public boolean explosionFlagCancellation;

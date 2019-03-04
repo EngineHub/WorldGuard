@@ -105,21 +105,24 @@ public class RegionProtectionListener extends AbstractListener {
 
         if (rootCause instanceof Player) {
             Player player = (Player) rootCause;
-            LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
             long now = System.currentTimeMillis();
             Long lastTime = WGMetadata.getIfPresent(player, DENY_MESSAGE_KEY, Long.class);
             if (lastTime == null || now - lastTime >= LAST_MESSAGE_DELAY) {
                 RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+                LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
                 String message = query.queryValue(BukkitAdapter.adapt(location), localPlayer, Flags.DENY_MESSAGE);
-                message = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(localPlayer, message);
-                message = CommandUtils.replaceColorMacros(message);
-                if (message != null && !message.isEmpty()) {
-                    player.sendMessage(message.replace("%what%", what));
-                }
+                formatAndSendDenyMessage(what, localPlayer, message);
                 WGMetadata.put(player, DENY_MESSAGE_KEY, now);
             }
         }
+    }
+
+    static void formatAndSendDenyMessage(String what, LocalPlayer localPlayer, String message) {
+        if (message == null || message.isEmpty()) return;
+        message = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(localPlayer, message);
+        message = CommandUtils.replaceColorMacros(message);
+        localPlayer.printRaw(message.replace("%what%", what));
     }
 
     /**

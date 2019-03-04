@@ -30,10 +30,10 @@ import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GameModeFlag;
@@ -160,20 +160,26 @@ public class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg =
                 WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
         if (wcfg.useRegions) {
-            if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(localPlayer.getLocation(), localPlayer, Flags.SEND_CHAT))) {
-                player.sendMessage(ChatColor.RED + "You don't have permission to chat in this region!");
+            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+            ApplicableRegionSet chatFrom = query.getApplicableRegions(localPlayer.getLocation());
+
+            if (!chatFrom.testState(localPlayer, Flags.SEND_CHAT)) {
+                String message = chatFrom.queryValue(localPlayer, Flags.DENY_MESSAGE);
+                RegionProtectionListener.formatAndSendDenyMessage("chat", localPlayer, message);
                 event.setCancelled(true);
                 return;
             }
 
+            boolean anyRemoved = false;
             for (Iterator<Player> i = event.getRecipients().iterator(); i.hasNext();) {
                 Player rPlayer = i.next();
                 LocalPlayer rLocal = plugin.wrapPlayer(rPlayer);
-                if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(rLocal.getLocation(), rLocal, Flags.RECEIVE_CHAT))) {
+                if (!query.testState(rLocal.getLocation(), rLocal, Flags.RECEIVE_CHAT)) {
                     i.remove();
+                    anyRemoved = true;
                 }
             }
-            if (event.getRecipients().size() == 0) {
+            if (anyRemoved && event.getRecipients().size() == 0 && wcfg.regionCancelEmptyChatEvents) {
                 event.setCancelled(true);
             }
         }
@@ -397,20 +403,18 @@ public class WorldGuardPlayerListener implements Listener {
                     return;
                 }
             }
-            try {
-                if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
-                    if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
-                        boolean allowFrom = setFrom.testState(localPlayer, Flags.CHORUS_TELEPORT);
-                        boolean allowTo = set.testState(localPlayer, Flags.CHORUS_TELEPORT);
-                        if (!allowFrom || !allowTo) {
-                            player.sendMessage(ChatColor.DARK_RED + "You're not allowed to teleport " +
-                                    (!allowFrom ? "from here." : "there."));
-                            event.setCancelled(true);
-                            return;
-                        }
+            if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
+                if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
+                    boolean allowFrom = setFrom.testState(localPlayer, Flags.CHORUS_TELEPORT);
+                    boolean allowTo = set.testState(localPlayer, Flags.CHORUS_TELEPORT);
+                    if (!allowFrom || !allowTo) {
+                        player.sendMessage(ChatColor.DARK_RED + "You're not allowed to teleport " +
+                                (!allowFrom ? "from here." : "there."));
+                        event.setCancelled(true);
+                        return;
                     }
                 }
-            } catch (NoSuchFieldError ignored) {}
+            }
         }
     }
 
@@ -476,7 +480,8 @@ public class WorldGuardPlayerListener implements Listener {
             CommandFilter test = new CommandFilter(allowedCommands, blockedCommands);
 
             if (!test.apply(event.getMessage())) {
-                player.sendMessage(ChatColor.RED + event.getMessage() + " is not allowed in this area.");
+                String message = set.queryValue(localPlayer, Flags.DENY_MESSAGE);
+                RegionProtectionListener.formatAndSendDenyMessage("use " + event.getMessage(), localPlayer, message);
                 event.setCancelled(true);
                 return;
             }
