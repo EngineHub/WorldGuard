@@ -424,7 +424,12 @@ public class RegionProtectionListener extends AbstractListener {
 
         /* Paintings, item frames, etc. */
         } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
-            canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
+            if (event.getEntity().getType() == EntityType.ITEM_FRAME && event.getCause().getFirstPlayer() != null
+                && ((org.bukkit.entity.ItemFrame) event.getEntity()).getItem() != null) {
+                    canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_FRAME_ROTATE));
+            } else {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
+            }
             what = "change that";
 
         /* Ridden on use */

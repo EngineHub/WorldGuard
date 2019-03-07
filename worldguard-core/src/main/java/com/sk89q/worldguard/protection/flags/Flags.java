@@ -59,6 +59,7 @@ public final class Flags {
     public static final StateFlag LIGHTER = register(new StateFlag("lighter", false));
     public static final StateFlag RIDE = register(new StateFlag("ride", false));
     public static final StateFlag POTION_SPLASH = register(new StateFlag("potion-splash", false));
+    public static final StateFlag ITEM_FRAME_ROTATE = register(new StateFlag("item-frame-rotation", false));
 
     // These flags are similar to the ones above (used in tandem with BUILD),
     // but their defaults are set to TRUE because it is more user friendly.
