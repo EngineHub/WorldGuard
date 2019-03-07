@@ -421,11 +421,10 @@ public class RegionProtectionListener extends AbstractListener {
                 || Entities.isNPC(event.getEntity()) || Entities.isVehicle(event.getEntity().getType())) {
             canUse = event.getRelevantFlags().isEmpty() || query.queryState(BukkitAdapter.adapt(target), associable, combine(event)) != State.DENY;
             what = "use that";
-
         /* Paintings, item frames, etc. */
         } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
             if (event.getEntity().getType() == EntityType.ITEM_FRAME && event.getCause().getFirstPlayer() != null
-                && ((org.bukkit.entity.ItemFrame) event.getEntity()).getItem() != null) {
+                && ((org.bukkit.entity.ItemFrame) event.getEntity()).getItem().getType() != Material.AIR) {
                     canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_FRAME_ROTATE));
             } else {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
