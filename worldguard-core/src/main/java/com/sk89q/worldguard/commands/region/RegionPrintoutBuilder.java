@@ -91,7 +91,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
      */
     public void appendFlags() {
         builder.append(Style.BLUE);
-        builder.append("FlagUtil: ");
+        builder.append("Flags: ");
         
         appendFlagsList(true);
         
@@ -99,7 +99,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
     }
     
     /**
-     * Append just the list of flags (without "FlagUtil:"), including colors.
+     * Append just the list of flags (without "Flags:"), including colors.
      *
      * @param useColors true to use colors
      */
