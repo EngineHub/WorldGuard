@@ -395,21 +395,36 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (event.getCause() == TeleportCause.ENDER_PEARL) {
-                if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())
-                        && !(set.testState(localPlayer, Flags.ENDERPEARL)
-                                && setFrom.testState(localPlayer, Flags.ENDERPEARL))) {
-                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
-                    event.setCancelled(true);
-                    return;
+                if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
+                    boolean cancel = false;
+                    String message = null;
+                    if (!setFrom.testState(localPlayer, Flags.ENDERPEARL)) {
+                        cancel = true;
+                        message = set.queryValue(localPlayer, Flags.EXIT_DENY_MESSAGE);
+                    } else if (!set.testState(localPlayer, Flags.ENDERPEARL)) {
+                        cancel = true;
+                        message = set.queryValue(localPlayer, Flags.ENTRY_DENY_MESSAGE);
+                    }
+                    if (cancel) {
+                        player.sendMessage(message);
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
             }
             if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
                 if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
-                    boolean allowFrom = setFrom.testState(localPlayer, Flags.CHORUS_TELEPORT);
-                    boolean allowTo = set.testState(localPlayer, Flags.CHORUS_TELEPORT);
-                    if (!allowFrom || !allowTo) {
-                        player.sendMessage(ChatColor.DARK_RED + "You're not allowed to teleport " +
-                                (!allowFrom ? "from here." : "there."));
+                    boolean cancel = false;
+                    String message = null;
+                    if (!setFrom.testState(localPlayer, Flags.CHORUS_TELEPORT)) {
+                        cancel = true;
+                        message = set.queryValue(localPlayer, Flags.EXIT_DENY_MESSAGE);
+                    } else if (!set.testState(localPlayer, Flags.CHORUS_TELEPORT)) {
+                        cancel = true;
+                        message = set.queryValue(localPlayer, Flags.ENTRY_DENY_MESSAGE);
+                    }
+                    if (cancel) {
+                        player.sendMessage(message);
                         event.setCancelled(true);
                         return;
                     }

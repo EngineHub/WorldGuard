@@ -143,14 +143,6 @@ public final class Flags {
     public static final SetFlag<String> BLOCKED_CMDS = register(new SetFlag<>("blocked-cmds", new CommandStringFlag(null)));
     public static final SetFlag<String> ALLOWED_CMDS = register(new SetFlag<>("allowed-cmds", new CommandStringFlag(null)));
 
-    // these 3 are not used by worldguard and should be re-implemented in plugins that may use them using custom flag api
-    @Deprecated
-    public static final StateFlag ENABLE_SHOP = register(new StateFlag("allow-shop", false));
-    @Deprecated
-    public static final BooleanFlag BUYABLE = register(new BooleanFlag("buyable"));
-    @Deprecated
-    public static final DoubleFlag PRICE = register(new DoubleFlag("price"));
-
     private Flags() {
     }
 
