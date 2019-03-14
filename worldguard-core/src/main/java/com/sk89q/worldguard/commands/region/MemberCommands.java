@@ -105,11 +105,10 @@ public class MemberCommands extends RegionCommandsBase {
 
         id = region.getId();
 
-        Boolean flag = region.getFlag(Flags.BUYABLE);
         DefaultDomain owners = region.getOwners();
 
         if (player != null) {
-            if (flag != null && flag && owners != null && owners.size() == 0) {
+            if (owners != null && owners.size() == 0) {
                 // TODO: Move this to an event
                 if (!sender.hasPermission("worldguard.region.unlimited")) {
                     int maxRegionCount = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).getMaxRegionCount(player);
