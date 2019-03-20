@@ -8,6 +8,8 @@ dependencies {
     compile 'org.flywaydb:flyway-core:3.0'
     compile 'org.khelekore:prtree:1.5.0'
     compile 'com.google.code.findbugs:jsr305:1.3.9'
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.hamcrest:hamcrest-library:1.2.1'
 }
 
 sourceSets {

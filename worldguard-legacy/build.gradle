@@ -17,8 +17,6 @@ dependencies {
         exclude group: 'com.zachsthings.libcomponents'
     }
     compile 'org.bstats:bstats-bukkit:1.4'
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.hamcrest:hamcrest-library:1.2.1'
 }
 
 processResources {
