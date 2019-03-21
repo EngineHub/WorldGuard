@@ -61,6 +61,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Hopper;
+import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -363,7 +364,11 @@ public class EventAbstractionListener extends AbstractListener {
             int originalLength = blocks.size();
             BlockFace dir = event.getDirection();
             for (int i = 0; i < blocks.size(); i++) {
-                blocks.set(i, blocks.get(i).getRelative(dir));
+                Block existing = blocks.get(i);
+                if (existing.getPistonMoveReaction() == PistonMoveReaction.MOVE
+                    || existing.getPistonMoveReaction() == PistonMoveReaction.PUSH_ONLY) {
+                    blocks.set(i, existing.getRelative(dir));
+                }
             }
             Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getBlock()), event.getBlock().getWorld(), blocks, Material.STONE));
             if (blocks.size() != originalLength) {
