@@ -20,52 +20,44 @@
 package com.sk89q.worldguard.protection.flags;
 
 import javax.annotation.Nullable;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * Stores a timestamp.
  */
-public class TimestampFlag extends Flag<Date> {
-    private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss");
-
-    protected TimestampFlag(String name, @Nullable RegionGroup defaultGroup) {
+public class TimestampFlag extends Flag<Instant> {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC);
+    public TimestampFlag(String name, @Nullable RegionGroup defaultGroup) {
         super(name, defaultGroup);
     }
 
-    protected TimestampFlag(String name) {
+    public TimestampFlag(String name) {
         super(name);
     }
 
     @Override
-    public Date parseInput(FlagContext context) throws InvalidFlagFormat {
+    public Instant parseInput(FlagContext context) throws InvalidFlagFormat {
         String input = context.getUserInput();
         if("now".equalsIgnoreCase(input)) {
-            return new Date();
-        } else if("none".equalsIgnoreCase(input)) {
-            return null;
+            return Instant.now();
         } else {
-            DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
             try {
-                return format.parse(input);
-            } catch (ParseException ignored) {
-                String pattern = format instanceof SimpleDateFormat ?
-                        ((SimpleDateFormat) format).toLocalizedPattern() :
-                        format.format(new Date());
-                throw new InvalidFlagFormat("Expected input in format: " + pattern);
+                return Instant.from(FORMATTER.parse(input));
+            } catch(DateTimeParseException ignored) {
+                throw new InvalidFlagFormat("Expected 'now' or ISO 8601 formatted input.");
             }
         }
     }
 
     @Override
-    public Date unmarshal(@Nullable Object o) {
+    public Instant unmarshal(@Nullable Object o) {
         if (o instanceof String) {
             try {
-                return DEFAULT_FORMAT.parse((String) o);
-            } catch (ParseException e) {
+                return Instant.from(FORMATTER.parse((String) o));
+            } catch(DateTimeParseException ignored) {
                 return null;
             }
         }
@@ -73,7 +65,7 @@ public class TimestampFlag extends Flag<Date> {
     }
 
     @Override
-    public Object marshal(Date o) {
-        return DEFAULT_FORMAT.format(o);
+    public Object marshal(Instant o) {
+        return FORMATTER.format(o);
     }
 }
