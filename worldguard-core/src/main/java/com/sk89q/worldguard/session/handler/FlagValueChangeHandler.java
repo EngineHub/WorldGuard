@@ -47,7 +47,8 @@ public abstract class FlagValueChangeHandler<T> extends Handler {
 
     @Override
     public boolean onCrossBoundary(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
-        if (entered.isEmpty() && exited.isEmpty()) {
+        if (entered.isEmpty() && exited.isEmpty()
+                && from.getExtent().equals(to.getExtent())) { // sets don't include global regions - check if those changed
             return true; // no changes to flags if regions didn't change
         }
 

@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.command.parametric.ExceptionConverterHelper;
 import com.sk89q.worldedit.util.command.parametric.ExceptionMatch;
 import com.sk89q.worldguard.WorldGuard;
@@ -88,4 +89,8 @@ public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
         throw new CommandException(e.getMessage(), e);
     }
 
+    @ExceptionMatch
+    public void convert(AuthorizationException e) throws CommandException {
+        throw new CommandException("You don't have permission to do that.", e);
+    }
 }
