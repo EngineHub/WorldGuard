@@ -63,7 +63,7 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("PLACE");
         builder.append(" ");
-        builder.append("").append(event.getEffectiveMaterial());
+        builder.append(event.getEffectiveMaterial());
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
@@ -81,7 +81,7 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("DIG");
         builder.append(" ");
-        builder.append("").append(event.getEffectiveMaterial());
+        builder.append(event.getEffectiveMaterial());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
@@ -99,14 +99,14 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("INTERACT");
         builder.append(" ");
-        builder.append("").append(event.getEffectiveMaterial());
+        builder.append(event.getEffectiveMaterial());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
         builder.append(": ").append(getEventName(event.getOriginalEvent()));
-        if (event.getOriginalEvent() instanceof org.bukkit.event.player.PlayerInteractEvent) {
+        if (event.getOriginalEvent() instanceof PlayerInteractEvent) {
             builder.append(".").append(((PlayerInteractEvent) event.getOriginalEvent()).getAction());
         }
         if (event.getResult() != Result.DEFAULT) {
@@ -120,7 +120,7 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("SPAWN");
         builder.append(" ");
-        builder.append("").append(event.getEffectiveType());
+        builder.append(event.getEffectiveType());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
@@ -138,7 +138,7 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("DESTROY");
         builder.append(" ");
-        builder.append("").append(event.getEntity().getType());
+        builder.append(event.getEntity().getType());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
@@ -156,7 +156,7 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("INTERACT");
         builder.append(" ");
-        builder.append("").append(event.getEntity().getType());
+        builder.append(event.getEntity().getType());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
@@ -174,7 +174,7 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("DAMAGE");
         builder.append(" ");
-        builder.append("").append(event.getEntity().getType());
+        builder.append(event.getEntity().getType());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
@@ -192,7 +192,7 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("USE");
         builder.append(" ");
-        builder.append("").append(event.getItemStack().getType());
+        builder.append(event.getItemStack().getType());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");

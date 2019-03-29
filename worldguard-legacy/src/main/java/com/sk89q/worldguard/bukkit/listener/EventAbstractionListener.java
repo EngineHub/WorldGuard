@@ -412,6 +412,7 @@ public class EventAbstractionListener extends AbstractListener {
                 // turtle eggs are broken when this happens
                 if (clicked.getType() == Material.TURTLE_EGG) { // normally we'd be safe but WG7 is 1.13+ only
                     entityBreakBlockDebounce.debounce(clicked, player, event, new BreakBlockEvent(event, cause, clicked));
+                    break;
                 }
 
                 // Forget about Redstone ore
