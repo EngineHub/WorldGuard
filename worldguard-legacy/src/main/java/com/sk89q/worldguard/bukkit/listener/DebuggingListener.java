@@ -34,6 +34,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -68,7 +69,7 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -86,7 +87,7 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -104,7 +105,10 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
+        if (event.getOriginalEvent() instanceof org.bukkit.event.player.PlayerInteractEvent) {
+            builder.append(".").append(((PlayerInteractEvent) event.getOriginalEvent()).getAction());
+        }
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -122,7 +126,7 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -140,7 +144,7 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -158,7 +162,7 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -176,7 +180,7 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -194,7 +198,7 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append("@").append(event.getWorld().getName());
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
