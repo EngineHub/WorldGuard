@@ -255,7 +255,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param group The group
      * @return whether {@code player} is in {@code group}
      */
-    public boolean inGroup(Player player, String group) {
+    public boolean inGroup(OfflinePlayer player, String group) {
         try {
             return PermissionsResolverManager.getInstance().inGroup(player, group);
         } catch (Throwable t) {
@@ -270,7 +270,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param player The player to check
      * @return The names of each group the playe is in.
      */
-    public String[] getGroups(Player player) {
+    public String[] getGroups(OfflinePlayer player) {
         try {
             return PermissionsResolverManager.getInstance().getGroups(player);
         } catch (Throwable t) {
@@ -392,7 +392,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return The wrapped player
      */
     public LocalPlayer wrapOfflinePlayer(OfflinePlayer player) {
-        return new BukkitOfflinePlayer(player);
+        return new BukkitOfflinePlayer(this, player);
     }
 
     /**

@@ -31,7 +31,7 @@ import org.bukkit.entity.Player;
 
 public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implements LocalPlayer {
 
-    private final WorldGuardPlugin plugin;
+    protected final WorldGuardPlugin plugin;
     private final boolean silenced;
     private String name;
 
@@ -40,7 +40,7 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     BukkitPlayer(WorldGuardPlugin plugin, Player player, boolean silenced) {
-        super((WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit"), player);
+        super(player);
         this.plugin = plugin;
         this.silenced = silenced;
     }
