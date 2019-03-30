@@ -114,8 +114,7 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
-    public double getSaturation()
-    {
+    public double getSaturation() {
         throw new UnsupportedOperationException();
     }
 
@@ -125,8 +124,7 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
-    public float getExhaustion()
-    {
+    public float getExhaustion() {
         throw new UnsupportedOperationException();
     }
 
@@ -136,8 +134,7 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
-    public WeatherType getPlayerWeather()
-    {
+    public WeatherType getPlayerWeather() {
         throw new UnsupportedOperationException();
     }
 
@@ -152,14 +149,12 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
-    public boolean isPlayerTimeRelative()
-    {
+    public boolean isPlayerTimeRelative() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public long getPlayerTimeOffset()
-    {
+    public long getPlayerTimeOffset() {
         throw new UnsupportedOperationException();
     }
 
@@ -194,8 +189,7 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
-    public World getWorld()
-    {
+    public World getWorld() {
         throw new UnsupportedOperationException();
     }
 
@@ -210,8 +204,7 @@ class BukkitOfflinePlayer extends BukkitPlayer {
     }
 
     @Override
-    public BlockBag getInventoryBlockBag()
-    {
+    public BlockBag getInventoryBlockBag() {
         throw new UnsupportedOperationException();
     }
 
@@ -222,14 +215,12 @@ class BukkitOfflinePlayer extends BukkitPlayer {
 
     @Nullable
     @Override
-    public BaseEntity getState()
-    {
+    public BaseEntity getState() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Location getLocation()
-    {
+    public Location getLocation() {
         throw new UnsupportedOperationException();
     }
 
