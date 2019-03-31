@@ -27,6 +27,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Tameable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityCombustEvent;
@@ -73,6 +74,10 @@ public class InvincibilityListener extends AbstractListener {
                 if (event instanceof EntityDamageByEntityEvent) {
                     EntityDamageByEntityEvent byEntityEvent = (EntityDamageByEntityEvent) event;
                     Entity attacker = byEntityEvent.getDamager();
+
+                    if (attacker instanceof Projectile && ((Projectile) attacker).getShooter() instanceof Entity) {
+                        attacker = (Entity) ((Projectile) attacker).getShooter();
+                    }
 
                     if (worldConfig.regionInvinciblityRemovesMobs
                             && attacker instanceof LivingEntity && !(attacker instanceof Player)
