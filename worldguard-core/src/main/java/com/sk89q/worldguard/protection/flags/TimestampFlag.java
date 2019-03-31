@@ -21,15 +21,24 @@ package com.sk89q.worldguard.protection.flags;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 
 /**
  * Stores a timestamp.
  */
 public class TimestampFlag extends Flag<Instant> {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC);
+    private static final DateTimeFormatter SERIALIZER = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC);
+    private static final DateTimeFormatter PARSER = new DateTimeFormatterBuilder()
+            .append(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            .optionalStart().appendOffsetId()
+            .toFormatter();
+
     public TimestampFlag(String name, @Nullable RegionGroup defaultGroup) {
         super(name, defaultGroup);
     }
@@ -41,12 +50,20 @@ public class TimestampFlag extends Flag<Instant> {
     @Override
     public Instant parseInput(FlagContext context) throws InvalidFlagFormat {
         String input = context.getUserInput();
-        if("now".equalsIgnoreCase(input)) {
+        if ("now".equalsIgnoreCase(input)) {
             return Instant.now();
         } else {
             try {
-                return Instant.from(FORMATTER.parse(input));
-            } catch(DateTimeParseException ignored) {
+                TemporalAccessor parsed = PARSER.parseBest(input, ZonedDateTime::from, LocalDateTime::from);
+                // convert whatever input into UTC for storage
+                if (parsed instanceof LocalDateTime) {
+                    return ((LocalDateTime) parsed).atZone(ZoneOffset.UTC).toInstant();
+                } else if (parsed instanceof ZonedDateTime) {
+                    return ((ZonedDateTime) parsed).toInstant();
+                } else {
+                    throw new InvalidFlagFormat("Unrecognized input.");
+                }
+            } catch (DateTimeParseException ignored) {
                 throw new InvalidFlagFormat("Expected 'now' or ISO 8601 formatted input.");
             }
         }
@@ -56,7 +73,7 @@ public class TimestampFlag extends Flag<Instant> {
     public Instant unmarshal(@Nullable Object o) {
         if (o instanceof String) {
             try {
-                return Instant.from(FORMATTER.parse((String) o));
+                return Instant.from(SERIALIZER.parse((String) o));
             } catch(DateTimeParseException ignored) {
                 return null;
             }
@@ -66,6 +83,6 @@ public class TimestampFlag extends Flag<Instant> {
 
     @Override
     public Object marshal(Instant o) {
-        return FORMATTER.format(o);
+        return SERIALIZER.format(o);
     }
 }
