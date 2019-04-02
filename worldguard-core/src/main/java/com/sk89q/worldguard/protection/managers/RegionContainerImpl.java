@@ -246,6 +246,8 @@ public class RegionContainerImpl {
      * successfully loaded.
      */
     private class BackgroundLoader extends TimerTask {
+        private String lastMsg;
+
         @Override
         public void run() {
             synchronized (lock) {
@@ -261,7 +263,13 @@ public class RegionContainerImpl {
                             it.remove();
                             log.info("Successfully loaded region data for '" + normal.toString() + "'");
                         } catch (StorageException e) {
+                            if (e.getCause() != null && e.getCause().getMessage().equals(lastMsg)) {
+                                // if it's the same error, don't print a whole stacktrace
+                                log.log(Level.WARNING, "Region data is still failing to load, at least for the world named '" + normal.toString() + "'");
+                                break;
+                            }
                             log.log(Level.WARNING, "Region data is still failing to load, at least for the world named '" + normal.toString() + "'", e);
+                            lastMsg = e.getCause() == null ? e.getMessage() : e.getCause().getMessage();
                             break;
                         }
                     }
