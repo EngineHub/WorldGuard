@@ -154,8 +154,6 @@ public class WorldGuardPlugin extends JavaPlugin {
             }
         }, 0L);
 
-        WorldGuard.logger.info("Loading region data...");
-
         getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
 
         // Register events

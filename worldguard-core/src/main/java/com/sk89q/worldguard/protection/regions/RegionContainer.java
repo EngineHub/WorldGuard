@@ -169,6 +169,7 @@ public abstract class RegionContainer {
      * Try loading the region managers for all currently loaded worlds.
      */
     protected void loadWorlds() {
+        WorldGuard.logger.info("Loading region data...");
         synchronized (lock) {
             for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
                 load(world);
