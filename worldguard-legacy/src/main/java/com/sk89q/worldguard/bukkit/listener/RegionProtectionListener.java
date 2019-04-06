@@ -136,10 +136,7 @@ public class RegionProtectionListener extends AbstractListener {
     private boolean isWhitelisted(Cause cause, World world, boolean pvp) {
         Object rootCause = cause.getRootCause();
 
-        if (rootCause instanceof Block) {
-            Material type = ((Block) rootCause).getType();
-            return type == Material.HOPPER || type == Material.DROPPER;
-        } else if (rootCause instanceof Player) {
+        if (rootCause instanceof Player) {
             Player player = (Player) rootCause;
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
             WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(world));

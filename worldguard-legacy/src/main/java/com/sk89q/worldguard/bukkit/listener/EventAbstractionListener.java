@@ -59,7 +59,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.block.Container;
 import org.bukkit.block.DoubleChest;
+import org.bukkit.block.Dropper;
 import org.bukkit.block.Hopper;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.entity.AreaEffectCloud;
@@ -861,8 +863,9 @@ public class EventAbstractionListener extends AbstractListener {
         InventoryHolder sourceHolder = event.getSource().getHolder();
         InventoryHolder targetHolder = event.getDestination().getHolder();
 
-        if (causeHolder instanceof Hopper
-                && ((BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(((Hopper) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
+        if ((causeHolder instanceof Hopper || causeHolder instanceof Dropper)
+                && ((BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(
+                        BukkitAdapter.adapt(((Container) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
             return;
         }
 
@@ -879,19 +882,15 @@ public class EventAbstractionListener extends AbstractListener {
                 cause = Cause.unknown();
             }
 
-            if (!causeHolder.equals(sourceHolder)) {
+            if (causeHolder != null && !causeHolder.equals(sourceHolder)) {
                 handleInventoryHolderUse(event, cause, sourceHolder);
             }
 
             handleInventoryHolderUse(event, cause, targetHolder);
 
             if (event.isCancelled() && causeHolder instanceof Hopper) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), new Runnable() {
-                    @Override
-                    public void run() {
-                        ((Hopper) causeHolder).getBlock().breakNaturally();
-                    }
-                });
+                Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
+                        () -> ((Hopper) causeHolder).getBlock().breakNaturally());
             } else {
                 entry.setCancelled(event.isCancelled());
             }
