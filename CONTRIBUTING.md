@@ -4,7 +4,7 @@ Thank you for your interest in contributing to WorldGuard! We appreciate your
 effort, but to make sure that the inclusion of your patch is a smooth process, we
 ask that you make note of the following guidelines.
 
-* **Follow the [Oracle coding conventions](http://www.oracle.com/technetwork/java/codeconv-138413.html).**
+* **Follow the [Oracle coding conventions](https://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html).**
   We can't stress this enough; if your code has notable issues, it may delay
   the process significantly.
 * **Target Java 6 for source and compilation.** Make sure to mark methods with
