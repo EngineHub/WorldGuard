@@ -276,8 +276,8 @@ public class FlagValueCalculator {
 
         int minimumPriority = Integer.MIN_VALUE;
 
-        Map<ProtectedRegion, V> consideredValues = new HashMap<ProtectedRegion, V>();
-        Set<ProtectedRegion> ignoredParents = new HashSet<ProtectedRegion>();
+        Map<ProtectedRegion, V> consideredValues = new HashMap<>();
+        Set<ProtectedRegion> ignoredParents = new HashSet<>();
 
         for (ProtectedRegion region : getApplicable()) {
             if (getPriority(region) < minimumPriority) {
@@ -374,7 +374,7 @@ public class FlagValueCalculator {
 
         ProtectedRegion current = region;
 
-        List<ProtectedRegion> seen = new ArrayList<ProtectedRegion>();
+        List<ProtectedRegion> seen = new ArrayList<>();
 
         while (current != null) {
             seen.add(current);

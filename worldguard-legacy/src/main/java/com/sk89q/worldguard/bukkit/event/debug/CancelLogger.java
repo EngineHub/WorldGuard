@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class CancelLogger {
 
-    private List<CancelAttempt> entries = new ArrayList<CancelAttempt>();
+    private List<CancelAttempt> entries = new ArrayList<>();
 
     /**
      * Log a call.

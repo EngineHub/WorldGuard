@@ -81,7 +81,7 @@ public class DirectoryYamlDriver implements RegionDriver {
 
     @Override
     public List<RegionDatabase> getAll() throws StorageException {
-        List<RegionDatabase> stores = new ArrayList<RegionDatabase>();
+        List<RegionDatabase> stores = new ArrayList<>();
 
         File files[] = rootDir.listFiles();
         if (files != null) {

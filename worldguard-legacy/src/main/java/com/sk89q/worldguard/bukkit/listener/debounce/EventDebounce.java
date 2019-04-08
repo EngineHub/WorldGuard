@@ -75,7 +75,7 @@ public class EventDebounce<K> {
     }
 
     public static <K> EventDebounce<K> create(int debounceTime) {
-        return new EventDebounce<K>(debounceTime);
+        return new EventDebounce<>(debounceTime);
     }
 
     public static class Entry {

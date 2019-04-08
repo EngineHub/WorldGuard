@@ -92,7 +92,7 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
     @Override
     public DefaultDomain call() throws UnresolvedNamesException {
         DefaultDomain domain = new DefaultDomain();
-        List<String> namesToQuery = new ArrayList<String>();
+        List<String> namesToQuery = new ArrayList<>();
 
         for (String s : input) {
             Matcher m = GROUP_PATTERN.matcher(s);

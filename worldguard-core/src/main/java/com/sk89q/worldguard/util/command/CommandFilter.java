@@ -171,7 +171,7 @@ public class CommandFilter implements Predicate<String> {
         public Builder permit(String ... rules) {
             checkNotNull(rules);
             if (permitted == null) {
-                permitted = new HashSet<String>();
+                permitted = new HashSet<>();
             }
             permitted.addAll(Arrays.asList(rules));
             return this;
@@ -186,7 +186,7 @@ public class CommandFilter implements Predicate<String> {
         public Builder deny(String ... rules) {
             checkNotNull(rules);
             if (denied == null) {
-                denied = new HashSet<String>();
+                denied = new HashSet<>();
             }
             denied.addAll(Arrays.asList(rules));
             return this;
@@ -199,8 +199,8 @@ public class CommandFilter implements Predicate<String> {
          */
         public CommandFilter build() {
             return new CommandFilter(
-                    permitted != null ? new HashSet<String>(permitted) : null,
-                    denied != null ? new HashSet<String>(denied) : null);
+                    permitted != null ? new HashSet<>(permitted) : null,
+                    denied != null ? new HashSet<>(denied) : null);
         }
     }
 

@@ -43,9 +43,9 @@ class RegionInserter {
     private final DataSourceConfig config;
     private final Connection conn;
     private final int worldId;
-    private final List<ProtectedRegion> all = new ArrayList<ProtectedRegion>();
-    private final List<ProtectedCuboidRegion> cuboids = new ArrayList<ProtectedCuboidRegion>();
-    private final List<ProtectedPolygonalRegion> polygons = new ArrayList<ProtectedPolygonalRegion>();
+    private final List<ProtectedRegion> all = new ArrayList<>();
+    private final List<ProtectedCuboidRegion> cuboids = new ArrayList<>();
+    private final List<ProtectedPolygonalRegion> polygons = new ArrayList<>();
 
     RegionInserter(DataUpdater updater) {
         this.config = updater.config;

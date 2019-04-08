@@ -82,7 +82,7 @@ public class SQLDriver implements RegionDriver {
     public List<RegionDatabase> getAll() throws StorageException {
         Closer closer = Closer.create();
         try {
-            List<RegionDatabase> stores = new ArrayList<RegionDatabase>();
+            List<RegionDatabase> stores = new ArrayList<>();
             Connection connection = closer.register(getConnection());
             Statement stmt = connection.createStatement();
             ResultSet rs = closer.register(stmt.executeQuery("SELECT name FROM " + config.getTablePrefix() + "world"));
@@ -148,7 +148,7 @@ public class SQLDriver implements RegionDriver {
             }
 
             // Our placeholders
-            Map<String, String> placeHolders = new HashMap<String, String>();
+            Map<String, String> placeHolders = new HashMap<>();
             placeHolders.put("tablePrefix", config.getTablePrefix());
 
             Flyway flyway = new Flyway();
