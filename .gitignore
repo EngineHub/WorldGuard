@@ -15,4 +15,3 @@
 /.gradle
 **/build
 out/
-/.nb-gradle/

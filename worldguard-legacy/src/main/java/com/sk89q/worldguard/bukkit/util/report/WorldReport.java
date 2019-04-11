@@ -24,7 +24,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.generator.ChunkGenerator;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WorldReport extends DataReport {
 
@@ -67,7 +69,9 @@ public class WorldReport extends DataReport {
 
             DataReport protection = new DataReport("Protection");
             protection.append("PVP?", world.getPVP());
-            protection.append("Game Rules", world.getGameRules());
+            protection.append("Game Rules", Arrays.stream(world.getGameRules())
+                    .map(name -> name + "=" + world.getGameRuleValue(name))
+                    .collect(Collectors.joining(", ")));
             report.append(protection.getTitle(), protection);
 
             append(report.getTitle(), report);

@@ -22,12 +22,11 @@ package com.sk89q.worldguard.bukkit.listener;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
-import com.sk89q.worldguard.bukkit.util.Entities;
 import com.sk89q.worldguard.bukkit.util.Materials;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -77,7 +76,7 @@ public class RegionFlagsListener extends AbstractListener {
         com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(event.getWorld());
         if (!isRegionSupportEnabled(weWorld)) return; // Region support disabled
 
-        BukkitWorldConfiguration config = getWorldConfig(weWorld);
+        WorldConfiguration config = getWorldConfig(weWorld);
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
         Block block;
@@ -95,7 +94,7 @@ public class RegionFlagsListener extends AbstractListener {
             event.filter(testState(query, Flags.ENDERDRAGON_BLOCK_DAMAGE), config.explosionFlagCancellation);
         }
 
-        if (event.getCause().find(Entities.enderCrystalType) != null) { // should be nullsafe even if enderCrystalType field is null
+        if (event.getCause().find(EntityType.ENDER_CRYSTAL) != null) { // EnderCrystal
             event.filter(testState(query, Flags.OTHER_EXPLOSION), config.explosionFlagCancellation);
         }
     }

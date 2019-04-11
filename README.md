@@ -21,7 +21,7 @@ Currently, Bukkit is required to use WorldGuard. You can get a release copy of W
 Compiling
 ---------
 
-The project is written for Java 6 and our build process makes use of
+The project is written for Java 8 and our build process makes use of
 [Gradle](http://gradle.org). Detailed compilation information
 [can be found on the wiki](http://wiki.sk89q.com/wiki/WorldGuard/Development#Compiling).
 
@@ -40,7 +40,8 @@ Links
 -----
 
 * [Homepage](http://enginehub.org/worldguard)
+* [Discord](https://discord.gg/enginehub)
 * [IRC channel](http://skq.me/irc/irc.esper.net/sk89q/) (#sk89q on irc.esper.net)
 * [Issue tracker](http://youtrack.sk89q.com/issues/WORLDGUARD)
-* [Continuous integration](http://builds.enginehub.org)
-* [End-user documentation](http://wiki.sk89q.com/wiki/WorldGuard)
+* [Continuous integration](http://builds.enginehub.org) [![Build Status](https://travis-ci.org/EngineHub/WorldGuard.svg?branch=master)](https://travis-ci.org/EngineHub/WorldGuard)
+* [End-user documentation](https://worldguard.enginehub.org/en/latest/) / [Older Wiki](http://wiki.sk89q.com/wiki/WorldGuard)

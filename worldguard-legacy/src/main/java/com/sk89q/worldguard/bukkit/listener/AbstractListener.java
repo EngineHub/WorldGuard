@@ -24,9 +24,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import org.bukkit.event.Listener;
 
 /**
@@ -77,17 +77,17 @@ class AbstractListener implements Listener {
      * @param world The world to get the configuration for.
      * @return The configuration for {@code world}
      */
-    protected BukkitWorldConfiguration getWorldConfig(World world) {
-        return (BukkitWorldConfiguration) getConfig().get(world);
+    protected WorldConfiguration getWorldConfig(World world) {
+        return getConfig().get(world);
     }
 
     /**
      * Get the world configuration given a player.
      *
      * @param player The player to get the wold from
-     * @return The {@link BukkitWorldConfiguration} for the player's world
+     * @return The {@link WorldConfiguration} for the player's world
      */
-    protected BukkitWorldConfiguration getWorldConfig(LocalPlayer player) {
+    protected WorldConfiguration getWorldConfig(LocalPlayer player) {
         return getWorldConfig((World) player.getExtent());
     }
 

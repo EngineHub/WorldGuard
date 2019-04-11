@@ -92,8 +92,7 @@ public abstract class Handler {
     }
 
     /**
-     * Called when a player has moved into a new location where either
-     * there are fewer regions or more regions.
+     * Called when a player has moved into a new location.
      *
      * <p>This is called only if the move test
      * ({@link Session#testMoveTo(LocalPlayer, Location, MoveType)}) was successful.</p>

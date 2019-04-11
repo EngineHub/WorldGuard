@@ -146,22 +146,29 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
             if (removed != null) {
                 removedSet.add(removed);
 
-                Iterator<ProtectedRegion> it = regions.values().iterator();
+                while (true) {
+                    int lastSize = removedSet.size();
+                    Iterator<ProtectedRegion> it = regions.values().iterator();
 
-                // Handle children
-                while (it.hasNext()) {
-                    ProtectedRegion current = it.next();
-                    ProtectedRegion parent = current.getParent();
+                    // Handle children
+                    while (it.hasNext()) {
+                        ProtectedRegion current = it.next();
+                        ProtectedRegion parent = current.getParent();
 
-                    if (parent != null && parent == removed) {
-                        switch (strategy) {
-                            case REMOVE_CHILDREN:
-                                removedSet.add(current);
-                                it.remove();
-                                break;
-                            case UNSET_PARENT_IN_CHILDREN:
-                                current.clearParent();
+                        if (parent != null && removedSet.contains(parent)) {
+                            switch (strategy) {
+                                case REMOVE_CHILDREN:
+                                    removedSet.add(current);
+                                    it.remove();
+                                    break;
+                                case UNSET_PARENT_IN_CHILDREN:
+                                    current.clearParent();
+                            }
                         }
+                    }
+                    if (strategy == RemovalStrategy.UNSET_PARENT_IN_CHILDREN
+                        || removedSet.size() == lastSize) {
+                        break;
                     }
                 }
             }

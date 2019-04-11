@@ -35,11 +35,10 @@ import com.sk89q.worldguard.blacklist.logger.FileHandler;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
 import com.sk89q.worldguard.bukkit.chest.BukkitSignChestProtection;
-import com.sk89q.worldguard.bukkit.commands.CommandUtils;
 import com.sk89q.worldguard.bukkit.internal.TargetMatcherSet;
 import com.sk89q.worldguard.chest.ChestProtection;
+import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.config.YamlWorldConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.yaml.snakeyaml.parser.ParserException;
 
@@ -115,7 +114,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             try {
                 set.add(matcherParser.fromInput(input));
             } catch (TargetMatcherParseException e) {
-                log.warning("Невозможно разобрать тип блока/предмета, указанный в качестве '" + input + "'");
+                log.warning("Не удалось проанализировать тип блока/предмета, указанный как '" + input + "'");
             }
         }
 
@@ -133,7 +132,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             log.severe("Ошибка чтения конфигурации для мира " + worldName + ": ");
             e.printStackTrace();
         } catch (ParserException e) {
-            log.severe("Ошибка при разборе конфигурации для мира " + worldName + ". ");
+            log.severe("Ошибка разбора конфигурации для мира " + worldName + ". ");
             throw e;
         }
 
@@ -142,7 +141,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         buildPermissions = getBoolean("build-permission-nodes.enable", false);
         buildPermissionDenyMessage = CommandUtils.replaceColorMacros(
-                getString("build-permission-nodes.deny-message", "&c&l[!] &7Извините, но Вы не можете сделать это в этом месте."));
+                getString("build-permission-nodes.deny-message", "&eИзвините, но вам не разрешено делать это в этом месте."));
 
         strictEntitySpawn = getBoolean("event-handling.block-entity-spawns-with-untraceable-cause", false);
         allowAllInteract = getTargetMatchers("event-handling.interaction-whitelist");
@@ -165,6 +164,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             }
         }
         blockPotionsAlways = getBoolean("gameplay.block-potions-overly-reliably", false);
+        disableConduitEffects = getBoolean("gameplay.disable-conduit-effects", false);
 
         simulateSponge = getBoolean("simulation.sponge.enable", false);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
@@ -253,6 +253,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
+        regionCancelEmptyChatEvents = getBoolean("regions.cancel-chat-without-recipients", true);
         regionNetherPortalProtection = getBoolean("regions.nether-portal-protection", false);
         fakePlayerBuildOverride = getBoolean("regions.fake-player-build-override", true);
         explosionFlagCancellation = getBoolean("regions.explosion-flags-block-entity-damage", true);
@@ -285,7 +286,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             EntityType creature = EntityTypes.get(creatureName.toLowerCase());
 
             if (creature == null) {
-                log.warning("Неизвестный тип моба '" + creatureName + "'");
+                log.warning("Неизвестный тип объекта '" + creatureName + "'");
             } else {
                 blockCreatureSpawn.add(creature);
             }
@@ -326,7 +327,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             } else {
                 this.blacklist = blist;
                 if (summaryOnStart) {
-                    log.log(Level.INFO, "Черный список загружен.");
+                    log.log(Level.INFO, "Blacklist loaded.");
                 }
 
                 BlacklistLoggerHandler blacklistLogger = blist.getLogger();
@@ -355,22 +356,22 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         // Print an overview of settings
         if (summaryOnStart) {
             log.log(Level.INFO, blockTNTExplosions
-                    ? "(" + worldName + ") Поджигание TNT отключено."
-                    : "(" + worldName + ") Поджигание TNT РАЗРЕШЕНО.");
+                    ? "(" + worldName + ") зажигание TNT заблокировано."
+                    : "(" + worldName + ") зажигание ТНТ РАЗРЕШЕНО.");
             log.log(Level.INFO, blockLighter
-                    ? "(" + worldName + ") Зажигалки отключены."
-                    : "(" + worldName + ") Зажигалки РАЗРЕШЕНЫ.");
+                    ? "(" + worldName + ") Огниво заблокировано."
+                    : "(" + worldName + ") Огниво РАЗРЕШЕНО.");
             log.log(Level.INFO, preventLavaFire
-                    ? "(" + worldName + ") Огонь лавы отключен."
-                    : "(" + worldName + ") Огонь лавы РАЗРЕШЕН.");
+                    ? "(" + worldName + ") Лавовый огонь заблокирован."
+                    : "(" + worldName + ") Лавовый огонь РАЗРЕШЕН.");
 
             if (disableFireSpread) {
                 log.log(Level.INFO, "(" + worldName + ") Все распространение огня отключено.");
             } else {
                 if (disableFireSpreadBlocks.size() > 0) {
                     log.log(Level.INFO, "(" + worldName
-                            + ") Распространение огня ограничено к "
-                            + disableFireSpreadBlocks.size() + " типов блоков.");
+                            + ") Распространение огня ограничено для "
+                            + disableFireSpreadBlocks.size() + " типы блоков.");
                 } else {
                     log.log(Level.INFO, "(" + worldName
                             + ") Распространение огня НЕОГРАНИЧЕНО.");
@@ -383,10 +384,12 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         config.save();
     }
 
+    @Override
     public Blacklist getBlacklist() {
         return this.blacklist;
     }
 
+    @Override
     public String getWorldName() {
         return this.worldName;
     }
@@ -433,19 +436,4 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         return chestProtection;
     }
 
-    public int getMaxRegionCount(Player player) {
-        int max = -1;
-        for (String group : plugin.getGroups(player)) {
-            if (maxRegionCounts.containsKey(group)) {
-                int groupMax = maxRegionCounts.get(group);
-                if (max < groupMax) {
-                    max = groupMax;
-                }
-            }
-        }
-        if (max <= -1) {
-            max = maxRegionCountPerPlayer;
-        }
-        return max;
-    }
 }

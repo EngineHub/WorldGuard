@@ -39,10 +39,15 @@ class BukkitOfflinePlayer extends BukkitPlayer {
 
     private final OfflinePlayer player;
 
-    BukkitOfflinePlayer(OfflinePlayer offlinePlayer) {
-        super(null, null);
+    BukkitOfflinePlayer(WorldGuardPlugin plugin, OfflinePlayer offlinePlayer) {
+        super(plugin, offlinePlayer.getPlayer()); // null if they are offline
         this.player = offlinePlayer;
     }
+
+    /// ========================================
+    /// These are checked for RegionAssociable
+    /// (to see if a player belongs to a region)
+    /// ========================================
 
     @Override
     public String getName() {
@@ -56,160 +61,182 @@ class BukkitOfflinePlayer extends BukkitPlayer {
 
     @Override
     public boolean hasGroup(String group) {
-        return false;
-    }
-
-    @Override
-    public void kick(String msg) {
-    }
-
-    @Override
-    public void ban(String msg) {
-    }
-
-    @Override
-    public double getHealth() {
-        return 0;
-    }
-
-    @Override
-    public void setHealth(double health) {
-
-    }
-
-    @Override
-    public double getMaxHealth() {
-        return 0;
-    }
-
-    @Override
-    public double getFoodLevel() {
-        return 0;
-    }
-
-    @Override
-    public void setFoodLevel(double foodLevel) {
-
-    }
-
-    @Override
-    public double getSaturation() {
-        return 0;
-    }
-
-    @Override
-    public void setSaturation(double saturation) {
-
-    }
-
-    @Override
-    public WeatherType getPlayerWeather() {
-        return WeatherTypes.CLEAR;
-    }
-
-    @Override
-    public void setPlayerWeather(WeatherType weather) {
-
-    }
-
-    @Override
-    public void resetPlayerWeather() {
-
-    }
-
-    @Override
-    public boolean isPlayerTimeRelative() {
-        return false;
-    }
-
-    @Override
-    public long getPlayerTimeOffset() {
-        return 0;
-    }
-
-    @Override
-    public void setPlayerTime(long time, boolean relative) {
-
-    }
-
-    @Override
-    public void resetPlayerTime() {
-
-    }
-
-    @Override
-    public void printRaw(String msg) {
-    }
-
-    @Override
-    public void printDebug(String msg) {
-
-    }
-
-    @Override
-    public void print(String msg) {
-
-    }
-
-    @Override
-    public void printError(String msg) {
-
+        return plugin.inGroup(player, group);
     }
 
     @Override
     public String[] getGroups() {
-        return new String[0];
+        return plugin.getGroups(player);
     }
+
+    /// ==========================================
+    /// None of the following should ever be used.
+    /// ==========================================
 
     @Override
     public boolean hasPermission(String perm) {
-        return false;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void kick(String msg) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void ban(String msg) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public double getHealth() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setHealth(double health) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public double getMaxHealth() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public double getFoodLevel() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setFoodLevel(double foodLevel) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public double getSaturation() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setSaturation(double saturation) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public float getExhaustion() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setExhaustion(float exhaustion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public WeatherType getPlayerWeather() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPlayerWeather(WeatherType weather) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void resetPlayerWeather() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isPlayerTimeRelative() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long getPlayerTimeOffset() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPlayerTime(long time, boolean relative) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void resetPlayerTime() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void printRaw(String msg) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void printDebug(String msg) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void print(String msg) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void printError(String msg) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public World getWorld() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public BaseItemStack getItemInHand(HandSide handSide) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void giveItem(BaseItemStack itemStack) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public BlockBag getInventoryBlockBag() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setPosition(Vector3 pos, float pitch, float yaw) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Nullable
     @Override
     public BaseEntity getState() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Location getLocation() {
-        return null;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setCompassTarget(Location location) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public SessionKey getSessionKey() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Nullable
     @Override
     public <T> T getFacet(Class<? extends T> cls) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

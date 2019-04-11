@@ -33,7 +33,7 @@ public enum RemovalStrategy {
     UNSET_PARENT_IN_CHILDREN,
 
     /**
-     * Remove any children under the removed regions.
+     * Remove any children under the removed regions. This includes sub-children, etc.
      */
     REMOVE_CHILDREN
 

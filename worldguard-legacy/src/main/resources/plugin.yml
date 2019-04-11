@@ -1,3 +1,7 @@
+# --------------------------------- #
+# RUS by DarkFort                   #
+# vk.com/darkfortmc | t.me/darkfort #
+# --------------------------------- #
 name: WorldGuard
 main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
 version: "${project.internalVersion}"

@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.squirrelid.cache.HashMapCache;
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.squirrelid.cache.SQLiteCache;
@@ -32,14 +33,18 @@ import com.sk89q.squirrelid.resolver.CacheForwardingService;
 import com.sk89q.squirrelid.resolver.CombinedProfileService;
 import com.sk89q.squirrelid.resolver.HttpRepositoryService;
 import com.sk89q.squirrelid.resolver.ProfileService;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.task.SimpleSupervisor;
+import com.sk89q.worldedit.util.task.Supervisor;
+import com.sk89q.worldedit.util.task.Task;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
+import com.sk89q.worldguard.util.WorldGuardExceptionConverter;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
-import com.sk89q.worldguard.util.task.SimpleSupervisor;
-import com.sk89q.worldguard.util.task.Supervisor;
-import com.sk89q.worldguard.util.task.Task;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,13 +58,20 @@ public class WorldGuard {
 
     public static final Logger logger = Logger.getLogger(WorldGuard.class.getCanonicalName());
 
+    private static String version;
     private static final WorldGuard instance = new WorldGuard();
+
     private WorldGuardPlatform platform;
     private final SimpleFlagRegistry flagRegistry = new SimpleFlagRegistry();
     private final Supervisor supervisor = new SimpleSupervisor();
     private ProfileCache profileCache;
     private ProfileService profileService;
     private ListeningExecutorService executorService;
+    private WorldGuardExceptionConverter exceptionConverter = new WorldGuardExceptionConverter(this);
+
+    static {
+        Flags.registerAll();
+    }
 
     public static WorldGuard getInstance() {
         return instance;
@@ -75,9 +87,9 @@ public class WorldGuard {
         cacheDir.mkdirs();
 
         try {
-            profileCache = new SQLiteCache(new File(getPlatform().getConfigDir().toFile(), "profiles.sqlite"));
+            profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
         } catch (IOException e) {
-            WorldGuard.logger.log(Level.WARNING, "Failed to initialize SQLite profile cache");
+            WorldGuard.logger.log(Level.WARNING, "Не удалось инициализировать кэш профиля SQLite");
             profileCache = new HashMapCache();
         }
 
@@ -88,7 +100,6 @@ public class WorldGuard {
                 profileCache);
 
         getPlatform().load();
-        Flags.registerAll();
     }
 
     /**
@@ -153,17 +164,41 @@ public class WorldGuard {
     }
 
     /**
+     * Get the exception converter
+     *
+     * @return the exception converter
+     */
+    public WorldGuardExceptionConverter getExceptionConverter() {
+        return exceptionConverter;
+    }
+
+    /**
+     * Checks to see if the sender is a player, otherwise throw an exception.
+     *
+     * @param sender The sender
+     * @return The player
+     * @throws CommandException if it isn't a player
+     */
+    public LocalPlayer checkPlayer(Actor sender) throws CommandException {
+        if (sender instanceof LocalPlayer) {
+            return (LocalPlayer) sender;
+        } else {
+            throw new CommandException("Ожидается игрок.");
+        }
+    }
+
+    /**
      * Called when WorldGuard should be disabled.
      */
     public void disable() {
         executorService.shutdown();
 
         try {
-            WorldGuard.logger.log(Level.INFO, "Shutting down executor and waiting for any pending tasks...");
+            WorldGuard.logger.log(Level.INFO, "Завершение работы исполнителя и ожидание ожидающих выполнения задач....");
 
             List<Task<?>> tasks = supervisor.getTasks();
             if (!tasks.isEmpty()) {
-                StringBuilder builder = new StringBuilder("Known tasks:");
+                StringBuilder builder = new StringBuilder("Известные задачи:");
                 for (Task<?> task : tasks) {
                     builder.append("\n");
                     builder.append(task.getName());
@@ -176,9 +211,39 @@ public class WorldGuard {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            WorldGuard.logger.log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
+            WorldGuard.logger.log(Level.WARNING, "Не удалось выполнить некоторые задачи, ожидая завершения оставшихся задач", e);
         }
 
         platform.unload();
     }
+
+    /**
+     * Get the version.
+     *
+     * @return the version of WorldEdit
+     */
+    public static String getVersion() {
+        if (version != null) {
+            return version;
+        }
+
+        Package p = WorldGuard.class.getPackage();
+
+        if (p == null) {
+            p = Package.getPackage("com.sk89q.worldguard");
+        }
+
+        if (p == null) {
+            version = "(unknown)";
+        } else {
+            version = p.getImplementationVersion();
+
+            if (version == null) {
+                version = "(unknown)";
+            }
+        }
+
+        return version;
+    }
+
 }

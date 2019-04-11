@@ -58,7 +58,7 @@ public class ChestProtectionListener extends AbstractListener {
         final Player player = event.getCause().getFirstPlayer();
 
         if (player != null) {
-            final BukkitWorldConfiguration wcfg = getWorldConfig(WorldGuardPlugin.inst().wrapPlayer(player));
+            final BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) getWorldConfig(WorldGuardPlugin.inst().wrapPlayer(player));
 
             // Early guard
             if (!wcfg.signChestProtection) {
@@ -68,7 +68,7 @@ public class ChestProtectionListener extends AbstractListener {
             event.filter(target -> {
                 if (wcfg.getChestProtection().isChest(BukkitAdapter.asBlockType(event.getEffectiveMaterial())) && wcfg.isChestProtected(BukkitAdapter.adapt(target.getBlock().getLocation()),
                         WorldGuardPlugin.inst().wrapPlayer(player))) {
-                    sendMessage(event, player, ChatColor.DARK_RED + "Это место для сундука, для которого у Вас нет разрешения.");
+                    sendMessage(event, player, ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
                     return false;
                 }
 
@@ -81,7 +81,7 @@ public class ChestProtectionListener extends AbstractListener {
     public void onBreakBlock(final BreakBlockEvent event) {
         final Player player = event.getCause().getFirstPlayer();
 
-        final BukkitWorldConfiguration wcfg = getWorldConfig(BukkitAdapter.adapt(event.getWorld()));
+        final BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(event.getWorld()));
 
         // Early guard
         if (!wcfg.signChestProtection) {
@@ -92,7 +92,7 @@ public class ChestProtectionListener extends AbstractListener {
             final LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
             event.filter(target -> {
                 if (wcfg.isChestProtected(BukkitAdapter.adapt(target.getBlock().getLocation()), localPlayer)) {
-                    sendMessage(event, player, ChatColor.DARK_RED + "Этот сундук защищен.");
+                    sendMessage(event, player, ChatColor.DARK_RED + "This chest is protected.");
                     return false;
                 }
 
@@ -107,7 +107,7 @@ public class ChestProtectionListener extends AbstractListener {
     public void onUseBlock(final UseBlockEvent event) {
         final Player player = event.getCause().getFirstPlayer();
 
-        final BukkitWorldConfiguration wcfg = getWorldConfig(BukkitAdapter.adapt(event.getWorld()));
+        final BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(event.getWorld()));
 
         // Early guard
         if (!wcfg.signChestProtection) {
@@ -118,7 +118,7 @@ public class ChestProtectionListener extends AbstractListener {
             final LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
             event.filter(target -> {
                 if (wcfg.isChestProtected(BukkitAdapter.adapt(target.getBlock().getLocation()), localPlayer)) {
-                    sendMessage(event, player, ChatColor.DARK_RED + "Этот сундук защищен.");
+                    sendMessage(event, player, ChatColor.DARK_RED + "This chest is protected.");
                     return false;
                 }
 
@@ -132,12 +132,12 @@ public class ChestProtectionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
-        BukkitWorldConfiguration wcfg = getWorldConfig(WorldGuardPlugin.inst().wrapPlayer(player));
+        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) getWorldConfig(WorldGuardPlugin.inst().wrapPlayer(player));
 
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 if (wcfg.isChestProtectedPlacement(BukkitAdapter.adapt(event.getBlock().getLocation()), WorldGuardPlugin.inst().wrapPlayer(player))) {
-                    player.sendMessage(ChatColor.DARK_RED + "Вы не являетесь владельцем сундука.");
+                    player.sendMessage(ChatColor.DARK_RED + "You do not own the adjacent chest.");
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
                     return;
@@ -145,7 +145,7 @@ public class ChestProtectionListener extends AbstractListener {
 
                 if (event.getBlock().getType() != Material.SIGN) {
                     player.sendMessage(ChatColor.RED
-                            + "Табличка [Lock] далжна стоять на земле, а не висеть.");
+                            + "The [Lock] sign must be a sign post, not a wall sign.");
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -154,7 +154,7 @@ public class ChestProtectionListener extends AbstractListener {
 
                 if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
                     player.sendMessage(ChatColor.RED
-                            + "В первой строке должен быть ваш ник.");
+                            + "The first owner line must be your name.");
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -166,7 +166,7 @@ public class ChestProtectionListener extends AbstractListener {
                 if (below == Material.TNT || below == Material.SAND
                         || below == Material.GRAVEL || below == Material.SIGN) {
                     player.sendMessage(ChatColor.RED
-                            + "На этот тип блока лучше не ставить табличку.");
+                            + "That is not a safe block that you're putting this sign on.");
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -175,12 +175,12 @@ public class ChestProtectionListener extends AbstractListener {
 
                 event.setLine(0, "[Lock]");
                 player.sendMessage(ChatColor.YELLOW
-                        + "Сундук или двойной сундук теперь защищены.");
+                        + "A chest or double chest above is now protected.");
             }
         } else if (!wcfg.disableSignChestProtectionCheck) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 player.sendMessage(ChatColor.RED
-                        + "WorldGuard: Защита сундуков с помощью табличек отключена.");
+                        + "WorldGuard's sign chest protection is disabled.");
 
                 event.getBlock().breakNaturally();
                 event.setCancelled(true);

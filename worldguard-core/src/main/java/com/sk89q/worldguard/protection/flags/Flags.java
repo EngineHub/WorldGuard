@@ -59,6 +59,7 @@ public final class Flags {
     public static final StateFlag LIGHTER = register(new StateFlag("lighter", false));
     public static final StateFlag RIDE = register(new StateFlag("ride", false));
     public static final StateFlag POTION_SPLASH = register(new StateFlag("potion-splash", false));
+    public static final StateFlag ITEM_FRAME_ROTATE = register(new StateFlag("item-frame-rotation", false));
 
     // These flags are similar to the ones above (used in tandem with BUILD),
     // but their defaults are set to TRUE because it is more user friendly.
@@ -109,14 +110,14 @@ public final class Flags {
 
     // FlagUtil that adjust behaviors that aren't state flags
     public static final StringFlag DENY_MESSAGE = register(new StringFlag("deny-message",
-            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
-                    .append(new StyledFragment(Style.GRAY).append(" Sorry, but you can't %what% here.")))));
+            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("§c§l[!]"))
+                    .append(new StyledFragment(Style.GRAY).append(" Извините, но Вы не можете %what% в этом месте.")))));
     public static final StringFlag ENTRY_DENY_MESSAGE = register(new StringFlag("entry-deny-message",
-            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
-                    .append(new StyledFragment(Style.GRAY).append(" You are not permitted to enter this area.")))));
+            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("§c§l[!]"))
+                    .append(new StyledFragment(Style.GRAY).append(" Извините, но Вам не разрешено входить в эту область.")))));
     public static final StringFlag EXIT_DENY_MESSAGE = register(new StringFlag("exit-deny-message",
-            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
-                    .append(new StyledFragment(Style.GRAY).append(" You are not permitted to leave this area.")))));
+            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("§c§l[!]"))
+                    .append(new StyledFragment(Style.GRAY).append(" Извините, но Вам не разрешено покидать эту область.")))));
     public static final BooleanFlag EXIT_OVERRIDE = register(new BooleanFlag("exit-override"));
     public static final StateFlag EXIT_VIA_TELEPORT = register(new StateFlag("exit-via-teleport", true));
     public static final StringFlag GREET_MESSAGE = register(new StringFlag("greeting"));
@@ -141,14 +142,6 @@ public final class Flags {
     public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
     public static final SetFlag<String> BLOCKED_CMDS = register(new SetFlag<>("blocked-cmds", new CommandStringFlag(null)));
     public static final SetFlag<String> ALLOWED_CMDS = register(new SetFlag<>("allowed-cmds", new CommandStringFlag(null)));
-
-    // these 3 are not used by worldguard and should be re-implemented in plugins that may use them using custom flag api
-    @Deprecated
-    public static final StateFlag ENABLE_SHOP = register(new StateFlag("allow-shop", false));
-    @Deprecated
-    public static final BooleanFlag BUYABLE = register(new BooleanFlag("buyable"));
-    @Deprecated
-    public static final DoubleFlag PRICE = register(new DoubleFlag("price"));
 
     private Flags() {
     }

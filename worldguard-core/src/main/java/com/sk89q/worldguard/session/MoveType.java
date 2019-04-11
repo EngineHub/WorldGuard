@@ -29,6 +29,8 @@ public enum MoveType {
     RESPAWN(false, true),
     EMBARK(true, false),
     MOVE(true, false),
+    GLIDE(true, false),
+    SWIM(true, false),
     TELEPORT(true, true),
     RIDE(true, false),
     OTHER_NON_CANCELLABLE(false, false),

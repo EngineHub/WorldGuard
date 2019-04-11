@@ -70,6 +70,10 @@ public final class InteropUtils {
         UUID uuid = player.getUniqueId();
         String name = player.getName();
 
+        if (player.hasMetadata("NPC")) {
+            return true;
+        }
+
         if (uuid.equals(forgeFakePlayerUuid)) {
             return true;
         }

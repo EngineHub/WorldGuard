@@ -26,7 +26,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath "com.github.jengelman.gradle.plugins:shadow:4.0.3"
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.7.5'
         classpath 'org.ajoberstar:gradle-git:1.7.2'
     }
@@ -77,7 +77,7 @@ artifactoryPublish.skip = true
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
-//    apply plugin: 'checkstyle' TODO Fix
+    apply plugin: 'checkstyle'
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'com.jfrog.artifactory'
 
@@ -86,8 +86,8 @@ subprojects {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
-//    checkstyle.configFile = new File(rootProject.projectDir, "config/checkstyle/checkstyle.xml")
-//    checkstyle.toolVersion = '7.6.1'
+    checkstyle.configFile = new File(rootProject.projectDir, "config/checkstyle/checkstyle.xml")
+    checkstyle.toolVersion = '7.6.1'
 
     repositories {
         mavenLocal()
@@ -110,23 +110,29 @@ subprojects {
         from sourceSets.main.allSource
     }
 
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
     artifacts {
         archives jar
         archives sourcesJar
+        archives javadocJar
     }
 
-//    build.dependsOn(checkstyleMain)
-//    build.dependsOn(checkstyleTest)
+    build.dependsOn(checkstyleMain)
+    build.dependsOn(checkstyleTest)
     build.dependsOn(sourcesJar)
+    build.dependsOn(javadocJar)
 
     shadowJar {
         classifier 'dist'
         dependencies {
             include(dependency('org.khelekore:prtree:1.5.0'))
-            include(dependency('com.sk89q:squirrelid:0.1.0'))
+            include(dependency('com.sk89q:squirrelid:0.2.0'))
             include(dependency('org.flywaydb:flyway-core:3.0'))
             include(dependency('com.googlecode.json-simple:json-simple:1.1.1'))
-            include(dependency('net.sf.opencsv:opencsv:2.0'))
         }
         exclude 'GradleStart**'
         exclude '.cache'

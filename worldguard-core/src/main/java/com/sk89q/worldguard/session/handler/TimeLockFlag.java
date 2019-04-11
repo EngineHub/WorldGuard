@@ -49,9 +49,6 @@ public class TimeLockFlag extends FlagValueChangeHandler<String> {
     }
 
     private void updatePlayerTime(LocalPlayer player, @Nullable String value) {
-        // store settings, regardless of if we change anything
-        initialRelative = player.isPlayerTimeRelative();
-        initialTime = player.getPlayerTimeOffset();
         if (value == null || !timePattern.matcher(value).matches()) {
             // invalid input
             return;
@@ -66,6 +63,8 @@ public class TimeLockFlag extends FlagValueChangeHandler<String> {
 
     @Override
     protected void onInitialValue(LocalPlayer player, ApplicableRegionSet set, String value) {
+        initialRelative = player.isPlayerTimeRelative();
+        initialTime = player.getPlayerTimeOffset();
         updatePlayerTime(player, value);
     }
 

@@ -33,6 +33,7 @@ import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.sk89q.worldguard.commands.CommandUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -185,10 +186,10 @@ public class Blacklist {
                             entry.setIgnorePermissions(parts[1].split(","));
 
                         } else if (parts[0].equalsIgnoreCase("message")) {
-                            entry.setMessage(WorldGuard.getInstance().getPlatform().replaceColorMacros(parts[1].trim()));
+                            entry.setMessage(CommandUtils.replaceColorMacros(parts[1].trim()));
 
                         } else if (parts[0].equalsIgnoreCase("comment")) {
-                            entry.setComment(WorldGuard.getInstance().getPlatform().replaceColorMacros(parts[1].trim()));
+                            entry.setComment(CommandUtils.replaceColorMacros(parts[1].trim()));
 
                         } else {
                             boolean found = false;

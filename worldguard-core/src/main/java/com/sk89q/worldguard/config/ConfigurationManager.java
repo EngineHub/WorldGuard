@@ -64,8 +64,6 @@ public abstract class ConfigurationManager {
             "# - Lines starting with # are comments and so they are ignored.\r\n" +
             "#\r\n";
 
-    private boolean hasCommandBookGodMode = false;
-
     public boolean useRegionsCreatureSpawnEvent;
     public boolean activityHaltToggle = false;
     public boolean useGodPermission;

@@ -28,6 +28,7 @@ import com.sk89q.worldguard.session.Session;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -80,7 +81,15 @@ public class PlayerMoveListener implements Listener {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer);
-        com.sk89q.worldedit.util.Location weLocation = session.testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.MOVE);
+        MoveType moveType = MoveType.MOVE;
+        if (event.getPlayer().isGliding()) {
+            moveType = MoveType.GLIDE;
+        } else if (event.getPlayer().isSwimming()) {
+            moveType = MoveType.SWIM;
+        } else if (event.getPlayer().getVehicle() != null && event.getPlayer().getVehicle() instanceof Horse) {
+            moveType = MoveType.RIDE;
+        }
+        com.sk89q.worldedit.util.Location weLocation = session.testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), moveType);
 
         if (weLocation != null) {
             final Location override = BukkitAdapter.adapt(weLocation);

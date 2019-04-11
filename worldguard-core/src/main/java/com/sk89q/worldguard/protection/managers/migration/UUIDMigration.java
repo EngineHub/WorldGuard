@@ -127,7 +127,7 @@ public class UUIDMigration extends AbstractMigration {
             }
 
             // Name -> UUID in all regions
-            log.log(Level.INFO, "UUIDs решено... теперь мигрируются все регионы UUID, где это возможно...");
+            log.log(Level.INFO, "UUIDs разрешены... теперь мигрируются все регионы UUID, где это возможно...");
             convert(regions);
 
             return true;

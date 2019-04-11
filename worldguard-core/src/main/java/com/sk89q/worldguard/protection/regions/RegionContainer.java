@@ -19,16 +19,24 @@
 
 package com.sk89q.worldguard.protection.regions;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.protection.managers.RegionContainerImpl;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.migration.Migration;
+import com.sk89q.worldguard.protection.managers.migration.MigrationException;
+import com.sk89q.worldguard.protection.managers.migration.UUIDMigration;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.annotation.Nullable;
 
@@ -52,6 +60,20 @@ public abstract class RegionContainer {
     public void initialize() {
         ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         container = new RegionContainerImpl(config.selectedRegionStoreDriver, WorldGuard.getInstance().getFlagRegistry());
+
+        loadWorlds();
+
+        // Migrate to UUIDs
+        autoMigrate();
+    }
+
+    /**
+     * Save data and unload.
+     */
+    public void unload() {
+        synchronized (lock) {
+            container.unloadAll();
+        }
     }
 
     /**
@@ -69,7 +91,12 @@ public abstract class RegionContainer {
      * <p>This method may block until the data for all loaded worlds has been
      * unloaded and new data has been loaded.</p>
      */
-    public abstract void reload();
+    public void reload() {
+        synchronized (lock) {
+            unload();
+            loadWorlds();
+        }
+    }
 
     /**
      * Get the region manager for a world if one exists.
@@ -116,4 +143,81 @@ public abstract class RegionContainer {
         return new RegionQuery(cache);
     }
 
+    /**
+     * Execute a migration and block any loading of region data during
+     * the migration.
+     *
+     * @param migration the migration
+     * @throws MigrationException thrown by the migration on error
+     */
+    public void migrate(Migration migration) throws MigrationException {
+        checkNotNull(migration);
+
+        synchronized (lock) {
+            try {
+                WorldGuard.logger.info("Выгрузка и сохранение данных региона, загруженных в данный момент...");
+                unload();
+                migration.migrate();
+            } finally {
+                WorldGuard.logger.info("Загрузка данных региона для загруженных миров...");
+                loadWorlds();
+            }
+        }
+    }
+
+    /**
+     * Try loading the region managers for all currently loaded worlds.
+     */
+    protected void loadWorlds() {
+        WorldGuard.logger.info("Loading region data...");
+        synchronized (lock) {
+            for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
+                load(world);
+            }
+        }
+    }
+
+    /**
+     * Unload the region data for a world.
+     *
+     * @param world a world
+     */
+    public void unload(World world) {
+        checkNotNull(world);
+
+        synchronized (lock) {
+            container.unload(world.getName());
+        }
+    }
+
+    /**
+     * Execute auto-migration.
+     */
+    protected void autoMigrate() {
+        ConfigurationManager config = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+
+        if (config.migrateRegionsToUuid) {
+            RegionDriver driver = getDriver();
+            UUIDMigration migrator = new UUIDMigration(driver, WorldGuard.getInstance().getProfileService(), WorldGuard.getInstance().getFlagRegistry());
+            migrator.setKeepUnresolvedNames(config.keepUnresolvedNames);
+            try {
+                migrate(migrator);
+
+                WorldGuard.logger.info("Регионы сохранены после миграции UUID! Это не повторится, если " +
+                        "изменить соответствующий параметр конфигурации в конфигурации WorldGuard.");
+
+                config.disableUuidMigration();
+            } catch (MigrationException e) {
+                WorldGuard.logger.log(Level.WARNING, "Не удалось выполнить миграцию", e);
+            }
+        }
+    }
+
+    /**
+     * Load the region data for a world if it has not been loaded already.
+     *
+     * @param world the world
+     * @return a region manager, either returned from the cache or newly loaded
+     */
+    @Nullable protected abstract RegionManager load(World world);
 }

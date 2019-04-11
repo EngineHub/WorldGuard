@@ -265,7 +265,7 @@ public final class Closer implements Closeable {
         @Override
         public void suppress(Closeable closeable, Throwable thrown, Throwable suppressed) {
             // log to the same place as Closeables
-            logger.log(Level.WARNING, "Подавляя исключение брошено при закрытии " + closeable, suppressed);
+            logger.log(Level.WARNING, "Подавление исключения, сгенерированного при закрытии " + closeable, suppressed);
         }
     }
 

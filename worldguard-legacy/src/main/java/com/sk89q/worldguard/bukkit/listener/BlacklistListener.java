@@ -32,7 +32,6 @@ import com.sk89q.worldguard.blacklist.event.ItemAcquireBlacklistEvent;
 import com.sk89q.worldguard.blacklist.event.ItemDestroyWithBlacklistEvent;
 import com.sk89q.worldguard.blacklist.event.ItemDropBlacklistEvent;
 import com.sk89q.worldguard.blacklist.event.ItemUseBlacklistEvent;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
@@ -42,6 +41,7 @@ import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
@@ -79,7 +79,7 @@ public class BlacklistListener extends AbstractListener {
         }
 
         final LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
-        final BukkitWorldConfiguration wcfg = getWorldConfig(localPlayer);
+        final WorldConfiguration wcfg = getWorldConfig(localPlayer);
 
         // Blacklist guard
         if (wcfg.getBlacklist() == null) {
@@ -88,7 +88,7 @@ public class BlacklistListener extends AbstractListener {
 
         event.filter(target -> {
             if (!wcfg.getBlacklist().check(
-                    new BlockBreakBlacklistEvent(localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock())), false, false)) {
+                    new BlockBreakBlacklistEvent(localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock(), event.getEffectiveMaterial())), false, false)) {
                 return false;
             } else if (!wcfg.getBlacklist().check(
                     new ItemDestroyWithBlacklistEvent(localPlayer, BukkitAdapter.asBlockVector(target), createTarget(player.getItemInHand())), false, false)) {
@@ -108,7 +108,7 @@ public class BlacklistListener extends AbstractListener {
         }
 
         final LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
-        final BukkitWorldConfiguration wcfg = getWorldConfig(localPlayer);
+        final WorldConfiguration wcfg = getWorldConfig(localPlayer);
 
         // Blacklist guard
         if (wcfg.getBlacklist() == null) {
@@ -116,7 +116,7 @@ public class BlacklistListener extends AbstractListener {
         }
 
         event.filter(target -> wcfg.getBlacklist().check(new BlockPlaceBlacklistEvent(
-                localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock())), false, false));
+                localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock(), event.getEffectiveMaterial())), false, false));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -128,7 +128,7 @@ public class BlacklistListener extends AbstractListener {
         }
 
         final LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
-        final BukkitWorldConfiguration wcfg = getWorldConfig(localPlayer);
+        final WorldConfiguration wcfg = getWorldConfig(localPlayer);
 
         // Blacklist guard
         if (wcfg.getBlacklist() == null) {
@@ -136,7 +136,7 @@ public class BlacklistListener extends AbstractListener {
         }
 
         event.filter(target -> wcfg.getBlacklist().check(new BlockInteractBlacklistEvent(
-                localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock())), false, false));
+                localPlayer, BukkitAdapter.asBlockVector(target), createTarget(target.getBlock(), event.getEffectiveMaterial())), false, false));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -148,7 +148,7 @@ public class BlacklistListener extends AbstractListener {
         }
 
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
-        BukkitWorldConfiguration wcfg = getWorldConfig(localPlayer);
+        WorldConfiguration wcfg = getWorldConfig(localPlayer);
 
         // Blacklist guard
         if (wcfg.getBlacklist() == null) {
@@ -173,7 +173,7 @@ public class BlacklistListener extends AbstractListener {
 
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         Entity target = event.getEntity();
-        BukkitWorldConfiguration wcfg = getWorldConfig(localPlayer);
+        WorldConfiguration wcfg = getWorldConfig(localPlayer);
 
         // Blacklist guard
         if (wcfg.getBlacklist() == null) {
@@ -209,7 +209,7 @@ public class BlacklistListener extends AbstractListener {
 
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         ItemStack target = event.getItemStack();
-        BukkitWorldConfiguration wcfg = getWorldConfig(localPlayer);
+        WorldConfiguration wcfg = getWorldConfig(localPlayer);
 
         // Blacklist guard
         if (wcfg.getBlacklist() == null) {
@@ -224,7 +224,7 @@ public class BlacklistListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getPlayer().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getPlayer().getWorld()));
 
         if (wcfg.getBlacklist() != null) {
             Item ci = event.getItemDrop();
@@ -240,7 +240,7 @@ public class BlacklistListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockDispense(BlockDispenseEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getBlock().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getBlock().getWorld()));
 
         if (wcfg.getBlacklist() != null) {
             if (!wcfg.getBlacklist().check(new BlockDispenseBlacklistEvent(null, BukkitAdapter.asBlockVector(event.getBlock().getLocation()),
@@ -259,7 +259,7 @@ public class BlacklistListener extends AbstractListener {
         if (item != null && inventory != null && inventory.getHolder() != null && entity instanceof Player) {
             Player player = (Player) entity;
             ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-            BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(entity.getWorld()));
+            WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(entity.getWorld()));
             LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
             if (wcfg.getBlacklist() != null && !wcfg.getBlacklist().check(
@@ -281,7 +281,7 @@ public class BlacklistListener extends AbstractListener {
         if (item != null && entity instanceof Player) {
             Player player = (Player) entity;
             ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-            BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(entity.getWorld()));
+            WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(entity.getWorld()));
             LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
             if (wcfg.getBlacklist() != null && !wcfg.getBlacklist().check(
@@ -300,7 +300,7 @@ public class BlacklistListener extends AbstractListener {
 
         if (item != null) {
             ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-            BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(player.getWorld()));
+            WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(player.getWorld()));
             LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
             if (wcfg.getBlacklist() != null && !wcfg.getBlacklist().check(

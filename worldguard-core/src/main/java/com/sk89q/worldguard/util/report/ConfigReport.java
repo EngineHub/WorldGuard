@@ -22,7 +22,7 @@ package com.sk89q.worldguard.util.report;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.report.DataReport;
-import com.sk89q.worldedit.util.report.ShallowObjectReport;
+import com.sk89q.worldedit.util.report.HierarchyObjectReport;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.blacklist.Blacklist;
@@ -39,13 +39,13 @@ public class ConfigReport extends DataReport {
 
         List<? extends World> worlds = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds();
 
-        append("Configuration", new ShallowObjectReport("Configuration", WorldGuard.getInstance().getPlatform().getGlobalStateManager()));
+        append("Configuration", new HierarchyObjectReport("Configuration", WorldGuard.getInstance().getPlatform().getGlobalStateManager()));
 
         for (World world : worlds) {
             WorldConfiguration config = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
             DataReport report = new DataReport("World: " + world.getName());
-            report.append("Configuration", new ShallowObjectReport("Configuration", config));
+            report.append("Configuration", new HierarchyObjectReport("Configuration", config));
 
             Blacklist blacklist = config.getBlacklist();
             if (blacklist != null) {

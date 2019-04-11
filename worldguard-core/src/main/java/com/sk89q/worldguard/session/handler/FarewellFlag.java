@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -74,8 +75,8 @@ public class FarewellFlag extends Handler {
 
         for (String message : lastMessageStack) {
             if (!messages.contains(message)) {
-                String effective = WorldGuard.getInstance().getPlatform().replaceColorMacros(message);
-                effective = WorldGuard.getInstance().getPlatform().replaceMacros(player, effective);
+                String effective = CommandUtils.replaceColorMacros(message);
+                effective = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, effective);
                 for (String mess : effective.replaceAll("\\\\n", "\n").split("\\n")) {
                     player.printRaw(mess);
                 }

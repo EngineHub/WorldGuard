@@ -35,11 +35,11 @@ import org.bukkit.event.Listener;
  */
 public class WorldGuardCommandBookListener implements Listener {
     private final WorldGuardPlugin plugin;
-
+    
     public WorldGuardCommandBookListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
-
+    
     @EventHandler
     public void onPlayerWhois(InfoComponent.PlayerWhoisEvent event) {
         if (event.getPlayer() instanceof Player) {
@@ -48,31 +48,31 @@ public class WorldGuardCommandBookListener implements Listener {
             if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld()).useRegions) {
                 ApplicableRegionSet regions =
                         WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(localPlayer.getLocation());
-
+                
                 // Current regions
                 StringBuilder regionStr = new StringBuilder();
                 boolean first = true;
-
+                
                 for (ProtectedRegion region : regions) {
                     if (!first) {
                         regionStr.append(", ");
                     }
-
+                    
                     if (region.isOwner(localPlayer)) {
                         regionStr.append("+");
                     } else if (region.isMemberOnly(localPlayer)) {
                         regionStr.append("-");
                     }
-
+                    
                     regionStr.append(region.getId());
-
+                    
                     first = false;
                 }
-
+                
                 if (regions.size() > 0) {
-                    event.addWhoisInformation("Текущие регионы", regionStr);
+                    event.addWhoisInformation("Current Regions", regionStr);
                 }
-                event.addWhoisInformation("Можно строить", regions.testState(localPlayer, Flags.BUILD));
+                event.addWhoisInformation("Can build", regions.testState(localPlayer, Flags.BUILD));
             }
         }
     }

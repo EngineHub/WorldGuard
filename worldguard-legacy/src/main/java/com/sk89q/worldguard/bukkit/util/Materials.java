@@ -230,7 +230,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.COCOA, 0);
         MATERIAL_FLAGS.put(Material.SANDSTONE_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.EMERALD_ORE, 0);
-        MATERIAL_FLAGS.put(Material.ENDER_CHEST, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.ENDER_CHEST, 0);
         MATERIAL_FLAGS.put(Material.TRIPWIRE_HOOK, 0);
         MATERIAL_FLAGS.put(Material.TRIPWIRE, 0);
         MATERIAL_FLAGS.put(Material.EMERALD_BLOCK, 0);
@@ -454,6 +454,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.PINK_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.PURPLE_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.COCOA_BEANS, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.BONE_MEAL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.BONE, 0);
         MATERIAL_FLAGS.put(Material.SUGAR, 0);
         MATERIAL_FLAGS.put(Material.COOKIE, 0);
@@ -620,7 +621,7 @@ public final class Materials {
                 MATERIAL_FLAGS.put(material, MODIFIED_ON_RIGHT);
             }
             if (!MATERIAL_FLAGS.containsKey(material)) {
-                logger.fine("Missing item definition for " + material.getKey().toString());
+                logger.fine("Missing item definition for " + material.name());
                 MATERIAL_FLAGS.put(material, 0);
             }
         }
@@ -1020,21 +1021,14 @@ public final class Materials {
     public static boolean isUseFlagApplicable(Material material) {
         if (Tag.BUTTONS.getValues().contains(material)
             || Tag.DOORS.getValues().contains(material)
-            || Tag.WOODEN_PRESSURE_PLATES.getValues().contains(material)) {
+            || Tag.WOODEN_PRESSURE_PLATES.getValues().contains(material)
+            || Tag.WOODEN_TRAPDOORS.getValues().contains(material)) {
             return true;
         }
         switch (material) {
             case LEVER: return true;
             case TRIPWIRE: return true;
-            case OAK_TRAPDOOR: return true;
-            case ACACIA_TRAPDOOR: return true;
-            case BIRCH_TRAPDOOR: return true;
-            case DARK_OAK_TRAPDOOR: return true;
-            case IRON_TRAPDOOR: return true;
-            case JUNGLE_TRAPDOOR: return true;
-            case SPRUCE_TRAPDOOR: return true;
             case ENCHANTING_TABLE: return true;
-            case ENDER_CHEST: return true;
             case BEACON: return true;
             case ANVIL: return true;
             case STONE_PRESSURE_PLATE: return true;

@@ -218,7 +218,7 @@ public final class Cause {
      */
     public static void trackParentCause(Metadatable target, Object parent) {
         if (target instanceof Block) {
-            throw new IllegalArgumentException("Невозможно отследить причины на блоках потому, что причина не проверяется на метаданных блока");
+            throw new IllegalArgumentException("Can't track causes on Blocks because Cause doesn't check block metadata");
         }
 
         WGMetadata.put(target, CAUSE_KEY, parent);
@@ -233,7 +233,7 @@ public final class Cause {
         private boolean indirect;
 
         private Builder(int expectedSize) {
-            this.causes = new ArrayList<Object>(expectedSize);
+            this.causes = new ArrayList<>(expectedSize);
         }
 
         private void addAll(@Nullable Object... element) {
@@ -250,7 +250,7 @@ public final class Cause {
                     } else if (o instanceof Projectile) {
                         addAll(((Projectile) o).getShooter());
                     } else if (o instanceof Vehicle) {
-                        addAll(((Vehicle) o).getPassenger());
+                        addAll(((Vehicle) o).getPassengers());
                     } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
                         indirect = true;
                         addAll(((Creature) o).getTarget());

@@ -25,6 +25,7 @@ import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -85,8 +86,8 @@ public class WorldGuardBlockListener implements Listener {
      * @param world The world to get the configuration for.
      * @return The configuration for {@code world}
      */
-    protected BukkitWorldConfiguration getWorldConfig(World world) {
-        return (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(world));
+    protected WorldConfiguration getWorldConfig(World world) {
+        return WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(world));
     }
 
     /**
@@ -95,7 +96,7 @@ public class WorldGuardBlockListener implements Listener {
      * @param player The player to get the wold from
      * @return The {@link BukkitWorldConfiguration} for the player's world
      */
-    protected BukkitWorldConfiguration getWorldConfig(Player player) {
+    protected WorldConfiguration getWorldConfig(Player player) {
         return getWorldConfig(player.getWorld());
     }
 
@@ -105,8 +106,7 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        Block target = event.getBlock();
-        BukkitWorldConfiguration wcfg = getWorldConfig(player);
+        WorldConfiguration wcfg = getWorldConfig(player);
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getItemInHand();
@@ -131,7 +131,7 @@ public class WorldGuardBlockListener implements Listener {
         boolean isAir = blockFrom.getType() == Material.AIR;
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
@@ -219,7 +219,7 @@ public class WorldGuardBlockListener implements Listener {
         World world = block.getWorld();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = getWorldConfig(world);
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
@@ -306,7 +306,7 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBurn(BlockBurnEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) getWorldConfig(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
@@ -377,7 +377,7 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPhysics(BlockPhysicsEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
@@ -417,7 +417,7 @@ public class WorldGuardBlockListener implements Listener {
         Block target = event.getBlock();
         World world = target.getWorld();
 
-        BukkitWorldConfiguration wcfg = getWorldConfig(world);
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.simulateSponge && target.getType() == Material.SPONGE) {
             if (wcfg.redstoneSponges && target.isBlockIndirectlyPowered()) {
@@ -440,7 +440,7 @@ public class WorldGuardBlockListener implements Listener {
         Block blockTo = event.getBlock();
         World world = blockTo.getWorld();
 
-        BukkitWorldConfiguration wcfg = getWorldConfig(world);
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
             int ox = blockTo.getX();
@@ -469,7 +469,7 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLeavesDecay(LeavesDecayEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
@@ -494,7 +494,7 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockForm(BlockFormEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
@@ -552,7 +552,7 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockSpread(BlockSpreadEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
@@ -618,7 +618,7 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent event) {
 
-        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (Tag.ICE.isTagged(event.getBlock().getType())) {
             if (wcfg.disableIceMelting) {

@@ -23,6 +23,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
+import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
@@ -33,6 +34,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -61,13 +63,13 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("PLACE");
         builder.append(" ");
-        builder.append("").append(event.getEffectiveMaterial());
+        builder.append(event.getEffectiveMaterial());
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -79,13 +81,13 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("DIG");
         builder.append(" ");
-        builder.append("").append(event.getEffectiveMaterial());
+        builder.append(event.getEffectiveMaterial());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -97,13 +99,16 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("INTERACT");
         builder.append(" ");
-        builder.append("").append(event.getEffectiveMaterial());
+        builder.append(event.getEffectiveMaterial());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getBlocks()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
+        if (event.getOriginalEvent() instanceof PlayerInteractEvent) {
+            builder.append(".").append(((PlayerInteractEvent) event.getOriginalEvent()).getAction());
+        }
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -115,13 +120,13 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("SPAWN");
         builder.append(" ");
-        builder.append("").append(event.getEffectiveType());
+        builder.append(event.getEffectiveType());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -133,13 +138,13 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("DESTROY");
         builder.append(" ");
-        builder.append("").append(event.getEntity().getType());
+        builder.append(event.getEntity().getType());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -151,13 +156,31 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("INTERACT");
         builder.append(" ");
-        builder.append("").append(event.getEntity().getType());
+        builder.append(event.getEntity().getType());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
         builder.append("@").append(toBlockString(event.getTarget()));
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
+        if (event.getResult() != Result.DEFAULT) {
+            builder.append(" [").append(event.getResult()).append("]");
+        }
+        logger.info(builder.toString());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDamageEntity(DamageEntityEvent event) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("DAMAGE");
+        builder.append(" ");
+        builder.append(event.getEntity().getType());
+        builder.append(" ");
+        builder.append("[").append(event.getCause()).append("]");
+        builder.append(" ");
+        builder.append("@").append(toBlockString(event.getTarget()));
+        builder.append(" ");
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }
@@ -169,13 +192,13 @@ public class DebuggingListener extends AbstractListener {
         StringBuilder builder = new StringBuilder();
         builder.append("USE");
         builder.append(" ");
-        builder.append("").append(event.getItemStack().getType());
+        builder.append(event.getItemStack().getType());
         builder.append(" ");
         builder.append("[").append(event.getCause()).append("]");
         builder.append(" ");
         builder.append("@").append(event.getWorld().getName());
         builder.append(" ");
-        builder.append(":").append(getEventName(event.getOriginalEvent()));
+        builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getResult() != Result.DEFAULT) {
             builder.append(" [").append(event.getResult()).append("]");
         }

@@ -43,6 +43,7 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.parser.ParserException;
 import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.File;
@@ -118,7 +119,7 @@ public class YamlRegionFile implements RegionDatabase {
             config.load();
         } catch (FileNotFoundException e) {
             return new HashSet<>(loaded.values());
-        } catch (IOException e) {
+        } catch (IOException | ParserException e) {
             throw new StorageException("Не удалось загрузить данные из региона '" + file + "'", e);
         }
 
@@ -341,7 +342,7 @@ public class YamlRegionFile implements RegionDatabase {
         try {
             return ERROR_DUMP_YAML.dump(object).replaceAll("(?m)^", "\t");
         } catch (Throwable t) {
-            return "<Ошибка сброса объекта>";
+            return "<ошибка при сбросе объекта>";
         }
     }
 

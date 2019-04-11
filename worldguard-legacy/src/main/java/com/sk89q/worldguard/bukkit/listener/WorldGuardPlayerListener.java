@@ -23,21 +23,21 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.config.ConfigurationManager;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GameModeFlag;
+import com.sk89q.worldguard.util.Entities;
 import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -78,7 +78,7 @@ import javax.annotation.Nullable;
 public class WorldGuardPlayerListener implements Listener {
 
     private static final Logger log = Logger.getLogger(WorldGuardPlayerListener.class.getCanonicalName());
-    private static final Pattern opPattern = Pattern.compile("^/(?:minecraft:)(?:bukkit:)?op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern opPattern = Pattern.compile("^/(?:minecraft:)?(?:bukkit:)?(?:de)?op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
     private WorldGuardPlugin plugin;
 
     /**
@@ -102,8 +102,7 @@ public class WorldGuardPlayerListener implements Listener {
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
+        WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().getIfPresent(localPlayer);
         if (session != null) {
             GameModeFlag handler = session.getHandler(GameModeFlag.class);
@@ -111,7 +110,7 @@ public class WorldGuardPlayerListener implements Listener {
                     localPlayer.getWorld())) {
                 GameMode expected = handler.getSetGameMode();
                 if (handler.getOriginalGameMode() != null && expected != null && expected != BukkitAdapter.adapt(event.getNewGameMode())) {
-                    log.info("Смена режима игры " + player.getName() + " была заблокирована в этом регионе");
+                    log.info("Game mode change on " + player.getName() + " has been blocked due to the region GAMEMODE flag");
                     event.setCancelled(true);
                 }
             }
@@ -125,58 +124,62 @@ public class WorldGuardPlayerListener implements Listener {
         World world = player.getWorld();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(localPlayer.getWorld());
+        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
 
         if (cfg.activityHaltToggle) {
             player.sendMessage(ChatColor.YELLOW
-                    + "Интенсивная активность на сервере ОТКЛЮЧЕНА.");
+                    + "Intensive server activity has been HALTED.");
 
             int removed = 0;
 
             for (Entity entity : world.getEntities()) {
-                if (BukkitUtil.isIntensiveEntity(entity)) {
+                if (Entities.isIntensiveEntity(BukkitAdapter.adapt(entity))) {
                     entity.remove();
                     removed++;
                 }
             }
 
             if (removed > 10) {
-                log.info("Блокировка активности: " + removed + " (>10) было удалено в мире "
+                log.info("Halt-Act: " + removed + " entities (>10) auto-removed from "
                         + player.getWorld().toString());
             }
         }
 
         if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW
-                    + "Распространение огня было отключено в данном мире.");
+                    + "Fire spread is currently globally disabled for this world.");
         }
 
         Events.fire(new ProcessPlayerEvent(player));
-
-        WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer); // Initializes a session
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        BukkitWorldConfiguration wcfg =
-                (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
+        WorldConfiguration wcfg =
+                WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
         if (wcfg.useRegions) {
-            if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(localPlayer.getLocation(), localPlayer, Flags.SEND_CHAT))) {
-                player.sendMessage(ChatColor.RED + "Вы не можете писать в чат из этого региона!");
+            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+            ApplicableRegionSet chatFrom = query.getApplicableRegions(localPlayer.getLocation());
+
+            if (!chatFrom.testState(localPlayer, Flags.SEND_CHAT)) {
+                String message = chatFrom.queryValue(localPlayer, Flags.DENY_MESSAGE);
+                RegionProtectionListener.formatAndSendDenyMessage("chat", localPlayer, message);
                 event.setCancelled(true);
                 return;
             }
 
+            boolean anyRemoved = false;
             for (Iterator<Player> i = event.getRecipients().iterator(); i.hasNext();) {
                 Player rPlayer = i.next();
                 LocalPlayer rLocal = plugin.wrapPlayer(rPlayer);
-                if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(rLocal.getLocation(), rLocal, Flags.RECEIVE_CHAT))) {
+                if (!query.testState(rLocal.getLocation(), rLocal, Flags.RECEIVE_CHAT)) {
                     i.remove();
+                    anyRemoved = true;
                 }
             }
-            if (event.getRecipients().size() == 0) {
+            if (anyRemoved && event.getRecipients().size() == 0 && wcfg.regionCancelEmptyChatEvents) {
                 event.setCancelled(true);
             }
         }
@@ -202,10 +205,10 @@ public class WorldGuardPlayerListener implements Listener {
             if (!hostname.equals(hostKey)
                     && !(cfg.hostKeysAllowFMLClients && hostname.equals(hostKey + "\u0000FML\u0000"))) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
-                        "Вы вошли с неправильным ключем сервера!");
-                log.warning("WorldGuard проводит проверку ключа: " +
-                        player.getName() + " присоединился '" + hostname +
-                        "' но '" + hostKey + "' ожидалось. Кикнут!");
+                        "You did not join with the valid host key!");
+                log.warning("WorldGuard host key check: " +
+                        player.getName() + " joined with '" + hostname +
+                        "' but '" + hostKey + "' was expected. Kicked!");
                 return;
             }
         }
@@ -227,7 +230,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         if (wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
@@ -235,7 +238,7 @@ public class WorldGuardPlayerListener implements Listener {
             ItemStack heldItem = player.getInventory().getItem(slot);
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(slot, null);
-                player.sendMessage(ChatColor.RED + "Бесконечный стак удален.");
+                player.sendMessage(ChatColor.RED + "Infinite stack removed.");
             }
         }
     }
@@ -257,7 +260,7 @@ public class WorldGuardPlayerListener implements Listener {
         @Nullable ItemStack item = event.getItem();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         // Infinite stack removal
         if ((type == Material.CHEST
@@ -274,7 +277,7 @@ public class WorldGuardPlayerListener implements Listener {
                 ItemStack heldItem = player.getInventory().getItem(slot);
                 if (heldItem != null && heldItem.getAmount() < 0) {
                     player.getInventory().setItem(slot, null);
-                    player.sendMessage(ChatColor.RED + "Бесконечные стак в слоте #" + slot + " удален.");
+                    player.sendMessage(ChatColor.RED + "Infinite stack in slot #" + slot + " removed.");
                 }
             }
         }
@@ -288,7 +291,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (item != null && item.getType().getKey().toString().equals(wcfg.regionWand) && plugin.hasPermission(player, "worldguard.region.wand")) {
                 if (set.size() > 0) {
-                    player.sendMessage(ChatColor.YELLOW + "Вы можете здесь строить? " + (set.testState(localPlayer, Flags.BUILD) ? "Да" : "Нет"));
+                    player.sendMessage(ChatColor.YELLOW + "Can you build? " + (set.testState(localPlayer, Flags.BUILD) ? "Yes" : "No"));
 
                     StringBuilder str = new StringBuilder();
                     for (Iterator<ProtectedRegion> it = set.iterator(); it.hasNext();) {
@@ -298,9 +301,9 @@ public class WorldGuardPlayerListener implements Listener {
                         }
                     }
 
-                    localPlayer.print("Размещенные здесь регионы: " + str.toString());
+                    localPlayer.print("Applicable regions: " + str.toString());
                 } else {
-                    localPlayer.print("Здесь не обнаружено ни одного регионаe!");
+                    localPlayer.print("WorldGuard: No defined regions here!");
                 }
 
                 event.setCancelled(true);
@@ -322,7 +325,7 @@ public class WorldGuardPlayerListener implements Listener {
         World world = player.getWorld();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         if (block.getType() == Material.FARMLAND && wcfg.disablePlayerCropTrampling) {
             event.setCancelled(true);
@@ -336,7 +339,7 @@ public class WorldGuardPlayerListener implements Listener {
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(localPlayer.getWorld());
+        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
 
         if (wcfg.useRegions) {
             ApplicableRegionSet set =
@@ -355,7 +358,7 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(player.getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(player.getWorld()));
 
         if (wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
@@ -363,7 +366,7 @@ public class WorldGuardPlayerListener implements Listener {
             ItemStack heldItem = player.getInventory().getItem(newSlot);
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(newSlot, null);
-                player.sendMessage(ChatColor.RED + "Бесконечный стак удален.");
+                player.sendMessage(ChatColor.RED + "Infinite stack removed.");
             }
         }
     }
@@ -374,7 +377,7 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(localPlayer.getWorld());
+        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
 
         if (wcfg.useRegions) {
             ApplicableRegionSet set =
@@ -392,28 +395,41 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (event.getCause() == TeleportCause.ENDER_PEARL) {
-                if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())
-                        && !(set.testState(localPlayer, Flags.ENDERPEARL)
-                                && setFrom.testState(localPlayer, Flags.ENDERPEARL))) {
-                    player.sendMessage(ChatColor.DARK_RED + "Вы не можете телепортироваться на данную територию.");
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-            try {
-                if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
-                    if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
-                        boolean allowFrom = setFrom.testState(localPlayer, Flags.CHORUS_TELEPORT);
-                        boolean allowTo = set.testState(localPlayer, Flags.CHORUS_TELEPORT);
-                        if (!allowFrom || !allowTo) {
-                            player.sendMessage(ChatColor.DARK_RED + "Вы не можете телепортироваться " +
-                                    (!allowFrom ? "отсюда." : "сюда."));
-                            event.setCancelled(true);
-                            return;
-                        }
+                if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
+                    boolean cancel = false;
+                    String message = null;
+                    if (!setFrom.testState(localPlayer, Flags.ENDERPEARL)) {
+                        cancel = true;
+                        message = set.queryValue(localPlayer, Flags.EXIT_DENY_MESSAGE);
+                    } else if (!set.testState(localPlayer, Flags.ENDERPEARL)) {
+                        cancel = true;
+                        message = set.queryValue(localPlayer, Flags.ENTRY_DENY_MESSAGE);
+                    }
+                    if (cancel) {
+                        player.sendMessage(message);
+                        event.setCancelled(true);
+                        return;
                     }
                 }
-            } catch (NoSuchFieldError ignored) {}
+            }
+            if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
+                if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
+                    boolean cancel = false;
+                    String message = null;
+                    if (!setFrom.testState(localPlayer, Flags.CHORUS_TELEPORT)) {
+                        cancel = true;
+                        message = set.queryValue(localPlayer, Flags.EXIT_DENY_MESSAGE);
+                    } else if (!set.testState(localPlayer, Flags.CHORUS_TELEPORT)) {
+                        cancel = true;
+                        message = set.queryValue(localPlayer, Flags.ENTRY_DENY_MESSAGE);
+                    }
+                    if (cancel) {
+                        player.sendMessage(message);
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -424,7 +440,7 @@ public class WorldGuardPlayerListener implements Listener {
         }
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getTo().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getTo().getWorld()));
         if (!wcfg.regionNetherPortalProtection) return;
         if (event.getCause() != TeleportCause.NETHER_PORTAL) {
             return;
@@ -456,7 +472,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (mgr == null) return;
             ApplicableRegionSet set = mgr.getApplicableRegions(check);
             if (!set.testState(plugin.wrapPlayer(event.getPlayer()), Flags.BUILD)) {
-                event.getPlayer().sendMessage(ChatColor.RED + "Место назначения находится в защищенном регионе.");
+                event.getPlayer().sendMessage(ChatColor.RED + "Destination is in a protected area.");
                 event.setCancelled(true);
                 return;
             }
@@ -468,7 +484,7 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(localPlayer.getWorld());
+        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
 
         if (wcfg.useRegions && !WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
             ApplicableRegionSet set =
@@ -479,7 +495,8 @@ public class WorldGuardPlayerListener implements Listener {
             CommandFilter test = new CommandFilter(allowedCommands, blockedCommands);
 
             if (!test.apply(event.getMessage())) {
-                player.sendMessage(ChatColor.RED + event.getMessage() + " не разрешена в этом регионе.");
+                String message = set.queryValue(localPlayer, Flags.DENY_MESSAGE);
+                RegionProtectionListener.formatAndSendDenyMessage("use " + event.getMessage(), localPlayer, message);
                 event.setCancelled(true);
                 return;
             }
@@ -487,7 +504,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (cfg.blockInGameOp) {
             if (opPattern.matcher(event.getMessage()).matches()) {
-                player.sendMessage(ChatColor.RED + "/op можно использовать только в консоли (так установлено в настройках WG).");
+                player.sendMessage(ChatColor.RED + "/op and /deop can only be used in console (as set by a WG setting).");
                 event.setCancelled(true);
                 return;
             }

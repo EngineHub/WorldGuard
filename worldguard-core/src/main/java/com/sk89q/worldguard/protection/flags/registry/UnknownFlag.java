@@ -33,7 +33,7 @@ public class UnknownFlag extends Flag<Object> {
 
     @Override
     public Object parseInput(FlagContext context) throws InvalidFlagFormat {
-        throw new InvalidFlagFormat("Плагин, который зарегистрировал этот флаг не установлен");
+        throw new InvalidFlagFormat("Плагин, который зарегистрировал этот флаг, в настоящее время не установлен");
     }
 
     @Override

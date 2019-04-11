@@ -48,7 +48,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         try {
             config.load();
         } catch (IOException e) {
-            log.severe("Error reading configuration for global config: ");
+            log.severe("Ошибка чтения глобальной конфигурации: ");
             e.printStackTrace();
         }
 
@@ -115,7 +115,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
     public void disableUuidMigration() {
         config.setProperty("regions.uuid-migration.perform-on-next-start", false);
         if (!config.save()) {
-            log.severe("Error saving configuration!");
+            log.severe("Ошибка сохранения конфигурации!");
         }
     }
 }

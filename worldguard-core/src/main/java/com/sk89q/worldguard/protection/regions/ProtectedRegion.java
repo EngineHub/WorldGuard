@@ -75,7 +75,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         checkNotNull(id);
 
         if (!isValidId(id)) {
-            throw new IllegalArgumentException("Недопустимый ID региона: " + id);
+            throw new IllegalArgumentException("Неверный ID региона: " + id);
         }
 
         this.id = Normal.normalize(id);
@@ -299,7 +299,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      *
      * @param playerName player name to check
      * @return whether an owner
-     * @deprecated Names are deprecated
+     * @deprecated Names are deprecated, this will not return owners added by UUID (LocalPlayer)
      */
     @Deprecated
     public boolean isOwner(String playerName) {
@@ -335,20 +335,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
             return true;
         }
 
-        if (members.contains(player)) {
-            return true;
-        }
-
-        ProtectedRegion curParent = getParent();
-        while (curParent != null) {
-            if (curParent.getMembers().contains(player)) {
-                return true;
-            }
-
-            curParent = curParent.getParent();
-        }
-
-        return false;
+        return isMemberOnly(player);
     }
 
     /**
@@ -357,7 +344,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      *
      * @param playerName player name to check
      * @return whether an owner or member
-     * @deprecated Names are deprecated
+     * @deprecated Names are deprecated, this will not return players added by UUID (LocalPlayer)
      */
     @Deprecated
     public boolean isMember(String playerName) {
@@ -713,6 +700,15 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         return id.hashCode();
     }
 
+    //  ** This equals doesn't take the region manager into account (since it's not available anyway)
+    //  ** and thus will return equality for two regions with the same name in different worlds (or even
+    //  ** no world at all, such as when testing intersection with a dummy region). Thus, we keep the
+    //  ** hashCode method to improve hashset operation (which is fine within one manager - ids are unique)
+    //  ** and will only leave a collision when regions in different managers with the same id are tested.
+    //  ** In that case, they are checked for reference equality. Note that is it possible to programmatically
+    //  ** add the same region object to two different managers. If someone uses the API in this way, it is expected
+    //  ** that the regions be the same reference in both worlds. (Though that might lead to other odd behavior)
+    /*
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ProtectedRegion)) {
@@ -722,6 +718,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         ProtectedRegion other = (ProtectedRegion) obj;
         return other.getId().equals(getId());
     }
+    */
 
     @Override
     public String toString() {

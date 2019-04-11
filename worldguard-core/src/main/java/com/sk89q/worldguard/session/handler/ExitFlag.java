@@ -23,6 +23,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -60,7 +61,7 @@ public class ExitFlag extends FlagValueChangeHandler<State> {
         long now = System.currentTimeMillis();
 
         if ((now - lastMessage) > MESSAGE_THRESHOLD && storedMessage != null && !storedMessage.isEmpty()) {
-            player.printRaw(WorldGuard.getInstance().getPlatform().replaceColorMacros(storedMessage));
+            player.printRaw(CommandUtils.replaceColorMacros(storedMessage));
             lastMessage = now;
         }
     }

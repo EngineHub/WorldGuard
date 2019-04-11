@@ -70,13 +70,13 @@ public class PlayerModesListener extends AbstractListener {
 
         if (hasGodModeGroup(player) || hasGodModePermission(player)) {
             if (GodMode.set(localPlayer, session, true)) {
-                log.log(Level.INFO, "Включен автоматический режим бога для игрока " + player.getName());
+                log.log(Level.INFO, "Enabled auto-god mode for " + player.getName());
             }
         }
 
         if (hasAmphibiousGroup(player)) {
             if (WaterBreathing.set(localPlayer, session, true)) {
-                log.log(Level.INFO, "Включен режим дыхания под водой для игрока " + player.getName() + " (игрок находится в группе 'wg-amphibious')");
+                log.log(Level.INFO, "Enabled water breathing mode for " + player.getName() + " (player is in group 'wg-amphibious')");
             }
         }
     }

@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -36,9 +35,9 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
-import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
-import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
+import com.sk89q.worldguard.commands.GeneralCommands;
+import com.sk89q.worldguard.commands.ProtectionCommands;
+import com.sk89q.worldguard.commands.ToggleCommands;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.BlacklistListener;
 import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
@@ -66,20 +65,16 @@ import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.logging.ClassSourceValidator;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -89,19 +84,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-
-import javax.annotation.Nullable;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
@@ -110,7 +95,7 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     private static WorldGuardPlugin inst;
     private static BukkitWorldGuardPlatform platform;
-    private final CommandsManager<CommandSender> commands;
+    private final CommandsManager<Actor> commands;
     private PlayerMoveListener playerMoveListener;
 
     /**
@@ -118,11 +103,11 @@ public class WorldGuardPlugin extends JavaPlugin {
      * this merely instantiates the objects.
      */
     public WorldGuardPlugin() {
-        final WorldGuardPlugin plugin = inst = this;
-        commands = new CommandsManager<CommandSender>() {
+        inst = this;
+        commands = new CommandsManager<Actor>() {
             @Override
-            public boolean hasPermission(CommandSender player, String perm) {
-                return plugin.hasPermission(player, perm);
+            public boolean hasPermission(Actor player, String perm) {
+                return player.hasPermission(perm);
             }
         };
     }
@@ -139,7 +124,6 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Called on plugin enable.
      */
     @Override
-    @SuppressWarnings("deprecation")
     public void onEnable() {
         configureLogger();
 
@@ -152,7 +136,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         BukkitSessionManager sessionManager = (BukkitSessionManager) platform.getSessionManager();
 
         // Set the proper command injector
-        commands.setInjector(new SimpleInjector(this));
+        commands.setInjector(new SimpleInjector(WorldGuard.getInstance()));
 
         // Catch bad things being done by naughty plugins that include
         // WorldGuard's classes
@@ -169,8 +153,6 @@ public class WorldGuardPlugin extends JavaPlugin {
                 reg.register(GeneralCommands.class);
             }
         }, 0L);
-
-        WorldGuard.logger.info("Загрузка данных региона...");
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, sessionManager, BukkitSessionManager.RUN_DELAY, BukkitSessionManager.RUN_DELAY);
 
@@ -235,7 +217,18 @@ public class WorldGuardPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         try {
-            commands.execute(cmd.getName(), args, sender, sender);
+            Actor actor = wrapCommandSender(sender);
+            try {
+                commands.execute(cmd.getName(), args, actor, actor);
+            } catch (Throwable t) {
+                Throwable next = t;
+                do {
+                    WorldGuard.getInstance().getExceptionConverter().convert(next);
+                    next = next.getCause();
+                } while (next != null);
+
+                throw t;
+            }
         } catch (CommandPermissionsException e) {
             sender.sendMessage(ChatColor.RED + "У вас нет разрешения.");
         } catch (MissingNestedCommandException e) {
@@ -244,40 +237,12 @@ public class WorldGuardPlugin extends JavaPlugin {
             sender.sendMessage(ChatColor.RED + e.getMessage());
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (WrappedCommandException e) {
-            sender.sendMessage(ChatColor.RED + convertThrowable(e.getCause()));
+            sender.sendMessage(ChatColor.RED + e.getCause().getMessage());
         } catch (CommandException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }
 
         return true;
-    }
-
-    /**
-     * Convert the throwable into a somewhat friendly message.
-     *
-     * @param throwable the throwable
-     * @return a message
-     */
-    public String convertThrowable(@Nullable Throwable throwable) {
-        if (throwable instanceof NumberFormatException) {
-            return "Значение может быть только числовым.";
-        } else if (throwable instanceof StorageException) {
-            WorldGuard.logger.log(Level.WARNING, "Ошибка загрузки/сохранения регионов", throwable);
-            return "Данные региона не могут быть загружены/сохранены: " + throwable.getMessage();
-        } else if (throwable instanceof RejectedExecutionException) {
-            return "В настоящее время слишком много задач в очереди, чтобы добавить ваш. Используйте /wg running в список поставленных в очередь и запуска задач.";
-        } else if (throwable instanceof CancellationException) {
-            return "WorldGuard: Задача была отменена";
-        } else if (throwable instanceof InterruptedException) {
-            return "WorldGuard: Задача была прервана";
-        } else if (throwable instanceof UnresolvedNamesException) {
-            return throwable.getMessage();
-        } else if (throwable instanceof CommandException) {
-            return throwable.getMessage();
-        } else {
-            WorldGuard.logger.log(Level.WARNING, "Произошла непредвиденная ошибка WorldGuard", throwable);
-            return "WorldGuard: Произошла непредвиденная ошибка! Смотрите вывод в консоль.";
-        }
     }
 
     /**
@@ -288,7 +253,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param group The group
      * @return whether {@code player} is in {@code group}
      */
-    public boolean inGroup(Player player, String group) {
+    public boolean inGroup(OfflinePlayer player, String group) {
         try {
             return PermissionsResolverManager.getInstance().inGroup(player, group);
         } catch (Throwable t) {
@@ -303,43 +268,12 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @param player The player to check
      * @return The names of each group the playe is in.
      */
-    public String[] getGroups(Player player) {
+    public String[] getGroups(OfflinePlayer player) {
         try {
             return PermissionsResolverManager.getInstance().getGroups(player);
         } catch (Throwable t) {
             t.printStackTrace();
             return new String[0];
-        }
-    }
-
-    /**
-     * Gets the name of a command sender. This is a unique name and this
-     * method should never return a "display name".
-     *
-     * @param sender The sender to get the name of
-     * @return The unique name of the sender.
-     */
-    public String toUniqueName(CommandSender sender) {
-        if (sender instanceof ConsoleCommandSender) {
-            return "*Console*";
-        } else {
-            return sender.getName();
-        }
-    }
-
-    /**
-     * Gets the name of a command sender. This play be a display name.
-     *
-     * @param sender The CommandSender to get the name of.
-     * @return The name of the given sender
-     */
-    public String toName(CommandSender sender) {
-        if (sender instanceof ConsoleCommandSender) {
-            return "*Console*";
-        } else if (sender instanceof Player) {
-            return ((Player) sender).getDisplayName();
-        } else {
-            return sender.getName();
         }
     }
 
@@ -385,298 +319,6 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
 
     /**
-     * Checks to see if the sender is a player, otherwise throw an exception.
-     *
-     * @param sender The {@link CommandSender} to check
-     * @return {@code sender} casted to a player
-     * @throws CommandException if {@code sender} isn't a {@link Player}
-     */
-    public Player checkPlayer(CommandSender sender)
-            throws CommandException {
-        if (sender instanceof Player) {
-            return (Player) sender;
-        } else {
-            throw new CommandException("Ожидается игрок.");
-        }
-    }
-
-    /**
-     * Match player names.
-     *
-     * The filter string uses the following format:
-     * @[name] looks up all players with the exact {@code name}
-     * *[name] matches any player whose name contains {@code name}
-     * [name] matches any player whose name starts with {@code name}
-     *
-     * @param filter The filter string to check.
-     * @return A {@link List} of players who match {@code filter}
-     */
-    public List<Player> matchPlayerNames(String filter) {
-        Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
-
-        filter = filter.toLowerCase();
-
-        // Allow exact name matching
-        if (filter.charAt(0) == '@' && filter.length() >= 2) {
-            filter = filter.substring(1);
-
-            for (Player player : players) {
-                if (player.getName().equalsIgnoreCase(filter)) {
-                    List<Player> list = new ArrayList<>();
-                    list.add(player);
-                    return list;
-                }
-            }
-
-            return new ArrayList<>();
-        // Allow partial name matching
-        } else if (filter.charAt(0) == '*' && filter.length() >= 2) {
-            filter = filter.substring(1);
-
-            List<Player> list = new ArrayList<>();
-
-            for (Player player : players) {
-                if (player.getName().toLowerCase().contains(filter)) {
-                    list.add(player);
-                }
-            }
-
-            return list;
-
-        // Start with name matching
-        } else {
-            List<Player> list = new ArrayList<>();
-
-            for (Player player : players) {
-                if (player.getName().toLowerCase().startsWith(filter)) {
-                    list.add(player);
-                }
-            }
-
-            return list;
-        }
-    }
-
-    /**
-     * Checks if the given list of players is greater than size 0, otherwise
-     * throw an exception.
-     *
-     * @param players The {@link List} to check
-     * @return {@code players} as an {@link Iterable}
-     * @throws CommandException If {@code players} is empty
-     */
-    protected Iterable<? extends Player> checkPlayerMatch(List<? extends Player> players)
-            throws CommandException {
-        // Check to see if there were any matches
-        if (players.size() == 0) {
-            throw new CommandException("Игроки не найдены.");
-        }
-
-        return players;
-    }
-
-    /**
-     * Matches players based on the specified filter string
-     *
-     * The filter string format is as follows:
-     * * returns all the players currently online
-     * If {@code sender} is a {@link Player}:
-     * #world returns all players in the world that {@code sender} is in
-     * #near reaturns all players within 30 blocks of {@code sender}'s location
-     * Otherwise, the format is as specified in {@link #matchPlayerNames(String)}
-     *
-     * @param source The CommandSender who is trying to find a player
-     * @param filter The filter string for players
-     * @return iterator for players
-     * @throws CommandException if no matches are found
-     */
-    public Iterable<? extends Player> matchPlayers(CommandSender source, String filter)
-            throws CommandException {
-
-
-        if (Bukkit.getServer().getOnlinePlayers().isEmpty()) {
-            throw new CommandException("Игроки не найдены.");
-        }
-
-        if (filter.equals("*")) {
-            return checkPlayerMatch(Lists.newArrayList(Bukkit.getServer().getOnlinePlayers()));
-        }
-
-        // Handle special hash tag groups
-        if (filter.charAt(0) == '#') {
-            // Handle #world, which matches player of the same world as the
-            // calling source
-            if (filter.equalsIgnoreCase("#world")) {
-                List<Player> players = new ArrayList<>();
-                Player sourcePlayer = checkPlayer(source);
-                World sourceWorld = sourcePlayer.getWorld();
-
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    if (player.getWorld().equals(sourceWorld)) {
-                        players.add(player);
-                    }
-                }
-
-                return checkPlayerMatch(players);
-
-            // Handle #near, which is for nearby players.
-            } else if (filter.equalsIgnoreCase("#near")) {
-                List<Player> players = new ArrayList<>();
-                Player sourcePlayer = checkPlayer(source);
-                World sourceWorld = sourcePlayer.getWorld();
-                org.bukkit.util.Vector sourceVector
-                        = sourcePlayer.getLocation().toVector();
-
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    if (player.getWorld().equals(sourceWorld)
-                            && player.getLocation().toVector().distanceSquared(
-                                    sourceVector) < 900) {
-                        players.add(player);
-                    }
-                }
-
-                return checkPlayerMatch(players);
-
-            } else {
-                throw new CommandException("Неверная группа '" + filter + "'.");
-            }
-        }
-
-        List<Player> players = matchPlayerNames(filter);
-
-        return checkPlayerMatch(players);
-    }
-
-    /**
-     * Match only a single player.
-     *
-     * @param sender The {@link CommandSender} who is requesting a player match
-     * @param filter The filter string.
-     * @see #matchPlayers(org.bukkit.entity.Player) for filter string syntax
-     * @return The single player
-     * @throws CommandException If more than one player match was found
-     */
-    public Player matchSinglePlayer(CommandSender sender, String filter)
-            throws CommandException {
-        // This will throw an exception if there are no matches
-        Iterator<? extends Player> players = matchPlayers(sender, filter).iterator();
-
-        Player match = players.next();
-
-        // We don't want to match the wrong person, so fail if if multiple
-        // players were found (we don't want to just pick off the first one,
-        // as that may be the wrong player)
-        if (players.hasNext()) {
-            throw new CommandException("Найдено больше одного игрока! " +
-                        "Используйте @<name> для точного поиска.");
-        }
-
-        return match;
-    }
-
-    /**
-     * Match only a single player or console.
-     *
-     * The filter string syntax is as follows:
-     * #console, *console, or ! return the server console
-     * All syntax from {@link #matchSinglePlayer(org.bukkit.command.CommandSender, String)}
-     * @param sender The sender trying to match a CommandSender
-     * @param filter The filter string
-     * @return The resulting CommandSender
-     * @throws CommandException if either zero or more than one player matched.
-     */
-    public CommandSender matchPlayerOrConsole(CommandSender sender, String filter)
-            throws CommandException {
-
-        // Let's see if console is wanted
-        if (filter.equalsIgnoreCase("#console")
-                || filter.equalsIgnoreCase("*console*")
-                || filter.equalsIgnoreCase("!")) {
-            return getServer().getConsoleSender();
-        }
-
-        return matchSinglePlayer(sender, filter);
-    }
-
-    /**
-     * Get a single player as an iterator for players.
-     *
-     * @param player The player to return in an Iterable
-     * @return iterator for player
-     */
-    public Iterable<Player> matchPlayers(Player player) {
-        return Arrays.asList(player);
-    }
-
-    /**
-     * Match a world.
-     *
-     * The filter string syntax is as follows:
-     * #main returns the main world
-     * #normal returns the first world with a normal environment
-     * #nether return the first world with a nether environment
-     * #player:[name] returns the world that a player named {@code name} is located in, if the player is online.
-     * [name] A world with the name {@code name}
-     *
-     * @param sender The sender requesting a match
-     * @param filter The filter string
-     * @return The resulting world
-     * @throws CommandException if no world matches
-     */
-    public World matchWorld(CommandSender sender, String filter) throws CommandException {
-        List<World> worlds = getServer().getWorlds();
-
-        // Handle special hash tag groups
-        if (filter.charAt(0) == '#') {
-            // #main for the main world
-            if (filter.equalsIgnoreCase("#main")) {
-                return worlds.get(0);
-
-            // #normal for the first normal world
-            } else if (filter.equalsIgnoreCase("#normal")) {
-                for (World world : worlds) {
-                    if (world.getEnvironment() == Environment.NORMAL) {
-                        return world;
-                    }
-                }
-
-                throw new CommandException("Стандартный мир не найден.");
-
-            // #nether for the first nether world
-            } else if (filter.equalsIgnoreCase("#nether")) {
-                for (World world : worlds) {
-                    if (world.getEnvironment() == Environment.NETHER) {
-                        return world;
-                    }
-                }
-
-                throw new CommandException("Нижний мир не найден.");
-
-            // Handle getting a world from a player
-            } else if (filter.matches("^#player$")) {
-                String parts[] = filter.split(":", 2);
-
-                // They didn't specify an argument for the player!
-                if (parts.length == 1) {
-                    throw new CommandException("Не хватает значений #player.");
-                }
-
-                return matchPlayers(sender, parts[1]).iterator().next().getWorld();
-            } else {
-                throw new CommandException("Не правильный идентификатор '" + filter + "'.");
-            }
-        }
-
-        for (World world : worlds) {
-            if (world.getName().equals(filter)) {
-                return world;
-            }
-        }
-
-        throw new CommandException("Мир с таким имененм не найден.");
-    }
-
-    /**
      * Gets a copy of the WorldEdit plugin.
      *
      * @return The WorldEditPlugin instance
@@ -685,13 +327,13 @@ public class WorldGuardPlugin extends JavaPlugin {
     public WorldEditPlugin getWorldEdit() throws CommandException {
         Plugin worldEdit = getServer().getPluginManager().getPlugin("WorldEdit");
         if (worldEdit == null) {
-            throw new CommandException("WorldEdit не установлен.");
+            throw new CommandException("WorldEdit не устанавливается.");
         }
 
         if (worldEdit instanceof WorldEditPlugin) {
             return (WorldEditPlugin) worldEdit;
         } else {
-            throw new CommandException("Ошибка определения WorldEdit.");
+            throw new CommandException("Обнаружение WorldEdit не удалось (ошибка отчета).");
         }
     }
 
@@ -729,6 +371,16 @@ public class WorldGuardPlugin extends JavaPlugin {
         return null;
     }
 
+    public CommandSender unwrapActor(Actor sender) {
+        if (sender instanceof BukkitPlayer) {
+            return ((BukkitPlayer) sender).getPlayer();
+        } else if (sender instanceof BukkitCommandSender) {
+            return Bukkit.getConsoleSender(); // TODO Fix
+        } else {
+            throw new IllegalArgumentException("Неизвестный тип актера. Пожалуйста, сообщите");
+        }
+    }
+
     /**
      * Wrap a player as a LocalPlayer.
      *
@@ -738,7 +390,7 @@ public class WorldGuardPlugin extends JavaPlugin {
      * @return The wrapped player
      */
     public LocalPlayer wrapOfflinePlayer(OfflinePlayer player) {
-        return new BukkitOfflinePlayer(player);
+        return new BukkitOfflinePlayer(this, player);
     }
 
     /**
@@ -786,7 +438,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 if (copy == null) throw new FileNotFoundException();
                 input = file.getInputStream(copy);
             } catch (IOException e) {
-                WorldGuard.logger.severe("Не удается прочитать конфигурацию по умолчанию: " + defaultName);
+                WorldGuard.logger.severe("Невозможно прочитать конфигурацию по умолчанию: " + defaultName);
             }
 
         if (input != null) {
@@ -800,7 +452,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     output.write(buf, 0, length);
                 }
 
-                WorldGuard.logger.info("Конфигурационный файл записан по умолчанию: "
+                WorldGuard.logger.info("Файл конфигурации по умолчанию записан: "
                         + actual.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();

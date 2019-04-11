@@ -267,10 +267,9 @@ public class DefaultDomain implements Domain, ChangeTracked {
         return toPlayersString(null);
     }
 
-    @SuppressWarnings("deprecation")
     public String toPlayersString(@Nullable ProfileCache cache) {
         StringBuilder str = new StringBuilder();
-        List<String> output = new ArrayList<String>();
+        List<String> output = new ArrayList<>();
 
         for (String name : playerDomain.getPlayers()) {
             output.add("" + name);
@@ -292,7 +291,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
             }
         }
 
-        Collections.sort(output, String.CASE_INSENSITIVE_ORDER);
+        output.sort(String.CASE_INSENSITIVE_ORDER);
         for (Iterator<String> it = output.iterator(); it.hasNext();) {
             str.append(it.next());
             if (it.hasNext()) {
