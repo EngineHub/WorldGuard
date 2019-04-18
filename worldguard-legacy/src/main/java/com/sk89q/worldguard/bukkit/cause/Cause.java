@@ -251,6 +251,8 @@ public final class Cause {
                         addAll(((Projectile) o).getShooter());
                     } else if (o instanceof Vehicle) {
                         addAll(((Vehicle) o).getPassengers());
+                    } else if (o instanceof AreaEffectCloud) {
+                        addAll(((AreaEffectCloud) o).getSource());
                     } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
                         indirect = true;
                         addAll(((Creature) o).getTarget());
