@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -62,8 +63,8 @@ public class WorldGuardVehicleListener implements Listener {
     public void onVehicleMove(VehicleMoveEvent event) {
         Vehicle vehicle = event.getVehicle();
         if (vehicle.getPassengers().isEmpty()) return;
-        List<LocalPlayer> playerPassengers =
-                vehicle.getPassengers().stream().filter(ent -> ent instanceof Player).map(ent -> plugin.wrapPlayer((Player) ent)).collect(Collectors.toList());
+        List<Player> playerPassengers = vehicle.getPassengers().stream()
+                .filter(ent -> ent instanceof Player).map(ent -> (Player) ent).collect(Collectors.toList());
         if (playerPassengers.isEmpty()) {
             return;
         }
@@ -74,11 +75,17 @@ public class WorldGuardVehicleListener implements Listener {
         if (wcfg.useRegions) {
             // Did we move a block?
             if (Locations.isDifferentBlock(BukkitAdapter.adapt(event.getFrom()), BukkitAdapter.adapt(event.getTo()))) {
-                for (LocalPlayer player : playerPassengers) {
-                    if (null != WorldGuard.getInstance().getPlatform().getSessionManager().get(player)
-                            .testMoveTo(player, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE)) {
+                for (Player player : playerPassengers) {
+                    LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                    Location lastValid;
+                    if ((lastValid = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer)
+                            .testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE)) != null) {
                         vehicle.setVelocity(new Vector(0, 0, 0));
                         vehicle.teleport(event.getFrom());
+                        if (Locations.isDifferentBlock(lastValid, BukkitAdapter.adapt(event.getFrom()))) {
+                            Vector dir = player.getLocation().getDirection();
+                            player.teleport(BukkitAdapter.adapt(lastValid).setDirection(dir));
+                        }
                         return;
                     }
                 }
