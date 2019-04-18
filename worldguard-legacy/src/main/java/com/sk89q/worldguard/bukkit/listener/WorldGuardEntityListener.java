@@ -733,13 +733,6 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-
-            if (wcfg.useRegions) {
-                if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(location), (RegionAssociable) null, Flags.ENDER_BUILD))) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
         } else if (ent.getType() == EntityType.WITHER) {
             if (wcfg.blockWitherBlockDamage || wcfg.blockWitherExplosions) {
                 event.setCancelled(true);

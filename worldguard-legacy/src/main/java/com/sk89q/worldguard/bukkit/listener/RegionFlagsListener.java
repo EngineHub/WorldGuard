@@ -69,6 +69,14 @@ public class RegionFlagsListener extends AbstractListener {
                 event.filter(testState(query, Flags.PISTONS), false);
             }
         }
+
+        if (event.getCause().find(EntityType.SNOWMAN) != null) {
+            event.filter(testState(query, Flags.SNOWMAN_TRAILS), false);
+        }
+
+        if (event.getCause().find(EntityType.ENDERMAN) != null) {
+            event.filter(testState(query, Flags.ENDER_BUILD), false);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -96,6 +104,10 @@ public class RegionFlagsListener extends AbstractListener {
 
         if (event.getCause().find(EntityType.ENDER_CRYSTAL) != null) { // EnderCrystal
             event.filter(testState(query, Flags.OTHER_EXPLOSION), config.explosionFlagCancellation);
+        }
+
+        if (event.getCause().find(EntityType.ENDERMAN) != null) {
+            event.filter(testState(query, Flags.ENDER_BUILD), false);
         }
     }
 

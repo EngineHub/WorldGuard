@@ -305,6 +305,10 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
         Entity entity = event.getEntity();
+        if (event.getYield() == 0 && event.blockList().isEmpty()) {
+            // avoids ender dragon spam
+            return;
+        }
 
         Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR));
     }
@@ -466,17 +470,16 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityBlockForm(EntityBlockFormEvent event) {
-        if (event.getEntity() instanceof Player) {
-            // should just be frostwalker...other uses of EntityBlockForm are in BlockListener
-            Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getEntity()),
-                    event.getBlock().getLocation(), event.getNewState().getType()));
-        }
+        entityBreakBlockDebounce.debounce(event.getBlock(), event.getEntity(), event,
+                new PlaceBlockEvent(event, create(event.getEntity()),
+                        event.getBlock().getLocation(), event.getNewState().getType()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
         interactDebounce.debounce(event.getBlock(), event.getEntity(), event,
-                new UseBlockEvent(event, create(event.getEntity()), event.getBlock()).setAllowed(hasInteractBypass(event.getBlock())));
+                new UseBlockEvent(event, create(event.getEntity()),
+                        event.getBlock()).setAllowed(hasInteractBypass(event.getBlock())));
     }
 
     @EventHandler(ignoreCancelled = true)

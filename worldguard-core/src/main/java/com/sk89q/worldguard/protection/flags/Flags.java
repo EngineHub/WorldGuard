@@ -72,20 +72,29 @@ public final class Flags {
 
     // These flags adjust behavior and are not checked in tandem with the
     // BUILD flag so they need to be TRUE for their defaults.
+
+    // mob griefing related
     public static final StateFlag MOB_DAMAGE = register(new StateFlag("mob-damage", true));
-    public static final StateFlag MOB_SPAWNING = register(new StateFlag("mob-spawning", true));
     public static final StateFlag CREEPER_EXPLOSION = register(new StateFlag("creeper-explosion", true));
     public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = register(new StateFlag("enderdragon-block-damage", true));
     public static final StateFlag GHAST_FIREBALL = register(new StateFlag("ghast-fireball", true));
     public static final StateFlag FIREWORK_DAMAGE = register(new StateFlag("firework-damage", true));
     public static final StateFlag OTHER_EXPLOSION = register(new StateFlag("other-explosion", true));
     public static final StateFlag WITHER_DAMAGE = register(new StateFlag("wither-damage", true));
+    public static final StateFlag ENDER_BUILD = register(new StateFlag("enderman-grief", true));
+    public static final StateFlag SNOWMAN_TRAILS = register(new StateFlag("snowman-trails", true));
+    public static final StateFlag ENTITY_PAINTING_DESTROY = register(new StateFlag("entity-painting-destroy", true));
+    public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = register(new StateFlag("entity-item-frame-destroy", true));
+
+    // mob spawning related
+    public static final StateFlag MOB_SPAWNING = register(new StateFlag("mob-spawning", true));
+    public static final SetFlag<EntityType> DENY_SPAWN = register(new SetFlag<>("deny-spawn", new EntityTypeFlag(null)));
+
+    // block dynamics
+    public static final StateFlag PISTONS = register(new StateFlag("pistons", true));
     public static final StateFlag FIRE_SPREAD = register(new StateFlag("fire-spread", true));
     public static final StateFlag LAVA_FIRE = register(new StateFlag("lava-fire", true));
     public static final StateFlag LIGHTNING = register(new StateFlag("lightning", true));
-    public static final StateFlag WATER_FLOW = register(new StateFlag("water-flow", true));
-    public static final StateFlag LAVA_FLOW = register(new StateFlag("lava-flow", true));
-    public static final StateFlag PISTONS = register(new StateFlag("pistons", true));
     public static final StateFlag SNOW_FALL = register(new StateFlag("snow-fall", true));
     public static final StateFlag SNOW_MELT = register(new StateFlag("snow-melt", true));
     public static final StateFlag ICE_FORM = register(new StateFlag("ice-form", true));
@@ -96,35 +105,33 @@ public final class Flags {
     public static final StateFlag MYCELIUM_SPREAD = register(new StateFlag("mycelium-spread", true));
     public static final StateFlag VINE_GROWTH = register(new StateFlag("vine-growth", true));
     public static final StateFlag SOIL_DRY = register(new StateFlag("soil-dry", true));
-    public static final StateFlag ENDER_BUILD = register(new StateFlag("enderman-grief", true));
-    public static final StateFlag INVINCIBILITY = register(new StateFlag("invincible", false));
+    public static final StateFlag WATER_FLOW = register(new StateFlag("water-flow", true));
+    public static final StateFlag LAVA_FLOW = register(new StateFlag("lava-flow", true));
+
+    // chat related flags
     public static final StateFlag SEND_CHAT = register(new StateFlag("send-chat", true));
     public static final StateFlag RECEIVE_CHAT = register(new StateFlag("receive-chat", true));
+    public static final SetFlag<String> BLOCKED_CMDS = register(new SetFlag<>("blocked-cmds", new CommandStringFlag(null)));
+    public static final SetFlag<String> ALLOWED_CMDS = register(new SetFlag<>("allowed-cmds", new CommandStringFlag(null)));
+
+    // locations
+    public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport", RegionGroup.MEMBERS));
+    public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
+
+    // session and movement based flags
+    public static final StateFlag INVINCIBILITY = register(new StateFlag("invincible", false));
     public static final StateFlag ENTRY = register(new StateFlag("entry", true, RegionGroup.NON_MEMBERS));
     public static final StateFlag EXIT = register(new StateFlag("exit", true, RegionGroup.NON_MEMBERS));
     public static final StateFlag ENDERPEARL = register(new StateFlag("enderpearl", true));
     public static final StateFlag CHORUS_TELEPORT = register(new StateFlag("chorus-fruit-teleport", true));
-    public static final StateFlag ENTITY_PAINTING_DESTROY = register(new StateFlag("entity-painting-destroy", true));
-    public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = register(new StateFlag("entity-item-frame-destroy", true));
     public static final StateFlag FALL_DAMAGE = register(new StateFlag("fall-damage", true));
 
-    // FlagUtil that adjust behaviors that aren't state flags
-    public static final StringFlag DENY_MESSAGE = register(new StringFlag("deny-message",
-            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
-                    .append(new StyledFragment(Style.GRAY).append(" Sorry, but you can't %what% here.")))));
-    public static final StringFlag ENTRY_DENY_MESSAGE = register(new StringFlag("entry-deny-message",
-            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
-                    .append(new StyledFragment(Style.GRAY).append(" You are not permitted to enter this area.")))));
-    public static final StringFlag EXIT_DENY_MESSAGE = register(new StringFlag("exit-deny-message",
-            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
-                    .append(new StyledFragment(Style.GRAY).append(" You are not permitted to leave this area.")))));
     public static final BooleanFlag EXIT_OVERRIDE = register(new BooleanFlag("exit-override"));
     public static final StateFlag EXIT_VIA_TELEPORT = register(new StateFlag("exit-via-teleport", true));
     public static final StringFlag GREET_MESSAGE = register(new StringFlag("greeting"));
     public static final StringFlag FAREWELL_MESSAGE = register(new StringFlag("farewell"));
     public static final BooleanFlag NOTIFY_ENTER = register(new BooleanFlag("notify-enter"));
     public static final BooleanFlag NOTIFY_LEAVE = register(new BooleanFlag("notify-leave"));
-    public static final SetFlag<EntityType> DENY_SPAWN = register(new SetFlag<>("deny-spawn", new EntityTypeFlag(null)));
     public static final Flag<GameMode> GAME_MODE = register(new GameModeTypeFlag("game-mode"));
     public static final StringFlag TIME_LOCK = register(new StringFlag("time-lock"));
     public static final Flag<WeatherType> WEATHER_LOCK = register(new WeatherTypeFlag("weather-lock"));
@@ -136,12 +143,17 @@ public final class Flags {
     public static final IntegerFlag FEED_AMOUNT = register(new IntegerFlag("feed-amount"));
     public static final IntegerFlag MIN_FOOD = register(new IntegerFlag("feed-min-hunger"));
     public static final IntegerFlag MAX_FOOD = register(new IntegerFlag("feed-max-hunger"));
-    // public static final IntegerFlag MAX_PLAYERS = register(new IntegerFlag("max-players-allowed"));
-    // public static final StringFlag MAX_PLAYERS_MESSAGE = register(new StringFlag("max-players-reject-message"));
-    public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport", RegionGroup.MEMBERS));
-    public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
-    public static final SetFlag<String> BLOCKED_CMDS = register(new SetFlag<>("blocked-cmds", new CommandStringFlag(null)));
-    public static final SetFlag<String> ALLOWED_CMDS = register(new SetFlag<>("allowed-cmds", new CommandStringFlag(null)));
+
+    // deny messages
+    public static final StringFlag DENY_MESSAGE = register(new StringFlag("deny-message",
+            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
+                    .append(new StyledFragment(Style.GRAY).append(" Sorry, but you can't %what% here.")))));
+    public static final StringFlag ENTRY_DENY_MESSAGE = register(new StringFlag("entry-deny-message",
+            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
+                    .append(new StyledFragment(Style.GRAY).append(" You are not permitted to enter this area.")))));
+    public static final StringFlag EXIT_DENY_MESSAGE = register(new StringFlag("exit-deny-message",
+            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
+                    .append(new StyledFragment(Style.GRAY).append(" You are not permitted to leave this area.")))));
 
     private Flags() {
     }
