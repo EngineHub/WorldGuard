@@ -598,7 +598,7 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        if (fromType == Material.VINE) {
+        if (fromType == Material.VINE || fromType == Material.KELP) {
             if (wcfg.disableVineGrowth) {
                 event.setCancelled(true);
                 return;
