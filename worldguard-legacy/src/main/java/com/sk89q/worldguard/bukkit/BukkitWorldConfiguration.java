@@ -327,7 +327,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             } else {
                 this.blacklist = blist;
                 if (summaryOnStart) {
-                    log.log(Level.INFO, "Blacklist loaded.");
+                    log.log(Level.INFO, "({0}) Blacklist loaded with {1} entries.",
+                            new Object[]{worldName, blacklist.getItemCount()});
                 }
 
                 BlacklistLoggerHandler blacklistLogger = blist.getLogger();

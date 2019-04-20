@@ -60,6 +60,7 @@ public final class Flags {
     public static final StateFlag RIDE = register(new StateFlag("ride", false));
     public static final StateFlag POTION_SPLASH = register(new StateFlag("potion-splash", false));
     public static final StateFlag ITEM_FRAME_ROTATE = register(new StateFlag("item-frame-rotation", false));
+    public static final StateFlag TRAMPLE_BLOCKS = register(new StateFlag("block-trampling", false));
 
     // These flags are similar to the ones above (used in tandem with BUILD),
     // but their defaults are set to TRUE because it is more user friendly.
@@ -118,27 +119,35 @@ public final class Flags {
     public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport", RegionGroup.MEMBERS));
     public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
 
-    // session and movement based flags
+    // idk?
     public static final StateFlag INVINCIBILITY = register(new StateFlag("invincible", false));
-    public static final StateFlag ENTRY = register(new StateFlag("entry", true, RegionGroup.NON_MEMBERS));
-    public static final StateFlag EXIT = register(new StateFlag("exit", true, RegionGroup.NON_MEMBERS));
-    public static final StateFlag ENDERPEARL = register(new StateFlag("enderpearl", true));
-    public static final StateFlag CHORUS_TELEPORT = register(new StateFlag("chorus-fruit-teleport", true));
     public static final StateFlag FALL_DAMAGE = register(new StateFlag("fall-damage", true));
 
+    // session and movement based flags
+    public static final StateFlag ENTRY = register(new StateFlag("entry", true, RegionGroup.NON_MEMBERS));
+    public static final StateFlag EXIT = register(new StateFlag("exit", true, RegionGroup.NON_MEMBERS));
     public static final BooleanFlag EXIT_OVERRIDE = register(new BooleanFlag("exit-override"));
+    public static final StateFlag ENTRY_VIA_TELEPORT = register(new StateFlag("entry-via-teleport", true));
     public static final StateFlag EXIT_VIA_TELEPORT = register(new StateFlag("exit-via-teleport", true));
+
+    public static final StateFlag ENDERPEARL = register(new StateFlag("enderpearl", true));
+    public static final StateFlag CHORUS_TELEPORT = register(new StateFlag("chorus-fruit-teleport", true));
+
     public static final StringFlag GREET_MESSAGE = register(new StringFlag("greeting"));
     public static final StringFlag FAREWELL_MESSAGE = register(new StringFlag("farewell"));
+
     public static final BooleanFlag NOTIFY_ENTER = register(new BooleanFlag("notify-enter"));
     public static final BooleanFlag NOTIFY_LEAVE = register(new BooleanFlag("notify-leave"));
+
     public static final Flag<GameMode> GAME_MODE = register(new GameModeTypeFlag("game-mode"));
     public static final StringFlag TIME_LOCK = register(new StringFlag("time-lock"));
     public static final Flag<WeatherType> WEATHER_LOCK = register(new WeatherTypeFlag("weather-lock"));
+
     public static final IntegerFlag HEAL_DELAY = register(new IntegerFlag("heal-delay"));
     public static final IntegerFlag HEAL_AMOUNT = register(new IntegerFlag("heal-amount"));
     public static final DoubleFlag MIN_HEAL = register(new DoubleFlag("heal-min-health"));
     public static final DoubleFlag MAX_HEAL = register(new DoubleFlag("heal-max-health"));
+
     public static final IntegerFlag FEED_DELAY = register(new IntegerFlag("feed-delay"));
     public static final IntegerFlag FEED_AMOUNT = register(new IntegerFlag("feed-amount"));
     public static final IntegerFlag MIN_FOOD = register(new IntegerFlag("feed-min-hunger"));

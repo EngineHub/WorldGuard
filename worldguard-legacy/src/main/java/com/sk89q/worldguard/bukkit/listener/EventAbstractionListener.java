@@ -396,19 +396,16 @@ public class EventAbstractionListener extends AbstractListener {
 
         switch (event.getAction()) {
             case PHYSICAL:
-                // turtle eggs are broken when this happens
-                if (clicked.getType() == Material.TURTLE_EGG) { // normally we'd be safe but WG7 is 1.13+ only
-                    entityBreakBlockDebounce.debounce(clicked, player, event, new BreakBlockEvent(event, cause, clicked));
-                    break;
-                }
-
-                // Forget about Redstone ore
-                if (clicked.getType() == Material.REDSTONE_ORE || clicked.getType() == Material.FARMLAND) {
+                DelegateEvent firedEvent = new UseBlockEvent(event, cause, clicked).setAllowed(hasInteractBypass(clicked));
+                if (clicked.getType() == Material.REDSTONE_ORE) {
                     silent = true;
                 }
-
-                interactDebounce.debounce(clicked, event.getPlayer(), event,
-                        new UseBlockEvent(event, cause, clicked).setSilent(silent).setAllowed(hasInteractBypass(clicked)));
+                if (clicked.getType() == Material.FARMLAND || clicked.getType() == Material.TURTLE_EGG) {
+                    silent = true;
+                    firedEvent.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
+                }
+                firedEvent.setSilent(silent);
+                interactDebounce.debounce(clicked, event.getPlayer(), event, firedEvent);
                 break;
 
             case RIGHT_CLICK_BLOCK:
