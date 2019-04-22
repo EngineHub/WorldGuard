@@ -19,9 +19,11 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import com.sk89q.worldedit.util.formatting.ColorCodeBuilder;
-import com.sk89q.worldedit.util.formatting.Style;
-import com.sk89q.worldedit.util.formatting.StyledFragment;
+import com.google.common.collect.Sets;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
+import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.weather.WeatherType;
@@ -155,14 +157,17 @@ public final class Flags {
 
     // deny messages
     public static final StringFlag DENY_MESSAGE = register(new StringFlag("deny-message",
-            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
-                    .append(new StyledFragment(Style.GRAY).append(" Sorry, but you can't %what% here.")))));
+            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("Hey!",
+                    TextColor.RED, Sets.newHashSet(TextDecoration.BOLD))
+                    .append(TextComponent.of(" Sorry, but you can't %what% here.", TextColor.GRAY)))));
     public static final StringFlag ENTRY_DENY_MESSAGE = register(new StringFlag("entry-deny-message",
-            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
-                    .append(new StyledFragment(Style.GRAY).append(" You are not permitted to enter this area.")))));
+            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("Hey!",
+                    TextColor.RED, Sets.newHashSet(TextDecoration.BOLD))
+                    .append(TextComponent.of(" You are not permitted to enter this area.", TextColor.GRAY)))));
     public static final StringFlag EXIT_DENY_MESSAGE = register(new StringFlag("exit-deny-message",
-            ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.RED, Style.BOLD).append("Hey!"))
-                    .append(new StyledFragment(Style.GRAY).append(" You are not permitted to leave this area.")))));
+            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("Hey!",
+                    TextColor.RED, Sets.newHashSet(TextDecoration.BOLD))
+                    .append(TextComponent.of(" You are not permitted to leave this area.", TextColor.GRAY)))));
 
     private Flags() {
     }

@@ -21,7 +21,7 @@ package com.sk89q.worldguard.commands;
 
 import com.google.common.base.Function;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
 import javax.annotation.Nullable;
 
@@ -42,40 +42,41 @@ public final class CommandUtils {
     public static String replaceColorMacros(String str) {
         // TODO: Make this more efficient
 
-        str = str.replace("`r", Style.RED.toString());
-        str = str.replace("`R", Style.RED_DARK.toString());
-
-        str = str.replace("`y", Style.YELLOW.toString());
-        str = str.replace("`Y", Style.YELLOW_DARK.toString());
-
-        str = str.replace("`g", Style.GREEN.toString());
-        str = str.replace("`G", Style.GREEN_DARK.toString());
-
-        str = str.replace("`c", Style.CYAN.toString());
-        str = str.replace("`C", Style.CYAN_DARK.toString());
-
-        str = str.replace("`b", Style.BLUE.toString());
-        str = str.replace("`B", Style.BLUE_DARK.toString());
-
-        str = str.replace("`p", Style.PURPLE.toString());
-        str = str.replace("`P", Style.PURPLE_DARK.toString());
-
-        str = str.replace("`0", Style.BLACK.toString());
-        str = str.replace("`1", Style.GRAY_DARK.toString());
-        str = str.replace("`2", Style.GRAY.toString());
-        str = str.replace("`w", Style.WHITE.toString());
-
-        str = str.replace("`k", Style.RANDOMIZE.toString());
-
-        str = str.replace("`l", Style.BOLD.toString());
-        str = str.replace("`m", Style.STRIKETHROUGH.toString());
-        str = str.replace("`n", Style.UNDERLINE.toString());
-        str = str.replace("`o", Style.ITALIC.toString());
-
-        str = str.replace("`x", Style.RESET.toString());
-
-        // MC classic
-        str = Style.translateAlternateColorCodes('&', str);
+        // TODO Fix
+//        str = str.replace("`r", Style.RED.toString());
+//        str = str.replace("`R", Style.RED_DARK.toString());
+//
+//        str = str.replace("`y", Style.YELLOW.toString());
+//        str = str.replace("`Y", Style.YELLOW_DARK.toString());
+//
+//        str = str.replace("`g", Style.GREEN.toString());
+//        str = str.replace("`G", Style.GREEN_DARK.toString());
+//
+//        str = str.replace("`c", Style.CYAN.toString());
+//        str = str.replace("`C", Style.CYAN_DARK.toString());
+//
+//        str = str.replace("`b", Style.BLUE.toString());
+//        str = str.replace("`B", Style.BLUE_DARK.toString());
+//
+//        str = str.replace("`p", Style.PURPLE.toString());
+//        str = str.replace("`P", Style.PURPLE_DARK.toString());
+//
+//        str = str.replace("`0", Style.BLACK.toString());
+//        str = str.replace("`1", Style.GRAY_DARK.toString());
+//        str = str.replace("`2", Style.GRAY.toString());
+//        str = str.replace("`w", Style.WHITE.toString());
+//
+//        str = str.replace("`k", Style.RANDOMIZE.toString());
+//
+//        str = str.replace("`l", Style.BOLD.toString());
+//        str = str.replace("`m", Style.STRIKETHROUGH.toString());
+//        str = str.replace("`n", Style.UNDERLINE.toString());
+//        str = str.replace("`o", Style.ITALIC.toString());
+//
+//        str = str.replace("`x", Style.RESET.toString());
+//
+//        // MC classic
+//        str = Style.translateAlternateColorCodes('&', str);
 
         return str;
     }
@@ -107,6 +108,20 @@ public final class CommandUtils {
     public static java.util.function.Function<String, ?> messageFunction(final Actor sender) {
         return (Function<String, Object>) s -> {
             sender.printRaw(s);
+            return null;
+        };
+    }
+
+    /**
+     * Return a function that accepts a TextComponent to send a message to the
+     * given sender.
+     *
+     * @param sender the sender
+     * @return a function
+     */
+    public static java.util.function.Function<TextComponent, ?> messageComponentFunction(final Actor sender) {
+        return (Function<TextComponent, Object>) s -> {
+            sender.print(s);
             return null;
         };
     }

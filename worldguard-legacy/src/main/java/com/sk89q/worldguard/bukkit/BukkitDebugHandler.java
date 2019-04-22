@@ -23,7 +23,8 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.paste.ActorCallbackPaste;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -191,7 +192,7 @@ public class BukkitDebugHandler implements DebugHandler {
         Player bukkitTarget = BukkitAdapter.adapt(target);
 
         Block block = traceBlock(bukkitSender, bukkitTarget, fromTarget);
-        sender.printRaw(Style.CYAN + "Testing BLOCK BREAK at " + Style.CYAN_DARK + block);
+        sender.print(TextComponent.of("Testing BLOCK BREAK at ", TextColor.AQUA).append(TextComponent.of(block.toString(), TextColor.DARK_AQUA)));
         LoggingBlockBreakEvent event = new LoggingBlockBreakEvent(block, bukkitTarget);
         testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
     }
@@ -202,7 +203,7 @@ public class BukkitDebugHandler implements DebugHandler {
         Player bukkitTarget = BukkitAdapter.adapt(target);
 
         Block block = traceBlock(bukkitSender, bukkitTarget, fromTarget);
-        sender.printRaw(Style.CYAN + "Testing BLOCK PLACE at " + Style.CYAN_DARK + block);
+        sender.print(TextComponent.of("Testing BLOCK PLACE at ", TextColor.AQUA).append(TextComponent.of(block.toString(), TextColor.DARK_AQUA)));
         LoggingBlockPlaceEvent event = new LoggingBlockPlaceEvent(block, block.getState(), block.getRelative(BlockFace.DOWN), bukkitTarget.getItemInHand(), bukkitTarget, true);
         testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
     }
@@ -213,7 +214,7 @@ public class BukkitDebugHandler implements DebugHandler {
         Player bukkitTarget = BukkitAdapter.adapt(target);
 
         Block block = traceBlock(bukkitSender, bukkitTarget, fromTarget);
-        sender.printRaw(Style.CYAN + "Testing BLOCK INTERACT at " + Style.CYAN_DARK + block);
+        sender.print(TextComponent.of("Testing BLOCK INTERACT at ", TextColor.AQUA).append(TextComponent.of(block.toString(), TextColor.DARK_AQUA)));
         LoggingPlayerInteractEvent event = new LoggingPlayerInteractEvent(bukkitTarget, Action.RIGHT_CLICK_BLOCK, bukkitTarget.getItemInHand(), block, BlockFace.SOUTH);
         testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
     }
@@ -223,7 +224,7 @@ public class BukkitDebugHandler implements DebugHandler {
         CommandSender bukkitSender = plugin.unwrapActor(sender);
         Player bukkitTarget = BukkitAdapter.adapt(target);
         Entity entity = traceEntity(bukkitSender, bukkitTarget, fromTarget);
-        sender.printRaw(Style.CYAN + "Testing ENTITY DAMAGE on " + Style.CYAN_DARK + entity);
+        sender.print(TextComponent.of("Testing ENTITY DAMAGE at ", TextColor.AQUA).append(TextComponent.of(entity.toString(), TextColor.DARK_AQUA)));
         LoggingEntityDamageByEntityEvent event = new LoggingEntityDamageByEntityEvent(bukkitTarget, entity, EntityDamageEvent.DamageCause.ENTITY_ATTACK, 1);
         testEvent(bukkitSender, bukkitTarget, event, stackTraceMode);
     }
