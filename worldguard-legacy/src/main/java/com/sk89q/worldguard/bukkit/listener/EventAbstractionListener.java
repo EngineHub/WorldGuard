@@ -812,11 +812,6 @@ public class EventAbstractionListener extends AbstractListener {
         Events.fireToCancel(event, new DamageEntityEvent(event, create(attacker), event.getVehicle()));
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onVehicleEnter(VehicleDamageEvent event) {
-        Events.fireToCancel(event, new UseEntityEvent(event, create(event.getAttacker()), event.getVehicle()));
-    }
-
     //-------------------------------------------------------------------------
     // Composite events
     //-------------------------------------------------------------------------
