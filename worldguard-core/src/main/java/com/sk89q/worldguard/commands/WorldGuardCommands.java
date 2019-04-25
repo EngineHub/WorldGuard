@@ -33,7 +33,7 @@ import com.sk89q.worldedit.command.util.AsyncCommandHelper;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.paste.ActorCallbackPaste;
 import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.util.report.SystemInfoReport;
@@ -266,18 +266,18 @@ public class WorldGuardCommands {
         if (!tasks.isEmpty()) {
             tasks.sort(new TaskStateComparator());
             StringBuilder builder = new StringBuilder();
-            builder.append(Style.GRAY);
+            builder.append(TextColor.GRAY);
             builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
             builder.append(" Running tasks ");
             builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
-            builder.append("\n").append(Style.GRAY).append("Note: Some 'running' tasks may be waiting to be start.");
+            builder.append("\n").append(TextColor.GRAY).append("Note: Some 'running' tasks may be waiting to be start.");
             for (Task task : tasks) {
                 builder.append("\n");
-                builder.append(Style.BLUE).append("(").append(task.getState().name()).append(") ");
-                builder.append(Style.YELLOW);
+                builder.append(TextColor.BLUE).append("(").append(task.getState().name()).append(") ");
+                builder.append(TextColor.YELLOW);
                 builder.append(CommandUtils.getOwnerName(task.getOwner()));
                 builder.append(": ");
-                builder.append(Style.WHITE);
+                builder.append(TextColor.WHITE);
                 builder.append(task.getName());
             }
             sender.printRaw(builder.toString());

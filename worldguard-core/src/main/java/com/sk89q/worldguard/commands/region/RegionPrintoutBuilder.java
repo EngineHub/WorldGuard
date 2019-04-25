@@ -22,7 +22,13 @@ package com.sk89q.worldguard.commands.region;
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
+import com.sk89q.worldedit.util.formatting.component.LabelFormat;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -40,12 +46,12 @@ import javax.annotation.Nullable;
  * Create a region printout, as used in /region info to show information about
  * a region.
  */
-public class RegionPrintoutBuilder implements Callable<String> {
+public class RegionPrintoutBuilder implements Callable<TextComponent> {
     
     private final ProtectedRegion region;
     @Nullable
     private final ProfileCache cache;
-    private final StringBuilder builder = new StringBuilder();
+    private final TextComponentProducer builder = new TextComponentProducer();
 
     /**
      * Create a new instance with a region to report on.
@@ -62,26 +68,22 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * Add a new line.
      */
     private void newLine() {
-        builder.append("\n");
+        builder.append(Component.newline());
     }
     
     /**
      * Add region name, type, and priority.
      */
     public void appendBasics() {
-        builder.append(Style.BLUE);
-        builder.append("Region: ");
-        builder.append(Style.YELLOW);
-        builder.append(region.getId());
+        builder.append(TextComponent.of("Region: ", TextColor.BLUE));
+        builder.append(TextComponent.of(region.getId(), TextColor.YELLOW));
         
-        builder.append(Style.GRAY);
-        builder.append(" (type=");
-        builder.append(region.getType().getName());
+        builder.append(TextComponent.of(" (type=", TextColor.GRAY));
+        builder.append(TextComponent.of(region.getType().getName()));
         
-        builder.append(Style.GRAY);
-        builder.append(", priority=");
-        builder.append(region.getPriority());
-        builder.append(")");
+        builder.append(TextComponent.of(", priority=", TextColor.GRAY));
+        builder.append(TextComponent.of(String.valueOf(region.getPriority())));
+        builder.append(TextComponent.of(")", TextColor.GRAY));
 
         newLine();
     }
@@ -90,8 +92,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * Add information about flags.
      */
     public void appendFlags() {
-        builder.append(Style.BLUE);
-        builder.append("Flags: ");
+        builder.append(TextComponent.of("Flags: ", TextColor.BLUE));
         
         appendFlagsList(true);
         
@@ -115,11 +116,7 @@ public class RegionPrintoutBuilder implements Callable<String> {
             }
 
             if (hasFlags) {
-                builder.append(", ");
-            } else {
-                if (useColors) {
-                    builder.append(Style.YELLOW);
-                }
+                builder.append(TextComponent.of(", "));
             }
 
             RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
@@ -127,23 +124,21 @@ public class RegionPrintoutBuilder implements Callable<String> {
                 group = region.getFlag(groupFlag);
             }
 
+            String flagString;
+
             if (group == null) {
-                builder.append(flag.getName()).append(": ")
-                        .append(Style.stripColor(String.valueOf(val)));
+                flagString = flag.getName() + ": " + val;
             } else {
-                builder.append(flag.getName()).append(" -g ")
-                        .append(group).append(": ")
-                        .append(Style.stripColor(String.valueOf(val)));
+                flagString = flag.getName() + " -g "+ group + ": " + val;
             }
+
+            builder.append(TextComponent.of(flagString, !(hasFlags && useColors) ? TextColor.YELLOW : TextColor.WHITE));
 
             hasFlags = true;
         }
             
         if (!hasFlags) {
-            if (useColors) {
-                builder.append(Style.RED);
-            }
-            builder.append("(none)");
+            builder.append(TextComponent.of("(none)", useColors ? TextColor.RED : TextColor.WHITE));
         }
     }
     
@@ -179,27 +174,24 @@ public class RegionPrintoutBuilder implements Callable<String> {
         int indent = 0;
         while (it.hasPrevious()) {
             ProtectedRegion cur = it.previous();
-            if (useColors) {
-                builder.append(Style.GREEN);
-            }
+
+            StringBuilder nameString = new StringBuilder();
             
             // Put symbol for child
             if (indent != 0) {
                 for (int i = 0; i < indent; i++) {
-                    builder.append("  ");
+                    nameString.append("  ");
                 }
-                builder.append("\u2517");
+                nameString.append("\u2517");
             }
             
             // Put name
-            builder.append(cur.getId());
+            nameString.append(cur.getId());
+            builder.append(TextComponent.of(nameString.toString(), useColors ? TextColor.GREEN : TextColor.WHITE));
             
             // Put (parent)
             if (!cur.equals(region)) {
-                if (useColors) {
-                    builder.append(Style.GRAY);
-                }
-                builder.append(" (parent, priority=").append(cur.getPriority()).append(")");
+                builder.append(TextComponent.of(" (parent, priority=" + cur.getPriority() + ")", useColors ? TextColor.GRAY : TextColor.WHITE));
             }
             
             indent++;
@@ -211,24 +203,20 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * Add information about members.
      */
     public void appendDomain() {
-        builder.append(Style.BLUE);
-        builder.append("Owners: ");
+        builder.append(TextComponent.of("Owners: ", TextColor.BLUE));
         addDomainString(region.getOwners());
         newLine();
 
-        builder.append(Style.BLUE);
-        builder.append("Members: ");
+        builder.append(TextComponent.of("Members: ", TextColor.BLUE));
         addDomainString(region.getMembers());
         newLine();
     }
 
     private void addDomainString(DefaultDomain domain) {
         if (domain.size() != 0) {
-            builder.append(Style.YELLOW);
-            builder.append(domain.toUserFriendlyString(cache));
+            builder.append(LabelFormat.wrap(domain.toUserFriendlyString(cache)));
         } else {
-            builder.append(Style.RED);
-            builder.append("(none)");
+            builder.append(ErrorFormat.wrap("(none)"));
         }
     }
     
@@ -238,20 +226,20 @@ public class RegionPrintoutBuilder implements Callable<String> {
     public void appendBounds() {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        builder.append(Style.BLUE);
-        builder.append("Bounds:");
-        builder.append(Style.YELLOW);
-        builder.append(" (").append(min.getBlockX()).append(",").append(min.getBlockY()).append(",").append(min.getBlockZ()).append(")");
-        builder.append(" -> (").append(max.getBlockX()).append(",").append(max.getBlockY()).append(",").append(max.getBlockZ()).append(")");
-        
+        builder.append(TextComponent.of("Bounds:", TextColor.BLUE));
+        builder.append(TextComponent.of(" (" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")"
+                + " -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")", TextColor.YELLOW));
+
         newLine();
     }
 
     private void appendRegionInformation() {
-        builder.append(Style.GRAY);
-        builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
-        builder.append(" Region Info ");
-        builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
+        TextComponent format = SubtleFormat.wrap(
+                "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550",
+                " Region Info ",
+                "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550"
+        );
+        builder.append(format);
         newLine();
         appendBasics();
         appendFlags();
@@ -260,15 +248,15 @@ public class RegionPrintoutBuilder implements Callable<String> {
         appendBounds();
 
         if (cache != null) {
-            builder.append(Style.GRAY).append("Any names suffixed by * are 'last seen names' and may not be up to date.");
+            builder.append(SubtleFormat.wrap("Any names suffixed by * are 'last seen names' and may not be up to date."));
             newLine();
         }
     }
 
     @Override
-    public String call() throws Exception {
+    public TextComponent call() throws Exception {
         appendRegionInformation();
-        return builder.toString();
+        return toComponent();
     }
 
     /**
@@ -277,65 +265,21 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * @param sender the recipient
      */
     public void send(Actor sender) {
-        sender.printRaw(toString());
+        sender.print(toComponent());
     }
 
-    public StringBuilder append(boolean b) {
-        return builder.append(b);
+    public TextComponentProducer append(String str) {
+        return builder.append(TextComponent.of(str));
     }
 
-    public StringBuilder append(char c) {
-        return builder.append(c);
+    public TextComponentProducer append(TextComponent component) {
+        return builder.append(component);
     }
 
-    public StringBuilder append(char[] str, int offset, int len) {
-        return builder.append(str, offset, len);
+    public TextComponent toComponent() {
+        return builder.create();
     }
 
-    public StringBuilder append(char[] str) {
-        return builder.append(str);
-    }
-
-    public StringBuilder append(CharSequence s, int start, int end) {
-        return builder.append(s, start, end);
-    }
-
-    public StringBuilder append(CharSequence s) {
-        return builder.append(s);
-    }
-
-    public StringBuilder append(double d) {
-        return builder.append(d);
-    }
-
-    public StringBuilder append(float f) {
-        return builder.append(f);
-    }
-
-    public StringBuilder append(int i) {
-        return builder.append(i);
-    }
-
-    public StringBuilder append(long lng) {
-        return builder.append(lng);
-    }
-
-    public StringBuilder append(Object obj) {
-        return builder.append(obj);
-    }
-
-    public StringBuilder append(String str) {
-        return builder.append(str);
-    }
-
-    public StringBuilder append(StringBuffer sb) {
-        return builder.append(sb);
-    }
-
-    public StringBuilder appendCodePoint(int codePoint) {
-        return builder.appendCodePoint(codePoint);
-    }
-    
     @Override
     public String toString() {
         return builder.toString().trim();

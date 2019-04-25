@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.internal.platform;
 
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldguard.LocalPlayer;
@@ -86,6 +87,15 @@ public interface WorldGuardPlatform {
      * @param message The notification to broadcast
      */
     void broadcastNotification(String message);
+
+    /**
+     * Notifies all with the worldguard.notify permission.
+     * This will check both superperms and WEPIF,
+     * but makes sure WEPIF checks don't result in duplicate notifications
+     *
+     * @param component The notification to broadcast
+     */
+    void broadcastNotification(TextComponent component);
 
     /**
      * Load the platform

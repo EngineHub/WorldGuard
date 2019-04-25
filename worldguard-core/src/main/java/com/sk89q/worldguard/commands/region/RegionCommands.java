@@ -34,7 +34,11 @@ import com.sk89q.worldedit.command.util.MessageFutureCallback.Builder;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
+import com.sk89q.worldedit.util.formatting.component.LabelFormat;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -376,7 +380,7 @@ public final class RegionCommands extends RegionCommandsBase {
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, args.hasFlag('u') ? null : WorldGuard.getInstance().getProfileCache());
         ListenableFuture<?> future = Futures.transform(
                 WorldGuard.getInstance().getExecutorService().submit(printout),
-                CommandUtils.messageFunction(sender)::apply);
+                CommandUtils.messageComponentFunction(sender)::apply);
 
         // If it takes too long...
         FutureProgressListener.addProgressListener(
@@ -513,20 +517,14 @@ public final class RegionCommands extends RegionCommandsBase {
             for (int i = 0; i < flagList.size(); i++) {
                 String flag = flagList.get(i);
 
-                if (i % 2 == 0) {
-                    list.append(Style.GRAY);
-                } else {
-                    list.append(Style.WHITE);
-                }
-
-                list.append(flag);
+                list.append(TextComponent.of(flag, i % 2 == 0 ? TextColor.GRAY : TextColor.WHITE));
                 if ((i + 1) < flagList.size()) {
                     list.append(", ");
                 }
             }
 
             sender.printError("Unknown flag specified: " + flagName);
-            sender.print(Style.YELLOW + "Available flags: " + list);
+            sender.print("Available flags: " + list);
             
             return;
         }
@@ -567,7 +565,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 throw new CommandException(e.getMessage());
             }
 
-            sender.print("Region flag " + foundFlag.getName() + " set on '" + existing.getId() + "' to '" + Style.stripColor(value) + "'.");
+            sender.print("Region flag " + foundFlag.getName() + " set on '" + existing.getId() + "' to '" + value + "'.");
         
         // No value? Clear the flag, if -g isn't specified
         } else if (!args.hasFlag('g')) {
@@ -599,10 +597,9 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Print region information
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, null);
-        printout.append(Style.GRAY);
-        printout.append("(Current flags: ");
+        printout.append(SubtleFormat.wrap("(Current flags: "));
         printout.appendFlagsList(false);
-        printout.append(")");
+        printout.append(SubtleFormat.wrap(")"));
         printout.send(sender);
     }
 
@@ -678,29 +675,23 @@ public final class RegionCommands extends RegionCommandsBase {
         } catch (CircularInheritanceException e) {
             // Tell the user what's wrong
             RegionPrintoutBuilder printout = new RegionPrintoutBuilder(parent, null);
-            printout.append(Style.RED);
             assert parent != null;
-            printout.append("Uh oh! Setting '" + parent.getId() + "' to be the parent " +
-                    "of '" + child.getId() + "' would cause circular inheritance.\n");
-            printout.append(Style.GRAY);
-            printout.append("(Current inheritance on '" + parent.getId() + "':\n");
+            printout.append(ErrorFormat.wrap("Uh oh! Setting '", parent.getId(), "' to be the parent of '", child.getId(),
+                    "' would cause circular inheritance.")).newline();
+            printout.append(SubtleFormat.wrap("(Current inheritance on '", parent.getId(), "':")).newline();
             printout.appendParentTree(true);
-            printout.append(Style.GRAY);
-            printout.append(")");
+            printout.append(SubtleFormat.wrap(")"));
             printout.send(sender);
             return;
         }
         
         // Tell the user the current inheritance
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(child, null);
-        printout.append(Style.YELLOW);
-        printout.append("Inheritance set for region '" + child.getId() + "'.\n");
+        printout.append(LabelFormat.wrap("Inheritance set for region '", child.getId(), "'.")).newline();
         if (parent != null) {
-            printout.append(Style.GRAY);
-            printout.append("(Current inheritance:\n");
+            printout.append(SubtleFormat.wrap("(Current inheritance:")).newline();
             printout.appendParentTree(true);
-            printout.append(Style.GRAY);
-            printout.append(")");
+            printout.append(SubtleFormat.wrap(")"));
         }
         printout.send(sender);
     }

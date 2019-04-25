@@ -27,6 +27,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
@@ -188,6 +189,11 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     @Override
     public void printError(String msg) {
+
+    }
+
+    @Override
+    public void print(TextComponent component) {
 
     }
 

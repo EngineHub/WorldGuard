@@ -19,9 +19,9 @@
 
 package com.sk89q.worldguard.blacklist;
 
-import com.sk89q.worldedit.util.formatting.ColorCodeBuilder;
-import com.sk89q.worldedit.util.formatting.Style;
-import com.sk89q.worldedit.util.formatting.StyledFragment;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.blacklist.action.Action;
 import com.sk89q.worldguard.blacklist.action.ActionType;
@@ -30,10 +30,8 @@ import com.sk89q.worldguard.blacklist.event.EventType;
 import com.sk89q.worldguard.blacklist.target.TargetMatcher;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.sk89q.worldguard.commands.CommandUtils;
+import com.sk89q.worldguard.util.formatting.component.BlacklistNotify;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -264,20 +262,7 @@ public class Blacklist {
     public void notify(BlacklistEvent event, String comment) {
         lastEvent = event;
 
-        StyledFragment fragment = new StyledFragment().append(new StyledFragment(Style.GRAY).append("WG: "))
-                .append(new StyledFragment(Style.PURPLE).append(event.getCauseName()))
-                .append(new StyledFragment(Style.YELLOW_DARK).append(" (" + event.getDescription() + ") "))
-                .append(new StyledFragment(Style.WHITE).append(event.getTarget().getFriendlyName() + (comment != null ? " (" + comment + ")" : "") + "."));
-        broadcastNotification(ColorCodeBuilder.asColorCodes(fragment));
-    }
-
-    /**
-     * Sends a notification to all subscribing users.
-     *
-     * @param msg The message to broadcast
-     */
-    public void broadcastNotification(String msg) {
-        WorldGuard.getInstance().getPlatform().broadcastNotification(msg);
+        WorldGuard.getInstance().getPlatform().broadcastNotification(new BlacklistNotify(event, comment).create());
     }
 
     public LoadingCache<String, TrackedEvent> getRepeatingEventCache() {

@@ -32,7 +32,9 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -298,9 +300,8 @@ class RegionCommandsBase {
         if (failures.size() > 0) {
             String failingList = Joiner.on(", ").join(failures.stream().map(regionManager -> "'" + regionManager.getName() + "'").collect(Collectors.toList()));
 
-            sender.printRaw(Style.YELLOW_DARK +
-                    "(Warning: The background saving of region data is failing for these worlds: " + failingList + ". " +
-                    "Your changes are getting lost. See the server log for more information.)");
+            sender.print(TextComponent.of("(Warning: The background saving of region data is failing for these worlds: " + failingList + ". " +
+                    "Your changes are getting lost. See the server log for more information.)", TextColor.GOLD));
         }
     }
 
@@ -326,11 +327,9 @@ class RegionCommandsBase {
      */
     protected static void informNewUser(Actor sender, RegionManager manager, ProtectedRegion region) {
         if (manager.getRegions().size() <= 2) {
-            sender.printRaw(Style.GRAY +
-                    "(This region is NOW PROTECTED from modification from others. " +
-                    "Don't want that? Use " +
-                    Style.CYAN + "/rg flag " + region.getId() + " passthrough allow" +
-                    Style.GRAY + ")");
+            sender.print(SubtleFormat.wrap("(This region is NOW PROTECTED from modification from others. Don't want that? Use ")
+                            .append(TextComponent.of("/rg flag " + region.getId() + " passthrough allow", TextColor.AQUA))
+                            .append(TextComponent.of(")", TextColor.GRAY)));
         }
     }
 

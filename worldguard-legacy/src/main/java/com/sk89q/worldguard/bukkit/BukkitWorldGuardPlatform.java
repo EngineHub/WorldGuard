@@ -19,6 +19,9 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
@@ -44,7 +47,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
 
@@ -98,6 +103,19 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
             }
         }
         WorldGuard.logger.info(message);
+    }
+
+    @Override
+    public void broadcastNotification(TextComponent component) {
+        List<LocalPlayer>
+                wgPlayers = Bukkit.getServer().getOnlinePlayers().stream().map(player -> WorldGuardPlugin.inst().wrapPlayer(player)).collect(
+                Collectors.toList());
+
+        for (LocalPlayer player : wgPlayers) {
+            if (player.hasPermission("worldguard.notify")) {
+                player.print(component);
+            }
+        }
     }
 
     @Override
