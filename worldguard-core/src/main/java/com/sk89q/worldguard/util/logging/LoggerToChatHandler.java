@@ -20,7 +20,7 @@
 package com.sk89q.worldguard.util.logging;
 
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.util.formatting.component.Subtle;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
@@ -72,6 +72,6 @@ public class LoggerToChatHandler extends Handler {
      */
     @Override
     public void publish(LogRecord record) {
-        player.print(new Subtle(record.getLevel().getName() + ": ").append(TextComponent.of(formatter.format(record), TextColor.WHITE)).create());
+        player.print(SubtleFormat.wrap(record.getLevel().getName() + ": ").append(TextComponent.of(formatter.format(record), TextColor.WHITE)));
     }
 }

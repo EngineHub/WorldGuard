@@ -32,7 +32,7 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
-import com.sk89q.worldedit.util.formatting.component.Subtle;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
@@ -327,9 +327,9 @@ class RegionCommandsBase {
      */
     protected static void informNewUser(Actor sender, RegionManager manager, ProtectedRegion region) {
         if (manager.getRegions().size() <= 2) {
-            sender.print(new Subtle("(This region is NOW PROTECTED from modification from others. Don't want that? Use ")
+            sender.print(SubtleFormat.wrap("(This region is NOW PROTECTED from modification from others. Don't want that? Use ")
                             .append(TextComponent.of("/rg flag " + region.getId() + " passthrough allow", TextColor.AQUA))
-                            .append(TextComponent.of(")", TextColor.GRAY)).create());
+                            .append(TextComponent.of(")", TextColor.GRAY)));
         }
     }
 

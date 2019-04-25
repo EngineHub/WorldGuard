@@ -27,7 +27,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.util.formatting.component.Label;
+import com.sk89q.worldedit.util.formatting.component.LabelFormat;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -59,8 +59,8 @@ public class ToggleCommands {
 
         if (!wcfg.fireSpreadDisableToggle) {
             worldGuard.getPlatform().broadcastNotification(
-                    new Label("Fire spread has been globally disabled for '" + world.getName() + "' by "
-                    + sender.getDisplayName() + ".").create());
+                    LabelFormat.wrap("Fire spread has been globally disabled for '" + world.getName() + "' by "
+                    + sender.getDisplayName() + "."));
         } else {
             sender.print("Fire spread was already globally disabled.");
         }
@@ -84,8 +84,8 @@ public class ToggleCommands {
         WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world);
 
         if (wcfg.fireSpreadDisableToggle) {
-            worldGuard.getPlatform().broadcastNotification(new Label("Fire spread has been globally for '" + world.getName() + "' re-enabled by "
-                    + sender.getDisplayName() + ".").create());
+            worldGuard.getPlatform().broadcastNotification(LabelFormat.wrap("Fire spread has been globally for '" + world.getName() + "' re-enabled by "
+                    + sender.getDisplayName() + "."));
         } else {
             sender.print("Fire spread was already globally enabled.");
         }
@@ -115,8 +115,7 @@ public class ToggleCommands {
                 }
 
                 if (!args.hasFlag('s')) {
-                    worldGuard.getPlatform().broadcastNotification(new Label("ALL intensive server activity halted by "
-                            + sender.getDisplayName() + ".").create());
+                    worldGuard.getPlatform().broadcastNotification(LabelFormat.wrap("ALL intensive server activity halted by " + sender.getDisplayName() + "."));
                 } else {
                     sender.print("(Silent) ALL intensive server activity halted by " + sender.getDisplayName() + ".");
                 }
@@ -138,7 +137,7 @@ public class ToggleCommands {
                 }
             } else {
                 if (!args.hasFlag('s')) {
-                    worldGuard.getPlatform().broadcastNotification(new Label("ALL intensive server activity is now allowed.").create());
+                    worldGuard.getPlatform().broadcastNotification(LabelFormat.wrap("ALL intensive server activity is now allowed."));
                     
                     if (!(sender instanceof LocalPlayer)) {
                         sender.print("ALL intensive server activity is now allowed.");

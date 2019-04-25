@@ -34,9 +34,9 @@ import com.sk89q.worldedit.command.util.MessageFutureCallback.Builder;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.component.Error;
-import com.sk89q.worldedit.util.formatting.component.Label;
-import com.sk89q.worldedit.util.formatting.component.Subtle;
+import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
+import com.sk89q.worldedit.util.formatting.component.LabelFormat;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
@@ -597,9 +597,9 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Print region information
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(existing, null);
-        printout.append(new Subtle("(Current flags: ").create());
+        printout.append(SubtleFormat.wrap("(Current flags: "));
         printout.appendFlagsList(false);
-        printout.append(new Subtle(")").create());
+        printout.append(SubtleFormat.wrap(")"));
         printout.send(sender);
     }
 
@@ -676,22 +676,22 @@ public final class RegionCommands extends RegionCommandsBase {
             // Tell the user what's wrong
             RegionPrintoutBuilder printout = new RegionPrintoutBuilder(parent, null);
             assert parent != null;
-            printout.append(new Error("Uh oh! Setting '" + parent.getId() + "' to be the parent " +
-                    "of '" + child.getId() + "' would cause circular inheritance.\n").create());
-            printout.append(new Subtle("(Current inheritance on '" + parent.getId() + "':\n").create());
+            printout.append(ErrorFormat.wrap("Uh oh! Setting '", parent.getId(), "' to be the parent of '", child.getId(),
+                    "' would cause circular inheritance.")).newline();
+            printout.append(SubtleFormat.wrap("(Current inheritance on '", parent.getId(), "':")).newline();
             printout.appendParentTree(true);
-            printout.append(new Subtle(")").create());
+            printout.append(SubtleFormat.wrap(")"));
             printout.send(sender);
             return;
         }
         
         // Tell the user the current inheritance
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(child, null);
-        printout.append(new Label("Inheritance set for region '" + child.getId() + "'.\n").create());
+        printout.append(LabelFormat.wrap("Inheritance set for region '", child.getId(), "'.")).newline();
         if (parent != null) {
-            printout.append(new Subtle("(Current inheritance:\n").create());
+            printout.append(SubtleFormat.wrap("(Current inheritance:")).newline();
             printout.appendParentTree(true);
-            printout.append(new Subtle(")").create());
+            printout.append(SubtleFormat.wrap(")"));
         }
         printout.send(sender);
     }

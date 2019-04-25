@@ -22,9 +22,9 @@ package com.sk89q.worldguard.commands.region;
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.formatting.component.Error;
-import com.sk89q.worldedit.util.formatting.component.Label;
-import com.sk89q.worldedit.util.formatting.component.Subtle;
+import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
+import com.sk89q.worldedit.util.formatting.component.LabelFormat;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -214,9 +214,9 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
 
     private void addDomainString(DefaultDomain domain) {
         if (domain.size() != 0) {
-            builder.append(new Label(domain.toUserFriendlyString(cache)).create());
+            builder.append(LabelFormat.wrap(domain.toUserFriendlyString(cache)));
         } else {
-            builder.append(new Error("(none)").create());
+            builder.append(ErrorFormat.wrap("(none)"));
         }
     }
     
@@ -234,9 +234,12 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
     }
 
     private void appendRegionInformation() {
-        builder.append(new Subtle("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550").create());
-        builder.append(new Subtle(" Region Info ").create());
-        builder.append(new Subtle("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550").create());
+        TextComponent format = SubtleFormat.wrap(
+                "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550",
+                " Region Info ",
+                "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550"
+        );
+        builder.append(format);
         newLine();
         appendBasics();
         appendFlags();
@@ -245,7 +248,7 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
         appendBounds();
 
         if (cache != null) {
-            builder.append(new Subtle("Any names suffixed by * are 'last seen names' and may not be up to date.").create());
+            builder.append(SubtleFormat.wrap("Any names suffixed by * are 'last seen names' and may not be up to date."));
             newLine();
         }
     }
