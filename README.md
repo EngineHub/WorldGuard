@@ -1,4 +1,4 @@
-# ![WorldGuard](http://static.sk89q.com/readme/worldguard-new.png)
+# ![WorldGuard](worldguard-logo.png)
 
 WorldGuard lets you and players guard areas of land against griefers and undesirables, as well as tweak and disable various gameplay features of Minecraft.
 
