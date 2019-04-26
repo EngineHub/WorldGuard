@@ -129,7 +129,6 @@ public final class Flags {
     public static final StateFlag ENTRY = register(new StateFlag("entry", true, RegionGroup.NON_MEMBERS));
     public static final StateFlag EXIT = register(new StateFlag("exit", true, RegionGroup.NON_MEMBERS));
     public static final BooleanFlag EXIT_OVERRIDE = register(new BooleanFlag("exit-override"));
-    public static final StateFlag ENTRY_VIA_TELEPORT = register(new StateFlag("entry-via-teleport", true));
     public static final StateFlag EXIT_VIA_TELEPORT = register(new StateFlag("exit-via-teleport", true));
 
     public static final StateFlag ENDERPEARL = register(new StateFlag("enderpearl", true));
@@ -177,7 +176,8 @@ public final class Flags {
         return flag;
     }
 
-    public static @Nullable Flag get(final String id) {
+    @Nullable
+    public static Flag get(final String id) {
         return WorldGuard.getInstance().getFlagRegistry().get(id);
     }
 
