@@ -27,7 +27,15 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.util.formatting.component.CodeFormat;
+import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.LabelFormat;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -93,8 +101,8 @@ public class ToggleCommands {
         wcfg.fireSpreadDisableToggle = false;
     }
 
-    @Command(aliases = {"halt-activity", "stoplag", "haltactivity"},
-            desc = "Attempts to cease as much activity in order to stop lag", flags = "cis", max = 0)
+    @Command(aliases = {"halt-activity", "stoplag", "haltactivity"}, usage = "[confirm]",
+            desc = "Attempts to cease as much activity in order to stop lag", flags = "cis", max = 1)
     @CommandPermissions({"worldguard.halt-activity"})
     public void stopLag(CommandContext args, Actor sender) throws CommandException {
 
@@ -110,6 +118,28 @@ public class ToggleCommands {
             configManager.activityHaltToggle = !args.hasFlag('c');
 
             if (configManager.activityHaltToggle) {
+                if (args.argsLength() == 0 || !args.getString(0).equalsIgnoreCase("confirm")) {
+                    String confirmCommand = "/" + args.getCommand() + " confirm";
+
+                    TextComponent message = TextComponent.builder("")
+                            .append(ErrorFormat.wrap("This command will "))
+                            .append(ErrorFormat.wrap("PERMANENTLY")
+                                    .decoration(TextDecoration.BOLD, TextDecoration.State.TRUE))
+                            .append(ErrorFormat.wrap(" erase ALL animals in ALL loaded chunks in ALL loaded worlds. "))
+                            .append(Component.newline())
+                            .append(TextComponent.of("[Click]", TextColor.GREEN)
+                                    .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, confirmCommand))
+                                    .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to confirm /" + args.getCommand()))))
+                            .append(ErrorFormat.wrap(" or type "))
+                            .append(CodeFormat.wrap(confirmCommand)
+                                    .clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, confirmCommand)))
+                            .append(ErrorFormat.wrap(" to confirm."))
+                            .build();
+
+                    sender.print(message);
+                    return;
+                }
+
                 if (!(sender instanceof LocalPlayer)) {
                     sender.print("ALL intensive server activity halted.");
                 }
