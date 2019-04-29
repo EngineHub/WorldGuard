@@ -406,8 +406,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
         }
 
         final TextComponent.Builder builder = TextComponent.builder("");
-        final Iterator<TextComponent> profiles = profileMap.keySet().stream().sorted().map(name ->
-        {
+        final Iterator<TextComponent> profiles = profileMap.keySet().stream().sorted().map(name -> {
             final UUID uuid = profileMap.get(name);
             final TextComponent component = TextComponent.of(name, TextColor.YELLOW)
                     .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, uuid == null
