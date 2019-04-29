@@ -25,8 +25,15 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.squirrelid.Profile;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -46,15 +53,18 @@ public class RegionLister implements Callable<Integer> {
 
     private final Actor sender;
     private final RegionManager manager;
+    private final String world;
     private OwnerMatcher ownerMatcher;
     private int page;
 
-    public RegionLister(RegionManager manager, Actor sender) {
+    public RegionLister(RegionManager manager, Actor sender, String world) {
         checkNotNull(manager);
         checkNotNull(sender);
+        checkNotNull(world);
 
         this.manager = manager;
         this.sender = sender;
+        this.world = world;
     }
 
     public int getPage() {
@@ -149,12 +159,12 @@ public class RegionLister implements Callable<Integer> {
         List<RegionListEntry> entries = new ArrayList<>();
 
         int index = 0;
-        for (String id : regions.keySet()) {
-            RegionListEntry entry = new RegionListEntry(id, index++);
+        for (Map.Entry<String, ProtectedRegion> rg : regions.entrySet()) {
+            RegionListEntry entry = new RegionListEntry(rg.getValue(), index++);
 
             // Filtering by owner?
-            ProtectedRegion region = regions.get(id);
             if (ownerMatcher != null) {
+                ProtectedRegion region = rg.getValue();
                 entry.isOwner = ownerMatcher.isContainedWithin(region.getOwners());
                 entry.isMember = ownerMatcher.isContainedWithin(region.getMembers());
 
@@ -172,9 +182,9 @@ public class RegionLister implements Callable<Integer> {
         final int pageSize = 10;
         final int pages = (int) Math.ceil(totalSize / (float) pageSize);
 
-        sender.printError(
-                (ownerMatcher == null ? "Regions (page " : "Regions for " + ownerMatcher.getName() + " (page ")
+        sender.print((ownerMatcher == null ? "Regions (page " : "Regions for " + ownerMatcher.getName() + " (page ")
                 + (page + 1) + " of " + pages + "):");
+        RegionPermissionModel perms = new RegionPermissionModel(sender);
 
         if (page < pages) {
             // Print
@@ -183,7 +193,21 @@ public class RegionLister implements Callable<Integer> {
                     break;
                 }
 
-                sender.print(String.valueOf(entries.get(i)));
+                final RegionListEntry entry = entries.get(i);
+                final TextComponent.Builder builder = TextComponent.builder(entry.toString());
+                if (perms.mayLookup(entry.region)) {
+                    builder.append(Component.space().append(TextComponent.of("[Info]", TextColor.GRAY)
+                            .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for info")))
+                            .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/rg info -w " + world + " " + entry.region.getId()))));
+                }
+                if (perms.mayTeleportTo(entry.region) && entry.region.getFlag(Flags.TELE_LOC) != null) {
+                    builder.append(Component.space().append(TextComponent.of("[Teleport]", TextColor.GRAY)
+                            .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to teleport")))
+                            .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/rg tp -w " + world + " " + entry.region.getId()))));
+                }
+                sender.print(builder.build());
             }
         }
 
@@ -197,13 +221,13 @@ public class RegionLister implements Callable<Integer> {
     }
 
     private class RegionListEntry implements Comparable<RegionListEntry> {
-        private final String id;
+        private final ProtectedRegion region;
         private final int index;
         boolean isOwner;
         boolean isMember;
 
-        private RegionListEntry(String id, int index) {
-            this.id = id;
+        private RegionListEntry(ProtectedRegion rg, int index) {
+            this.region = rg;
             this.index = index;
         }
 
@@ -215,17 +239,17 @@ public class RegionLister implements Callable<Integer> {
             if (isMember != o.isMember) {
                 return isMember ? 1 : -1;
             }
-            return id.compareTo(o.id);
+            return region.getId().compareTo(o.region.getId());
         }
 
         @Override
         public String toString() {
             if (isOwner) {
-                return (index + 1) + ". +" + id;
+                return (index + 1) + ". +" + region.getId();
             } else if (isMember) {
-                return (index + 1) + ". -" + id;
+                return (index + 1) + ". -" + region.getId();
             } else {
-                return (index + 1) + ". " + id;
+                return (index + 1) + ". " + region.getId();
             }
         }
     }
