@@ -2,14 +2,15 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 
 dependencies {
-    compile 'com.sk89q.worldedit:worldedit-core:7.0.0-SNAPSHOT'
-    compile 'com.sk89q.intake:intake:4.2-SNAPSHOT'
-    compile 'com.sk89q:squirrelid:0.2.0'
-    compile 'org.flywaydb:flyway-core:3.0'
-    compile 'org.khelekore:prtree:1.5.0'
-    compile 'com.google.code.findbugs:jsr305:1.3.9'
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.hamcrest:hamcrest-library:1.2.1'
+    api 'com.sk89q.worldedit:worldedit-core:7.0.0-SNAPSHOT'
+    implementation 'com.sk89q.intake:intake:4.2-SNAPSHOT'
+    implementation 'com.sk89q:squirrelid:0.2.0'
+    implementation 'org.flywaydb:flyway-core:3.0'
+    implementation 'org.khelekore:prtree:1.5.0'
+
+    api 'com.google.code.findbugs:jsr305:1.3.9'
+    testImplementation 'junit:junit:4.11'
+    testImplementation 'org.hamcrest:hamcrest-library:1.2.1'
 }
 
 sourceSets {

@@ -67,6 +67,7 @@ artifactoryPublish.skip = true
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'maven'
     apply plugin: 'checkstyle'
     apply plugin: 'com.github.johnrengelman.shadow'
@@ -123,7 +124,6 @@ subprojects {
             include(dependency('org.khelekore:prtree:1.5.0'))
             include(dependency('com.sk89q:squirrelid:0.2.0'))
             include(dependency('org.flywaydb:flyway-core:3.0'))
-            include(dependency('com.googlecode.json-simple:json-simple:1.1.1'))
         }
         exclude 'GradleStart**'
         exclude '.cache'

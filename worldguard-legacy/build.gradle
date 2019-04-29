@@ -9,14 +9,16 @@ repositories {
 }
 
 dependencies {
-    compile project(path: ':worldguard-core', configuration: 'shadow')
-    compile 'org.bukkit:bukkit:1.13-R0.1-SNAPSHOT'
-    compile 'com.sk89q.worldedit:worldedit-bukkit:7.0.0-SNAPSHOT'
-    compile ('com.sk89q:commandbook:2.3') {
+    api project(path: ':worldguard-core', configuration: 'shadow')
+    api 'org.bukkit:bukkit:1.13-R0.1-SNAPSHOT'
+    api 'com.sk89q.worldedit:worldedit-bukkit:7.0.0-SNAPSHOT'
+
+    implementation ('com.sk89q:commandbook:2.3') {
         exclude group: 'com.sk89q', module: 'worldedit'
         exclude group: 'com.zachsthings.libcomponents'
+        exclude group: 'org.bukkit'
     }
-    compile 'org.bstats:bstats-bukkit:1.4'
+    implementation 'org.bstats:bstats-bukkit:1.4'
 }
 
 processResources {
@@ -45,7 +47,6 @@ shadowJar {
     }
 
     relocate('org.flywaydb', 'com.sk89q.worldguard.internal.flywaydb')
-    relocate('org.json.simple', 'com.sk89q.worldguard.util.jsonsimple')
 
 }
 
