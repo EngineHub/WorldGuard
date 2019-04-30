@@ -261,32 +261,11 @@ public final class RegionManager {
     }
 
     /**
-     * Matches a region using either the pattern {@code #{region_index}} or
-     * simply by the exact name of the region.
-     *
-     * @param pattern the pattern
-     * @return a region
+     * @deprecated Use exact ids with {@link #getRegion}
      */
     @Nullable
+    @Deprecated
     public ProtectedRegion matchRegion(String pattern) {
-        checkNotNull(pattern);
-
-        if (pattern.startsWith("#")) {
-            int index;
-            try {
-                index = Integer.parseInt(pattern.substring(1)) - 1;
-            } catch (NumberFormatException e) {
-                return null;
-            }
-            for (ProtectedRegion region : this.index.values()) {
-                if (index == 0) {
-                    return region;
-                }
-                --index;
-            }
-            return null;
-        }
-
         return getRegion(pattern);
     }
 

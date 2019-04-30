@@ -32,7 +32,6 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.DomainInputResolver;
@@ -58,8 +57,6 @@ public class MemberCommands extends RegionCommandsBase {
         String id = args.getString(0);
         RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
-
-        id = region.getId();
 
         // Check permissions
         if (!getPermissionModel(sender).mayAddMembers(region)) {
@@ -109,7 +106,6 @@ public class MemberCommands extends RegionCommandsBase {
 
         if (player != null) {
             if (owners != null && owners.size() == 0) {
-                // TODO: Move this to an event
                 if (!sender.hasPermission("worldguard.region.unlimited")) {
                     int maxRegionCount = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).getMaxRegionCount(player);
                     if (maxRegionCount >= 0 && manager.getRegionCountOfPlayer(player)

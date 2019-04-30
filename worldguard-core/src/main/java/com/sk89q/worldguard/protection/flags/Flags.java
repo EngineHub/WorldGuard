@@ -171,13 +171,13 @@ public final class Flags {
     private Flags() {
     }
 
-    public static <T extends Flag> T register(final T flag) throws FlagConflictException {
+    private static <T extends Flag<?>> T register(final T flag) throws FlagConflictException {
         WorldGuard.getInstance().getFlagRegistry().register(flag);
         return flag;
     }
 
     @Nullable
-    public static Flag get(final String id) {
+    public static Flag<?> get(final String id) {
         return WorldGuard.getInstance().getFlagRegistry().get(id);
     }
 
@@ -189,8 +189,9 @@ public final class Flags {
      * @return a flag, or null
      */
     public static Flag<?> fuzzyMatchFlag(FlagRegistry flagRegistry, String id) {
+        final String compId = id.replace("-", "");
         for (Flag<?> flag : flagRegistry) {
-            if (flag.getName().replace("-", "").equalsIgnoreCase(id.replace("-", ""))) {
+            if (flag.getName().replace("-", "").equalsIgnoreCase(compId)) {
                 return flag;
             }
         }

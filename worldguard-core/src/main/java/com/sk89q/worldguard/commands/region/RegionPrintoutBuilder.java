@@ -22,8 +22,10 @@ package com.sk89q.worldguard.commands.region;
 import com.sk89q.squirrelid.cache.ProfileCache;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.LabelFormat;
+import com.sk89q.worldedit.util.formatting.component.MessageBox;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -142,8 +144,8 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
                 flagString = flag.getName() + " -g " + group + ": ";
             }
 
-            TextComponent flagText = TextComponent.of(flagString, useColors ? TextColor.YELLOW : TextColor.WHITE)
-                    .append(TextComponent.of(String.valueOf(val)));
+            TextComponent flagText = TextComponent.of(flagString, useColors ? TextColor.GOLD : TextColor.WHITE)
+                    .append(TextComponent.of(String.valueOf(val), useColors? TextColor.YELLOW : TextColor.WHITE));
             if (perms != null && perms.maySetFlag(region, flag)) {
                 flagText = flagText.hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set flag")))
                         .clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
@@ -206,9 +208,9 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
             // Put symbol for child
             if (indent != 0) {
                 for (int i = 0; i < indent; i++) {
-                    namePrefix.append("  ");
+                    namePrefix.append(" ");
                 }
-                namePrefix.append("\u2517"); // ┗
+                namePrefix.append("\u2937"); //⤷
             }
 
             // Put name
@@ -230,8 +232,8 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
             if (last != null && cur.equals(region) && perms != null && perms.maySetParent(cur, last)) {
                 builder.append(Component.space());
                 builder.append(TextComponent.of("[X]", TextColor.RED)
-                        .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to remove parent")))
-                        .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rg setparent -w " + world + " " + cur.getId())));
+                        .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to unlink parent")))
+                        .clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/rg setparent -w " + world + " " + cur.getId())));
             }
 
             last = cur;
@@ -300,11 +302,16 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
                     .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rg select " + region.getId()));
         }
         builder.append(bound);
-        if (perms != null && perms.mayTeleportTo(region) && region.getFlag(Flags.TELE_LOC) != null) {
-            builder.append(Component.space()).append(TextComponent.of("[Teleport]", TextColor.GRAY)
-                    .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to teleport")))
+        final Location teleFlag = region.getFlag(Flags.TELE_LOC);
+        if (perms != null && perms.mayTeleportTo(region) && teleFlag != null) {
+            builder.append(Component.space().append(TextComponent.of("[Teleport]", TextColor.GRAY)
+                    .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                            TextComponent.of("Click to teleport").append(Component.newline()).append(
+                                    TextComponent.of(teleFlag.getBlockY() + ", "
+                                            + teleFlag.getBlockY() + ", "
+                                            + teleFlag.getBlockZ()))))
                     .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                            "/rg tp -w " + world + " " + region.getId())));
+                            "/rg tp -w " + world + " " + region.getId()))));
         }
 
         newline();
@@ -322,13 +329,6 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
     }
 
     private void appendRegionInformation() {
-        TextComponent format = SubtleFormat.wrap(
-                "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550",
-                " Region Info ",
-                "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550"
-        );
-        builder.append(format);
-        newline();
         appendBasics();
         appendFlags();
         appendParents();
@@ -342,8 +342,9 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
 
     @Override
     public TextComponent call() {
+        MessageBox box = new MessageBox("Region Info", builder);
         appendRegionInformation();
-        return toComponent();
+        return box.create();
     }
 
     /**

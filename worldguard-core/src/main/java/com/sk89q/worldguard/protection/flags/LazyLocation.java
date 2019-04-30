@@ -19,12 +19,15 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.NullWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.WorldGuard;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * A location that stores the name of the world in case the world is unloaded.
@@ -38,14 +41,24 @@ class LazyLocation extends Location {
         return WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(worldName);
     }
 
-    public LazyLocation(String worldName, Vector3 position, float yaw, float pitch) {
-        super(findWorld(worldName), position, yaw, pitch);
+    LazyLocation(String worldName, Vector3 position, float yaw, float pitch) {
+        super(Optional.ofNullable(findWorld(worldName)).orElse(NullWorld.getInstance()), position, yaw, pitch);
         this.worldName = worldName;
     }
 
-    public LazyLocation(String worldName, Vector3 position) {
-        super(findWorld(worldName), position);
+    LazyLocation(String worldName, Vector3 position) {
+        super(Optional.ofNullable(findWorld(worldName)).orElse(NullWorld.getInstance()), position);
         this.worldName = worldName;
+    }
+
+    @Override
+    public Extent getExtent() {
+        if (super.getExtent() != NullWorld.getInstance()) {
+            return super.getExtent();
+        }
+        // try loading the world again now
+        // if it fails it will throw an error later (presumably when trying to teleport someone there)
+        return Optional.ofNullable(findWorld(getWorldName())).orElse(NullWorld.getInstance());
     }
 
     public String getWorldName() {
@@ -56,6 +69,7 @@ class LazyLocation extends Location {
         return new LazyLocation(worldName, toVector(), yaw, pitch);
     }
 
+    @Override
     public LazyLocation setPosition(Vector3 position) {
         return new LazyLocation(worldName, position, getYaw(), getPitch());
     }
@@ -71,10 +85,12 @@ class LazyLocation extends Location {
     @Override
     public String toString() {
         if (getPitch() == 0 && getYaw() == 0) {
-            return String.join(", ", "World=" + worldName, "X=" + getX(), "Y=" + getY(), "Z=" + getZ());
+            return String.join(", ", worldName,
+                    String.valueOf((int) getX()), String.valueOf((int) getY()), String.valueOf((int) getZ()));
         } else {
-            return String.join(", ", "World=" + worldName, "X=" + getX(), "Y=" + getY(),
-                    "Z=" + getZ(), "Pitch=" + getPitch(), "Yaw=" + getYaw());
+            return String.join(", ", worldName,
+                    String.valueOf((int) getX()), String.valueOf((int) getY()), String.valueOf((int) getZ()),
+                    String.valueOf((int) getPitch()), String.valueOf((int) getYaw()));
         }
     }
 }
