@@ -23,8 +23,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.squirrelid.Profile;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
@@ -33,7 +33,6 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -56,6 +55,8 @@ public class RegionLister implements Callable<Integer> {
     private final String world;
     private OwnerMatcher ownerMatcher;
     private int page;
+    private String playerName;
+    private boolean nameOnly;
 
     public RegionLister(RegionManager manager, Actor sender, String world) {
         checkNotNull(manager);
@@ -75,21 +76,9 @@ public class RegionLister implements Callable<Integer> {
         this.page = page;
     }
 
-    public void filterOwnedByPlayer(final Player player) {
-        ownerMatcher = new OwnerMatcher() {
-            @Override
-            public String getName() {
-                return player.getName();
-            }
-
-            @Override
-            public boolean isContainedWithin(DefaultDomain domain) throws CommandException {
-                return domain.contains(player.getUniqueId());
-            }
-        };
-    }
-
     public void filterOwnedByName(String name, boolean nameOnly) {
+        this.playerName = name;
+        this.nameOnly = nameOnly;
         if (nameOnly) {
             filterOwnedByName(name);
         } else {
@@ -105,7 +94,7 @@ public class RegionLister implements Callable<Integer> {
             }
 
             @Override
-            public boolean isContainedWithin(DefaultDomain domain) throws CommandException {
+            public boolean isContainedWithin(DefaultDomain domain) {
                 return domain.contains(name);
             }
         };
@@ -158,58 +147,40 @@ public class RegionLister implements Callable<Integer> {
         // Build a list of regions to show
         List<RegionListEntry> entries = new ArrayList<>();
 
-        int index = 0;
         for (Map.Entry<String, ProtectedRegion> rg : regions.entrySet()) {
-            RegionListEntry entry = new RegionListEntry(rg.getValue(), index++);
-
-            // Filtering by owner?
-            if (ownerMatcher != null) {
-                ProtectedRegion region = rg.getValue();
-                entry.isOwner = ownerMatcher.isContainedWithin(region.getOwners());
-                entry.isMember = ownerMatcher.isContainedWithin(region.getMembers());
-
-                if (!entry.isOwner && !entry.isMember) {
-                    continue; // Skip
-                }
+            if (rg.getKey().equals("__global__")) {
+                continue;
             }
-
-            entries.add(entry);
-        }
-
-        Collections.sort(entries);
-
-        final int totalSize = entries.size();
-        final int pageSize = 10;
-        final int pages = (int) Math.ceil(totalSize / (float) pageSize);
-
-        sender.print((ownerMatcher == null ? "Regions (page " : "Regions for " + ownerMatcher.getName() + " (page ")
-                + (page + 1) + " of " + pages + "):");
-        RegionPermissionModel perms = new RegionPermissionModel(sender);
-
-        if (page < pages) {
-            // Print
-            for (int i = page * pageSize; i < page * pageSize + pageSize; i++) {
-                if (i >= totalSize) {
-                    break;
-                }
-
-                final RegionListEntry entry = entries.get(i);
-                final TextComponent.Builder builder = TextComponent.builder(entry.toString());
-                if (perms.mayLookup(entry.region)) {
-                    builder.append(Component.space().append(TextComponent.of("[Info]", TextColor.GRAY)
-                            .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for info")))
-                            .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                    "/rg info -w " + world + " " + entry.region.getId()))));
-                }
-                if (perms.mayTeleportTo(entry.region) && entry.region.getFlag(Flags.TELE_LOC) != null) {
-                    builder.append(Component.space().append(TextComponent.of("[Teleport]", TextColor.GRAY)
-                            .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to teleport")))
-                            .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                                    "/rg tp -w " + world + " " + entry.region.getId()))));
-                }
-                sender.print(builder.build());
+            final ProtectedRegion region = rg.getValue();
+            final RegionListEntry entry = new RegionListEntry(region);
+            if (entry.matches(ownerMatcher)) {
+                entries.add(entry);
             }
         }
+
+        if (ownerMatcher == null) {
+            Collections.sort(entries);
+        }
+        // insert global on top
+        if (regions.containsKey("__global__")) {
+            final RegionListEntry entry = new RegionListEntry(regions.get("__global__"));
+            if (entry.matches(ownerMatcher)) {
+                entries.add(0, entry);
+            }
+        }
+        // unless we're matching owners, then sort by ownership
+        if (ownerMatcher != null) {
+            Collections.sort(entries);
+        }
+
+        RegionPermissionModel perms = sender.isPlayer() ? new RegionPermissionModel(sender) : null;
+        String title = ownerMatcher == null ? "Regions" : "Regions for " + ownerMatcher.getName();
+        String cmd = "/rg list -w " + world
+                + (playerName != null ? " -p " + playerName : "")
+                + (nameOnly ? " -n" : "")
+                + " %page%";
+        PaginationBox box = new RegionListBox(title, cmd, perms, entries, world);
+        sender.print(box.create(page));
 
         return page;
     }
@@ -220,37 +191,81 @@ public class RegionLister implements Callable<Integer> {
         boolean isContainedWithin(DefaultDomain domain) throws CommandException;
     }
 
-    private class RegionListEntry implements Comparable<RegionListEntry> {
+    private static final class RegionListEntry implements Comparable<RegionListEntry> {
         private final ProtectedRegion region;
-        private final int index;
-        boolean isOwner;
-        boolean isMember;
+        private boolean isOwner;
+        private boolean isMember;
 
-        private RegionListEntry(ProtectedRegion rg, int index) {
+        private RegionListEntry(ProtectedRegion rg) {
             this.region = rg;
-            this.index = index;
+        }
+
+        public boolean matches(OwnerMatcher matcher) throws CommandException {
+            return matcher == null
+                    || (isOwner = matcher.isContainedWithin(region.getOwners()))
+                    || (isMember = matcher.isContainedWithin(region.getMembers()));
+        }
+
+        public ProtectedRegion getRegion() {
+            return region;
+        }
+
+        public boolean isOwner() {
+            return isOwner;
+        }
+
+        public boolean isMember() {
+            return isMember;
         }
 
         @Override
         public int compareTo(RegionListEntry o) {
             if (isOwner != o.isOwner) {
-                return isOwner ? 1 : -1;
+                return isOwner ? -1 : 1;
             }
             if (isMember != o.isMember) {
-                return isMember ? 1 : -1;
+                return isMember ? -1 : 1;
             }
             return region.getId().compareTo(o.region.getId());
         }
+    }
+
+    private static class RegionListBox extends PaginationBox {
+        private final RegionPermissionModel perms;
+        private final List<RegionListEntry> entries;
+        private String world;
+
+        RegionListBox(String title, String cmd, RegionPermissionModel perms, List<RegionListEntry> entries, String world) {
+            super(title, cmd);
+            this.perms = perms;
+            this.entries = entries;
+            this.world = world;
+        }
 
         @Override
-        public String toString() {
-            if (isOwner) {
-                return (index + 1) + ". +" + region.getId();
-            } else if (isMember) {
-                return (index + 1) + ". -" + region.getId();
-            } else {
-                return (index + 1) + ". " + region.getId();
+        public Component getComponent(int number) {
+            final RegionListEntry entry = entries.get(number);
+            final TextComponent.Builder builder = TextComponent.builder(number + 1 + ".").color(TextColor.LIGHT_PURPLE);
+            if (entry.isOwner()) {
+                builder.append(Component.space()).append(TextComponent.of("+", TextColor.DARK_AQUA)
+                        .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Owner", TextColor.GOLD))));
+            } else if (entry.isMember()) {
+                builder.append(Component.space()).append(TextComponent.of("-", TextColor.AQUA)
+                        .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Member", TextColor.GOLD))));
             }
+            builder.append(Component.space()).append(TextComponent.of(entry.getRegion().getId(), TextColor.GOLD));
+            if (perms != null && perms.mayLookup(entry.region)) {
+                builder.append(Component.space().append(TextComponent.of("[Info]", TextColor.GRAY)
+                        .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for info")))
+                        .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                "/rg info -w " + world + " " + entry.region.getId()))));
+            }
+            return builder.build();
+        }
+
+        @Override
+        public int getComponentsSize() {
+            return entries.size();
         }
     }
 }

@@ -297,8 +297,9 @@ class RegionCommandsBase {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         Set<RegionManager> failures = container.getSaveFailures();
 
-        if (failures.size() > 0) {
-            String failingList = Joiner.on(", ").join(failures.stream().map(regionManager -> "'" + regionManager.getName() + "'").collect(Collectors.toList()));
+        if (!failures.isEmpty()) {
+            String failingList = Joiner.on(", ").join(failures.stream()
+                    .map(regionManager -> "'" + regionManager.getName() + "'").collect(Collectors.toList()));
 
             sender.print(TextComponent.of("(Warning: The background saving of region data is failing for these worlds: " + failingList + ". " +
                     "Your changes are getting lost. See the server log for more information.)", TextColor.GOLD));

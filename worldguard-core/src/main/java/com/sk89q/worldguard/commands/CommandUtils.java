@@ -19,12 +19,12 @@
 
 package com.sk89q.worldguard.commands;
 
-import com.google.common.base.Function;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 
 import javax.annotation.Nullable;
+import java.util.function.Function;
 
 /**
  * Command-related utility methods.
@@ -105,8 +105,8 @@ public final class CommandUtils {
      * @param sender the sender
      * @return a function
      */
-    public static java.util.function.Function<String, ?> messageFunction(final Actor sender) {
-        return (Function<String, Object>) s -> {
+    public static Function<String, ?> messageFunction(final Actor sender) {
+        return s -> {
             sender.printRaw(s);
             return null;
         };
@@ -119,8 +119,8 @@ public final class CommandUtils {
      * @param sender the sender
      * @return a function
      */
-    public static java.util.function.Function<TextComponent, ?> messageComponentFunction(final Actor sender) {
-        return (Function<TextComponent, Object>) s -> {
+    public static Function<TextComponent, ?> messageComponentFunction(final Actor sender) {
+        return s -> {
             sender.print(s);
             return null;
         };

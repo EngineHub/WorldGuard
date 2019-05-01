@@ -23,9 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.internal.command.exception.ExceptionConverterHelper;
+import com.sk89q.worldedit.internal.command.exception.ExceptionMatch;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
-import com.sk89q.worldedit.util.command.parametric.ExceptionConverterHelper;
-import com.sk89q.worldedit.util.command.parametric.ExceptionMatch;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;

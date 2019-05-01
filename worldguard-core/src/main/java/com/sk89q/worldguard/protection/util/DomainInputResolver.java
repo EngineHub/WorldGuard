@@ -140,22 +140,16 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
     }
 
     public Function<DefaultDomain, DefaultDomain> createAddAllFunction(final DefaultDomain target) {
-        return new Function<DefaultDomain, DefaultDomain>() {
-            @Override
-            public DefaultDomain apply(@Nullable DefaultDomain domain) {
-                target.addAll(domain);
-                return domain;
-            }
+        return domain -> {
+            target.addAll(domain);
+            return domain;
         };
     }
 
     public Function<DefaultDomain, DefaultDomain> createRemoveAllFunction(final DefaultDomain target) {
-        return new Function<DefaultDomain, DefaultDomain>() {
-            @Override
-            public DefaultDomain apply(@Nullable DefaultDomain domain) {
-                target.removeAll(domain);
-                return domain;
-            }
+        return domain -> {
+            target.removeAll(domain);
+            return domain;
         };
     }
 

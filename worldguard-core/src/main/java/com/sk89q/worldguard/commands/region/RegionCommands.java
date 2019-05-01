@@ -37,10 +37,12 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.LabelFormat;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -416,9 +418,9 @@ public final class RegionCommands extends RegionCommandsBase {
         String ownedBy;
 
         // Get page
-        int page = args.getInteger(0, 1) - 1;
-        if (page < 0) {
-            page = 0;
+        int page = args.getInteger(0, 1);
+        if (page < 1) {
+            page = 1;
         }
 
         // -p flag to lookup a player's regions
@@ -515,6 +517,8 @@ public final class RegionCommands extends RegionCommandsBase {
 
             Collections.sort(flagList);
 
+            // TODO paginationbox + descs etc
+
             final TextComponent.Builder builder = TextComponent.builder("Available flags: ");
 
             final HoverEvent clickToSet = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set"));
@@ -533,6 +537,35 @@ public final class RegionCommands extends RegionCommandsBase {
             sender.print(builder.build());
             
             return;
+        } else {
+            if (foundFlag == Flags.BUILD || foundFlag == Flags.BLOCK_BREAK || foundFlag == Flags.BLOCK_PLACE) {
+                sender.print(Component.empty().append(TextComponent.of("WARNING:", TextColor.RED).decoration(TextDecoration.BOLD, true))
+                        .append(ErrorFormat.wrap(" Setting the " + foundFlag.getName() + " flag is not required for protection."))
+                        .append(Component.newline())
+                        .append(TextComponent.of("Setting this flag will completely override default protection, and apply" +
+                                " to members, non-members, pistons, and everything else that can modify blocks."))
+                        .append(Component.newline())
+                        .append(TextComponent.of("Only set this flag if you are sure you know what you are doing. See ")
+                        .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
+                                .clickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
+                                        "https://worldguard.readthedocs.io/en/latest/regions/flags/#protection-related")))
+                        .append(TextComponent.of(" for more info."))));
+                if (!sender.isPlayer()) {
+                    sender.printRaw("https://worldguard.readthedocs.io/en/latest/regions/flags/#protection-related");
+                }
+            } else if (foundFlag == Flags.PASSTHROUGH) {
+                sender.print(Component.empty().append(TextComponent.of("WARNING:", TextColor.RED).decoration(TextDecoration.BOLD, true))
+                        .append(ErrorFormat.wrap(" This flag is unrelated to moving through regions."))
+                        .append(Component.newline())
+                        .append(TextComponent.of("It overrides build checks. If you're unsure what this means, see ")
+                        .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
+                                .clickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
+                                        "https://worldguard.readthedocs.io/en/latest/regions/flags/#overrides")))
+                        .append(TextComponent.of(" for more info."))));
+                if (!sender.isPlayer()) {
+                    sender.printRaw("https://worldguard.readthedocs.io/en/latest/regions/flags/#overrides");
+                }
+            }
         }
         
         // Also make sure that we can use this flag
@@ -694,13 +727,13 @@ public final class RegionCommands extends RegionCommandsBase {
         // Tell the user the current inheritance
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), child, null, sender);
         printout.append(LabelFormat.wrap("Inheritance set for region '", child.getId(), "'."));
-        printout.append(TextComponent.of(" [Undo]").clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                "/rg setparent -w " + world.getName() + " " + child.getId() + (parent != null ? " " + parent.getId() : ""))));
         if (parent != null) {
             printout.newline();
             printout.append(SubtleFormat.wrap("(Current inheritance:")).newline();
             printout.appendParentTree(true);
             printout.append(SubtleFormat.wrap(")"));
+        } else {
+            printout.append(LabelFormat.wrap(" Region is now orphaned."));
         }
         printout.send(sender);
     }

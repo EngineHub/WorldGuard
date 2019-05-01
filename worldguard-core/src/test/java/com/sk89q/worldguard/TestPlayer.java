@@ -27,6 +27,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.weather.WeatherType;
@@ -43,11 +44,11 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     private final UUID uuid = UUID.randomUUID();
     private final String name;
     private final Set<String> groups = new HashSet<>();
-    
+
     public TestPlayer(String name) {
         this.name = name;
     }
-    
+
     public void addGroup(String group) {
         groups.add(group.toLowerCase());
     }
@@ -193,7 +194,7 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
-    public void print(TextComponent component) {
+    public void print(Component component) {
 
     }
 
