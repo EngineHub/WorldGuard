@@ -442,6 +442,7 @@ class FlagHelperBox extends PaginationBox {
             } else {
                 final TextComponent defComp = LegacyComponentSerializer.INSTANCE.deserialize(defVal);
                 String display = reduceToText(defComp);
+                display = display.replace("\n", "\\n");
                 if (display.length() > 23) {
                     display = display.substring(0, 20) + "...";
                 }
@@ -451,6 +452,7 @@ class FlagHelperBox extends PaginationBox {
         } else {
             TextComponent currComp = LegacyComponentSerializer.INSTANCE.deserialize(currVal);
             String display = reduceToText(currComp);
+            display = display.replace("\n", "\\n");
             if (display.length() > 23) {
                 display = display.substring(0, 20) + "...";
             }

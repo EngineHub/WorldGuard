@@ -41,7 +41,7 @@ public final class MessagingUtil {
         String title = CommandUtils.replaceColorMacros(parts[0]);
         title = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, title);
         if (parts.length > 1) {
-            String subtitle = CommandUtils.replaceColorMacros(parts[0]);
+            String subtitle = CommandUtils.replaceColorMacros(parts[1]);
             subtitle = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, subtitle);
             player.sendTitle(title, subtitle);
         } else {
