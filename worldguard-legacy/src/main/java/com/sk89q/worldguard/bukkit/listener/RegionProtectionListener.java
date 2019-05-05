@@ -205,12 +205,13 @@ public class RegionProtectionListener extends AbstractListener {
                 canPlace = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, flags.toArray(new StateFlag[flags.size()])));
                 what = "place fire";
 
+            } else if (type == Material.FROSTED_ICE) {
+                event.setSilent(true); // gets spammy
+                canPlace = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_PLACE, Flags.FROSTED_ICE_FORM));
+                what = "use frostwalker"; // hidden anyway
             /* Everything else */
             } else {
                 canPlace = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.BLOCK_PLACE));
-                try {
-                    event.setSilent(type == Material.FROSTED_ICE);
-                } catch (NoSuchFieldError ignored) {} // back compat
                 what = "place that block";
             }
 

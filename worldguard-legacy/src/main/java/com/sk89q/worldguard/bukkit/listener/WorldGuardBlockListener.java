@@ -513,7 +513,7 @@ public class WorldGuardBlockListener implements Listener {
             return;
         }
 
-        if (Tag.ICE.isTagged(type)) {
+        if (type == Material.ICE) {
             if (wcfg.disableIceFormation) {
                 event.setCancelled(true);
                 return;
@@ -530,7 +530,7 @@ public class WorldGuardBlockListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            if (wcfg.allowedSnowFallOver.size() > 0) {
+            if (!wcfg.allowedSnowFallOver.isEmpty()) {
                 Material targetId = event.getBlock().getRelative(0, -1, 0).getType();
 
                 if (!wcfg.allowedSnowFallOver.contains(BukkitAdapter.asBlockType(targetId).getId())) {
@@ -620,7 +620,7 @@ public class WorldGuardBlockListener implements Listener {
 
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
-        if (Tag.ICE.isTagged(event.getBlock().getType())) {
+        if (event.getBlock().getType() == Material.ICE) {
             if (wcfg.disableIceMelting) {
                 event.setCancelled(true);
                 return;
@@ -628,6 +628,12 @@ public class WorldGuardBlockListener implements Listener {
 
             if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                     .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.ICE_MELT))) {
+                event.setCancelled(true);
+                return;
+            }
+        } else if (event.getBlock().getType() == Material.FROSTED_ICE) {
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.FROSTED_ICE_MELT))) {
                 event.setCancelled(true);
                 return;
             }

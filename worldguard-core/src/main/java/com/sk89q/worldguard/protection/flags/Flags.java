@@ -108,6 +108,8 @@ public final class Flags {
     public static final StateFlag SNOW_MELT = register(new StateFlag("snow-melt", true));
     public static final StateFlag ICE_FORM = register(new StateFlag("ice-form", true));
     public static final StateFlag ICE_MELT = register(new StateFlag("ice-melt", true));
+    public static final StateFlag FROSTED_ICE_MELT = register(new StateFlag("frosted-ice-melt", true));
+    public static final StateFlag FROSTED_ICE_FORM = register(new StateFlag("frosted-ice-form", false)); // this belongs in the first category of "checked with build"
     public static final StateFlag MUSHROOMS = register(new StateFlag("mushroom-growth", true));
     public static final StateFlag LEAF_DECAY = register(new StateFlag("leaf-decay", true));
     public static final StateFlag GRASS_SPREAD = register(new StateFlag("grass-growth", true));
@@ -145,6 +147,8 @@ public final class Flags {
 
     public static final StringFlag GREET_MESSAGE = register(new StringFlag("greeting"));
     public static final StringFlag FAREWELL_MESSAGE = register(new StringFlag("farewell"));
+    public static final StringFlag GREET_TITLE = register(new StringFlag("greeting-title"));
+    public static final StringFlag FAREWELL_TITLE = register(new StringFlag("farewell-title"));
 
     public static final BooleanFlag NOTIFY_ENTER = register(new BooleanFlag("notify-enter"));
     public static final BooleanFlag NOTIFY_LEAVE = register(new BooleanFlag("notify-leave"));

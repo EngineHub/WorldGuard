@@ -209,7 +209,7 @@ class RegionCommandsBase {
                 builder.append(regionComp);
             }
             player.print(builder.build());
-            throw new CommandException("You're standing in several regions (please pick one).");
+            throw new CommandException("Several regions affect your current location (please pick one).");
         }
 
         return set.iterator().next();
