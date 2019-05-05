@@ -115,31 +115,33 @@ public class ToggleCommands {
                  sender.print("ALL intensive server activity is allowed.");
             }
         } else {
-            configManager.activityHaltToggle = !args.hasFlag('c');
+            boolean activityHaltToggle = !args.hasFlag('c');
 
-            if (configManager.activityHaltToggle) {
-                if (args.argsLength() == 0 || !args.getString(0).equalsIgnoreCase("confirm")) {
-                    String confirmCommand = "/" + args.getCommand() + " confirm";
+            if (activityHaltToggle && (args.argsLength() == 0 || !args.getString(0).equalsIgnoreCase("confirm"))) {
+                String confirmCommand = "/" + args.getCommand() + " confirm";
 
-                    TextComponent message = TextComponent.builder("")
-                            .append(ErrorFormat.wrap("This command will "))
-                            .append(ErrorFormat.wrap("PERMANENTLY")
-                                    .decoration(TextDecoration.BOLD, TextDecoration.State.TRUE))
-                            .append(ErrorFormat.wrap(" erase ALL animals in ALL loaded chunks in ALL loaded worlds. "))
-                            .append(Component.newline())
-                            .append(TextComponent.of("[Click]", TextColor.GREEN)
-                                    .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, confirmCommand))
-                                    .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to confirm /" + args.getCommand()))))
-                            .append(ErrorFormat.wrap(" or type "))
-                            .append(CodeFormat.wrap(confirmCommand)
-                                    .clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, confirmCommand)))
-                            .append(ErrorFormat.wrap(" to confirm."))
-                            .build();
+                TextComponent message = TextComponent.builder("")
+                        .append(ErrorFormat.wrap("This command will "))
+                        .append(ErrorFormat.wrap("PERMANENTLY")
+                                .decoration(TextDecoration.BOLD, TextDecoration.State.TRUE))
+                        .append(ErrorFormat.wrap(" erase ALL animals in ALL loaded chunks in ALL loaded worlds. "))
+                        .append(Component.newline())
+                        .append(TextComponent.of("[Click]", TextColor.GREEN)
+                                .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, confirmCommand))
+                                .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to confirm /" + args.getCommand()))))
+                        .append(ErrorFormat.wrap(" or type "))
+                        .append(CodeFormat.wrap(confirmCommand)
+                                .clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, confirmCommand)))
+                        .append(ErrorFormat.wrap(" to confirm."))
+                        .build();
 
-                    sender.print(message);
-                    return;
-                }
+                sender.print(message);
+                return;
+            }
 
+            configManager.activityHaltToggle = activityHaltToggle;
+
+            if (activityHaltToggle) {
                 if (!(sender instanceof LocalPlayer)) {
                     sender.print("ALL intensive server activity halted.");
                 }
