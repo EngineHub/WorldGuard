@@ -25,15 +25,28 @@ import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.session.handler.*;
+import com.sk89q.worldguard.session.handler.EntryFlag;
+import com.sk89q.worldguard.session.handler.ExitFlag;
+import com.sk89q.worldguard.session.handler.FarewellFlag;
+import com.sk89q.worldguard.session.handler.FeedFlag;
+import com.sk89q.worldguard.session.handler.GameModeFlag;
+import com.sk89q.worldguard.session.handler.GodMode;
+import com.sk89q.worldguard.session.handler.GreetingFlag;
+import com.sk89q.worldguard.session.handler.Handler;
+import com.sk89q.worldguard.session.handler.HealFlag;
+import com.sk89q.worldguard.session.handler.InvincibilityFlag;
+import com.sk89q.worldguard.session.handler.NotifyEntryFlag;
+import com.sk89q.worldguard.session.handler.NotifyExitFlag;
+import com.sk89q.worldguard.session.handler.TimeLockFlag;
+import com.sk89q.worldguard.session.handler.WaterBreathing;
+import com.sk89q.worldguard.session.handler.WeatherLockFlag;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -64,9 +77,9 @@ public abstract class AbstractSessionManager implements SessionManager {
                 }
             });
 
-    private LinkedList<Handler.Factory<? extends Handler>> handlers = new LinkedList<>();
+    private List<Handler.Factory<? extends Handler>> handlers = new LinkedList<>();
 
-    private static final Set<Handler.Factory<? extends Handler>> defaultHandlers = new HashSet<>();
+    private static final List<Handler.Factory<? extends Handler>> defaultHandlers = new LinkedList<>();
     static {
         Handler.Factory<?>[] factories = {
                 HealFlag.FACTORY,
@@ -87,7 +100,7 @@ public abstract class AbstractSessionManager implements SessionManager {
         defaultHandlers.addAll(Arrays.asList(factories));
     }
 
-    public AbstractSessionManager() {
+    protected AbstractSessionManager() {
         handlers.addAll(defaultHandlers);
     }
 
@@ -137,7 +150,7 @@ public abstract class AbstractSessionManager implements SessionManager {
     @Override
     @Nullable
     public Session getIfPresent(LocalPlayer player) {
-        return sessions.getIfPresent(player);
+        return sessions.getIfPresent(new CacheKey(player));
     }
 
     @Override
