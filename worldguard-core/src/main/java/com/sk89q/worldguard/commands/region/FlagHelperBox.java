@@ -96,7 +96,8 @@ class FlagHelperBox extends PaginationBox {
             number -= 1;
         }
         Flag<?> flag = FLAGS.get(number);
-        return createLine(flag, number >= Flags.INBUILT_FLAGS.size());    }
+        return createLine(flag, number >= Flags.INBUILT_FLAGS.size());
+    }
 
     @Override
     public int getComponentsSize() {
