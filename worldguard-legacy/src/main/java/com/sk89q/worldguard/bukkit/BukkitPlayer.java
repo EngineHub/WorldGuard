@@ -169,6 +169,11 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
+    public void sendTitle(String title, String subtitle) {
+        getPlayer().sendTitle(title, subtitle, -1, -1, -1);
+    }
+
+    @Override
     public String[] getGroups() {
         return plugin.getGroups(getPlayer());
     }

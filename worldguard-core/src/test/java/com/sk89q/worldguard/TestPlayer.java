@@ -28,9 +28,9 @@ import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.weather.WeatherType;
+import org.junit.Ignore;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +38,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-@org.junit.Ignore
+@Ignore
 public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     private final UUID uuid = UUID.randomUUID();
@@ -170,6 +170,11 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     @Override
     public void setCompassTarget(Location location) {
+
+    }
+
+    @Override
+    public void sendTitle(String title, String subtitle) {
 
     }
 
