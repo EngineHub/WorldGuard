@@ -60,6 +60,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.event.Event.Result;
@@ -415,20 +416,24 @@ public class RegionProtectionListener extends AbstractListener {
         String what;
 
         /* Hostile / ambient mob override */
+        final EntityType type = event.getEntity().getType();
         if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())
-                || Entities.isNPC(event.getEntity()) || Entities.isVehicle(event.getEntity().getType())) {
+                || Entities.isNPC(event.getEntity())) {
             canUse = event.getRelevantFlags().isEmpty() || query.queryState(BukkitAdapter.adapt(target), associable, combine(event)) != State.DENY;
             what = "use that";
         /* Paintings, item frames, etc. */
         } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
-            if (event.getEntity().getType() == EntityType.ITEM_FRAME && event.getCause().getFirstPlayer() != null
-                && ((org.bukkit.entity.ItemFrame) event.getEntity()).getItem().getType() != Material.AIR) {
-                    canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_FRAME_ROTATE));
+            if (type == EntityType.ITEM_FRAME && event.getCause().getFirstPlayer() != null
+                    && ((ItemFrame) event.getEntity()).getItem().getType() != Material.AIR) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_FRAME_ROTATE));
+                what = "change that";
+            } else if (Entities.isMinecart(type)) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
+                what = "open that";
             } else {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
+                what = "change that";
             }
-            what = "change that";
-
         /* Ridden on use */
         } else if (Entities.isRiddenOnUse(event.getEntity())) {
             canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.RIDE, Flags.INTERACT));

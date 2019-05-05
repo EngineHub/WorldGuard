@@ -29,6 +29,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Flying;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
@@ -42,6 +43,7 @@ import org.bukkit.entity.TippedArrow;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.entity.WaterMob;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.projectiles.ProjectileSource;
 
 import javax.annotation.Nullable;
@@ -206,7 +208,8 @@ public final class Entities {
     public static boolean isConsideredBuildingIfUsed(Entity entity) {
         return entity instanceof Hanging
                 || entity instanceof ArmorStand
-                || entity instanceof EnderCrystal;
+                || entity instanceof EnderCrystal
+                || entity instanceof Minecart && entity instanceof InventoryHolder;
     }
 
     public static boolean isPotionArrow(Entity entity) {
