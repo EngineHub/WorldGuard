@@ -36,7 +36,6 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
-import com.sk89q.worldedit.util.formatting.component.InvalidComponentException;
 import com.sk89q.worldedit.util.formatting.component.LabelFormat;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -644,13 +643,17 @@ public final class RegionCommands extends RegionCommandsBase {
         // Print region information
         if (args.hasFlag('h')) {
             int page = args.getFlagInteger('h');
-            try {
-                final FlagHelperBox flagHelperBox = new FlagHelperBox(world, existing, permModel);
-                flagHelperBox.setComponentsPerPage(18);
+            final FlagHelperBox flagHelperBox = new FlagHelperBox(world, existing, permModel);
+            flagHelperBox.setComponentsPerPage(18);
+            ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(() -> {
                 sender.print(flagHelperBox.create(page));
-            } catch (InvalidComponentException e) {
-                throw new CommandException("Error creating component.", e);
-            }
+                return null;
+            });
+
+            AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
+                    .registerWithSupervisor("Getting region flags.")
+                    .sendMessageAfterDelay("(Please wait... fetching region info...)")
+                    .thenTellErrorsOnly("Failed to fetch region info");
         } else {
             RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), existing, null, sender);
             printout.append(SubtleFormat.wrap("(Current flags: "));
@@ -677,13 +680,18 @@ public final class RegionCommands extends RegionCommandsBase {
             throw new CommandPermissionsException();
         }
         int page = args.getInteger(1, 1);
-        try {
-            final FlagHelperBox flagHelperBox = new FlagHelperBox(world, region, perms);
-            flagHelperBox.setComponentsPerPage(18);
+
+        final FlagHelperBox flagHelperBox = new FlagHelperBox(world, region, perms);
+        flagHelperBox.setComponentsPerPage(18);
+        ListenableFuture<?> future = WorldGuard.getInstance().getExecutorService().submit(() -> {
             sender.print(flagHelperBox.create(page));
-        } catch (InvalidComponentException e) {
-            throw new CommandException("Error creating component.", e);
-        }
+            return null;
+        });
+
+        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
+                .registerWithSupervisor("Getting region flags.")
+                .sendMessageAfterDelay("(Please wait... fetching region info...)")
+                .thenTellErrorsOnly("Failed to fetch region info");
     }
 
     /**
