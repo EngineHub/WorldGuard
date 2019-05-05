@@ -33,7 +33,15 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.NormativeOrders;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,7 +57,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FlagValueCalculator {
 
-    private final List<ProtectedRegion> regions;
     @Nullable
     private final ProtectedRegion globalRegion;
     private final Iterable<ProtectedRegion> applicable;
@@ -63,14 +70,10 @@ public class FlagValueCalculator {
     public FlagValueCalculator(List<ProtectedRegion> regions, @Nullable ProtectedRegion globalRegion) {
         checkNotNull(regions);
 
-        this.regions = regions;
         this.globalRegion = globalRegion;
 
-        if (globalRegion != null) {
-            applicable = Iterables.concat(regions, Arrays.asList(globalRegion));
-        } else {
-            applicable = regions;
-        }
+        applicable = globalRegion == null ? regions
+                : Iterables.concat(regions, Collections.singletonList(globalRegion));
     }
 
     /**
@@ -128,7 +131,7 @@ public class FlagValueCalculator {
 
             minimumPriority = getPriority(region);
 
-            boolean member = RegionGroup.MEMBERS.contains(subject.getAssociation(Arrays.asList(region)));
+            boolean member = RegionGroup.MEMBERS.contains(subject.getAssociation(Collections.singletonList(region)));
 
             if (member) {
                 result = Result.SUCCESS;

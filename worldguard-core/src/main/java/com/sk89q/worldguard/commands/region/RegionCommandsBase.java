@@ -34,6 +34,8 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
@@ -157,8 +159,8 @@ class RegionCommandsBase {
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player) throws CommandException {
-        return checkRegionStandingIn(regionManager, player, false);
+    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, String rgCmd) throws CommandException {
+        return checkRegionStandingIn(regionManager, player, false, rgCmd);
     }
 
     /**
@@ -176,7 +178,7 @@ class RegionCommandsBase {
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, boolean allowGlobal) throws CommandException {
+    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, boolean allowGlobal, String rgCmd) throws CommandException {
         ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation().toVector().toBlockPoint());
 
         if (set.size() == 0) {
@@ -190,19 +192,24 @@ class RegionCommandsBase {
                     "You're not standing in a region." +
                             "Specify an ID if you want to select a specific region.");
         } else if (set.size() > 1) {
-            StringBuilder builder = new StringBuilder();
             boolean first = true;
 
+            final TextComponent.Builder builder = TextComponent.builder("");
+            builder.append(TextComponent.of("Current regions: ", TextColor.GOLD));
             for (ProtectedRegion region : set) {
                 if (!first) {
-                    builder.append(", ");
+                    builder.append(TextComponent.of(", "));
                 }
                 first = false;
-                builder.append(region.getId());
+                TextComponent regionComp = TextComponent.of(region.getId(), TextColor.AQUA);
+                if (rgCmd != null && rgCmd.contains("%id%")) {
+                    regionComp = regionComp.hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to pick this region")))
+                            .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, rgCmd.replace("%id%", region.getId())));
+                }
+                builder.append(regionComp);
             }
-
-            throw new CommandException(
-                    "You're standing in several regions (please pick one).\nYou're in: " + builder.toString());
+            player.print(builder.build());
+            throw new CommandException("You're standing in several regions (please pick one).");
         }
 
         return set.iterator().next();

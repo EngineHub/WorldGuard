@@ -21,6 +21,7 @@ package com.sk89q.worldguard.commands.region;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.minecraft.util.commands.Command;
@@ -35,6 +36,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
+import com.sk89q.worldedit.util.formatting.component.InvalidComponentException;
 import com.sk89q.worldedit.util.formatting.component.LabelFormat;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -319,7 +321,7 @@ public final class RegionCommands extends RegionCommandsBase {
         
         // If no arguments were given, get the region that the player is inside
         if (args.argsLength() == 0) {
-            existing = checkRegionStandingIn(manager, player);
+            existing = checkRegionStandingIn(manager, player, "/rg select %id%");
         } else {
             existing = checkExistingRegion(manager, args.getString(0), false);
         }
@@ -360,7 +362,8 @@ public final class RegionCommands extends RegionCommandsBase {
                 throw new CommandException("Please specify the region with /region info -w world_name region_name.");
             }
             
-            existing = checkRegionStandingIn(manager, (LocalPlayer) sender, true);
+            existing = checkRegionStandingIn(manager, (LocalPlayer) sender, true,
+                    "/rg info -w " + world.getName() + " %id%" + (args.hasFlag('u') ? " -u" : "") + (args.hasFlag('s') ? " -s" : ""));
         } else { // Get region from the ID
             existing = checkExistingRegion(manager, args.getString(0), true);
         }
@@ -463,7 +466,7 @@ public final class RegionCommands extends RegionCommandsBase {
      */
     @Command(aliases = {"flag", "f"},
              usage = "<id> <flag> [-w world] [-g group] [value]",
-             flags = "g:w:e",
+             flags = "g:w:eh:",
              desc = "Set flags",
              min = 2)
     public void flag(CommandContext args, Actor sender) throws CommandException {
@@ -537,9 +540,9 @@ public final class RegionCommands extends RegionCommandsBase {
             sender.print(builder.build());
             
             return;
-        } else {
+        } else if (value != null) {
             if (foundFlag == Flags.BUILD || foundFlag == Flags.BLOCK_BREAK || foundFlag == Flags.BLOCK_PLACE) {
-                sender.print(Component.empty().append(TextComponent.of("WARNING:", TextColor.RED).decoration(TextDecoration.BOLD, true))
+                sender.print(Component.empty().append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
                         .append(ErrorFormat.wrap(" Setting the " + foundFlag.getName() + " flag is not required for protection."))
                         .append(Component.newline())
                         .append(TextComponent.of("Setting this flag will completely override default protection, and apply" +
@@ -554,7 +557,7 @@ public final class RegionCommands extends RegionCommandsBase {
                     sender.printRaw("https://worldguard.readthedocs.io/en/latest/regions/flags/#protection-related");
                 }
             } else if (foundFlag == Flags.PASSTHROUGH) {
-                sender.print(Component.empty().append(TextComponent.of("WARNING:", TextColor.RED).decoration(TextDecoration.BOLD, true))
+                sender.print(Component.empty().append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
                         .append(ErrorFormat.wrap(" This flag is unrelated to moving through regions."))
                         .append(Component.newline())
                         .append(TextComponent.of("It overrides build checks. If you're unsure what this means, see ")
@@ -604,7 +607,9 @@ public final class RegionCommands extends RegionCommandsBase {
                 throw new CommandException(e.getMessage());
             }
 
-            sender.print("Region flag " + foundFlag.getName() + " set on '" + existing.getId() + "' to '" + value + "'.");
+            if (!args.hasFlag('h')) {
+                sender.print("Region flag " + foundFlag.getName() + " set on '" + existing.getId() + "' to '" + value + "'.");
+            }
         
         // No value? Clear the flag, if -g isn't specified
         } else if (!args.hasFlag('g')) {
@@ -617,7 +622,9 @@ public final class RegionCommands extends RegionCommandsBase {
                 existing.setFlag(groupFlag, null);
             }
 
-            sender.print("Region flag " + foundFlag.getName() + " removed from '" + existing.getId() + "'. (Any -g(roups) were also removed.)");
+            if (!args.hasFlag('h')) {
+                sender.print("Region flag " + foundFlag.getName() + " removed from '" + existing.getId() + "'. (Any -g(roups) were also removed.)");
+            }
         }
 
         // Now set the group
@@ -635,11 +642,48 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Print region information
-        RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), existing, null, sender);
-        printout.append(SubtleFormat.wrap("(Current flags: "));
-        printout.appendFlagsList(false);
-        printout.append(SubtleFormat.wrap(")"));
-        printout.send(sender);
+        if (args.hasFlag('h')) {
+            int page = args.getFlagInteger('h');
+            try {
+                final FlagHelperBox flagHelperBox = new FlagHelperBox(world, existing, permModel);
+                flagHelperBox.setComponentsPerPage(18);
+                sender.print(flagHelperBox.create(page));
+            } catch (InvalidComponentException e) {
+                throw new CommandException("Error creating component.", e);
+            }
+        } else {
+            RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), existing, null, sender);
+            printout.append(SubtleFormat.wrap("(Current flags: "));
+            printout.appendFlagsList(false);
+            printout.append(SubtleFormat.wrap(")"));
+            printout.send(sender);
+        }
+    }
+
+    @Command(aliases = "flags",
+             usage = "<id> [page]",
+             flags = "w:",
+             desc = "View region flags",
+             min = 1, max = 2)
+    public void flagHelper(CommandContext args, Actor sender) throws CommandException {
+        World world = checkWorld(args, sender, 'w'); // Get the world
+
+        // Lookup the existing region
+        RegionManager manager = checkRegionManager(world);
+        ProtectedRegion region = checkExistingRegion(manager, args.getString(0), true);
+
+        final RegionPermissionModel perms = getPermissionModel(sender);
+        if (!perms.mayLookup(region)) {
+            throw new CommandPermissionsException();
+        }
+        int page = args.getInteger(1, 1);
+        try {
+            final FlagHelperBox flagHelperBox = new FlagHelperBox(world, region, perms);
+            flagHelperBox.setComponentsPerPage(18);
+            sender.print(flagHelperBox.create(page));
+        } catch (InvalidComponentException e) {
+            throw new CommandException("Error creating component.", e);
+        }
     }
 
     /**

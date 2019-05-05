@@ -32,11 +32,17 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * The flags that are used in WorldGuard.
  */
 public final class Flags {
+
+    private static final List<String> INBUILT_FLAGS_LIST = new ArrayList<>();
+    public static final List<String> INBUILT_FLAGS = Collections.unmodifiableList(INBUILT_FLAGS_LIST);
 
     // Overrides membership check
     public static final StateFlag PASSTHROUGH = register(new StateFlag("passthrough", false));
@@ -91,7 +97,7 @@ public final class Flags {
 
     // mob spawning related
     public static final StateFlag MOB_SPAWNING = register(new StateFlag("mob-spawning", true));
-    public static final SetFlag<EntityType> DENY_SPAWN = register(new SetFlag<>("deny-spawn", new EntityTypeFlag(null)));
+    public static final SetFlag<EntityType> DENY_SPAWN = register(new SetFlag<>("deny-spawn", new RegistryFlag<>(null, EntityType.REGISTRY)));
 
     // block dynamics
     public static final StateFlag PISTONS = register(new StateFlag("pistons", true));
@@ -110,6 +116,9 @@ public final class Flags {
     public static final StateFlag SOIL_DRY = register(new StateFlag("soil-dry", true));
     public static final StateFlag WATER_FLOW = register(new StateFlag("water-flow", true));
     public static final StateFlag LAVA_FLOW = register(new StateFlag("lava-flow", true));
+
+    public static final RegistryFlag<WeatherType> WEATHER_LOCK = register(new RegistryFlag<>("weather-lock", WeatherType.REGISTRY));
+    public static final StringFlag TIME_LOCK = register(new StringFlag("time-lock"));
 
     // chat related flags
     public static final StateFlag SEND_CHAT = register(new StateFlag("send-chat", true));
@@ -140,9 +149,7 @@ public final class Flags {
     public static final BooleanFlag NOTIFY_ENTER = register(new BooleanFlag("notify-enter"));
     public static final BooleanFlag NOTIFY_LEAVE = register(new BooleanFlag("notify-leave"));
 
-    public static final Flag<GameMode> GAME_MODE = register(new GameModeTypeFlag("game-mode"));
-    public static final StringFlag TIME_LOCK = register(new StringFlag("time-lock"));
-    public static final Flag<WeatherType> WEATHER_LOCK = register(new WeatherTypeFlag("weather-lock"));
+    public static final RegistryFlag<GameMode> GAME_MODE = register(new RegistryFlag<>("game-mode", GameMode.REGISTRY));
 
     public static final IntegerFlag HEAL_DELAY = register(new IntegerFlag("heal-delay"));
     public static final IntegerFlag HEAL_AMOUNT = register(new IntegerFlag("heal-amount"));
@@ -173,6 +180,7 @@ public final class Flags {
 
     private static <T extends Flag<?>> T register(final T flag) throws FlagConflictException {
         WorldGuard.getInstance().getFlagRegistry().register(flag);
+        INBUILT_FLAGS_LIST.add(flag.getName());
         return flag;
     }
 

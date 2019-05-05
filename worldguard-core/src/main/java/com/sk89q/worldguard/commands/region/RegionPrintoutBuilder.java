@@ -163,9 +163,9 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
 
         if (perms != null && perms.maySetFlag(region)) {
             builder.append(Component.space())
-                    .append(TextComponent.of("[Add]", useColors ? TextColor.GREEN : TextColor.GRAY)
+                    .append(TextComponent.of("[Flags]", useColors ? TextColor.GREEN : TextColor.GRAY)
                     .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set a flag")))
-                    .clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/rg flag -w " + world + " " + region.getId() + " ")));
+                    .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rg flags -w " + world + " " + region.getId())));
         }
     }
 
