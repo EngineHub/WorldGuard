@@ -30,7 +30,6 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.formatting.component.CodeFormat;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.LabelFormat;
-import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
@@ -125,13 +124,13 @@ public class ToggleCommands {
                         .append(ErrorFormat.wrap("PERMANENTLY")
                                 .decoration(TextDecoration.BOLD, TextDecoration.State.TRUE))
                         .append(ErrorFormat.wrap(" erase ALL animals in ALL loaded chunks in ALL loaded worlds. "))
-                        .append(Component.newline())
+                        .append(TextComponent.newline())
                         .append(TextComponent.of("[Click]", TextColor.GREEN)
-                                .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, confirmCommand))
-                                .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to confirm /" + args.getCommand()))))
+                                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, confirmCommand))
+                                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to confirm /" + args.getCommand()))))
                         .append(ErrorFormat.wrap(" or type "))
                         .append(CodeFormat.wrap(confirmCommand)
-                                .clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, confirmCommand)))
+                                .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, confirmCommand)))
                         .append(ErrorFormat.wrap(" to confirm."))
                         .build();
 

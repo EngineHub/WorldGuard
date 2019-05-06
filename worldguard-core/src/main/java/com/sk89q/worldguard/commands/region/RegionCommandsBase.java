@@ -203,8 +203,8 @@ class RegionCommandsBase {
                 first = false;
                 TextComponent regionComp = TextComponent.of(region.getId(), TextColor.AQUA);
                 if (rgCmd != null && rgCmd.contains("%id%")) {
-                    regionComp = regionComp.hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to pick this region")))
-                            .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, rgCmd.replace("%id%", region.getId())));
+                    regionComp = regionComp.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to pick this region")))
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, rgCmd.replace("%id%", region.getId())));
                 }
                 builder.append(regionComp);
             }

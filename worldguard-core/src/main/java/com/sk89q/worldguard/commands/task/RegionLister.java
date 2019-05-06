@@ -247,17 +247,17 @@ public class RegionLister implements Callable<Integer> {
             final RegionListEntry entry = entries.get(number);
             final TextComponent.Builder builder = TextComponent.builder(number + 1 + ".").color(TextColor.LIGHT_PURPLE);
             if (entry.isOwner()) {
-                builder.append(Component.space()).append(TextComponent.of("+", TextColor.DARK_AQUA)
-                        .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Owner", TextColor.GOLD))));
+                builder.append(TextComponent.space()).append(TextComponent.of("+", TextColor.DARK_AQUA)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Owner", TextColor.GOLD))));
             } else if (entry.isMember()) {
-                builder.append(Component.space()).append(TextComponent.of("-", TextColor.AQUA)
-                        .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Member", TextColor.GOLD))));
+                builder.append(TextComponent.space()).append(TextComponent.of("-", TextColor.AQUA)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Member", TextColor.GOLD))));
             }
-            builder.append(Component.space()).append(TextComponent.of(entry.getRegion().getId(), TextColor.GOLD));
+            builder.append(TextComponent.space()).append(TextComponent.of(entry.getRegion().getId(), TextColor.GOLD));
             if (perms != null && perms.mayLookup(entry.region)) {
-                builder.append(Component.space().append(TextComponent.of("[Info]", TextColor.GRAY)
-                        .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for info")))
-                        .clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                builder.append(TextComponent.space().append(TextComponent.of("[Info]", TextColor.GRAY)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for info")))
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                                 "/rg info -w " + world + " " + entry.region.getId()))));
             }
             return builder.build();

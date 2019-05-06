@@ -117,19 +117,19 @@ class FlagHelperBox extends PaginationBox {
         int length = FlagFontInfo.getPxLength(name);
         builder.append(TextComponent.of(name, color));
         if (flag.usesMembershipAsDefault()) {
-            builder.append(Component.empty().append(TextComponent.of("*", TextColor.AQUA))
-                    .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+            builder.append(TextComponent.empty().append(TextComponent.of("*", TextColor.AQUA))
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
                             TextComponent.of("This is a special flag which defaults to allow for members, and deny for non-members"))));
             length += FlagFontInfo.getPxLength('*');
         }
         if (flag == Flags.PASSTHROUGH) {
-            builder.append(Component.empty().append(TextComponent.of("*", TextColor.AQUA))
-                    .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+            builder.append(TextComponent.empty().append(TextComponent.of("*", TextColor.AQUA))
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
                             TextComponent.of("This is a special flag which overrides build checks. (Not movement related!)"))));
             length += FlagFontInfo.getPxLength('*');
         }
         int leftover = PAD_PX_SIZE - length;
-        builder.append(Component.space());
+        builder.append(TextComponent.space());
         leftover -= 4;
         if (leftover > 0) {
             builder.append(TextComponent.of(Strings.repeat(".", leftover / 2), TextColor.DARK_GRAY));
@@ -194,7 +194,7 @@ class FlagHelperBox extends PaginationBox {
             TextColor col = isExplicitSet ? TextColor.WHITE : inherited && currVal == choice ? TextColor.GRAY : TextColor.DARK_GRAY;
             Set<TextDecoration> styles = choice == defVal ? ImmutableSet.of(TextDecoration.UNDERLINED) : Collections.emptySet();
 
-            Component choiceComponent = Component.empty().append(TextComponent.of(capitalize(String.valueOf(choice)), col, styles));
+            Component choiceComponent = TextComponent.empty().append(TextComponent.of(capitalize(String.valueOf(choice)), col, styles));
 
             List<Component> hoverTexts = new ArrayList<>();
             if (maySet) {
@@ -214,26 +214,26 @@ class FlagHelperBox extends PaginationBox {
                 for (Iterator<Component> hovIt = hoverTexts.iterator(); hovIt.hasNext(); ) {
                     hoverBuilder.append(hovIt.next());
                     if (hovIt.hasNext()) {
-                        hoverBuilder.append(Component.newline());
+                        hoverBuilder.append(TextComponent.newline());
                     }
                 }
                 choiceComponent = choiceComponent.hoverEvent(
-                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverBuilder.build()));
+                        HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hoverBuilder.build()));
             }
 
             if (maySet) {
-                builder.append(choiceComponent.clickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                builder.append(choiceComponent.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                         makeCommand(flag, isExplicitSet ? "" : choice))));
             } else {
                 builder.append(choiceComponent);
             }
-            builder.append(Component.space());
+            builder.append(TextComponent.space());
         }
         if (suggestChoice != null && perms.maySetFlag(region, flag)) {
             builder.append(TextComponent.of(suggestChoice, TextColor.DARK_GRAY)
-                    .hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
                             TextComponent.of("Click to set custom value", TextColor.GOLD)))
-                    .clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, makeCommand(flag, ""))));
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, makeCommand(flag, ""))));
         }
     }
 
@@ -255,7 +255,7 @@ class FlagHelperBox extends PaginationBox {
         TextColor col = isExplicitSet ? TextColor.WHITE : inherited ? TextColor.GRAY : TextColor.DARK_GRAY;
         Set<TextDecoration> styles = currVal == defVal ? ImmutableSet.of(TextDecoration.UNDERLINED) : Collections.emptySet();
 
-        Component displayComponent = Component.empty().append(TextComponent.of(display, col, styles));
+        Component displayComponent = TextComponent.empty().append(TextComponent.of(display, col, styles));
 
         List<Component> hoverTexts = new ArrayList<>();
         if (maySet) {
@@ -275,24 +275,24 @@ class FlagHelperBox extends PaginationBox {
             for (Iterator<Component> hovIt = hoverTexts.iterator(); hovIt.hasNext(); ) {
                 hoverBuilder.append(hovIt.next());
                 if (hovIt.hasNext()) {
-                    hoverBuilder.append(Component.newline());
+                    hoverBuilder.append(TextComponent.newline());
                 }
             }
             if (hover != null) {
-                hoverBuilder.append(Component.newline());
+                hoverBuilder.append(TextComponent.newline());
                 hoverBuilder.append(hover);
             }
             displayComponent = displayComponent.hoverEvent(
-                    new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverBuilder.build()));
+                    HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hoverBuilder.build()));
         }
 
         if (maySet) {
-            builder.append(displayComponent.clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+            builder.append(displayComponent.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
                     makeCommand(flag, ""))));
         } else {
             builder.append(displayComponent);
         }
-        builder.append(Component.space());
+        builder.append(TextComponent.space());
     }
 
     private String makeCommand(Flag<?> flag, Object choice) {
@@ -322,7 +322,7 @@ class FlagHelperBox extends PaginationBox {
             }
         } else {
             if (currVal == defVal) {
-                valType = Component.empty()
+                valType = TextComponent.empty()
                         .append(TextComponent.of("Default")
                                 .decoration(TextDecoration.UNDERLINED, true))
                         .append(TextComponent.of(" value"));
@@ -362,7 +362,7 @@ class FlagHelperBox extends PaginationBox {
         TextComponent hoverComp = TextComponent.of("");
         if (currVal != null) {
             hoverComp = hoverComp.append(TextComponent.of("Current values:"))
-                    .append(Component.newline()).append(TextComponent.of(stringValue));
+                    .append(TextComponent.newline()).append(TextComponent.of(stringValue));
         }
         appendValueText(builder, flag, display, hoverComp);
     }
@@ -389,11 +389,11 @@ class FlagHelperBox extends PaginationBox {
                 appendValueText(builder, flag, "unset location", null);
             } else {
                 appendValueText(builder, flag, defVal.toString(), TextComponent.of("Default value:")
-                        .append(Component.newline()).append(TextComponent.of(defVal.toString())));
+                        .append(TextComponent.newline()).append(TextComponent.of(defVal.toString())));
             }
         } else {
             appendValueText(builder, flag, currVal.toString(), TextComponent.of("Current value:")
-                    .append(Component.newline()).append(TextComponent.of(currVal.toString())));
+                    .append(TextComponent.newline()).append(TextComponent.of(currVal.toString())));
         }
     }
 
@@ -448,7 +448,7 @@ class FlagHelperBox extends PaginationBox {
                     display = display.substring(0, 20) + "...";
                 }
                 appendValueText(builder, flag, display, TextComponent.of("Default value:")
-                        .append(Component.newline()).append(defComp));
+                        .append(TextComponent.newline()).append(defComp));
             }
         } else {
             TextComponent currComp = LegacyComponentSerializer.INSTANCE.deserialize(currVal);
@@ -458,7 +458,7 @@ class FlagHelperBox extends PaginationBox {
                 display = display.substring(0, 20) + "...";
             }
             appendValueText(builder, flag, display, TextComponent.of("Current value:")
-                    .append(Component.newline()).append(currComp));
+                    .append(TextComponent.newline()).append(currComp));
         }
     }
 

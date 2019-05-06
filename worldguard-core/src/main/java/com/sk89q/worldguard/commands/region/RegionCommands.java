@@ -38,7 +38,6 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.LabelFormat;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
-import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
@@ -523,12 +522,12 @@ public final class RegionCommands extends RegionCommandsBase {
 
             final TextComponent.Builder builder = TextComponent.builder("Available flags: ");
 
-            final HoverEvent clickToSet = new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set"));
+            final HoverEvent clickToSet = HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set"));
             for (int i = 0; i < flagList.size(); i++) {
                 String flag = flagList.get(i);
 
                 builder.append(TextComponent.of(flag, i % 2 == 0 ? TextColor.GRAY : TextColor.WHITE)
-                        .hoverEvent(clickToSet).clickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+                        .hoverEvent(clickToSet).clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
                                 "/rg flag -w " + world.getName() + " " + existing.getId() + " " + flag + " ")));
                 if (i < flagList.size() + 1) {
                     builder.append(TextComponent.of(", "));
@@ -541,27 +540,27 @@ public final class RegionCommands extends RegionCommandsBase {
             return;
         } else if (value != null) {
             if (foundFlag == Flags.BUILD || foundFlag == Flags.BLOCK_BREAK || foundFlag == Flags.BLOCK_PLACE) {
-                sender.print(Component.empty().append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
+                sender.print(TextComponent.empty().append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
                         .append(ErrorFormat.wrap(" Setting the " + foundFlag.getName() + " flag is not required for protection."))
-                        .append(Component.newline())
+                        .append(TextComponent.newline())
                         .append(TextComponent.of("Setting this flag will completely override default protection, and apply" +
                                 " to members, non-members, pistons, and everything else that can modify blocks."))
-                        .append(Component.newline())
+                        .append(TextComponent.newline())
                         .append(TextComponent.of("Only set this flag if you are sure you know what you are doing. See ")
                         .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
-                                .clickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
+                                .clickEvent(ClickEvent.of(ClickEvent.Action.OPEN_URL,
                                         "https://worldguard.readthedocs.io/en/latest/regions/flags/#protection-related")))
                         .append(TextComponent.of(" for more info."))));
                 if (!sender.isPlayer()) {
                     sender.printRaw("https://worldguard.readthedocs.io/en/latest/regions/flags/#protection-related");
                 }
             } else if (foundFlag == Flags.PASSTHROUGH) {
-                sender.print(Component.empty().append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
+                sender.print(TextComponent.empty().append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
                         .append(ErrorFormat.wrap(" This flag is unrelated to moving through regions."))
-                        .append(Component.newline())
+                        .append(TextComponent.newline())
                         .append(TextComponent.of("It overrides build checks. If you're unsure what this means, see ")
                         .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
-                                .clickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
+                                .clickEvent(ClickEvent.of(ClickEvent.Action.OPEN_URL,
                                         "https://worldguard.readthedocs.io/en/latest/regions/flags/#overrides")))
                         .append(TextComponent.of(" for more info."))));
                 if (!sender.isPlayer()) {
