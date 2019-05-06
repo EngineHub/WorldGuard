@@ -62,8 +62,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
     private static final TargetMatcherParser matcherParser = new TargetMatcherParser();
 
-    @Unreported private WorldGuardPlugin plugin;
-
     @Unreported private String worldName;
 
     @Unreported private ChestProtection chestProtection = new BukkitSignChestProtection();
@@ -86,7 +84,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         File configFile = new File(baseFolder, "config.yml");
         blacklistFile = new File(baseFolder, "blacklist.txt");
 
-        this.plugin = plugin;
         this.worldName = worldName;
         this.parentConfig = parentConfig;
 
@@ -105,7 +102,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         TargetMatcherSet set = new TargetMatcherSet();
         List<String> inputs = parentConfig.getStringList(node, null);
 
-        if (inputs == null || inputs.size() == 0) {
+        if (inputs == null || inputs.isEmpty()) {
             parentConfig.setProperty(node, new ArrayList<String>());
             return set;
         }
@@ -129,8 +126,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         try {
             config.load();
         } catch (IOException e) {
-            log.severe("Error reading configuration for world " + worldName + ": ");
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error reading configuration for world " + worldName + ": ", e);
         } catch (ParserException e) {
             log.severe("Error parsing configuration for world " + worldName + ". ");
             throw e;
@@ -369,7 +365,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             if (disableFireSpread) {
                 log.log(Level.INFO, "(" + worldName + ") All fire spread is disabled.");
             } else {
-                if (disableFireSpreadBlocks.size() > 0) {
+                if (!disableFireSpreadBlocks.isEmpty()) {
                     log.log(Level.INFO, "(" + worldName
                             + ") Fire spread is limited to "
                             + disableFireSpreadBlocks.size() + " block types.");

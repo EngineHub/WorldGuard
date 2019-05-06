@@ -388,16 +388,10 @@ public final class RegionCommands extends RegionCommandsBase {
                 WorldGuard.getInstance().getExecutorService().submit(printout),
                 CommandUtils.messageComponentFunction(sender)::apply);
 
-        // If it takes too long...
-        FutureProgressListener.addProgressListener(
-                future, sender, "(Please wait... fetching region information...)");
-
-        // Send a response message
-        Futures.addCallback(future,
-                new Builder(sender)
-                        .exceptionConverter(worldGuard.getExceptionConverter())
-                        .onFailure("Failed to fetch region information")
-                        .build());
+        AsyncCommandHelper.wrap(future, WorldGuard.getInstance().getSupervisor(), sender, WorldGuard.getInstance().getExceptionConverter())
+                .registerWithSupervisor("Fetching region info")
+                .sendMessageAfterDelay("(Please wait... fetching region information...)")
+                .thenTellErrorsOnly("Failed to fetch region information");
     }
 
     /**
