@@ -379,20 +379,11 @@ public class WorldGuardPlayerListener implements Listener {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
 
-        if (wcfg.useRegions) {
+        if (wcfg.useRegions && cfg.usePlayerTeleports) {
             ApplicableRegionSet set =
                     WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(event.getTo()));
             ApplicableRegionSet setFrom =
                     WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(event.getFrom()));
-
-            if (cfg.usePlayerTeleports) {
-                if (null != WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer).testMoveTo(localPlayer,
-                        BukkitAdapter.adapt(event.getTo()),
-                        MoveType.TELEPORT)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
 
             if (event.getCause() == TeleportCause.ENDER_PEARL) {
                 if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
@@ -429,6 +420,12 @@ public class WorldGuardPlayerListener implements Listener {
                         return;
                     }
                 }
+            }
+            if (null != WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer).testMoveTo(localPlayer,
+                    BukkitAdapter.adapt(event.getTo()),
+                    MoveType.TELEPORT)) {
+                event.setCancelled(true);
+                return;
             }
         }
     }
