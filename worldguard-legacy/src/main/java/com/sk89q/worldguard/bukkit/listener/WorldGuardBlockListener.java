@@ -27,6 +27,7 @@ import com.sk89q.worldguard.bukkit.WorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -35,19 +36,8 @@ import org.bukkit.entity.Snowman;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockFadeEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.block.EntityBlockFormEvent;
-import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -662,6 +652,44 @@ public class WorldGuardBlockListener implements Listener {
             break;
         }
 
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockExplode(BlockExplodeEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+        Location l = event.getBlock().getLocation();
+        World world = l.getWorld();
+        WorldConfiguration wcfg = cfg.get(world);
+
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (wcfg.blockOtherExplosions) {
+           event.setCancelled(true);
+           return;
+        }
+
+        if (wcfg.useRegions) {
+            com.sk89q.worldguard.protection.managers.RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+            for (Block block : event.blockList()) {
+                if (!plugin.getRegionContainer().createQuery().getApplicableRegions(block.getLocation()).allows(DefaultFlag.OTHER_EXPLOSION)) {
+                    event.blockList().clear();
+                    if (wcfg.explosionFlagCancellation) event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+
+        if (wcfg.signChestProtection) {
+            for (Block block : event.blockList()) {
+                if (wcfg.isChestProtected(block)) {
+                    event.blockList().clear();
+                    return;
+                }
+            }
+        }
     }
 
 }
