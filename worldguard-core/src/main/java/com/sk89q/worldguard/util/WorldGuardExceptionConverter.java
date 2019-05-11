@@ -19,16 +19,16 @@
 
 package com.sk89q.worldguard.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.minecraft.util.commands.CommandException;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverterHelper;
 import com.sk89q.worldedit.internal.command.exception.ExceptionMatch;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
+import org.enginehub.piston.exception.CommandException;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.RejectedExecutionException;
@@ -39,11 +39,9 @@ import java.util.regex.Pattern;
 public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
 
     private static final Pattern numberFormat = Pattern.compile("^For input string: \"(.*)\"$");
-    private final WorldGuard worldGuard;
 
-    public WorldGuardExceptionConverter(WorldGuard worldGuard) {
-        checkNotNull(worldGuard);
-        this.worldGuard = worldGuard;
+    private CommandException newCommandException(String message, Throwable cause) {
+        return new CommandException(TextComponent.of(String.valueOf(message)), cause, ImmutableList.of());
     }
 
     @ExceptionMatch
@@ -51,46 +49,46 @@ public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
         final Matcher matcher = numberFormat.matcher(e.getMessage());
 
         if (matcher.matches()) {
-            throw new CommandException("Number expected; string \"" + matcher.group(1)
-                    + "\" given.");
+            throw newCommandException("Number expected; string \"" + matcher.group(1)
+                    + "\" given.", e);
         } else {
-            throw new CommandException("Number expected; string given.");
+            throw newCommandException("Number expected; string given.", e);
         }
     }
 
     @ExceptionMatch
     public void convert(StorageException e) throws CommandException {
         WorldGuard.logger.log(Level.WARNING, "Error loading/saving regions", e);
-        throw new CommandException("Region data could not be loaded/saved: " + e.getMessage());
+        throw newCommandException("Region data could not be loaded/saved: " + e.getMessage(), e);
     }
 
     @ExceptionMatch
     public void convert(RejectedExecutionException e) throws CommandException {
-        throw new CommandException("There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.", e);
+        throw newCommandException("There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.", e);
     }
 
     @ExceptionMatch
     public void convert(CancellationException e) throws CommandException {
-        throw new CommandException("WorldGuard: Task was cancelled.", e);
+        throw newCommandException("Task was cancelled.", e);
     }
 
     @ExceptionMatch
     public void convert(InterruptedException e) throws CommandException {
-        throw new CommandException("WorldGuard: Task was interrupted.", e);
+        throw newCommandException("Task was interrupted.", e);
     }
 
     @ExceptionMatch
     public void convert(WorldEditException e) throws CommandException {
-        throw new CommandException(e.getMessage(), e);
+        throw newCommandException(e.getMessage(), e);
     }
 
     @ExceptionMatch
     public void convert(UnresolvedNamesException e) throws CommandException {
-        throw new CommandException(e.getMessage(), e);
+        throw newCommandException(e.getMessage(), e);
     }
 
     @ExceptionMatch
     public void convert(AuthorizationException e) throws CommandException {
-        throw new CommandException("You don't have permission to do that.", e);
+        throw newCommandException("You don't have permission to do that.", e);
     }
 }

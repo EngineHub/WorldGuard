@@ -17,11 +17,11 @@
     <allow pkg="org.flywaydb"/>
     <allow pkg="org.yaml"/>
     <allow pkg="org.json"/>
+    <allow pkg="org.enginehub.piston"/>
 
     <subpackage name="bukkit">
       <allow pkg="org.bukkit"/>
       <allow pkg="org.bstats.bukkit"/>
-      <allow pkg="net.minecraft.server"/>
     </subpackage>
 
     <subpackage name="sponge">

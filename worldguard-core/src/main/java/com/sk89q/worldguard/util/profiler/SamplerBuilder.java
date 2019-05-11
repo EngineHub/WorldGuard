@@ -33,6 +33,7 @@ import java.util.SortedMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -109,6 +110,12 @@ public class SamplerBuilder {
         }
 
         @Override
+        public boolean cancel() {
+            future.setException(new CancellationException());
+            return super.cancel();
+        }
+
+        @Override
         public synchronized void run() {
             try {
                 if (endTime <= System.currentTimeMillis()) {
@@ -129,7 +136,7 @@ public class SamplerBuilder {
                 }
             } catch (Throwable t) {
                 future.setException(t);
-                cancel();
+                super.cancel();
             }
         }
 

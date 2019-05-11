@@ -33,6 +33,10 @@ import com.sk89q.worldedit.command.util.AsyncCommandHelper;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.formatting.component.MessageBox;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.paste.ActorCallbackPaste;
 import com.sk89q.worldedit.util.report.ReportList;
@@ -191,11 +195,15 @@ public class WorldGuardCommands {
             sampler = activeSampler = builder.start();
         }
 
+        sender.print(TextComponent.of("Starting CPU profiling. Use ", TextColor.LIGHT_PURPLE)
+                .append(TextComponent.of("/wg stopprofle", TextColor.AQUA)
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/wg stopprofile")))
+                .append(TextComponent.of(" to stop profling.", TextColor.LIGHT_PURPLE)));
         AsyncCommandHelper.wrap(sampler.getFuture(), worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
                 .formatUsing(minutes)
                 .registerWithSupervisor("Running CPU profiler for %d minute(s)...")
                 .sendMessageAfterDelay("(Please wait... profiling for %d minute(s)...)")
-                .thenTellErrorsOnly("CPU profiling failed.");
+                .thenTellErrorsOnly("CPU profiling failed");
 
         sampler.getFuture().addListener(() -> {
             synchronized (WorldGuardCommands.this) {
@@ -263,26 +271,19 @@ public class WorldGuardCommands {
     public void listRunningTasks(CommandContext args, Actor sender) throws CommandException {
         List<Task<?>> tasks = WorldGuard.getInstance().getSupervisor().getTasks();
 
-        if (!tasks.isEmpty()) {
-            tasks.sort(new TaskStateComparator());
-            StringBuilder builder = new StringBuilder();
-            builder.append(TextColor.GRAY);
-            builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
-            builder.append(" Running tasks ");
-            builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
-            builder.append("\n").append(TextColor.GRAY).append("Note: Some 'running' tasks may be waiting to be start.");
-            for (Task task : tasks) {
-                builder.append("\n");
-                builder.append(TextColor.BLUE).append("(").append(task.getState().name()).append(") ");
-                builder.append(TextColor.YELLOW);
-                builder.append(CommandUtils.getOwnerName(task.getOwner()));
-                builder.append(": ");
-                builder.append(TextColor.WHITE);
-                builder.append(task.getName());
-            }
-            sender.printRaw(builder.toString());
-        } else {
+        if (tasks.isEmpty()) {
             sender.print("There are currently no running tasks.");
+        } else {
+            tasks.sort(new TaskStateComparator());
+            MessageBox builder = new MessageBox("Running Tasks", new TextComponentProducer());
+            builder.append(TextComponent.of("Note: Some 'running' tasks may be waiting to be start.", TextColor.GRAY));
+            for (Task<?> task : tasks) {
+                builder.append(TextComponent.newline());
+                builder.append(TextComponent.of("(" + task.getState().name() + ") ", TextColor.BLUE));
+                builder.append(TextComponent.of(CommandUtils.getOwnerName(task.getOwner()) + ": ", TextColor.YELLOW));
+                builder.append(TextComponent.of(task.getName(), TextColor.WHITE));
+            }
+            sender.print(builder.create());
         }
     }
 

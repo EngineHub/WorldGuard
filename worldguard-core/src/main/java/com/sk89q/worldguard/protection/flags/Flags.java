@@ -31,7 +31,6 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -186,11 +185,6 @@ public final class Flags {
         WorldGuard.getInstance().getFlagRegistry().register(flag);
         INBUILT_FLAGS_LIST.add(flag.getName());
         return flag;
-    }
-
-    @Nullable
-    public static Flag<?> get(final String id) {
-        return WorldGuard.getInstance().getFlagRegistry().get(id);
     }
 
     /**

@@ -65,7 +65,7 @@ public final class WorldGuard {
     private ProfileCache profileCache;
     private ProfileService profileService;
     private ListeningExecutorService executorService;
-    private WorldGuardExceptionConverter exceptionConverter = new WorldGuardExceptionConverter(this);
+    private WorldGuardExceptionConverter exceptionConverter = new WorldGuardExceptionConverter();
 
     static {
         Flags.registerAll();
@@ -192,7 +192,7 @@ public final class WorldGuard {
         executorService.shutdown();
 
         try {
-            logger.log(Level.INFO, "Shutting down executor and waiting for any pending tasks...");
+            logger.log(Level.INFO, "Shutting down executor and cancelling any pending tasks...");
 
             List<Task<?>> tasks = supervisor.getTasks();
             if (!tasks.isEmpty()) {
@@ -200,16 +200,15 @@ public final class WorldGuard {
                 for (Task<?> task : tasks) {
                     builder.append("\n");
                     builder.append(task.getName());
+                    task.cancel(true);
                 }
                 logger.log(Level.INFO, builder.toString());
             }
 
-            Futures.successfulAsList(tasks).get();
-            executorService.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
+            //Futures.successfulAsList(tasks).get();
+            executorService.awaitTermination(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            logger.log(Level.WARNING, "Some tasks failed while waiting for remaining tasks to finish", e);
         }
 
         platform.unload();
