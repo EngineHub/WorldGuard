@@ -41,7 +41,7 @@ public class RegistryFlag<T extends Keyed> extends Flag<T> {
 
     @Override
     public T parseInput(FlagContext context) throws InvalidFlagFormat {
-        final String key = context.getUserInput().trim().toLowerCase(Locale.ENGLISH);
+        final String key = context.getUserInput().trim().toLowerCase(Locale.ROOT);
         return Optional.ofNullable(registry.get(key))
                 .orElseThrow(() -> new InvalidFlagFormat("Unknown " + registry.getName() + ": " + key));
     }
@@ -52,7 +52,7 @@ public class RegistryFlag<T extends Keyed> extends Flag<T> {
 
     @Override
     public T unmarshal(@Nullable Object o) {
-        return registry.get(String.valueOf(o));
+        return registry.get(String.valueOf(o).toLowerCase(Locale.ROOT));
     }
 
     @Override
