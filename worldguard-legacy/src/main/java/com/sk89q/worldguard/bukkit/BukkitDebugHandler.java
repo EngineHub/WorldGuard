@@ -95,9 +95,8 @@ public class BukkitDebugHandler implements DebugHandler {
             log.info("Event report for " + receiver.getName() + ":\n\n" + result);
 
             plugin.checkPermission(receiver, "worldguard.debug.pastebin");
-            ActorCallbackPaste
-                    .pastebin(WorldGuard.getInstance().getSupervisor(), plugin.wrapCommandSender(receiver), result,
-                            "Event debugging report: %s.txt", WorldGuard.getInstance().getExceptionConverter());
+            ActorCallbackPaste.pastebin(WorldGuard.getInstance().getSupervisor(), plugin.wrapCommandSender(receiver),
+                    result, "Event debugging report: %s.txt");
         } else {
             receiver.sendMessage(result.replaceAll("(?m)^", ChatColor.AQUA.toString()));
 

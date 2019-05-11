@@ -139,6 +139,10 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
         return domain;
     }
 
+    /**
+     * @deprecated was only used for Future transformation. Can be replaced with {@code region.getOwners()::addAll} (or getMembers).
+     */
+    @Deprecated
     public Function<DefaultDomain, DefaultDomain> createAddAllFunction(final DefaultDomain target) {
         return domain -> {
             target.addAll(domain);
@@ -146,6 +150,10 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
         };
     }
 
+    /**
+     * @deprecated was only used for Future transformation. Can be replaced with {@code region.getOwners()::removeAll} (or getMembers).
+     */
+    @Deprecated
     public Function<DefaultDomain, DefaultDomain> createRemoveAllFunction(final DefaultDomain target) {
         return domain -> {
             target.removeAll(domain);

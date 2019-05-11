@@ -82,7 +82,7 @@ class FlagHelperBox extends PaginationBox {
     private final RegionPermissionModel perms;
 
     FlagHelperBox(World world, ProtectedRegion region, RegionPermissionModel perms) {
-        super("Flags for " + region.getId(), "/rg flags -w " + world.getName() + " " + region.getId() + " %page%");
+        super("Flags for " + region.getId(), "/rg flags -w " + world.getName() + " -p %page% " + region.getId());
         this.world = world;
         this.region = region;
         this.perms = perms;
