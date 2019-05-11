@@ -29,7 +29,6 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.command.util.AsyncCommandHelper;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
@@ -41,6 +40,7 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.paste.ActorCallbackPaste;
 import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.util.report.SystemInfoReport;
+import com.sk89q.worldedit.util.task.FutureForwardingTask;
 import com.sk89q.worldedit.util.task.Task;
 import com.sk89q.worldedit.util.task.TaskStateComparator;
 import com.sk89q.worldedit.world.World;
@@ -142,7 +142,7 @@ public class WorldGuardCommands {
         
         if (args.hasFlag('p')) {
             sender.checkPermission("worldguard.report.pastebin");
-            ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, result, "WorldGuard report: %s.report", worldGuard.getExceptionConverter());
+            ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, result, "WorldGuard report: %s.report");
         }
     }
 
@@ -196,14 +196,12 @@ public class WorldGuardCommands {
         }
 
         sender.print(TextComponent.of("Starting CPU profiling. Use ", TextColor.LIGHT_PURPLE)
-                .append(TextComponent.of("/wg stopprofle", TextColor.AQUA)
+                .append(TextComponent.of("/wg stopprofile", TextColor.AQUA)
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/wg stopprofile")))
-                .append(TextComponent.of(" to stop profling.", TextColor.LIGHT_PURPLE)));
-        AsyncCommandHelper.wrap(sampler.getFuture(), worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
-                .formatUsing(minutes)
-                .registerWithSupervisor("Running CPU profiler for %d minute(s)...")
-                .sendMessageAfterDelay("(Please wait... profiling for %d minute(s)...)")
-                .thenTellErrorsOnly("CPU profiling failed");
+                .append(TextComponent.of(" to stop profiling.", TextColor.LIGHT_PURPLE)));
+
+        worldGuard.getSupervisor().monitor(FutureForwardingTask.create(
+                sampler.getFuture(), "CPU profiling for " + minutes + " minutes", sender));
 
         sampler.getFuture().addListener(() -> {
             synchronized (WorldGuardCommands.this) {
@@ -225,7 +223,7 @@ public class WorldGuardCommands {
                 }
 
                 if (pastebin) {
-                    ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, output, "Profile result: %s.profile", worldGuard.getExceptionConverter());
+                    ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, output, "Profile result: %s.profile");
                 }
             }
 

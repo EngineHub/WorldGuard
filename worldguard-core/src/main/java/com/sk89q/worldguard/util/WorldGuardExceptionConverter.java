@@ -19,16 +19,15 @@
 
 package com.sk89q.worldguard.util;
 
-import com.google.common.collect.ImmutableList;
+import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverterHelper;
 import com.sk89q.worldedit.internal.command.exception.ExceptionMatch;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.component.InvalidComponentException;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
-import org.enginehub.piston.exception.CommandException;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.RejectedExecutionException;
@@ -41,7 +40,7 @@ public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
     private static final Pattern numberFormat = Pattern.compile("^For input string: \"(.*)\"$");
 
     private CommandException newCommandException(String message, Throwable cause) {
-        return new CommandException(TextComponent.of(String.valueOf(message)), cause, ImmutableList.of());
+        return new CommandException(message, cause);
     }
 
     @ExceptionMatch
@@ -54,6 +53,11 @@ public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
         } else {
             throw newCommandException("Number expected; string given.", e);
         }
+    }
+
+    @ExceptionMatch
+    public void convert(InvalidComponentException e) throws CommandException {
+        throw newCommandException(e.getMessage(), e);
     }
 
     @ExceptionMatch

@@ -19,13 +19,11 @@
 
 package com.sk89q.worldguard.commands.region;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.worldedit.command.util.AsyncCommandHelper;
+import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.world.World;
@@ -36,6 +34,8 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.DomainInputResolver;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
+
+import java.util.concurrent.Callable;
 
 public class MemberCommands extends RegionCommandsBase {
 
@@ -68,16 +68,13 @@ public class MemberCommands extends RegionCommandsBase {
                 WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
         resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
 
-        // Then add it to the members
-        ListenableFuture<DefaultDomain> future = Futures.transform(
-                WorldGuard.getInstance().getExecutorService().submit(resolver),
-                resolver.createAddAllFunction(region.getMembers()));
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
-                .formatUsing(region.getId(), world.getName())
-                .registerWithSupervisor("Adding members to the region '%s' on '%s'")
-                .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with new members.", "Failed to add new members");
+        final String description = String.format("Adding members to the region '%s' on '%s'", region.getId(), world.getName());
+        AsyncCommandBuilder.wrap(resolver, sender)
+                .registerWithSupervisor(worldGuard.getSupervisor(), description)
+                .onSuccess(String.format("Region '%s' updated with new members.", region.getId()), region.getMembers()::addAll)
+                .onFailure("Failed to add new members", worldGuard.getExceptionConverter())
+                .buildAndExec(worldGuard.getExecutorService());
     }
 
     @Command(aliases = {"addowner", "addowner", "ao"},
@@ -127,16 +124,13 @@ public class MemberCommands extends RegionCommandsBase {
                 WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
         resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_ONLY);
 
-        // Then add it to the owners
-        ListenableFuture<DefaultDomain> future = Futures.transform(
-                WorldGuard.getInstance().getExecutorService().submit(resolver),
-                resolver.createAddAllFunction(region.getOwners()));
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
-                .formatUsing(region.getId(), world.getName())
-                .registerWithSupervisor("Adding owners to the region '%s' on '%s'")
-                .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with new owners.", "Failed to add new owners");
+        final String description = String.format("Adding owners to the region '%s' on '%s'", region.getId(), world.getName());
+        AsyncCommandBuilder.wrap(resolver, sender)
+                .registerWithSupervisor(worldGuard.getSupervisor(), description)
+                .onSuccess(String.format("Region '%s' updated with new owners.", region.getId()), region.getOwners()::addAll)
+                .onFailure("Failed to add new owners", worldGuard.getExceptionConverter())
+                .buildAndExec(worldGuard.getExecutorService());
     }
 
     @Command(aliases = {"removemember", "remmember", "removemem", "remmem", "rm"},
@@ -157,12 +151,9 @@ public class MemberCommands extends RegionCommandsBase {
             throw new CommandPermissionsException();
         }
 
-        ListenableFuture<?> future;
-
+        Callable<DefaultDomain> callable;
         if (args.hasFlag('a')) {
-            region.getMembers().removeAll();
-
-            future = Futures.immediateFuture(null);
+            callable = region::getMembers;
         } else {
             if (args.argsLength() < 2) {
                 throw new CommandException("List some names to remove, or use -a to remove all.");
@@ -173,17 +164,16 @@ public class MemberCommands extends RegionCommandsBase {
                     WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
             resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
 
-            // Then remove it from the members
-            future = Futures.transform(
-                    WorldGuard.getInstance().getExecutorService().submit(resolver),
-                    resolver.createRemoveAllFunction(region.getMembers()));
+            callable = resolver;
         }
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
-                .formatUsing(region.getId(), world.getName())
-                .registerWithSupervisor("Removing members from the region '%s' on '%s'")
+        final String description = String.format("Removing members from the region '%s' on '%s'", region.getId(), world.getName());
+        AsyncCommandBuilder.wrap(callable, sender)
+                .registerWithSupervisor(worldGuard.getSupervisor(), description)
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with members removed.", "Failed to remove members");
+                .onSuccess(String.format("Region '%s' updated with members removed.", region.getId()), region.getMembers()::removeAll)
+                .onFailure("Failed to remove members", worldGuard.getExceptionConverter())
+                .buildAndExec(worldGuard.getExecutorService());
     }
 
     @Command(aliases = {"removeowner", "remowner", "ro"},
@@ -204,12 +194,9 @@ public class MemberCommands extends RegionCommandsBase {
             throw new CommandPermissionsException();
         }
 
-        ListenableFuture<?> future;
-
+        Callable<DefaultDomain> callable;
         if (args.hasFlag('a')) {
-            region.getOwners().removeAll();
-
-            future = Futures.immediateFuture(null);
+            callable = region::getOwners;
         } else {
             if (args.argsLength() < 2) {
                 throw new CommandException("List some names to remove, or use -a to remove all.");
@@ -220,16 +207,15 @@ public class MemberCommands extends RegionCommandsBase {
                     WorldGuard.getInstance().getProfileService(), args.getParsedPaddedSlice(1, 0));
             resolver.setLocatorPolicy(args.hasFlag('n') ? UserLocatorPolicy.NAME_ONLY : UserLocatorPolicy.UUID_AND_NAME);
 
-            // Then remove it from the owners
-            future = Futures.transform(
-                    WorldGuard.getInstance().getExecutorService().submit(resolver),
-                    resolver.createRemoveAllFunction(region.getOwners()));
+            callable = resolver;
         }
 
-        AsyncCommandHelper.wrap(future, worldGuard.getSupervisor(), sender, worldGuard.getExceptionConverter())
-                .formatUsing(region.getId(), world.getName())
-                .registerWithSupervisor("Removing owners from the region '%s' on '%s'")
+        final String description = String.format("Removing owners from the region '%s' on '%s'", region.getId(), world.getName());
+        AsyncCommandBuilder.wrap(callable, sender)
+                .registerWithSupervisor(worldGuard.getSupervisor(), description)
                 .sendMessageAfterDelay("(Please wait... querying player names...)")
-                .thenRespondWith("Region '%s' updated with owners removed.", "Failed to remove owners");
+                .onSuccess(String.format("Region '%s' updated with owners removed.", region.getId()), region.getOwners()::removeAll)
+                .onFailure("Failed to remove owners", worldGuard.getExceptionConverter())
+                .buildAndExec(worldGuard.getExecutorService());
     }
 }
