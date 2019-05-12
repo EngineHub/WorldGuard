@@ -960,8 +960,10 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
-        Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(event.getBlock()),
-                event.getBlock().getLocation().getWorld(), event.blockList(), Material.AIR));
+        final BreakBlockEvent eventToFire = new BreakBlockEvent(event, create(event.getBlock()),
+                event.getBlock().getLocation().getWorld(), event.blockList(), Material.AIR);
+        eventToFire.getRelevantFlags().add(Flags.OTHER_EXPLOSION);
+        Events.fireBulkEventToCancel(event, eventToFire);
     }
 
     /**
