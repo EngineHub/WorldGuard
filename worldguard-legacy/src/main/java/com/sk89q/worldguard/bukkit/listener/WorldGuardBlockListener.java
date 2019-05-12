@@ -37,6 +37,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
@@ -662,6 +663,21 @@ public class WorldGuardBlockListener implements Listener {
             break;
         }
 
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockExplode(BlockExplodeEvent event) {
+        ConfigurationManager cfg = plugin.getGlobalStateManager();
+
+        if (cfg.activityHaltToggle) {
+            event.setCancelled(true);
+            return;
+        }
+
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        if (wcfg.blockOtherExplosions) {
+            event.setCancelled(true);
+        }
     }
 
 }

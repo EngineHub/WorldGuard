@@ -410,9 +410,7 @@ public class WorldGuardEntityListener implements Listener {
         Entity ent = event.getEntity();
 
         if (cfg.activityHaltToggle) {
-            if (ent != null) {
-                ent.remove();
-            }
+            ent.remove();
             event.setCancelled(true);
             return;
         }

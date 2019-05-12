@@ -880,6 +880,14 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockExplode(BlockExplodeEvent event) {
+        final BreakBlockEvent eventToFire = new BreakBlockEvent(event, create(event.getBlock()),
+                event.getBlock().getLocation().getWorld(), event.blockList(), Material.AIR);
+        eventToFire.getRelevantFlags().add(DefaultFlag.OTHER_EXPLOSION);
+        Events.fireBulkEventToCancel(event, eventToFire);
+    }
+
     /**
      * Handle the right click of a block while an item is held.
      *
