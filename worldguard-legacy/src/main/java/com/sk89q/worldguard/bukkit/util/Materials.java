@@ -157,11 +157,9 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.WHEAT, 0);
         MATERIAL_FLAGS.put(Material.FARMLAND, 0);
         MATERIAL_FLAGS.put(Material.FURNACE, MODIFIED_ON_RIGHT);
-        MATERIAL_FLAGS.put(Material.SIGN, 0);
         MATERIAL_FLAGS.put(Material.LADDER, 0);
         MATERIAL_FLAGS.put(Material.RAIL, 0);
         MATERIAL_FLAGS.put(Material.COBBLESTONE_STAIRS, 0);
-        MATERIAL_FLAGS.put(Material.WALL_SIGN, 0);
         MATERIAL_FLAGS.put(Material.LEVER, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.STONE_PRESSURE_PLATE, 0);
         MATERIAL_FLAGS.put(Material.REDSTONE_ORE, 0);
@@ -445,7 +443,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.COD, 0);
         MATERIAL_FLAGS.put(Material.COOKED_COD, 0);
         MATERIAL_FLAGS.put(Material.INK_SAC, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.DANDELION_YELLOW, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.CYAN_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.GRAY_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.LIGHT_BLUE_DYE, MODIFIES_BLOCKS);
@@ -614,6 +611,16 @@ public final class Materials {
             MATERIAL_FLAGS.put(pot, MODIFIED_ON_RIGHT);
         }
 
+        try {
+            MATERIAL_FLAGS.put(Material.SIGN, 0);
+            MATERIAL_FLAGS.put(Material.WALL_SIGN, 0);
+            MATERIAL_FLAGS.put(Material.DANDELION_YELLOW, MODIFIES_BLOCKS);
+            MATERIAL_FLAGS.put(Material.ROSE_RED, MODIFIES_BLOCKS);
+            MATERIAL_FLAGS.put(Material.CACTUS_GREEN, MODIFIES_BLOCKS);
+        } catch (NoSuchFieldError ignored) { // missing fields in 1.14
+        }
+
+        
         // Check for missing items/blocks
         for (Material material : Material.values()) {
             // Add spawn eggs
