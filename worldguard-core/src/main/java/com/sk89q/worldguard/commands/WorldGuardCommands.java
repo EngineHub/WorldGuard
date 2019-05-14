@@ -146,9 +146,9 @@ public class WorldGuardCommands {
         }
     }
 
-    @Command(aliases = {"profile"}, usage = "[<minutes>]",
+    @Command(aliases = {"profile"}, usage = "[-p] [-i <interval>] [-t <thread filter>] [<minutes>]",
             desc = "Profile the CPU usage of the server", min = 0, max = 1,
-            flags = "t:p")
+            flags = "t:i:p")
     @CommandPermissions("worldguard.profile")
     public void profile(final CommandContext args, final Actor sender) throws CommandException, AuthorizationException {
         Predicate<ThreadInfo> threadFilter;
@@ -182,6 +182,16 @@ public class WorldGuardCommands {
             }
         }
 
+        int interval = 20;
+        if (args.hasFlag('i')) {
+            interval = args.getFlagInteger('i');
+            if (interval < 1 || interval > 100) {
+                throw new CommandException("Interval must be between 1 and 100 (in milliseconds)");
+            }
+            if (interval < 10) {
+                sender.printDebug("Note: A low interval may cause additional slowdown during profiling.");
+            }
+        }
         Sampler sampler;
 
         synchronized (this) {
@@ -192,6 +202,7 @@ public class WorldGuardCommands {
             SamplerBuilder builder = new SamplerBuilder();
             builder.setThreadFilter(threadFilter);
             builder.setRunTime(minutes, TimeUnit.MINUTES);
+            builder.setInterval(interval);
             sampler = activeSampler = builder.start();
         }
 

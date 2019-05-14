@@ -21,7 +21,6 @@ package com.sk89q.worldguard;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -47,7 +46,6 @@ import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;

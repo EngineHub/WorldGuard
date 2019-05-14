@@ -21,7 +21,6 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.session.Session;

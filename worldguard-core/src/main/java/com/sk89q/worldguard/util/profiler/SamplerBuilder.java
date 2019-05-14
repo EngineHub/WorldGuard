@@ -49,7 +49,7 @@ public class SamplerBuilder {
     }
 
     public void setInterval(int interval) {
-        checkArgument(interval >= 10, "interval >= 10");
+        checkArgument(interval >= 1, "interval >= 1");
         this.interval = interval;
     }
 

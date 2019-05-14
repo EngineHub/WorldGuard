@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.bukkit;
 
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.report.ReportList;
 import com.sk89q.worldedit.world.gamemode.GameMode;

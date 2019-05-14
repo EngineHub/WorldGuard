@@ -28,7 +28,6 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.weather.WeatherType;
-import com.sk89q.worldedit.world.weather.WeatherTypes;
 import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;

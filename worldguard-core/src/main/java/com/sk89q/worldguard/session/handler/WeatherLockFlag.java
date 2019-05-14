@@ -27,8 +27,6 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 
-import javax.annotation.Nullable;
-
 public class WeatherLockFlag extends FlagValueChangeHandler<WeatherType> {
 
     public static final Factory FACTORY = new Factory();
