@@ -616,7 +616,7 @@ public final class Materials {
             MATERIAL_FLAGS.put(Material.WALL_SIGN, 0);
             MATERIAL_FLAGS.put(Material.DANDELION_YELLOW, MODIFIES_BLOCKS);
             MATERIAL_FLAGS.put(Material.ROSE_RED, MODIFIES_BLOCKS);
-            MATERIAL_FLAGS.put(MATERIAL.CACTUS_GREEN, MODIFIES_BLOCKS);
+            MATERIAL_FLAGS.put(Material.CACTUS_GREEN, MODIFIES_BLOCKS);
         } catch (NoSuchFieldError ignored) { // missing fields in 1.14
         }
 
