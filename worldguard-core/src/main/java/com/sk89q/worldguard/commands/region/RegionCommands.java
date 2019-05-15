@@ -291,7 +291,8 @@ public final class RegionCommands extends RegionCommandsBase {
                 .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), description)
                 .sendMessageAfterDelay("(Please wait... " + description + ")")
                 .onSuccess(TextComponent.of(String.format("A new region has been claimed named '%s'.", id)), null)
-                .onFailure("Failed to claim region", WorldGuard.getInstance().getExceptionConverter());
+                .onFailure("Failed to claim region", WorldGuard.getInstance().getExceptionConverter())
+                .buildAndExec(WorldGuard.getInstance().getExecutorService());
     }
 
     /**
