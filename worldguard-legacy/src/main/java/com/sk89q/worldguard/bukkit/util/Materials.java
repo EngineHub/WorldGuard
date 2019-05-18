@@ -29,11 +29,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
@@ -49,7 +50,7 @@ public final class Materials {
     private static final int MODIFIES_BLOCKS = 4;
 
     private static final BiMap<EntityType, Material> ENTITY_ITEMS = HashBiMap.create();
-    private static final Map<Material, Integer> MATERIAL_FLAGS = new HashMap<>();
+    private static final Map<Material, Integer> MATERIAL_FLAGS = new EnumMap<>(Material.class);
     private static final Set<PotionEffectType> DAMAGE_EFFECTS = new HashSet<>();
 
 
@@ -299,6 +300,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.NETHER_WART_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.RED_NETHER_BRICKS, 0);
         MATERIAL_FLAGS.put(Material.BONE_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.BARRIER, 0);
         MATERIAL_FLAGS.put(Material.STRUCTURE_VOID, 0);
         // 1.12
         MATERIAL_FLAGS.put(Material.BLACK_CONCRETE, 0);
@@ -308,6 +310,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.GRAY_CONCRETE, 0);
         MATERIAL_FLAGS.put(Material.GREEN_CONCRETE, 0);
         MATERIAL_FLAGS.put(Material.LIGHT_BLUE_CONCRETE, 0);
+        MATERIAL_FLAGS.put(Material.YELLOW_CONCRETE, 0);
         MATERIAL_FLAGS.put(Material.LIGHT_GRAY_CONCRETE, 0);
         MATERIAL_FLAGS.put(Material.LIME_CONCRETE, 0);
         MATERIAL_FLAGS.put(Material.MAGENTA_CONCRETE, 0);
@@ -323,6 +326,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.GRAY_CONCRETE_POWDER, 0);
         MATERIAL_FLAGS.put(Material.GREEN_CONCRETE_POWDER, 0);
         MATERIAL_FLAGS.put(Material.LIGHT_BLUE_CONCRETE_POWDER, 0);
+        MATERIAL_FLAGS.put(Material.YELLOW_CONCRETE_POWDER, 0);
         MATERIAL_FLAGS.put(Material.LIGHT_GRAY_CONCRETE_POWDER, 0);
         MATERIAL_FLAGS.put(Material.LIME_CONCRETE_POWDER, 0);
         MATERIAL_FLAGS.put(Material.MAGENTA_CONCRETE_POWDER, 0);
@@ -348,6 +352,100 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.GREEN_GLAZED_TERRACOTTA, 0);
         MATERIAL_FLAGS.put(Material.RED_GLAZED_TERRACOTTA, 0);
         MATERIAL_FLAGS.put(Material.BLACK_GLAZED_TERRACOTTA, 0);
+
+        // 1.13
+        MATERIAL_FLAGS.put(Material.ANDESITE, 0);
+        MATERIAL_FLAGS.put(Material.ATTACHED_MELON_STEM, 0);
+        MATERIAL_FLAGS.put(Material.ATTACHED_PUMPKIN_STEM, 0);
+        MATERIAL_FLAGS.put(Material.BLACK_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.BLACK_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.BLACK_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.BLUE_ICE, 0);
+        MATERIAL_FLAGS.put(Material.BLUE_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.BLUE_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.BLUE_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.BROWN_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.BROWN_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.BROWN_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.BUBBLE_COLUMN, 0);
+        MATERIAL_FLAGS.put(Material.CARROTS, 0);
+        MATERIAL_FLAGS.put(Material.CARVED_PUMPKIN, 0);
+        MATERIAL_FLAGS.put(Material.CAVE_AIR, 0);
+        MATERIAL_FLAGS.put(Material.CHISELED_QUARTZ_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.CHISELED_RED_SANDSTONE, 0);
+        MATERIAL_FLAGS.put(Material.CHISELED_SANDSTONE, 0);
+        MATERIAL_FLAGS.put(Material.COARSE_DIRT, 0);
+        MATERIAL_FLAGS.put(Material.CONDUIT, 0);
+        MATERIAL_FLAGS.put(Material.CUT_RED_SANDSTONE, 0);
+        MATERIAL_FLAGS.put(Material.CUT_SANDSTONE, 0);
+        MATERIAL_FLAGS.put(Material.CYAN_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.CYAN_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.CYAN_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.DARK_PRISMARINE, 0);
+        MATERIAL_FLAGS.put(Material.DIORITE, 0);
+        MATERIAL_FLAGS.put(Material.DRIED_KELP_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.FERN, 0);
+        MATERIAL_FLAGS.put(Material.GRANITE, 0);
+        MATERIAL_FLAGS.put(Material.GRAY_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.GRAY_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.GRAY_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.GREEN_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.GREEN_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.GREEN_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.KELP, 0);
+        MATERIAL_FLAGS.put(Material.KELP_PLANT, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT_BLUE_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT_BLUE_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT_BLUE_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT_GRAY_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT_GRAY_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT_GRAY_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.LIME_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.LIME_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.LIME_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.MAGENTA_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.MAGENTA_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.MAGENTA_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.MOSSY_COBBLESTONE_WALL, 0);
+        MATERIAL_FLAGS.put(Material.MUSHROOM_STEM, 0);
+        MATERIAL_FLAGS.put(Material.OBSERVER, 0);
+        MATERIAL_FLAGS.put(Material.ORANGE_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.ORANGE_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.ORANGE_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.PINK_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.PINK_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.PINK_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.PODZOL, 0);
+        MATERIAL_FLAGS.put(Material.POLISHED_ANDESITE, 0);
+        MATERIAL_FLAGS.put(Material.POLISHED_DIORITE, 0);
+        MATERIAL_FLAGS.put(Material.POLISHED_GRANITE, 0);
+        MATERIAL_FLAGS.put(Material.POTATOES, 0);
+        MATERIAL_FLAGS.put(Material.PRISMARINE_BRICKS, 0);
+        MATERIAL_FLAGS.put(Material.PURPLE_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.PURPLE_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.PURPLE_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.QUARTZ_PILLAR, 0);
+        MATERIAL_FLAGS.put(Material.RED_SAND, 0);
+        MATERIAL_FLAGS.put(Material.RED_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.RED_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.RED_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.SEAGRASS, 0);
+        MATERIAL_FLAGS.put(Material.SEA_PICKLE, 0);
+        MATERIAL_FLAGS.put(Material.SMOOTH_QUARTZ, 0);
+        MATERIAL_FLAGS.put(Material.SMOOTH_RED_SANDSTONE, 0);
+        MATERIAL_FLAGS.put(Material.SMOOTH_SANDSTONE, 0);
+        MATERIAL_FLAGS.put(Material.SMOOTH_STONE, 0);
+        MATERIAL_FLAGS.put(Material.TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.TURTLE_EGG, 0);
+        MATERIAL_FLAGS.put(Material.VOID_AIR, 0);
+        MATERIAL_FLAGS.put(Material.WALL_TORCH, 0);
+        MATERIAL_FLAGS.put(Material.WET_SPONGE, 0);
+        MATERIAL_FLAGS.put(Material.WHITE_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.WHITE_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.WHITE_TERRACOTTA, 0);
+        MATERIAL_FLAGS.put(Material.YELLOW_STAINED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.YELLOW_STAINED_GLASS_PANE, 0);
+        MATERIAL_FLAGS.put(Material.YELLOW_TERRACOTTA, 0);
 
         MATERIAL_FLAGS.put(Material.IRON_SHOVEL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.IRON_PICKAXE, 0);
@@ -549,6 +647,28 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.SHULKER_SHELL, 0);
         MATERIAL_FLAGS.put(Material.KNOWLEDGE_BOOK, 0);
 
+        MATERIAL_FLAGS.put(Material.CHARCOAL, 0);
+        MATERIAL_FLAGS.put(Material.COD_BUCKET, 0);
+        MATERIAL_FLAGS.put(Material.COOKED_SALMON, 0);
+        MATERIAL_FLAGS.put(Material.DEBUG_STICK, 0);
+        MATERIAL_FLAGS.put(Material.DRIED_KELP, 0);
+        MATERIAL_FLAGS.put(Material.ENCHANTED_GOLDEN_APPLE, 0);
+        MATERIAL_FLAGS.put(Material.HEART_OF_THE_SEA, 0);
+        MATERIAL_FLAGS.put(Material.IRON_NUGGET, 0);
+        MATERIAL_FLAGS.put(Material.LAPIS_LAZULI, 0);
+        MATERIAL_FLAGS.put(Material.NAUTILUS_SHELL, 0);
+        MATERIAL_FLAGS.put(Material.PHANTOM_MEMBRANE, 0);
+        MATERIAL_FLAGS.put(Material.PUFFERFISH, 0);
+        MATERIAL_FLAGS.put(Material.PUFFERFISH_BUCKET, 0);
+        MATERIAL_FLAGS.put(Material.SALMON, 0);
+        MATERIAL_FLAGS.put(Material.SALMON_BUCKET, 0);
+        MATERIAL_FLAGS.put(Material.SCUTE, 0);
+        MATERIAL_FLAGS.put(Material.SPLASH_POTION, 0);
+        MATERIAL_FLAGS.put(Material.TURTLE_HELMET, 0);
+        MATERIAL_FLAGS.put(Material.TRIDENT, 0);
+        MATERIAL_FLAGS.put(Material.TROPICAL_FISH, 0);
+        MATERIAL_FLAGS.put(Material.TROPICAL_FISH_BUCKET, 0);
+
         MATERIAL_FLAGS.put(Material.MUSIC_DISC_11, 0);
         MATERIAL_FLAGS.put(Material.MUSIC_DISC_13, 0);
         MATERIAL_FLAGS.put(Material.MUSIC_DISC_BLOCKS, 0);
@@ -610,6 +730,16 @@ public final class Materials {
         for (Material pot : Tag.FLOWER_POTS.getValues()) {
             MATERIAL_FLAGS.put(pot, MODIFIED_ON_RIGHT);
         }
+        Stream.concat(Stream.concat(
+                Tag.CORAL_BLOCKS.getValues().stream(),
+                Tag.CORALS.getValues().stream()),
+                Tag.WALL_CORALS.getValues().stream()).forEach(m -> {
+            MATERIAL_FLAGS.put(m, 0);
+            Material dead = Material.getMaterial("DEAD_" + m.name());
+            if (dead != null) {
+                MATERIAL_FLAGS.put(dead, 0);
+            }
+        });
 
         try {
             MATERIAL_FLAGS.put(Material.SIGN, 0);
@@ -620,9 +750,9 @@ public final class Materials {
         } catch (NoSuchFieldError ignored) { // missing fields in 1.14
         }
 
-        
         // Check for missing items/blocks
         for (Material material : Material.values()) {
+            if (material.isLegacy()) continue;
             // Add spawn eggs
             if (isSpawnEgg(material)) {
                 MATERIAL_FLAGS.put(material, 0);
@@ -630,8 +760,8 @@ public final class Materials {
                 MATERIAL_FLAGS.put(material, MODIFIED_ON_RIGHT);
             }
             if (!MATERIAL_FLAGS.containsKey(material)) {
-                logger.fine("Missing item definition for " + material.name());
-                MATERIAL_FLAGS.put(material, 0);
+                logger.fine("Missing material definition for " + (material.isBlock() ? "block " : "item ") + material.name());
+                MATERIAL_FLAGS.put(material, MODIFIED_ON_LEFT | MODIFIED_ON_RIGHT);
             }
         }
 
@@ -1011,6 +1141,7 @@ public final class Materials {
             case PURPLE_BED:
             case RED_BED:
             case WHITE_BED:
+            case YELLOW_BED:
                 return true;
             default:
                 return false;
