@@ -42,7 +42,6 @@ import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.TravelAgent;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -51,6 +50,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityCreatePortalEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
@@ -58,7 +58,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -430,50 +429,50 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
+    //Replaces onPlayerPortal
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onPlayerPortal(PlayerPortalEvent event) {
-        if (event.getTo() == null) { // apparently this counts as a cancelled event, implementation specific though
+    public void onPortalCreate(EntityCreatePortalEvent event) {
+        // This applies to normal Entities too...!?
+        if (event.getPortalType() != PortalType.NETHER || event.getEntity().getType() != EntityType.PLAYER) {
             return;
         }
+        Player who = (Player)event.getEntity();
+        LocalPlayer localPlayer = plugin.wrapPlayer(who);
+        //Get the portal blocks to be spawned
+        List<BlockState> blocks = event.getBlocks();
+        //is more than one in any case
+        World where = blocks.get(0).getWorld();
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getTo().getWorld()));
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(where));
         if (!wcfg.regionNetherPortalProtection) return;
-        if (event.getCause() != TeleportCause.NETHER_PORTAL) {
-            return;
-        }
-        if (!event.useTravelAgent()) { // either end travel (even though we checked cause) or another plugin is fucking with us, shouldn't create a portal though
-            return;
-        }
-        TravelAgent pta = event.getPortalTravelAgent();
-        if (pta == null) { // possible, but shouldn't create a portal
-            return;
-        }
-        if (pta.findPortal(event.getTo()) != null) {
-            return; // portal exists...it shouldn't make a new one
-        }
-        // HOPEFULLY covered everything the server can throw at us...proceed protection checking
-        // a lot of that is implementation specific though
-
-        // hackily estimate the area that could be effected by this event, since the server refuses to tell us
-        int radius = pta.getCreationRadius();
-        Location min = event.getTo().clone().subtract(radius, radius, radius);
-        Location max = event.getTo().clone().add(radius, radius, radius);
-        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(event.getTo().getWorld());
-
-        ProtectedRegion check = new ProtectedCuboidRegion("__portalcheck__", BukkitAdapter.adapt(min.getBlock().getLocation()).toVector().toBlockPoint(),
-                BukkitAdapter.adapt(max.getBlock().getLocation()).toVector().toBlockPoint());
-
-        if (wcfg.useRegions && !WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, world)) {
-            RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
-            if (mgr == null) return;
-            ApplicableRegionSet set = mgr.getApplicableRegions(check);
-            if (!set.testState(plugin.wrapPlayer(event.getPlayer()), Flags.BUILD)) {
-                event.getPlayer().sendMessage(ChatColor.RED + "Destination is in a protected area.");
-                event.setCancelled(true);
-                return;
+        Location firstCorner = null;
+        Location secondCorner = null;
+        for(int i = 0; i<blocks.size();i++) {
+            if(firstCorner == null)
+                firstCorner = blocks.get(i).getLocation();
+            for(int j = 0; j<blocks.size();j++) {
+                if(secondCorner == null)
+                    secondCorner = blocks.get(j).getLocation();
+                if(blocks.get(i).getLocation().distance(blocks.get(j).getLocation())>firstCorner.distance(secondCorner)) {
+                    firstCorner = blocks.get(i).getLocation();
+                    secondCorner = blocks.get(j).getLocation();
+                }
             }
         }
+        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(where);
+        // No idea what I should do if this method fails to check out...?
+        ProtectedRegion check = new ProtectedCuboidRegion("__portalcheck__", BukkitAdapter.adapt(firstCorner.getBlock().getLocation()).toVector().toBlockPoint(),
+                BukkitAdapter.adapt(secondCorner.getBlock().getLocation()).toVector().toBlockPoint());
+         if (wcfg.useRegions && !WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, world)) {
+             RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
+             if (mgr == null) return;
+             ApplicableRegionSet set = mgr.getApplicableRegions(check);
+             if (!set.testState(plugin.wrapPlayer(who), Flags.BUILD)) {
+                 who.sendMessage(ChatColor.RED + "Destination is in a protected area.");
+                 event.setCancelled(true);
+                 return;
+             }
+         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

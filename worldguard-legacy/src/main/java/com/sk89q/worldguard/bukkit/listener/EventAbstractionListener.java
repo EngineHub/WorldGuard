@@ -69,7 +69,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -929,7 +928,7 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onLingeringSplash(LingeringPotionSplashEvent event) {
         AreaEffectCloud aec = event.getAreaEffectCloud();
-        LingeringPotion potion = event.getEntity();
+        ThrownPotion potion = event.getEntity();
         World world = potion.getWorld();
         Cause cause = create(event.getEntity());
 

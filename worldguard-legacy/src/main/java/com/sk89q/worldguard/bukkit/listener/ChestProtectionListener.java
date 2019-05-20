@@ -143,7 +143,9 @@ public class ChestProtectionListener extends AbstractListener {
                     return;
                 }
 
-                if (event.getBlock().getType() != Material.SIGN) {
+                if (event.getBlock().getType() != Material.OAK_SIGN && event.getBlock().getType() != Material.BIRCH_SIGN && event.getBlock().getType() != Material.SPRUCE_SIGN
+                        && event.getBlock().getType() != Material.DARK_OAK_SIGN && event.getBlock().getType() != Material.JUNGLE_SIGN
+                        && event.getBlock().getType() != Material.ACACIA_SIGN) {
                     player.sendMessage(ChatColor.RED
                             + "The [Lock] sign must be a sign post, not a wall sign.");
 
@@ -164,7 +166,10 @@ public class ChestProtectionListener extends AbstractListener {
                 Material below = event.getBlock().getRelative(0, -1, 0).getType();
 
                 if (below == Material.TNT || below == Material.SAND
-                        || below == Material.GRAVEL || below == Material.SIGN) {
+                        || below == Material.GRAVEL || below == Material.TNT || below == Material.SAND || below == Material.GRAVEL
+                        || below == Material.OAK_SIGN || below == Material.BIRCH_SIGN || below == Material.SPRUCE_SIGN
+                        || below == Material.DARK_OAK_SIGN || below == Material.JUNGLE_SIGN
+                        || below == Material.ACACIA_SIGN) {
                     player.sendMessage(ChatColor.RED
                             + "That is not a safe block that you're putting this sign on.");
 
