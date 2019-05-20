@@ -30,8 +30,9 @@ public class ServerReport extends DataReport {
 
         Server server = Bukkit.getServer();
 
-        append("Server ID", server.getServerId());
-        append("Server Name", server.getServerName());
+        //Doesn't compute with 1.14.x+ API
+        //append("Server ID", server.getServerId());
+        //append("Server Name", server.getServerName());
         append("Bukkit Version", server.getBukkitVersion());
         append("Implementation", server.getVersion());
         append("Player Count", "%d/%d", Bukkit.getOnlinePlayers().size(), server.getMaxPlayers());
