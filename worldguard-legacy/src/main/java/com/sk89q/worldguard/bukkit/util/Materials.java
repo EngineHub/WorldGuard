@@ -742,12 +742,12 @@ public final class Materials {
         });
 
         try {
-            MATERIAL_FLAGS.put(Material.SIGN, 0);
-            MATERIAL_FLAGS.put(Material.WALL_SIGN, 0);
-            MATERIAL_FLAGS.put(Material.DANDELION_YELLOW, MODIFIES_BLOCKS);
-            MATERIAL_FLAGS.put(Material.ROSE_RED, MODIFIES_BLOCKS);
-            MATERIAL_FLAGS.put(Material.CACTUS_GREEN, MODIFIES_BLOCKS);
-        } catch (NoSuchFieldError ignored) { // missing fields in 1.14
+            MATERIAL_FLAGS.put(Material.valueOf("SIGN"), 0);
+            MATERIAL_FLAGS.put(Material.valueOf("WALL_SIGN"), 0);
+            MATERIAL_FLAGS.put(Material.valueOf("DANDELION_YELLOW"), MODIFIES_BLOCKS);
+            MATERIAL_FLAGS.put(Material.valueOf("ROSE_RED"), MODIFIES_BLOCKS);
+            MATERIAL_FLAGS.put(Material.valueOf("CACTUS_GREEN"), MODIFIES_BLOCKS);
+        } catch (IllegalArgumentException ignored) { // missing fields in 1.14
         }
 
         // Check for missing items/blocks
