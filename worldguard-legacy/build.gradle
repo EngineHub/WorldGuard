@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     compile project(path: ':worldguard-core', configuration: 'shadow')
-    api 'org.bukkit:bukkit:1.13-R0.1-SNAPSHOT'
+    api 'org.bukkit:bukkit:1.14-R0.1-SNAPSHOT'
     api 'com.sk89q.worldedit:worldedit-bukkit:7.0.0-SNAPSHOT'
 
     implementation ('com.sk89q:commandbook:2.3') {
