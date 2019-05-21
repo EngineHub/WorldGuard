@@ -563,9 +563,9 @@ public class WorldGuardBlockListener implements Listener {
             return;
         }
 
-        Material fromType = event.getSource().getType();
+        Material newType = event.getNewState().getType(); // craftbukkit randomly gives AIR as event.getSource even if that block is not air
 
-        if (Materials.isMushroom(fromType)) {
+        if (Materials.isMushroom(newType)) {
             if (wcfg.disableMushroomSpread) {
                 event.setCancelled(true);
                 return;
@@ -577,7 +577,7 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        if (fromType == Material.GRASS_BLOCK) {
+        if (newType == Material.GRASS_BLOCK) {
             if (wcfg.disableGrassGrowth) {
                 event.setCancelled(true);
                 return;
@@ -589,7 +589,7 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        if (fromType == Material.MYCELIUM) {
+        if (newType == Material.MYCELIUM) {
             if (wcfg.disableMyceliumSpread) {
                 event.setCancelled(true);
                 return;
@@ -602,7 +602,7 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        if (fromType == Material.VINE || fromType == Material.KELP) {
+        if (newType == Material.VINE || newType == Material.KELP) {
             if (wcfg.disableVineGrowth) {
                 event.setCancelled(true);
                 return;
