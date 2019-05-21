@@ -151,7 +151,6 @@ public class SimpleFlagRegistry implements FlagRegistry {
                 }
             }
         }
-        RegionGroupFlag groupUnmarshaller = new RegionGroupFlag("unmarshaldummy", RegionGroup.NONE);
         for (Entry<String, Object> entry : regionFlags.entrySet()) {
             String parentName = entry.getKey().replaceAll("-group", "");
             Flag<?> parent = get(parentName);
@@ -162,7 +161,7 @@ public class SimpleFlagRegistry implements FlagRegistry {
                 }
                 Flag<?> unk = get(entry.getKey());
                 if (unk != null) {
-                    values.put(unk, groupUnmarshaller.unmarshal(entry.getValue()));
+                    values.put(unk, entry.getValue());
                 }
             } else {
                 values.put(parent.getRegionGroupFlag(), parent.getRegionGroupFlag().unmarshal(entry.getValue()));
