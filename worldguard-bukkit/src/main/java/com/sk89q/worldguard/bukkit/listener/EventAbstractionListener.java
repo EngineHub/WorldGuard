@@ -21,7 +21,6 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import static com.sk89q.worldguard.bukkit.cause.Cause.create;
 
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
@@ -125,6 +124,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
@@ -137,6 +137,7 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -173,10 +174,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
-        List<Block> blocks = new ArrayList<>();
-        for (BlockState bs : event.getReplacedBlockStates()) {
-            blocks.add(bs.getBlock());
-        }
+        List<Block> blocks = event.getReplacedBlockStates().stream().map(BlockStateAsBlockFunction::apply).collect(Collectors.toList());
         Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()),
                 event.getBlock().getWorld(), blocks, event.getBlock().getType()));
     }
@@ -187,7 +185,7 @@ public class EventAbstractionListener extends AbstractListener {
         BlockState previousState = event.getBlockReplacedState();
 
         // Some blocks, like tall grass and fire, get replaced
-        if (previousState.getType() != Material.AIR) {
+        if (previousState.getType() != Material.AIR && previousState.getType() != event.getBlockReplacedState().getType()) {
             Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getPlayer()), previousState.getLocation(), previousState.getType()));
         }
 
@@ -239,7 +237,7 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onStructureGrowEvent(StructureGrowEvent event) {
         int originalCount = event.getBlocks().size();
-        List<Block> blockList = Lists.transform(event.getBlocks(), new BlockStateAsBlockFunction());
+        List<Block> blockList = event.getBlocks().stream().map(BlockStateAsBlockFunction::apply).collect(Collectors.toList());
 
         Player player = event.getPlayer();
         if (player != null) {
@@ -252,8 +250,6 @@ public class EventAbstractionListener extends AbstractListener {
             event.getLocation().getBlock().setType(Material.AIR);
         }
     }
-
-    // TODO: Handle EntityCreatePortalEvent?
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
@@ -268,8 +264,9 @@ public class EventAbstractionListener extends AbstractListener {
 
         // Fire two events: one as BREAK and one as PLACE
         if (event.getTo() != Material.AIR && event.getBlock().getType() != Material.AIR) {
-            Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), block));
-            Events.fireToCancel(event, new PlaceBlockEvent(event, create(entity), block.getLocation(), to));
+            if (!Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), block))) {
+                Events.fireToCancel(event, new PlaceBlockEvent(event, create(entity), block.getLocation(), to));
+            }
         } else {
             if (event.getTo() == Material.AIR) {
                 // Track the source so later we can create a proper chain of causes
@@ -304,11 +301,6 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
         Entity entity = event.getEntity();
-        if (event.getYield() == 0 && event.blockList().isEmpty()) {
-            // avoids ender dragon spam
-            return;
-        }
-
         Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR));
     }
 
@@ -626,27 +618,7 @@ public class EventAbstractionListener extends AbstractListener {
                     Events.fireToCancel(event, new SpawnEntityEvent(event, Cause.unknown(), event.getEntity()));
                 }
                 break;
-            case NATURAL:
-            case JOCKEY:
-            case CHUNK_GEN:
-            case SPAWNER:
-            case LIGHTNING:
-            case BUILD_SNOWMAN:
-            case BUILD_IRONGOLEM:
-            case BUILD_WITHER:
-            case VILLAGE_DEFENSE:
-            case VILLAGE_INVASION:
-            case BREEDING:
-            case SLIME_SPLIT:
-            case REINFORCEMENTS:
-            case NETHER_PORTAL:
-            case INFECTION:
-            case CURED:
-            case OCELOT_BABY:
-            case SILVERFISH_BLOCK:
-            case MOUNT:
-            case CUSTOM:
-            case DEFAULT:
+            default:
         }
     }
 
@@ -797,7 +769,7 @@ public class EventAbstractionListener extends AbstractListener {
         if (event instanceof PlayerUnleashEntityEvent) {
             PlayerUnleashEntityEvent playerEvent = (PlayerUnleashEntityEvent) event;
             Events.fireToCancel(playerEvent, new UseEntityEvent(playerEvent, create(playerEvent.getPlayer()), event.getEntity()));
-        }  // TODO: Raise anyway?
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -979,6 +951,13 @@ public class EventAbstractionListener extends AbstractListener {
                 event.getBlock().getLocation().getWorld(), event.blockList(), Material.AIR);
         eventToFire.getRelevantFlags().add(Flags.OTHER_EXPLOSION);
         Events.fireBulkEventToCancel(event, eventToFire);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onTakeLecternBook(PlayerTakeLecternBookEvent event) {
+        final UseBlockEvent useEvent = new UseBlockEvent(event, create(event.getPlayer()), event.getLectern().getBlock());
+        useEvent.getRelevantFlags().add(Flags.CHEST_ACCESS);
+        Events.fireToCancel(event, useEvent);
     }
 
     /**

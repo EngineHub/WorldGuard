@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
@@ -31,11 +32,14 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderCrystal;
@@ -62,7 +66,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityCreatePortalEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -74,6 +77,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
@@ -102,9 +106,6 @@ public class WorldGuardEntityListener implements Listener {
      */
     public void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        if (!EntityCreatePortalEvent.class.isAnnotationPresent(Deprecated.class)) {
-            plugin.getServer().getPluginManager().registerEvents(new UselessIn114Listener(), plugin);
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -669,17 +670,48 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    private static class UselessIn114Listener implements Listener {
-        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-        public void onCreatePortal(EntityCreatePortalEvent event) {
-            ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-            WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onCreatePortal(PortalCreateEvent event) {
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        final com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(event.getWorld());
+        WorldConfiguration wcfg = cfg.get(world);
 
-            switch (event.getEntityType()) {
-                case ENDER_DRAGON:
-                    if (wcfg.blockEnderDragonPortalCreation) event.setCancelled(true);
-                    break;
+        if (wcfg.regionNetherPortalProtection
+                && event.getReason() == PortalCreateEvent.CreateReason.NETHER_PAIR
+                && !event.getBlocks().isEmpty()) {
+            final RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer()
+                    .get(world);
+            if (regionManager == null) return;
+            LocalPlayer associable = null;
+            if (event.getEntity() instanceof Player) {
+                associable = plugin.wrapPlayer(((Player) event.getEntity()));
             }
+            if (WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(associable, world)) {
+                return;
+            }
+            BlockVector3 min = null;
+            BlockVector3 max = null;
+            for (BlockState block : event.getBlocks()) {
+                BlockVector3 loc = BlockVector3.at(block.getX(), block.getY(), block.getZ());
+                min = min == null ? loc : loc.getMinimum(min);
+                max = max == null ? loc : loc.getMaximum(max);
+            }
+            ProtectedCuboidRegion target = new ProtectedCuboidRegion("__portal_check", true, min, max);
+            final ApplicableRegionSet regions = regionManager.getApplicableRegions(target);
+            if (!regions.testState(associable, Flags.BUILD, Flags.BLOCK_PLACE)) {
+                if (associable != null) {
+                    // NB there is no way to cancel the teleport without PTA (since PlayerPortal doesn't have block info)
+                    // removing PTA was a mistake
+                    associable.print("Destination is an a protected area.");
+                }
+                event.setCancelled(true);
+            }
+        }
+
+        // NOTE: as of right now, bukkit doesn't fire this event for this (despite deprecating EntityCreatePortalEvent for it)
+        // maybe one day this code will be useful
+        if (event.getEntity() instanceof EnderDragon && wcfg.blockEnderDragonPortalCreation) {
+            event.setCancelled(true);
         }
     }
 

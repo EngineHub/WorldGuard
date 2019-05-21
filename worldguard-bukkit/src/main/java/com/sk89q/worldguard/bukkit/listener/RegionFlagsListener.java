@@ -109,6 +109,10 @@ public class RegionFlagsListener extends AbstractListener {
         if (event.getCause().find(EntityType.ENDERMAN) != null) {
             event.filter(testState(query, Flags.ENDER_BUILD), false);
         }
+
+        if (event.getCause().find(EntityType.RAVAGER) != null) {
+            event.filter(testState(query, Flags.RAVAGER_RAVAGE), false);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -126,21 +130,18 @@ public class RegionFlagsListener extends AbstractListener {
                 return;
             }
         } else {
-            try {
-                if (entity instanceof Player && event.getCause() == DamageCause.FLY_INTO_WALL) {
-                    LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer((Player) entity);
-                    if (!query.testState(BukkitAdapter.adapt(entity.getLocation()), localPlayer, Flags.FALL_DAMAGE)) {
-                        event.setCancelled(true);
-                        return;
-                    }
+            if (entity instanceof Player && event.getCause() == DamageCause.FLY_INTO_WALL) {
+                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer((Player) entity);
+                if (!query.testState(BukkitAdapter.adapt(entity.getLocation()), localPlayer, Flags.FALL_DAMAGE)) {
+                    event.setCancelled(true);
+                    return;
                 }
-            } catch (NoSuchFieldError ignored) {
             }
         }
 
         if (event instanceof EntityDamageByEntityEvent) {
             Entity damager = (((EntityDamageByEntityEvent) event)).getDamager();
-            if (damager != null && damager.getType() == EntityType.FIREWORK) {
+            if (damager.getType() == EntityType.FIREWORK) {
                 if (!query.testState(BukkitAdapter.adapt(entity.getLocation()), (RegionAssociable) null, Flags.FIREWORK_DAMAGE)) {
                     event.setCancelled(true);
                     return;

@@ -52,7 +52,6 @@ public final class Materials {
     private static final Map<Material, Integer> MATERIAL_FLAGS = new EnumMap<>(Material.class);
     private static final Set<PotionEffectType> DAMAGE_EFFECTS = new HashSet<>();
 
-
     private static Set<Material> shulkerBoxes = new HashSet<>();
 
     static {
@@ -123,20 +122,10 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.PISTON, 0);
         MATERIAL_FLAGS.put(Material.PISTON_HEAD, 0);
         MATERIAL_FLAGS.put(Material.MOVING_PISTON, 0);
-        MATERIAL_FLAGS.put(Material.DANDELION, 0);
-        MATERIAL_FLAGS.put(Material.BLUE_ORCHID, 0);
-        MATERIAL_FLAGS.put(Material.ALLIUM, 0);
-        MATERIAL_FLAGS.put(Material.AZURE_BLUET, 0);
-        MATERIAL_FLAGS.put(Material.ORANGE_TULIP, 0);
-        MATERIAL_FLAGS.put(Material.PINK_TULIP, 0);
-        MATERIAL_FLAGS.put(Material.RED_TULIP, 0);
-        MATERIAL_FLAGS.put(Material.WHITE_TULIP, 0);
-        MATERIAL_FLAGS.put(Material.OXEYE_DAISY, 0);
         MATERIAL_FLAGS.put(Material.SUNFLOWER, 0);
         MATERIAL_FLAGS.put(Material.LILAC, 0);
         MATERIAL_FLAGS.put(Material.PEONY, 0);
         MATERIAL_FLAGS.put(Material.ROSE_BUSH, 0);
-        MATERIAL_FLAGS.put(Material.POPPY, 0);
         MATERIAL_FLAGS.put(Material.BROWN_MUSHROOM, 0);
         MATERIAL_FLAGS.put(Material.RED_MUSHROOM, 0);
         MATERIAL_FLAGS.put(Material.GOLD_BLOCK, 0);
@@ -234,7 +223,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.EMERALD_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.COMMAND_BLOCK, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.BEACON, MODIFIED_ON_RIGHT);
-        MATERIAL_FLAGS.put(Material.COBBLESTONE_WALL, 0);
         MATERIAL_FLAGS.put(Material.ANVIL, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.CHIPPED_ANVIL, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.DAMAGED_ANVIL, MODIFIED_ON_RIGHT);
@@ -405,7 +393,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.MAGENTA_STAINED_GLASS, 0);
         MATERIAL_FLAGS.put(Material.MAGENTA_STAINED_GLASS_PANE, 0);
         MATERIAL_FLAGS.put(Material.MAGENTA_TERRACOTTA, 0);
-        MATERIAL_FLAGS.put(Material.MOSSY_COBBLESTONE_WALL, 0);
         MATERIAL_FLAGS.put(Material.MUSHROOM_STEM, 0);
         MATERIAL_FLAGS.put(Material.OBSERVER, 0);
         MATERIAL_FLAGS.put(Material.ORANGE_STAINED_GLASS, 0);
@@ -445,6 +432,26 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.YELLOW_STAINED_GLASS, 0);
         MATERIAL_FLAGS.put(Material.YELLOW_STAINED_GLASS_PANE, 0);
         MATERIAL_FLAGS.put(Material.YELLOW_TERRACOTTA, 0);
+
+        MATERIAL_FLAGS.put(Material.BAMBOO, 0);
+        MATERIAL_FLAGS.put(Material.BAMBOO_SAPLING, 0);
+        MATERIAL_FLAGS.put(Material.BARREL, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.BELL, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.BLAST_FURNACE, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.CAMPFIRE, MODIFIED_ON_RIGHT | MODIFIED_ON_LEFT);
+        MATERIAL_FLAGS.put(Material.CARTOGRAPHY_TABLE, 0);
+        MATERIAL_FLAGS.put(Material.COMPOSTER, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.FLETCHING_TABLE, 0);
+        MATERIAL_FLAGS.put(Material.GRINDSTONE, 0);
+        MATERIAL_FLAGS.put(Material.JIGSAW, MODIFIED_ON_RIGHT | MODIFIED_ON_LEFT);
+        MATERIAL_FLAGS.put(Material.LANTERN, 0);
+        MATERIAL_FLAGS.put(Material.LECTERN, 0);
+        MATERIAL_FLAGS.put(Material.LOOM, 0);
+        MATERIAL_FLAGS.put(Material.SCAFFOLDING, 0);
+        MATERIAL_FLAGS.put(Material.SMITHING_TABLE, 0);
+        MATERIAL_FLAGS.put(Material.SMOKER, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.STONECUTTER, 0);
+        MATERIAL_FLAGS.put(Material.SWEET_BERRY_BUSH, MODIFIED_ON_RIGHT);
 
         MATERIAL_FLAGS.put(Material.IRON_SHOVEL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.IRON_PICKAXE, 0);
@@ -538,9 +545,13 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.GLOWSTONE_DUST, 0);
         MATERIAL_FLAGS.put(Material.COD, 0);
         MATERIAL_FLAGS.put(Material.COOKED_COD, 0);
-        MATERIAL_FLAGS.put(Material.INK_SAC, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.INK_SAC, 0);
+        MATERIAL_FLAGS.put(Material.BLACK_DYE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.BLUE_DYE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.BROWN_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.CYAN_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.GRAY_DYE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.GREEN_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.LIGHT_BLUE_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.LIGHT_GRAY_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.LIME_DYE, MODIFIES_BLOCKS);
@@ -548,7 +559,10 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.ORANGE_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.PINK_DYE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.PURPLE_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.COCOA_BEANS, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.RED_DYE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.WHITE_DYE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.YELLOW_DYE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.COCOA_BEANS, 0);
         MATERIAL_FLAGS.put(Material.BONE_MEAL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.BONE, 0);
         MATERIAL_FLAGS.put(Material.SUGAR, 0);
@@ -622,6 +636,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.RABBIT_FOOT, 0);
         MATERIAL_FLAGS.put(Material.RABBIT_HIDE, 0);
         MATERIAL_FLAGS.put(Material.ARMOR_STAND, 0);
+        MATERIAL_FLAGS.put(Material.LEATHER_HORSE_ARMOR, 0);
         MATERIAL_FLAGS.put(Material.IRON_HORSE_ARMOR, 0);
         MATERIAL_FLAGS.put(Material.GOLDEN_HORSE_ARMOR, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_HORSE_ARMOR, 0);
@@ -667,18 +682,15 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.TROPICAL_FISH, 0);
         MATERIAL_FLAGS.put(Material.TROPICAL_FISH_BUCKET, 0);
 
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_11, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_13, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_BLOCKS, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_CAT, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_CHIRP, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_FAR, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_MALL, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_MELLOHI, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_STAL, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_STRAD, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_WAIT, 0);
-        MATERIAL_FLAGS.put(Material.MUSIC_DISC_WARD, 0);
+        MATERIAL_FLAGS.put(Material.CREEPER_BANNER_PATTERN, 0);
+        MATERIAL_FLAGS.put(Material.FLOWER_BANNER_PATTERN, 0);
+        MATERIAL_FLAGS.put(Material.GLOBE_BANNER_PATTERN, 0);
+        MATERIAL_FLAGS.put(Material.MOJANG_BANNER_PATTERN, 0);
+        MATERIAL_FLAGS.put(Material.SKULL_BANNER_PATTERN, 0);
+        MATERIAL_FLAGS.put(Material.CROSSBOW, 0);
+        MATERIAL_FLAGS.put(Material.SUSPICIOUS_STEW, 0);
+        MATERIAL_FLAGS.put(Material.SWEET_BERRIES, 0);
+
 
         // Fake tags
         for (Material m : shulkerBoxes) {
@@ -728,6 +740,24 @@ public final class Materials {
         for (Material pot : Tag.FLOWER_POTS.getValues()) {
             MATERIAL_FLAGS.put(pot, MODIFIED_ON_RIGHT);
         }
+        for (Material wall : Tag.WALLS.getValues()) {
+            MATERIAL_FLAGS.put(wall, 0);
+        }
+        for (Material sign : Tag.SIGNS.getValues()) {
+            MATERIAL_FLAGS.put(sign, 0);
+        }
+        for (Material flower : Tag.SMALL_FLOWERS.getValues()) {
+            MATERIAL_FLAGS.put(flower, 0);
+        }
+        for (Material bed : Tag.BEDS.getValues()) {
+            MATERIAL_FLAGS.put(bed, 0);
+        }
+        for (Material musicDisc : Tag.ITEMS_MUSIC_DISCS.getValues()) {
+            MATERIAL_FLAGS.put(musicDisc, 0);
+        }
+        for (Material bannerPat : Tag.ITEMS_BANNERS.getValues()) {
+            MATERIAL_FLAGS.put(bannerPat, 0);
+        }
         Stream.concat(Stream.concat(
                 Tag.CORAL_BLOCKS.getValues().stream(),
                 Tag.CORALS.getValues().stream()),
@@ -739,57 +769,51 @@ public final class Materials {
             }
         });
 
-        try {
-            MATERIAL_FLAGS.put(Material.SIGN, 0);
-            MATERIAL_FLAGS.put(Material.WALL_SIGN, 0);
-            MATERIAL_FLAGS.put(Material.DANDELION_YELLOW, MODIFIES_BLOCKS);
-            MATERIAL_FLAGS.put(Material.ROSE_RED, MODIFIES_BLOCKS);
-            MATERIAL_FLAGS.put(Material.CACTUS_GREEN, MODIFIES_BLOCKS);
-        } catch (NoSuchFieldError ignored) { // missing fields in 1.14
-        }
-
         // Check for missing items/blocks
         for (Material material : Material.values()) {
+            //noinspection deprecation
             if (material.isLegacy()) continue;
             // Add spawn eggs
             if (isSpawnEgg(material)) {
                 MATERIAL_FLAGS.put(material, 0);
-            } else if (isBed(material)) {
-                MATERIAL_FLAGS.put(material, MODIFIED_ON_RIGHT);
             }
             if (!MATERIAL_FLAGS.containsKey(material)) {
                 logger.fine("Missing material definition for " + (material.isBlock() ? "block " : "item ") + material.name());
-                MATERIAL_FLAGS.put(material, MODIFIED_ON_LEFT | MODIFIED_ON_RIGHT);
             }
         }
 
-        //DAMAGE_EFFECTS.add(PotionEffectType.ABSORPTION);
-        DAMAGE_EFFECTS.add(PotionEffectType.BLINDNESS);
-        DAMAGE_EFFECTS.add(PotionEffectType.CONFUSION);
-        //DAMAGE_EFFECTS.add(PotionEffectType.DAMAGE_RESISTANCE);
-        //DAMAGE_EFFECTS.add(PotionEffectType.FAST_DIGGING);
-        //DAMAGE_EFFECTS.add(PotionEffectType.FIRE_RESISTANCE);
-        DAMAGE_EFFECTS.add(PotionEffectType.HARM);
-        //DAMAGE_EFFECTS.add(PotionEffectType.HEAL);
-        //DAMAGE_EFFECTS.add(PotionEffectType.HEALTH_BOOST);
-        DAMAGE_EFFECTS.add(PotionEffectType.HUNGER);
-        //DAMAGE_EFFECTS.add(PotionEffectType.INCREASE_DAMAGE);
-        //DAMAGE_EFFECTS.add(PotionEffectType.INVISIBILITY);
-        //DAMAGE_EFFECTS.add(PotionEffectType.JUMP);
-        //DAMAGE_EFFECTS.add(PotionEffectType.NIGHT_VISION);
-        DAMAGE_EFFECTS.add(PotionEffectType.POISON);
-        //DAMAGE_EFFECTS.add(PotionEffectType.REGENERATION);
-        //DAMAGE_EFFECTS.add(PotionEffectType.SATURATION);
+//        DAMAGE_EFFECTS.add(PotionEffectType.SPEED);
         DAMAGE_EFFECTS.add(PotionEffectType.SLOW);
+//        DAMAGE_EFFECTS.add(PotionEffectType.FAST_DIGGING);
         DAMAGE_EFFECTS.add(PotionEffectType.SLOW_DIGGING);
-        //DAMAGE_EFFECTS.add(PotionEffectType.SPEED);
-        //DAMAGE_EFFECTS.add(PotionEffectType.WATER_BREATHING);
+//        DAMAGE_EFFECTS.add(PotionEffectType.INCREASE_DAMAGE);
+//        DAMAGE_EFFECTS.add(PotionEffectType.HEAL);
+        DAMAGE_EFFECTS.add(PotionEffectType.HARM);
+//        DAMAGE_EFFECTS.add(PotionEffectType.JUMP);
+        DAMAGE_EFFECTS.add(PotionEffectType.CONFUSION);
+//        DAMAGE_EFFECTS.add(PotionEffectType.REGENERATION);
+//        DAMAGE_EFFECTS.add(PotionEffectType.DAMAGE_RESISTANCE);
+//        DAMAGE_EFFECTS.add(PotionEffectType.FIRE_RESISTANCE);
+//        DAMAGE_EFFECTS.add(PotionEffectType.WATER_BREATHING);
+//        DAMAGE_EFFECTS.add(PotionEffectType.INVISIBILITY);
+        DAMAGE_EFFECTS.add(PotionEffectType.BLINDNESS);
+//        DAMAGE_EFFECTS.add(PotionEffectType.NIGHT_VISION);
+        DAMAGE_EFFECTS.add(PotionEffectType.HUNGER);
         DAMAGE_EFFECTS.add(PotionEffectType.WEAKNESS);
+        DAMAGE_EFFECTS.add(PotionEffectType.POISON);
         DAMAGE_EFFECTS.add(PotionEffectType.WITHER);
-
-        DAMAGE_EFFECTS.add(PotionEffectType.LEVITATION); // considered by game so I guess
+//        DAMAGE_EFFECTS.add(PotionEffectType.HEALTH_BOOST);
+//        DAMAGE_EFFECTS.add(PotionEffectType.ABSORPTION);
+//        DAMAGE_EFFECTS.add(PotionEffectType.SATURATION);
+        DAMAGE_EFFECTS.add(PotionEffectType.GLOWING);
+        DAMAGE_EFFECTS.add(PotionEffectType.LEVITATION);
+//        DAMAGE_EFFECTS.add(PotionEffectType.LUCK);
         DAMAGE_EFFECTS.add(PotionEffectType.UNLUCK);
-
+//        DAMAGE_EFFECTS.add(PotionEffectType.SLOW_FALLING);
+//        DAMAGE_EFFECTS.add(PotionEffectType.CONDUIT_POWER);
+//        DAMAGE_EFFECTS.add(PotionEffectType.DOLPHINS_GRACE);
+        DAMAGE_EFFECTS.add(PotionEffectType.BAD_OMEN);
+//        DAMAGE_EFFECTS.add(PotionEffectType.HERO_OF_THE_VILLAGE);
     }
 
     private Materials() {
@@ -824,7 +848,6 @@ public final class Materials {
             case LAVA_BUCKET:
                 return Material.LAVA;
             case WATER_BUCKET:
-                return Material.WATER;
             default:
                 return Material.WATER;
         }
@@ -867,7 +890,7 @@ public final class Materials {
      * @return true if a water block
      */
     public static boolean isWater(Material material) {
-        return material == Material.WATER;
+        return material == Material.WATER || material == Material.BUBBLE_COLUMN;
     }
 
     /**
@@ -926,6 +949,7 @@ public final class Materials {
                 || material == Material.FURNACE_MINECART
                 || material == Material.CHEST_MINECART;
     }
+
     /**
      * Test whether the given material is a Boat.
      *
@@ -951,14 +975,18 @@ public final class Materials {
                 || material == Material.TRAPPED_CHEST
                 || material == Material.HOPPER
                 || material == Material.DROPPER
+                || material == Material.BARREL
+                || material == Material.BLAST_FURNACE
+                || material == Material.SMOKER
                 || shulkerBoxes.contains(material);
     }
 
     public static boolean isSpawnEgg(Material material) {
-        switch(material) {
+        switch (material) {
             case SPIDER_SPAWN_EGG:
             case BAT_SPAWN_EGG:
             case BLAZE_SPAWN_EGG:
+            case CAT_SPAWN_EGG:
             case CAVE_SPIDER_SPAWN_EGG:
             case CHICKEN_SPAWN_EGG:
             case COD_SPAWN_EGG:
@@ -971,6 +999,7 @@ public final class Materials {
             case ENDERMAN_SPAWN_EGG:
             case ENDERMITE_SPAWN_EGG:
             case EVOKER_SPAWN_EGG:
+            case FOX_SPAWN_EGG:
             case GHAST_SPAWN_EGG:
             case GUARDIAN_SPAWN_EGG:
             case HORSE_SPAWN_EGG:
@@ -980,12 +1009,15 @@ public final class Materials {
             case MOOSHROOM_SPAWN_EGG:
             case MULE_SPAWN_EGG:
             case OCELOT_SPAWN_EGG:
+            case PANDA_SPAWN_EGG:
             case PARROT_SPAWN_EGG:
             case PHANTOM_SPAWN_EGG:
             case PIG_SPAWN_EGG:
+            case PILLAGER_SPAWN_EGG:
             case POLAR_BEAR_SPAWN_EGG:
             case PUFFERFISH_SPAWN_EGG:
             case RABBIT_SPAWN_EGG:
+            case RAVAGER_SPAWN_EGG:
             case SALMON_SPAWN_EGG:
             case SHEEP_SPAWN_EGG:
             case SHULKER_SPAWN_EGG:
@@ -995,11 +1027,13 @@ public final class Materials {
             case SLIME_SPAWN_EGG:
             case SQUID_SPAWN_EGG:
             case STRAY_SPAWN_EGG:
+            case TRADER_LLAMA_SPAWN_EGG:
             case TROPICAL_FISH_SPAWN_EGG:
             case TURTLE_SPAWN_EGG:
             case VEX_SPAWN_EGG:
             case VILLAGER_SPAWN_EGG:
             case VINDICATOR_SPAWN_EGG:
+            case WANDERING_TRADER_SPAWN_EGG:
             case WITCH_SPAWN_EGG:
             case WITHER_SKELETON_SPAWN_EGG:
             case WOLF_SPAWN_EGG:
@@ -1021,6 +1055,8 @@ public final class Materials {
                 return EntityType.BAT;
             case BLAZE_SPAWN_EGG:
                 return EntityType.BLAZE;
+            case CAT_SPAWN_EGG:
+                return EntityType.CAT;
             case CAVE_SPIDER_SPAWN_EGG:
                 return EntityType.CAVE_SPIDER;
             case CHICKEN_SPAWN_EGG:
@@ -1045,6 +1081,8 @@ public final class Materials {
                 return EntityType.ENDERMITE;
             case EVOKER_SPAWN_EGG:
                 return EntityType.EVOKER;
+            case FOX_SPAWN_EGG:
+                return EntityType.FOX;
             case GHAST_SPAWN_EGG:
                 return EntityType.GHAST;
             case GUARDIAN_SPAWN_EGG:
@@ -1063,18 +1101,22 @@ public final class Materials {
                 return EntityType.MULE;
             case OCELOT_SPAWN_EGG:
                 return EntityType.OCELOT;
+            case PANDA_SPAWN_EGG:
+                return EntityType.PANDA;
             case PARROT_SPAWN_EGG:
                 return EntityType.PARROT;
             case PHANTOM_SPAWN_EGG:
                 return EntityType.PHANTOM;
-            case PIG_SPAWN_EGG:
-                return EntityType.PIG;
+            case PILLAGER_SPAWN_EGG:
+                return EntityType.PILLAGER;
             case POLAR_BEAR_SPAWN_EGG:
                 return EntityType.POLAR_BEAR;
             case PUFFERFISH_SPAWN_EGG:
                 return EntityType.PUFFERFISH;
             case RABBIT_SPAWN_EGG:
                 return EntityType.RABBIT;
+            case RAVAGER_SPAWN_EGG:
+                return EntityType.RAVAGER;
             case SALMON_SPAWN_EGG:
                 return EntityType.SALMON;
             case SHEEP_SPAWN_EGG:
@@ -1093,6 +1135,8 @@ public final class Materials {
                 return EntityType.SQUID;
             case STRAY_SPAWN_EGG:
                 return EntityType.STRAY;
+            case TRADER_LLAMA_SPAWN_EGG:
+                return EntityType.TRADER_LLAMA;
             case TROPICAL_FISH_SPAWN_EGG:
                 return EntityType.TROPICAL_FISH;
             case TURTLE_SPAWN_EGG:
@@ -1103,6 +1147,8 @@ public final class Materials {
                 return EntityType.VILLAGER;
             case VINDICATOR_SPAWN_EGG:
                 return EntityType.VINDICATOR;
+            case WANDERING_TRADER_SPAWN_EGG:
+                return EntityType.WANDERING_TRADER;
             case WITCH_SPAWN_EGG:
                 return EntityType.WITCH;
             case WITHER_SKELETON_SPAWN_EGG:
@@ -1117,33 +1163,14 @@ public final class Materials {
                 return EntityType.ZOMBIE;
             case ZOMBIE_VILLAGER_SPAWN_EGG:
                 return EntityType.ZOMBIE_VILLAGER;
-            default:
-                return EntityType.PIG; // Uhhh
+            case PIG_SPAWN_EGG:
+            default: // Uhh
+                return EntityType.PIG;
         }
     }
 
     public static boolean isBed(Material material) {
-        switch (material) {
-            case BLACK_BED:
-            case BLUE_BED:
-            case BROWN_BED:
-            case CYAN_BED:
-            case GRAY_BED:
-            case GREEN_BED:
-            case LIGHT_BLUE_BED:
-            case LIGHT_GRAY_BED:
-            case LIME_BED:
-            case MAGENTA_BED:
-            case ORANGE_BED:
-            case PINK_BED:
-            case PURPLE_BED:
-            case RED_BED:
-            case WHITE_BED:
-            case YELLOW_BED:
-                return true;
-            default:
-                return false;
-        }
+        return Tag.BEDS.isTagged(material);
     }
 
     /**
@@ -1174,28 +1201,33 @@ public final class Materials {
      */
     public static boolean isUseFlagApplicable(Material material) {
         if (Tag.BUTTONS.isTagged(material)
-            || Tag.DOORS.isTagged(material)
-            || Tag.WOODEN_PRESSURE_PLATES.isTagged(material)
-            || Tag.WOODEN_TRAPDOORS.isTagged(material)) {
+                || Tag.DOORS.isTagged(material)
+                || Tag.WOODEN_PRESSURE_PLATES.isTagged(material)
+                || Tag.WOODEN_TRAPDOORS.isTagged(material)) {
             return true;
         }
         switch (material) {
-            case LEVER: return true;
-            case TRIPWIRE: return true;
-            case ENCHANTING_TABLE: return true;
-            case BEACON: return true;
-            case ANVIL: return true;
-            case DAMAGED_ANVIL: return true;
-            case CHIPPED_ANVIL: return true;
-            case STONE_PRESSURE_PLATE: return true;
-            case HEAVY_WEIGHTED_PRESSURE_PLATE: return true;
-            case LIGHT_WEIGHTED_PRESSURE_PLATE: return true;
-            case OAK_FENCE_GATE: return true;
-            case SPRUCE_FENCE_GATE: return true;
-            case BIRCH_FENCE_GATE: return true;
-            case JUNGLE_FENCE_GATE: return true;
-            case DARK_OAK_FENCE_GATE: return true;
-            case ACACIA_FENCE_GATE: return true;
+            case LEVER:
+            case LECTERN:
+            case ACACIA_FENCE_GATE:
+            case DARK_OAK_FENCE_GATE:
+            case JUNGLE_FENCE_GATE:
+            case BIRCH_FENCE_GATE:
+            case SPRUCE_FENCE_GATE:
+            case OAK_FENCE_GATE:
+            case LIGHT_WEIGHTED_PRESSURE_PLATE:
+            case HEAVY_WEIGHTED_PRESSURE_PLATE:
+            case STONE_PRESSURE_PLATE:
+            case ANVIL:
+            case DAMAGED_ANVIL:
+            case CHIPPED_ANVIL:
+            case ENCHANTING_TABLE:
+            case BELL:
+            case LOOM:
+            case CARTOGRAPHY_TABLE:
+            case STONECUTTER:
+            case GRINDSTONE:
+                return true;
             default: return false;
         }
     }
@@ -1294,7 +1326,7 @@ public final class Materials {
             case GOLDEN_CHESTPLATE:
             case GOLDEN_LEGGINGS:
             case GOLDEN_BOOTS:
-            //case TURTLE_HELMET:
+            case TURTLE_HELMET:
                 return true;
             default:
                 return false;

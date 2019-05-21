@@ -19,16 +19,16 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.google.common.base.Function;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
 import javax.annotation.Nullable;
 
-class BlockStateAsBlockFunction implements Function<BlockState, Block> {
+final class BlockStateAsBlockFunction {
+    private BlockStateAsBlockFunction() {
+    }
 
-    @Override
-    public Block apply(@Nullable BlockState blockState) {
+    static Block apply(@Nullable BlockState blockState) {
         return blockState != null ? blockState.getBlock() : null;
     }
 

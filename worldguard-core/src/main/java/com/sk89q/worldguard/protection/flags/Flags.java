@@ -91,6 +91,7 @@ public final class Flags {
     public static final StateFlag WITHER_DAMAGE = register(new StateFlag("wither-damage", true));
     public static final StateFlag ENDER_BUILD = register(new StateFlag("enderman-grief", true));
     public static final StateFlag SNOWMAN_TRAILS = register(new StateFlag("snowman-trails", true));
+    public static final StateFlag RAVAGER_RAVAGE = register(new StateFlag("ravager-grief", true));
     public static final StateFlag ENTITY_PAINTING_DESTROY = register(new StateFlag("entity-painting-destroy", true));
     public static final StateFlag ENTITY_ITEM_FRAME_DESTROY = register(new StateFlag("entity-item-frame-destroy", true));
 
