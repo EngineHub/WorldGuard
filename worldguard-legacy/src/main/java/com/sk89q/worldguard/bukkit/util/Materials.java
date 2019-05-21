@@ -849,7 +849,7 @@ public final class Materials {
      * @return true if a leaf block
      */
     public static boolean isLeaf(Material material) {
-        return Tag.LEAVES.getValues().contains(material);
+        return Tag.LEAVES.isTagged(material);
     }
 
     /**
@@ -899,7 +899,7 @@ public final class Materials {
      * @return true if a rail block
      */
     public static boolean isRailBlock(Material material) {
-        return Tag.RAILS.getValues().contains(material);
+        return Tag.RAILS.isTagged(material);
     }
 
     /**
@@ -935,7 +935,7 @@ public final class Materials {
      * @return true if a Boat item
      */
     public static boolean isBoat(Material material) {
-        return Tag.ITEMS_BOATS.getValues().contains(material);
+        return Tag.ITEMS_BOATS.isTagged(material);
     }
 
     /**
@@ -1159,10 +1159,10 @@ public final class Materials {
      * @return true if covered by the use flag
      */
     public static boolean isUseFlagApplicable(Material material) {
-        if (Tag.BUTTONS.getValues().contains(material)
-            || Tag.DOORS.getValues().contains(material)
-            || Tag.WOODEN_PRESSURE_PLATES.getValues().contains(material)
-            || Tag.WOODEN_TRAPDOORS.getValues().contains(material)) {
+        if (Tag.BUTTONS.isTagged(material)
+            || Tag.DOORS.isTagged(material)
+            || Tag.WOODEN_PRESSURE_PLATES.isTagged(material)
+            || Tag.WOODEN_TRAPDOORS.isTagged(material)) {
             return true;
         }
         switch (material) {
@@ -1227,7 +1227,7 @@ public final class Materials {
     public static boolean isConsideredBuildingIfUsed(Material type) {
         return type == Material.REPEATER
             || type == Material.COMPARATOR
-            || Tag.FLOWER_POTS.getValues().contains(type);
+            || Tag.FLOWER_POTS.isTagged(type);
     }
 
     /**
