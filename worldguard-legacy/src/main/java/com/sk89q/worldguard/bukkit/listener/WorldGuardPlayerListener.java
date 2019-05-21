@@ -26,12 +26,11 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.util.Events;
+import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import com.sk89q.worldguard.session.MoveType;
@@ -40,9 +39,7 @@ import com.sk89q.worldguard.session.handler.GameModeFlag;
 import com.sk89q.worldguard.util.Entities;
 import com.sk89q.worldguard.util.command.CommandFilter;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.TravelAgent;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -58,19 +55,17 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
 
 /**
  * Handles all events thrown in relation to a player.
@@ -141,7 +136,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (removed > 10) {
                 log.info("Halt-Act: " + removed + " entities (>10) auto-removed from "
-                        + player.getWorld().toString());
+                        + player.getWorld());
             }
         }
 
@@ -179,7 +174,7 @@ public class WorldGuardPlayerListener implements Listener {
                     anyRemoved = true;
                 }
             }
-            if (anyRemoved && event.getRecipients().size() == 0 && wcfg.regionCancelEmptyChatEvents) {
+            if (anyRemoved && event.getRecipients().isEmpty() && wcfg.regionCancelEmptyChatEvents) {
                 event.setCancelled(true);
             }
         }
@@ -263,15 +258,8 @@ public class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         // Infinite stack removal
-        if ((type == Material.CHEST
-                || type == Material.JUKEBOX
-                || type == Material.DISPENSER
-                || type == Material.FURNACE
-                || type == Material.DROPPER
-                || type == Material.BREWING_STAND
-                || type == Material.TRAPPED_CHEST
-                || type == Material.ENCHANTING_TABLE)
-                && wcfg.removeInfiniteStacks
+        if (wcfg.removeInfiniteStacks
+                && Materials.isInventoryBlock(type)
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
             for (int slot = 0; slot < 40; slot++) {
                 ItemStack heldItem = player.getInventory().getItem(slot);
@@ -301,7 +289,7 @@ public class WorldGuardPlayerListener implements Listener {
                         }
                     }
 
-                    localPlayer.print("Applicable regions: " + str.toString());
+                    localPlayer.print("Applicable regions: " + str);
                 } else {
                     localPlayer.print("WorldGuard: No defined regions here!");
                 }
@@ -373,7 +361,6 @@ public class WorldGuardPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        World world = event.getFrom().getWorld();
         Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
@@ -397,7 +384,9 @@ public class WorldGuardPlayerListener implements Listener {
                         message = set.queryValue(localPlayer, Flags.ENTRY_DENY_MESSAGE);
                     }
                     if (cancel) {
-                        player.sendMessage(message);
+                        if (message != null) {
+                            player.sendMessage(message);
+                        }
                         event.setCancelled(true);
                         return;
                     }
@@ -415,7 +404,9 @@ public class WorldGuardPlayerListener implements Listener {
                         message = set.queryValue(localPlayer, Flags.ENTRY_DENY_MESSAGE);
                     }
                     if (cancel) {
-                        player.sendMessage(message);
+                        if (message != null) {
+                            player.sendMessage(message);
+                        }
                         event.setCancelled(true);
                         return;
                     }
@@ -424,52 +415,6 @@ public class WorldGuardPlayerListener implements Listener {
             if (null != WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer).testMoveTo(localPlayer,
                     BukkitAdapter.adapt(event.getTo()),
                     MoveType.TELEPORT)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onPlayerPortal(PlayerPortalEvent event) {
-        if (event.getTo() == null) { // apparently this counts as a cancelled event, implementation specific though
-            return;
-        }
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getTo().getWorld()));
-        if (!wcfg.regionNetherPortalProtection) return;
-        if (event.getCause() != TeleportCause.NETHER_PORTAL) {
-            return;
-        }
-        if (!event.useTravelAgent()) { // either end travel (even though we checked cause) or another plugin is fucking with us, shouldn't create a portal though
-            return;
-        }
-        TravelAgent pta = event.getPortalTravelAgent();
-        if (pta == null) { // possible, but shouldn't create a portal
-            return;
-        }
-        if (pta.findPortal(event.getTo()) != null) {
-            return; // portal exists...it shouldn't make a new one
-        }
-        // HOPEFULLY covered everything the server can throw at us...proceed protection checking
-        // a lot of that is implementation specific though
-
-        // hackily estimate the area that could be effected by this event, since the server refuses to tell us
-        int radius = pta.getCreationRadius();
-        Location min = event.getTo().clone().subtract(radius, radius, radius);
-        Location max = event.getTo().clone().add(radius, radius, radius);
-        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(event.getTo().getWorld());
-
-        ProtectedRegion check = new ProtectedCuboidRegion("__portalcheck__", BukkitAdapter.adapt(min.getBlock().getLocation()).toVector().toBlockPoint(),
-                BukkitAdapter.adapt(max.getBlock().getLocation()).toVector().toBlockPoint());
-
-        if (wcfg.useRegions && !WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, world)) {
-            RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
-            if (mgr == null) return;
-            ApplicableRegionSet set = mgr.getApplicableRegions(check);
-            if (!set.testState(plugin.wrapPlayer(event.getPlayer()), Flags.BUILD)) {
-                event.getPlayer().sendMessage(ChatColor.RED + "Destination is in a protected area.");
                 event.setCancelled(true);
                 return;
             }

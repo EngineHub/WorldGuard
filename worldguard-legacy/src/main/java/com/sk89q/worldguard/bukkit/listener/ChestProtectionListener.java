@@ -29,6 +29,7 @@ import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.UseBlockEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.SignChangeEvent;
@@ -135,7 +136,7 @@ public class ChestProtectionListener extends AbstractListener {
         BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) getWorldConfig(WorldGuardPlugin.inst().wrapPlayer(player));
 
         if (wcfg.signChestProtection) {
-            if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
+            if ("[Lock]".equalsIgnoreCase(event.getLine(0))) {
                 if (wcfg.isChestProtectedPlacement(BukkitAdapter.adapt(event.getBlock().getLocation()), WorldGuardPlugin.inst().wrapPlayer(player))) {
                     player.sendMessage(ChatColor.DARK_RED + "You do not own the adjacent chest.");
                     event.getBlock().breakNaturally();
@@ -143,7 +144,7 @@ public class ChestProtectionListener extends AbstractListener {
                     return;
                 }
 
-                if (event.getBlock().getType() != Material.SIGN) {
+                if (!Tag.STANDING_SIGNS.isTagged(event.getBlock().getType())) {
                     player.sendMessage(ChatColor.RED
                             + "The [Lock] sign must be a sign post, not a wall sign.");
 
@@ -152,7 +153,7 @@ public class ChestProtectionListener extends AbstractListener {
                     return;
                 }
 
-                if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
+                if (!player.getName().equalsIgnoreCase(event.getLine(1))) {
                     player.sendMessage(ChatColor.RED
                             + "The first owner line must be your name.");
 
@@ -164,7 +165,7 @@ public class ChestProtectionListener extends AbstractListener {
                 Material below = event.getBlock().getRelative(0, -1, 0).getType();
 
                 if (below == Material.TNT || below == Material.SAND
-                        || below == Material.GRAVEL || below == Material.SIGN) {
+                        || below == Material.GRAVEL || Tag.STANDING_SIGNS.isTagged(below)) {
                     player.sendMessage(ChatColor.RED
                             + "That is not a safe block that you're putting this sign on.");
 
@@ -178,7 +179,7 @@ public class ChestProtectionListener extends AbstractListener {
                         + "A chest or double chest above is now protected.");
             }
         } else if (!wcfg.disableSignChestProtectionCheck) {
-            if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
+            if ("[Lock]".equalsIgnoreCase(event.getLine(0))) {
                 player.sendMessage(ChatColor.RED
                         + "WorldGuard's sign chest protection is disabled.");
 
