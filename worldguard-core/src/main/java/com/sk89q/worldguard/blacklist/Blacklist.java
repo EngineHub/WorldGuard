@@ -54,12 +54,7 @@ public class Blacklist {
     private LoadingCache<String, TrackedEvent> repeatingEventCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(30, TimeUnit.SECONDS)
-            .build(new CacheLoader<String, TrackedEvent>() {
-                @Override
-                public TrackedEvent load(String s) throws Exception {
-                    return new TrackedEvent();
-                }
-            });
+            .build(CacheLoader.from(TrackedEvent::new));
 
     public Blacklist(boolean useAsWhitelist) {
         this.useAsWhitelist = useAsWhitelist;
