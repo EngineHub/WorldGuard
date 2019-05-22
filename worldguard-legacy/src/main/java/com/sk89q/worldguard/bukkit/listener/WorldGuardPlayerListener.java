@@ -26,6 +26,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.util.Events;
+import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -47,6 +48,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -249,7 +251,7 @@ public class WorldGuardPlayerListener implements Listener {
      * @param event Thrown event
      */
     private void handleBlockRightClick(PlayerInteractEvent event) {
-        if (event.isCancelled()) {
+        if (event.useItemInHand() == Event.Result.DENY) {
             return;
         }
 
@@ -263,14 +265,7 @@ public class WorldGuardPlayerListener implements Listener {
         WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
         // Infinite stack removal
-        if ((type == Material.CHEST
-                || type == Material.JUKEBOX
-                || type == Material.DISPENSER
-                || type == Material.FURNACE
-                || type == Material.DROPPER
-                || type == Material.BREWING_STAND
-                || type == Material.TRAPPED_CHEST
-                || type == Material.ENCHANTING_TABLE)
+        if (Materials.isInventoryBlock(type)
                 && wcfg.removeInfiniteStacks
                 && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
             for (int slot = 0; slot < 40; slot++) {
@@ -301,12 +296,12 @@ public class WorldGuardPlayerListener implements Listener {
                         }
                     }
 
-                    localPlayer.print("Applicable regions: " + str.toString());
+                    localPlayer.print("Applicable regions: " + str);
                 } else {
                     localPlayer.print("WorldGuard: No defined regions here!");
                 }
 
-                event.setCancelled(true);
+                event.setUseItemInHand(Event.Result.DENY);
             }
         }
     }
@@ -317,7 +312,7 @@ public class WorldGuardPlayerListener implements Listener {
      * @param event Thrown event
      */
     private void handlePhysicalInteract(PlayerInteractEvent event) {
-        if (event.isCancelled()) return;
+        if (event.useInteractedBlock() == Event.Result.DENY) return;
 
         Player player = event.getPlayer();
         Block block = event.getClickedBlock(); //not actually clicked but whatever

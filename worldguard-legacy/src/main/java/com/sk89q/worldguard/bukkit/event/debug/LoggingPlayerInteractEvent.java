@@ -36,8 +36,21 @@ public class LoggingPlayerInteractEvent extends PlayerInteractEvent implements C
         super(who, action, item, clickedBlock, clickedFace);
     }
 
+    @Override
     public List<CancelAttempt> getCancels() {
         return logger.getCancels();
+    }
+
+    @Override
+    public void setUseInteractedBlock(Result useInteractedBlock) {
+        this.logger.log(useInteractedBlock() == Result.DENY, useInteractedBlock == Result.DENY, new Exception().getStackTrace());
+        super.setUseInteractedBlock(useInteractedBlock);
+    }
+
+    @Override
+    public void setUseItemInHand(Result useItemInHand) {
+        this.logger.log(useItemInHand() == Result.DENY, useItemInHand == Result.DENY, new Exception().getStackTrace());
+        super.setUseItemInHand(useItemInHand);
     }
 
     @Override

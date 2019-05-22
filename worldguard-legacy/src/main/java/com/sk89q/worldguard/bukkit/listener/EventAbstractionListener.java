@@ -384,7 +384,7 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         @Nullable ItemStack item = event.getItem();
@@ -396,59 +396,66 @@ public class EventAbstractionListener extends AbstractListener {
 
         switch (event.getAction()) {
             case PHYSICAL:
-                DelegateEvent firedEvent = new UseBlockEvent(event, cause, clicked).setAllowed(hasInteractBypass(clicked));
-                if (clicked.getType() == Material.REDSTONE_ORE) {
-                    silent = true;
+                if (event.useInteractedBlock() != Result.DENY) {
+                    DelegateEvent firedEvent = new UseBlockEvent(event, cause, clicked).setAllowed(hasInteractBypass(clicked));
+                    if (clicked.getType() == Material.REDSTONE_ORE) {
+                        silent = true;
+                    }
+                    if (clicked.getType() == Material.FARMLAND || clicked.getType() == Material.TURTLE_EGG) {
+                        silent = true;
+                        firedEvent.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
+                    }
+                    firedEvent.setSilent(silent);
+                    interactDebounce.debounce(clicked, event.getPlayer(), event, firedEvent);
                 }
-                if (clicked.getType() == Material.FARMLAND || clicked.getType() == Material.TURTLE_EGG) {
-                    silent = true;
-                    firedEvent.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
-                }
-                firedEvent.setSilent(silent);
-                interactDebounce.debounce(clicked, event.getPlayer(), event, firedEvent);
                 break;
 
             case RIGHT_CLICK_BLOCK:
-                placed = clicked.getRelative(event.getBlockFace());
+                if (event.useInteractedBlock() != Result.DENY) {
+                    placed = clicked.getRelative(event.getBlockFace());
 
-                // Re-used for dispensers
-                handleBlockRightClick(event, create(event.getPlayer()), item, clicked, event.getBlockFace(), placed);
+                    // Re-used for dispensers
+                    handleBlockRightClick(event, create(event.getPlayer()), item, clicked, event.getBlockFace(), placed);
+                }
 
             case LEFT_CLICK_BLOCK:
-                placed = clicked.getRelative(event.getBlockFace());
+                if (event.useInteractedBlock() != Result.DENY) {
+                    placed = clicked.getRelative(event.getBlockFace());
 
-                // Only fire events for blocks that are modified when right clicked
-                modifiesWorld = isBlockModifiedOnClick(clicked, event.getAction() == Action.RIGHT_CLICK_BLOCK) || (item != null && isItemAppliedToBlock(item, clicked));
+                    // Only fire events for blocks that are modified when right clicked
+                    modifiesWorld = isBlockModifiedOnClick(clicked, event.getAction() == Action.RIGHT_CLICK_BLOCK) || (item != null && isItemAppliedToBlock(item, clicked));
 
-                if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, clicked).setAllowed(!modifiesWorld))) {
-                    event.setUseInteractedBlock(Result.DENY);
-                }
-
-                // Handle connected blocks (i.e. beds, chests)
-                for (Block connected : Blocks.getConnected(clicked)) {
-                    if (Events.fireAndTestCancel(new UseBlockEvent(event, create(event.getPlayer()), connected).setAllowed(!modifiesWorld))) {
+                    if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, clicked).setAllowed(!modifiesWorld))) {
                         event.setUseInteractedBlock(Result.DENY);
-                        break;
                     }
-                }
 
-                // Special handling of putting out fires
-                if (event.getAction() == Action.LEFT_CLICK_BLOCK && placed.getType() == Material.FIRE) {
-                    if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), placed))) {
-                        event.setUseInteractedBlock(Result.DENY);
-                        break;
+                    // Handle connected blocks (i.e. beds, chests)
+                    for (Block connected : Blocks.getConnected(clicked)) {
+                        if (Events.fireAndTestCancel(new UseBlockEvent(event, create(event.getPlayer()), connected).setAllowed(!modifiesWorld))) {
+                            event.setUseInteractedBlock(Result.DENY);
+                            break;
+                        }
                     }
-                }
 
-                if (event.isCancelled()) {
-                    playDenyEffect(event.getPlayer(), clicked.getLocation().add(0.5, 1, 0.5));
+                    // Special handling of putting out fires
+                    if (event.getAction() == Action.LEFT_CLICK_BLOCK && placed.getType() == Material.FIRE) {
+                        if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), placed))) {
+                            event.setUseInteractedBlock(Result.DENY);
+                            break;
+                        }
+                    }
+
+                    if (event.isCancelled()) {
+                        playDenyEffect(event.getPlayer(), clicked.getLocation().add(0.5, 1, 0.5));
+                    }
                 }
 
             case LEFT_CLICK_AIR:
             case RIGHT_CLICK_AIR:
-                if (item != null && !item.getType().isBlock() && Events.fireAndTestCancel(new UseItemEvent(event, cause, player.getWorld(), item))) {
-                    event.setUseItemInHand(Result.DENY);
-                    event.setCancelled(true); // The line above does not appear to work with spawn eggs
+                if (event.useItemInHand() != Result.DENY) {
+                    if (item != null && !item.getType().isBlock() && Events.fireAndTestCancel(new UseItemEvent(event, cause, player.getWorld(), item))) {
+                        event.setUseItemInHand(Result.DENY);
+                    }
                 }
 
                 // Check for items that the administrator has configured to
@@ -457,7 +464,7 @@ public class EventAbstractionListener extends AbstractListener {
                 // throw events
                 if (item != null && ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(player.getWorld()))).blockUseAtFeet.test(item)) {
                     if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, player.getLocation().getBlock()))) {
-                        event.setCancelled(true);
+                        event.setUseInteractedBlock(Result.DENY);
                     }
                 }
 
