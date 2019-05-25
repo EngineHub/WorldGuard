@@ -218,7 +218,11 @@ public class BukkitStringMatcher implements StringMatcher {
 
     @Override
     public World getWorldByName(String worldName) {
-        return BukkitAdapter.adapt(Bukkit.getServer().getWorld(worldName));
+        final org.bukkit.World bukkitW = Bukkit.getServer().getWorld(worldName);
+        if (bukkitW == null) {
+            return null;
+        }
+        return BukkitAdapter.adapt(bukkitW);
     }
 
     @Override

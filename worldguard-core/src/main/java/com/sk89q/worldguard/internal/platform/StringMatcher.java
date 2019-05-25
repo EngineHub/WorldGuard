@@ -26,6 +26,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -150,6 +151,7 @@ public interface StringMatcher {
      * @param worldName The name
      * @return The world
      */
+    @Nullable
     World getWorldByName(String worldName);
 
     /**

@@ -58,7 +58,12 @@ class LazyLocation extends Location {
         }
         // try loading the world again now
         // if it fails it will throw an error later (presumably when trying to teleport someone there)
-        return Optional.ofNullable(findWorld(getWorldName())).orElse(NullWorld.getInstance());
+        return Optional.ofNullable(findWorld(getWorldName())).orElse(new NullWorld() {
+            @Override
+            public String getName() {
+                return worldName;
+            }
+        });
     }
 
     public String getWorldName() {

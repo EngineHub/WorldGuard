@@ -1089,7 +1089,7 @@ public final class RegionCommands extends RegionCommandsBase {
         // Lookup the existing region
         World world = checkWorld(args, player, 'w');
         RegionManager regionManager = checkRegionManager(world);
-        ProtectedRegion existing = checkExistingRegion(regionManager, args.getString(0), false);
+        ProtectedRegion existing = checkExistingRegion(regionManager, args.getString(0), true);
 
         // Check permissions
         if (!getPermissionModel(player).mayTeleportTo(existing)) {
