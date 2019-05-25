@@ -381,16 +381,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         config.save();
     }
 
-    @Override
-    public Blacklist getBlacklist() {
-        return this.blacklist;
-    }
-
-    @Override
-    public String getWorldName() {
-        return this.worldName;
-    }
-
     public boolean isChestProtected(Location block, LocalPlayer player) {
         if (!signChestProtection) {
             return false;
