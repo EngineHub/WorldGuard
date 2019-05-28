@@ -1149,6 +1149,20 @@ public final class Materials {
     }
 
     /**
+     * Test whether the material is a crop.
+     * @param type the material
+     * @return true if the material is a crop
+     */
+    public static boolean isCrop(Material type) {
+        return type == Material.WHEAT
+                || type == Material.CARROTS
+                || type == Material.POTATOES
+                || type == Material.BEETROOTS
+                || type == Material.MELON_STEM
+                || type == Material.PUMPKIN_STEM;
+    }
+
+    /**
      * Test whether the given material is affected by
      * {@link Flags#USE}.
      *
