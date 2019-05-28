@@ -1159,7 +1159,9 @@ public final class Materials {
                 || type == Material.POTATOES
                 || type == Material.BEETROOTS
                 || type == Material.MELON_STEM
-                || type == Material.PUMPKIN_STEM;
+                || type == Material.PUMPKIN_STEM
+                || type == Material.PUMPKIN
+                || type == Material.MELON;
     }
 
     /**
