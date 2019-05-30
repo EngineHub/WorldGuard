@@ -223,7 +223,13 @@ public class WorldGuardPlugin extends JavaPlugin {
             } catch (Throwable t) {
                 Throwable next = t;
                 do {
-                    WorldGuard.getInstance().getExceptionConverter().convert(next);
+                    try {
+                        WorldGuard.getInstance().getExceptionConverter().convert(next);
+                    } catch (org.enginehub.piston.exception.CommandException pce) {
+                        if (pce.getCause() instanceof CommandException) {
+                            throw ((CommandException) pce.getCause());
+                        }
+                    }
                     next = next.getCause();
                 } while (next != null);
 
