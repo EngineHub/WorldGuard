@@ -64,6 +64,7 @@ import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Dropper;
 import org.bukkit.block.Hopper;
 import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -132,7 +133,6 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Dispenser;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
@@ -415,7 +415,7 @@ public class EventAbstractionListener extends AbstractListener {
                     placed = clicked.getRelative(event.getBlockFace());
 
                     // Re-used for dispensers
-                    handleBlockRightClick(event, create(event.getPlayer()), item, clicked, event.getBlockFace(), placed);
+                    handleBlockRightClick(event, create(event.getPlayer()), item, clicked, placed);
                 }
 
             case LEFT_CLICK_BLOCK:
@@ -929,7 +929,7 @@ public class EventAbstractionListener extends AbstractListener {
             Dispenser dispenser = (Dispenser) dispenserBlock.getBlockData();
             Block placed = dispenserBlock.getRelative(dispenser.getFacing());
             Block clicked = placed.getRelative(dispenser.getFacing());
-            handleBlockRightClick(event, cause, item, clicked, dispenser.getFacing().getOppositeFace(), placed);
+            handleBlockRightClick(event, cause, item, clicked, placed);
         }
     }
 
@@ -979,16 +979,14 @@ public class EventAbstractionListener extends AbstractListener {
      * @param event the original event
      * @param cause the list of cause
      * @param item the item
-     * @param clicked the clicked block
-     * @param faceClicked the face of the clicked block
      * @param placed the placed block
      * @param <T> the event type
      */
-    private static <T extends Event & Cancellable> void handleBlockRightClick(T event, Cause cause, @Nullable ItemStack item, Block clicked, BlockFace faceClicked, Block placed) {
+    private static <T extends Event & Cancellable> void handleBlockRightClick(T event, Cause cause, @Nullable ItemStack item, Block clicked, Block placed) {
         if (item != null && item.getType() == Material.TNT) {
             // Workaround for a bug that allowed TNT to trigger instantly if placed
             // next to redstone, without plugins getting the clicked place event
-            // (not sure if this actually still happens)
+            // (not sure if this actually still happens) -- note Jun 2019 - happens with dispensers still, tho not players
             Events.fireToCancel(event, new UseBlockEvent(event, cause, clicked.getLocation(), Material.TNT));
 
             // Workaround for http://leaky.bukkit.org/issues/1034
@@ -1025,15 +1023,6 @@ public class EventAbstractionListener extends AbstractListener {
         // Handle created spawn eggs
         if (item != null && Materials.isSpawnEgg(item.getType())) {
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), Materials.getEntitySpawnEgg(item.getType())));
-            return;
-        }
-
-        // Handle cocoa beans
-        if (item != null && item.getType() == Material.COCOA_BEANS) {
-            // CraftBukkit doesn't or didn't throw a clicked place for this
-            if (!(faceClicked == BlockFace.DOWN || faceClicked == BlockFace.UP)) {
-                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(), Material.COCOA));
-            }
             return;
         }
     }
