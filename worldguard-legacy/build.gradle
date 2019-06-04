@@ -11,12 +11,14 @@ repositories {
 dependencies {
     compile project(path: ':worldguard-core', configuration: 'shadow')
     api 'org.bukkit:bukkit:1.13-R0.1-SNAPSHOT'
-    api 'com.sk89q.worldedit:worldedit-bukkit:7.0.0-SNAPSHOT'
-
+    api ('com.sk89q.worldedit:worldedit-bukkit:7.0.0-SNAPSHOT') {
+        exclude group: 'io.papermc', module: 'paperlib'
+    }
     implementation ('com.sk89q:commandbook:2.3') {
         exclude group: 'com.sk89q', module: 'worldedit'
         exclude group: 'com.zachsthings.libcomponents'
         exclude group: 'org.bukkit'
+        exclude group: 'net.sf.opencsv'
     }
     implementation 'org.bstats:bstats-bukkit:1.4'
 }
