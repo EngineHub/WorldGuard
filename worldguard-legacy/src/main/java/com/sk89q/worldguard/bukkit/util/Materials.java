@@ -486,8 +486,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.IRON_HOE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.DIAMOND_HOE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.GOLDEN_HOE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.WHEAT_SEEDS, MODIFIES_BLOCKS);
-//        MATERIAL_FLAGS.put(Material.WHEAT_CROPS, 0); // Where is this?
+        MATERIAL_FLAGS.put(Material.WHEAT_SEEDS, 0);
         MATERIAL_FLAGS.put(Material.BREAD, 0);
         MATERIAL_FLAGS.put(Material.LEATHER_HELMET, 0);
         MATERIAL_FLAGS.put(Material.LEATHER_CHESTPLATE, 0);
@@ -632,7 +631,7 @@ public final class Materials {
 
         MATERIAL_FLAGS.put(Material.BEETROOT, 0);
         MATERIAL_FLAGS.put(Material.BEETROOT_SOUP, 0);
-        MATERIAL_FLAGS.put(Material.BEETROOT_SEEDS, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.BEETROOT_SEEDS, 0);
         MATERIAL_FLAGS.put(Material.CHORUS_FRUIT, 0);
         MATERIAL_FLAGS.put(Material.POPPED_CHORUS_FRUIT, 0);
         MATERIAL_FLAGS.put(Material.SHIELD, 0);
