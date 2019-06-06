@@ -20,13 +20,12 @@
 package com.sk89q.worldguard.bukkit.util;
 
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.material.Bed;
-import org.bukkit.material.Chest;
-import org.bukkit.material.MaterialData;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Bed;
+import org.bukkit.block.data.type.Chest;
+import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,37 +46,20 @@ public final class Blocks {
      */
     public static List<Block> getConnected(Block block) {
         BlockState state = block.getState();
-        MaterialData data = state.getData();
+        BlockData data = state.getBlockData();
 
         if (data instanceof Bed) {
             Bed bed = (Bed) data;
-            if (bed.isHeadOfBed()) {
-                return Collections.singletonList(block.getRelative(bed.getFacing().getOppositeFace()));
-            } else {
-                return Collections.singletonList(block.getRelative(bed.getFacing()));
-            }
+            return Collections.singletonList(block.getRelative(bed.getPart() == Bed.Part.FOOT
+                    ? bed.getFacing() : bed.getFacing().getOppositeFace()));
         } else if (data instanceof Chest) {
-            BlockFace facing = ((Chest) data).getFacing();
-            ArrayList<Block> chests = new ArrayList<>();
-            if (facing == BlockFace.NORTH || facing == BlockFace.SOUTH) {
-                if (block.getRelative(BlockFace.EAST).getState().getData() instanceof Chest) {
-                    chests.add(block.getRelative(BlockFace.EAST));
-                }
-                if (block.getRelative(BlockFace.WEST).getState().getData() instanceof Chest) {
-                    chests.add(block.getRelative(BlockFace.WEST));
-                }
-            } else if (facing == BlockFace.EAST || facing == BlockFace.WEST) {
-                if (block.getRelative(BlockFace.NORTH).getState().getData() instanceof Chest) {
-                    chests.add(block.getRelative(BlockFace.NORTH));
-                }
-                if (block.getRelative(BlockFace.SOUTH).getState().getData() instanceof Chest) {
-                    chests.add(block.getRelative(BlockFace.SOUTH));
-                }
-            } else {
-                // don't know how to handle diagonal chests
+            final Chest chest = (Chest) data;
+            Chest.Type type = chest.getType();
+            if (type == Chest.Type.SINGLE) {
                 return Collections.emptyList();
             }
-            return chests;
+            Vector offset = chest.getFacing().getDirection().rotateAroundY(Math.PI / 2 * (type == Chest.Type.LEFT ? -1 : 1));
+            return Collections.singletonList(block.getRelative((int) Math.round(offset.getX()), 0, (int) Math.round(offset.getZ())));
         } else {
             return Collections.emptyList();
         }

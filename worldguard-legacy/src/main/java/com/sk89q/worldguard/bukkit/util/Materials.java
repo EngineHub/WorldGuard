@@ -449,7 +449,7 @@ public final class Materials {
 
         MATERIAL_FLAGS.put(Material.IRON_SHOVEL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.IRON_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.IRON_AXE, 0);
+        MATERIAL_FLAGS.put(Material.IRON_AXE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.FLINT_AND_STEEL, 0);
         MATERIAL_FLAGS.put(Material.APPLE, 0);
         MATERIAL_FLAGS.put(Material.BOW, 0);
@@ -462,22 +462,22 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.WOODEN_SWORD, 0);
         MATERIAL_FLAGS.put(Material.WOODEN_SHOVEL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.WOODEN_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.WOODEN_AXE, 0);
+        MATERIAL_FLAGS.put(Material.WOODEN_AXE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.STONE_SWORD, 0);
         MATERIAL_FLAGS.put(Material.STONE_SHOVEL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.STONE_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.STONE_AXE, 0);
+        MATERIAL_FLAGS.put(Material.STONE_AXE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.DIAMOND_SWORD, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_SHOVEL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.DIAMOND_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.DIAMOND_AXE, 0);
+        MATERIAL_FLAGS.put(Material.DIAMOND_AXE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.STICK, 0);
         MATERIAL_FLAGS.put(Material.BOWL, 0);
         MATERIAL_FLAGS.put(Material.MUSHROOM_STEW, 0);
         MATERIAL_FLAGS.put(Material.GOLDEN_SWORD, 0);
         MATERIAL_FLAGS.put(Material.GOLDEN_SHOVEL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.GOLDEN_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.GOLDEN_AXE, 0);
+        MATERIAL_FLAGS.put(Material.GOLDEN_AXE, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.STRING, 0);
         MATERIAL_FLAGS.put(Material.FEATHER, 0);
         MATERIAL_FLAGS.put(Material.GUNPOWDER, 0);

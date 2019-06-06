@@ -423,7 +423,8 @@ public class EventAbstractionListener extends AbstractListener {
                     placed = clicked.getRelative(event.getBlockFace());
 
                     // Only fire events for blocks that are modified when right clicked
-                    final boolean hasItemInteraction = item != null && isItemAppliedToBlock(item, clicked);
+                    final boolean hasItemInteraction = item != null && isItemAppliedToBlock(item, clicked)
+                            && event.getAction() == Action.RIGHT_CLICK_BLOCK;
                     modifiesWorld = isBlockModifiedOnClick(clicked, event.getAction() == Action.RIGHT_CLICK_BLOCK)
                             || hasItemInteraction;
 
