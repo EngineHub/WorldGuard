@@ -42,6 +42,6 @@ Links
 * [Homepage](http://enginehub.org/worldguard)
 * [Discord](https://discord.gg/enginehub)
 * [IRC channel](https://webchat.esper.net/?join=sk89q) (#sk89q on irc.esper.net)
-* [Issue tracker]((https://dev.enginehub.org/issues/WORLDGUARD)
+* [Issue tracker](https://dev.enginehub.org/issues/WORLDGUARD)
 * [Continuous integration](http://builds.enginehub.org) [![Build Status](https://travis-ci.org/EngineHub/WorldGuard.svg?branch=master)](https://travis-ci.org/EngineHub/WorldGuard)
 * [End-user documentation](https://worldguard.readthedocs.io/en/latest/) / [Older Wiki](http://wiki.sk89q.com/wiki/WorldGuard)
