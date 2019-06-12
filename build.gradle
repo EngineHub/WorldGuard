@@ -34,7 +34,7 @@ buildscript {
 
 allprojects {
     group = 'com.sk89q.worldguard'
-    version = '7.0.0-SNAPSHOT'
+    version = '7.0.0'
 }
 
 if (!project.hasProperty("artifactory_contextUrl")) ext.artifactory_contextUrl = "http://localhost"
@@ -84,10 +84,10 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url "http://repo.spongepowered.org/maven/" }
+        maven { url "https://repo.spongepowered.org/maven/" }
         maven { url "https://hub.spigotmc.org/nexus/content/groups/public" }
-        maven { url "http://maven.sk89q.com/repo/" }
-        maven { url "http://repo.maven.apache.org/maven2" }
+        maven { url "https://maven.sk89q.com/repo/" }
+        maven { url "https://repo.maven.apache.org/maven2" }
     }
 
     if (JavaVersion.current().isJava8Compatible()) {

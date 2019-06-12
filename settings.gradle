@@ -1,3 +1,3 @@
 rootProject.name = 'worldguard'
 
-include 'worldguard-core', 'worldguard-legacy'
+include 'worldguard-core', 'worldguard-bukkit'
