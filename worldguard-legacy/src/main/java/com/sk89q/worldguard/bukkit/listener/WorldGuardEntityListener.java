@@ -102,6 +102,9 @@ public class WorldGuardEntityListener implements Listener {
      */
     public void registerEvents() {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        if (!EntityCreatePortalEvent.class.isAnnotationPresent(Deprecated.class)) {
+            plugin.getServer().getPluginManager().registerEvents(new UselessIn114Listener(), plugin);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -666,15 +669,17 @@ public class WorldGuardEntityListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onCreatePortal(EntityCreatePortalEvent event) {
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
+    private static class UselessIn114Listener implements Listener {
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        public void onCreatePortal(EntityCreatePortalEvent event) {
+            ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+            WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
 
-        switch (event.getEntityType()) {
-            case ENDER_DRAGON:
-                if (wcfg.blockEnderDragonPortalCreation) event.setCancelled(true);
-                break;
+            switch (event.getEntityType()) {
+                case ENDER_DRAGON:
+                    if (wcfg.blockEnderDragonPortalCreation) event.setCancelled(true);
+                    break;
+            }
         }
     }
 

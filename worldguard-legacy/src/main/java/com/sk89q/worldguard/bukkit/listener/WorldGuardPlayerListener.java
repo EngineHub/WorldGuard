@@ -437,7 +437,11 @@ public class WorldGuardPlayerListener implements Listener {
         if (event.getCause() != TeleportCause.NETHER_PORTAL) {
             return;
         }
-        if (!event.useTravelAgent()) { // either end travel (even though we checked cause) or another plugin is fucking with us, shouldn't create a portal though
+        try {
+            if (!event.useTravelAgent()) { // either end travel (even though we checked cause) or another plugin is fucking with us, shouldn't create a portal though
+                return;
+            }
+        } catch (NoSuchMethodError ignored) {
             return;
         }
         TravelAgent pta = event.getPortalTravelAgent();

@@ -945,7 +945,7 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onLingeringSplash(LingeringPotionSplashEvent event) {
         AreaEffectCloud aec = event.getAreaEffectCloud();
-        LingeringPotion potion = event.getEntity();
+        ThrownPotion potion = event.getEntity();
         World world = potion.getWorld();
         Cause cause = create(event.getEntity());
 
