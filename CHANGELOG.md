@@ -1,5 +1,44 @@
 # Changelog
 
+## 7.0.0
+* Added support for MC 1.13, dropped support for previous versions.
+* Added lots of interactive text in e.g. `/rg info` command.
+* Added `/rg flags` command which allows viewing and interactively setting all flags on a region.
+* Large behind-the-scenes changes to WorldGuard's API (developers, see https://worldguard.enginehub.org/en/latest/developer/)
+* Places that used numeric block ids (e.g. blacklist) should now use Minecraft's new string IDs.
+* Fix various interactions with NPCs and region protection.
+* Sponge-simulation now destroys kelp and seagrass, and de-waterlogs blocks.
+* Added an option to block conduit effects.
+* Fix using newlines in string flags such as greeting and farewell.
+* Add item-frame-rotation flag.
+* Ender chests no longer require chest-access (since they don't have inventories).
+* Add kelp to vine-growth flag/config.
+* Add block-trampling flag (for turtle eggs and farmland).
+* Add snowman-trails flag.
+* Track potion area-of-effect cloud causes for pvp etc. protection.
+* Add confirmation to /stoplag command.
+* Forcefully eject players from vehicles trying to force their way into entry deny regions (and out of exit deny).
+* Fix removing child regions when removing a region with children.
+* Fix some over-protectiveness of pistons.
+* Chat and command flags (send-/receive- and allowed-/blocked-) now respect deny-message flag.
+* Misc fixes.
+
+## 6.2.2
+* Added support for MC 1.12.
+* Changed flower pots to fall under the build flag.
+* Fix heal flag not functioning.
+* Add option to allow Forge clients with host-keys setting.
+* Add mobs.block-armor-stand-destroy config.
+* Add firework-damage flag.
+* Add config option to ignore hopper checks.
+* Misc fixes.
+
+## 6.2
+* Added support for MC 1.11.
+* Add a custom flag and session API (for developers, see https://worldguard.enginehub.org/en/latest/developer/)
+* Add a config option to ensure location flags (teleport, spawn) are inside their region.
+* Misc fixes.
+
 ## 6.1.2
 * Added support for new blocks in 1.8, 1.9, and 1.10.
 * Added protection from nether portals being created in protected region (enable via config `nether-portal-protection`).
