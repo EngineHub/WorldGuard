@@ -2,8 +2,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 
 dependencies {
-    api 'com.sk89q.worldedit:worldedit-core:7.0.0-SNAPSHOT'
-    implementation 'com.sk89q.intake:intake:4.2-SNAPSHOT'
+    api 'com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT'
     implementation 'com.sk89q:squirrelid:0.2.0'
     implementation 'org.flywaydb:flyway-core:3.0'
     implementation 'org.khelekore:prtree:1.5.0'

@@ -11,7 +11,7 @@ repositories {
 dependencies {
     compile project(path: ':worldguard-core', configuration: 'shadow')
     api 'org.bukkit:bukkit:1.13-R0.1-SNAPSHOT'
-    api ('com.sk89q.worldedit:worldedit-bukkit:7.0.0-SNAPSHOT') {
+    api ('com.sk89q.worldedit:worldedit-bukkit:7.0.1-SNAPSHOT') {
         exclude group: 'io.papermc', module: 'paperlib'
     }
     implementation ('com.sk89q:commandbook:2.3') {
@@ -20,7 +20,7 @@ dependencies {
         exclude group: 'org.bukkit'
         exclude group: 'net.sf.opencsv'
     }
-    implementation 'org.bstats:bstats-bukkit:1.4'
+    implementation 'org.bstats:bstats-bukkit:1.5'
 }
 
 processResources {
@@ -44,7 +44,7 @@ shadowJar {
     dependencies {
         include(dependency(':worldguard-core'))
         relocate ("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
-            include(dependency("org.bstats:bstats-bukkit:1.4"))
+            include(dependency("org.bstats:bstats-bukkit:1.5"))
         }
     }
 
