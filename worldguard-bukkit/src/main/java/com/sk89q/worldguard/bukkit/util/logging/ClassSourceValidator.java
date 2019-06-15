@@ -87,6 +87,9 @@ public class ClassSourceValidator {
      * @param classes The list of classes to check
      */
     public void reportMismatches(List<Class<?>> classes) {
+        if (Boolean.getBoolean("worldguard.disable.class.validation")) {
+            return;
+        }
         Map<Class<?>, CodeSource> mismatches = findMismatches(classes);
 
         if (!mismatches.isEmpty()) {
