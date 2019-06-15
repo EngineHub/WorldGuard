@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.internal.HasConvention
 
 plugins {
     id("java-library")
@@ -15,6 +16,10 @@ repositories {
         url = uri("https://hub.spigotmc.org/nexus/content/groups/public")
     }
     maven {
+        name = "paper"
+        url = uri("https://papermc.io/repo/repository/maven-public/")
+    }
+    maven {
         name = "bstats"
         url = uri("https://repo.codemc.org/repository/maven-public")
     }
@@ -23,10 +28,26 @@ repositories {
 dependencies {
     "compile"(project(":worldguard-core"))
     //"compile"(project(":worldguard-libs:bukkit"))
-    "api"("org.bukkit:bukkit:1.14.2-R0.1-SNAPSHOT")
+    "api"("com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT")
+    "implementation"("io.papermc:paperlib:1.0.2")
     "api"("com.sk89q.worldedit:worldedit-bukkit:7.0.1-SNAPSHOT") { isTransitive = false }
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "implementation"("org.bstats:bstats-bukkit:1.5")
+}
+
+tasks.named<Upload>("install") {
+    (repositories as HasConvention).convention.getPlugin<MavenRepositoryHandlerConvention>().mavenInstaller {
+        pom.whenConfigured {
+            dependencies.firstOrNull { dep ->
+                dep!!.withGroovyBuilder {
+                    getProperty("groupId") == "com.destroystokyo.paper" && getProperty("artifactId") == "paper-api"
+                }
+            }?.withGroovyBuilder {
+                setProperty("groupId", "org.bukkit")
+                setProperty("artifactId", "bukkit")
+            }
+        }
+    }
 }
 
 tasks.named<Copy>("processResources") {
@@ -45,6 +66,9 @@ tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
             include(dependency("org.bstats:bstats-bukkit:1.5"))
+        }
+        relocate ("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
+            include(dependency("io.papermc:paperlib:1.0.2"))
         }
     }
 }

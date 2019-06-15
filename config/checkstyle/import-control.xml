@@ -22,6 +22,8 @@
     <subpackage name="bukkit">
       <allow pkg="org.bukkit"/>
       <allow pkg="org.bstats.bukkit"/>
+      <allow pkg="io.papermc.lib"/>
+      <allow pkg="com.destroystokyo.paper"/>
     </subpackage>
 
     <subpackage name="sponge">
