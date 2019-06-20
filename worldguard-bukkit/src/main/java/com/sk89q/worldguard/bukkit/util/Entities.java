@@ -32,6 +32,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.NPC;
+import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Shulker;
@@ -41,7 +42,6 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.TippedArrow;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.entity.WaterMob;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.projectiles.ProjectileSource;
@@ -91,7 +91,7 @@ public final class Entities {
      * @return true if the entity can be ridden
      */
     public static boolean isRiddenOnUse(Entity entity) {
-        return entity instanceof Vehicle;
+        return entity instanceof Pig ? ((Pig) entity).hasSaddle() : entity instanceof Vehicle;
     }
 
     /**
@@ -163,8 +163,7 @@ public final class Entities {
      * @return true if non-hostile
      */
     public static boolean isNonHostile(Entity entity) {
-        return !isHostile(entity)
-                && (entity instanceof Creature || entity instanceof WaterMob);
+        return !isHostile(entity) && entity instanceof Creature;
     }
 
     /**
