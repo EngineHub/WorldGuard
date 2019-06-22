@@ -200,7 +200,7 @@ class FlagHelperBox extends PaginationBox {
             if (maySet) {
                 if (isExplicitSet) {
                     hoverTexts.add(TextComponent.of("Click to unset", TextColor.GOLD));
-                } else {
+                } else if (flag != Flags.BUILD && flag != Flags.PASSTHROUGH) {
                     hoverTexts.add(TextComponent.of("Click to set", TextColor.GOLD));
                 }
             }
@@ -221,7 +221,7 @@ class FlagHelperBox extends PaginationBox {
                         HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hoverBuilder.build()));
             }
 
-            if (maySet) {
+            if (maySet && (isExplicitSet || flag != Flags.BUILD && flag != Flags.PASSTHROUGH)) {
                 builder.append(choiceComponent.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                         makeCommand(flag, isExplicitSet ? "" : choice))));
             } else {
