@@ -1186,6 +1186,8 @@ public final class Materials {
             case ENCHANTING_TABLE: return true;
             case BEACON: return true;
             case ANVIL: return true;
+            case DAMAGED_ANVIL: return true;
+            case CHIPPED_ANVIL: return true;
             case STONE_PRESSURE_PLATE: return true;
             case HEAVY_WEIGHTED_PRESSURE_PLATE: return true;
             case LIGHT_WEIGHTED_PRESSURE_PLATE: return true;
