@@ -27,13 +27,14 @@ public enum EventType {
     DISPENSE(BlockDispenseBlacklistEvent.class, "on-dispense"),
     DESTROY_WITH(ItemDestroyWithBlacklistEvent.class, "on-destroy-with"),
     ACQUIRE(ItemAcquireBlacklistEvent.class, "on-acquire"),
+    EQUIP(ItemEquipBlacklistEvent.class, "on-equip"),
     DROP(ItemDropBlacklistEvent.class, "on-drop"),
     USE(ItemUseBlacklistEvent.class, "on-use");
 
     private final Class<? extends BlacklistEvent> eventClass;
     private final String ruleName;
 
-    private EventType(Class<? extends BlacklistEvent> eventClass, String ruleName) {
+    EventType(Class<? extends BlacklistEvent> eventClass, String ruleName) {
         this.eventClass = eventClass;
         this.ruleName = ruleName;
     }

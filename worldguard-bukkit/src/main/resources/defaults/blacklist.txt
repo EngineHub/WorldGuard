@@ -19,6 +19,8 @@
 # - on-interact (when a block in used (doors, chests, etc.))
 # - on-drop (an item is being dropped from the player's inventory)
 # - on-acquire (an item enters a player's inventory via some method)
+# - on-equip (an item is equipped to the player's armor slots)
+#      NOTE: on-equip is overprotective due to deficiencies in Bukkit API
 # - on-dispense (a dispenser is about to dispense an item)
 #
 # Actions (for events):
@@ -40,7 +42,7 @@
 ###############################################################################
 #
 # For more information, see:
-# http://wiki.sk89q.com/wiki/WorldGuard/Blacklist
+# https://worldguard.readthedocs.io/en/latest/blacklist/
 #
 ###############################################################################
 #

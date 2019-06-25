@@ -28,6 +28,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -35,8 +36,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
-import javax.annotation.Nullable;
 
 /**
  * Material utility class.
@@ -1262,6 +1261,44 @@ public final class Materials {
         }
 
         return false;
+    }
+
+    // should match instances of ItemArmor
+
+    /**
+     * Check if the material is equippable armor (i.e. that it is equipped on right-click
+     * not necessarily that it can be put in the armor slots)
+     *
+     * @param type material to check
+     * @return true if equippable armor
+     */
+    public static boolean isArmor(Material type) {
+        switch (type) {
+            case LEATHER_HELMET:
+            case LEATHER_CHESTPLATE:
+            case LEATHER_LEGGINGS:
+            case LEATHER_BOOTS:
+            case CHAINMAIL_HELMET:
+            case CHAINMAIL_CHESTPLATE:
+            case CHAINMAIL_LEGGINGS:
+            case CHAINMAIL_BOOTS:
+            case IRON_HELMET:
+            case IRON_CHESTPLATE:
+            case IRON_LEGGINGS:
+            case IRON_BOOTS:
+            case DIAMOND_HELMET:
+            case DIAMOND_CHESTPLATE:
+            case DIAMOND_LEGGINGS:
+            case DIAMOND_BOOTS:
+            case GOLDEN_HELMET:
+            case GOLDEN_CHESTPLATE:
+            case GOLDEN_LEGGINGS:
+            case GOLDEN_BOOTS:
+            //case TURTLE_HELMET:
+                return true;
+            default:
+                return false;
+        }
     }
 
 }
