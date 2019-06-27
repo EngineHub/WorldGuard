@@ -357,7 +357,9 @@ class RegionCommandsBase {
             BlockVector3 pt1 = cuboid.getMinimumPoint();
             BlockVector3 pt2 = cuboid.getMaximumPoint();
 
-            session.setRegionSelector(player.getWorld(), new CuboidRegionSelector(player.getWorld(), pt1, pt2));
+            CuboidRegionSelector selector = new CuboidRegionSelector(player.getWorld(), pt1, pt2);
+            session.setRegionSelector(player.getWorld(), selector);
+            selector.explainRegionAdjust(player, session);
             player.print("Region selected as a cuboid.");
 
         } else if (region instanceof ProtectedPolygonalRegion) {
@@ -365,8 +367,9 @@ class RegionCommandsBase {
             Polygonal2DRegionSelector selector = new Polygonal2DRegionSelector(
                     player.getWorld(), poly2d.getPoints(),
                     poly2d.getMinimumPoint().getBlockY(),
-                    poly2d.getMaximumPoint().getBlockY() );
+                    poly2d.getMaximumPoint().getBlockY());
             session.setRegionSelector(player.getWorld(), selector);
+            selector.explainRegionAdjust(player, session);
             player.print("Region selected as a polygon.");
 
         } else if (region instanceof GlobalProtectedRegion) {
