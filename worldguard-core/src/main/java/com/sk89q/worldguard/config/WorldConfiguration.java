@@ -134,6 +134,7 @@ public abstract class WorldConfiguration {
     public boolean alwaysRaining;
     public boolean alwaysThundering;
     public boolean disablePigZap;
+    public boolean disableVillagerZap;
     public boolean disableCreeperPower;
     public boolean disableHealthRegain;
     public boolean disableMushroomSpread;
