@@ -33,6 +33,7 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -259,6 +260,12 @@ public class RegionLister implements Callable<Integer> {
                         .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for info")))
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                                 "/rg info -w " + world + " " + entry.region.getId()))));
+            }
+            if (perms != null && entry.region.getFlag(Flags.TELE_LOC) != null && perms.mayTeleportTo(entry.region)) {
+                builder.append(TextComponent.space().append(TextComponent.of("[TP]", TextColor.GRAY)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for teleport")))
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
+                                "/rg tp -w " + world + " " + entry.region.getId()))));
             }
             return builder.build();
         }
