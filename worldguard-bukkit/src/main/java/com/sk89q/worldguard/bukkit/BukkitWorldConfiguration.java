@@ -231,6 +231,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableThunder = getBoolean("weather.disable-thunderstorm", false);
         disableWeather = getBoolean("weather.disable-weather", false);
         disablePigZap = getBoolean("weather.disable-pig-zombification", false);
+        disableVillagerZap = getBoolean("weather.disable-villager-witchification", false);
         disableCreeperPower = getBoolean("weather.disable-powered-creepers", false);
         alwaysRaining = getBoolean("weather.always-raining", false);
         alwaysThundering = getBoolean("weather.always-thundering", false);

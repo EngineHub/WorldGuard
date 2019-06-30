@@ -263,7 +263,7 @@ public class RegionLister implements Callable<Integer> {
             }
             if (perms != null && entry.region.getFlag(Flags.TELE_LOC) != null && perms.mayTeleportTo(entry.region)) {
                 builder.append(TextComponent.space().append(TextComponent.of("[TP]", TextColor.GRAY)
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for teleport")))
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to teleport")))
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                                 "/rg tp -w " + world + " " + entry.region.getId()))));
             }

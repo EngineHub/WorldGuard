@@ -74,6 +74,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -716,9 +717,23 @@ public class WorldGuardEntityListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityTransform(EntityTransformEvent event) {
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        final Entity entity = event.getEntity();
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(entity.getWorld()));
+
+        final EntityType type = entity.getType();
+        if (wcfg.disableVillagerZap && type == EntityType.VILLAGER
+                && event.getTransformReason() == EntityTransformEvent.TransformReason.LIGHTNING) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPigZap(PigZapEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntity().getWorld()));
+        final Entity entity = event.getEntity();
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(entity.getWorld()));
 
         if (wcfg.disablePigZap) {
             event.setCancelled(true);
