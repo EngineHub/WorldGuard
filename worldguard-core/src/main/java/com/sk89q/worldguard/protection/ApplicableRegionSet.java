@@ -65,7 +65,7 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
      *
      * <p>{@code subject} can be non-null to satisfy region group requirements,
      * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (FlagUtil on a region can be changed so that they only apply
+     * regions. (Flags on a region can be changed so that they only apply
      * to certain users.) The subject argument is required if the
      * {@link Flags#BUILD} flag is in the list of flags.</p>
      *
@@ -83,7 +83,7 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
      *
      * <p>{@code subject} can be non-null to satisfy region group requirements,
      * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (FlagUtil on a region can be changed so that they only apply
+     * regions. (Flags on a region can be changed so that they only apply
      * to certain users.) The subject argument is required if the
      * {@link Flags#BUILD} flag is in the list of flags.</p>
      *
@@ -108,7 +108,7 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
      *
      * <p>{@code subject} can be non-null to satisfy region group requirements,
      * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (FlagUtil on a region can be changed so that they only apply
+     * regions. (Flags on a region can be changed so that they only apply
      * to certain users.) The subject argument is required if the
      * {@link Flags#BUILD} flag is the flag being queried.</p>
      *
@@ -126,7 +126,7 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
      *
      * <p>{@code subject} can be non-null to satisfy region group requirements,
      * otherwise it will be assumed that the caller that is not a member of any
-     * regions. (FlagUtil on a region can be changed so that they only apply
+     * regions. (Flags on a region can be changed so that they only apply
      * to certain users.) The subject argument is required if the
      * {@link Flags#BUILD} flag is the flag being queried.</p>
      *
