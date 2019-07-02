@@ -34,7 +34,7 @@ public class RegionReport extends DataReport {
         append("Priority", region.getPriority());
         append("Owners", region.getOwners());
         append("Members", region.getMembers());
-        append("FlagUtil", region.getFlags());
+        append("Flags", region.getFlags());
     }
 
 }
