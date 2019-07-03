@@ -434,6 +434,7 @@ public class EventAbstractionListener extends AbstractListener {
                     if (hasItemInteraction) {
                         if (Events.fireAndTestCancel(new PlaceBlockEvent(event, cause, clicked.getLocation(), clicked.getType()))) {
                             event.setUseItemInHand(Result.DENY);
+                            event.setUseInteractedBlock(Result.DENY);
                         }
                     }
 
