@@ -721,7 +721,12 @@ public class EventAbstractionListener extends AbstractListener {
         Entity entity = event.getRightClicked();
 
         Events.fireToCancel(event, new UseItemEvent(event, create(player), world, item));
-        Events.fireToCancel(event, new UseEntityEvent(event, create(player), entity));
+        final UseEntityEvent useEntityEvent = new UseEntityEvent(event, create(player), entity);
+        Material matchingItem = Materials.getRelatedMaterial(entity.getType());
+        if (matchingItem != null && hasInteractBypass(world, matchingItem)) {
+            useEntityEvent.setAllowed(true);
+        }
+        Events.fireToCancel(event, useEntityEvent);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -812,13 +817,9 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
         InventoryHolder holder = event.getInventory().getHolder();
-        if (holder instanceof BlockState) {
-            Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), ((BlockState) holder).getBlock()));
-        } else if (holder instanceof Entity) {
-            if (!(holder instanceof Player)) {
-                Events.fireToCancel(event, new UseEntityEvent(event, create(event.getPlayer()), (Entity) holder));
-            }
-        }
+        if (holder instanceof Entity && holder == event.getPlayer()) return;
+
+        handleInventoryHolderUse(event, create(event.getPlayer()), holder);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -984,14 +985,16 @@ public class EventAbstractionListener extends AbstractListener {
 
         // Handle created Minecarts
         if (item != null && Materials.isMinecart(item.getType())) {
-            // TODO: Give a more specific Minecart type
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.MINECART));
+            EntityType entityType = Materials.getRelatedEntity(item.getType());
+            if (entityType == null) {
+                entityType = EntityType.MINECART;
+            }
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), entityType));
             return;
         }
 
         // Handle created boats
         if (item != null && Materials.isBoat(item.getType())) {
-            // TODO as above
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.BOAT));
             return;
         }
@@ -1021,47 +1024,64 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         if (holder instanceof Entity) {
-            Events.fireToCancel(originalEvent, new UseEntityEvent(originalEvent, cause, (Entity) holder));
-        } else if (holder instanceof BlockState) {
-            Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((BlockState) holder).getBlock()));
-        } else if (holder instanceof DoubleChest) {
-            InventoryHolder left = ((DoubleChest) holder).getLeftSide();
-            InventoryHolder right = ((DoubleChest) holder).getRightSide();
-            if (left instanceof Chest) {
-                Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((Chest) left).getBlock()));
+            Entity entity = (Entity) holder;
+            Material mat = Materials.getRelatedMaterial((entity).getType());
+            UseEntityEvent useEntityEvent = new UseEntityEvent(originalEvent, cause, entity);
+            if (hasInteractBypass((entity).getWorld(), mat)) {
+                useEntityEvent.setAllowed(true);
             }
-            if (right instanceof Chest) {
-                Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((Chest) right).getBlock()));
+            Events.fireToCancel(originalEvent, useEntityEvent);
+        } else {
+            if (holder instanceof BlockState) {
+                final BlockState block = (BlockState) holder;
+                final UseBlockEvent useBlockEvent = new UseBlockEvent(originalEvent, cause, block.getBlock());
+                if (hasInteractBypass(block.getWorld(), block.getType())) {
+                    useBlockEvent.setAllowed(true);
+                }
+                Events.fireToCancel(originalEvent, useBlockEvent);
+            } else if (holder instanceof DoubleChest) {
+                InventoryHolder left = ((DoubleChest) holder).getLeftSide();
+                InventoryHolder right = ((DoubleChest) holder).getRightSide();
+                if (left instanceof Chest) {
+                    Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((Chest) left).getBlock()));
+                }
+                if (right instanceof Chest) {
+                    Events.fireToCancel(originalEvent, new UseBlockEvent(originalEvent, cause, ((Chest) right).getBlock()));
+                }
             }
         }
     }
 
-    private boolean hasInteractBypass(Block block) {
+    private static boolean hasInteractBypass(Block block) {
         return ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(block.getWorld()))).allowAllInteract.test(block);
     }
 
-    private boolean hasInteractBypass(World world, ItemStack item) {
+    private static boolean hasInteractBypass(World world, Material material) {
+        return ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(world))).allowAllInteract.test(material);
+    }
+
+    private static boolean hasInteractBypass(World world, ItemStack item) {
         return ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(world))).allowAllInteract.test(item);
     }
 
-    private boolean isBlockModifiedOnClick(Block block, boolean rightClick) {
+    private static boolean isBlockModifiedOnClick(Block block, boolean rightClick) {
         return Materials.isBlockModifiedOnClick(block.getType(), rightClick) && !hasInteractBypass(block);
     }
 
-    private boolean isItemAppliedToBlock(ItemStack item, Block clicked) {
+    private static boolean isItemAppliedToBlock(ItemStack item, Block clicked) {
         return Materials.isItemAppliedToBlock(item.getType(), clicked.getType())
                 && !hasInteractBypass(clicked)
                 && !hasInteractBypass(clicked.getWorld(), item);
     }
 
-    private void playDenyEffect(Player player, Location location) {
+    private static void playDenyEffect(Player player, Location location) {
         //player.playSound(location, Sound.SUCCESSFUL_HIT, 0.2f, 0.4f);
         if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().particleEffects) {
             player.playEffect(location, Effect.SMOKE, BlockFace.UP);
         }
     }
 
-    private void playDenyEffect(Location location) {
+    private static void playDenyEffect(Location location) {
         if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().particleEffects) {
             location.getWorld().playEffect(location, Effect.SMOKE, BlockFace.UP);
         }

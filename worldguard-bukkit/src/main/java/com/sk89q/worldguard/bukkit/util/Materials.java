@@ -831,6 +831,17 @@ public final class Materials {
     }
 
     /**
+     * Get the related entity type for a material.
+     *
+     * @param material the material
+     * @return the related entity type or {@code null} if one is not known or exists
+     */
+    @Nullable
+    public static EntityType getRelatedEntity(Material material) {
+        return ENTITY_ITEMS.inverse().get(material);
+    }
+
+    /**
      * Get the material of the block placed by the given bucket, defaulting
      * to water if the bucket type is not known.
      *

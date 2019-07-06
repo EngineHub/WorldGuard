@@ -67,7 +67,7 @@ class AbstractListener implements Listener {
      *
      * @return the configuration
      */
-    protected ConfigurationManager getConfig() {
+    protected static ConfigurationManager getConfig() {
         return WorldGuard.getInstance().getPlatform().getGlobalStateManager();
     }
 
@@ -77,7 +77,7 @@ class AbstractListener implements Listener {
      * @param world The world to get the configuration for.
      * @return The configuration for {@code world}
      */
-    protected WorldConfiguration getWorldConfig(World world) {
+    protected static WorldConfiguration getWorldConfig(World world) {
         return getConfig().get(world);
     }
 
@@ -87,7 +87,7 @@ class AbstractListener implements Listener {
      * @param player The player to get the wold from
      * @return The {@link WorldConfiguration} for the player's world
      */
-    protected WorldConfiguration getWorldConfig(LocalPlayer player) {
+    protected static WorldConfiguration getWorldConfig(LocalPlayer player) {
         return getWorldConfig((World) player.getExtent());
     }
 
@@ -97,7 +97,7 @@ class AbstractListener implements Listener {
      * @param world the world
      * @return true if region support is enabled
      */
-    protected boolean isRegionSupportEnabled(World world) {
+    protected static boolean isRegionSupportEnabled(World world) {
         return getWorldConfig(world).useRegions;
     }
 
