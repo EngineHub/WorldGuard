@@ -1027,7 +1027,7 @@ public class EventAbstractionListener extends AbstractListener {
             Entity entity = (Entity) holder;
             Material mat = Materials.getRelatedMaterial((entity).getType());
             UseEntityEvent useEntityEvent = new UseEntityEvent(originalEvent, cause, entity);
-            if (hasInteractBypass((entity).getWorld(), mat)) {
+            if (mat != null && hasInteractBypass((entity).getWorld(), mat)) {
                 useEntityEvent.setAllowed(true);
             }
             Events.fireToCancel(originalEvent, useEntityEvent);
