@@ -989,7 +989,7 @@ public class EventAbstractionListener extends AbstractListener {
             if (entityType == null) {
                 entityType = EntityType.MINECART;
             }
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), entityType));
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, clicked.getLocation().add(0.5, 0, 0.5), entityType));
             return;
         }
 
