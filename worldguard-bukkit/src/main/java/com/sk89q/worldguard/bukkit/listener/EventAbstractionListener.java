@@ -1005,7 +1005,7 @@ public class EventAbstractionListener extends AbstractListener {
         // Handle created Minecarts
         if (item != null && Materials.isMinecart(item.getType())) {
             // TODO: Give a more specific Minecart type
-            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), EntityType.MINECART));
+            Events.fireToCancel(event, new SpawnEntityEvent(event, cause, clicked.getLocation().add(0.5, 0, 0.5), EntityType.MINECART));
             return;
         }
 
