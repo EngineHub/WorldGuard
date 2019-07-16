@@ -416,15 +416,16 @@ public class RegionProtectionListener extends AbstractListener {
         String what;
 
         /* Hostile / ambient mob override */
-        final EntityType type = event.getEntity().getType();
-        if (Entities.isHostile(event.getEntity()) || Entities.isAmbient(event.getEntity())
-                || Entities.isNPC(event.getEntity())) {
+        final Entity entity = event.getEntity();
+        final EntityType type = entity.getType();
+        if (Entities.isHostile(entity) || Entities.isAmbient(entity)
+                || Entities.isNPC(entity)) {
             canUse = event.getRelevantFlags().isEmpty() || query.queryState(BukkitAdapter.adapt(target), associable, combine(event)) != State.DENY;
             what = "use that";
         /* Paintings, item frames, etc. */
-        } else if (Entities.isConsideredBuildingIfUsed(event.getEntity())) {
+        } else if (Entities.isConsideredBuildingIfUsed(entity)) {
             if (type == EntityType.ITEM_FRAME && event.getCause().getFirstPlayer() != null
-                    && ((ItemFrame) event.getEntity()).getItem().getType() != Material.AIR) {
+                    && ((ItemFrame) entity).getItem().getType() != Material.AIR) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_FRAME_ROTATE));
                 what = "change that";
             } else if (Entities.isMinecart(type)) {
@@ -435,9 +436,13 @@ public class RegionProtectionListener extends AbstractListener {
                 what = "change that";
             }
         /* Ridden on use */
-        } else if (Entities.isRiddenOnUse(event.getEntity())) {
+        } else if (Entities.isRiddenOnUse(entity)) {
             canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.RIDE, Flags.INTERACT));
             what = "ride that";
+
+        } else if (entity instanceof Player && event.getCause().getRootCause() instanceof Player) {
+            canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.PVP));
+            what = "use that";
 
         /* Everything else */
         } else {
