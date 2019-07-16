@@ -720,7 +720,9 @@ public class EventAbstractionListener extends AbstractListener {
                 ? player.getInventory().getItemInOffHand() : player.getInventory().getItemInMainHand();
         Entity entity = event.getRightClicked();
 
-        Events.fireToCancel(event, new UseItemEvent(event, create(player), world, item));
+        if (Events.fireToCancel(event, new UseItemEvent(event, create(player), world, item))) {
+            return;
+        }
         final UseEntityEvent useEntityEvent = new UseEntityEvent(event, create(player), entity);
         Material matchingItem = Materials.getRelatedMaterial(entity.getType());
         if (matchingItem != null && hasInteractBypass(world, matchingItem)) {

@@ -57,7 +57,7 @@ import com.sk89q.worldguard.util.report.ConfigReport;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ThreadInfo;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -134,7 +134,7 @@ public class WorldGuardCommands {
 
         try {
             File dest = new File(worldGuard.getPlatform().getConfigDir().toFile(), "report.txt");
-            Files.write(result, dest, Charset.forName("UTF-8"));
+            Files.write(result, dest, StandardCharsets.UTF_8);
             sender.print("WorldGuard report written to " + dest.getAbsolutePath());
         } catch (IOException e) {
             throw new CommandException("Failed to write report: " + e.getMessage());
@@ -196,7 +196,7 @@ public class WorldGuardCommands {
 
         synchronized (this) {
             if (activeSampler != null) {
-                throw new CommandException("A profile is currently in progress! Please use /wg stopprofile to stop the current profile.");
+                throw new CommandException("A profile is currently in progress! Please use /wg stopprofile to cancel the current profile.");
             }
 
             SamplerBuilder builder = new SamplerBuilder();
@@ -206,10 +206,12 @@ public class WorldGuardCommands {
             sampler = activeSampler = builder.start();
         }
 
-        sender.print(TextComponent.of("Starting CPU profiling. Use ", TextColor.LIGHT_PURPLE)
+        sender.print(TextComponent.of("Starting CPU profiling. Results will be available in " + minutes + " minutes.", TextColor.LIGHT_PURPLE)
+                .append(TextComponent.newline())
+                .append(TextComponent.of("Use ", TextColor.GRAY))
                 .append(TextComponent.of("/wg stopprofile", TextColor.AQUA)
-                        .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/wg stopprofile")))
-                .append(TextComponent.of(" to stop profiling.", TextColor.LIGHT_PURPLE)));
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/wg stopprofile")))
+                .append(TextComponent.of(" at any time to cancel CPU profiling.", TextColor.GRAY)));
 
         worldGuard.getSupervisor().monitor(FutureForwardingTask.create(
                 sampler.getFuture(), "CPU profiling for " + minutes + " minutes", sender));
@@ -227,7 +229,7 @@ public class WorldGuardCommands {
 
                 try {
                     File dest = new File(worldGuard.getPlatform().getConfigDir().toFile(), "profile.txt");
-                    Files.write(output, dest, Charset.forName("UTF-8"));
+                    Files.write(output, dest, StandardCharsets.UTF_8);
                     sender.print("CPU profiling data written to " + dest.getAbsolutePath());
                 } catch (IOException e) {
                     sender.printError("Failed to write CPU profiling data: " + e.getMessage());
@@ -256,7 +258,7 @@ public class WorldGuardCommands {
             activeSampler = null;
         }
 
-        sender.print("The running CPU profile has been stopped.");
+        sender.print("The running CPU profile has been cancelled.");
     }
 
     @Command(aliases = {"flushstates", "clearstates"},
