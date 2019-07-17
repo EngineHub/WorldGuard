@@ -64,6 +64,7 @@ import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Dropper;
 import org.bukkit.block.Hopper;
 import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
@@ -530,7 +531,15 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         Player player = event.getPlayer();
-        Block blockAffected = event.getBlockClicked().getRelative(event.getBlockFace());
+        Block blockClicked = event.getBlockClicked();
+        Block blockAffected;
+
+        if (blockClicked.getBlockData() instanceof Waterlogged) {
+            blockAffected = blockClicked;
+        } else {
+            blockAffected = blockClicked.getRelative(event.getBlockFace());
+        }
+
         boolean allowed = false;
 
         // Milk buckets can't be emptied as of writing
