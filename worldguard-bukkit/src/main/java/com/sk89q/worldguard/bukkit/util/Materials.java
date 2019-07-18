@@ -1338,6 +1338,7 @@ public final class Materials {
             case GOLDEN_LEGGINGS:
             case GOLDEN_BOOTS:
             case TURTLE_HELMET:
+            case ELYTRA:
                 return true;
             default:
                 return false;
