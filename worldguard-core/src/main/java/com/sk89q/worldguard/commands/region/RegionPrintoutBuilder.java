@@ -302,7 +302,7 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
         }
         builder.append(bound);
         final Location teleFlag = region.getFlag(Flags.TELE_LOC);
-        if (perms != null && perms.mayTeleportTo(region) && teleFlag != null) {
+        if (teleFlag != null && perms != null && perms.mayTeleportTo(region)) {
             builder.append(TextComponent.space().append(TextComponent.of("[Teleport]", TextColor.GRAY)
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
                             TextComponent.of("Click to teleport").append(TextComponent.newline()).append(

@@ -419,7 +419,7 @@ public class RegionProtectionListener extends AbstractListener {
         final Entity entity = event.getEntity();
         final EntityType type = entity.getType();
         if (Entities.isHostile(entity) || Entities.isAmbient(entity)
-                || Entities.isNPC(entity)) {
+                || Entities.isNPC(entity) || entity instanceof Player) {
             canUse = event.getRelevantFlags().isEmpty() || query.queryState(BukkitAdapter.adapt(target), associable, combine(event)) != State.DENY;
             what = "use that";
         /* Paintings, item frames, etc. */
@@ -439,10 +439,6 @@ public class RegionProtectionListener extends AbstractListener {
         } else if (Entities.isRiddenOnUse(entity)) {
             canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.RIDE, Flags.INTERACT));
             what = "ride that";
-
-        } else if (entity instanceof Player && event.getCause().getRootCause() instanceof Player) {
-            canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.PVP));
-            what = "use that";
 
         /* Everything else */
         } else {
