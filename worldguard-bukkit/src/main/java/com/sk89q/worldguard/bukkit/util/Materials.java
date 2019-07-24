@@ -750,7 +750,7 @@ public final class Materials {
             MATERIAL_FLAGS.put(flower, 0);
         }
         for (Material bed : Tag.BEDS.getValues()) {
-            MATERIAL_FLAGS.put(bed, 0);
+            MATERIAL_FLAGS.put(bed, MODIFIED_ON_RIGHT);
         }
         for (Material musicDisc : Tag.ITEMS_MUSIC_DISCS.getValues()) {
             MATERIAL_FLAGS.put(musicDisc, 0);
