@@ -70,7 +70,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.Cancellable;
@@ -651,6 +653,15 @@ public class EventAbstractionListener extends AbstractListener {
             if (event.isCancelled() && remover instanceof Player) {
                 playDenyEffect((Player) remover, event.getEntity().getLocation());
             }
+        } else if (event.getCause() == HangingBreakEvent.RemoveCause.EXPLOSION){
+            DestroyEntityEvent destroyEntityEvent = new DestroyEntityEvent(event, Cause.unknown(), event.getEntity());
+            destroyEntityEvent.getRelevantFlags().add(Flags.OTHER_EXPLOSION);
+            if (event.getEntity() instanceof ItemFrame) {
+                destroyEntityEvent.getRelevantFlags().add(Flags.ENTITY_ITEM_FRAME_DESTROY);
+            } else if (event.getEntity() instanceof Painting) {
+                destroyEntityEvent.getRelevantFlags().add(Flags.ENTITY_PAINTING_DESTROY);
+            }
+            Events.fireToCancel(event, destroyEntityEvent);
         }
     }
 
