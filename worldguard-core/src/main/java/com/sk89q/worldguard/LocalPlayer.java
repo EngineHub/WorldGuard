@@ -207,4 +207,9 @@ public interface LocalPlayer extends Player, RegionAssociable {
      */
     @Beta
     void sendTitle(String title, String subtitle);
+
+    /**
+     * Clears fall distance.
+     */
+    void resetFallDistance();
 }

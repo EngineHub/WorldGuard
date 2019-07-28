@@ -179,6 +179,11 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
+    public void resetFallDistance() {
+
+    }
+
+    @Override
     public void printRaw(String msg) {
         System.out.println("-> TestPlayer{" + this.name + "}: " + msg);
     }

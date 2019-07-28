@@ -111,6 +111,7 @@ public abstract class WorldConfiguration {
     public boolean teleportOnSuffocation;
     public boolean disableVoidDamage;
     public boolean teleportOnVoid;
+    public boolean safeFallOnVoid;
     public boolean disableExplosionDamage;
     public boolean disableMobDamage;
     public boolean highFreqFlags;

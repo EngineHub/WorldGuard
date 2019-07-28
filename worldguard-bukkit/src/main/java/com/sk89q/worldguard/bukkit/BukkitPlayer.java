@@ -174,6 +174,11 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     }
 
     @Override
+    public void resetFallDistance() {
+        getPlayer().setFallDistance(0);
+    }
+
+    @Override
     public String[] getGroups() {
         return plugin.getGroups(getPlayer());
     }

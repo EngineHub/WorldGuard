@@ -216,6 +216,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         teleportOnSuffocation = getBoolean("player-damage.teleport-on-suffocation", false);
         disableVoidDamage = getBoolean("player-damage.disable-void-damage", false);
         teleportOnVoid = getBoolean("player-damage.teleport-on-void-falling", false);
+        safeFallOnVoid = getBoolean("player-damage.reset-fall-on-void-teleport", false);
         disableExplosionDamage = getBoolean("player-damage.disable-explosion-damage", false);
         disableMobDamage = getBoolean("player-damage.disable-mob-damage", false);
         disableDeathMessages = getBoolean("player-damage.disable-death-messages", false);

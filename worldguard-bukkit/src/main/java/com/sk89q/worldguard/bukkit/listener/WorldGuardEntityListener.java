@@ -164,6 +164,9 @@ public class WorldGuardEntityListener implements Listener {
 
             if (wcfg.teleportOnVoid && type == DamageCause.VOID) {
                 localPlayer.findFreePosition();
+                if (wcfg.safeFallOnVoid) {
+                    localPlayer.resetFallDistance();
+                }
                 event.setCancelled(true);
                 return;
             }
