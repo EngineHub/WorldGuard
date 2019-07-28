@@ -60,6 +60,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     @Override
     public void unload() {
         worlds.clear();
+        getConfig().save();
     }
 
     @Override
