@@ -22,8 +22,7 @@ Compiling
 ---------
 
 The project is written for Java 8 and our build process makes use of
-[Gradle](http://gradle.org). Detailed compilation information
-[can be found on the wiki](http://wiki.sk89q.com/wiki/WorldGuard/Development#Compiling).
+[Gradle](http://gradle.org).
 
 Dependencies are automatically handled by Gradle.
 
@@ -43,5 +42,5 @@ Links
 * [Discord](https://discord.gg/enginehub)
 * [IRC channel](https://webchat.esper.net/?join=sk89q) (#sk89q on irc.esper.net)
 * [Issue tracker](https://dev.enginehub.org/issues/WORLDGUARD)
-* [Continuous integration](http://builds.enginehub.org) [![Build Status](https://travis-ci.org/EngineHub/WorldGuard.svg?branch=master)](https://travis-ci.org/EngineHub/WorldGuard)
-* [End-user documentation](https://worldguard.readthedocs.io/en/latest/) / [Older Wiki](http://wiki.sk89q.com/wiki/WorldGuard)
+* [Continuous integration](http://builds.enginehub.org) [![Build Status](https://ci.enginehub.org/app/rest/builds/buildType:bt11,branch:master/statusIcon.svg)](http://ci.enginehub.org/viewType.html?buildTypeId=bt11&guest=1)
+* [End-user documentation](https://worldguard.readthedocs.io/en/latest/)
