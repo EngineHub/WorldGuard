@@ -22,7 +22,7 @@ package com.sk89q.worldguard.commands.task;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.squirrelid.Profile;
+import com.sk89q.worldguard.util.profile.Profile;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;

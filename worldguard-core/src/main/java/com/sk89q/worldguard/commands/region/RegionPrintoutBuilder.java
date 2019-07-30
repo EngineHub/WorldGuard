@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.commands.region;
 
-import com.sk89q.squirrelid.cache.ProfileCache;
+import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;

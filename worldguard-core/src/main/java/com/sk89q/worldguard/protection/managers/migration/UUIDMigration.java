@@ -20,8 +20,8 @@
 package com.sk89q.worldguard.protection.managers.migration;
 
 import com.google.common.base.Predicate;
-import com.sk89q.squirrelid.Profile;
-import com.sk89q.squirrelid.resolver.ProfileService;
+import com.sk89q.worldguard.util.profile.Profile;
+import com.sk89q.worldguard.util.profile.resolver.ProfileService;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.domains.PlayerDomain;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
