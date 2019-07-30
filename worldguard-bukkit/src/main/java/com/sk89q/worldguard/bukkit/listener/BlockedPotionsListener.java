@@ -22,21 +22,20 @@ package com.sk89q.worldguard.bukkit.listener;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.entity.DamageEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
 import com.sk89q.worldguard.bukkit.util.Entities;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpectralArrow;
-import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -66,8 +65,8 @@ public class BlockedPotionsListener extends AbstractListener {
                     if (wcfg.blockPotions.contains(PotionEffectType.GLOWING)) {
                         blockedEffect = PotionEffectType.GLOWING;
                     }
-                } else if (originalEvent.getDamager() instanceof TippedArrow) {
-                    TippedArrow tippedArrow = (TippedArrow) originalEvent.getDamager();
+                } else if (originalEvent.getDamager() instanceof Arrow) {
+                    Arrow tippedArrow = (Arrow) originalEvent.getDamager();
                     PotionEffectType baseEffect = tippedArrow.getBasePotionData().getType().getEffectType();
                     if (wcfg.blockPotions.contains(baseEffect)) {
                         blockedEffect = baseEffect;
@@ -101,23 +100,11 @@ public class BlockedPotionsListener extends AbstractListener {
         BukkitWorldConfiguration wcfg = (BukkitWorldConfiguration) cfg.get(BukkitAdapter.adapt(event.getWorld()));
         ItemStack item = event.getItemStack();
 
-        // We only care about potions
-        boolean oldPotions = false;
-        try {
-            if (item.getType() != Material.POTION
-                    && item.getType() != Material.SPLASH_POTION
-                    && item.getType() != Material.LINGERING_POTION) {
-                return;
-            }
-        } catch (NoSuchFieldError ignored) {
-            // PotionMeta technically has been around since 1.7, so the code below
-            // *should* work still. we just have different materials now.
-            if (item.getType() != Material.POTION) {
-                return;
-            }
-            oldPotions = true;
+        if (item.getType() != Material.POTION
+                && item.getType() != Material.SPLASH_POTION
+                && item.getType() != Material.LINGERING_POTION) {
+            return;
         }
-
 
         if (!wcfg.blockPotions.isEmpty()) {
             PotionEffectType blockedEffect = null;
@@ -149,13 +136,8 @@ public class BlockedPotionsListener extends AbstractListener {
 
                 if (player != null) {
                     if (getPlugin().hasPermission(player, "worldguard.override.potions")) {
-                        boolean isSplash = false;
-                        try {
-                            isSplash = (!oldPotions && (item.getType() == Material.SPLASH_POTION || item.getType() == Material.LINGERING_POTION));
-                        } catch (NoSuchFieldError ignored) {
-                        }
-                        isSplash |= (oldPotions && (Potion.fromItemStack(item).isSplash()));
-                        if (isSplash && wcfg.blockPotionsAlways) {
+                        if (wcfg.blockPotionsAlways && (item.getType() == Material.SPLASH_POTION
+                                || item.getType() == Material.LINGERING_POTION)) {
                             player.sendMessage(ChatColor.RED + "Sorry, potions with " +
                                     blockedEffect.getName() + " can't be thrown, " +
                                     "even if you have a permission to bypass it, " +
