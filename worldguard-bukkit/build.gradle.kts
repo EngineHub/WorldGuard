@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     "compile"(project(":worldguard-core"))
-    "compile"(project(":worldguard-libs:bukkit"))
+    //"compile"(project(":worldguard-libs:bukkit"))
     "api"("org.bukkit:bukkit:1.14.2-R0.1-SNAPSHOT")
     "api"("com.sk89q.worldedit:worldedit-bukkit:7.0.1-SNAPSHOT") { isTransitive = false }
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
@@ -43,9 +43,6 @@ tasks.named<Jar>("jar") {
 
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
-        include(dependency(":worldguard-core"))
-        include(dependency(":worldguard-libs:core"))
-        include(dependency(":worldguard-libs:bukkit"))
         relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
             include(dependency("org.bstats:bstats-bukkit:1.5"))
         }

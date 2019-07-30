@@ -45,8 +45,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
     }
 
     dependencies {
-        "testImplementation"("junit:junit:${Versions.JUNIT}")
-        "testRuntime"("junit:junit:${Versions.JUNIT}")
+        "testCompile"("junit:junit:${Versions.JUNIT}")
         // TODO switch to jupiter - doesn't support abstract test classes so tests need rewriting
         //"testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
         //"testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
@@ -105,7 +104,7 @@ fun Project.applyShadowConfiguration() {
         archiveClassifier.set("dist")
         dependencies {
             include(project(":worldguard-libs:core"))
-            include(project(":worldguard-libs:${project.name.replace("worldguard-", "")}"))
+            //include(project(":worldguard-libs:${project.name.replace("worldguard-", "")}"))
             include(project(":worldguard-core"))
         }
         exclude("GradleStart**")
