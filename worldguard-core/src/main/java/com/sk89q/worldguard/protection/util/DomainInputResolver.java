@@ -21,9 +21,9 @@ package com.sk89q.worldguard.protection.util;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.sk89q.squirrelid.Profile;
-import com.sk89q.squirrelid.resolver.ProfileService;
-import com.sk89q.squirrelid.util.UUIDs;
+import com.sk89q.worldguard.util.profile.Profile;
+import com.sk89q.worldguard.util.profile.resolver.ProfileService;
+import com.sk89q.worldguard.util.profile.util.UUIDs;
 import com.sk89q.worldguard.domains.DefaultDomain;
 
 import javax.annotation.Nullable;
