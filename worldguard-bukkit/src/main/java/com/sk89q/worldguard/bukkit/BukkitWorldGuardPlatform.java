@@ -25,6 +25,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.util.profile.resolver.PaperProfileService;
 import com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.bukkit.util.report.PerformanceReport;
@@ -39,12 +40,20 @@ import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.session.SessionManager;
+import com.sk89q.worldguard.util.profile.cache.ProfileCache;
+import com.sk89q.worldguard.util.profile.resolver.BukkitPlayerService;
+import com.sk89q.worldguard.util.profile.resolver.CacheForwardingService;
+import com.sk89q.worldguard.util.profile.resolver.CombinedProfileService;
+import com.sk89q.worldguard.util.profile.resolver.HttpRepositoryService;
+import com.sk89q.worldguard.util.profile.resolver.ProfileService;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -227,5 +236,19 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
         report.add(new ServicesReport());
         report.add(new WorldReport());
         report.add(new PerformanceReport());
+    }
+
+    @Override
+    public ProfileService createProfileService(ProfileCache profileCache) {
+        List<ProfileService> services = new ArrayList<>();
+        if (PaperLib.isPaper()) {
+            // Paper has a shared cache, and will do lookups for us if needed
+            services.add(PaperProfileService.getInstance());
+        } else {
+            services.add(BukkitPlayerService.getInstance());
+            services.add(HttpRepositoryService.forMinecraft());
+        }
+        return new CacheForwardingService(new CombinedProfileService(services),
+                profileCache);
     }
 }
