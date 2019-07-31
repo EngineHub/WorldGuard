@@ -31,7 +31,12 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
@@ -47,7 +52,7 @@ public class UUIDMigration extends AbstractMigration {
     private static final Logger log = Logger.getLogger(UUIDMigration.class.getCanonicalName());
     private static final int LOG_DELAY = 5000;
 
-    private final Timer timer = new Timer();
+    private final Timer timer = new Timer("WorldGuard UUID Migration");
     private final ProfileService profileService;
     private final FlagRegistry flagRegistry;
     private final ConcurrentMap<String, UUID> resolvedNames = new ConcurrentHashMap<>();

@@ -29,6 +29,8 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -93,8 +95,12 @@ public class WorldGuardWeatherListener implements Listener {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getWorld()));
 
-        if (wcfg.disallowedLightningBlocks.size() > 0) {
-            Material targetId = event.getLightning().getLocation().getBlock().getType();
+        if (!wcfg.disallowedLightningBlocks.isEmpty()) {
+            final Block target = event.getLightning().getLocation().getBlock();
+            Material targetId = target.getType();
+            if (targetId == Material.AIR) {
+                targetId = target.getRelative(BlockFace.DOWN).getType();
+            }
             if (wcfg.disallowedLightningBlocks.contains(BukkitAdapter.asBlockType(targetId).getId())) {
                 event.setCancelled(true);
             }

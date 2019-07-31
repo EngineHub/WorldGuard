@@ -60,7 +60,6 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     @Override
     public void unload() {
         worlds.clear();
-        getConfig().save();
     }
 
     @Override
@@ -69,6 +68,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
         for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
             get(world);
         }
+        getConfig().save();
     }
 
     /**

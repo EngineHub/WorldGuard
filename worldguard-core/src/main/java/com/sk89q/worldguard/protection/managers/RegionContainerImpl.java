@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.managers;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.index.ChunkHashTable;
 import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
@@ -29,14 +31,21 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.util.Normal;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Manages different {@link RegionManager}s for different worlds or dimensions.
@@ -52,8 +61,8 @@ public class RegionContainerImpl {
     private final ConcurrentMap<Normal, RegionManager> mapping = new ConcurrentHashMap<>();
     private final Object lock = new Object();
     private final RegionDriver driver;
-    private final Supplier<? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
-    private final Timer timer = new Timer();
+    private final Function<String, ? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
+    private final Timer timer = new Timer("WorldGuard Region I/O");
     private final FlagRegistry flagRegistry;
 
     private final Set<Normal> failingLoads = new HashSet<>();
@@ -180,6 +189,14 @@ public class RegionContainerImpl {
             failingLoads.clear();
             failingSaves.clear();
         }
+    }
+
+    /**
+     * Disable completely.
+     */
+    public void shutdown() {
+        timer.cancel();
+        unloadAll();
     }
 
     /**

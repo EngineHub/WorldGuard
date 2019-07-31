@@ -41,7 +41,6 @@ import com.sk89q.worldguard.session.handler.TimeLockFlag;
 import com.sk89q.worldguard.session.handler.WaterBreathing;
 import com.sk89q.worldguard.session.handler.WeatherLockFlag;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -61,25 +60,18 @@ public abstract class AbstractSessionManager implements SessionManager {
     private final LoadingCache<WorldPlayerTuple, Boolean> bypassCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(2, TimeUnit.SECONDS)
-            .build(new CacheLoader<WorldPlayerTuple, Boolean>() {
-                @Override
-                public Boolean load(@Nonnull WorldPlayerTuple tuple) throws Exception {
-                    return tuple.getPlayer().hasPermission("worldguard.region.bypass." + tuple.getWorld().getName());
-                }
-            });
+            .build(CacheLoader.from(tuple ->
+                    tuple.getPlayer().hasPermission("worldguard.region.bypass." + tuple.getWorld().getName())));
 
     private final LoadingCache<CacheKey, Session> sessions = CacheBuilder.newBuilder()
             .expireAfterAccess(SESSION_LIFETIME, TimeUnit.MINUTES)
-            .build(new CacheLoader<CacheKey, Session>() {
-                @Override
-                public Session load(@Nonnull CacheKey key) throws Exception {
-                    return createSession(key.playerRef.get());
-                }
-            });
+            .build(CacheLoader.from(key ->
+                    createSession(key.playerRef.get())));
 
     private List<Handler.Factory<? extends Handler>> handlers = new LinkedList<>();
 
     private static final List<Handler.Factory<? extends Handler>> defaultHandlers = new LinkedList<>();
+
     static {
         Handler.Factory<?>[] factories = {
                 HealFlag.FACTORY,

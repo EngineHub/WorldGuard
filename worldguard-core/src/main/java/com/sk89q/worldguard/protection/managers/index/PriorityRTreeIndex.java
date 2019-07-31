@@ -30,8 +30,8 @@ import org.khelekore.prtree.SimpleMBR;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * An implementation of an index that uses {@link HashMapIndex} for queries
@@ -103,9 +103,9 @@ public class PriorityRTreeIndex extends HashMapIndex {
     /**
      * A factory for new instances using this index.
      */
-    public static final class Factory implements Supplier<PriorityRTreeIndex> {
+    public static final class Factory implements Function<String, PriorityRTreeIndex> {
         @Override
-        public PriorityRTreeIndex get() {
+        public PriorityRTreeIndex apply(String name) {
             return new PriorityRTreeIndex();
         }
     }

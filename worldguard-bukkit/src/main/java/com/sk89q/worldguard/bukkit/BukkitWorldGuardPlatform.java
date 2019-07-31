@@ -130,7 +130,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     @Override
     public void unload() {
         configuration.unload();
-        regionContainer.unload();
+        regionContainer.shutdown();
     }
 
     @Override

@@ -97,6 +97,10 @@ public class BukkitRegionContainer extends RegionContainer {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, cache::invalidateAll, CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
     }
 
+    public void shutdown() {
+        container.shutdown();
+    }
+
     @Override
     @Nullable
     protected RegionManager load(World world) {

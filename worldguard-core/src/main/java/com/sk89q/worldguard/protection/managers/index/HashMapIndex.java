@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,10 +36,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
 
 /**
  * An index that stores regions in a hash map, which allows for fast lookup
@@ -287,9 +286,9 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
     /**
      * A factory for new instances using this index.
      */
-    public static final class Factory implements Supplier<HashMapIndex> {
+    public static final class Factory implements Function<String, HashMapIndex> {
         @Override
-        public HashMapIndex get() {
+        public HashMapIndex apply(String name) {
             return new HashMapIndex();
         }
     }

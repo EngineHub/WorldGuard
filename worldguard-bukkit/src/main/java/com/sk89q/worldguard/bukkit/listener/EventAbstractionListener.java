@@ -594,7 +594,7 @@ public class EventAbstractionListener extends AbstractListener {
         Material toType = to.getType();
 
         // Liquids pass this event when flowing to solid blocks
-        if (toType.isSolid() && Materials.isLiquid(fromType)) {
+        if (Materials.isLiquid(fromType) && toType.isSolid()) {
             return;
         }
 

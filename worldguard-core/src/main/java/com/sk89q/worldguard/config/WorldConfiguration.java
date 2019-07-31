@@ -19,15 +19,21 @@
 
 package com.sk89q.worldguard.config;
 
+import com.sk89q.worldedit.util.report.Unreported;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldedit.util.report.Unreported;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -55,7 +61,8 @@ public abstract class WorldConfiguration {
 
     protected File blacklistFile;
 
-    @Unreported protected Blacklist blacklist;
+    @Unreported
+    protected Blacklist blacklist;
 
     public boolean boundedLocationFlags;
     public boolean useRegions;
@@ -173,49 +180,63 @@ public abstract class WorldConfiguration {
     }
 
     public List<String> convertLegacyItems(List<String> legacyItems) {
-        return legacyItems.stream().map(this::convertLegacyItem).collect(Collectors.toList());
+        return legacyItems.stream().map(this::convertLegacyItem).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public String convertLegacyItem(String legacy) {
-        String item = legacy;
+        String[] splitter = legacy.split(":", 2);
         try {
-            String[] splitter = item.split(":", 2);
-            int id = 0;
-            byte data = 0;
+            int id;
+            byte data;
             if (splitter.length == 1) {
-                id = Integer.parseInt(item);
+                id = Integer.parseInt(splitter[0]);
+                data = 0;
             } else {
                 id = Integer.parseInt(splitter[0]);
                 data = Byte.parseByte(splitter[1]);
             }
-            item = LegacyMapper.getInstance().getItemFromLegacy(id, data).getId();
-        } catch (Throwable e) {
+            ItemType legacyItem = LegacyMapper.getInstance().getItemFromLegacy(id, data);
+            if (legacyItem != null) {
+                return legacyItem.getId();
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        final ItemType itemType = ItemTypes.get(legacy);
+        if (itemType != null) {
+            return itemType.getId();
         }
 
-        return item;
+        return null;
     }
 
     public List<String> convertLegacyBlocks(List<String> legacyBlocks) {
-        return legacyBlocks.stream().map(this::convertLegacyBlock).collect(Collectors.toList());
+        return legacyBlocks.stream().map(this::convertLegacyBlock).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public String convertLegacyBlock(String legacy) {
-        String block = legacy;
+        String[] splitter = legacy.split(":", 2);
         try {
-            String[] splitter = block.split(":", 2);
-            int id = 0;
-            byte data = 0;
+            int id;
+            byte data;
             if (splitter.length == 1) {
-                id = Integer.parseInt(block);
+                id = Integer.parseInt(splitter[0]);
+                data = 0;
             } else {
                 id = Integer.parseInt(splitter[0]);
                 data = Byte.parseByte(splitter[1]);
             }
-            block = LegacyMapper.getInstance().getBlockFromLegacy(id, data).getBlockType().getId();
-        } catch (Throwable e) {
+            BlockState legacyBlock = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
+            if (legacyBlock != null) {
+                return legacyBlock.getBlockType().getId();
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        final BlockType blockType = BlockTypes.get(legacy);
+        if (blockType != null) {
+            return blockType.getId();
         }
 
-        return block;
+        return null;
     }
 
     public int getMaxRegionCount(LocalPlayer player) {
