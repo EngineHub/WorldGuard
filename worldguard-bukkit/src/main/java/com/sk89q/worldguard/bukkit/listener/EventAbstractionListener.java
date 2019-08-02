@@ -266,12 +266,12 @@ public class EventAbstractionListener extends AbstractListener {
         }
 
         // Fire two events: one as BREAK and one as PLACE
-        if (event.getTo() != Material.AIR && event.getBlock().getType() != Material.AIR) {
+        if (to != Material.AIR && block.getType() != Material.AIR) {
             if (!Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), block))) {
                 Events.fireToCancel(event, new PlaceBlockEvent(event, create(entity), block.getLocation(), to));
             }
         } else {
-            if (event.getTo() == Material.AIR) {
+            if (to == Material.AIR) {
                 // Track the source so later we can create a proper chain of causes
                 if (entity instanceof FallingBlock) {
                     Cause.trackParentCause(entity, block);
@@ -280,17 +280,19 @@ public class EventAbstractionListener extends AbstractListener {
                     Events.fireToCancel(event, new SpawnEntityEvent(event, create(block), entity));
                 } else {
                     entityBreakBlockDebounce.debounce(
-                            event.getBlock(), event.getEntity(), event, new BreakBlockEvent(event, create(entity), event.getBlock()));
+                            block, event.getEntity(), event, new BreakBlockEvent(event, create(entity), block));
                 }
             } else {
                 boolean wasCancelled = event.isCancelled();
                 Cause cause = create(entity);
 
-                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getLocation(), to));
+                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, block.getLocation(), to));
 
                 if (event.isCancelled() && !wasCancelled && entity instanceof FallingBlock) {
                     FallingBlock fallingBlock = (FallingBlock) entity;
-                    ItemStack itemStack = new ItemStack(fallingBlock.getBlockData().getMaterial(), 1);
+                    final Material material = fallingBlock.getBlockData().getMaterial();
+                    if (!material.isItem()) return;
+                    ItemStack itemStack = new ItemStack(material, 1);
                     Item item = block.getWorld().dropItem(fallingBlock.getLocation(), itemStack);
                     item.setVelocity(new Vector());
                     if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(block, entity), item))) {
