@@ -69,6 +69,7 @@ import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -138,11 +139,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
 
 public class EventAbstractionListener extends AbstractListener {
 
@@ -767,7 +767,11 @@ public class EventAbstractionListener extends AbstractListener {
         } else if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) event;
             Entity damager = entityEvent.getDamager();
-            Events.fireToCancel(event, new DamageEntityEvent(event, create(damager), event.getEntity()));
+            final DamageEntityEvent eventToFire = new DamageEntityEvent(event, create(damager), event.getEntity());
+            if (damager instanceof Firework) {
+                eventToFire.getRelevantFlags().add(Flags.FIREWORK_DAMAGE);
+            }
+            Events.fireToCancel(event, eventToFire);
 
             // Item use event with the item in hand
             // Older blacklist handler code used this, although it suffers from

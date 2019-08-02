@@ -70,6 +70,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
     public Set<PotionEffectType> blockPotions;
     public TargetMatcherSet allowAllInteract;
     public TargetMatcherSet blockUseAtFeet;
+    public boolean usePaperEntityOrigin;
     /* Configuration data end */
 
     /**
@@ -143,6 +144,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         allowAllInteract = getTargetMatchers("event-handling.interaction-whitelist");
         blockUseAtFeet = getTargetMatchers("event-handling.emit-block-use-at-feet");
         ignoreHopperMoveEvents = getBoolean("event-handling.ignore-hopper-item-move-events", false);
+
+        usePaperEntityOrigin = getBoolean("regions.use-paper-entity-origin", false);
 
         itemDurability = getBoolean("protection.item-durability", true);
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);

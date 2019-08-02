@@ -242,12 +242,12 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     public ProfileService createProfileService(ProfileCache profileCache) {
         List<ProfileService> services = new ArrayList<>();
         if (PaperLib.isPaper()) {
-            // Paper has a shared cache, and will do lookups for us if needed
+            // Paper has a shared cache
             services.add(PaperProfileService.getInstance());
         } else {
             services.add(BukkitPlayerService.getInstance());
-            services.add(HttpRepositoryService.forMinecraft());
         }
+        services.add(HttpRepositoryService.forMinecraft());
         return new CacheForwardingService(new CombinedProfileService(services),
                 profileCache);
     }

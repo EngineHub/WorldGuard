@@ -31,22 +31,17 @@ import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
-import io.papermc.lib.PaperLib;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import java.util.UUID;
 import java.util.function.Predicate;
 
 public class RegionFlagsListener extends AbstractListener {
@@ -143,25 +138,6 @@ public class RegionFlagsListener extends AbstractListener {
             }
         }
 
-        if (event instanceof EntityDamageByEntityEvent) {
-            Entity damager = (((EntityDamageByEntityEvent) event)).getDamager();
-            if (damager.getType() == EntityType.FIREWORK) {
-                RegionAssociable associable = null;
-                if (PaperLib.isPaper()) {
-                    UUID spawning = ((Firework) damager).getSpawningEntity();
-                    if (spawning != null) {
-                        Player player = Bukkit.getPlayer(spawning);
-                        if (player != null) {
-                            associable = WorldGuardPlugin.inst().wrapPlayer(player);
-                        }
-                    }
-                }
-                if (!query.testState(BukkitAdapter.adapt(entity.getLocation()), associable, Flags.FIREWORK_DAMAGE)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        }
     }
 
     /**

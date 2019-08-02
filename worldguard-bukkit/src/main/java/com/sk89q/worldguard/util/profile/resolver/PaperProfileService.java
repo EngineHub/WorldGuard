@@ -44,7 +44,7 @@ public final class PaperProfileService extends SingleRequestService {
     @Nullable
     public Profile findByName(String name) {
         PlayerProfile profile = Bukkit.createProfile(name);
-        if (profile.complete(false)) {
+        if (profile.completeFromCache()) {
             //noinspection ConstantConditions - completeFromCache guarantees non-null on success
             return new Profile(profile.getId(), profile.getName());
         }

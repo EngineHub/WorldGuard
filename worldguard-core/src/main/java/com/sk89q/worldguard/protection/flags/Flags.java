@@ -68,6 +68,7 @@ public final class Flags {
     public static final StateFlag POTION_SPLASH = register(new StateFlag("potion-splash", false));
     public static final StateFlag ITEM_FRAME_ROTATE = register(new StateFlag("item-frame-rotation", false));
     public static final StateFlag TRAMPLE_BLOCKS = register(new StateFlag("block-trampling", false));
+    public static final StateFlag FIREWORK_DAMAGE = register(new StateFlag("firework-damage", false));
 
     // These flags are similar to the ones above (used in tandem with BUILD),
     // but their defaults are set to TRUE because it is more user friendly.
@@ -86,7 +87,6 @@ public final class Flags {
     public static final StateFlag CREEPER_EXPLOSION = register(new StateFlag("creeper-explosion", true));
     public static final StateFlag ENDERDRAGON_BLOCK_DAMAGE = register(new StateFlag("enderdragon-block-damage", true));
     public static final StateFlag GHAST_FIREBALL = register(new StateFlag("ghast-fireball", true));
-    public static final StateFlag FIREWORK_DAMAGE = register(new StateFlag("firework-damage", true));
     public static final StateFlag OTHER_EXPLOSION = register(new StateFlag("other-explosion", true));
     public static final StateFlag WITHER_DAMAGE = register(new StateFlag("wither-damage", true));
     public static final StateFlag ENDER_BUILD = register(new StateFlag("enderman-grief", true));

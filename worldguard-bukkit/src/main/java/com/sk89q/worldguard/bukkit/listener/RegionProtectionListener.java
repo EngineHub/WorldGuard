@@ -41,10 +41,7 @@ import com.sk89q.worldguard.bukkit.util.InteropUtils;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.config.WorldConfiguration;
-import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
-import com.sk89q.worldguard.protection.DelayedRegionOverlapAssociation;
-import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -53,7 +50,6 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -149,26 +145,6 @@ public class RegionProtectionListener extends AbstractListener {
             return !pvp && new RegionPermissionModel(localPlayer).mayIgnoreRegionProtection(BukkitAdapter.adapt(world));
         } else {
             return false;
-        }
-    }
-
-    private RegionAssociable createRegionAssociable(Cause cause) {
-        Object rootCause = cause.getRootCause();
-
-        if (!cause.isKnown()) {
-            return Associables.constant(Association.NON_MEMBER);
-        } else if (rootCause instanceof Player) {
-            return getPlugin().wrapPlayer((Player) rootCause);
-        } else if (rootCause instanceof OfflinePlayer) {
-            return getPlugin().wrapOfflinePlayer((OfflinePlayer) rootCause);
-        } else if (rootCause instanceof Entity) {
-            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-            return new DelayedRegionOverlapAssociation(query, BukkitAdapter.adapt(((Entity) rootCause).getLocation()));
-        } else if (rootCause instanceof Block) {
-            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
-            return new DelayedRegionOverlapAssociation(query, BukkitAdapter.adapt(((Block) rootCause).getLocation()));
-        } else {
-            return Associables.constant(Association.NON_MEMBER);
         }
     }
 
