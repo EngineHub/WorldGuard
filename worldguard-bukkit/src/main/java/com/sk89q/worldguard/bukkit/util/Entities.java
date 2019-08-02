@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.util;
 
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
@@ -40,7 +41,6 @@ import org.bukkit.entity.Slime;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
-import org.bukkit.entity.TippedArrow;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.inventory.InventoryHolder;
@@ -212,7 +212,7 @@ public final class Entities {
     }
 
     public static boolean isPotionArrow(Entity entity) {
-        return entity instanceof TippedArrow || entity instanceof SpectralArrow;
+        return entity instanceof Arrow || entity instanceof SpectralArrow;
     }
 
     public static boolean isAoECloud(EntityType type) {
