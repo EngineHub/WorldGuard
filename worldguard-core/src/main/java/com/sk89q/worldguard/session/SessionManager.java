@@ -55,6 +55,11 @@ public interface SessionManager {
     void resetState(LocalPlayer player);
 
     /**
+     * @return true if custom handlers are or were at some point registered, false otherwise
+     */
+    boolean customHandlersRegistered();
+
+    /**
      * Register a handler with the BukkitSessionManager.
      *
      * You may specify another handler class to ensure your handler is always registered after that class.

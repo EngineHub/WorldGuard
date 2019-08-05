@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -35,6 +36,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.blacklist.Blacklist;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.bukkit.listener.BlacklistListener;
 import com.sk89q.worldguard.bukkit.listener.BlockedPotionsListener;
@@ -64,7 +66,12 @@ import com.sk89q.worldguard.commands.GeneralCommands;
 import com.sk89q.worldguard.commands.ProtectionCommands;
 import com.sk89q.worldguard.commands.ToggleCommands;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
+import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
+import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
@@ -84,6 +91,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -205,7 +214,48 @@ public class WorldGuardPlugin extends JavaPlugin {
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
 
         // Enable metrics
-        new Metrics(this);
+        final Metrics metrics = new Metrics(this);
+        if (metrics.isEnabled() && platform.getGlobalStateManager().extraStats) {
+            setupCustomCharts(metrics);
+        }
+    }
+
+    private void setupCustomCharts(Metrics metrics) {
+        metrics.addCustomChart(new Metrics.SingleLineChart("region_count", () ->
+                platform.getRegionContainer().getLoaded().stream().mapToInt(RegionManager::size).sum()));
+        metrics.addCustomChart(new Metrics.SimplePie("region_driver", () -> {
+            RegionDriver driver = platform.getGlobalStateManager().selectedRegionStoreDriver;
+            return driver instanceof DirectoryYamlDriver ? "yaml" : driver instanceof SQLDriver ? "sql" : "unknown";
+        }));
+        metrics.addCustomChart(new Metrics.SimpleBarChart("blacklist", () -> {
+            int unused = 0;
+            int standard = 0;
+            int whitelist = 0;
+            for (BukkitWorldConfiguration worldConfig : platform.getGlobalStateManager().getWorldConfigs()) {
+                Blacklist blacklist = worldConfig.getBlacklist();
+                if (blacklist == null || blacklist.isEmpty()) {
+                    unused++;
+                } else if (blacklist.isWhitelist()) {
+                    whitelist++;
+                } else {
+                    standard++;
+                }
+            }
+            Map<String, Integer> blacklistCounts = new HashMap<>();
+            blacklistCounts.put("unused", unused);
+            blacklistCounts.put("blacklist", standard);
+            blacklistCounts.put("whitelist", whitelist);
+            return blacklistCounts;
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("chest_protection", () ->
+                "" + Streams.stream(platform.getGlobalStateManager().getWorldConfigs()).anyMatch(cfg -> cfg.signChestProtection)));
+        metrics.addCustomChart(new Metrics.SimplePie("build_permissions", () ->
+                "" + Streams.stream(platform.getGlobalStateManager().getWorldConfigs()).anyMatch(cfg -> cfg.buildPermissions)));
+
+        metrics.addCustomChart(new Metrics.SimplePie("custom_flags", () ->
+                "" + (WorldGuard.getInstance().getFlagRegistry().size() > Flags.INBUILT_FLAGS.size())));
+        metrics.addCustomChart(new Metrics.SimplePie("custom_handlers", () ->
+                "" + (WorldGuard.getInstance().getPlatform().getSessionManager().customHandlersRegistered())));
     }
 
     @Override

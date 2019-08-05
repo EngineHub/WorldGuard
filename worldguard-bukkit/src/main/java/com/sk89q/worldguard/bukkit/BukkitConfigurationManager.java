@@ -35,6 +35,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     @Unreported private ConcurrentMap<String, BukkitWorldConfiguration> worlds = new ConcurrentHashMap<>();
 
     private boolean hasCommandBookGodMode;
+    boolean extraStats;
 
     /**
      * Construct the object.
@@ -44,6 +45,16 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     public BukkitConfigurationManager(WorldGuardPlugin plugin) {
         super();
         this.plugin = plugin;
+    }
+
+    public Iterable<BukkitWorldConfiguration> getWorldConfigs() {
+        return worlds.values();
+    }
+
+    @Override
+    public void load() {
+        super.load();
+        this.extraStats = getConfig().getBoolean("custom-metrics-charts", true);
     }
 
     @Override
