@@ -1,5 +1,31 @@
 # Changelog
 
+## 7.0.1 RC 2 (inc. beta 1)
+* Due to breaking changes in important Bukkit API, this is not compatible with MC 1.13!
+* Update to MC 1.14. Adds protection for new blocks, etc.
+* To allow players to read from lecterns, but not take the book, flag interact allow, and then flag chest-access -g nonmembers deny.
+* Add ravager-grief flag.
+* Fix overprotection of unsaddled pigs with the ride flag.
+* Fix lava fire defaulting to off (won't change existing configs).
+* Fix damaged/chipped anvils not respecting use flag like regular anvils.
+* Add on-equip blacklist event. Note that it is overprotective due to deficiencies in Bukkit API.
+* Update WorldEdit CUI when using /rg select.
+* Add config option to disable villagers getting zapped into witches. ("weather.disable-villager-witchification")
+* Add entity support to interact-whitelist config option (use the Material of the corresponding item).
+* Fix vehicle-place protecting the rails at the very top of region boundaries incorrectly.
+* Fix for emptying buckets on waterloggable blocks.
+* Whitelist all player -> player interactions (previously was spammy in pvp).
+* Fix sleep flag not protecting against explosions in nether/end.
+* Add config for the teleport-on-void to reset fall distance.
+* Fix config options taking material lists requiring "minecraft:" namespace.
+* Fix disallowed-lightning-blocks situationally not working.
+* Fix errors that occurred when plugins used falling block entities with non-item materials.
+* Add special support for Paper servers (papermc.io): Paper's API allows us to track who launched fireworks.
+* Fireworks are now protected by default. On Paper servers, members can use them by default (to deal damage), 
+on non-Paper servers, flag firework-damage allow to revert to old behavior (everyone can deal damage with fireworks by default).
+* Misc performance enhancements for Paper servers.
+* Add 'regions.use-paper-entity-origin' as an experimental setting (default off) for Paper servers. Enabling it will make non-player entities be treated as members of the place they spawned, instead of their current location when flags are checked.
+
 ## 7.0.0
 * Added support for MC 1.13, dropped support for previous versions.
 * Added lots of interactive text in e.g. `/rg info` command.
