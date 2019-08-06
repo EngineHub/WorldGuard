@@ -27,6 +27,8 @@ import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.session.SessionManager;
+import com.sk89q.worldguard.util.profile.cache.ProfileCache;
+import com.sk89q.worldguard.util.profile.resolver.ProfileService;
 
 import java.nio.file.Path;
 
@@ -148,4 +150,9 @@ public interface WorldGuardPlatform {
      * @param report The reportlist
      */
     void addPlatformReports(ReportList report);
+
+    /**
+     * Internal use.
+     */
+    ProfileService createProfileService(ProfileCache profileCache);
 }

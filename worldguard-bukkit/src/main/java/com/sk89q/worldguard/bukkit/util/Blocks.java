@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.util;
 
+import io.papermc.lib.PaperLib;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
@@ -45,7 +46,7 @@ public final class Blocks {
      * @return a list of connected blocks, not including the given block
      */
     public static List<Block> getConnected(Block block) {
-        BlockState state = block.getState();
+        BlockState state = PaperLib.getBlockState(block, false).getState();
         BlockData data = state.getBlockData();
 
         if (data instanceof Bed) {

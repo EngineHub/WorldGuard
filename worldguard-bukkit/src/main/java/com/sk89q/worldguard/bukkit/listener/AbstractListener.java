@@ -21,12 +21,26 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
+import com.sk89q.worldguard.domains.Association;
+import com.sk89q.worldguard.protection.DelayedRegionOverlapAssociation;
+import com.sk89q.worldguard.protection.association.Associables;
+import com.sk89q.worldguard.protection.association.RegionAssociable;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
+import io.papermc.lib.PaperLib;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 /**
@@ -101,4 +115,34 @@ class AbstractListener implements Listener {
         return getWorldConfig(world).useRegions;
     }
 
+    protected RegionAssociable createRegionAssociable(Cause cause) {
+        Object rootCause = cause.getRootCause();
+
+        if (!cause.isKnown()) {
+            return Associables.constant(Association.NON_MEMBER);
+        } else if (rootCause instanceof Player) {
+            return getPlugin().wrapPlayer((Player) rootCause);
+        } else if (rootCause instanceof OfflinePlayer) {
+            return getPlugin().wrapOfflinePlayer((OfflinePlayer) rootCause);
+        } else if (rootCause instanceof Entity) {
+            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+            final Entity entity = (Entity) rootCause;
+            Location loc;
+            if (PaperLib.isPaper()
+                    && ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(entity.getWorld()))).usePaperEntityOrigin) {
+                loc = entity.getOrigin();
+                if (loc == null) {
+                    loc = entity.getLocation();
+                }
+            } else {
+                loc = entity.getLocation();
+            }
+            return new DelayedRegionOverlapAssociation(query, BukkitAdapter.adapt(loc));
+        } else if (rootCause instanceof Block) {
+            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+            return new DelayedRegionOverlapAssociation(query, BukkitAdapter.adapt(((Block) rootCause).getLocation()));
+        } else {
+            return Associables.constant(Association.NON_MEMBER);
+        }
+    }
 }

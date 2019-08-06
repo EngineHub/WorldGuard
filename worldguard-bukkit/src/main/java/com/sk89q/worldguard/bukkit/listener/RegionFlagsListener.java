@@ -39,7 +39,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
@@ -139,15 +138,6 @@ public class RegionFlagsListener extends AbstractListener {
             }
         }
 
-        if (event instanceof EntityDamageByEntityEvent) {
-            Entity damager = (((EntityDamageByEntityEvent) event)).getDamager();
-            if (damager.getType() == EntityType.FIREWORK) {
-                if (!query.testState(BukkitAdapter.adapt(entity.getLocation()), (RegionAssociable) null, Flags.FIREWORK_DAMAGE)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        }
     }
 
     /**
