@@ -42,7 +42,7 @@
 ###############################################################################
 #
 # For more information, see:
-# https://worldguard.readthedocs.io/en/latest/blacklist/
+# https://worldguard.enginehub.org/en/latest/blacklist/
 #
 ###############################################################################
 #

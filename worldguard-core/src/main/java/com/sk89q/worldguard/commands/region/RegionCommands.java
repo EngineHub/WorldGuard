@@ -539,10 +539,10 @@ public final class RegionCommands extends RegionCommandsBase {
                         .append(TextComponent.of("Only set this flag if you are sure you know what you are doing. See ")
                         .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
                                 .clickEvent(ClickEvent.of(ClickEvent.Action.OPEN_URL,
-                                        "https://worldguard.readthedocs.io/en/latest/regions/flags/#protection-related")))
+                                        "https://worldguard.enginehub.org/en/latest/regions/flags/#protection-related")))
                         .append(TextComponent.of(" for more info."))));
                 if (!sender.isPlayer()) {
-                    sender.printRaw("https://worldguard.readthedocs.io/en/latest/regions/flags/#protection-related");
+                    sender.printRaw("https://worldguard.enginehub.org/en/latest/regions/flags/#protection-related");
                 }
             } else if (foundFlag == Flags.PASSTHROUGH) {
                 sender.print(TextComponent.empty().append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
@@ -551,10 +551,10 @@ public final class RegionCommands extends RegionCommandsBase {
                         .append(TextComponent.of("It overrides build checks. If you're unsure what this means, see ")
                         .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
                                 .clickEvent(ClickEvent.of(ClickEvent.Action.OPEN_URL,
-                                        "https://worldguard.readthedocs.io/en/latest/regions/flags/#overrides")))
+                                        "https://worldguard.enginehub.org/en/latest/regions/flags/#overrides")))
                         .append(TextComponent.of(" for more info."))));
                 if (!sender.isPlayer()) {
-                    sender.printRaw("https://worldguard.readthedocs.io/en/latest/regions/flags/#overrides");
+                    sender.printRaw("https://worldguard.enginehub.org/en/latest/regions/flags/#overrides");
                 }
             }
         }

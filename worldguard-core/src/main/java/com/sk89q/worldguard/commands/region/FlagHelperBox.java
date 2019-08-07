@@ -76,6 +76,7 @@ class FlagHelperBox extends PaginationBox {
             .collect(Collectors.toList());
     private static final int SIZE = FLAGS.size() == Flags.INBUILT_FLAGS.size() ? FLAGS.size() : FLAGS.size() + 1;
     private static final int PAD_PX_SIZE = 180;
+    private static final Set<Flag<?>> DANGER_ZONE = ImmutableSet.of(Flags.BUILD, Flags.PASSTHROUGH, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK);
 
     private final World world;
     private final ProtectedRegion region;
@@ -200,7 +201,13 @@ class FlagHelperBox extends PaginationBox {
             if (maySet) {
                 if (isExplicitSet) {
                     hoverTexts.add(TextComponent.of("Click to unset", TextColor.GOLD));
-                } else if (flag != Flags.BUILD && flag != Flags.PASSTHROUGH) {
+                } else if (DANGER_ZONE.contains(flag)) {
+                    hoverTexts.add(TextComponent.of("Setting this flag may have unintended consequences.", TextColor.RED)
+                            .append(TextComponent.newline())
+                            .append(TextComponent.of("Please read the documentation and set this flag manually if you really intend to.")
+                            .append(TextComponent.newline())
+                            .append(TextComponent.of("(Hint: You do not need to set this to protect the region!)"))));
+                } else {
                     hoverTexts.add(TextComponent.of("Click to set", TextColor.GOLD));
                 }
             }
@@ -221,7 +228,7 @@ class FlagHelperBox extends PaginationBox {
                         HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hoverBuilder.build()));
             }
 
-            if (maySet && (isExplicitSet || flag != Flags.BUILD && flag != Flags.PASSTHROUGH)) {
+            if (maySet && (isExplicitSet || !DANGER_ZONE.contains(flag))) {
                 builder.append(choiceComponent.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                         makeCommand(flag, isExplicitSet ? "" : choice))));
             } else {
