@@ -676,6 +676,9 @@ public final class RegionCommands extends RegionCommandsBase {
     private static void sendFlagHelper(Actor sender, World world, ProtectedRegion region, RegionPermissionModel perms, int page) {
         final FlagHelperBox flagHelperBox = new FlagHelperBox(world, region, perms);
         flagHelperBox.setComponentsPerPage(18);
+        if (!sender.isPlayer()) {
+            flagHelperBox.tryMonoSpacing();
+        }
         AsyncCommandBuilder.wrap(() -> flagHelperBox.create(page), sender)
                 .onSuccess((Component) null, sender::print)
                 .onFailure("Failed to get region flags", WorldGuard.getInstance().getExceptionConverter())

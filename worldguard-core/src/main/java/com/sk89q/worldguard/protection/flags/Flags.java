@@ -34,6 +34,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The flags that are used in WorldGuard.
@@ -156,15 +157,20 @@ public final class Flags {
 
     public static final RegistryFlag<GameMode> GAME_MODE = register(new RegistryFlag<>("game-mode", GameMode.REGISTRY));
 
-    public static final IntegerFlag HEAL_DELAY = register(new IntegerFlag("heal-delay"));
-    public static final IntegerFlag HEAL_AMOUNT = register(new IntegerFlag("heal-amount"));
-    public static final DoubleFlag MIN_HEAL = register(new DoubleFlag("heal-min-health"));
-    public static final DoubleFlag MAX_HEAL = register(new DoubleFlag("heal-max-health"));
+    private static final Number[] DELAY_VALUES = {0, 1, 5};
+    private static final Number[] VITALS_VALUES = {0, 5, 10, 20};
+    private static final Number[] VITALS_MINS = {0, 10};
+    private static final Number[] VITALS_MAXS = {10, 20};
 
-    public static final IntegerFlag FEED_DELAY = register(new IntegerFlag("feed-delay"));
-    public static final IntegerFlag FEED_AMOUNT = register(new IntegerFlag("feed-amount"));
-    public static final IntegerFlag MIN_FOOD = register(new IntegerFlag("feed-min-hunger"));
-    public static final IntegerFlag MAX_FOOD = register(new IntegerFlag("feed-max-hunger"));
+    public static final IntegerFlag HEAL_DELAY = register(new IntegerFlag("heal-delay"), f -> f.setSuggestedValues(DELAY_VALUES));
+    public static final IntegerFlag HEAL_AMOUNT = register(new IntegerFlag("heal-amount"), f -> f.setSuggestedValues(VITALS_VALUES));
+    public static final DoubleFlag MIN_HEAL = register(new DoubleFlag("heal-min-health"), f -> f.setSuggestedValues(VITALS_MINS));
+    public static final DoubleFlag MAX_HEAL = register(new DoubleFlag("heal-max-health"), f -> f.setSuggestedValues(VITALS_MAXS));
+
+    public static final IntegerFlag FEED_DELAY = register(new IntegerFlag("feed-delay"), f -> f.setSuggestedValues(DELAY_VALUES));
+    public static final IntegerFlag FEED_AMOUNT = register(new IntegerFlag("feed-amount"), f -> f.setSuggestedValues(VITALS_VALUES));
+    public static final IntegerFlag MIN_FOOD = register(new IntegerFlag("feed-min-hunger"), f -> f.setSuggestedValues(VITALS_MINS));
+    public static final IntegerFlag MAX_FOOD = register(new IntegerFlag("feed-max-hunger"), f -> f.setSuggestedValues(VITALS_MAXS));
 
     // deny messages
     public static final StringFlag DENY_MESSAGE = register(new StringFlag("deny-message",
@@ -187,6 +193,12 @@ public final class Flags {
         WorldGuard.getInstance().getFlagRegistry().register(flag);
         INBUILT_FLAGS_LIST.add(flag.getName());
         return flag;
+    }
+
+    private static <T extends Flag<?>> T register(final T flag, Consumer<T> cfg) throws FlagConflictException {
+        T f = register(flag);
+        cfg.accept(f);
+        return f;
     }
 
     /**

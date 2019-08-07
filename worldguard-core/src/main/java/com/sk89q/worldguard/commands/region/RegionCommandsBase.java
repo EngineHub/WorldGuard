@@ -230,7 +230,7 @@ class RegionCommandsBase {
             throw new CommandException(
                     "Please select an area first. " +
                             "Use WorldEdit to make a selection! " +
-                            "(wiki: http://wiki.sk89q.com/wiki/WorldEdit).");
+                            "(see: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).");
         }
     }
 

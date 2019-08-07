@@ -19,37 +19,29 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-/**
- * Stores doubles.
- */
-public class DoubleFlag extends NumberFlag<Double> {
+import static com.google.common.base.Preconditions.checkNotNull;
 
-    public DoubleFlag(String name, RegionGroup defaultGroup) {
+/**
+ * Stores an Number.
+ */
+public abstract class NumberFlag<T extends Number> extends Flag<T> {
+
+    private static final Number[] EMPTY_NUMBER_ARRAY = new Number[0];
+    private Number[] suggestions = EMPTY_NUMBER_ARRAY;
+
+    protected NumberFlag(String name, RegionGroup defaultGroup) {
         super(name, defaultGroup);
     }
 
-    public DoubleFlag(String name) {
+    protected NumberFlag(String name) {
         super(name);
     }
 
-    @Override
-    public Double parseInput(FlagContext context) throws InvalidFlagFormat {
-        return context.getUserInputAsDouble();
+    public void setSuggestedValues(Number[] values) {
+        this.suggestions = checkNotNull(values);
     }
 
-    @Override
-    public Double unmarshal(Object o) {
-        if (o instanceof Double) {
-            return (Double) o;
-        } else if (o instanceof Number) {
-            return ((Number) o).doubleValue();
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public Object marshal(Double o) {
-        return o;
+    public Number[] getSuggestedValues() {
+        return suggestions;
     }
 }
