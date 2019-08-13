@@ -82,41 +82,19 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "nw:",
             desc = "Add an owner to a region",
             min = 2)
-    public void addOwner(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
+    public void addOwner(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
         World world = checkWorld(args, sender, 'w'); // Get the world
-
-        LocalPlayer player = null;
-        if (sender instanceof LocalPlayer) {
-            player = (LocalPlayer) sender;
-        }
 
         String id = args.getString(0);
 
         RegionManager manager = checkRegionManager(world);
         ProtectedRegion region = checkExistingRegion(manager, id, true);
 
-        id = region.getId();
-
-        DefaultDomain owners = region.getOwners();
-
-        if (player != null) {
-            if (owners != null && owners.size() == 0) {
-                if (!sender.hasPermission("worldguard.region.unlimited")) {
-                    int maxRegionCount = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).getMaxRegionCount(player);
-                    if (maxRegionCount >= 0 && manager.getRegionCountOfPlayer(player)
-                            >= maxRegionCount) {
-                        throw new CommandException("You already own the maximum allowed amount of regions.");
-                    }
-                }
-                sender.checkPermission("worldguard.region.addowner.unclaimed." + id.toLowerCase());
-            } else {
-                // Check permissions
-                if (!getPermissionModel(player).mayAddOwners(region)) {
-                    throw new CommandPermissionsException();
-                }
-            }
+        // Check permissions
+        if (!getPermissionModel(sender).mayAddOwners(region)) {
+            throw new CommandPermissionsException();
         }
 
         // Resolve owners asynchronously
@@ -126,11 +104,44 @@ public class MemberCommands extends RegionCommandsBase {
 
 
         final String description = String.format("Adding owners to the region '%s' on '%s'", region.getId(), world.getName());
-        AsyncCommandBuilder.wrap(resolver, sender)
+        AsyncCommandBuilder.wrap(checkedAddOwners(sender, manager, region, world, resolver), sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
                 .onSuccess(String.format("Region '%s' updated with new owners.", region.getId()), region.getOwners()::addAll)
                 .onFailure("Failed to add new owners", worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
+    }
+
+    private static Callable<DefaultDomain> checkedAddOwners(Actor sender, RegionManager manager, ProtectedRegion region,
+                                                            World world, DomainInputResolver resolver) {
+        return () -> {
+            DefaultDomain owners = resolver.call();
+            // TODO this was always broken and never checked other players
+            if (sender instanceof LocalPlayer) {
+                LocalPlayer player = (LocalPlayer) sender;
+                if (owners.contains(player) && !sender.hasPermission("worldguard.region.unlimited")) {
+                    int maxRegionCount = WorldGuard.getInstance().getPlatform().getGlobalStateManager()
+                            .get(world).getMaxRegionCount(player);
+                    if (maxRegionCount >= 0 && manager.getRegionCountOfPlayer(player)
+                            >= maxRegionCount) {
+                        throw new CommandException("You already own the maximum allowed amount of regions.");
+                    }
+                }
+            }
+            if (region.getOwners().size() == 0) {
+                boolean anyOwners = false;
+                ProtectedRegion parent;
+                while ((parent = region.getParent()) != null) {
+                    if (parent.getOwners().size() > 0) {
+                        anyOwners = true;
+                        break;
+                    }
+                }
+                if (!anyOwners) {
+                    sender.checkPermission("worldguard.region.addowner.unclaimed." + region.getId().toLowerCase());
+                }
+            }
+            return owners;
+        };
     }
 
     @Command(aliases = {"removemember", "remmember", "removemem", "remmem", "rm"},
