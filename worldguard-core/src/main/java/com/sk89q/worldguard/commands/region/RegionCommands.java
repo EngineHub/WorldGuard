@@ -79,6 +79,7 @@ import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -95,7 +96,29 @@ public final class RegionCommands extends RegionCommandsBase {
         checkNotNull(worldGuard);
         this.worldGuard = worldGuard;
     }
-    
+
+    private static TextComponent passthroughFlagWarning = TextComponent.empty()
+            .append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
+            .append(ErrorFormat.wrap(" This flag is unrelated to moving through regions."))
+            .append(TextComponent.newline())
+            .append(TextComponent.of("It overrides build checks. If you're unsure what this means, see ")
+                    .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.OPEN_URL,
+                                    "https://worldguard.enginehub.org/en/latest/regions/flags/#overrides")))
+                    .append(TextComponent.of(" for more info.")));
+    private static TextComponent buildFlagWarning = TextComponent.empty()
+            .append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
+            .append(ErrorFormat.wrap(" Setting this flag is not required for protection."))
+            .append(TextComponent.newline())
+            .append(TextComponent.of("Setting this flag will completely override default protection, and apply" +
+                    " to members, non-members, pistons, sand physics, and everything else that can modify blocks."))
+            .append(TextComponent.newline())
+            .append(TextComponent.of("Only set this flag if you are sure you know what you are doing. See ")
+                    .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.OPEN_URL,
+                                    "https://worldguard.enginehub.org/en/latest/regions/flags/#protection-related")))
+                    .append(TextComponent.of(" for more info.")));
+
     /**
      * Defines a new region.
      * 
@@ -484,75 +507,28 @@ public final class RegionCommands extends RegionCommandsBase {
         if (!permModel.maySetFlag(existing)) {
             throw new CommandPermissionsException();
         }
+        String regionId = existing.getId();
 
         Flag<?> foundFlag = Flags.fuzzyMatchFlag(flagRegistry, flagName);
 
         // We didn't find the flag, so let's print a list of flags that the user
         // can use, and do nothing afterwards
         if (foundFlag == null) {
-            ArrayList<String> flagList = new ArrayList<>();
-
-            // Need to build a list
-            for (Flag<?> flag : flagRegistry) {
-                // Can the user set this flag?
-                if (!permModel.maySetFlag(existing, flag)) {
-                    continue;
-                }
-
-                flagList.add(flag.getName());
-            }
-
-            Collections.sort(flagList);
-
-            final TextComponent.Builder builder = TextComponent.builder("Available flags: ");
-
-            final HoverEvent clickToSet = HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set"));
-            for (int i = 0; i < flagList.size(); i++) {
-                String flag = flagList.get(i);
-
-                builder.append(TextComponent.of(flag, i % 2 == 0 ? TextColor.GRAY : TextColor.WHITE)
-                        .hoverEvent(clickToSet).clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
-                                "/rg flag -w " + world.getName() + " " + existing.getId() + " " + flag + " ")));
-                if (i < flagList.size() + 1) {
-                    builder.append(TextComponent.of(", "));
-                }
-            }
-
-            sender.printError("Unknown flag specified: " + flagName);
-            sender.print(builder.build());
-            if (sender.isPlayer()) {
-                sender.print(TextComponent.of("Or use the command ", TextColor.LIGHT_PURPLE)
-                        .append(TextComponent.of("/rg flags " + existing.getId(), TextColor.AQUA)
-                                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
-                                        "/rg flags -w " + world.getName() + " " + existing.getId()))));
-            }
-
+            AsyncCommandBuilder.wrap(new FlagListBuilder(flagRegistry, permModel, existing, world,
+                                                         regionId, sender, flagName), sender)
+                    .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), "Flag list for invalid flag command.")
+                    .onSuccess((Component) null, sender::print)
+                    .onFailure((Component) null, WorldGuard.getInstance().getExceptionConverter())
+                    .buildAndExec(WorldGuard.getInstance().getExecutorService());
             return;
         } else if (value != null) {
             if (foundFlag == Flags.BUILD || foundFlag == Flags.BLOCK_BREAK || foundFlag == Flags.BLOCK_PLACE) {
-                sender.print(TextComponent.empty().append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                        .append(ErrorFormat.wrap(" Setting the " + foundFlag.getName() + " flag is not required for protection."))
-                        .append(TextComponent.newline())
-                        .append(TextComponent.of("Setting this flag will completely override default protection, and apply" +
-                                " to members, non-members, pistons, and everything else that can modify blocks."))
-                        .append(TextComponent.newline())
-                        .append(TextComponent.of("Only set this flag if you are sure you know what you are doing. See ")
-                        .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
-                                .clickEvent(ClickEvent.of(ClickEvent.Action.OPEN_URL,
-                                        "https://worldguard.enginehub.org/en/latest/regions/flags/#protection-related")))
-                        .append(TextComponent.of(" for more info."))));
+                sender.print(buildFlagWarning);
                 if (!sender.isPlayer()) {
                     sender.printRaw("https://worldguard.enginehub.org/en/latest/regions/flags/#protection-related");
                 }
             } else if (foundFlag == Flags.PASSTHROUGH) {
-                sender.print(TextComponent.empty().append(TextComponent.of("WARNING:", TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                        .append(ErrorFormat.wrap(" This flag is unrelated to moving through regions."))
-                        .append(TextComponent.newline())
-                        .append(TextComponent.of("It overrides build checks. If you're unsure what this means, see ")
-                        .append(TextComponent.of("[this documentation page]", TextColor.AQUA)
-                                .clickEvent(ClickEvent.of(ClickEvent.Action.OPEN_URL,
-                                        "https://worldguard.enginehub.org/en/latest/regions/flags/#overrides")))
-                        .append(TextComponent.of(" for more info."))));
+                sender.print(passthroughFlagWarning);
                 if (!sender.isPlayer()) {
                     sender.printRaw("https://worldguard.enginehub.org/en/latest/regions/flags/#overrides");
                 }
@@ -596,7 +572,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             if (!args.hasFlag('h')) {
-                sender.print("Region flag " + foundFlag.getName() + " set on '" + existing.getId() + "' to '" + value + "'.");
+                sender.print("Region flag " + foundFlag.getName() + " set on '" + regionId + "' to '" + value + "'.");
             }
 
         // No value? Clear the flag, if -g isn't specified
@@ -611,7 +587,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             if (!args.hasFlag('h')) {
-                sender.print("Region flag " + foundFlag.getName() + " removed from '" + existing.getId() + "'. (Any -g(roups) were also removed.)");
+                sender.print("Region flag " + foundFlag.getName() + " removed from '" + regionId + "'. (Any -g(roups) were also removed.)");
             }
         }
 
@@ -1117,5 +1093,68 @@ public final class RegionCommands extends RegionCommandsBase {
 
         player.setLocation(teleportLocation);
         sender.print("Teleported you to the region '" + existing.getId() + "'.");
+    }
+
+    private static class FlagListBuilder implements Callable<Component> {
+        private final FlagRegistry flagRegistry;
+        private final RegionPermissionModel permModel;
+        private final ProtectedRegion existing;
+        private final World world;
+        private final String regionId;
+        private final Actor sender;
+        private final String flagName;
+
+        FlagListBuilder(FlagRegistry flagRegistry, RegionPermissionModel permModel, ProtectedRegion existing,
+                        World world, String regionId, Actor sender, String flagName) {
+            this.flagRegistry = flagRegistry;
+            this.permModel = permModel;
+            this.existing = existing;
+            this.world = world;
+            this.regionId = regionId;
+            this.sender = sender;
+            this.flagName = flagName;
+        }
+
+        @Override
+        public Component call() {
+            ArrayList<String> flagList = new ArrayList<>();
+
+            // Need to build a list
+            for (Flag<?> flag : flagRegistry) {
+                // Can the user set this flag?
+                if (!permModel.maySetFlag(existing, flag)) {
+                    continue;
+                }
+
+                flagList.add(flag.getName());
+            }
+
+            Collections.sort(flagList);
+
+            final TextComponent.Builder builder = TextComponent.builder("Available flags: ");
+
+            final HoverEvent clickToSet = HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set"));
+            for (int i = 0; i < flagList.size(); i++) {
+                String flag = flagList.get(i);
+
+                builder.append(TextComponent.of(flag, i % 2 == 0 ? TextColor.GRAY : TextColor.WHITE)
+                        .hoverEvent(clickToSet).clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
+                                "/rg flag -w " + world.getName() + " " + regionId + " " + flag + " ")));
+                if (i < flagList.size() + 1) {
+                    builder.append(TextComponent.of(", "));
+                }
+            }
+
+            Component ret = ErrorFormat.wrap("Unknown flag specified: " + flagName)
+                    .append(TextComponent.newline())
+                    .append(builder.build());
+            if (sender.isPlayer()) {
+                return ret.append(TextComponent.of("Or use the command ", TextColor.LIGHT_PURPLE)
+                                .append(TextComponent.of("/rg flags " + regionId, TextColor.AQUA)
+                                    .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
+                                        "/rg flags -w " + world.getName() + " " + regionId))));
+            }
+            return ret;
+        }
     }
 }
