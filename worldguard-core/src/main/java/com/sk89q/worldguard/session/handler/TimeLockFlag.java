@@ -39,7 +39,7 @@ public class TimeLockFlag extends FlagValueChangeHandler<String> {
         }
     }
 
-    private Long initialTime;
+    private long initialTime;
     private boolean initialRelative;
 
     private static Pattern timePattern = Pattern.compile("([+\\-])?\\d+");
@@ -54,10 +54,7 @@ public class TimeLockFlag extends FlagValueChangeHandler<String> {
             return;
         }
         boolean relative = value.startsWith("+") || value.startsWith("-");
-        Long time = Long.valueOf(value);
-//        if (!relative && (time < 0L || time > 24000L)) { // invalid time, reset to 0
-//            time = 0L;
-//        }
+        long time = Long.parseLong(value);
         player.setPlayerTime(time, relative);
     }
 
@@ -70,15 +67,20 @@ public class TimeLockFlag extends FlagValueChangeHandler<String> {
 
     @Override
     protected boolean onSetValue(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, String currentValue, String lastValue, MoveType moveType) {
+        if (lastValue == null) {
+            initialRelative = player.isPlayerTimeRelative();
+            initialTime = player.getPlayerTimeOffset();
+        }
         updatePlayerTime(player, currentValue);
         return true;
     }
 
     @Override
     protected boolean onAbsentValue(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, String lastValue, MoveType moveType) {
+        // in the case that time = 0 and relative = true, this is the same as resetPlayerTime
         player.setPlayerTime(initialTime, initialRelative);
-        initialRelative = true;
         initialTime = 0L;
+        initialRelative = true;
         return true;
     }
 

@@ -45,16 +45,17 @@ public class WeatherLockFlag extends FlagValueChangeHandler<WeatherType> {
 
     @Override
     protected void onInitialValue(LocalPlayer player, ApplicableRegionSet set, WeatherType value) {
-        if (value == null) {
-            initialWeather = null;
-            return;
+        initialWeather = player.getPlayerWeather();
+        if (value != null) {
+            player.setPlayerWeather(value);
         }
-        initialWeather = value;
-        player.setPlayerWeather(value);
     }
 
     @Override
     protected boolean onSetValue(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, WeatherType currentValue, WeatherType lastValue, MoveType moveType) {
+        if (lastValue == null) {
+            initialWeather = player.getPlayerWeather();
+        }
         player.setPlayerWeather(currentValue);
         return true;
     }
