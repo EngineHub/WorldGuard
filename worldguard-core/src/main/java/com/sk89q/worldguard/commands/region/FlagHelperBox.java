@@ -83,7 +83,7 @@ class FlagHelperBox extends PaginationBox {
     private boolean monoSpace;
 
     FlagHelperBox(World world, ProtectedRegion region, RegionPermissionModel perms) {
-        super("Flags for " + region.getId(), "/rg flags -w " + world.getName() + " -p %page% " + region.getId());
+        super("Flags for " + region.getId(), "/rg flags -w \"" + world.getName() + "\" -p %page% " + region.getId());
         this.world = world;
         this.region = region;
         this.perms = perms;
@@ -301,7 +301,7 @@ class FlagHelperBox extends PaginationBox {
     }
 
     private String makeCommand(Flag<?> flag, Object choice) {
-        return "/rg flag -w " + world.getName() + " -h " + getCurrentPage()
+        return "/rg flag -w \"" + world.getName() + "\" -h " + getCurrentPage()
                 + " " + region.getId() + " " + flag.getName() + " " + choice;
     }
 

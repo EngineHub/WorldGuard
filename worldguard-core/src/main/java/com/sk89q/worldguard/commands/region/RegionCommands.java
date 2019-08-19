@@ -378,7 +378,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             existing = checkRegionStandingIn(manager, (LocalPlayer) sender, true,
-                    "/rg info -w " + world.getName() + " %id%" + (args.hasFlag('u') ? " -u" : "") + (args.hasFlag('s') ? " -s" : ""));
+                    "/rg info -w \"" + world.getName() + "\" %id%" + (args.hasFlag('u') ? " -u" : "") + (args.hasFlag('s') ? " -s" : ""));
         } else { // Get region from the ID
             existing = checkExistingRegion(manager, args.getString(0), true);
         }
@@ -635,7 +635,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
 
             region = checkRegionStandingIn(manager, (LocalPlayer) sender, true,
-                    "/rg flags -w " + world.getName() + " %id%");
+                    "/rg flags -w \"" + world.getName() + "\" %id%");
         } else { // Get region from the ID
             region = checkExistingRegion(manager, args.getString(0), true);
         }
@@ -1139,7 +1139,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
                 builder.append(TextComponent.of(flag, i % 2 == 0 ? TextColor.GRAY : TextColor.WHITE)
                         .hoverEvent(clickToSet).clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
-                                "/rg flag -w " + world.getName() + " " + regionId + " " + flag + " ")));
+                                "/rg flag -w \"" + world.getName() + "\" " + regionId + " " + flag + " ")));
                 if (i < flagList.size() + 1) {
                     builder.append(TextComponent.of(", "));
                 }
@@ -1152,7 +1152,7 @@ public final class RegionCommands extends RegionCommandsBase {
                 return ret.append(TextComponent.of("Or use the command ", TextColor.LIGHT_PURPLE)
                                 .append(TextComponent.of("/rg flags " + regionId, TextColor.AQUA)
                                     .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
-                                        "/rg flags -w " + world.getName() + " " + regionId))));
+                                        "/rg flags -w \"" + world.getName() + "\" " + regionId))));
             }
             return ret;
         }
