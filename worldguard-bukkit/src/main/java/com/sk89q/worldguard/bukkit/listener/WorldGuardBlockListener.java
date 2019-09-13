@@ -620,7 +620,7 @@ public class WorldGuardBlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockGrow(BlockGrowEvent event) {
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        final Material type = event.getBlock().getType();
+        final Material type = event.getNewState().getType();
 
         if (Materials.isCrop(type)) {
             if (wcfg.disableCropGrowth) {
