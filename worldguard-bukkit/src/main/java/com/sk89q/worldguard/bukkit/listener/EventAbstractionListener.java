@@ -58,9 +58,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
-import org.bukkit.block.Container;
 import org.bukkit.block.DoubleChest;
-import org.bukkit.block.Dropper;
 import org.bukkit.block.Hopper;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.Waterlogged;
@@ -751,7 +749,12 @@ public class EventAbstractionListener extends AbstractListener {
         if (matchingItem != null && hasInteractBypass(world, matchingItem)) {
             useEntityEvent.setAllowed(true);
         }
-        Events.fireToCancel(event, useEntityEvent);
+        if (!Events.fireToCancel(event, useEntityEvent)) {
+            // so this is a hack but CreeperIgniteEvent doesn't actually tell us who, so we need to do it here
+            if (item.getType() == Material.FLINT_AND_STEEL && entity.getType() == EntityType.CREEPER) {
+                Cause.trackParentCause(entity, player);
+            }
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
