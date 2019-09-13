@@ -76,6 +76,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
@@ -853,18 +854,20 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         final InventoryHolder causeHolder = event.getInitiator().getHolder();
-        InventoryHolder sourceHolder = event.getSource().getHolder();
-        InventoryHolder targetHolder = event.getDestination().getHolder();
 
-        if ((causeHolder instanceof Hopper || causeHolder instanceof Dropper)
-                && ((BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(
-                        BukkitAdapter.adapt(((Container) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
+        if (causeHolder instanceof Hopper
+                && getWorldConfig(BukkitAdapter.adapt((((Hopper) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
+            return;
+        } else if (causeHolder instanceof HopperMinecart
+                && getWorldConfig(BukkitAdapter.adapt((((HopperMinecart) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
             return;
         }
 
         Entry entry;
 
         if ((entry = moveItemDebounce.tryDebounce(event)) != null) {
+            InventoryHolder sourceHolder = event.getSource().getHolder();
+            InventoryHolder targetHolder = event.getDestination().getHolder();
             Cause cause;
 
             if (causeHolder instanceof Entity) {
