@@ -270,7 +270,7 @@ public final class Cause {
                             }
                         }
                     } else if (o instanceof Vehicle) {
-                        addAll(((Vehicle) o).getPassengers());
+                        ((Vehicle) o).getPassengers().forEach(this::addAll);
                     } else if (o instanceof AreaEffectCloud) {
                         indirect = true;
                         addAll(((AreaEffectCloud) o).getSource());

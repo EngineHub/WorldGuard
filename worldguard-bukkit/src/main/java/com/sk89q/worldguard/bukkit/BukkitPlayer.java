@@ -24,6 +24,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import com.sk89q.worldguard.LocalPlayer;
+import io.papermc.lib.PaperLib;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -177,6 +178,12 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
     @Override
     public void resetFallDistance() {
         getPlayer().setFallDistance(0);
+    }
+
+    @Override
+    public void teleport(Location location, String message) {
+        PaperLib.teleportAsync(getPlayer(), BukkitAdapter.adapt(location))
+                .thenApply(success -> { if (success) print(message); return success; });
     }
 
     @Override
