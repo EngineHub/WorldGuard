@@ -1091,8 +1091,9 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        player.setLocation(teleportLocation);
-        sender.print("Teleported you to the region '" + existing.getId() + "'.");
+        player.teleport(teleportLocation,
+                "Teleported you to the region '" + existing.getId() + "'.",
+                "Unable to teleport to region '" + existing.getId() + "'.");
     }
 
     private static class FlagListBuilder implements Callable<Component> {

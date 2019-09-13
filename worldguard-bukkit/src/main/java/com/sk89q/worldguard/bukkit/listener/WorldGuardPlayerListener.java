@@ -413,9 +413,8 @@ public class WorldGuardPlayerListener implements Listener {
                     }
                 }
             }
-            if (null != WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer).testMoveTo(localPlayer,
-                    BukkitAdapter.adapt(event.getTo()),
-                    MoveType.TELEPORT)) {
+            if (null != WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer)
+                    .testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.TELEPORT)) {
                 event.setCancelled(true);
                 return;
             }

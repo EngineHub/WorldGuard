@@ -212,4 +212,12 @@ public interface LocalPlayer extends Player, RegionAssociable {
      * Clears fall distance.
      */
     void resetFallDistance();
+
+    /**
+     * Teleport the player, potentially async, displaying the message on a success.
+     *  @param location location to teleport to
+     * @param successMessage message to display on success
+     * @param failMessage message to display on failure
+     */
+    void teleport(Location location, String successMessage, String failMessage);
 }

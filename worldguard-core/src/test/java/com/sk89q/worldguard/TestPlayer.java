@@ -184,6 +184,11 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
+    public void teleport(Location location, String successMessage, String failMessage) {
+
+    }
+
+    @Override
     public void printRaw(String msg) {
         System.out.println("-> TestPlayer{" + this.name + "}: " + msg);
     }
