@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.event.block;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldguard.bukkit.cause.Cause;
@@ -28,12 +29,15 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.event.Event;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -44,7 +48,8 @@ import javax.annotation.Nullable;
 abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
 
     private final World world;
-    private final List<Block> blocks;
+    private List<Block> blocks;
+    private final List<BlockState> blockStates;
     private final Material effectiveMaterial;
 
     protected AbstractBlockEvent(@Nullable Event originalEvent, Cause cause, World world, List<Block> blocks, Material effectiveMaterial) {
@@ -55,6 +60,18 @@ abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
         this.world = world;
         this.blocks = blocks;
         this.effectiveMaterial = effectiveMaterial;
+        this.blockStates = null;
+    }
+
+    protected AbstractBlockEvent(@Nullable Event originalEvent, Cause cause, World world, List<BlockState> blocks) {
+        super(originalEvent, cause);
+        checkNotNull(world);
+        checkNotNull(blocks);
+        checkArgument(!blocks.isEmpty());
+        this.world = world;
+        this.blockStates = blocks;
+        this.blocks = null;
+        this.effectiveMaterial = blocks.get(0).getType();
     }
 
     protected AbstractBlockEvent(@Nullable Event originalEvent, Cause cause, Block block) {
@@ -86,6 +103,9 @@ abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
      * @return a list of affected block
      */
     public List<Block> getBlocks() {
+        if (blocks == null) { // be lazy here because we often don't call getBlocks internally, just filter
+            blocks = blockStates.stream().map(BlockState::getBlock).collect(Collectors.toList());
+        }
         return blocks;
     }
 
@@ -99,15 +119,21 @@ abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
      * @return true if one or more blocks were filtered out
      */
     public boolean filter(Predicate<Location> predicate, boolean cancelEventOnFalse) {
-        boolean hasRemoval = false;
+        return blocks == null
+                ? filterInternal(blockStates, BlockState::getLocation, predicate, cancelEventOnFalse)
+                : filterInternal(blocks, Block::getLocation, predicate, cancelEventOnFalse);
+    }
 
-        Iterator<Block> it = blocks.iterator();
+    private <B> boolean filterInternal(List<B> blockList, Function<B, Location> locFunc,
+                                       Predicate<Location> predicate, boolean cancelEventOnFalse) {
+        boolean hasRemoval = false;
+        Iterator<B> it = blockList.iterator();
         while (it.hasNext()) {
-            if (!predicate.test(it.next().getLocation())) {
+            if (!predicate.test(locFunc.apply(it.next()))) {
                 hasRemoval = true;
 
                 if (cancelEventOnFalse) {
-                    getBlocks().clear();
+                    blockList.clear();
                     setCancelled(true);
                     break;
                 } else {
@@ -115,7 +141,6 @@ abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
                 }
             }
         }
-
         return hasRemoval;
     }
 
@@ -147,7 +172,7 @@ abstract class AbstractBlockEvent extends DelegateEvent implements BulkEvent {
 
     @Override
     public Result getResult() {
-        if (blocks.isEmpty()) {
+        if (blocks == null ? blockStates.isEmpty() : blocks.isEmpty()) {
             return Result.DENY;
         }
         return super.getResult();

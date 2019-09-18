@@ -86,6 +86,7 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFertilizeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
@@ -176,9 +177,8 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
-        List<Block> blocks = event.getReplacedBlockStates().stream().map(BlockStateAsBlockFunction::apply).collect(Collectors.toList());
         Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()),
-                event.getBlock().getWorld(), blocks, event.getBlock().getType()));
+                event.getBlock().getWorld(), event.getReplacedBlockStates()));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -239,14 +239,11 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onStructureGrowEvent(StructureGrowEvent event) {
         int originalCount = event.getBlocks().size();
-        List<Block> blockList = event.getBlocks().stream().map(BlockStateAsBlockFunction::apply).collect(Collectors.toList());
 
         Player player = event.getPlayer();
-        if (player != null) {
-            Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(player), event.getLocation().getWorld(), blockList, Material.AIR));
-        } else {
-            Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getLocation().getBlock()), event.getLocation().getWorld(), blockList, Material.AIR));
-        }
+        Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event,
+                create(player == null ? event.getLocation() : player),
+                event.getLocation().getWorld(), event.getBlocks()));
 
         if (!event.isCancelled() && event.getBlocks().size() != originalCount) {
             event.getLocation().getBlock().setType(Material.AIR);
@@ -257,20 +254,26 @@ public class EventAbstractionListener extends AbstractListener {
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         Block block = event.getBlock();
         Entity entity = event.getEntity();
-        Material to = event.getTo();
-
-        // Forget about Redstone ore, especially since we handle it in INTERACT
-        if (block.getType() == Material.REDSTONE_ORE && to == Material.REDSTONE_ORE) {
-            return;
-        }
+        Material toType = event.getTo();
+        Material fromType = block.getType();
+        Cause cause = create(entity);
 
         // Fire two events: one as BREAK and one as PLACE
-        if (to != Material.AIR && block.getType() != Material.AIR) {
-            if (!Events.fireToCancel(event, new BreakBlockEvent(event, create(entity), block))) {
-                Events.fireToCancel(event, new PlaceBlockEvent(event, create(entity), block.getLocation(), to));
+        if (toType != Material.AIR && fromType != Material.AIR) {
+            boolean trample = fromType == Material.FARMLAND && toType == Material.DIRT;
+            BreakBlockEvent breakDelagate = new BreakBlockEvent(event, cause, block);
+            if (trample) {
+                breakDelagate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
+            }
+            if (!Events.fireToCancel(event, breakDelagate)) {
+                PlaceBlockEvent placeDelegate = new PlaceBlockEvent(event, cause, block.getLocation(), toType);
+                if (trample) {
+                    placeDelegate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
+                }
+                Events.fireToCancel(event, placeDelegate);
             }
         } else {
-            if (to == Material.AIR) {
+            if (toType == Material.AIR) {
                 // Track the source so later we can create a proper chain of causes
                 if (entity instanceof FallingBlock) {
                     Cause.trackParentCause(entity, block);
@@ -279,13 +282,12 @@ public class EventAbstractionListener extends AbstractListener {
                     Events.fireToCancel(event, new SpawnEntityEvent(event, create(block), entity));
                 } else {
                     entityBreakBlockDebounce.debounce(
-                            block, event.getEntity(), event, new BreakBlockEvent(event, create(entity), block));
+                            block, event.getEntity(), event, new BreakBlockEvent(event, cause, block));
                 }
             } else {
                 boolean wasCancelled = event.isCancelled();
-                Cause cause = create(entity);
 
-                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, block.getLocation(), to));
+                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, block.getLocation(), toType));
 
                 if (event.isCancelled() && !wasCancelled && entity instanceof FallingBlock) {
                     FallingBlock fallingBlock = (FallingBlock) entity;
@@ -489,6 +491,12 @@ public class EventAbstractionListener extends AbstractListener {
         interactDebounce.debounce(event.getBlock(), event.getEntity(), event,
                 new UseBlockEvent(event, create(event.getEntity()),
                         event.getBlock()).setAllowed(hasInteractBypass(event.getBlock())));
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockFertilize(BlockFertilizeEvent event) {
+        Cause cause = create(event.getPlayer(), event.getBlock());
+        Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getWorld(), event.getBlocks()));
     }
 
     @EventHandler(ignoreCancelled = true)
