@@ -129,8 +129,8 @@ public class MemberCommands extends RegionCommandsBase {
             }
             if (region.getOwners().size() == 0) {
                 boolean anyOwners = false;
-                ProtectedRegion parent;
-                while ((parent = region.getParent()) != null) {
+                ProtectedRegion parent = region;
+                while ((parent = parent.getParent()) != null) {
                     if (parent.getOwners().size() > 0) {
                         anyOwners = true;
                         break;
