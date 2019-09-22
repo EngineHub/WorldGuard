@@ -177,8 +177,14 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
-        Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()),
-                event.getBlock().getWorld(), event.getReplacedBlockStates()));
+        List<Block> placed = event.getReplacedBlockStates().stream().map(BlockState::getBlock).collect(Collectors.toList());
+        int origAmt = placed.size();
+        PlaceBlockEvent delegateEvent = new PlaceBlockEvent(event, create(event.getPlayer()), event.getBlock().getWorld(),
+                placed, event.getBlockPlaced().getType());
+        Events.fireToCancel(event, delegateEvent);
+        if (origAmt != placed.size()) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
