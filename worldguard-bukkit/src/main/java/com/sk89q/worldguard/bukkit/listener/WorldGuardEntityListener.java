@@ -282,13 +282,6 @@ public class WorldGuardEntityListener implements Listener {
                             event.setCancelled(true);
                             return;
                         }
-
-                        if (attacker instanceof Creeper) {
-                            if (!set.testState(localPlayer, Flags.CREEPER_EXPLOSION) && wcfg.explosionFlagCancellation) {
-                                event.setCancelled(true);
-                                return;
-                            }
-                        }
                     }
                 }
             }

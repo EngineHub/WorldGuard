@@ -64,6 +64,7 @@ import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.entity.AreaEffectCloud;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -788,6 +789,8 @@ public class EventAbstractionListener extends AbstractListener {
             final DamageEntityEvent eventToFire = new DamageEntityEvent(event, create(damager), event.getEntity());
             if (damager instanceof Firework) {
                 eventToFire.getRelevantFlags().add(Flags.FIREWORK_DAMAGE);
+            } else if (damager instanceof Creeper) {
+                eventToFire.getRelevantFlags().add(Flags.CREEPER_EXPLOSION);
             }
             Events.fireToCancel(event, eventToFire);
 
