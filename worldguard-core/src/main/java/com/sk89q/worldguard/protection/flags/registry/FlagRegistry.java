@@ -58,7 +58,7 @@ public interface FlagRegistry extends Iterable<Flag<?>> {
     void registerAll(Collection<Flag<?>> flags);
 
     /**
-     * Get af flag by its name.
+     * Get a flag by its name.
      *
      * @param name The name
      * @return The flag, if it has been registered
