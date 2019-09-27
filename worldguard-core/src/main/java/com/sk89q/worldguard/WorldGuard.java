@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldguard.domains.registry.CustomDomainRegistry;
+import com.sk89q.worldguard.domains.registry.SimpleCustomDomainRegistry;
 import com.sk89q.worldguard.util.profile.cache.HashMapCache;
 import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldguard.util.profile.cache.SQLiteCache;
@@ -55,6 +57,7 @@ public final class WorldGuard {
 
     private WorldGuardPlatform platform;
     private final SimpleFlagRegistry flagRegistry = new SimpleFlagRegistry();
+    private final CustomDomainRegistry customDomainRegsitry = new SimpleCustomDomainRegistry();
     private final Supervisor supervisor = new SimpleSupervisor();
     private ProfileCache profileCache;
     private ProfileService profileService;
@@ -64,6 +67,7 @@ public final class WorldGuard {
     static {
         Flags.registerAll();
     }
+
 
     public static WorldGuard getInstance() {
         return instance;
@@ -113,6 +117,15 @@ public final class WorldGuard {
      */
     public FlagRegistry getFlagRegistry() {
         return this.flagRegistry;
+    }
+
+    /**
+     * Get the custom domain registry.
+     * 
+     * @return the domain registry
+     */
+    public CustomDomainRegistry getCustomDomainRegistry() {
+        return this.customDomainRegsitry;
     }
 
     /**

@@ -27,7 +27,9 @@ import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.domains.registry.CustomDomain;
 import com.sk89q.worldguard.protection.flags.FlagUtil;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
@@ -168,6 +170,14 @@ public class YamlRegionFile implements RegionDatabase {
                 region.setOwners(parseDomain(node.getNode("owners")));
                 region.setMembers(parseDomain(node.getNode("members")));
 
+                YAMLNode customDomains = node.getNode("customDomains");
+                if(customDomains != null) {
+                    List<CustomDomain> all = WorldGuard.getInstance().getCustomDomainRegistry().getAll();
+                    for (CustomDomain customDomain : all) {
+                        parseDomain(customDomains.getNode(customDomain.getName()));
+                    }
+                }
+
                 loaded.put(id, region);
 
                 String parentId = node.getString("parent");
@@ -235,6 +245,13 @@ public class YamlRegionFile implements RegionDatabase {
             node.setProperty("flags", getFlagData(region));
             node.setProperty("owners", getDomainData(region.getOwners()));
             node.setProperty("members", getDomainData(region.getMembers()));
+
+            YAMLNode domains = node.addNode("customDomains");
+            for (CustomDomain customDomain : WorldGuard.getInstance().getCustomDomainRegistry().getAll()) {
+                DefaultDomain domain = region.getCustomDomain(customDomain.getName());
+                if(domain == null || domain.size() == 0) continue;
+                domains.setProperty(customDomain.getName(), getDomainData(domain));
+            }
 
             ProtectedRegion parent = region.getParent();
             if (parent != null) {

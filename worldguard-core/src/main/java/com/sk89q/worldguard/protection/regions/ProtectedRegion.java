@@ -33,6 +33,7 @@ import com.sk89q.worldguard.util.Normal;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,6 +63,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     private DefaultDomain owners = new DefaultDomain();
     private DefaultDomain members = new DefaultDomain();
     private ConcurrentMap<Flag<?>, Object> flags = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, DefaultDomain> customDomains = new ConcurrentHashMap<>();
     private boolean dirty = true;
 
     /**
@@ -258,6 +260,35 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         checkNotNull(members);
         setDirty(true);
         this.members = new DefaultDomain(members);
+    }
+
+    /**
+     * Get the map of domains that contains custom registered domains
+     *
+     * @return the map of domains
+     */
+    public Map<String, DefaultDomain> getCustomDomains() {
+        return Collections.unmodifiableMap(customDomains);
+    }
+
+    /**
+     * Get one custom domains from the name
+     *
+     * @return the domain
+     */
+    public DefaultDomain getCustomDomain(String name) {
+        checkNotNull(name);
+        return customDomains.get(name.toLowerCase());
+    }
+
+    /**
+     * Set the custom domains
+     */
+    public void setCustomDomains(Map<String, DefaultDomain> domains) {
+        checkNotNull(domains);
+        setDirty(true);
+        customDomains.clear();
+        domains.forEach((name, domain) -> customDomains.put(name, new DefaultDomain(domain)));
     }
 
     /**
@@ -471,6 +502,7 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
         checkNotNull(other);
         setMembers(other.getMembers());
         setOwners(other.getOwners());
+        setCustomDomains(other.getCustomDomains());
         setFlags(other.getFlags());
         setPriority(other.getPriority());
         try {
