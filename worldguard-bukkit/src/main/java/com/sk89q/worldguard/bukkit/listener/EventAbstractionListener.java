@@ -249,7 +249,7 @@ public class EventAbstractionListener extends AbstractListener {
 
         Player player = event.getPlayer();
         Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event,
-                create(player == null ? event.getLocation() : player),
+                create(player == null ? event.getLocation().getBlock() : player),
                 event.getLocation().getWorld(), event.getBlocks()));
 
         if (!event.isCancelled() && event.getBlocks().size() != originalCount) {
