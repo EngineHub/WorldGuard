@@ -152,8 +152,6 @@ public final class RegionCommands extends RegionCommandsBase {
             region = new GlobalProtectedRegion(id);
         } else {
             region = checkRegionFromSelection(player, id);
-            warnAboutDimensions(player, region);
-            informNewUser(player, manager, region);
         }
 
         RegionAdder task = new RegionAdder(manager, region);
@@ -162,8 +160,13 @@ public final class RegionCommands extends RegionCommandsBase {
         final String description = String.format("Adding region '%s'", region.getId());
         AsyncCommandBuilder.wrap(task, sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
-                .onSuccess(String.format("A new region has been made named '%s'.", region.getId()), null)
-                .onFailure("Failed to add the region '%s'", worldGuard.getExceptionConverter())
+                .onSuccess((Component) null,
+                        t -> {
+                            sender.print(String.format("A new region has been made named '%s'.", region.getId()));
+                            warnAboutDimensions(sender, region);
+                            informNewUser(sender, manager, region);
+                        })
+                .onFailure(String.format("Failed to add the region '%s'", region.getId()), worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
     }
 
@@ -201,8 +204,6 @@ public final class RegionCommands extends RegionCommandsBase {
             region = new GlobalProtectedRegion(id);
         } else {
             region = checkRegionFromSelection(player, id);
-            warnAboutDimensions(player, region);
-            informNewUser(player, manager, region);
         }
 
         region.copyFrom(existing);
@@ -213,7 +214,12 @@ public final class RegionCommands extends RegionCommandsBase {
         AsyncCommandBuilder.wrap(task, sender)
                 .registerWithSupervisor(worldGuard.getSupervisor(), description)
                 .sendMessageAfterDelay("(Please wait... " + description + ")")
-                .onSuccess(String.format("Region '%s' has been updated with a new area.", region.getId()), null)
+                .onSuccess((Component) null,
+                        t -> {
+                            player.print(String.format("Region '%s' has been updated with a new area.", region.getId()));
+                            warnAboutDimensions(player, region);
+                            informNewUser(player, manager, region);
+                        })
                 .onFailure(String.format("Failed to update the region '%s'", region.getId()), worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
     }

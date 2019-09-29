@@ -12,10 +12,6 @@ applyShadowConfiguration()
 
 repositories {
     maven {
-        name = "spigot"
-        url = uri("https://hub.spigotmc.org/nexus/content/groups/public")
-    }
-    maven {
         name = "paper"
         url = uri("https://papermc.io/repo/repository/maven-public/")
     }
