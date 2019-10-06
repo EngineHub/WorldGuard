@@ -682,9 +682,9 @@ public class WorldGuardEntityListener implements Listener {
             LocalPlayer associable = null;
             if (event.getEntity() instanceof Player) {
                 associable = plugin.wrapPlayer(((Player) event.getEntity()));
-            }
-            if (WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(associable, world)) {
-                return;
+                if (WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(associable, world)) {
+                    return;
+                }
             }
             BlockVector3 min = null;
             BlockVector3 max = null;

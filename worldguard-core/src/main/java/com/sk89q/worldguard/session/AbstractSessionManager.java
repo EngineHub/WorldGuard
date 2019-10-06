@@ -127,7 +127,9 @@ public abstract class AbstractSessionManager implements SessionManager {
 
     @Override
     public boolean hasBypass(LocalPlayer player, World world) {
-        return bypassCache.getUnchecked(new WorldPlayerTuple(world, player));
+        Session sess = getIfPresent(player);
+        return sess != null && !sess.hasBypassDisabled()
+                && bypassCache.getUnchecked(new WorldPlayerTuple(world, player));
     }
 
     @Override

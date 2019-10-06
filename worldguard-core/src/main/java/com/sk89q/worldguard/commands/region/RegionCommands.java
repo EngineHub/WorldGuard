@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
@@ -73,6 +74,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.util.DomainInputResolver.UserLocatorPolicy;
+import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.util.Enums;
 import com.sk89q.worldguard.util.logging.LoggerToChatHandler;
 
@@ -1095,6 +1097,21 @@ public final class RegionCommands extends RegionCommandsBase {
         player.teleport(teleportLocation,
                 "Teleported you to the region '" + existing.getId() + "'.",
                 "Unable to teleport to region '" + existing.getId() + "'.");
+    }
+
+    @Command(aliases = {"toggle-bypass", "bypass"},
+             desc = "Toggle region bypassing, effectively ignoring bypass permissions.")
+    @CommandPermissions({"worldguard.region.toggle-bypass"})
+    public void toggleBypass(CommandContext args, Actor sender) throws CommandException {
+        LocalPlayer player = worldGuard.checkPlayer(sender);
+        Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
+        if (session.hasBypassDisabled()) {
+            session.setBypassDisabled(false);
+            player.print("You are now bypassing region protection (as long as you have permission).");
+        } else {
+            session.setBypassDisabled(true);
+            player.print("You are no longer bypassing region protection.");
+        }
     }
 
     private static class FlagListBuilder implements Callable<Component> {

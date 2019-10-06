@@ -136,13 +136,14 @@ public class RegionProtectionListener extends AbstractListener {
         if (rootCause instanceof Player) {
             Player player = (Player) rootCause;
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-            WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(world));
+            com.sk89q.worldedit.world.World localWorld = BukkitAdapter.adapt(world);
+            WorldConfiguration config = getWorldConfig(localWorld);
 
             if (config.fakePlayerBuildOverride && InteropUtils.isFakePlayer(player)) {
                 return true;
             }
 
-            return !pvp && new RegionPermissionModel(localPlayer).mayIgnoreRegionProtection(BukkitAdapter.adapt(world));
+            return !pvp && WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localWorld);
         } else {
             return false;
         }
