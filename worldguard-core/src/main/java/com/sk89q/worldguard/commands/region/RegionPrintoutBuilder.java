@@ -293,8 +293,7 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
         builder.append(TextComponent.of("Bounds:", TextColor.BLUE));
-        TextComponent bound = TextComponent.of(" (" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")"
-                + " -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")", TextColor.YELLOW);
+        TextComponent bound = TextComponent.of(" " + min + " -> " + max, TextColor.YELLOW);
         if (perms != null && perms.maySelect(region)) {
             bound = bound
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to select")))

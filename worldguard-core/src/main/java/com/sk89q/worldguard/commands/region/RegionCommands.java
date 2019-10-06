@@ -748,7 +748,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         // Tell the user the current inheritance
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), child, null, sender);
-        printout.append(LabelFormat.wrap("Inheritance set for region '", child.getId(), "'."));
+        printout.append(TextComponent.of("Inheritance set for region '" + child.getId() + "'.", TextColor.LIGHT_PURPLE));
         if (parent != null) {
             printout.newline();
             printout.append(SubtleFormat.wrap("(Current inheritance:")).newline();

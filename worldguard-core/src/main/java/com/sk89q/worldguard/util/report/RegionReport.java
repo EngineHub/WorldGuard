@@ -32,9 +32,11 @@ public class RegionReport extends DataReport {
 
         append("Type", region.getType());
         append("Priority", region.getPriority());
+        append("Parent", region.getParent() == null ? "<none>" : region.getParent().getId());
         append("Owners", region.getOwners());
         append("Members", region.getMembers());
         append("Flags", region.getFlags());
+        append("Bounds", region.getMinimumPoint() + " -> " + region.getMaximumPoint());
     }
 
 }

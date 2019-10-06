@@ -52,6 +52,7 @@ import com.sk89q.worldguard.util.profiler.SamplerBuilder;
 import com.sk89q.worldguard.util.profiler.SamplerBuilder.Sampler;
 import com.sk89q.worldguard.util.profiler.ThreadIdFilter;
 import com.sk89q.worldguard.util.profiler.ThreadNameFilter;
+import com.sk89q.worldguard.util.report.ApplicableRegionsReport;
 import com.sk89q.worldguard.util.report.ConfigReport;
 
 import java.io.File;
@@ -130,6 +131,9 @@ public class WorldGuardCommands {
         worldGuard.getPlatform().addPlatformReports(report);
         report.add(new SystemInfoReport());
         report.add(new ConfigReport());
+        if (sender instanceof LocalPlayer) {
+            report.add(new ApplicableRegionsReport((LocalPlayer) sender));
+        }
         String result = report.toString();
 
         try {
