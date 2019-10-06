@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.commands.CommandUtils;
+
 import javax.annotation.Nullable;
 
 /**
@@ -56,7 +58,10 @@ public class StringFlag extends Flag<String> {
 
     @Override
     public String parseInput(FlagContext context) throws InvalidFlagFormat {
-        return context.getUserInput().replaceAll("(?!<\\\\)\\\\n", "\n").replaceAll("\\\\\\\\n", "\\n");
+        String lines = context.getUserInput().replaceAll("(?<!\\\\)\\\\n", "\n").replaceAll("\\\\\\\\n", "\\\\n");
+        // Add color codes
+        lines = CommandUtils.replaceColorMacros(lines);
+        return lines;
     }
 
     @Override

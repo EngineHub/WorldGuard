@@ -392,8 +392,10 @@ class RegionCommandsBase {
      * @param value the value
      * @throws InvalidFlagFormat thrown if the value is invalid
      */
-    protected static <V> void setFlag(ProtectedRegion region, Flag<V> flag, Actor sender, String value) throws InvalidFlagFormat {
-        region.setFlag(flag, flag.parseInput(FlagContext.create().setSender(sender).setInput(value).setObject("region", region).build()));
+    protected static <V> V setFlag(ProtectedRegion region, Flag<V> flag, Actor sender, String value) throws InvalidFlagFormat {
+        V val = flag.parseInput(FlagContext.create().setSender(sender).setInput(value).setObject("region", region).build());
+        region.setFlag(flag, val);
+        return val;
     }
 
 }

@@ -500,11 +500,6 @@ public final class RegionCommands extends RegionCommandsBase {
             value = "";
         }
 
-        // Add color codes
-        if (value != null) {
-            value = CommandUtils.replaceColorMacros(value);
-        }
-
         // Lookup the existing region
         RegionManager manager = checkRegionManager(world);
         ProtectedRegion existing = checkExistingRegion(manager, args.getString(0), true);
@@ -572,7 +567,7 @@ public final class RegionCommands extends RegionCommandsBase {
         if (value != null) {
             // Set the flag if [value] was given even if [-g group] was given as well
             try {
-                setFlag(existing, foundFlag, sender, value);
+                value = setFlag(existing, foundFlag, sender, value).toString();
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }

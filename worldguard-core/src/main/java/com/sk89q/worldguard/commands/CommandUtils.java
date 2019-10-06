@@ -24,7 +24,9 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Command-related utility methods.
@@ -76,7 +78,12 @@ public final class CommandUtils {
         str = str.replace("`x", "&r");
 
         // MC classic
-        str = LegacyComponentSerializer.INSTANCE.serialize(LegacyComponentSerializer.INSTANCE.deserialize(str, '&'));
+        // FIXME: workaround for https://github.com/KyoriPowered/text/issues/50
+        // remove when fixed upstream and updated in WorldEdit
+        str = Arrays.stream(str.split("\n")).map(line -> {
+            TextComponent comp = LegacyComponentSerializer.INSTANCE.deserialize(line, '&');
+            return LegacyComponentSerializer.INSTANCE.serialize(comp);
+        }).collect(Collectors.joining("\n"));
 
         return str;
     }
