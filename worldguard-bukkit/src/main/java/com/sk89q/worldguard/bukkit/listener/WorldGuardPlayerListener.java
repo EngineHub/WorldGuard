@@ -379,7 +379,7 @@ public class WorldGuardPlayerListener implements Listener {
                     String message = null;
                     if (!setFrom.testState(localPlayer, Flags.ENDERPEARL)) {
                         cancel = true;
-                        message = set.queryValue(localPlayer, Flags.EXIT_DENY_MESSAGE);
+                        message = setFrom.queryValue(localPlayer, Flags.EXIT_DENY_MESSAGE);
                     } else if (!set.testState(localPlayer, Flags.ENDERPEARL)) {
                         cancel = true;
                         message = set.queryValue(localPlayer, Flags.ENTRY_DENY_MESSAGE);
@@ -392,14 +392,13 @@ public class WorldGuardPlayerListener implements Listener {
                         return;
                     }
                 }
-            }
-            if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
+            } else if (event.getCause() == TeleportCause.CHORUS_FRUIT) {
                 if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
                     boolean cancel = false;
                     String message = null;
                     if (!setFrom.testState(localPlayer, Flags.CHORUS_TELEPORT)) {
                         cancel = true;
-                        message = set.queryValue(localPlayer, Flags.EXIT_DENY_MESSAGE);
+                        message = setFrom.queryValue(localPlayer, Flags.EXIT_DENY_MESSAGE);
                     } else if (!set.testState(localPlayer, Flags.CHORUS_TELEPORT)) {
                         cancel = true;
                         message = set.queryValue(localPlayer, Flags.ENTRY_DENY_MESSAGE);
