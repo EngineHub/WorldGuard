@@ -944,7 +944,8 @@ public final class Materials {
      */
     public static boolean isPistonBlock(Material material) {
         return material == Material.PISTON
-                || material == Material.STICKY_PISTON;
+                || material == Material.STICKY_PISTON
+                || material == Material.MOVING_PISTON;
     }
 
     /**
