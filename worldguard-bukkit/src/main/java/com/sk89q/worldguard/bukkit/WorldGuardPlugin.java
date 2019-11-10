@@ -228,23 +228,21 @@ public class WorldGuardPlugin extends JavaPlugin {
             return driver instanceof DirectoryYamlDriver ? "yaml" : driver instanceof SQLDriver ? "sql" : "unknown";
         }));
         metrics.addCustomChart(new Metrics.SimpleBarChart("blacklist", () -> {
-            int unused = 0;
-            int standard = 0;
-            int whitelist = 0;
+            int blacklisted = 0;
+            int whitelisted = 0;
             for (BukkitWorldConfiguration worldConfig : platform.getGlobalStateManager().getWorldConfigs()) {
                 Blacklist blacklist = worldConfig.getBlacklist();
                 if (blacklist == null || blacklist.isEmpty()) {
-                    unused++;
+                    continue;
                 } else if (blacklist.isWhitelist()) {
-                    whitelist++;
+                    whitelisted += blacklist.getItemCount();
                 } else {
-                    standard++;
+                    blacklisted += blacklist.getItemCount();
                 }
             }
             Map<String, Integer> blacklistCounts = new HashMap<>();
-            blacklistCounts.put("unused", unused);
-            blacklistCounts.put("blacklist", standard);
-            blacklistCounts.put("whitelist", whitelist);
+            blacklistCounts.put("blacklist", blacklisted);
+            blacklistCounts.put("whitelist", whitelisted);
             return blacklistCounts;
         }));
         metrics.addCustomChart(new Metrics.SimplePie("chest_protection", () ->
