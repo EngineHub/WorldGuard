@@ -26,6 +26,7 @@ import com.sk89q.worldguard.config.YamlConfigurationManager;
 import com.sk89q.worldedit.util.report.Unreported;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -47,7 +48,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
         this.plugin = plugin;
     }
 
-    public Iterable<BukkitWorldConfiguration> getWorldConfigs() {
+    public Collection<BukkitWorldConfiguration> getWorldConfigs() {
         return worlds.values();
     }
 
