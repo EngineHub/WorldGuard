@@ -232,12 +232,12 @@ public class WorldGuardPlugin extends JavaPlugin {
             int whitelisted = 0;
             for (BukkitWorldConfiguration worldConfig : platform.getGlobalStateManager().getWorldConfigs()) {
                 Blacklist blacklist = worldConfig.getBlacklist();
-                if (blacklist == null || blacklist.isEmpty()) {
-                    continue;
-                } else if (blacklist.isWhitelist()) {
-                    whitelisted += blacklist.getItemCount();
-                } else {
-                    blacklisted += blacklist.getItemCount();
+                if (blacklist != null && !blacklist.isEmpty()) {
+                    if (blacklist.isWhitelist()) {
+                        whitelisted += blacklist.getItemCount();
+                    } else {
+                        blacklisted += blacklist.getItemCount();
+                    }
                 }
             }
             Map<String, Integer> blacklistCounts = new HashMap<>();
@@ -246,9 +246,9 @@ public class WorldGuardPlugin extends JavaPlugin {
             return blacklistCounts;
         }));
         metrics.addCustomChart(new Metrics.SimplePie("chest_protection", () ->
-                "" + Streams.stream(platform.getGlobalStateManager().getWorldConfigs()).anyMatch(cfg -> cfg.signChestProtection)));
+                "" + platform.getGlobalStateManager().getWorldConfigs().stream().anyMatch(cfg -> cfg.signChestProtection)));
         metrics.addCustomChart(new Metrics.SimplePie("build_permissions", () ->
-                "" + Streams.stream(platform.getGlobalStateManager().getWorldConfigs()).anyMatch(cfg -> cfg.buildPermissions)));
+                "" + platform.getGlobalStateManager().getWorldConfigs().stream().anyMatch(cfg -> cfg.buildPermissions)));
 
         metrics.addCustomChart(new Metrics.SimplePie("custom_flags", () ->
                 "" + (WorldGuard.getInstance().getFlagRegistry().size() > Flags.INBUILT_FLAGS.size())));
