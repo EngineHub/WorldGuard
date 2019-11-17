@@ -1,5 +1,22 @@
 # Changelog
 
+## 7.0.1
+* Add `/rg toggle-bypass` command which temporarily turns off region bypassing until used again.
+* More improvements to `/rg flag` and `/rg flags` commands.
+* Fix some checks for adding owners to unclaimed regions.
+* Fix an issue with time-/weather-lock flags when logging in to a region with the flag set.
+* Fix cause tracking in vehicles (incl. breaking lilypads in a boat)
+* Use async teleports on Paper.
+* Include hopper minecarts in the ignore hoppers config setting.
+* Add sugar cane and cacti to the crop-growth flag. Bamboo is also included pending Spigot throwing an event for it.
+* Specifically track when players ignite creepers with flint and steel.
+* Fix fuzziness when using bonemeal near a protected region.
+* Fix color codes not applying in greeting, etc flags when placed after a newline (\n).
+* Add applicable region information to `/wg report`.
+* Fix pistons flag not applying to sticky pistons pulling blocks.
+* Add some custom metrics for bStats.
+* Everything in the RC/beta changelog below.
+
 ## 7.0.1 RC 2 (inc. beta 1)
 * Due to breaking changes in important Bukkit API, this is not compatible with MC 1.13!
 * Update to MC 1.14. Adds protection for new blocks, etc.
