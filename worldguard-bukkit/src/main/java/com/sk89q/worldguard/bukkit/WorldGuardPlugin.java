@@ -227,22 +227,27 @@ public class WorldGuardPlugin extends JavaPlugin {
             RegionDriver driver = platform.getGlobalStateManager().selectedRegionStoreDriver;
             return driver instanceof DirectoryYamlDriver ? "yaml" : driver instanceof SQLDriver ? "sql" : "unknown";
         }));
-        metrics.addCustomChart(new Metrics.SimpleBarChart("blacklist", () -> {
-            int blacklisted = 0;
-            int whitelisted = 0;
+        metrics.addCustomChart(new Metrics.DrilldownPie("blacklist", () -> {
+            int empty = 0;
+            Map<String, Integer> blacklistMap = new HashMap<>();
+            Map<String, Integer> whitelistMap = new HashMap<>();
             for (BukkitWorldConfiguration worldConfig : platform.getGlobalStateManager().getWorldConfigs()) {
                 Blacklist blacklist = worldConfig.getBlacklist();
                 if (blacklist != null && !blacklist.isEmpty()) {
-                    if (blacklist.isWhitelist()) {
-                        whitelisted += blacklist.getItemCount();
-                    } else {
-                        blacklisted += blacklist.getItemCount();
-                    }
+                    Map<String, Integer> target = blacklist.isWhitelist() ? whitelistMap : blacklistMap;
+                    int floor = ((blacklist.getItemCount() - 1) / 10) * 10;
+                    String range = floor >= 100 ? "101+" : (floor + 1) + " - " + (floor + 10);
+                    target.merge(range, 1, Integer::sum);
+                } else {
+                    empty++;
                 }
             }
-            Map<String, Integer> blacklistCounts = new HashMap<>();
-            blacklistCounts.put("blacklist", blacklisted);
-            blacklistCounts.put("whitelist", whitelisted);
+            Map<String, Map<String, Integer>> blacklistCounts = new HashMap<>();
+            Map<String, Integer> emptyMap = new HashMap<>();
+            emptyMap.put("empty", empty);
+            blacklistCounts.put("empty", emptyMap);
+            blacklistCounts.put("blacklist", blacklistMap);
+            blacklistCounts.put("whitelist", whitelistMap);
             return blacklistCounts;
         }));
         metrics.addCustomChart(new Metrics.SimplePie("chest_protection", () ->

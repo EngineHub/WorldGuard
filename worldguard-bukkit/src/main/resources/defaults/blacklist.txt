@@ -7,7 +7,7 @@
 ###############################################################################
 #
 # Example to block some ore mining and placement:
-# [coalore,goldore,ironore]
+# [coal_ore,gold_ore,iron_ore]
 # on-break=deny,log,kick
 # on-place=deny,tell
 #
@@ -51,17 +51,12 @@
 #
 
 # Deny lava buckets
-#[lavabucket]
+#[lava_bucket]
 #ignore-perms=my.own.madeup.permission
 #ignore-groups=admins,mods
 #on-use=deny,tell
 
 # Deny some ore
-#[coalore,goldore,ironore]
-#ignore-groups=admins,mods
-#on-break=notify,deny,log
-
-# Some funky data value tests
-#[wood:0;>=2]
+#[coal_ore,gold_ore,iron_ore]
 #ignore-groups=admins,mods
 #on-break=notify,deny,log
