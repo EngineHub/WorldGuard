@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.util.profile.resolver;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
+//import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldguard.util.profile.Profile;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
@@ -43,11 +43,11 @@ public final class PaperProfileService extends SingleRequestService {
     @Override
     @Nullable
     public Profile findByName(String name) {
-        PlayerProfile profile = Bukkit.createProfile(name);
-        if (profile.completeFromCache()) {
-            //noinspection ConstantConditions - completeFromCache guarantees non-null on success
-            return new Profile(profile.getId(), profile.getName());
-        }
+//        PlayerProfile profile = Bukkit.createProfile(name);
+//        if (profile.completeFromCache()) {
+//            //noinspection ConstantConditions - completeFromCache guarantees non-null on success
+//            return new Profile(profile.getId(), profile.getName());
+//        }
         return null;
     }
 

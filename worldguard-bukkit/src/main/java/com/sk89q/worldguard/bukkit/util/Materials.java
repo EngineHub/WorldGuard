@@ -692,6 +692,16 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.SUSPICIOUS_STEW, 0);
         MATERIAL_FLAGS.put(Material.SWEET_BERRIES, 0);
 
+        // 1.15
+        try {
+            MATERIAL_FLAGS.put(Material.BEEHIVE, MODIFIED_ON_RIGHT);
+            MATERIAL_FLAGS.put(Material.BEE_NEST, 0);
+            MATERIAL_FLAGS.put(Material.HONEY_BLOCK, 0);
+            MATERIAL_FLAGS.put(Material.HONEYCOMB_BLOCK, 0);
+            MATERIAL_FLAGS.put(Material.HONEY_BOTTLE, 0);
+            MATERIAL_FLAGS.put(Material.HONEYCOMB, 0);
+        } catch (NoSuchFieldError ignored) {
+        }
 
         // Fake tags
         for (Material m : shulkerBoxes) {
@@ -998,6 +1008,7 @@ public final class Materials {
         switch (material) {
             case SPIDER_SPAWN_EGG:
             case BAT_SPAWN_EGG:
+            case BEE_SPAWN_EGG:
             case BLAZE_SPAWN_EGG:
             case CAT_SPAWN_EGG:
             case CAVE_SPIDER_SPAWN_EGG:
@@ -1066,6 +1077,8 @@ public final class Materials {
                 return EntityType.SPIDER;
             case BAT_SPAWN_EGG:
                 return EntityType.BAT;
+            case BEE_SPAWN_EGG:
+                return EntityType.BEE;
             case BLAZE_SPAWN_EGG:
                 return EntityType.BLAZE;
             case CAT_SPAWN_EGG:
