@@ -695,7 +695,7 @@ public final class Materials {
         // 1.15
         try {
             MATERIAL_FLAGS.put(Material.BEEHIVE, MODIFIED_ON_RIGHT);
-            MATERIAL_FLAGS.put(Material.BEE_NEST, 0);
+            MATERIAL_FLAGS.put(Material.BEE_NEST, MODIFIED_ON_RIGHT);
             MATERIAL_FLAGS.put(Material.HONEY_BLOCK, 0);
             MATERIAL_FLAGS.put(Material.HONEYCOMB_BLOCK, 0);
             MATERIAL_FLAGS.put(Material.HONEY_BOTTLE, 0);
