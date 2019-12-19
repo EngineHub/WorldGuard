@@ -8,7 +8,7 @@ applyPlatformAndCoreConfiguration()
 
 dependencies {
     "compile"(project(":worldguard-libs:core"))
-    "compile"("com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT")
+    "compile"("com.sk89q.worldedit:worldedit-core:${Versions.WORLDEDIT}")
     "implementation"("org.flywaydb:flyway-core:3.0")
 
     "compileOnly"("com.google.code.findbugs:jsr305:1.3.9")

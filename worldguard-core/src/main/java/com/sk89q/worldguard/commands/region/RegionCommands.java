@@ -144,7 +144,8 @@ public final class RegionCommands extends RegionCommandsBase {
 
         String id = checkRegionId(args.getString(0), false);
 
-        RegionManager manager = checkRegionManager(player.getWorld());
+        World world = player.getWorld();
+        RegionManager manager = checkRegionManager(world);
 
         checkRegionDoesNotExist(manager, id, true);
 
@@ -167,6 +168,7 @@ public final class RegionCommands extends RegionCommandsBase {
                             sender.print(String.format("A new region has been made named '%s'.", region.getId()));
                             warnAboutDimensions(sender, region);
                             informNewUser(sender, manager, region);
+                            checkSpawnOverlap(sender, world, region);
                         })
                 .onFailure(String.format("Failed to add the region '%s'", region.getId()), worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());
@@ -191,7 +193,8 @@ public final class RegionCommands extends RegionCommandsBase {
 
         String id = checkRegionId(args.getString(0), false);
 
-        RegionManager manager = checkRegionManager(player.getWorld());
+        World world = player.getWorld();
+        RegionManager manager = checkRegionManager(world);
 
         ProtectedRegion existing = checkExistingRegion(manager, id, false);
 
@@ -221,6 +224,7 @@ public final class RegionCommands extends RegionCommandsBase {
                             player.print(String.format("Region '%s' has been updated with a new area.", region.getId()));
                             warnAboutDimensions(player, region);
                             informNewUser(player, manager, region);
+                            checkSpawnOverlap(sender, world, region);
                         })
                 .onFailure(String.format("Failed to update the region '%s'", region.getId()), worldGuard.getExceptionConverter())
                 .buildAndExec(worldGuard.getExecutorService());

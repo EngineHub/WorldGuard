@@ -24,13 +24,14 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.session.AbstractSessionManager;
 import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.util.profile.Profile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.Collection;
 
@@ -57,10 +58,12 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void onPlayerProcess(ProcessPlayerEvent event) {
         // Pre-load a session
         LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
         get(player).initialize(player);
+        WorldGuard.getInstance().getExecutorService().submit(() ->
+            WorldGuard.getInstance().getProfileCache().put(new Profile(player.getUniqueId(), player.getName())));
     }
 
     @Override
@@ -75,7 +78,7 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     public boolean hasBypass(LocalPlayer player, World world) {
         if (player instanceof BukkitPlayer) {
             if (((BukkitPlayer) player).getPlayer().hasMetadata("NPC")
-                && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride)
+                    && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride)
                 return true;
         }
         return super.hasBypass(player, world);

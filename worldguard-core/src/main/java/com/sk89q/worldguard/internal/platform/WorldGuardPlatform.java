@@ -21,15 +21,18 @@ package com.sk89q.worldguard.internal.platform;
 
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.report.ReportList;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.protection.flags.FlagContext;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.session.SessionManager;
 import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldguard.util.profile.resolver.ProfileService;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 
 /**
@@ -155,4 +158,15 @@ public interface WorldGuardPlatform {
      * Internal use.
      */
     ProfileService createProfileService(ProfileCache profileCache);
+
+    /**
+     * Get a region that encompasses the Vanilla spawn protection for the given world, if applicable.
+     *
+     * @param world world to check spawn protection of
+     * @return a region, or null if not applicable
+     */
+    @Nullable
+    default ProtectedRegion getSpawnProtection(World world) {
+        return null;
+    }
 }

@@ -19,12 +19,18 @@
 
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.report.ReportList;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.resolver.PaperProfileService;
 import com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
@@ -52,6 +58,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permissible;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -250,5 +257,23 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
         services.add(HttpRepositoryService.forMinecraft());
         return new CacheForwardingService(new CombinedProfileService(services),
                 profileCache);
+    }
+
+    @Nullable
+    @Override
+    public ProtectedRegion getSpawnProtection(World world) {
+        if (world instanceof BukkitWorld) {
+            org.bukkit.World bWorld = ((BukkitWorld) world).getWorld();
+            if (bWorld.getUID().equals(Bukkit.getServer().getWorlds().get(0).getUID())) {
+                int radius = Bukkit.getServer().getSpawnRadius();
+                if (radius > 0) {
+                    BlockVector3 spawnLoc = BukkitAdapter.asBlockVector(bWorld.getSpawnLocation());
+                    return new ProtectedCuboidRegion("__spawn_protection__",
+                            spawnLoc.subtract(radius, 0, radius).withY(world.getMinimumPoint().getY()),
+                            spawnLoc.add(radius, 0, radius).withY(world.getMaxY()));
+                }
+            }
+        }
+        return null;
     }
 }

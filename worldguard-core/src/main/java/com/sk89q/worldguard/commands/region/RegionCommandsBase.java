@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.commands.region;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -32,11 +33,13 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
+import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -338,6 +341,24 @@ class RegionCommandsBase {
             sender.print(SubtleFormat.wrap("(This region is NOW PROTECTED from modification from others. Don't want that? Use ")
                             .append(TextComponent.of("/rg flag " + region.getId() + " passthrough allow", TextColor.AQUA))
                             .append(TextComponent.of(")", TextColor.GRAY)));
+        }
+    }
+
+    /**
+     * Inform a user if the region overlaps spawn protection.
+     *
+     * @param sender the sender to send the message to
+     * @param world the world the region is in
+     * @param region the region
+     */
+    protected static void checkSpawnOverlap(Actor sender, World world, ProtectedRegion region) {
+        ProtectedRegion spawn = WorldGuard.getInstance().getPlatform().getSpawnProtection(world);
+        if (spawn != null) {
+            if (!spawn.getIntersectingRegions(ImmutableList.of(region)).isEmpty()) {
+                sender.print(ErrorFormat.wrap("Warning!")
+                        .append(TextComponent.of(" This region overlaps vanilla's spawn protection. WorldGuard cannot " +
+                                "override this, and only server operators will be able to interact with this area.")));
+            }
         }
     }
 

@@ -33,6 +33,7 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 import org.junit.Ignore;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -211,6 +212,11 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     @Override
     public void print(Component component) {
 
+    }
+
+    @Override
+    public Locale getLocale() {
+        return Locale.ENGLISH;
     }
 
     @Override
