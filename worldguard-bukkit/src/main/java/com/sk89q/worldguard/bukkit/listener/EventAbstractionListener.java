@@ -357,7 +357,8 @@ public class EventAbstractionListener extends AbstractListener {
             for (int i = 0; i < blocks.size(); i++) {
                 Block existing = blocks.get(i);
                 if (existing.getPistonMoveReaction() == PistonMoveReaction.MOVE
-                    || existing.getPistonMoveReaction() == PistonMoveReaction.PUSH_ONLY) {
+                    || existing.getPistonMoveReaction() == PistonMoveReaction.PUSH_ONLY
+                    || existing.getType() == Material.PISTON || existing.getType() == Material.STICKY_PISTON) {
                     blocks.set(i, existing.getRelative(dir));
                 }
             }
