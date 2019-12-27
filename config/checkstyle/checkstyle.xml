@@ -7,8 +7,10 @@
   <module name="FileTabCharacter"/>
 
   <module name="SuppressionFilter">
-    <property name="file" value="${basedir}/config/checkstyle/suppressions.xml"/>
+    <property name="file" value="${config_loc}/suppressions.xml"/>
   </module>
+
+
 
   <module name="TreeWalker">
     <!-- Important basics -->
@@ -20,7 +22,7 @@
     It is a bit draconian, so update as necessary!
     -->
     <module name="ImportControl">
-      <property name="file" value="${basedir}/config/checkstyle/import-control.xml"/>
+      <property name="file" value="${config_loc}/import-control.xml"/>
     </module>
 
     <!-- Code -->
