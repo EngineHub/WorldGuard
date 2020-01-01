@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.commandbook.InfoComponent;
+import com.sk89q.commandbook.component.info.InfoComponent;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
