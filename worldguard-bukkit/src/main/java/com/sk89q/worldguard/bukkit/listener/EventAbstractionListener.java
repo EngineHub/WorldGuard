@@ -1068,6 +1068,13 @@ public class EventAbstractionListener extends AbstractListener {
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, placed.getLocation().add(0.5, 0, 0.5), Materials.getEntitySpawnEgg(item.getType())));
             return;
         }
+
+        // handle water/lava placement
+        if (item != null && (item.getType() == Material.WATER_BUCKET || item.getType() == Material.LAVA_BUCKET)) {
+            Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(),
+                    item.getType() == Material.WATER_BUCKET ? Material.WATER : Material.LAVA));
+            return;
+        }
     }
 
     private static <T extends Event & Cancellable> void handleInventoryHolderUse(T originalEvent, Cause cause, InventoryHolder holder) {
