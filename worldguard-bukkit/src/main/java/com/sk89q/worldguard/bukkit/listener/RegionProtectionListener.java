@@ -259,7 +259,7 @@ public class RegionProtectionListener extends AbstractListener {
 
             /* Inventory */
             } else if (Materials.isInventoryBlock(type)) {
-                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.CHEST_ACCESS));
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = "open that";
 
             /* Beds */
