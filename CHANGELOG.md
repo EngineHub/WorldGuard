@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.0.2
+* Update to MC 1.15. Still compatible with 1.14, and incompatible with 1.13, as before.
+* Add an informational message when defining a region that overlaps vanilla spawn protection.
+* Protect against pushing a piston with another piston on a region border.
+* Protect against buckets in dispensers on region borders.
+
 ## 7.0.1
 * Add `/rg toggle-bypass` command which temporarily turns off region bypassing until used again.
 * More improvements to `/rg flag` and `/rg flags` commands.
