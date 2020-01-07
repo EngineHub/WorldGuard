@@ -77,6 +77,14 @@ public class PlayerMoveListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerMove(PlayerMoveEvent event) {
+        Location from = event.getFrom();
+        Location to = event.getTo();
+        if (from.getBlockX() == to.getBlockX()
+                && from.getBlockY() == to.getBlockY()
+                && from.getBlockZ() == to.getBlockZ()) {
+            return;
+        }
+
         final Player player = event.getPlayer();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
 
@@ -89,15 +97,15 @@ public class PlayerMoveListener implements Listener {
         } else if (event.getPlayer().getVehicle() != null && event.getPlayer().getVehicle() instanceof Horse) {
             moveType = MoveType.RIDE;
         }
-        com.sk89q.worldedit.util.Location weLocation = session.testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), moveType);
+        com.sk89q.worldedit.util.Location weLocation = session.testMoveTo(localPlayer, BukkitAdapter.adapt(to), moveType);
 
         if (weLocation != null) {
             final Location override = BukkitAdapter.adapt(weLocation);
             override.setX(override.getBlockX() + 0.5);
             override.setY(override.getBlockY());
             override.setZ(override.getBlockZ() + 0.5);
-            override.setPitch(event.getTo().getPitch());
-            override.setYaw(event.getTo().getYaw());
+            override.setPitch(to.getPitch());
+            override.setYaw(to.getYaw());
 
             event.setTo(override.clone());
 
