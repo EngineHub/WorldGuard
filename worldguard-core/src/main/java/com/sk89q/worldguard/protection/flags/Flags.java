@@ -137,6 +137,8 @@ public final class Flags {
     // idk?
     public static final StateFlag INVINCIBILITY = register(new StateFlag("invincible", false));
     public static final StateFlag FALL_DAMAGE = register(new StateFlag("fall-damage", true));
+    public static final StateFlag HEALTH_REGEN = register(new StateFlag("natural-health-regen", true));
+    public static final StateFlag HUNGER_DRAIN = register(new StateFlag("natural-hunger-drain", true));
 
     // session and movement based flags
     public static final StateFlag ENTRY = register(new StateFlag("entry", true, RegionGroup.NON_MEMBERS));

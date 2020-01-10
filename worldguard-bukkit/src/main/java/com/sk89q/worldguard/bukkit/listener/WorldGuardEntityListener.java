@@ -48,6 +48,7 @@ import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -74,8 +75,10 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.world.PortalCreateEvent;
@@ -748,6 +751,10 @@ public class WorldGuardEntityListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+        RegainReason regainReason = event.getRegainReason();
+        if (regainReason != RegainReason.REGEN && regainReason != RegainReason.SATIATED) {
+            return;
+        }
 
         Entity ent = event.getEntity();
         World world = ent.getWorld();
@@ -758,6 +765,31 @@ public class WorldGuardEntityListener implements Listener {
         if (wcfg.disableHealthRegain) {
             event.setCancelled(true);
             return;
+        }
+        if (wcfg.useRegions && ent instanceof Player
+                && !WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().testState(
+                        BukkitAdapter.adapt(ent.getLocation()),
+                        WorldGuardPlugin.inst().wrapPlayer((Player) ent),
+                        Flags.HEALTH_REGEN)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onFoodChange(FoodLevelChangeEvent event) {
+        if (event.getItem() != null) return;
+        HumanEntity ent = event.getEntity();
+        if (!(ent instanceof Player)) return;
+        LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer((Player) ent);
+        if (event.getFoodLevel() > player.getFoodLevel()) return;
+
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(player.getWorld());
+
+        if (wcfg.useRegions
+                && !WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().testState(
+                        player.getLocation(), player, Flags.HUNGER_DRAIN)) {
+            event.setCancelled(true);
         }
     }
 
