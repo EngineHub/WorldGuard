@@ -19,56 +19,32 @@
 
 package com.sk89q.worldguard.protection.managers.storage.file;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLNode;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.FlagUtil;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
-import com.sk89q.worldguard.protection.managers.storage.RegionDatabaseUtils;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
-import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.DumperOptions.FlowStyle;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
+import com.sk89q.worldguard.protection.regions.*;
 import org.yaml.snakeyaml.parser.ParserException;
-import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldguard.protection.managers.storage.file.YamlCommon.YAML_GLOBAL_NAMESPACE_NAME;
 
 /**
  * A store that persists regions in a YAML-encoded file.
  */
 public class YamlRegionFile implements RegionDatabase {
-
-    private static final Logger log = Logger.getLogger(YamlRegionFile.class.getCanonicalName());
-    private static final Yaml ERROR_DUMP_YAML;
-
     private static final String FILE_HEADER = "#\r\n" +
             "# WorldGuard regions file\r\n" +
             "#\r\n" +
@@ -81,16 +57,18 @@ public class YamlRegionFile implements RegionDatabase {
             "# REMEMBER TO KEEP PERIODICAL BACKUPS.\r\n" +
             "#";
 
-    private final String name;
-    private final File file;
+    private static final List<YamlReader> YAML_READERS = new ArrayList<>();
 
     static {
-        DumperOptions options = new DumperOptions();
-        options.setIndent(4);
-        options.setDefaultFlowStyle(FlowStyle.AUTO);
-
-        ERROR_DUMP_YAML = new Yaml(new SafeConstructor(), new Representer(), options);
+        // IMPORTANT: For best performance, add these in reverse order.
+        // We always want the latest version to be attempted first, so that once migrated, we are checking
+        // one version, not n.
+        YAML_READERS.add(new YamlReaderVersionTwo());
+        YAML_READERS.add(new YamlReaderVersionOne());
     }
+
+    private final String name;
+    private final File file;
 
     /**
      * Create a new instance.
@@ -112,80 +90,22 @@ public class YamlRegionFile implements RegionDatabase {
 
     @Override
     public Set<ProtectedRegion> loadAll(FlagRegistry flagRegistry) throws StorageException {
-        Map<String, ProtectedRegion> loaded = new HashMap<>();
-
         YAMLProcessor config = createYamlProcessor(file);
         try {
             config.load();
         } catch (FileNotFoundException e) {
-            return new HashSet<>(loaded.values());
+            return new HashSet<>();
         } catch (IOException | ParserException e) {
             throw new StorageException("Failed to load region data from '" + file + "'", e);
         }
 
-        Map<String, YAMLNode> regionData = config.getNodes("regions");
-
-        if (regionData == null) {
-            return Collections.emptySet(); // No regions are even configured
-        }
-
-        Map<ProtectedRegion, String> parentSets = new LinkedHashMap<>();
-
-        for (Map.Entry<String, YAMLNode> entry : regionData.entrySet()) {
-            String id = entry.getKey();
-            YAMLNode node = entry.getValue();
-
-            String type = node.getString("type");
-            ProtectedRegion region;
-
-            try {
-                if (type == null) {
-                    log.warning("Undefined region type for region '" + id + "'!\n" +
-                            "Here is what the region data looks like:\n\n" + toYamlOutput(entry.getValue().getMap()) + "\n");
-                    continue;
-                } else if (type.equals("cuboid")) {
-                    Vector3 pt1 = checkNotNull(node.getVector("min"));
-                    Vector3 pt2 = checkNotNull(node.getVector("max"));
-                    BlockVector3 min = pt1.getMinimum(pt2).toBlockPoint();
-                    BlockVector3 max = pt1.getMaximum(pt2).toBlockPoint();
-                    region = new ProtectedCuboidRegion(id, min, max);
-                } else if (type.equals("poly2d")) {
-                    Integer minY = checkNotNull(node.getInt("min-y"));
-                    Integer maxY = checkNotNull(node.getInt("max-y"));
-                    List<BlockVector2> points = node.getBlockVector2List("points", null);
-                    region = new ProtectedPolygonalRegion(id, points, minY, maxY);
-                } else if (type.equals("global")) {
-                    region = new GlobalProtectedRegion(id);
-                } else {
-                    log.warning("Unknown region type for region '" + id + "'!\n" +
-                            "Here is what the region data looks like:\n\n" + toYamlOutput(entry.getValue().getMap()) + "\n");
-                    continue;
-                }
-
-                Integer priority = checkNotNull(node.getInt("priority"));
-                region.setPriority(priority);
-                setFlags(flagRegistry, region, node.getNode("flags"));
-                region.setOwners(parseDomain(node.getNode("owners")));
-                region.setMembers(parseDomain(node.getNode("members")));
-
-                loaded.put(id, region);
-
-                String parentId = node.getString("parent");
-                if (parentId != null) {
-                    parentSets.put(region, parentId);
-                }
-            } catch (NullPointerException e) {
-                log.log(Level.WARNING,
-                        "Unexpected NullPointerException encountered during parsing for the region '" + id + "'!\n" +
-                                "Here is what the region data looks like:\n\n" + toYamlOutput(entry.getValue().getMap()) +
-                                "\n\nNote: This region will disappear as a result!", e);
+        for (YamlReader reader : YAML_READERS) {
+            if (reader.canLoad(config)) {
+                return reader.load(flagRegistry, config);
             }
         }
 
-        // Relink parents
-        RegionDatabaseUtils.relinkParents(loaded, parentSets);
-
-        return new HashSet<>(loaded.values());
+        throw new IllegalStateException("No YAML reader was registered that understands the saved region information");
     }
 
     @Override
@@ -197,13 +117,25 @@ public class YamlRegionFile implements RegionDatabase {
 
         config.clear();
 
+        config.setProperty("version", YAML_READERS.get(0).getVersion());
         YAMLNode regionsNode = config.addNode("regions");
-        Map<String, Object> map = regionsNode.getMap();
+
+        // Creates a mapping of existing namespace node names, to their underlying YAMLNode.
+        Map<String, YAMLNode> namespaceMap = new HashMap<>();
 
         for (ProtectedRegion region : regions) {
-            Map<String, Object> nodeMap = new HashMap<>();
-            map.put(region.getId(), nodeMap);
-            YAMLNode node = new YAMLNode(nodeMap, false);
+            RegionIdentifier identifier = region.getIdentifier();
+
+            String internalNamespace = identifier.getNamespace().orElse(YAML_GLOBAL_NAMESPACE_NAME);
+            YAMLNode namespaceNode = namespaceMap.compute(internalNamespace, (ignored, existingNamespaceNode) -> {
+                if (existingNamespaceNode == null) {
+                    existingNamespaceNode = regionsNode.addNode(internalNamespace);
+                }
+
+                return existingNamespaceNode;
+            });
+
+            YAMLNode node = namespaceNode.addNode(identifier.getName());
 
             if (region instanceof ProtectedCuboidRegion) {
                 ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
@@ -238,7 +170,7 @@ public class YamlRegionFile implements RegionDatabase {
 
             ProtectedRegion parent = region.getParent();
             if (parent != null) {
-                node.setProperty("parent", parent.getId());
+                node.setProperty("parent", parent.getIdentifier().getLegacyQualifiedName());
             }
         }
 
@@ -257,44 +189,8 @@ public class YamlRegionFile implements RegionDatabase {
         throw new DifferenceSaveException("Not supported");
     }
 
-    private DefaultDomain parseDomain(YAMLNode node) {
-        if (node == null) {
-            return new DefaultDomain();
-        }
-
-        DefaultDomain domain = new DefaultDomain();
-
-        for (String name : node.getStringList("players", null)) {
-            if (!name.isEmpty()) {
-                domain.addPlayer(name);
-            }
-        }
-
-        for (String stringId : node.getStringList("unique-ids", null)) {
-            try {
-                domain.addPlayer(UUID.fromString(stringId));
-            } catch (IllegalArgumentException e) {
-                log.log(Level.WARNING, "Failed to parse UUID '" + stringId + "'", e);
-            }
-        }
-
-        for (String name : node.getStringList("groups", null)) {
-            if (!name.isEmpty()) {
-                domain.addGroup(name);
-            }
-        }
-
-        return domain;
-    }
-
     private Map<String, Object> getFlagData(ProtectedRegion region) {
         return FlagUtil.marshal(region.getFlags());
-    }
-
-    private void setFlags(FlagRegistry flagRegistry, ProtectedRegion region, YAMLNode flagsData) {
-        if (flagsData != null) {
-            region.setFlags(flagRegistry.unmarshal(flagsData.getMap(), true));
-        }
     }
 
     private Map<String, Object> getDomainData(DefaultDomain domain) {
@@ -331,19 +227,4 @@ public class YamlRegionFile implements RegionDatabase {
         checkNotNull(file);
         return new YAMLProcessor(file, false, YAMLFormat.COMPACT);
     }
-
-    /**
-     * Dump the given object as YAML for debugging purposes.
-     *
-     * @param object the object
-     * @return the YAML string or an error string if dumping fals
-     */
-    private static String toYamlOutput(Object object) {
-        try {
-            return ERROR_DUMP_YAML.dump(object).replaceAll("(?m)^", "\t");
-        } catch (Throwable t) {
-            return "<error while dumping object>";
-        }
-    }
-
 }

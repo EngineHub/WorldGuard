@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.commands.region;
 
+import com.sk89q.worldguard.protection.regions.RegionIdentifier;
 import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -58,6 +59,7 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
     @Nullable
     private final ProfileCache cache;
     private final TextComponentProducer builder = new TextComponentProducer();
+    private final Actor actor;
     private final RegionPermissionModel perms;
 
     /**
@@ -70,6 +72,7 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
         this.world = world;
         this.region = region;
         this.cache = cache;
+        this.actor = actor;
         this.perms = actor != null && actor.isPlayer() ? new RegionPermissionModel(actor) : null;
     }
 
@@ -85,8 +88,10 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
      */
     public void appendBasics() {
         builder.append(TextComponent.of("Region: ", TextColor.BLUE));
-        builder.append(TextComponent.of(region.getId(), TextColor.YELLOW)
-                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/rg info -w \"" + world + "\" " + region.getId())));
+
+        RegionIdentifier id = region.getIdentifier();
+        builder.append(TextComponent.of(id.getDisplayName(actor), TextColor.YELLOW)
+                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/rg info -w \"" + world + "\" " + id.getQualifiedName())));
         
         builder.append(TextComponent.of(" (type=", TextColor.GRAY));
         builder.append(TextComponent.of(region.getType().getName()));

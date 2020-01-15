@@ -28,7 +28,6 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.util.ChangeTracked;
-import com.sk89q.worldguard.util.Normal;
 
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
@@ -37,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -50,12 +48,11 @@ import javax.annotation.Nullable;
 public abstract class ProtectedRegion implements ChangeTracked, Comparable<ProtectedRegion> {
 
     public static final String GLOBAL_REGION = "__global__";
-    private static final Pattern VALID_ID_PATTERN = Pattern.compile("^[A-Za-z0-9_,'\\-\\+/]{1,}$");
 
     protected BlockVector3 min;
     protected BlockVector3 max;
 
-    private final String id;
+    private final RegionIdentifier id;
     private final boolean transientRegion;
     private int priority = 0;
     private ProtectedRegion parent;
@@ -67,18 +64,13 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
     /**
      * Construct a new instance of this region.
      *
-     * @param id the name of this region
+     * @param id the name information for this region
      * @param transientRegion whether this region should only be kept in memory and not be saved
-     * @throws IllegalArgumentException thrown if the ID is invalid (see {@link #isValidId(String)}
      */
-    ProtectedRegion(String id, boolean transientRegion) { // Package private because we can't have people creating their own region types
+    ProtectedRegion(RegionIdentifier id, boolean transientRegion) { // Package private because we can't have people creating their own region types
         checkNotNull(id);
 
-        if (!isValidId(id)) {
-            throw new IllegalArgumentException("Invalid region ID: " + id);
-        }
-
-        this.id = Normal.normalize(id);
+        this.id = id;
         this.transientRegion = transientRegion;
     }
 
@@ -119,7 +111,17 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      *
      * @return the name
      */
+    @Deprecated
     public String getId() {
+        return id.getLegacyQualifiedName();
+    }
+
+    /**
+     * Gets the identifier info for this region.
+     *
+     * @return the identifier info
+     */
+    public RegionIdentifier getIdentifier() {
         return id;
     }
 
@@ -734,9 +736,9 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * @param id the id to check
      * @return whether the region id given is valid
      */
+    @Deprecated
     public static boolean isValidId(String id) {
-        checkNotNull(id);
-        return VALID_ID_PATTERN.matcher(id).matches();
+        return RegionIdentifier.isValidName(id);
     }
 
     /**

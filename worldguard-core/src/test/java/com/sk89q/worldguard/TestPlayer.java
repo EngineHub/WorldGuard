@@ -65,6 +65,11 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
+    public String getDefaultNamespace() {
+        return null;
+    }
+
+    @Override
     public boolean hasGroup(String group) {
         return groups.contains(group.toLowerCase());
     }

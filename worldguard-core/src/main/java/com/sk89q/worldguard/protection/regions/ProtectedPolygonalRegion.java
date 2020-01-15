@@ -47,6 +47,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * @param minY the minimum y coordinate
      * @param maxY the maximum y coordinate
      */
+    @Deprecated
     public ProtectedPolygonalRegion(String id, List<BlockVector2> points, int minY, int maxY) {
         this(id, false, points, minY, maxY);
     }
@@ -60,7 +61,37 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      * @param minY the minimum y coordinate
      * @param maxY the maximum y coordinate
      */
+    @Deprecated
     public ProtectedPolygonalRegion(String id, boolean transientRegion, List<BlockVector2> points, int minY, int maxY) {
+        this(new RegionIdentifier(id), transientRegion, points, minY, maxY);
+    }
+
+    /**
+     * Construct a new instance of this polygonal region.<br>
+     * Equivalent to {@link #ProtectedPolygonalRegion(RegionIdentifier, boolean, List, int, int)
+     * ProtectedPolygonalRegion(id, false, points, minY, maxY)}<br>
+     * <code>transientRegion</code> will be set to false, and this region can be saved.
+     *
+     * @param id the region identifier
+     * @param points a {@link List} of points that this region should contain
+     * @param minY the minimum y coordinate
+     * @param maxY the maximum y coordinate
+     */
+    public ProtectedPolygonalRegion(RegionIdentifier id, List<BlockVector2> points, int minY, int maxY) {
+        this(id, false, points, minY, maxY);
+    }
+
+    /**
+     * Construct a new instance of this polygonal region.
+     *
+     * @param id the region identifier
+     * @param transientRegion whether this region should only be kept in memory and not be saved
+     * @param points a {@link List} of points that this region should contain
+     * @param minY the minimum y coordinate
+     * @param maxY the maximum y coordinate
+     */
+    public ProtectedPolygonalRegion(RegionIdentifier id, boolean transientRegion, List<BlockVector2> points,
+                                    int minY, int maxY) {
         super(id, transientRegion);
         ImmutableList<BlockVector2> immutablePoints = ImmutableList.copyOf(points);
         setMinMaxPoints(immutablePoints, minY, maxY);

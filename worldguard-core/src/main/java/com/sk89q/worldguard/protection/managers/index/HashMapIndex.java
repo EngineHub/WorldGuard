@@ -70,12 +70,13 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
         region.setDirty(true);
 
         synchronized (lock) {
-            String normalId = normalize(region.getId());
+            String newFullId = region.getIdentifier().getLegacyQualifiedName();
+            String normalId = normalize(newFullId);
 
             ProtectedRegion existing = regions.get(normalId);
 
             // Casing / form of ID has changed
-            if (existing != null && !existing.getId().equals(region.getId())) {
+            if (existing != null && !existing.getIdentifier().getLegacyQualifiedName().equals(newFullId)) {
                 removed.add(existing);
             }
 

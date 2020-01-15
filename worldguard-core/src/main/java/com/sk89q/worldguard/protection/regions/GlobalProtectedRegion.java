@@ -44,6 +44,7 @@ public class GlobalProtectedRegion extends ProtectedRegion {
      *
      * @param id the ID
      */
+    @Deprecated
     public GlobalProtectedRegion(String id) {
         this(id, false);
     }
@@ -54,7 +55,29 @@ public class GlobalProtectedRegion extends ProtectedRegion {
      * @param id the ID
      * @param transientRegion whether this region should only be kept in memory and not be saved
      */
+    @Deprecated
     public GlobalProtectedRegion(String id, boolean transientRegion) {
+        this(new RegionIdentifier(id), transientRegion);
+    }
+
+    /**
+     * Create a new instance.<br>
+     * Equivalent to {@link #GlobalProtectedRegion(String, boolean) GlobalProtectedRegion(id, false)}<br>
+     * <code>transientRegion</code> will be set to false, and this region can be saved.
+     *
+     * @param id the region identifier
+     */
+    public GlobalProtectedRegion(RegionIdentifier id) {
+        this(id, false);
+    }
+
+    /**
+     * Create a new instance.
+     *
+     * @param id the region identifier
+     * @param transientRegion whether this region should only be kept in memory and not be saved
+     */
+    public GlobalProtectedRegion(RegionIdentifier id, boolean transientRegion) {
         super(id, transientRegion);
         min = BlockVector3.ZERO;
         max = BlockVector3.ZERO;

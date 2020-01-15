@@ -63,6 +63,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         usePlayerMove = config.getBoolean("use-player-move-event", true);
         usePlayerTeleports = config.getBoolean("use-player-teleports", true);
         particleEffects = config.getBoolean("use-particle-effects", true);
+        useNamespaces = config.getBoolean("use-namespaces", true);
 
         deopOnJoin = config.getBoolean("security.deop-everyone-on-join", false);
         blockInGameOp = config.getBoolean("security.block-in-game-op-command", false);

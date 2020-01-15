@@ -32,6 +32,29 @@ import java.util.List;
 public interface LocalPlayer extends Player, RegionAssociable {
 
     /**
+     * Returns the default namespace for this player.
+     *
+     * @return the default namespace.
+     */
+    String getDefaultNamespace();
+
+    default boolean isDefaultNamespace(String otherNamespace) {
+        String namespace = getDefaultNamespace();
+        // If both are null, they're the same (the global)
+        if (namespace == null && otherNamespace == null) {
+            return true;
+        }
+
+        // If only one is null, they're a mismatch
+        if (namespace == null || otherNamespace == null) {
+            return false;
+        }
+
+        // Compare string equality
+        return namespace.equalsIgnoreCase(otherNamespace);
+    }
+
+    /**
      * Returns true if this player is inside a group.
      * 
      * @param group The group to check
