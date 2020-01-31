@@ -28,7 +28,7 @@ dependencies {
     "implementation"("io.papermc:paperlib:1.0.2")
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
-    "implementation"("org.bstats:bstats-bukkit:1.5")
+    "implementation"("org.bstats:bstats-bukkit:1.7")
 }
 
 tasks.named<Upload>("install") {
@@ -61,7 +61,7 @@ tasks.named<Jar>("jar") {
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
-            include(dependency("org.bstats:bstats-bukkit:1.5"))
+            include(dependency("org.bstats:bstats-bukkit:1.7"))
         }
         relocate ("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib:1.0.2"))

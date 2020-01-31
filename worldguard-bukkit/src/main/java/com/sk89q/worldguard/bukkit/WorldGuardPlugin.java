@@ -214,7 +214,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
 
         // Enable metrics
-        final Metrics metrics = new Metrics(this);
+        final Metrics metrics = new Metrics(this, 3283); // bStats plugin id
         if (metrics.isEnabled() && platform.getGlobalStateManager().extraStats) {
             setupCustomCharts(metrics);
         }
