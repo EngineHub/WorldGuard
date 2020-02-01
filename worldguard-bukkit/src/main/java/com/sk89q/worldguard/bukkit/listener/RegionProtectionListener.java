@@ -41,7 +41,6 @@ import com.sk89q.worldguard.bukkit.util.InteropUtils;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.config.WorldConfiguration;
-import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;

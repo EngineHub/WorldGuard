@@ -270,14 +270,20 @@ public class EventAbstractionListener extends AbstractListener {
             boolean trample = fromType == Material.FARMLAND && toType == Material.DIRT;
             BreakBlockEvent breakDelagate = new BreakBlockEvent(event, cause, block);
             if (trample) {
+                breakDelagate.setSilent(true);
                 breakDelagate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
             }
-            if (!Events.fireToCancel(event, breakDelagate)) {
+            boolean denied;
+            if (!(denied = Events.fireToCancel(event, breakDelagate))) {
                 PlaceBlockEvent placeDelegate = new PlaceBlockEvent(event, cause, block.getLocation(), toType);
                 if (trample) {
+                    placeDelegate.setSilent(true);
                     placeDelegate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
                 }
-                Events.fireToCancel(event, placeDelegate);
+                denied = Events.fireToCancel(event, placeDelegate);
+            }
+            if (denied && entity instanceof Player) {
+                playDenyEffect((Player) entity, block.getLocation());
             }
         } else {
             if (toType == Material.AIR) {
@@ -395,23 +401,37 @@ public class EventAbstractionListener extends AbstractListener {
         @Nullable ItemStack item = event.getItem();
         Block clicked = event.getClickedBlock();
         Block placed;
-        boolean silent = false;
         boolean modifiesWorld;
         Cause cause = create(player);
 
         switch (event.getAction()) {
             case PHYSICAL:
                 if (event.useInteractedBlock() != Result.DENY) {
+                    if (clicked.getType() == Material.FARMLAND || clicked.getType() == Material.TURTLE_EGG) {
+                        BreakBlockEvent breakDelagate = new BreakBlockEvent(event, cause, clicked);
+                        breakDelagate.setSilent(true);
+                        breakDelagate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
+                        boolean denied;
+                        if (!(denied = Events.fireToCancel(event, breakDelagate))) {
+                            PlaceBlockEvent placeDelegate = new PlaceBlockEvent(event, cause, clicked.getLocation(),
+                                    clicked.getType() == Material.FARMLAND ? Material.DIRT : clicked.getType());
+                            placeDelegate.setSilent(true);
+                            placeDelegate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
+                            denied = Events.fireToCancel(event, placeDelegate);
+                        }
+                        if (denied) {
+                            playDenyEffect(player, clicked.getLocation());
+                        }
+                        return;
+                    }
                     DelegateEvent firedEvent = new UseBlockEvent(event, cause, clicked).setAllowed(hasInteractBypass(clicked));
                     if (clicked.getType() == Material.REDSTONE_ORE) {
-                        silent = true;
+                        firedEvent.setSilent(true);
                     }
-                    if (clicked.getType() == Material.FARMLAND || clicked.getType() == Material.TURTLE_EGG) {
-                        silent = true;
-                        firedEvent.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
-                    }
-                    firedEvent.setSilent(silent);
                     interactDebounce.debounce(clicked, event.getPlayer(), event, firedEvent);
+                    if (event.useInteractedBlock() == Result.DENY) {
+                        playDenyEffect(player, clicked.getLocation().add(0, 1, 0));
+                    }
                 }
                 break;
 
