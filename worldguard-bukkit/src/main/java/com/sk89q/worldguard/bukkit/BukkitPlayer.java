@@ -24,6 +24,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import io.papermc.lib.PaperLib;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
@@ -52,6 +53,16 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
             this.name = getPlayer().getName();
         }
         return name;
+    }
+
+    @Override
+    public String getDefaultNamespace() {
+        // TODO: Add a per player override
+        boolean useNamespaces = WorldGuard.getInstance().getPlatform().getGlobalStateManager().useNamespaces;
+        if (useNamespaces) {
+            return getUniqueId().toString();
+        }
+        return null;
     }
 
     @Override

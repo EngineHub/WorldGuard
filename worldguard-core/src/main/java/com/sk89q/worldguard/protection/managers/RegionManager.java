@@ -34,6 +34,7 @@ import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionIdentifier;
 import com.sk89q.worldguard.protection.util.RegionCollectionConsumer;
 import com.sk89q.worldguard.util.Normal;
 
@@ -242,8 +243,20 @@ public final class RegionManager {
      * @param id the name of the region
      * @return true if this index contains the region
      */
+    @Deprecated
     public boolean hasRegion(String id) {
         return index.contains(id);
+    }
+
+    /**
+     * Return whether the index contains a region with the given identifier,
+     * with quality determined by {@link Normal}.
+     *
+     * @param id the region identifier
+     * @return true if this index contains the region
+     */
+    public boolean hasRegion(RegionIdentifier id) {
+        return index.contains(id.getLegacyQualifiedName());
     }
 
     /**
@@ -254,9 +267,22 @@ public final class RegionManager {
      * @return a region or {@code null}
      */
     @Nullable
+    @Deprecated
     public ProtectedRegion getRegion(String id) {
         checkNotNull(id);
         return index.get(id);
+    }
+
+    /**
+     * Get the region named y the given id.
+     *
+     * @param id the region identifier
+     * @return a region or {@code null}
+     */
+    @Nullable
+    public ProtectedRegion getRegion(RegionIdentifier id) {
+        checkNotNull(id);
+        return index.get(id.getLegacyQualifiedName());
     }
 
     /**

@@ -47,6 +47,7 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * @param pt1 the first point of this region
      * @param pt2 the second point of this region
      */
+    @Deprecated
     public ProtectedCuboidRegion(String id, BlockVector3 pt1, BlockVector3 pt2) {
         this(id, false, pt1, pt2);
     }
@@ -59,7 +60,34 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * @param pt1 the first point of this region
      * @param pt2 the second point of this region
      */
+    @Deprecated
     public ProtectedCuboidRegion(String id, boolean transientRegion, BlockVector3 pt1, BlockVector3 pt2) {
+        this(new RegionIdentifier(id), transientRegion, pt1, pt2);
+    }
+
+    /**
+     * Construct a new instance of this cuboid region.<br>
+     * Equivalent to {@link #ProtectedCuboidRegion(RegionIdentifier, boolean, BlockVector3, BlockVector3)
+     * ProtectedCuboidRegion(id, false, pt1, pt2)}<br>
+     * <code>transientRegion</code> will be set to false, and this region can be saved.
+     *
+     * @param id the region identifier
+     * @param pt1 the first point of this region
+     * @param pt2 the second point of this region
+     */
+    public ProtectedCuboidRegion(RegionIdentifier id, BlockVector3 pt1, BlockVector3 pt2) {
+        this(id, false, pt1, pt2);
+    }
+
+    /**
+     * Construct a new instance of this cuboid region.
+     *
+     * @param id the region identifier
+     * @param transientRegion whether this region should only be kept in memory and not be saved
+     * @param pt1 the first point of this region
+     * @param pt2 the second point of this region
+     */
+    public ProtectedCuboidRegion(RegionIdentifier id, boolean transientRegion, BlockVector3 pt1, BlockVector3 pt2) {
         super(id, transientRegion);
         setMinMaxPoints(pt1, pt2);
     }

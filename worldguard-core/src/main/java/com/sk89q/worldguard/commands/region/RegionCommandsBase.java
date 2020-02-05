@@ -33,13 +33,13 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
+import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -49,13 +49,13 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.regions.*;
+import com.sk89q.worldguard.util.profile.Profile;
 
+import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 class RegionCommandsBase {
@@ -77,9 +77,9 @@ class RegionCommandsBase {
      * Gets the world from the given flag, or falling back to the the current player
      * if the sender is a player, otherwise reporting an error.
      *
-     * @param args the arguments
+     * @param args   the arguments
      * @param sender the sender
-     * @param flag the flag (such as 'w')
+     * @param flag   the flag (such as 'w')
      * @return a world
      * @throws CommandException on error
      */
@@ -96,25 +96,187 @@ class RegionCommandsBase {
     }
 
     /**
+     * Validate a region name.
+     *
+     * @param name        the name
+     * @param allowGlobal whether __global__ is allowed
+     * @throws CommandException thrown on an error
+     */
+    protected static void checkName(String name, boolean allowGlobal) throws CommandException {
+        if (!RegionIdentifier.isValidName(name)) {
+            throw new CommandException(
+                    "The region name of '" + name + "' contains characters that are not allowed.");
+        }
+
+        if (!allowGlobal && name.equalsIgnoreCase("__global__")) { // Sorry, no global
+            throw new CommandException(
+                    "Sorry, you can't use __global__ here.");
+        }
+    }
+
+    /**
      * Validate a region ID.
      *
-     * @param id the id
+     * @param id          the id
      * @param allowGlobal whether __global__ is allowed
      * @return the id given
      * @throws CommandException thrown on an error
      */
+    @Deprecated
     protected static String checkRegionId(String id, boolean allowGlobal) throws CommandException {
-        if (!ProtectedRegion.isValidId(id)) {
-            throw new CommandException(
-                    "The region name of '" + id + "' contains characters that are not allowed.");
-        }
-
-        if (!allowGlobal && id.equalsIgnoreCase("__global__")) { // Sorry, no global
-            throw new CommandException(
-                    "Sorry, you can't use __global__ here.");
-        }
-
+        checkName(id, allowGlobal);
         return id;
+    }
+
+    /**
+     * Validate a region namespace.
+     *
+     * @param namespace the namespace name
+     * @throws CommandException thrown on an error
+     */
+    protected static void checkNamespace(String namespace) throws CommandException {
+        if (!RegionIdentifier.isValidNamespace(namespace)) {
+            throw new CommandException(
+                    "The region namespace of '" + namespace + "' contains characters that are not allowed.");
+        }
+    }
+
+    /**
+     * Get the unqualified name from a possibly qualified region identifier.
+     *
+     * @param id the unprocessed region identifier
+     * @return the unqualified name, or an empty string if not present
+     */
+    protected static String getUnqualifiedName(String id) {
+        int namespaceSeparatorIndex = id.lastIndexOf(':');
+        if (namespaceSeparatorIndex == -1) {
+            return id;
+        }
+
+        int unqualifiedNameStartIndex = namespaceSeparatorIndex + 1;
+        if (unqualifiedNameStartIndex == id.length()) {
+            return "";
+        }
+
+        return id.substring(unqualifiedNameStartIndex);
+    }
+
+    /**
+     * Get the namespace name from a possibly qualified region identifier.
+     *
+     * @param id the unprocessed region identifier
+     * @return an optional containing the namespace name, or an empty string if qualified,
+     * if not qualified, an empty optional is returned
+     */
+    protected static Optional<String> getNamespace(String id) {
+        int namespaceSeparatorIndex = id.lastIndexOf(':');
+        if (namespaceSeparatorIndex == -1) {
+            return Optional.empty();
+        }
+
+        return Optional.of(id.substring(0, namespaceSeparatorIndex));
+    }
+
+    private static class InvalidMacroException extends RuntimeException {
+        public InvalidMacroException(String message) {
+            super(message);
+        }
+    }
+
+    /***
+     * Expand macros in the namespace name.
+     *
+     * @param namespace the unexpanded namespace name
+     * @return the expanded namespace name
+     */
+    protected static String expandNamespace(String namespace) {
+        if (namespace.startsWith("#")) {
+            String playerName = namespace.substring(1);
+
+            try {
+                Profile profile = WorldGuard.getInstance().getProfileService().findByName(playerName);
+                if (profile != null) {
+                    return profile.getUniqueId().toString();
+                }
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+
+            throw new InvalidMacroException("Macro unresolvable: " + namespace);
+        }
+
+        return namespace;
+    }
+
+    /**
+     * Get the macro expanded namespace name from a possibly qualified region identifier.
+     *
+     * @param id the unprocessed region identifier
+     * @return an optional containing the expanded namespace name, or an empty string if qualified,
+     * if not qualified, an empty optional is returned
+     */
+    protected static Optional<String> getExpandedNamespace(String id) throws CommandException {
+        try {
+            return getNamespace(id).map(RegionCommandsBase::expandNamespace);
+        } catch (InvalidMacroException ex) {
+            throw new CommandException(ex.getMessage());
+        }
+    }
+
+    /**
+     * Get the default namespace for a given actor.
+     *
+     * @param sender the sender who's default namespace we intend to retrieve.
+     * @return the default namespace
+     */
+    protected static String getDefaultNamespace(Actor sender) {
+        if (sender instanceof LocalPlayer) {
+            return ((LocalPlayer) sender).getDefaultNamespace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Process a possibly qualified region identifier into a RegionIdentifier.
+     *
+     * This method takes a possibly qualified region identifier, and processes it, expanding any namespace macros,
+     * running permissions checks, and validating the names for invalid character.
+     *
+     * @param sender the contextual sender to use for checks and macro expansions
+     * @param id the possibly unqualified id
+     * @param allowGlobal whether or not this method should allow use of the name __global__ name
+     * @return the processed region id
+     * @throws AuthorizationException if a permission check fails
+     * @throws CommandException if a name validation check fails
+     */
+    protected static RegionIdentifier processRegionId(Actor sender, String id, boolean allowGlobal) throws AuthorizationException, CommandException {
+        String unqualifiedName = getUnqualifiedName(id);
+        checkName(unqualifiedName, allowGlobal);
+
+        Optional<String> optProvidedNamespace = getExpandedNamespace(id);
+        String namespace = optProvidedNamespace.orElse(getDefaultNamespace(sender));
+
+        // TODO use more informative permission checks
+
+        // This needs checked as a special case, before namespace name validation.
+        if (namespace.equals("")) {
+            sender.checkPermission("worldguard.region.namespace.global");
+            return new RegionIdentifier(null, unqualifiedName);
+        }
+
+        checkNamespace(namespace);
+
+        try {
+            UUID namespacePlayerId = UUID.fromString(namespace);
+            if (!namespacePlayerId.equals(sender.getUniqueId())) {
+                sender.checkPermission("worldguard.region.namespace.player");
+            }
+        } catch (IllegalArgumentException ex) {
+            sender.checkPermission("worldguard.region.namespace.custom." + namespace);
+        }
+
+        return new RegionIdentifier(namespace, unqualifiedName);
     }
 
     /**
@@ -128,6 +290,7 @@ class RegionCommandsBase {
      * @param allowGlobal true to allow selecting __global__
      * @throws CommandException thrown if no region is found by the given name
      */
+    @Deprecated
     protected static ProtectedRegion checkExistingRegion(RegionManager regionManager, String id, boolean allowGlobal) throws CommandException {
         // Validate the id
         checkRegionId(id, allowGlobal);
@@ -145,6 +308,36 @@ class RegionCommandsBase {
 
             throw new CommandException(
                     "No region could be found with the name of '" + id + "'.");
+        }
+
+        return region;
+    }
+
+    /**
+     * Get a protected region by a given name, otherwise throw a
+     * {@link CommandException}.
+     *
+     * <p>This also validates the region ID.</p>
+     *
+     * @param actor the associated player
+     * @param regionManager the region manager
+     * @param id the name to search
+     * @throws CommandException thrown if no region is found by the given name
+     */
+    protected static ProtectedRegion checkExistingRegion(Actor actor, RegionManager regionManager, RegionIdentifier id) throws CommandException {
+        ProtectedRegion region = regionManager.getRegion(id);
+
+        // No region found!
+        if (region == null) {
+            // But we want a __global__, so let's create one
+            if (id.getQualifiedName().equals(":__global__")) {
+                region = new GlobalProtectedRegion(id);
+                regionManager.addRegion(region);
+                return region;
+            }
+
+            throw new CommandException(
+                    "No region could be found with the name of '" + id.getDisplayName(actor) + "'.");
         }
 
         return region;
@@ -204,10 +397,12 @@ class RegionCommandsBase {
                     builder.append(TextComponent.of(", "));
                 }
                 first = false;
-                TextComponent regionComp = TextComponent.of(region.getId(), TextColor.AQUA);
+
+                RegionIdentifier id = region.getIdentifier();
+                TextComponent regionComp = TextComponent.of(id.getDisplayName(player), TextColor.AQUA);
                 if (rgCmd != null && rgCmd.contains("%id%")) {
                     regionComp = regionComp.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to pick this region")))
-                            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, rgCmd.replace("%id%", region.getId())));
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, rgCmd.replace("%id%", id.getQualifiedName())));
                 }
                 builder.append(regionComp);
             }
@@ -244,10 +439,23 @@ class RegionCommandsBase {
      * @param id the ID
      * @throws CommandException thrown if the ID already exists
      */
+    @Deprecated
     protected static void checkRegionDoesNotExist(RegionManager manager, String id, boolean mayRedefine) throws CommandException {
+        checkRegionDoesNotExist(null, manager, new RegionIdentifier(id), mayRedefine);
+    }
+
+    /**
+     * Check that a region with the given ID does not already exist.
+     *
+     * @param actor the associated player
+     * @param manager the manager
+     * @param id the identifier
+     * @throws CommandException thrown if the ID already exists
+     */
+    protected static void checkRegionDoesNotExist(Actor actor, RegionManager manager, RegionIdentifier id, boolean mayRedefine) throws CommandException {
         if (manager.hasRegion(id)) {
             throw new CommandException("A region with that name already exists. Please choose another name." +
-                    (mayRedefine ? " To change the shape, use /region redefine " + id + "." : ""));
+                    (mayRedefine ? " To change the shape, use /region redefine " + id.getDisplayName(actor) + "." : ""));
         }
     }
 
@@ -280,7 +488,20 @@ class RegionCommandsBase {
      * @return a new region
      * @throws CommandException thrown on an error
      */
+    @Deprecated
     protected static ProtectedRegion checkRegionFromSelection(LocalPlayer player, String id) throws CommandException {
+        return checkRegionFromSelection(player, new RegionIdentifier(id));
+    }
+
+    /**
+     * Create a {@link ProtectedRegion} from the player's selection.
+     *
+     * @param player the player
+     * @param id the identifier of the new region
+     * @return a new region
+     * @throws CommandException thrown on an error
+     */
+    protected static ProtectedRegion checkRegionFromSelection(LocalPlayer player, RegionIdentifier id) throws CommandException {
         Region selection = checkSelection(player);
 
         // Detect the type of region from WorldEdit
