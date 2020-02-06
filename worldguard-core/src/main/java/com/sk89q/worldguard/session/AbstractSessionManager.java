@@ -59,7 +59,7 @@ public abstract class AbstractSessionManager implements SessionManager {
 
     private final LoadingCache<WorldPlayerTuple, Boolean> bypassCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
-            .expireAfterAccess(2, TimeUnit.SECONDS)
+            .expireAfterWrite(2, TimeUnit.SECONDS)
             .build(CacheLoader.from(tuple ->
                     tuple.getPlayer().hasPermission("worldguard.region.bypass." + tuple.getWorld().getName())));
 
