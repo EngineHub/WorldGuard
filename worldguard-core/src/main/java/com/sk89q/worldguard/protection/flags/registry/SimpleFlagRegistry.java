@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.protection.flags.registry;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -80,12 +79,12 @@ public class SimpleFlagRegistry implements FlagRegistry {
 
     private Flag<?> forceRegister(Flag<?> flag) throws FlagConflictException {
         checkNotNull(flag, "flag");
-        Preconditions.checkNotNull(flag.getName(), "flag.getName()");
+        checkNotNull(flag.getName(), "flag.getName()");
 
         synchronized (lock) {
             String name = flag.getName().toLowerCase();
             if (flags.containsKey(name)) {
-                throw new FlagConflictException("Флаг уже существует с именем " + name);
+            throw new FlagConflictException("Флаг с именем " + name + "уже существует с именем.");
             }
 
             flags.put(name, flag);
@@ -154,7 +153,14 @@ public class SimpleFlagRegistry implements FlagRegistry {
             String parentName = entry.getKey().replaceAll("-group", "");
             Flag<?> parent = get(parentName);
             if (parent == null || parent instanceof UnknownFlag) {
-                if (createUnknown) forceRegister(new UnknownFlag(entry.getKey()));
+                if (createUnknown && get(entry.getKey()) == null) {
+                    final UnknownFlag unknownFlag = new UnknownFlag(entry.getKey());
+                    forceRegister(unknownFlag);
+                }
+                Flag<?> unk = get(entry.getKey());
+                if (unk != null) {
+                    values.put(unk, entry.getValue());
+                }
             } else {
                 values.put(parent.getRegionGroupFlag(), parent.getRegionGroupFlag().unmarshal(entry.getValue()));
             }

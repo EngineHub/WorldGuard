@@ -22,16 +22,17 @@ package com.sk89q.worldguard.session.handler;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.util.MessagingUtil;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 public class FarewellFlag extends Handler {
 
@@ -44,49 +45,53 @@ public class FarewellFlag extends Handler {
     }
 
     private Set<String> lastMessageStack = Collections.emptySet();
+    private Set<String> lastTitleStack = Collections.emptySet();
 
     public FarewellFlag(Session session) {
         super(session);
     }
 
-    private Set<String> getMessages(LocalPlayer player, ApplicableRegionSet set) {
-        return Sets.newLinkedHashSet(set.queryAllValues(player, Flags.FAREWELL_MESSAGE));
+    private Set<String> getMessages(LocalPlayer player, ApplicableRegionSet set, Flag<String> flag) {
+        return Sets.newLinkedHashSet(set.queryAllValues(player, flag));
     }
 
     @Override
     public void initialize(LocalPlayer player, Location current, ApplicableRegionSet set) {
-        lastMessageStack = getMessages(player, set);
+        lastMessageStack = getMessages(player, set, Flags.FAREWELL_MESSAGE);
+        lastTitleStack = getMessages(player, set, Flags.FAREWELL_TITLE);
     }
 
     @Override
-    public boolean onCrossBoundary(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
-        Set<String> messages = getMessages(player, toSet);
+    public boolean onCrossBoundary(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet,
+                                   Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
+
+        lastMessageStack = collectAndSend(player, toSet, Flags.FAREWELL_MESSAGE, lastMessageStack, MessagingUtil::sendStringToChat);
+        lastTitleStack = collectAndSend(player, toSet, Flags.FAREWELL_TITLE, lastTitleStack, MessagingUtil::sendStringToTitle);
+
+        return true;
+    }
+
+    private Set<String> collectAndSend(LocalPlayer player, ApplicableRegionSet toSet, Flag<String> flag,
+                                       Set<String> stack, BiConsumer<LocalPlayer, String> msgFunc) {
+        Set<String> messages = getMessages(player, toSet, flag);
 
         if (!messages.isEmpty()) {
             // Due to flag priorities, we have to collect the lower
             // priority flag values separately
             for (ProtectedRegion region : toSet) {
-                String message = region.getFlag(Flags.FAREWELL_MESSAGE);
+                String message = region.getFlag(flag);
                 if (message != null) {
                     messages.add(message);
                 }
             }
         }
 
-        for (String message : lastMessageStack) {
+        for (String message : stack) {
             if (!messages.contains(message)) {
-                String effective = CommandUtils.replaceColorMacros(message);
-                effective = WorldGuard.getInstance().getPlatform().getMatcher().replaceMacros(player, effective);
-                for (String mess : effective.replaceAll("\\\\n", "\n").split("\\n")) {
-                    player.printRaw(mess);
-                }
+                msgFunc.accept(player, message);
                 break;
             }
         }
-
-        lastMessageStack = messages;
-
-        return true;
+        return messages;
     }
-
 }

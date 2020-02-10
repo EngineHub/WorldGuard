@@ -41,8 +41,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -52,6 +52,7 @@ import javax.annotation.Nullable;
  */
 public class ChunkHashTable implements ConcurrentRegionIndex {
 
+    private final String name;
     private ListeningExecutorService executor = createExecutor();
     private LongHashTable<ChunkState> states = new LongHashTable<>();
     private final RegionIndex index;
@@ -63,10 +64,12 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
      * Create a new instance.
      *
      * @param index the index
+     * @param name
      */
-    public ChunkHashTable(RegionIndex index) {
+    public ChunkHashTable(RegionIndex index, String name) {
         checkNotNull(index);
         this.index = index;
+        this.name = name;
     }
 
     /**
@@ -75,8 +78,8 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
      * @return an executor service
      */
     private ListeningExecutorService createExecutor() {
-        return MoreExecutors.listeningDecorator(
-                EvenMoreExecutors.newBoundedCachedThreadPool(0, 4, Integer.MAX_VALUE));
+        return MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 4, Integer.MAX_VALUE,
+                "WorldGuard Region Chunk Table - " + name));
     }
 
     /**
@@ -361,17 +364,17 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
     /**
      * A factory for instances of {@code ChunkHashCache}.
      */
-    public static class Factory implements Supplier<ChunkHashTable> {
-        private final Supplier<? extends ConcurrentRegionIndex> supplier;
+    public static class Factory implements Function<String, ChunkHashTable> {
+        private final Function<String, ? extends ConcurrentRegionIndex> supplier;
 
-        public Factory(Supplier<? extends ConcurrentRegionIndex> supplier) {
+        public Factory(Function<String, ? extends ConcurrentRegionIndex> supplier) {
             checkNotNull(supplier);
             this.supplier = supplier;
         }
 
         @Override
-        public ChunkHashTable get() {
-            return new ChunkHashTable(supplier.get());
+        public ChunkHashTable apply(String name) {
+            return new ChunkHashTable(supplier.apply(name), name);
         }
     }
 

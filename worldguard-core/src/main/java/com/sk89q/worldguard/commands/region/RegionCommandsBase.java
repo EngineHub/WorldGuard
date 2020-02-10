@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.commands.region;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -32,7 +33,13 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -155,8 +162,8 @@ class RegionCommandsBase {
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player) throws CommandException {
-        return checkRegionStandingIn(regionManager, player, false);
+    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, String rgCmd) throws CommandException {
+        return checkRegionStandingIn(regionManager, player, false, rgCmd);
     }
 
     /**
@@ -174,7 +181,7 @@ class RegionCommandsBase {
      * @return a region
      * @throws CommandException thrown if no region was found
      */
-    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, boolean allowGlobal) throws CommandException {
+    protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, boolean allowGlobal, String rgCmd) throws CommandException {
         ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation().toVector().toBlockPoint());
 
         if (set.size() == 0) {
@@ -188,19 +195,24 @@ class RegionCommandsBase {
                     "Вы не состоите ни в одном из регионов." +
                             "Укажите ID региона если хотите указать какой-то конкретный регион.");
         } else if (set.size() > 1) {
-            StringBuilder builder = new StringBuilder();
             boolean first = true;
 
+            final TextComponent.Builder builder = TextComponent.builder("");
+            builder.append(TextComponent.of("Текущие регионы: ", TextColor.GOLD));
             for (ProtectedRegion region : set) {
                 if (!first) {
-                    builder.append(", ");
+                    builder.append(TextComponent.of(", "));
                 }
                 first = false;
-                builder.append(region.getId());
+                TextComponent regionComp = TextComponent.of(region.getId(), TextColor.AQUA);
+                if (rgCmd != null && rgCmd.contains("%id%")) {
+                    regionComp = regionComp.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы выбрать этот регион")))
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, rgCmd.replace("%id%", region.getId())));
+                }
+                builder.append(regionComp);
             }
-
-            throw new CommandException(
-                    "Вы находитесь в нескольких регионах (пожалуйста, выберите один).\nВы в: " + builder.toString());
+            player.print(builder.build());
+            throw new CommandException("Вы находитесь в нескольких регионах (пожалуйста, выберите один).");
         }
 
         return set.iterator().next();
@@ -219,7 +231,9 @@ class RegionCommandsBase {
             return WorldEdit.getInstance().getSessionManager().get(player).getRegionSelector(player.getWorld()).getRegion();
         } catch (IncompleteRegionException e) {
             throw new CommandException(
-                    "Вы не выделили область для привата региона.");
+                    "Вы не выделили область для привата региона. " +
+                            "Используйте WorldEdit, чтобы сделать выделение! " +
+                            "(смотрите: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).");
         }
     }
 
@@ -243,7 +257,7 @@ class RegionCommandsBase {
      * @param world the world
      * @throws CommandException thrown if the manager is null
      */
-    protected static RegionManager checkRegionManager(com.sk89q.worldedit.world.World world) throws CommandException {
+    protected static RegionManager checkRegionManager(World world) throws CommandException {
         if (!WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).useRegions) {
             throw new CommandException("Регионы отключены в данном мире. " +
                     "Они могут быть включены для каждого мира в конфигурационных файлах WorldGuard. " +
@@ -293,12 +307,12 @@ class RegionCommandsBase {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         Set<RegionManager> failures = container.getSaveFailures();
 
-        if (failures.size() > 0) {
-            String failingList = Joiner.on(", ").join(failures.stream().map(regionManager -> "'" + regionManager.getName() + "'").collect(Collectors.toList()));
+        if (!failures.isEmpty()) {
+            String failingList = Joiner.on(", ").join(failures.stream()
+                    .map(regionManager -> "'" + regionManager.getName() + "'").collect(Collectors.toList()));
 
-            sender.printRaw(Style.YELLOW_DARK +
-                    "(Предупреждение: Не удается сохранить регион в этом мире: " + failingList + ". " +
-                    "Пожалуйста, сообщите администратору.)");
+            sender.print(TextComponent.of("(Предупреждение: Не удается сохранить регион в этом мире: " + failingList + ". " +
+                    "Пожалуйста, сообщите администратору.)", TextColor.GOLD));
         }
     }
 
@@ -323,12 +337,28 @@ class RegionCommandsBase {
      * @param region the region
      */
     protected static void informNewUser(Actor sender, RegionManager manager, ProtectedRegion region) {
-        if (manager.getRegions().size() <= 2) {
-            sender.printRaw(Style.GRAY +
-                    "(Теперь этот регион защищен от изменения другими игроками. " +
-                    "Не хотите этого? Используйте " +
-                    Style.CYAN + "/rg flag " + region.getId() + " passthrough allow" +
-                    Style.GRAY + ")");
+        if (manager.size() <= 2) {
+            sender.print(SubtleFormat.wrap("(Теперь этот регион защищен от изменения другими игроками. Не хотите этого? Используйте ")
+                            .append(TextComponent.of("/rg flag " + region.getId() + " passthrough allow", TextColor.AQUA))
+                            .append(TextComponent.of(")", TextColor.GRAY)));
+        }
+    }
+
+    /**
+     * Inform a user if the region overlaps spawn protection.
+     *
+     * @param sender the sender to send the message to
+     * @param world the world the region is in
+     * @param region the region
+     */
+    protected static void checkSpawnOverlap(Actor sender, World world, ProtectedRegion region) {
+        ProtectedRegion spawn = WorldGuard.getInstance().getPlatform().getSpawnProtection(world);
+        if (spawn != null) {
+            if (!spawn.getIntersectingRegions(ImmutableList.of(region)).isEmpty()) {
+                sender.print(ErrorFormat.wrap("Предупреждение!")
+                        .append(TextComponent.of(" Эта область перекрывается ванильной защитой спавна. WorldGuard не может " +
+                                "переопределить это, и только администраторы сервера будут иметь возможность взаимодействовать с этой областью.")));
+            }
         }
     }
 
@@ -348,7 +378,9 @@ class RegionCommandsBase {
             BlockVector3 pt1 = cuboid.getMinimumPoint();
             BlockVector3 pt2 = cuboid.getMaximumPoint();
 
-            session.setRegionSelector(player.getWorld(), new CuboidRegionSelector(player.getWorld(), pt1, pt2));
+            CuboidRegionSelector selector = new CuboidRegionSelector(player.getWorld(), pt1, pt2);
+            session.setRegionSelector(player.getWorld(), selector);
+            selector.explainRegionAdjust(player, session);
             player.print("Регион выбран как кубоид.");
 
         } else if (region instanceof ProtectedPolygonalRegion) {
@@ -356,8 +388,9 @@ class RegionCommandsBase {
             Polygonal2DRegionSelector selector = new Polygonal2DRegionSelector(
                     player.getWorld(), poly2d.getPoints(),
                     poly2d.getMinimumPoint().getBlockY(),
-                    poly2d.getMaximumPoint().getBlockY() );
+                    poly2d.getMaximumPoint().getBlockY());
             session.setRegionSelector(player.getWorld(), selector);
+            selector.explainRegionAdjust(player, session);
             player.print("Регион выбран как полигон.");
 
         } else if (region instanceof GlobalProtectedRegion) {
@@ -380,8 +413,10 @@ class RegionCommandsBase {
      * @param value the value
      * @throws InvalidFlagFormat thrown if the value is invalid
      */
-    protected static <V> void setFlag(ProtectedRegion region, Flag<V> flag, Actor sender, String value) throws InvalidFlagFormat {
-        region.setFlag(flag, flag.parseInput(FlagContext.create().setSender(sender).setInput(value).setObject("region", region).build()));
+    protected static <V> V setFlag(ProtectedRegion region, Flag<V> flag, Actor sender, String value) throws InvalidFlagFormat {
+        V val = flag.parseInput(FlagContext.create().setSender(sender).setInput(value).setObject("region", region).build());
+        region.setFlag(flag, val);
+        return val;
     }
 
 }

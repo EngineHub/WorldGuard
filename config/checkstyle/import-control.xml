@@ -16,24 +16,21 @@
     <allow pkg="org.khelekore"/>
     <allow pkg="org.flywaydb"/>
     <allow pkg="org.yaml"/>
-    <allow pkg="org.json"/>
+    <allow pkg="org.enginehub.piston"/>
+
+    <subpackage name="util.profile.resolver">
+      <allow pkg="org.bukkit"/>
+      <allow pkg="io.papermc.lib"/>
+      <allow pkg="com.destroystokyo.paper"/>
+    </subpackage>
 
     <subpackage name="bukkit">
       <allow pkg="org.bukkit"/>
       <allow pkg="org.bstats.bukkit"/>
-      <allow pkg="net.minecraft.server"/>
+      <allow pkg="io.papermc.lib"/>
+      <allow pkg="com.destroystokyo.paper"/>
     </subpackage>
 
-    <subpackage name="sponge">
-      <allow pkg="org.spongepowered"/>
-      <allow pkg="org.bstats.sponge"/>
-      <allow pkg="com.flowpowered"/>
-    </subpackage>
-
-    <subpackage name="forge">
-      <allow pkg="net.minecraft"/>
-      <allow pkg="net.minecraftforge"/>
-    </subpackage>
   </subpackage>
 
 </import-control>

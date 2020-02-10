@@ -19,15 +19,21 @@
 
 package com.sk89q.worldguard.config;
 
+import com.sk89q.worldedit.util.report.Unreported;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
-import com.sk89q.worldedit.util.report.Unreported;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -43,20 +49,20 @@ public abstract class WorldConfiguration {
     public static final Logger log = Logger.getLogger(WorldConfiguration.class.getCanonicalName());
 
     public static final String CONFIG_HEADER = "#\r\n" +
-            "# WorldGuard's world configuration file\r\n" +
+            "# Файл конфигурации мира WorldGuard\r\n" +
             "#\r\n" +
-            "# This is a world configuration file. Anything placed into here will only\r\n" +
-            "# affect this world. If you don't put anything in this file, then the\r\n" +
-            "# settings will be inherited from the main configuration file.\r\n" +
+            "# Это файл конфигурации мира. Все, что находится здесь будет влиять\r\n" +
+            "# только на этот мир. Если файл будет пустой, то настройки будут\r\n" +
+            "# унаследованы от основного файла конфигурации.\r\n" +
             "#\r\n" +
-            "# If you see {} below, that means that there are NO entries in this file.\r\n" +
-            "# Remove the {} and add your own entries.\r\n" +
+            "# Если вы видите {} ниже, это означает, что в этом файле нет записей.\r\n" +
+            "# Удалите {} и добавьте свои собственные записи.\r\n" +
             "#\r\n";
 
-    @Unreported private String worldName;
     protected File blacklistFile;
 
-    @Unreported protected Blacklist blacklist;
+    @Unreported
+    protected Blacklist blacklist;
 
     public boolean boundedLocationFlags;
     public boolean useRegions;
@@ -112,6 +118,7 @@ public abstract class WorldConfiguration {
     public boolean teleportOnSuffocation;
     public boolean disableVoidDamage;
     public boolean teleportOnVoid;
+    public boolean safeFallOnVoid;
     public boolean disableExplosionDamage;
     public boolean disableMobDamage;
     public boolean highFreqFlags;
@@ -135,6 +142,7 @@ public abstract class WorldConfiguration {
     public boolean alwaysRaining;
     public boolean alwaysThundering;
     public boolean disablePigZap;
+    public boolean disableVillagerZap;
     public boolean disableCreeperPower;
     public boolean disableHealthRegain;
     public boolean disableMushroomSpread;
@@ -146,6 +154,7 @@ public abstract class WorldConfiguration {
     public boolean disableGrassGrowth;
     public boolean disableMyceliumSpread;
     public boolean disableVineGrowth;
+    public boolean disableCropGrowth;
     public boolean disableEndermanGriefing;
     public boolean disableSnowmanTrails;
     public boolean disableSoilDehydration;
@@ -170,54 +179,64 @@ public abstract class WorldConfiguration {
         return this.blacklist;
     }
 
-    public String getWorldName() {
-        return this.worldName;
-    }
-
     public List<String> convertLegacyItems(List<String> legacyItems) {
-        return legacyItems.stream().map(this::convertLegacyItem).collect(Collectors.toList());
+        return legacyItems.stream().map(this::convertLegacyItem).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public String convertLegacyItem(String legacy) {
-        String item = legacy;
+        String[] splitter = legacy.split(":", 2);
         try {
-            String[] splitter = item.split(":", 2);
-            int id = 0;
-            byte data = 0;
+            int id;
+            byte data;
             if (splitter.length == 1) {
-                id = Integer.parseInt(item);
+                id = Integer.parseInt(splitter[0]);
+                data = 0;
             } else {
                 id = Integer.parseInt(splitter[0]);
                 data = Byte.parseByte(splitter[1]);
             }
-            item = LegacyMapper.getInstance().getItemFromLegacy(id, data).getId();
-        } catch (Throwable e) {
+            ItemType legacyItem = LegacyMapper.getInstance().getItemFromLegacy(id, data);
+            if (legacyItem != null) {
+                return legacyItem.getId();
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        final ItemType itemType = ItemTypes.get(legacy);
+        if (itemType != null) {
+            return itemType.getId();
         }
 
-        return item;
+        return null;
     }
 
     public List<String> convertLegacyBlocks(List<String> legacyBlocks) {
-        return legacyBlocks.stream().map(this::convertLegacyBlock).collect(Collectors.toList());
+        return legacyBlocks.stream().map(this::convertLegacyBlock).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public String convertLegacyBlock(String legacy) {
-        String block = legacy;
+        String[] splitter = legacy.split(":", 2);
         try {
-            String[] splitter = block.split(":", 2);
-            int id = 0;
-            byte data = 0;
+            int id;
+            byte data;
             if (splitter.length == 1) {
-                id = Integer.parseInt(block);
+                id = Integer.parseInt(splitter[0]);
+                data = 0;
             } else {
                 id = Integer.parseInt(splitter[0]);
                 data = Byte.parseByte(splitter[1]);
             }
-            block = LegacyMapper.getInstance().getBlockFromLegacy(id, data).getBlockType().getId();
-        } catch (Throwable e) {
+            BlockState legacyBlock = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
+            if (legacyBlock != null) {
+                return legacyBlock.getBlockType().getId();
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        final BlockType blockType = BlockTypes.get(legacy);
+        if (blockType != null) {
+            return blockType.getId();
         }
 
-        return block;
+        return null;
     }
 
     public int getMaxRegionCount(LocalPlayer player) {

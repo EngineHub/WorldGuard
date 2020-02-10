@@ -114,7 +114,7 @@ public class GeneralCommands {
                     // Keep track of this
                     included = true;
                 } else {
-                    player.print("Режим Бога отключен для " + sender.getDisplayName() + ".");
+                    player.print("Режим Бога отключен для игрока " + sender.getDisplayName() + ".");
 
                 }
             }

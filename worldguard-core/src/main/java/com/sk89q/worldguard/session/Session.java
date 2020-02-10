@@ -44,6 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Session {
 
     private final SessionManager manager;
+    private boolean disableBypass;
     private final HashMap<Class<?>, Handler> handlers = Maps.newLinkedHashMap();
     private Location lastValid;
     private Set<ProtectedRegion> lastRegionSet;
@@ -217,4 +218,18 @@ public class Session {
         return null;
     }
 
+    /**
+     * @return true if the owner of this session should not bypass protection, even if they have bypass permissions
+     */
+    public boolean hasBypassDisabled() {
+        return disableBypass;
+    }
+
+    /**
+     * Toggle bypass disabling for this session.
+     * @param disabled true to disable region bypass
+     */
+    public void setBypassDisabled(boolean disabled) {
+        disableBypass = disabled;
+    }
 }

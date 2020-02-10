@@ -40,7 +40,7 @@ public final class BlockDispenseBlacklistEvent extends BlockBlacklistEvent {
 
     @Override
     public String getDescription() {
-        return "dispense";
+        return "распределять";
     }
 
     @Override

@@ -20,15 +20,13 @@
 package com.sk89q.worldguard.session.handler;
 
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.ColorCodeBuilder;
-import com.sk89q.worldedit.util.formatting.Style;
-import com.sk89q.worldedit.util.formatting.StyledFragment;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.util.formatting.component.Notify;
 
 public class NotifyExitFlag extends FlagValueChangeHandler<Boolean> {
 
@@ -58,11 +56,7 @@ public class NotifyExitFlag extends FlagValueChangeHandler<Boolean> {
 
     @Override
     protected boolean onAbsentValue(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Boolean lastValue, MoveType moveType) {
-        WorldGuard.getInstance().getPlatform().broadcastNotification(
-                ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.GRAY).append("WG: "))
-                        .append(new StyledFragment(Style.PURPLE).append(player.getName()))
-                        .append(new StyledFragment(Style.YELLOW_DARK).append(" вышел из региона")))
-        );
+        WorldGuard.getInstance().getPlatform().broadcastNotification(new Notify(player.getName(), " вышел из региона NOTIFY").create());
         return true;
     }
 }

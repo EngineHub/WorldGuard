@@ -19,13 +19,12 @@
 
 package com.sk89q.worldguard.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.internal.command.exception.ExceptionConverterHelper;
+import com.sk89q.worldedit.internal.command.exception.ExceptionMatch;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
-import com.sk89q.worldedit.util.command.parametric.ExceptionConverterHelper;
-import com.sk89q.worldedit.util.command.parametric.ExceptionMatch;
+import com.sk89q.worldedit.util.formatting.component.InvalidComponentException;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.util.UnresolvedNamesException;
@@ -39,11 +38,9 @@ import java.util.regex.Pattern;
 public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
 
     private static final Pattern numberFormat = Pattern.compile("^Для входной строки: \"(.*)\"$");
-    private final WorldGuard worldGuard;
 
-    public WorldGuardExceptionConverter(WorldGuard worldGuard) {
-        checkNotNull(worldGuard);
-        this.worldGuard = worldGuard;
+    private CommandException newCommandException(String message, Throwable cause) {
+        return new CommandException(message, cause);
     }
 
     @ExceptionMatch
@@ -51,46 +48,51 @@ public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
         final Matcher matcher = numberFormat.matcher(e.getMessage());
 
         if (matcher.matches()) {
-            throw new CommandException("Ожидаемое количество; строка \"" + matcher.group(1)
-                    + "\" получено.");
+            throw newCommandException("Ожидаемое количество; строка \"" + matcher.group(1)
+                    + "\" получено.", e);
         } else {
-            throw new CommandException("Ожидаемое количество; заданная строка.");
+            throw newCommandException("Ожидаемое количество; заданная строка.", e);
         }
+    }
+
+    @ExceptionMatch
+    public void convert(InvalidComponentException e) throws CommandException {
+        throw newCommandException(e.getMessage(), e);
     }
 
     @ExceptionMatch
     public void convert(StorageException e) throws CommandException {
         WorldGuard.logger.log(Level.WARNING, "Ошибка загрузки/сохранения регионов", e);
-        throw new CommandException("Данные региона не могут быть загружены/сохранены: " + e.getMessage());
+        throw newCommandException("Данные региона не могут быть загружены/сохранены: " + e.getMessage(), e);
     }
 
     @ExceptionMatch
     public void convert(RejectedExecutionException e) throws CommandException {
-        throw new CommandException("В настоящее время в очереди слишком много задач, чтобы добавить ваши. Используйте /wg running, чтобы перечислить поставленные в очередь и выполняющиеся задачи.", e);
+        throw newCommandException("В настоящее время в очереди слишком много задач, чтобы добавить ваши. Используйте /wg running, чтобы перечислить поставленные в очередь и выполняющиеся задачи.", e);
     }
 
     @ExceptionMatch
     public void convert(CancellationException e) throws CommandException {
-        throw new CommandException("WorldGuard: Задача была отменена.", e);
+        throw newCommandException("Задача была отменена.", e);
     }
 
     @ExceptionMatch
     public void convert(InterruptedException e) throws CommandException {
-        throw new CommandException("WorldGuard: Задача была прервана.", e);
+        throw newCommandException("Задача была отменена.", e);
     }
 
     @ExceptionMatch
     public void convert(WorldEditException e) throws CommandException {
-        throw new CommandException(e.getMessage(), e);
+        throw newCommandException(e.getMessage(), e);
     }
 
     @ExceptionMatch
     public void convert(UnresolvedNamesException e) throws CommandException {
-        throw new CommandException(e.getMessage(), e);
+        throw newCommandException(e.getMessage(), e);
     }
 
     @ExceptionMatch
     public void convert(AuthorizationException e) throws CommandException {
-        throw new CommandException("У вас нет разрешения на это.", e);
+        throw newCommandException("У вас нет разрешения на это.", e);
     }
 }

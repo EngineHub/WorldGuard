@@ -110,7 +110,7 @@ public class LongBaseHashTable extends LongHash {
     }
 
     public synchronized ArrayList<EntryBase> entries() {
-        ArrayList<EntryBase> ret = new ArrayList<EntryBase>();
+        ArrayList<EntryBase> ret = new ArrayList<>();
 
         for (EntryBase[][] outer : this.values) {
             if (outer == null) continue;

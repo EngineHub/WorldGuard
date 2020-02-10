@@ -115,7 +115,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
     public void disableUuidMigration() {
         config.setProperty("regions.uuid-migration.perform-on-next-start", false);
         if (!config.save()) {
-            log.severe("Ошибка сохранения конфигурации!");
+            log.severe("Ошибка при сохранении конфигурации!");
         }
     }
 }

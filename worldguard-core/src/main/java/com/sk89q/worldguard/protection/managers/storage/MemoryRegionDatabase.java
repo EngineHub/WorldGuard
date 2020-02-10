@@ -49,7 +49,7 @@ public class MemoryRegionDatabase implements RegionDatabase {
 
     @Override
     public void saveAll(Set<ProtectedRegion> regions) {
-        this.regions = Collections.unmodifiableSet(new HashSet<ProtectedRegion>(regions));
+        this.regions = Collections.unmodifiableSet(new HashSet<>(regions));
     }
 
     @Override

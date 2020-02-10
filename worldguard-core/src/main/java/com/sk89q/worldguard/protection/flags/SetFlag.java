@@ -74,7 +74,7 @@ public class SetFlag<T> extends Flag<Set<T>> {
     public Set<T> unmarshal(Object o) {
         if (o instanceof Collection<?>) {
             Collection<?> collection = (Collection<?>) o;
-            Set<T> items = new HashSet<T>();
+            Set<T> items = new HashSet<>();
 
             for (Object sub : collection) {
                 T item = subFlag.unmarshal(sub);
@@ -91,7 +91,7 @@ public class SetFlag<T> extends Flag<Set<T>> {
 
     @Override
     public Object marshal(Set<T> o) {
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
         for (T item : o) {
             list.add(subFlag.marshal(item));
         }

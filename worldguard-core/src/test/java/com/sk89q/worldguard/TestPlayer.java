@@ -27,26 +27,29 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.weather.WeatherType;
+import org.junit.Ignore;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-@org.junit.Ignore
+@Ignore
 public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     private final UUID uuid = UUID.randomUUID();
     private final String name;
     private final Set<String> groups = new HashSet<>();
-    
+
     public TestPlayer(String name) {
         this.name = name;
     }
-    
+
     public void addGroup(String group) {
         groups.add(group.toLowerCase());
     }
@@ -172,6 +175,21 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
+    public void sendTitle(String title, String subtitle) {
+
+    }
+
+    @Override
+    public void resetFallDistance() {
+
+    }
+
+    @Override
+    public void teleport(Location location, String successMessage, String failMessage) {
+
+    }
+
+    @Override
     public void printRaw(String msg) {
         System.out.println("-> TestPlayer{" + this.name + "}: " + msg);
     }
@@ -189,6 +207,16 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     @Override
     public void printError(String msg) {
 
+    }
+
+    @Override
+    public void print(Component component) {
+
+    }
+
+    @Override
+    public Locale getLocale() {
+        return Locale.ENGLISH;
     }
 
     @Override

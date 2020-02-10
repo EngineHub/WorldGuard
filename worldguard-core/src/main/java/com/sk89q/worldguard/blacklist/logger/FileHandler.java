@@ -206,7 +206,7 @@ public class FileHandler implements LoggerHandler {
             }
 
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Не удалось войти в черный список событий '"
+            logger.log(Level.WARNING, "Не удалось зарегистрировать событие черного списка в '"
                     + path + "': " + e.getMessage());
         }
     }
@@ -222,7 +222,7 @@ public class FileHandler implements LoggerHandler {
     }
 
     private void logEvent(BlacklistEvent event, String text, Target target, BlockVector3 pos, String comment) {
-        log(event.getPlayer(), "Попытался " + text + " " + target.getFriendlyName() + " " + getCoordinates(pos), comment);
+        log(event.getPlayer(), "Пытался " + text + " " + target.getFriendlyName() + " " + getCoordinates(pos), comment);
     }
 
     @Override

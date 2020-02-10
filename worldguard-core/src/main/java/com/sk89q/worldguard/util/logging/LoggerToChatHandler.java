@@ -20,8 +20,11 @@
 package com.sk89q.worldguard.util.logging;
 
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -29,6 +32,13 @@ import java.util.logging.LogRecord;
  * Sends all logger messages to a player.
  */
 public class LoggerToChatHandler extends Handler {
+    private final Formatter formatter = new Formatter() {
+        @Override
+        public String format(LogRecord record) {
+            return formatMessage(record);
+        }
+    };
+
     /**
      * Player.
      */
@@ -62,6 +72,6 @@ public class LoggerToChatHandler extends Handler {
      */
     @Override
     public void publish(LogRecord record) {
-        player.printDebug(record.getLevel().getName() + ": " + Style.WHITE + record.getMessage());
+        player.print(SubtleFormat.wrap(record.getLevel().getName() + ": ").append(TextComponent.of(formatter.format(record), TextColor.WHITE)));
     }
 }

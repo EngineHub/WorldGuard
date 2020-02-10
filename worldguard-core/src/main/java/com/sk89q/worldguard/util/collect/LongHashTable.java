@@ -43,7 +43,7 @@ public class LongHashTable<V> extends LongBaseHashTable {
 
     @SuppressWarnings("unchecked")
     public synchronized ArrayList<V> values() {
-        ArrayList<V> ret = new ArrayList<V>();
+        ArrayList<V> ret = new ArrayList<>();
 
         ArrayList<EntryBase> entries = entries();
 

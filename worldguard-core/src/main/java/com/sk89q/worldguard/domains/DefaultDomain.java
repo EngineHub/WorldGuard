@@ -20,16 +20,23 @@
 package com.sk89q.worldguard.domains;
 
 import com.google.common.collect.ImmutableMap;
-import com.sk89q.squirrelid.Profile;
-import com.sk89q.squirrelid.cache.ProfileCache;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.sk89q.worldguard.util.profile.Profile;
+import com.sk89q.worldguard.util.profile.cache.ProfileCache;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.util.ChangeTracked;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -272,7 +279,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
         List<String> output = new ArrayList<>();
 
         for (String name : playerDomain.getPlayers()) {
-            output.add("" + name);
+            output.add("имя:" + name);
         }
 
         if (cache != null) {
@@ -280,7 +287,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
             for (UUID uuid : playerDomain.getUniqueIds()) {
                 Profile profile = results.get(uuid);
                 if (profile != null) {
-                    output.add(profile.getName() + "");
+                    output.add(profile.getName() + "*");
                 } else {
                     output.add("uuid:" + uuid);
                 }
@@ -304,7 +311,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
     public String toGroupsString() {
         StringBuilder str = new StringBuilder();
         for (Iterator<String> it = groupDomain.getGroups().iterator(); it.hasNext(); ) {
-            str.append("*");
+            str.append("");
             str.append(it.next());
             if (it.hasNext()) {
                 str.append(", ");
@@ -347,6 +354,86 @@ public class DefaultDomain implements Domain, ChangeTracked {
         }
 
         return str.toString();
+    }
+
+    public Component toUserFriendlyComponent(@Nullable ProfileCache cache) {
+        final TextComponent.Builder builder = TextComponent.builder("");
+        if (playerDomain.size() > 0) {
+            builder.append(toPlayersComponent(cache));
+        }
+        if (groupDomain.size() > 0) {
+            if (playerDomain.size() > 0) {
+                builder.append(TextComponent.of("; "));
+            }
+            builder.append(toGroupsComponent());
+        }
+        return builder.build();
+    }
+
+    private Component toGroupsComponent() {
+        final TextComponent.Builder builder = TextComponent.builder("");
+        for (Iterator<String> it = groupDomain.getGroups().iterator(); it.hasNext(); ) {
+            builder.append(TextComponent.of(it.next(), TextColor.GOLD));
+            if (it.hasNext()) {
+                builder.append(TextComponent.of(", "));
+            }
+        }
+        return builder.build().hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Groups")));
+    }
+
+    private Component toPlayersComponent(ProfileCache cache) {
+        List<String> uuids = Lists.newArrayList();
+        Map<String, UUID> profileMap = Maps.newHashMap();
+
+        for (String name : playerDomain.getPlayers()) {
+            profileMap.put(name, null);
+        }
+
+        if (cache != null) {
+            ImmutableMap<UUID, Profile> results = cache.getAllPresent(playerDomain.getUniqueIds());
+            for (UUID uuid : playerDomain.getUniqueIds()) {
+                Profile profile = results.get(uuid);
+                if (profile != null) {
+                    profileMap.put(profile.getName(), uuid);
+                } else {
+                    uuids.add(uuid.toString());
+                }
+            }
+        } else {
+            for (UUID uuid : playerDomain.getUniqueIds()) {
+                uuids.add(uuid.toString());
+            }
+        }
+
+        final TextComponent.Builder builder = TextComponent.builder("");
+        final Iterator<TextComponent> profiles = profileMap.keySet().stream().sorted().map(name -> {
+            final UUID uuid = profileMap.get(name);
+            final TextComponent component = TextComponent.of(name, TextColor.YELLOW)
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, uuid == null
+                            ? TextComponent.of("только имена", TextColor.GRAY)
+                            : TextComponent.of("Последнее известное UUID: ", TextColor.GRAY)
+                            .append(TextComponent.of(uuid.toString(), TextColor.WHITE))));
+            if (uuid == null) {
+                return component;
+            }
+            return component.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, uuid.toString()));
+        }).iterator();
+        while (profiles.hasNext()) {
+            builder.append(profiles.next());
+            if (profiles.hasNext() || !uuids.isEmpty()) {
+                builder.append(TextComponent.of(", "));
+            }
+        }
+
+        if (!uuids.isEmpty()) {
+            builder.append(TextComponent.of(uuids.size() + " неизвестное UUID" + (uuids.size() == 1 ? "" : "s"), TextColor.GRAY)
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(String.join("\n", uuids))
+                        .append(TextComponent.newline().append(TextComponent.of("Нажмите, чтобы выбрать")))))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, String.join(",", uuids))));
+        }
+
+
+        return builder.build();
     }
 
     @Override

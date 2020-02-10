@@ -20,9 +20,6 @@
 package com.sk89q.worldguard.session.handler;
 
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.ColorCodeBuilder;
-import com.sk89q.worldedit.util.formatting.Style;
-import com.sk89q.worldedit.util.formatting.StyledFragment;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -30,6 +27,7 @@ import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.util.formatting.component.Notify;
 
 public class NotifyEntryFlag extends FlagValueChangeHandler<Boolean> {
 
@@ -62,11 +60,7 @@ public class NotifyEntryFlag extends FlagValueChangeHandler<Boolean> {
             regionList.append(region.getId());
         }
 
-        WorldGuard.getInstance().getPlatform().broadcastNotification(
-                ColorCodeBuilder.asColorCodes(new StyledFragment().append(new StyledFragment(Style.GRAY).append("WG: "))
-                        .append(new StyledFragment(Style.PURPLE).append(player.getName()))
-                        .append(new StyledFragment(Style.YELLOW_DARK).append(" вошел в регион: " + regionList)))
-        );
+        WorldGuard.getInstance().getPlatform().broadcastNotification(new Notify(player.getName(), " вошел в регион NOTIFY: " + regionList).create());
 
         return true;
     }

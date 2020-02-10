@@ -22,11 +22,14 @@ package com.sk89q.worldguard.internal.permission;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldguard.internal.PermissionModel;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public abstract class AbstractPermissionModel implements PermissionModel {
     
     private final Actor sender;
 
-    public AbstractPermissionModel(Actor sender) {
+    protected AbstractPermissionModel(Actor sender) {
+        checkNotNull(sender);
         this.sender = sender;
     }
 

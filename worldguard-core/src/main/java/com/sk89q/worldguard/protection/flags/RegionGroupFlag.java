@@ -67,23 +67,14 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
         if (group == null || group == RegionGroup.ALL) {
             return true;
         } else if (group == RegionGroup.OWNERS) {
-            if (player != null && region.isOwner(player)) {
-                return true;
-            }
+            return player != null && region.isOwner(player);
         } else if (group == RegionGroup.MEMBERS) {
-            if (player != null && region.isMember(player)) {
-                return true;
-            }
+            return player != null && region.isMember(player);
         } else if (group == RegionGroup.NON_OWNERS) {
-            if (player == null || !region.isOwner(player)) {
-                return true;
-            }
+            return player == null || !region.isOwner(player);
         } else if (group == RegionGroup.NON_MEMBERS) {
-            if (player == null || !region.isMember(player)) {
-                return true;
-            }
+            return player == null || !region.isMember(player);
         }
-
         return false;
     }
 
@@ -91,23 +82,14 @@ public class RegionGroupFlag extends EnumFlag<RegionGroup> {
         if (group == null || group == RegionGroup.ALL) {
             return true;
         } else if (group == RegionGroup.OWNERS) {
-            if (set.isOwnerOfAll(player)) {
-                return true;
-            }
+            return set.isOwnerOfAll(player);
         } else if (group == RegionGroup.MEMBERS) {
-            if (set.isMemberOfAll(player)) {
-                return true;
-            }
+            return set.isMemberOfAll(player);
         } else if (group == RegionGroup.NON_OWNERS) {
-            if (!set.isOwnerOfAll(player)) {
-                return true;
-            }
+            return !set.isOwnerOfAll(player);
         } else if (group == RegionGroup.NON_MEMBERS) {
-            if (!set.isMemberOfAll(player)) {
-                return true;
-            }
+            return !set.isMemberOfAll(player);
         }
-
         return false;
     }
 

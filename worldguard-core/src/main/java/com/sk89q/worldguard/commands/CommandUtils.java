@@ -19,11 +19,14 @@
 
 package com.sk89q.worldguard.commands;
 
-import com.google.common.base.Function;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Command-related utility methods.
@@ -42,40 +45,45 @@ public final class CommandUtils {
     public static String replaceColorMacros(String str) {
         // TODO: Make this more efficient
 
-        str = str.replace("`r", Style.RED.toString());
-        str = str.replace("`R", Style.RED_DARK.toString());
+        str = str.replace("`r", "&c");
+        str = str.replace("`R", "&4");
 
-        str = str.replace("`y", Style.YELLOW.toString());
-        str = str.replace("`Y", Style.YELLOW_DARK.toString());
+        str = str.replace("`y", "&e");
+        str = str.replace("`Y", "&6");
 
-        str = str.replace("`g", Style.GREEN.toString());
-        str = str.replace("`G", Style.GREEN_DARK.toString());
+        str = str.replace("`g", "&a");
+        str = str.replace("`G", "&2");
 
-        str = str.replace("`c", Style.CYAN.toString());
-        str = str.replace("`C", Style.CYAN_DARK.toString());
+        str = str.replace("`c", "&b");
+        str = str.replace("`C", "&3");
 
-        str = str.replace("`b", Style.BLUE.toString());
-        str = str.replace("`B", Style.BLUE_DARK.toString());
+        str = str.replace("`b", "&9");
+        str = str.replace("`B", "&1");
 
-        str = str.replace("`p", Style.PURPLE.toString());
-        str = str.replace("`P", Style.PURPLE_DARK.toString());
+        str = str.replace("`p", "&d");
+        str = str.replace("`P", "&5");
 
-        str = str.replace("`0", Style.BLACK.toString());
-        str = str.replace("`1", Style.GRAY_DARK.toString());
-        str = str.replace("`2", Style.GRAY.toString());
-        str = str.replace("`w", Style.WHITE.toString());
+        str = str.replace("`0", "&0");
+        str = str.replace("`1", "&8");
+        str = str.replace("`2", "&7");
+        str = str.replace("`w", "&F");
 
-        str = str.replace("`k", Style.RANDOMIZE.toString());
+        str = str.replace("`k", "&k");
 
-        str = str.replace("`l", Style.BOLD.toString());
-        str = str.replace("`m", Style.STRIKETHROUGH.toString());
-        str = str.replace("`n", Style.UNDERLINE.toString());
-        str = str.replace("`o", Style.ITALIC.toString());
+        str = str.replace("`l", "&l");
+        str = str.replace("`m", "&m");
+        str = str.replace("`n", "&n");
+        str = str.replace("`o", "&o");
 
-        str = str.replace("`x", Style.RESET.toString());
+        str = str.replace("`x", "&r");
 
         // MC classic
-        str = Style.translateAlternateColorCodes('&', str);
+        // FIXME: workaround for https://github.com/KyoriPowered/text/issues/50
+        // remove when fixed upstream and updated in WorldEdit
+        str = Arrays.stream(str.split("\n")).map(line -> {
+            TextComponent comp = LegacyComponentSerializer.INSTANCE.deserialize(line, '&');
+            return LegacyComponentSerializer.INSTANCE.serialize(comp);
+        }).collect(Collectors.joining("\n"));
 
         return str;
     }
@@ -104,9 +112,23 @@ public final class CommandUtils {
      * @param sender the sender
      * @return a function
      */
-    public static java.util.function.Function<String, ?> messageFunction(final Actor sender) {
-        return (Function<String, Object>) s -> {
+    public static Function<String, ?> messageFunction(final Actor sender) {
+        return s -> {
             sender.printRaw(s);
+            return null;
+        };
+    }
+
+    /**
+     * Return a function that accepts a TextComponent to send a message to the
+     * given sender.
+     *
+     * @param sender the sender
+     * @return a function
+     */
+    public static Function<TextComponent, ?> messageComponentFunction(final Actor sender) {
+        return s -> {
+            sender.print(s);
             return null;
         };
     }

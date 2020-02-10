@@ -21,9 +21,9 @@ package com.sk89q.worldguard.protection.util;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.sk89q.squirrelid.Profile;
-import com.sk89q.squirrelid.resolver.ProfileService;
-import com.sk89q.squirrelid.util.UUIDs;
+import com.sk89q.worldguard.util.profile.Profile;
+import com.sk89q.worldguard.util.profile.resolver.ProfileService;
+import com.sk89q.worldguard.util.profile.util.UUIDs;
 import com.sk89q.worldguard.domains.DefaultDomain;
 
 import javax.annotation.Nullable;
@@ -92,7 +92,7 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
     @Override
     public DefaultDomain call() throws UnresolvedNamesException {
         DefaultDomain domain = new DefaultDomain();
-        List<String> namesToQuery = new ArrayList<String>();
+        List<String> namesToQuery = new ArrayList<>();
 
         for (String s : input) {
             Matcher m = GROUP_PATTERN.matcher(s);
@@ -133,29 +133,31 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
         }
 
         if (!namesToQuery.isEmpty()) {
-            throw new UnresolvedNamesException("Не удалось определить ник " + Joiner.on(", ").join(namesToQuery));
+            throw new UnresolvedNamesException("Unable to resolve the names " + Joiner.on(", ").join(namesToQuery));
         }
 
         return domain;
     }
 
+    /**
+     * @deprecated was only used for Future transformation. Can be replaced with {@code region.getOwners()::addAll} (or getMembers).
+     */
+    @Deprecated
     public Function<DefaultDomain, DefaultDomain> createAddAllFunction(final DefaultDomain target) {
-        return new Function<DefaultDomain, DefaultDomain>() {
-            @Override
-            public DefaultDomain apply(@Nullable DefaultDomain domain) {
-                target.addAll(domain);
-                return domain;
-            }
+        return domain -> {
+            target.addAll(domain);
+            return domain;
         };
     }
 
+    /**
+     * @deprecated was only used for Future transformation. Can be replaced with {@code region.getOwners()::removeAll} (or getMembers).
+     */
+    @Deprecated
     public Function<DefaultDomain, DefaultDomain> createRemoveAllFunction(final DefaultDomain target) {
-        return new Function<DefaultDomain, DefaultDomain>() {
-            @Override
-            public DefaultDomain apply(@Nullable DefaultDomain domain) {
-                target.removeAll(domain);
-                return domain;
-            }
+        return domain -> {
+            target.removeAll(domain);
+            return domain;
         };
     }
 

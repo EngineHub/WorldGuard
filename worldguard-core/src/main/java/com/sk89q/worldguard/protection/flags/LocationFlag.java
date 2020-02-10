@@ -49,7 +49,7 @@ public class LocationFlag extends Flag<Location> {
         if ("here".equalsIgnoreCase(input)) {
             Location playerLoc = player.getLocation();
             loc = new LazyLocation(((World) playerLoc.getExtent()).getName(),
-                    loc.toVector(), loc.getYaw(), loc.getPitch());
+                    playerLoc.toVector(), playerLoc.getYaw(), playerLoc.getPitch());
         } else {
             String[] split = input.split(",");
             if (split.length >= 3) {

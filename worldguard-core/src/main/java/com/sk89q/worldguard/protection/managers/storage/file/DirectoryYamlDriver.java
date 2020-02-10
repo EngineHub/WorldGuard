@@ -66,7 +66,7 @@ public class DirectoryYamlDriver implements RegionDriver {
             f.getCanonicalPath();
             return f;
         } catch (IOException e) {
-            throw new IllegalArgumentException("Недопустимый путь для файла регионов мира");
+            throw new IllegalArgumentException("Invalid file path for the world's regions file");
         }
     }
 
@@ -81,7 +81,7 @@ public class DirectoryYamlDriver implements RegionDriver {
 
     @Override
     public List<RegionDatabase> getAll() throws StorageException {
-        List<RegionDatabase> stores = new ArrayList<RegionDatabase>();
+        List<RegionDatabase> stores = new ArrayList<>();
 
         File files[] = rootDir.listFiles();
         if (files != null) {

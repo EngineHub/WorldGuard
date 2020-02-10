@@ -65,7 +65,7 @@ public class BlacklistEntry {
      * @param ignoreGroups the ignoreGroups to set
      */
     public void setIgnoreGroups(String[] ignoreGroups) {
-        Set<String> ignoreGroupsSet = new HashSet<String>();
+        Set<String> ignoreGroupsSet = new HashSet<>();
         for (String group : ignoreGroups) {
             ignoreGroupsSet.add(group.toLowerCase());
         }
@@ -76,7 +76,7 @@ public class BlacklistEntry {
      * @param ignorePermissions the ignorePermissions to set
      */
     public void setIgnorePermissions(String[] ignorePermissions) {
-        Set<String> ignorePermissionsSet = new HashSet<String>();
+        Set<String> ignorePermissionsSet = new HashSet<>();
         Collections.addAll(ignorePermissionsSet, ignorePermissions);
         this.ignorePermissions = ignorePermissionsSet;
     }

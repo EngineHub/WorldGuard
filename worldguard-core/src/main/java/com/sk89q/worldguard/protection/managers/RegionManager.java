@@ -37,6 +37,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.util.RegionCollectionConsumer;
 import com.sk89q.worldguard.util.Normal;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,9 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
+import java.util.function.Function;
 
 /**
  * A region manager holds the regions for a world.
@@ -57,7 +56,7 @@ import javax.annotation.Nullable;
 public final class RegionManager {
 
     private final RegionDatabase store;
-    private final Supplier<? extends ConcurrentRegionIndex> indexFactory;
+    private final Function<String, ? extends ConcurrentRegionIndex> indexFactory;
     private final FlagRegistry flagRegistry;
     private ConcurrentRegionIndex index;
 
@@ -68,14 +67,14 @@ public final class RegionManager {
      * @param indexFactory the factory for creating new instances of the index
      * @param flagRegistry the flag registry
      */
-    public RegionManager(RegionDatabase store, Supplier<? extends ConcurrentRegionIndex> indexFactory, FlagRegistry flagRegistry) {
+    public RegionManager(RegionDatabase store, Function<String, ? extends ConcurrentRegionIndex> indexFactory, FlagRegistry flagRegistry) {
         checkNotNull(store);
         checkNotNull(indexFactory);
         checkNotNull(flagRegistry, "flagRegistry");
 
         this.store = store;
         this.indexFactory = indexFactory;
-        this.index = indexFactory.get();
+        this.index = indexFactory.apply(store.getName());
         this.flagRegistry = flagRegistry;
     }
 
@@ -218,7 +217,7 @@ public final class RegionManager {
     public void setRegions(Collection<ProtectedRegion> regions) {
         checkNotNull(regions);
 
-        ConcurrentRegionIndex newIndex = indexFactory.get();
+        ConcurrentRegionIndex newIndex = indexFactory.apply(getName());
         newIndex.addAll(regions);
         newIndex.getAndClearDifference(); // Clear changes
         this.index = newIndex;
@@ -261,32 +260,11 @@ public final class RegionManager {
     }
 
     /**
-     * Matches a region using either the pattern {@code #{region_index}} or
-     * simply by the exact name of the region.
-     *
-     * @param pattern the pattern
-     * @return a region
+     * @deprecated Use exact ids with {@link #getRegion}
      */
     @Nullable
+    @Deprecated
     public ProtectedRegion matchRegion(String pattern) {
-        checkNotNull(pattern);
-
-        if (pattern.startsWith("#")) {
-            int index;
-            try {
-                index = Integer.parseInt(pattern.substring(1)) - 1;
-            } catch (NumberFormatException e) {
-                return null;
-            }
-            for (ProtectedRegion region : this.index.values()) {
-                if (index == 0) {
-                    return region;
-                }
-                --index;
-            }
-            return null;
-        }
-
         return getRegion(pattern);
     }
 

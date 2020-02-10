@@ -638,4 +638,11 @@ public class ApplicableRegionSetTest {
         assertThat(test.apply("/deny"), is(false));
     }
 
+    @Test
+    public void testRegionSetReturnsNullForUnsetState() {
+        MockApplicableRegionSet mock = new MockApplicableRegionSet();
+        mock.add(0);
+        mock.add(1);
+        assertNull(mock.getApplicableSet().queryState(null, Flags.INTERACT));
+    }
 }

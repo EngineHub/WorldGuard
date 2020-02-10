@@ -20,8 +20,8 @@
 package com.sk89q.worldguard.protection.managers.migration;
 
 import com.google.common.base.Predicate;
-import com.sk89q.squirrelid.Profile;
-import com.sk89q.squirrelid.resolver.ProfileService;
+import com.sk89q.worldguard.util.profile.Profile;
+import com.sk89q.worldguard.util.profile.resolver.ProfileService;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.domains.PlayerDomain;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
@@ -31,7 +31,12 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
@@ -47,7 +52,7 @@ public class UUIDMigration extends AbstractMigration {
     private static final Logger log = Logger.getLogger(UUIDMigration.class.getCanonicalName());
     private static final int LOG_DELAY = 5000;
 
-    private final Timer timer = new Timer();
+    private final Timer timer = new Timer("Миграция UUID WorldGuard");
     private final ProfileService profileService;
     private final FlagRegistry flagRegistry;
     private final ConcurrentMap<String, UUID> resolvedNames = new ConcurrentHashMap<>();
@@ -71,14 +76,14 @@ public class UUIDMigration extends AbstractMigration {
 
     @Override
     protected void migrate(RegionDatabase store) throws MigrationException {
-        log.log(Level.INFO, "Миграция регионов в '" + store.getName() + "' для преобразования имен -> UUIDs...");
+        log.log(Level.INFO, "Миграция архива в '" + store.getName() + "' для преобразования имен -> UUIDs...");
 
         Set<ProtectedRegion> regions;
 
         try {
             regions = store.loadAll(flagRegistry);
         } catch (StorageException e) {
-            throw new MigrationException("Не удалось загрузить данные региона для мира '" + store.getName() + "'", e);
+            throw new MigrationException("Не удалось загрузить данные по регионам для всего мира '" + store.getName() + "'", e);
         }
 
         migrate(regions);
@@ -86,7 +91,7 @@ public class UUIDMigration extends AbstractMigration {
         try {
             store.saveAll(regions);
         } catch (StorageException e) {
-            throw new MigrationException("Не удалось сохранить данные региона после миграции мира '" + store.getName() + "'", e);
+            throw new MigrationException("Не удалось сохранить данные о регионах после миграции мира '" + store.getName() + "'", e);
         }
     }
 
@@ -102,7 +107,7 @@ public class UUIDMigration extends AbstractMigration {
             try {
                 timer.schedule(task, LOG_DELAY, LOG_DELAY);
 
-                log.log(Level.INFO, "Решение " + names.size() + " имени(ей) в UUIDs... это может занять некоторое время.");
+                log.log(Level.INFO, "Resolving " + names.size() + " name(s) into UUIDs... this may take a while.");
 
                 // Don't lookup names that we already looked up for previous
                 // worlds -- note: all names are lowercase in these collections
@@ -118,16 +123,16 @@ public class UUIDMigration extends AbstractMigration {
                     }
                 });
             } catch (IOException e) {
-                throw new MigrationException("Имя -> Сбой UUID", e);
+                throw new MigrationException("The name -> UUID service failed", e);
             } catch (InterruptedException e) {
-                throw new MigrationException("Миграция была прервана");
+                throw new MigrationException("The migration was interrupted");
             } finally {
                 // Stop showing the % converted messages
                 task.cancel();
             }
 
             // Name -> UUID in all regions
-            log.log(Level.INFO, "UUIDs разрешены... теперь мигрируются все регионы UUID, где это возможно...");
+            log.log(Level.INFO, "UUIDs resolved... now migrating all regions to UUIDs where possible...");
             convert(regions);
 
             return true;
@@ -141,15 +146,15 @@ public class UUIDMigration extends AbstractMigration {
         if (!unresolvedNames.isEmpty()) {
             if (keepUnresolvedNames) {
                 log.log(Level.WARNING,
-                        "Некоторые имена участников и владельцев не существуют, " +
-                                "поэтому они не могут быть преобразованы в UUID. Они были оставлены в качестве имен, но преобразование можно повторно " +
-                                "запустить с 'keep-names-that-lack-uuids' установленым false в конфигурации " +
-                                "чтобы удалить эти имена. Если оставить имена, это значит, что кто-то сможет зарегистрироваться с одним из " +
-                                "тех имен в будущем и стать тем игроком.");
+                        "Some member and owner names do not seem to exist or own Minecraft so they " +
+                                "could not be converted into UUIDs. They have been left as names, but the conversion can " +
+                                "be re-run with 'keep-names-that-lack-uuids' set to false in the configuration in " +
+                                "order to remove these names. Leaving the names means that someone can register with one of " +
+                                "these names in the future and become that player.");
             } else {
                 log.log(Level.WARNING,
-                        "Некоторые имена участников и владельцев не существуют, " +
-                                "поэтому они не могут быть преобразованы в UUID. Эти имена были удалены.");
+                        "Some member and owner names do not seem to exist or own Minecraft so they " +
+                                "could not be converted into UUIDs. These names have been removed.");
             }
         }
     }
@@ -234,7 +239,7 @@ public class UUIDMigration extends AbstractMigration {
     private class ResolvedNamesTimerTask extends TimerTask {
         @Override
         public void run() {
-            log.info("UUIDs был найден для имени(ей) " + resolvedNames.size() + "...");
+            log.info("UUIDs have been found for " + resolvedNames.size() + " name(s)...");
         }
     }
 

@@ -23,6 +23,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -37,7 +38,13 @@ public class RegionPermissionModel extends AbstractPermissionModel {
         super(sender);
     }
 
+    /**
+     * @deprecated Check {@code WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(..)} instead
+     */
+    @Deprecated
     public boolean mayIgnoreRegionProtection(World world) {
+        if (getSender() instanceof LocalPlayer)
+            return WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass((LocalPlayer) getSender(), world);
         return hasPluginPermission("region.bypass." + world.getName());
     }
     

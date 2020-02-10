@@ -1,0 +1,10 @@
+# --------------------------------- #
+# RUS by DarkFort                   #
+# vk.com/darkfortmc | t.me/darkfort #
+# --------------------------------- #
+name: WorldGuard
+main: com.sk89q.worldguard.bukkit.WorldGuardPlugin
+version: "${internalVersion}"
+depend: [WorldEdit]
+softdepend: [CommandBook]
+api-version: 1.13

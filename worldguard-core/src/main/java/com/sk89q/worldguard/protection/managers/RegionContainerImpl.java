@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.managers;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.index.ChunkHashTable;
 import com.sk89q.worldguard.protection.managers.index.ConcurrentRegionIndex;
@@ -29,14 +31,21 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.util.Normal;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Manages different {@link RegionManager}s for different worlds or dimensions.
@@ -52,8 +61,8 @@ public class RegionContainerImpl {
     private final ConcurrentMap<Normal, RegionManager> mapping = new ConcurrentHashMap<>();
     private final Object lock = new Object();
     private final RegionDriver driver;
-    private final Supplier<? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
-    private final Timer timer = new Timer();
+    private final Function<String, ? extends ConcurrentRegionIndex> indexFactory = new ChunkHashTable.Factory(new PriorityRTreeIndex.Factory());
+    private final Timer timer = new Timer("WorldGuard Region I/O");
     private final FlagRegistry flagRegistry;
 
     private final Set<Normal> failingLoads = new HashSet<>();
@@ -108,7 +117,7 @@ public class RegionContainerImpl {
                     failingLoads.remove(normal);
                     return manager;
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Failed to load the region data for '" + name + "' (periodic attempts will be made to load the data until success)", e);
+                    log.log(Level.WARNING, "Не удалось загрузить данные региона для '" + name + "' (периодические попытки загрузки данных будут выполняться до тех пор, пока не увенчаются успехом)", e);
                     failingLoads.add(normal);
                     return null;
                 }
@@ -149,7 +158,7 @@ public class RegionContainerImpl {
                 try {
                     manager.save();
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Failed to save the region data for '" + name + "'", e);
+                    log.log(Level.WARNING, "Не удалось сохранить данные региона для '" + name + "'", e);
                 }
 
                 mapping.remove(normal);
@@ -172,7 +181,7 @@ public class RegionContainerImpl {
                 try {
                     manager.saveChanges();
                 } catch (StorageException e) {
-                    log.log(Level.WARNING, "Failed to save the region data for '" + name + "' while unloading the data for all worlds", e);
+                    log.log(Level.WARNING, "Не удалось сохранить данные региона для '" + name + "' при выгрузке данных для всех миров", e);
                 }
             }
 
@@ -180,6 +189,14 @@ public class RegionContainerImpl {
             failingLoads.clear();
             failingSaves.clear();
         }
+    }
+
+    /**
+     * Disable completely.
+     */
+    public void shutdown() {
+        timer.cancel();
+        unloadAll();
     }
 
     /**
@@ -226,15 +243,15 @@ public class RegionContainerImpl {
                     RegionManager manager = entry.getValue();
                     try {
                         if (manager.saveChanges()) {
-                            log.info("Region data changes made in '" + name + "' have been background saved");
+                            log.info("Данные области изменения, внесенные в '" + name + "' были сохранены фоновые данные");
                         }
                         failingSaves.remove(manager);
                     } catch (StorageException e) {
                         failingSaves.add(manager);
-                        log.log(Level.WARNING, "Failed to save the region data for '" + name + "' during a periodical save", e);
+                        log.log(Level.WARNING, "Не удалось сохранить данные региона для '" + name + "' во время периодического сохранения", e);
                     } catch (Exception e) {
                         failingSaves.add(manager);
-                        log.log(Level.WARNING, "An expected error occurred during a periodical save", e);
+                        log.log(Level.WARNING, "Произошла ошибка во время периодического сохранения", e);
                     }
                 }
             }
@@ -252,7 +269,7 @@ public class RegionContainerImpl {
         public void run() {
             synchronized (lock) {
                 if (!failingLoads.isEmpty()) {
-                    log.info("Attempting to load region data that has previously failed to load...");
+                    log.info("Попытка загрузки данных региона, которые ранее не были загружены...");
 
                     Iterator<Normal> it = failingLoads.iterator();
                     while (it.hasNext()) {
@@ -261,14 +278,14 @@ public class RegionContainerImpl {
                             RegionManager manager = createAndLoad(normal.toString());
                             mapping.put(normal, manager);
                             it.remove();
-                            log.info("Successfully loaded region data for '" + normal.toString() + "'");
+                            log.info("Данные региона для '" + normal.toString() + "' успешно загруженны");
                         } catch (StorageException e) {
                             if (e.getCause() != null && e.getCause().getMessage().equals(lastMsg)) {
                                 // if it's the same error, don't print a whole stacktrace
-                                log.log(Level.WARNING, "Region data is still failing to load, at least for the world named '" + normal.toString() + "'");
+                                log.log(Level.WARNING, "Данные по регионам по-прежнему не загружаются, по крайней мере для всего мира '" + normal.toString() + "'");
                                 break;
                             }
-                            log.log(Level.WARNING, "Region data is still failing to load, at least for the world named '" + normal.toString() + "'", e);
+                            log.log(Level.WARNING, "Данные по регионам по-прежнему не загружаются, по крайней мере для всего мира '" + normal.toString() + "'", e);
                             lastMsg = e.getCause() == null ? e.getMessage() : e.getCause().getMessage();
                             break;
                         }

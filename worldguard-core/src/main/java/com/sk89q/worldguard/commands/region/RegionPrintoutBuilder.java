@@ -19,13 +19,24 @@
 
 package com.sk89q.worldguard.commands.region;
 
-import com.sk89q.squirrelid.cache.ProfileCache;
+import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.formatting.Style;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
+import com.sk89q.worldedit.util.formatting.component.LabelFormat;
+import com.sk89q.worldedit.util.formatting.component.MessageBox;
+import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.internal.permission.RegionPermissionModel;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -40,12 +51,14 @@ import javax.annotation.Nullable;
  * Create a region printout, as used in /region info to show information about
  * a region.
  */
-public class RegionPrintoutBuilder implements Callable<String> {
-    
+public class RegionPrintoutBuilder implements Callable<TextComponent> {
+
+    private final String world;
     private final ProtectedRegion region;
     @Nullable
     private final ProfileCache cache;
-    private final StringBuilder builder = new StringBuilder();
+    private final TextComponentProducer builder = new TextComponentProducer();
+    private final RegionPermissionModel perms;
 
     /**
      * Create a new instance with a region to report on.
@@ -53,49 +66,47 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * @param region the region
      * @param cache a profile cache, or {@code null}
      */
-    public RegionPrintoutBuilder(ProtectedRegion region, @Nullable ProfileCache cache) {
+    public RegionPrintoutBuilder(String world, ProtectedRegion region, @Nullable ProfileCache cache, @Nullable Actor actor) {
+        this.world = world;
         this.region = region;
         this.cache = cache;
+        this.perms = actor != null && actor.isPlayer() ? new RegionPermissionModel(actor) : null;
     }
 
     /**
      * Add a new line.
      */
-    private void newLine() {
-        builder.append("\n");
+    public void newline() {
+        builder.append(TextComponent.newline());
     }
     
     /**
      * Add region name, type, and priority.
      */
     public void appendBasics() {
-        builder.append(Style.GREEN);
-        builder.append("Регион: ");
-        builder.append(Style.YELLOW);
-        builder.append(region.getId());
+        builder.append(TextComponent.of("Регион: ", TextColor.GREEN));
+        builder.append(TextComponent.of(region.getId(), TextColor.YELLOW)
+                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/rg info -w \"" + world + "\" " + region.getId())));
         
-        builder.append(Style.GRAY);
-        builder.append(" (тип=");
-        builder.append(region.getType().getName());
+        builder.append(TextComponent.of(" (тип=", TextColor.GRAY));
+        builder.append(TextComponent.of(region.getType().getName()));
         
-        builder.append(Style.GRAY);
-        builder.append(", приоритет=");
-        builder.append(region.getPriority());
-        builder.append(")");
+        builder.append(TextComponent.of(", приоритет=", TextColor.GRAY));
+        appendPriorityComponent(region);
+        builder.append(TextComponent.of(")", TextColor.GRAY));
 
-        newLine();
+        newline();
     }
-    
+
     /**
      * Add information about flags.
      */
     public void appendFlags() {
-        builder.append(Style.GREEN);
-        builder.append("Флаги: ");
+        builder.append(TextComponent.of("Флаги: ", TextColor.GREEN));
         
         appendFlagsList(true);
         
-        newLine();
+        newline();
     }
     
     /**
@@ -107,46 +118,56 @@ public class RegionPrintoutBuilder implements Callable<String> {
         boolean hasFlags = false;
         
         for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry()) {
-            Object val = region.getFlag(flag), group = null;
-            
+            Object val = region.getFlag(flag);
+
             // No value
             if (val == null) {
                 continue;
             }
 
             if (hasFlags) {
-                builder.append(", ");
-            } else {
-                if (useColors) {
-                    builder.append(Style.YELLOW);
-                }
+                builder.append(TextComponent.of(", "));
             }
 
             RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
+            Object group = null;
             if (groupFlag != null) {
                 group = region.getFlag(groupFlag);
             }
 
+            String flagString;
+
             if (group == null) {
-                builder.append(flag.getName()).append(": ")
-                        .append(Style.stripColor(String.valueOf(val)));
+                flagString = flag.getName() + ": ";
             } else {
-                builder.append(flag.getName()).append(" -g ")
-                        .append(group).append(": ")
-                        .append(Style.stripColor(String.valueOf(val)));
+                flagString = flag.getName() + " -g " + group + ": ";
             }
+
+            TextComponent flagText = TextComponent.of(flagString, useColors ? TextColor.GOLD : TextColor.WHITE)
+                    .append(TextComponent.of(String.valueOf(val), useColors? TextColor.YELLOW : TextColor.WHITE));
+            if (perms != null && perms.maySetFlag(region, flag)) {
+                flagText = flagText.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы установить флаг")))
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
+                                "/rg flag -w \"" + world + "\" " + region.getId() + " " + flag.getName() + " "));
+            }
+            builder.append(flagText);
 
             hasFlags = true;
         }
-            
+
         if (!hasFlags) {
-            if (useColors) {
-                builder.append(Style.RED);
-            }
-            builder.append("(нет)");
+            TextComponent noFlags = TextComponent.of("(нет)", useColors ? TextColor.RED : TextColor.WHITE);
+            builder.append(noFlags);
+        }
+
+        if (perms != null && perms.maySetFlag(region)) {
+            builder.append(TextComponent.space())
+                    .append(TextComponent.of("[Флаги]", useColors ? TextColor.BLUE : TextColor.GRAY)
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы установить флаг")))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/rg flags -w \"" + world + "\" " + region.getId())));
         }
     }
-    
+
     /**
      * Add information about parents.
      */
@@ -176,100 +197,155 @@ public class RegionPrintoutBuilder implements Callable<String> {
         ListIterator<ProtectedRegion> it = inheritance.listIterator(
                 inheritance.size());
 
+        ProtectedRegion last = null;
         int indent = 0;
         while (it.hasPrevious()) {
             ProtectedRegion cur = it.previous();
-            if (useColors) {
-                builder.append(Style.GREEN);
-            }
+
+            StringBuilder namePrefix = new StringBuilder();
             
             // Put symbol for child
             if (indent != 0) {
                 for (int i = 0; i < indent; i++) {
-                    builder.append("  ");
+                    namePrefix.append(" ");
                 }
-                builder.append("\u2517");
+                namePrefix.append("⤷"); //⤷
             }
-            
+
             // Put name
-            builder.append(cur.getId());
+            builder.append(TextComponent.of(namePrefix.toString(), useColors ? TextColor.GREEN : TextColor.WHITE));
+            if (perms != null && perms.mayLookup(cur)) {
+                builder.append(TextComponent.of(cur.getId(), useColors ? TextColor.GREEN : TextColor.WHITE)
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите для информации")))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/rg info -w \"" + world + "\" " + cur.getId())));
+            } else {
+                builder.append(TextComponent.of(cur.getId(), useColors ? TextColor.GREEN : TextColor.WHITE));
+            }
             
             // Put (parent)
             if (!cur.equals(region)) {
-                if (useColors) {
-                    builder.append(Style.GRAY);
-                }
-                builder.append(" (родитель, приоритет=").append(cur.getPriority()).append(")");
+                builder.append(TextComponent.of(" (родитель, приоритет=", useColors ? TextColor.GRAY : TextColor.WHITE));
+                appendPriorityComponent(cur);
+                builder.append(TextComponent.of(")", useColors ? TextColor.GRAY : TextColor.WHITE));
             }
-            
+            if (last != null && cur.equals(region) && perms != null && perms.maySetParent(cur, last)) {
+                builder.append(TextComponent.space());
+                builder.append(TextComponent.of("[X]", TextColor.RED)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы отменить связь между родителем")))
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/rg setparent -w \"" + world + "\" " + cur.getId())));
+            }
+
+            last = cur;
             indent++;
-            newLine();
+            newline();
         }
     }
-    
+
     /**
      * Add information about members.
      */
     public void appendDomain() {
-        builder.append(Style.GREEN);
-        builder.append("Владельцы: ");
-        addDomainString(region.getOwners());
-        newLine();
+        builder.append(TextComponent.of("Владельцы: ", TextColor.GREEN));
+        addDomainString(region.getOwners(),
+                perms != null && perms.mayAddOwners(region) ? "addowner" : null,
+                perms != null && perms.mayRemoveOwners(region) ? "removeowner" : null);
+        newline();
 
-        builder.append(Style.GREEN);
-        builder.append("Участники: ");
-        addDomainString(region.getMembers());
-        newLine();
+        builder.append(TextComponent.of("Участники: ", TextColor.GREEN));
+        addDomainString(region.getMembers(),
+                perms != null && perms.mayAddMembers(region) ? "addmember" : null,
+                perms != null && perms.mayRemoveMembers(region) ? "removemember" : null);
+        newline();
     }
 
-    private void addDomainString(DefaultDomain domain) {
-        if (domain.size() != 0) {
-            builder.append(Style.YELLOW);
-            builder.append(domain.toUserFriendlyString(cache));
+    private void addDomainString(DefaultDomain domain, String addCommand, String removeCommand) {
+        if (domain.size() == 0) {
+            builder.append(ErrorFormat.wrap("(нет)"));
         } else {
-            builder.append(Style.RED);
-            builder.append("(нет)");
+            if (perms != null) {
+                builder.append(domain.toUserFriendlyComponent(cache));
+            } else {
+                builder.append(LabelFormat.wrap(domain.toUserFriendlyString(cache)));
+            }
+        }
+        if (addCommand != null) {
+            builder.append(TextComponent.space().append(TextComponent.of("[Добавить]", TextColor.BLUE)
+                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы добавить игрока или группу")))
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
+                                    "/rg " + addCommand + " -w \"" + world + "\" " + region.getId() + " "))));
+        }
+        if (removeCommand != null && domain.size() > 0) {
+            builder.append(TextComponent.space().append(TextComponent.of("[Удалить]", TextColor.RED)
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы удалить игрока или группы")))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
+                            "/rg " + removeCommand + " -w \"" + world + "\" " + region.getId() + " "))));
+            builder.append(TextComponent.space().append(TextComponent.of("[Очистить]", TextColor.RED)
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы очистить")))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
+                            "/rg " + removeCommand + " -w \"" + world + "\" -a " + region.getId()))));
         }
     }
-    
+
     /**
      * Add information about coordinates.
      */
     public void appendBounds() {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        builder.append(Style.GREEN);
-        builder.append("Границы:");
-        builder.append(Style.YELLOW);
-        builder.append(" (").append(min.getBlockX()).append(",").append(min.getBlockY()).append(",").append(min.getBlockZ()).append(")");
-        builder.append(" -> (").append(max.getBlockX()).append(",").append(max.getBlockY()).append(",").append(max.getBlockZ()).append(")");
-        
-        newLine();
+        builder.append(TextComponent.of("Границы:", TextColor.GREEN));
+        TextComponent bound = TextComponent.of(" " + min + " -> " + max, TextColor.YELLOW);
+        if (perms != null && perms.maySelect(region)) {
+            bound = bound
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы выбрать")))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/rg select " + region.getId()));
+        }
+        builder.append(bound);
+        builder.append(TextComponent.of("\n§aРазмер: §e" + region.volume()));
+        builder.append(TextComponent.of("\n§c§lБудьте внимательны! Не добавляйте в приват кого попало!§r"));
+        builder.append(TextComponent.of("\n§7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"));
+        final Location teleFlag = region.getFlag(Flags.TELE_LOC);
+        if (teleFlag != null && perms != null && perms.mayTeleportTo(region)) {
+            builder.append(TextComponent.space().append(TextComponent.of("[Телепортация]", TextColor.GRAY)
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
+                            TextComponent.of("Нажмите, чтобы телепортироваться").append(TextComponent.newline()).append(
+                                    TextComponent.of(teleFlag.getBlockY() + ", "
+                                            + teleFlag.getBlockY() + ", "
+                                            + teleFlag.getBlockZ()))))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
+                            "/rg tp -w \"" + world + "\" " + region.getId()))));
+        }
+
+        newline();
+    }
+
+    private void appendPriorityComponent(ProtectedRegion rg) {
+        final String content = String.valueOf(rg.getPriority());
+        if (perms != null && perms.maySetPriority(rg)) {
+            builder.append(TextComponent.of(content, TextColor.GOLD)
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите для изменения")))
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/rg setpriority -w \"" + world + "\" " + rg.getId() + " ")));
+        } else {
+            builder.append(TextComponent.of(content, TextColor.WHITE));
+        }
     }
 
     private void appendRegionInformation() {
-        builder.append(Style.GRAY);
-        builder.append("§7\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
-        builder.append("§6\u2997§fИнформация о регионе§6\u2998");
-        builder.append("§7\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
-        newLine();
         appendBasics();
         appendFlags();
         appendParents();
         appendDomain();
         appendBounds();
 
-        if (cache != null) {
-            builder.append(Style.RED).append("§lБудьте внимательны! Не добавляйте в приват кого попало!");
-            builder.append(Style.GRAY).append("§7\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac\u25ac");
-            newLine();
+        if (cache != null && perms == null) {
+            builder.append(SubtleFormat.wrap(""));
         }
     }
 
     @Override
-    public String call() throws Exception {
+    public TextComponent call() {
+        MessageBox box = new MessageBox("§7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§6⦗§fИнформация о регионе§6⦘§7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬", builder);
         appendRegionInformation();
-        return builder.toString();
+        return box.create();
     }
 
     /**
@@ -278,65 +354,21 @@ public class RegionPrintoutBuilder implements Callable<String> {
      * @param sender the recipient
      */
     public void send(Actor sender) {
-        sender.printRaw(toString());
+        sender.print(toComponent());
     }
 
-    public StringBuilder append(boolean b) {
-        return builder.append(b);
+    public TextComponentProducer append(String str) {
+        return builder.append(TextComponent.of(str));
     }
 
-    public StringBuilder append(char c) {
-        return builder.append(c);
+    public TextComponentProducer append(TextComponent component) {
+        return builder.append(component);
     }
 
-    public StringBuilder append(char[] str, int offset, int len) {
-        return builder.append(str, offset, len);
+    public TextComponent toComponent() {
+        return builder.create();
     }
 
-    public StringBuilder append(char[] str) {
-        return builder.append(str);
-    }
-
-    public StringBuilder append(CharSequence s, int start, int end) {
-        return builder.append(s, start, end);
-    }
-
-    public StringBuilder append(CharSequence s) {
-        return builder.append(s);
-    }
-
-    public StringBuilder append(double d) {
-        return builder.append(d);
-    }
-
-    public StringBuilder append(float f) {
-        return builder.append(f);
-    }
-
-    public StringBuilder append(int i) {
-        return builder.append(i);
-    }
-
-    public StringBuilder append(long lng) {
-        return builder.append(lng);
-    }
-
-    public StringBuilder append(Object obj) {
-        return builder.append(obj);
-    }
-
-    public StringBuilder append(String str) {
-        return builder.append(str);
-    }
-
-    public StringBuilder append(StringBuffer sb) {
-        return builder.append(sb);
-    }
-
-    public StringBuilder appendCodePoint(int codePoint) {
-        return builder.appendCodePoint(codePoint);
-    }
-    
     @Override
     public String toString() {
         return builder.toString().trim();

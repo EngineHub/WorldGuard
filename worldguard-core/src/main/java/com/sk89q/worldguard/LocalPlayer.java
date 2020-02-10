@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard;
 
+import com.google.common.annotations.Beta;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.weather.WeatherType;
@@ -197,4 +198,26 @@ public interface LocalPlayer extends Player, RegionAssociable {
      * @param location The location
      */
     void setCompassTarget(Location location);
+
+    /**
+     * This should preferably take Components but there's no way to do that yet
+     *
+     * @param title the title to display
+     * @param subtitle the subtitle to display
+     */
+    @Beta
+    void sendTitle(String title, String subtitle);
+
+    /**
+     * Clears fall distance.
+     */
+    void resetFallDistance();
+
+    /**
+     * Teleport the player, potentially async, displaying the message on a success.
+     *  @param location location to teleport to
+     * @param successMessage message to display on success
+     * @param failMessage message to display on failure
+     */
+    void teleport(Location location, String successMessage, String failMessage);
 }

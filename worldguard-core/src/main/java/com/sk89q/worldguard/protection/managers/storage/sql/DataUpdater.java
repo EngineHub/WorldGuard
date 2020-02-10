@@ -116,7 +116,7 @@ class DataUpdater {
             }
 
             if (toRemove != null) {
-                List<String> removeNames = new ArrayList<String>();
+                List<String> removeNames = new ArrayList<>();
                 for (ProtectedRegion region : toRemove) {
                     removeNames.add(region.getId());
                 }
@@ -144,7 +144,7 @@ class DataUpdater {
     }
 
     private Map<String, String> getExistingRegions() throws SQLException {
-        Map<String, String> existing = new HashMap<String, String>();
+        Map<String, String> existing = new HashMap<>();
 
         Closer closer = Closer.create();
         try {

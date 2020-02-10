@@ -106,7 +106,7 @@ public abstract class YamlWorldConfiguration extends WorldConfiguration {
             res = config.getKeys(node);
         }
         if (res == null) {
-            res = new ArrayList<String>();
+            res = new ArrayList<>();
         }
 
         return res;

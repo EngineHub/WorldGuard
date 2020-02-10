@@ -26,6 +26,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,7 +73,7 @@ public interface StringMatcher {
     default Iterable<? extends LocalPlayer> checkPlayerMatch(List<? extends LocalPlayer> players) throws CommandException {
         // Check to see if there were any matches
         if (players.isEmpty()) {
-            throw new CommandException("Нет игроков, соответствующих запросу.");
+            throw new CommandException("Ни один игрок не соответствует запросу.");
         }
 
         return players;
@@ -114,7 +115,7 @@ public interface StringMatcher {
         // players were found (we don't want to just pick off the first one,
         // as that may be the wrong player)
         if (players.hasNext()) {
-            throw new CommandException("Найдено более одного игрока! " +
+            throw new CommandException("Более чем один игрок нашлось! " +
                     "Используйте @<name> для точного соответствия.");
         }
 
@@ -150,6 +151,7 @@ public interface StringMatcher {
      * @param worldName The name
      * @return The world
      */
+    @Nullable
     World getWorldByName(String worldName);
 
     /**

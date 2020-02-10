@@ -204,7 +204,7 @@ public class PlayerDomain implements Domain, ChangeTracked {
     public String toString() {
         return "{" +
                 "uuids=" + uniqueIds +
-                ", ники=" + names +
+                ", имена=" + names +
                 '}';
     }
 }

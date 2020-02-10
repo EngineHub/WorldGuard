@@ -155,7 +155,7 @@ public abstract class RegionContainer {
 
         synchronized (lock) {
             try {
-                WorldGuard.logger.info("Выгрузка и сохранение данных региона, загруженных в данный момент...");
+                WorldGuard.logger.info("Выгрузка и сохранение данных региона, который в настоящее время загружен...");
                 unload();
                 migration.migrate();
             } finally {
@@ -169,7 +169,7 @@ public abstract class RegionContainer {
      * Try loading the region managers for all currently loaded worlds.
      */
     protected void loadWorlds() {
-        WorldGuard.logger.info("Loading region data...");
+        WorldGuard.logger.info("Загрузка данных региона...");
         synchronized (lock) {
             for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
                 load(world);
@@ -204,7 +204,7 @@ public abstract class RegionContainer {
                 migrate(migrator);
 
                 WorldGuard.logger.info("Регионы сохранены после миграции UUID! Это не повторится, если " +
-                        "изменить соответствующий параметр конфигурации в конфигурации WorldGuard.");
+                        "изменить соответствующий параметр конфигурации WorldGuard.");
 
                 config.disableUuidMigration();
             } catch (MigrationException e) {

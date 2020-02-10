@@ -1,5 +1,93 @@
 # Changelog
 
+## 7.0.2
+* Update to MC 1.15. Still compatible with 1.14, and incompatible with 1.13, as before.
+* Add an informational message when defining a region that overlaps vanilla spawn protection.
+* Protect against pushing a piston with another piston on a region border.
+* Protect against buckets in dispensers on region borders.
+
+## 7.0.1
+* Add `/rg toggle-bypass` command which temporarily turns off region bypassing until used again.
+* More improvements to `/rg flag` and `/rg flags` commands.
+* Fix some checks for adding owners to unclaimed regions.
+* Fix an issue with time-/weather-lock flags when logging in to a region with the flag set.
+* Fix cause tracking in vehicles (incl. breaking lilypads in a boat)
+* Use async teleports on Paper.
+* Include hopper minecarts in the ignore hoppers config setting.
+* Add sugar cane and cacti to the crop-growth flag. Bamboo is also included pending Spigot throwing an event for it.
+* Specifically track when players ignite creepers with flint and steel.
+* Fix fuzziness when using bonemeal near a protected region.
+* Fix color codes not applying in greeting, etc flags when placed after a newline (\n).
+* Add applicable region information to `/wg report`.
+* Fix pistons flag not applying to sticky pistons pulling blocks.
+* Add some custom metrics for bStats.
+* Everything in the RC/beta changelog below.
+
+## 7.0.1 RC 2 (inc. beta 1)
+* Due to breaking changes in important Bukkit API, this is not compatible with MC 1.13!
+* Update to MC 1.14. Adds protection for new blocks, etc.
+* To allow players to read from lecterns, but not take the book, flag interact allow, and then flag chest-access -g nonmembers deny.
+* Add ravager-grief flag.
+* Fix overprotection of unsaddled pigs with the ride flag.
+* Fix lava fire defaulting to off (won't change existing configs).
+* Fix damaged/chipped anvils not respecting use flag like regular anvils.
+* Add on-equip blacklist event. Note that it is overprotective due to deficiencies in Bukkit API.
+* Update WorldEdit CUI when using /rg select.
+* Add config option to disable villagers getting zapped into witches. ("weather.disable-villager-witchification")
+* Add entity support to interact-whitelist config option (use the Material of the corresponding item).
+* Fix vehicle-place protecting the rails at the very top of region boundaries incorrectly.
+* Fix for emptying buckets on waterloggable blocks.
+* Whitelist all player -> player interactions (previously was spammy in pvp).
+* Fix sleep flag not protecting against explosions in nether/end.
+* Add config for the teleport-on-void to reset fall distance.
+* Fix config options taking material lists requiring "minecraft:" namespace.
+* Fix disallowed-lightning-blocks situationally not working.
+* Fix errors that occurred when plugins used falling block entities with non-item materials.
+* Add special support for Paper servers (papermc.io): Paper's API allows us to track who launched fireworks.
+* Fireworks are now protected by default. On Paper servers, members can use them by default (to deal damage), 
+on non-Paper servers, flag firework-damage allow to revert to old behavior (everyone can deal damage with fireworks by default).
+* Misc performance enhancements for Paper servers.
+* Add 'regions.use-paper-entity-origin' as an experimental setting (default off) for Paper servers. Enabling it will make non-player entities be treated as members of the place they spawned, instead of their current location when flags are checked.
+
+## 7.0.0
+* Added support for MC 1.13, dropped support for previous versions.
+* Added lots of interactive text in e.g. `/rg info` command.
+* Added `/rg flags` command which allows viewing and interactively setting all flags on a region.
+* Large behind-the-scenes changes to WorldGuard's API (developers, see https://worldguard.enginehub.org/en/latest/developer/)
+* Places that used numeric block ids (e.g. blacklist) should now use Minecraft's new string IDs.
+* Fix various interactions with NPCs and region protection.
+* Sponge-simulation now destroys kelp and seagrass, and de-waterlogs blocks.
+* Added an option to block conduit effects.
+* Fix using newlines in string flags such as greeting and farewell.
+* Add item-frame-rotation flag.
+* Ender chests no longer require chest-access (since they don't have inventories).
+* Add kelp to vine-growth flag/config.
+* Add block-trampling flag (for turtle eggs and farmland).
+* Add snowman-trails flag.
+* Track potion area-of-effect cloud causes for pvp etc. protection.
+* Add confirmation to /stoplag command.
+* Forcefully eject players from vehicles trying to force their way into entry deny regions (and out of exit deny).
+* Fix removing child regions when removing a region with children.
+* Fix some over-protectiveness of pistons.
+* Chat and command flags (send-/receive- and allowed-/blocked-) now respect deny-message flag.
+* Misc fixes.
+
+## 6.2.2
+* Added support for MC 1.12.
+* Changed flower pots to fall under the build flag.
+* Fix heal flag not functioning.
+* Add option to allow Forge clients with host-keys setting.
+* Add mobs.block-armor-stand-destroy config.
+* Add firework-damage flag.
+* Add config option to ignore hopper checks.
+* Misc fixes.
+
+## 6.2
+* Added support for MC 1.11.
+* Add a custom flag and session API (for developers, see https://worldguard.enginehub.org/en/latest/developer/)
+* Add a config option to ensure location flags (teleport, spawn) are inside their region.
+* Misc fixes.
+
 ## 6.1.2
 * Added support for new blocks in 1.8, 1.9, and 1.10.
 * Added protection from nether portals being created in protected region (enable via config `nether-portal-protection`).

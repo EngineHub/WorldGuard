@@ -22,7 +22,7 @@ package com.sk89q.worldguard.protection.flags;
 /**
  * Stores an integer.
  */
-public class IntegerFlag extends Flag<Integer> {
+public class IntegerFlag extends NumberFlag<Integer> {
 
     public IntegerFlag(String name, RegionGroup defaultGroup) {
         super(name, defaultGroup);

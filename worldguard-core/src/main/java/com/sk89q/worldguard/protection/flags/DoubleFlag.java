@@ -22,7 +22,7 @@ package com.sk89q.worldguard.protection.flags;
 /**
  * Stores doubles.
  */
-public class DoubleFlag extends Flag<Double> {
+public class DoubleFlag extends NumberFlag<Double> {
 
     public DoubleFlag(String name, RegionGroup defaultGroup) {
         super(name, defaultGroup);
