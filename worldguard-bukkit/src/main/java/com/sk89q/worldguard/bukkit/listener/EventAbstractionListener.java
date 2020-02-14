@@ -1009,29 +1009,6 @@ public class EventAbstractionListener extends AbstractListener {
             // radius unfortunately doesn't go through with this, so only a single location is tested
             Events.fireToCancel(event, new SpawnEntityEvent(event, cause, aec.getLocation().add(0.5, 0, 0.5), EntityType.AREA_EFFECT_CLOUD));
         }
-        Cause cause = create(event.getEntity());
-        event.getAffectedEntities()
-                .removeIf(victim -> Events.fireAndTestCancel(new DamageEntityEvent(event, cause, victim)));
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event){
-        onPlayerInteractEntity(event);
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onBlockExplode(BlockExplodeEvent event) {
-        final BreakBlockEvent eventToFire = new BreakBlockEvent(event, create(event.getBlock()),
-                event.getBlock().getLocation().getWorld(), event.blockList(), Material.AIR);
-        eventToFire.getRelevantFlags().add(Flags.OTHER_EXPLOSION);
-        Events.fireBulkEventToCancel(event, eventToFire);
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onTakeLecternBook(PlayerTakeLecternBookEvent event) {
-        final UseBlockEvent useEvent = new UseBlockEvent(event, create(event.getPlayer()), event.getLectern().getBlock());
-        useEvent.getRelevantFlags().add(Flags.CHEST_ACCESS);
-        Events.fireToCancel(event, useEvent);
     }
 
     @EventHandler(ignoreCancelled = true)
