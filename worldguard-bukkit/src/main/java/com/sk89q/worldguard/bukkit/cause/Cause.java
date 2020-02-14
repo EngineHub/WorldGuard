@@ -237,6 +237,15 @@ public final class Cause {
     }
 
     /**
+     * Remove a parent cause from a {@code Metadatable} object.
+     *
+     * @param target the target
+     */
+    public static void untrackParentCause(Metadatable target) {
+        WGMetadata.remove(target, CAUSE_KEY);
+    }
+
+    /**
      * Builds causes.
      */
     private static final class Builder {

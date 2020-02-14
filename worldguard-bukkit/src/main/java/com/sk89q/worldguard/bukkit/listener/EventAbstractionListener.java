@@ -35,6 +35,7 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
+import com.sk89q.worldguard.bukkit.internal.WGMetadata;
 import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonExtendKey;
 import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonRetractKey;
 import com.sk89q.worldguard.bukkit.listener.debounce.EventDebounce;
@@ -302,16 +303,19 @@ public class EventAbstractionListener extends AbstractListener {
 
                 Events.fireToCancel(event, new PlaceBlockEvent(event, cause, block.getLocation(), toType));
 
-                if (event.isCancelled() && !wasCancelled && entity instanceof FallingBlock) {
-                    FallingBlock fallingBlock = (FallingBlock) entity;
-                    final Material material = fallingBlock.getBlockData().getMaterial();
-                    if (!material.isItem()) return;
-                    ItemStack itemStack = new ItemStack(material, 1);
-                    Item item = block.getWorld().dropItem(fallingBlock.getLocation(), itemStack);
-                    item.setVelocity(new Vector());
-                    if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(block, entity), item))) {
-                        item.remove();
+                if (entity instanceof FallingBlock) {
+                    if (event.isCancelled() && !wasCancelled) {
+                        FallingBlock fallingBlock = (FallingBlock) entity;
+                        final Material material = fallingBlock.getBlockData().getMaterial();
+                        if (!material.isItem()) return;
+                        ItemStack itemStack = new ItemStack(material, 1);
+                        Item item = block.getWorld().dropItem(fallingBlock.getLocation(), itemStack);
+                        item.setVelocity(new Vector());
+                        if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(block, entity), item))) {
+                            item.remove();
+                        }
                     }
+                    Cause.untrackParentCause(entity);
                 }
             }
         }
@@ -321,6 +325,9 @@ public class EventAbstractionListener extends AbstractListener {
     public void onEntityExplode(EntityExplodeEvent event) {
         Entity entity = event.getEntity();
         Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR));
+        if (entity instanceof Creeper) {
+            Cause.untrackParentCause(entity);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)

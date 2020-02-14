@@ -75,4 +75,13 @@ public final class WGMetadata {
         return null;
     }
 
+    /**
+     * Removes metadata from the target.
+     *
+     * @param target the target
+     * @param key the key
+     */
+    public static void remove(Metadatable target, String key) {
+        target.removeMetadata(key, WorldGuardPlugin.inst());
+    }
 }
