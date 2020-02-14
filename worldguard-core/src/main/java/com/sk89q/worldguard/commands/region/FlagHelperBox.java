@@ -265,7 +265,7 @@ class FlagHelperBox extends PaginationBox {
         List<Component> hoverTexts = new ArrayList<>();
         if (maySet) {
             if (isExplicitSet) {
-                hoverTexts.add(TextComponent.of("Нажмите для изменения", TextColor.GOLD));
+                hoverTexts.add(TextComponent.of("Нажмите, чтобы изменить", TextColor.GOLD));
             } else {
                 hoverTexts.add(TextComponent.of("Нажмите, чтобы установить", TextColor.GOLD));
             }

@@ -77,24 +77,22 @@ public class WorldGuardCommands {
         this.worldGuard = worldGuard;
     }
 
-    @Command(aliases = {"version"}, desc = "Показать версию WorldGuard", max = 0)
+    @Command(aliases = {"version"}, desc = "Get the WorldGuard version", max = 0)
     public void version(CommandContext args, Actor sender) throws CommandException {
-        sender.print("§a>> §7Версия WorldGuard " + WorldGuard.getVersion());
-        sender.print("§a>> §7http://www.enginehub.org");
-        sender.print("§a>> §7Перевел томатный админ DarkFort");
-        sender.print("§a>> §bVK: https://vk.com/darkfortmc | TG: https://t.me/darkfort");
+        sender.print("WorldGuard " + WorldGuard.getVersion());
+        sender.print("http://www.enginehub.org");
 
-        sender.printDebug("----------- Платформа -----------");
+        sender.printDebug("----------- Platforms -----------");
         sender.printDebug(String.format("* %s (%s)", worldGuard.getPlatform().getPlatformName(), worldGuard.getPlatform().getPlatformVersion()));
     }
 
-    @Command(aliases = {"reload"}, desc = "Перезагрузить конфигурацию WorldGuard", max = 0)
+    @Command(aliases = {"reload"}, desc = "Reload WorldGuard configuration", max = 0)
     @CommandPermissions({"worldguard.reload"})
     public void reload(CommandContext args, Actor sender) throws CommandException {
         // TODO: This is subject to a race condition, but at least other commands are not being processed concurrently
         List<Task<?>> tasks = WorldGuard.getInstance().getSupervisor().getTasks();
         if (!tasks.isEmpty()) {
-            throw new CommandException("В настоящее время есть нерешенные задачи. Используйте /wg runnig для посмотра этих задач.");
+            throw new CommandException("There are currently pending tasks. Use /wg running to monitor these tasks first.");
         }
         
         LoggerToChatHandler handler = null;
@@ -116,9 +114,9 @@ public class WorldGuardCommands {
             }
             WorldGuard.getInstance().getPlatform().getRegionContainer().reload();
             // WGBukkit.cleanCache();
-            sender.print("Конфигурация WorldGuard перезагружена.");
+            sender.print("WorldGuard configuration reloaded.");
         } catch (Throwable t) {
-            sender.printError("Ошибка перезагрузки WorldGuard: " + t.getMessage());
+            sender.printError("Error while reloading: " + t.getMessage());
         } finally {
             if (minecraftLogger != null) {
                 minecraftLogger.removeHandler(handler);
@@ -126,7 +124,7 @@ public class WorldGuardCommands {
         }
     }
     
-    @Command(aliases = {"report"}, desc = "Отослать отчет об ошибке WorldGuard", flags = "p", max = 0)
+    @Command(aliases = {"report"}, desc = "Writes a report on WorldGuard", flags = "p", max = 0)
     @CommandPermissions({"worldguard.report"})
     public void report(CommandContext args, final Actor sender) throws CommandException, AuthorizationException {
         ReportList report = new ReportList("Report");
@@ -141,19 +139,19 @@ public class WorldGuardCommands {
         try {
             File dest = new File(worldGuard.getPlatform().getConfigDir().toFile(), "report.txt");
             Files.write(result, dest, StandardCharsets.UTF_8);
-            sender.print("Отчет WorldGuard был сохранен в файл " + dest.getAbsolutePath());
+            sender.print("WorldGuard report written to " + dest.getAbsolutePath());
         } catch (IOException e) {
-            throw new CommandException("Ошибка записи файла: " + e.getMessage());
+            throw new CommandException("Failed to write report: " + e.getMessage());
         }
         
         if (args.hasFlag('p')) {
             sender.checkPermission("worldguard.report.pastebin");
-            ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, result, "Отчет WorldGuard: %s.report");
+            ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, result, "WorldGuard report: %s.report");
         }
     }
 
     @Command(aliases = {"profile"}, usage = "[-p] [-i <interval>] [-t <thread filter>] [<minutes>]",
-            desc = "Профилирование использования CPU сервера", min = 0, max = 1,
+            desc = "Profile the CPU usage of the server", min = 0, max = 1,
             flags = "t:i:p")
     @CommandPermissions("worldguard.profile")
     public void profile(final CommandContext args, final Actor sender) throws CommandException, AuthorizationException {
@@ -182,9 +180,9 @@ public class WorldGuardCommands {
         } else {
             minutes = args.getInteger(0);
             if (minutes < 1) {
-                throw new CommandException("Профилирование должно быть включено не менее 1 минуты.");
+                throw new CommandException("You must run the profile for at least 1 minute.");
             } else if (minutes > 10) {
-                throw new CommandException("Профилировать можно максимум 10 минут.");
+                throw new CommandException("You can profile for, at maximum, 10 minutes.");
             }
         }
 
@@ -192,17 +190,17 @@ public class WorldGuardCommands {
         if (args.hasFlag('i')) {
             interval = args.getFlagInteger('i');
             if (interval < 1 || interval > 100) {
-                throw new CommandException("Интервал должен быть в пределах от 1 до 100 (в миллисекундах)");
+                throw new CommandException("Interval must be between 1 and 100 (in milliseconds)");
             }
             if (interval < 10) {
-                sender.printDebug("Заметка: Низкий интервал может вызвать дополнительное замедление во время профилирования.");
+                sender.printDebug("Note: A low interval may cause additional slowdown during profiling.");
             }
         }
         Sampler sampler;
 
         synchronized (this) {
             if (activeSampler != null) {
-                throw new CommandException("Профилирование в настоящее время запущено! Пожалуйста, используйте /wg stopprofile для остановки текущего профилирования.");
+                throw new CommandException("A profile is currently in progress! Please use /wg stopprofile to cancel the current profile.");
             }
 
             SamplerBuilder builder = new SamplerBuilder();
@@ -212,15 +210,15 @@ public class WorldGuardCommands {
             sampler = activeSampler = builder.start();
         }
 
-        sender.print(TextComponent.of("Запуск профилирования CPU. Результаты будут доступны через " + minutes + " минут.", TextColor.LIGHT_PURPLE)
+        sender.print(TextComponent.of("Starting CPU profiling. Results will be available in " + minutes + " minutes.", TextColor.LIGHT_PURPLE)
                 .append(TextComponent.newline())
-                .append(TextComponent.of("Используйте ", TextColor.GRAY))
+                .append(TextComponent.of("Use ", TextColor.GRAY))
                 .append(TextComponent.of("/wg stopprofile", TextColor.AQUA)
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/wg stopprofile")))
-                .append(TextComponent.of(" в любое время, чтобы отменить профилирование CPU.", TextColor.GRAY)));
+                .append(TextComponent.of(" at any time to cancel CPU profiling.", TextColor.GRAY)));
 
         worldGuard.getSupervisor().monitor(FutureForwardingTask.create(
-                sampler.getFuture(), "Результаты профилирования CPU будут доступны через " + minutes + " минут", sender));
+                sampler.getFuture(), "CPU profiling for " + minutes + " minutes", sender));
 
         sampler.getFuture().addListener(() -> {
             synchronized (WorldGuardCommands.this) {
@@ -236,13 +234,13 @@ public class WorldGuardCommands {
                 try {
                     File dest = new File(worldGuard.getPlatform().getConfigDir().toFile(), "profile.txt");
                     Files.write(output, dest, StandardCharsets.UTF_8);
-                    sender.print("Данные профилирования CPU записаны в " + dest.getAbsolutePath());
+                    sender.print("CPU profiling data written to " + dest.getAbsolutePath());
                 } catch (IOException e) {
-                    sender.printError("Не удалось записать данные профилирования CPU: " + e.getMessage());
+                    sender.printError("Failed to write CPU profiling data: " + e.getMessage());
                 }
 
                 if (pastebin) {
-                    ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, output, "Результат профилирования: %s.profile");
+                    ActorCallbackPaste.pastebin(worldGuard.getSupervisor(), sender, output, "Profile result: %s.profile");
                 }
             }
 
@@ -252,48 +250,48 @@ public class WorldGuardCommands {
         });
     }
 
-    @Command(aliases = {"stopprofile"}, usage = "",desc = "Остановить запущенное профилирование", min = 0, max = 0)
+    @Command(aliases = {"stopprofile"}, usage = "",desc = "Stop a running profile", min = 0, max = 0)
     @CommandPermissions("worldguard.profile")
     public void stopProfile(CommandContext args, final Actor sender) throws CommandException {
         synchronized (this) {
             if (activeSampler == null) {
-                throw new CommandException("Профилирование CPU в данный момент не запущено.");
+                throw new CommandException("No CPU profile is currently running.");
             }
 
             activeSampler.cancel();
             activeSampler = null;
         }
 
-        sender.print("Запущенное профилирование CPU остановлено.");
+        sender.print("The running CPU profile has been cancelled.");
     }
 
     @Command(aliases = {"flushstates", "clearstates"},
-            usage = "[player]", desc = "Сброс состояния менеджера", max = 1)
+            usage = "[player]", desc = "Flush the state manager", max = 1)
     @CommandPermissions("worldguard.flushstates")
     public void flushStates(CommandContext args, Actor sender) throws CommandException {
         if (args.argsLength() == 0) {
             WorldGuard.getInstance().getPlatform().getSessionManager().resetAllStates();
-            sender.print("Очищены все состояния.");
+            sender.print("Cleared all states.");
         } else {
             LocalPlayer player = worldGuard.getPlatform().getMatcher().matchSinglePlayer(sender, args.getString(0));
             if (player != null) {
                 WorldGuard.getInstance().getPlatform().getSessionManager().resetState(player);
-                sender.print("Очищены состояния для игрока \"" + player.getName() + "\".");
+                sender.print("Cleared states for player \"" + player.getName() + "\".");
             }
         }
     }
 
-    @Command(aliases = {"running", "queue"}, desc = "Список выполняющихся задач", max = 0)
+    @Command(aliases = {"running", "queue"}, desc = "List running tasks", max = 0)
     @CommandPermissions("worldguard.running")
     public void listRunningTasks(CommandContext args, Actor sender) throws CommandException {
         List<Task<?>> tasks = WorldGuard.getInstance().getSupervisor().getTasks();
 
         if (tasks.isEmpty()) {
-            sender.print("В настоящее время нет запущенных задач.");
+            sender.print("There are currently no running tasks.");
         } else {
             tasks.sort(new TaskStateComparator());
-            MessageBox builder = new MessageBox("Выполнение задач", new TextComponentProducer());
-            builder.append(TextComponent.of("Заметка: Некоторые 'запущенные' задачи могут ждать начала.", TextColor.GRAY));
+            MessageBox builder = new MessageBox("Running Tasks", new TextComponentProducer());
+            builder.append(TextComponent.of("Note: Some 'running' tasks may be waiting to be start.", TextColor.GRAY));
             for (Task<?> task : tasks) {
                 builder.append(TextComponent.newline());
                 builder.append(TextComponent.of("(" + task.getState().name() + ") ", TextColor.BLUE));
@@ -304,7 +302,7 @@ public class WorldGuardCommands {
         }
     }
 
-    @Command(aliases = {"debug"}, desc = "Команды отладки")
+    @Command(aliases = {"debug"}, desc = "Debugging commands")
     @NestedCommand({DebuggingCommands.class})
     public void debug(CommandContext args, Actor sender) {}
 

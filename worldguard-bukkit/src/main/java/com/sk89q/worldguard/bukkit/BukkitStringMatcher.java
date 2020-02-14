@@ -85,7 +85,6 @@ public class BukkitStringMatcher implements StringMatcher {
 
                 // They didn't specify an argument for the player!
                 if (parts.length == 1) {
-                    throw new CommandException("Ожидается аргумент для #player.");
                 }
 
                 return matchPlayers(sender, parts[1]).iterator().next().getWorld();

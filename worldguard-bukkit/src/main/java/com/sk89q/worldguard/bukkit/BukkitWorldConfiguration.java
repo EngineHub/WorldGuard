@@ -329,7 +329,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             } else {
                 this.blacklist = blist;
                 if (summaryOnStart) {
-                    log.log(Level.INFO, "({0}) Черный список загружен с {1} энтити.",
+                    log.log(Level.INFO, "({0}) Черный список загружен с {1} сущностей.",
                             new Object[]{worldName, blacklist.getItemCount()});
                 }
 

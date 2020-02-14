@@ -1,3 +1,4 @@
+
 /*
  * WorldGuard, a suite of tools for Minecraft
  * Copyright (C) sk89q <http://www.sk89q.com>
@@ -199,7 +200,7 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (!hostname.equals(hostKey)
-                    && !(cfg.hostKeysAllowFMLClients && hostname.equals(hostKey + " FML "))) {
+                    && !(cfg.hostKeysAllowFMLClients && hostname.equals(hostKey + "\u0000FML\u0000"))) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
                         "Вы не присоединились к действительному ключу хоста!");
                 log.warning("Проверка ключа хоста WorldGuard: " +

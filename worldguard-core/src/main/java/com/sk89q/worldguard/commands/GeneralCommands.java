@@ -39,7 +39,7 @@ public class GeneralCommands {
         this.worldGuard = worldGuard;
     }
     
-    @Command(aliases = {"god"}, usage = "[player]",
+    @Command(aliases = {"god"}, usage = "[игрок]",
             desc = "Включить режим Бога для игрока", flags = "s", max = 1)
     public void god(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
         Iterable<? extends LocalPlayer> targets = null;
@@ -84,7 +84,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"ungod"}, usage = "[player]",
+    @Command(aliases = {"ungod"}, usage = "[игрок]",
             desc = "Отключить режим Богда для игрока", flags = "s", max = 1)
     public void ungod(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
         Iterable<? extends LocalPlayer> targets;
@@ -127,7 +127,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"heal"}, usage = "[player]", desc = "Исцелить игрока", flags = "s", max = 1)
+    @Command(aliases = {"heal"}, usage = "[игрок]", desc = "Исцелить игрока", flags = "s", max = 1)
     public void heal(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
 
         Iterable<? extends LocalPlayer> targets = null;
@@ -171,7 +171,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"slay"}, usage = "[player]", desc = "Убить игрока", flags = "s", max = 1)
+    @Command(aliases = {"slay"}, usage = "[игрок]", desc = "Убить игрока", flags = "s", max = 1)
     public void slay(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
         
         Iterable<? extends LocalPlayer> targets = Lists.newArrayList();
@@ -212,7 +212,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"locate"}, usage = "[player]", desc = "Найти игрока", max = 1)
+    @Command(aliases = {"locate"}, usage = "[игрок]", desc = "Найти игрока", max = 1)
     @CommandPermissions({"worldguard.locate"})
     public void locate(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
