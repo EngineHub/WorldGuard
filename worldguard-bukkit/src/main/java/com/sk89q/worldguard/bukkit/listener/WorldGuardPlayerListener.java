@@ -1,4 +1,3 @@
-
 /*
  * WorldGuard, a suite of tools for Minecraft
  * Copyright (C) sk89q <http://www.sk89q.com>
