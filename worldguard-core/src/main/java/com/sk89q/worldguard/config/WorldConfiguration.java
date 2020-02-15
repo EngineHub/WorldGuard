@@ -162,6 +162,7 @@ public abstract class WorldConfiguration {
     public boolean regionInvinciblityRemovesMobs;
     public boolean regionCancelEmptyChatEvents;
     public boolean regionNetherPortalProtection;
+    public boolean forceDefaultTitleTimes;
     public boolean fakePlayerBuildOverride;
     public boolean explosionFlagCancellation;
     public boolean disableDeathMessages;

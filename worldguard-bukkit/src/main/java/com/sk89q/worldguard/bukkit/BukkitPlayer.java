@@ -24,6 +24,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import io.papermc.lib.PaperLib;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
@@ -172,7 +173,11 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
 
     @Override
     public void sendTitle(String title, String subtitle) {
-        getPlayer().sendTitle(title, subtitle, -1, -1, -1);
+        if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(getWorld()).forceDefaultTitleTimes) {
+            getPlayer().sendTitle(title, subtitle, 10, 70, 20);
+        } else {
+            getPlayer().sendTitle(title, subtitle, -1, -1, -1);
+        }
     }
 
     @Override

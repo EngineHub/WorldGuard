@@ -257,6 +257,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
         regionCancelEmptyChatEvents = getBoolean("regions.cancel-chat-without-recipients", true);
         regionNetherPortalProtection = getBoolean("regions.nether-portal-protection", true);
+        forceDefaultTitleTimes = config.getBoolean("regions.titles-always-use-default-times", true); // note: technically not region-specific, but we only use it for the title flags
         fakePlayerBuildOverride = getBoolean("regions.fake-player-build-override", true);
         explosionFlagCancellation = getBoolean("regions.explosion-flags-block-entity-damage", true);
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
