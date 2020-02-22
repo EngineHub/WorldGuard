@@ -403,7 +403,7 @@ public class RegionProtectionListener extends AbstractListener {
             if (type == EntityType.ITEM_FRAME && event.getCause().getFirstPlayer() != null
                     && ((ItemFrame) entity).getItem().getType() != Material.AIR) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_FRAME_ROTATE));
-                тоwhat = "изменять это";
+                what = "изменять это";
             } else if (Entities.isMinecart(type)) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = "открывать это";
