@@ -95,6 +95,7 @@ import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
@@ -1039,6 +1040,13 @@ public class EventAbstractionListener extends AbstractListener {
         final UseBlockEvent useEvent = new UseBlockEvent(event, create(event.getPlayer()), event.getLectern().getBlock());
         useEvent.getRelevantFlags().add(Flags.CHEST_ACCESS);
         Events.fireToCancel(event, useEvent);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onCauldronLevelChange(CauldronLevelChangeEvent event) {
+        interactDebounce.debounce(event.getBlock(), event.getEntity(), event,
+                new UseBlockEvent(event, create(event.getEntity()),
+                        event.getBlock()).setAllowed(hasInteractBypass(event.getBlock())));
     }
 
     /**
