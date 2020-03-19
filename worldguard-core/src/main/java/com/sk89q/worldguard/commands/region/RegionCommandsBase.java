@@ -84,9 +84,25 @@ class RegionCommandsBase {
      * @throws CommandException on error
      */
     protected static World checkWorld(CommandContext args, Actor sender, char flag) throws CommandException {
+        return checkWorld(args, sender, flag, true);
+    }
+
+    protected static World checkWorld(CommandContext args, Actor sender, char flag, boolean allowWorldEditOverride) throws CommandException {
         if (args.hasFlag(flag)) {
             return WorldGuard.getInstance().getPlatform().getMatcher().matchWorld(sender, args.getFlag(flag));
         } else {
+            if (allowWorldEditOverride) {
+                try {
+                    World override = WorldEdit.getInstance().getSessionManager().get(sender).getWorldOverride();
+                    if (override != null) {
+                        if (sender instanceof LocalPlayer && !override.equals(((LocalPlayer) sender).getWorld())) {
+                            sender.printDebug(TextComponent.of("Using //world override for region command: " + override.getName()));
+                        }
+                        return override;
+                    }
+                } catch (NoSuchMethodError ignored) {
+                }
+            }
             if (sender instanceof LocalPlayer) {
                 return ((LocalPlayer) sender).getWorld();
             } else {
@@ -219,16 +235,17 @@ class RegionCommandsBase {
     }
 
     /**
-     * Get a WorldEdit selection for a player, or emit an exception if there is none
+     * Get a WorldEdit selection for an actor, or emit an exception if there is none
      * available.
      *
-     * @param player the player
+     * @param actor the actor
      * @return the selection
      * @throws CommandException thrown on an error
      */
-    protected static Region checkSelection(LocalPlayer player) throws CommandException {
+    protected static Region checkSelection(Actor actor) throws CommandException {
         try {
-            return WorldEdit.getInstance().getSessionManager().get(player).getRegionSelector(player.getWorld()).getRegion();
+            LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(actor);
+            return localSession.getRegionSelector(localSession.getSelectionWorld()).getRegion();
         } catch (IncompleteRegionException e) {
             throw new CommandException(
                     "Please select an area first. " +
@@ -273,15 +290,15 @@ class RegionCommandsBase {
     }
 
     /**
-     * Create a {@link ProtectedRegion} from the player's selection.
+     * Create a {@link ProtectedRegion} from the actor's selection.
      *
-     * @param player the player
+     * @param actor the actor
      * @param id the ID of the new region
      * @return a new region
      * @throws CommandException thrown on an error
      */
-    protected static ProtectedRegion checkRegionFromSelection(LocalPlayer player, String id) throws CommandException {
-        Region selection = checkSelection(player);
+    protected static ProtectedRegion checkRegionFromSelection(Actor actor, String id) throws CommandException {
+        Region selection = checkSelection(actor);
 
         // Detect the type of region from WorldEdit
         if (selection instanceof Polygonal2DRegion) {
@@ -363,14 +380,14 @@ class RegionCommandsBase {
     }
 
     /**
-     * Set a player's selection to a given region.
+     * Set an actor's selection to a given region.
      *
-     * @param player the player
+     * @param actor the actor
      * @param region the region
      * @throws CommandException thrown on a command error
      */
-    protected static void setPlayerSelection(LocalPlayer player, ProtectedRegion region) throws CommandException {
-        LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
+    protected static void setPlayerSelection(Actor actor, ProtectedRegion region, World world) throws CommandException {
+        LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
 
         // Set selection
         if (region instanceof ProtectedCuboidRegion) {
@@ -378,20 +395,20 @@ class RegionCommandsBase {
             BlockVector3 pt1 = cuboid.getMinimumPoint();
             BlockVector3 pt2 = cuboid.getMaximumPoint();
 
-            CuboidRegionSelector selector = new CuboidRegionSelector(player.getWorld(), pt1, pt2);
-            session.setRegionSelector(player.getWorld(), selector);
-            selector.explainRegionAdjust(player, session);
-            player.print("Region selected as a cuboid.");
+            CuboidRegionSelector selector = new CuboidRegionSelector(world, pt1, pt2);
+            session.setRegionSelector(world, selector);
+            selector.explainRegionAdjust(actor, session);
+            actor.print("Region selected as a cuboid.");
 
         } else if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
             Polygonal2DRegionSelector selector = new Polygonal2DRegionSelector(
-                    player.getWorld(), poly2d.getPoints(),
+                    world, poly2d.getPoints(),
                     poly2d.getMinimumPoint().getBlockY(),
                     poly2d.getMaximumPoint().getBlockY());
-            session.setRegionSelector(player.getWorld(), selector);
-            selector.explainRegionAdjust(player, session);
-            player.print("Region selected as a polygon.");
+            session.setRegionSelector(world, selector);
+            selector.explainRegionAdjust(actor, session);
+            actor.print("Region selected as a polygon.");
 
         } else if (region instanceof GlobalProtectedRegion) {
             throw new CommandException(
