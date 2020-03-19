@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -93,9 +92,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
 
 /**
  * The main class for WorldGuard as a Bukkit plugin.
@@ -488,44 +486,25 @@ public class WorldGuardPlugin extends JavaPlugin {
             return;
         }
 
-        InputStream input = null;
-        try {
-            JarFile file = new JarFile(getFile());
-            ZipEntry copy = file.getEntry("defaults/" + defaultName);
-            if (copy == null) throw new FileNotFoundException();
-            input = file.getInputStream(copy);
+        try (InputStream stream = getResource("defaults/" + defaultName)){
+            if (stream == null) throw new FileNotFoundException();
+            copyDefaultConfig(stream, actual, defaultName);
         } catch (IOException e) {
-            WorldGuard.logger.severe("Unable to read default configuration: " + defaultName);
+            getLogger().severe("Unable to read default configuration: " + defaultName);
         }
 
-        if (input != null) {
-            FileOutputStream output = null;
+    }
 
-            try {
-                output = new FileOutputStream(actual);
-                byte[] buf = new byte[8192];
-                int length = 0;
-                while ((length = input.read(buf)) > 0) {
-                    output.write(buf, 0, length);
-                }
-
-                WorldGuard.logger.info("Default configuration file written: "
-                        + actual.getAbsolutePath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    input.close();
-                } catch (IOException ignore) {
-                }
-
-                try {
-                    if (output != null) {
-                        output.close();
-                    }
-                } catch (IOException ignore) {
-                }
+    private void copyDefaultConfig(InputStream input, File actual, String name) {
+        try (FileOutputStream output = new FileOutputStream(actual)) {
+            byte[] buf = new byte[8192];
+            int length;
+            while ((length = input.read(buf)) > 0) {
+                output.write(buf, 0, length);
             }
+            getLogger().info("Default configuration file written: " + name);
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Failed to write default config file", e);
         }
     }
 

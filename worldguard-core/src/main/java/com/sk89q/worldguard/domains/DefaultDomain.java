@@ -311,7 +311,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
     public String toGroupsString() {
         StringBuilder str = new StringBuilder();
         for (Iterator<String> it = groupDomain.getGroups().iterator(); it.hasNext(); ) {
-            str.append("*");
+            str.append("g:");
             str.append(it.next());
             if (it.hasNext()) {
                 str.append(", ");
@@ -373,7 +373,8 @@ public class DefaultDomain implements Domain, ChangeTracked {
     private Component toGroupsComponent() {
         final TextComponent.Builder builder = TextComponent.builder("");
         for (Iterator<String> it = groupDomain.getGroups().iterator(); it.hasNext(); ) {
-            builder.append(TextComponent.of(it.next(), TextColor.GOLD));
+            builder.append(TextComponent.of("g:", TextColor.GRAY))
+                    .append(TextComponent.of(it.next(), TextColor.GOLD));
             if (it.hasNext()) {
                 builder.append(TextComponent.of(", "));
             }

@@ -143,7 +143,17 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
                 flagString = flag.getName() + " -g " + group + ": ";
             }
 
-            TextComponent flagText = TextComponent.of(flagString, useColors ? TextColor.GOLD : TextColor.WHITE)
+            TextColor flagColor = TextColor.WHITE;
+            if (useColors) {
+                // passthrough is ok on global
+                if (FlagHelperBox.DANGER_ZONE.contains(flag)
+                        && !(region.getId().equals(ProtectedRegion.GLOBAL_REGION) && flag == Flags.PASSTHROUGH)) {
+                    flagColor = TextColor.DARK_RED;
+                } else {
+                    flagColor = TextColor.GOLD;
+                }
+            }
+            TextComponent flagText = TextComponent.of(flagString, flagColor)
                     .append(TextComponent.of(String.valueOf(val), useColors? TextColor.YELLOW : TextColor.WHITE));
             if (perms != null && perms.maySetFlag(region, flag)) {
                 flagText = flagText.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set flag")))
@@ -305,7 +315,7 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
             builder.append(TextComponent.space().append(TextComponent.of("[Teleport]", TextColor.GRAY)
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
                             TextComponent.of("Click to teleport").append(TextComponent.newline()).append(
-                                    TextComponent.of(teleFlag.getBlockY() + ", "
+                                    TextComponent.of(teleFlag.getBlockX() + ", "
                                             + teleFlag.getBlockY() + ", "
                                             + teleFlag.getBlockZ()))))
                     .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
