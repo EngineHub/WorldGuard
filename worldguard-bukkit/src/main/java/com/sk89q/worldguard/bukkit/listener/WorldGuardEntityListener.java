@@ -702,7 +702,7 @@ public class WorldGuardEntityListener implements Listener {
                 if (associable != null) {
                     // NB there is no way to cancel the teleport without PTA (since PlayerPortal doesn't have block info)
                     // removing PTA was a mistake
-                    associable.print("Destination is an a protected area.");
+                    associable.print("Пункт назначения является защищенным приватом.");
                 }
                 event.setCancelled(true);
             }

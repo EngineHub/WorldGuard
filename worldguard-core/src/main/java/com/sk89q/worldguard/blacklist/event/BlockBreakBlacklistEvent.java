@@ -40,7 +40,7 @@ public final class BlockBreakBlacklistEvent extends BlockBlacklistEvent {
 
     @Override
     public String getDescription() {
-        return "break";
+        return "ломать";
     }
 
     @Override

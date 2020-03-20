@@ -70,7 +70,7 @@ public class WorldGuardWorldListener implements Listener {
             }
 
             if (removed > 50) {
-                log.info("Halt-Act: " + removed + " entities (>50) auto-removed from " + event.getChunk().toString());
+                log.info("Интенсивная активность: " + removed + " энтити (>50) автоматически удалены из " + event.getChunk().toString());
             }
         }
     }

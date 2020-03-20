@@ -49,7 +49,7 @@ public final class FlagUtil {
             try {
                 rawValues.put(entry.getKey().getName(), marshal(entry.getKey(), entry.getValue()));
             } catch (Exception e) {
-                log.log(Level.WARNING, "Failed to marshal flag value for " + entry.getKey() + "; value is " + entry.getValue(), e);
+                log.log(Level.WARNING, "Не удалось упаковать значение флага для " + entry.getKey() + "; значение " + entry.getValue(), e);
             }
         }
 
