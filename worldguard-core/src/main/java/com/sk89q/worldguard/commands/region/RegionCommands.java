@@ -417,7 +417,10 @@ public final class RegionCommands extends RegionCommandsBase {
         AsyncCommandBuilder.wrap(printout, sender)
                 .registerWithSupervisor(WorldGuard.getInstance().getSupervisor(), "Fetching region info")
                 .sendMessageAfterDelay("(Please wait... fetching region information...)")
-                .onSuccess((Component) null, sender::print)
+                .onSuccess((Component) null, component -> {
+                    sender.print(component);
+                    checkSpawnOverlap(sender, world, existing);
+                })
                 .onFailure("Failed to fetch region information", WorldGuard.getInstance().getExceptionConverter())
                 .buildAndExec(WorldGuard.getInstance().getExecutorService());
     }
@@ -622,6 +625,7 @@ public final class RegionCommands extends RegionCommandsBase {
             printout.appendFlagsList(false);
             printout.append(SubtleFormat.wrap(")"));
             printout.send(sender);
+            checkSpawnOverlap(sender, world, existing);
         }
     }
 
@@ -662,7 +666,12 @@ public final class RegionCommands extends RegionCommandsBase {
         if (!sender.isPlayer()) {
             flagHelperBox.tryMonoSpacing();
         }
-        AsyncCommandBuilder.wrap(() -> flagHelperBox.create(page), sender)
+        AsyncCommandBuilder.wrap(() -> {
+                    if (checkSpawnOverlap(sender, world, region)) {
+                        flagHelperBox.setComponentsPerPage(15);
+                    }
+                    return flagHelperBox.create(page);
+                }, sender)
                 .onSuccess((Component) null, sender::print)
                 .onFailure("Failed to get region flags", WorldGuard.getInstance().getExceptionConverter())
                 .buildAndExec(WorldGuard.getInstance().getExecutorService());
@@ -698,6 +707,7 @@ public final class RegionCommands extends RegionCommandsBase {
         existing.setPriority(priority);
 
         sender.print("Priority of '" + existing.getId() + "' set to " + priority + " (higher numbers override).");
+        checkSpawnOverlap(sender, world, existing);
     }
 
     /**

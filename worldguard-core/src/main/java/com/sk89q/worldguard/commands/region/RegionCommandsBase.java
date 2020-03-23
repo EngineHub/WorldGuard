@@ -351,15 +351,17 @@ class RegionCommandsBase {
      * @param world the world the region is in
      * @param region the region
      */
-    protected static void checkSpawnOverlap(Actor sender, World world, ProtectedRegion region) {
+    protected static boolean checkSpawnOverlap(Actor sender, World world, ProtectedRegion region) {
         ProtectedRegion spawn = WorldGuard.getInstance().getPlatform().getSpawnProtection(world);
         if (spawn != null) {
             if (!spawn.getIntersectingRegions(ImmutableList.of(region)).isEmpty()) {
                 sender.print(ErrorFormat.wrap("Warning!")
                         .append(TextComponent.of(" This region overlaps vanilla's spawn protection. WorldGuard cannot " +
-                                "override this, and only server operators will be able to interact with this area.")));
+                                "override this, and only server operators will be able to interact with this area.", TextColor.WHITE)));
+                return true;
             }
         }
+        return false;
     }
 
     /**
