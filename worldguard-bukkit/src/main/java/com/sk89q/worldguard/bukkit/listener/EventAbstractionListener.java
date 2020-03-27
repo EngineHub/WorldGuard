@@ -346,6 +346,7 @@ public class EventAbstractionListener extends AbstractListener {
                 Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, cause, event.getBlock().getWorld(), blocks, Material.AIR));
                 if (originalSize != blocks.size()) {
                     event.setCancelled(true);
+                    return;
                 }
                 for (Block b : blocks) {
                     Location loc = b.getRelative(direction).getLocation();
@@ -365,8 +366,14 @@ public class EventAbstractionListener extends AbstractListener {
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
         EventDebounce.Entry entry = pistonExtendDebounce.getIfNotPresent(new BlockPistonExtendKey(event), event);
         if (entry != null) {
+            Cause cause = create(event.getBlock());
             List<Block> blocks = new ArrayList<>(event.getBlocks());
             int originalLength = blocks.size();
+            Events.fireBulkEventToCancel(event, new BreakBlockEvent(event, cause, event.getBlock().getWorld(), blocks, Material.AIR));
+            if (originalLength != blocks.size()) {
+                event.setCancelled(true);
+                return;
+            }
             BlockFace dir = event.getDirection();
             for (int i = 0; i < blocks.size(); i++) {
                 Block existing = blocks.get(i);
@@ -376,7 +383,7 @@ public class EventAbstractionListener extends AbstractListener {
                     blocks.set(i, existing.getRelative(dir));
                 }
             }
-            Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, create(event.getBlock()), event.getBlock().getWorld(), blocks, Material.STONE));
+            Events.fireBulkEventToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getWorld(), blocks, Material.STONE));
             if (blocks.size() != originalLength) {
                 event.setCancelled(true);
             }
