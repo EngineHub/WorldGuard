@@ -361,7 +361,8 @@ public class FlagValueCalculator {
             if (flag == Flags.PASSTHROUGH) {
                 // Has members/owners -> the global region acts like
                 // a regular region without PASSTHROUGH
-                if (region.hasMembersOrOwners() || region.getFlag(Flags.PASSTHROUGH) == State.DENY) {
+                State passthrough = region.getFlag(Flags.PASSTHROUGH);
+                if (passthrough == State.DENY || passthrough != State.ALLOW && region.hasMembersOrOwners()) {
                     return null;
                 } else {
                     return (V) State.ALLOW;
