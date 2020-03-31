@@ -34,6 +34,7 @@ import com.sk89q.worldguard.util.SpongeUtil;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.EventHandler;
@@ -194,7 +195,7 @@ public class WorldGuardBlockListener implements Listener {
             }
         }
 
-        if (wcfg.highFreqFlags && isWater
+        if (wcfg.highFreqFlags && (isWater || blockFrom.getBlockData() instanceof Waterlogged)
                 && WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(blockFrom.getLocation()), (RegionAssociable) null, Flags.WATER_FLOW) == StateFlag.State.DENY) {
             event.setCancelled(true);
             return;
@@ -203,13 +204,6 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.highFreqFlags && isLava
                 && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(blockFrom.getLocation()), (RegionAssociable) null, Flags.LAVA_FLOW))) {
             event.setCancelled(true);
-            return;
-        }
-
-        if (wcfg.disableObsidianGenerators && (isAir || isLava)
-                && (blockTo.getType() == Material.REDSTONE_WIRE
-                    || blockTo.getType() == Material.TRIPWIRE)) {
-            blockTo.setType(Material.AIR);
             return;
         }
     }
