@@ -62,8 +62,6 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
         // Pre-load a session
         LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
         get(player).initialize(player);
-        WorldGuard.getInstance().getExecutorService().submit(() ->
-            WorldGuard.getInstance().getProfileCache().put(new Profile(player.getUniqueId(), player.getName())));
     }
 
     @Override
