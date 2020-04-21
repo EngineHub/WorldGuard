@@ -47,6 +47,7 @@ import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.ItemFrame;
@@ -806,7 +807,19 @@ public class WorldGuardEntityListener implements Listener {
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(ent.getWorld()));
-        if (ent instanceof Enderman) {
+        if (ent instanceof FallingBlock) {
+            Material id = event.getBlock().getType();
+
+            if (id == Material.GRAVEL && wcfg.noPhysicsGravel) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (id == Material.SAND && wcfg.noPhysicsSand) {
+                event.setCancelled(true);
+                return;
+            }
+        } else if (ent instanceof Enderman) {
             if (wcfg.disableEndermanGriefing) {
                 event.setCancelled(true);
                 return;
