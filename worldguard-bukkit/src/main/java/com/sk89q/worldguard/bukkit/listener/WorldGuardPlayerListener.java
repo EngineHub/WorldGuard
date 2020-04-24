@@ -202,7 +202,8 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (!hostname.equals(hostKey)
-                    && !(cfg.hostKeysAllowFMLClients && hostname.equals(hostKey + "\u0000FML\u0000"))) {
+                    && !(cfg.hostKeysAllowFMLClients &&
+                            (hostname.equals(hostKey + "\u0000FML\u0000") || hostname.equals(hostKey + "\u0000FML2\u0000")))) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
                         "You did not join with the valid host key!");
                 log.warning("WorldGuard host key check: " +
