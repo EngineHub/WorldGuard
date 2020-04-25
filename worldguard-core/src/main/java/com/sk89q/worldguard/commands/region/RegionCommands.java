@@ -1111,8 +1111,10 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        player.teleport(teleportLocation,
-                "Teleported you to the region '" + existing.getId() + "'.",
+        String message = existing.getFlag(Flags.TELE_MESSAGE);
+        message = message == null ? Flags.TELE_MESSAGE.getDefault() : message;
+        message = message == null ? "" : message.replace("%id%", existing.getId());
+        player.teleport(teleportLocation, message,
                 "Unable to teleport to region '" + existing.getId() + "'.");
     }
 
