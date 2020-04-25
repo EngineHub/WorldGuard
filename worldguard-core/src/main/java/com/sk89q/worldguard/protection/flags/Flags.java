@@ -134,6 +134,8 @@ public final class Flags {
     public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport", RegionGroup.MEMBERS));
     public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
 
+    public static final StringFlag TELE_MESSAGE = register(new StringFlag("teleport-message", "\u00A7dTeleported you to the region '%id%'."));
+
     // idk?
     public static final StateFlag INVINCIBILITY = register(new StateFlag("invincible", false));
     public static final StateFlag FALL_DAMAGE = register(new StateFlag("fall-damage", true));
