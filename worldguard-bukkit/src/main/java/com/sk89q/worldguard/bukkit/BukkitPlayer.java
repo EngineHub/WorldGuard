@@ -191,13 +191,12 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
         PaperLib.teleportAsync(getPlayer(), BukkitAdapter.adapt(location))
                 .thenApply(success -> {
                     if (success) {
-                        if (successMessage != null && !successMessage.isEmpty()) {
+                        // The success message can be cleared via flag
+                        if (!successMessage.isEmpty()) {
                             MessagingUtil.sendStringToChat(this, successMessage);
                         }
                     } else {
-                        if (failMessage != null && !failMessage.isEmpty()) {
-                            printError(failMessage);
-                        }
+                        printError(failMessage);
                     }
                     return success;
                 });
