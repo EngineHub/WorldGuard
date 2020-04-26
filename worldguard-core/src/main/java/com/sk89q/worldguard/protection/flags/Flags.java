@@ -134,7 +134,9 @@ public final class Flags {
     public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport", RegionGroup.MEMBERS));
     public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
 
-    public static final StringFlag TELE_MESSAGE = register(new StringFlag("teleport-message", "\u00A7dTeleported you to the region '%id%'."));
+    public static final StringFlag TELE_MESSAGE = register(new StringFlag("teleport-message",
+            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of(
+                    "Teleported you to the region '%id%'.", TextColor.LIGHT_PURPLE)))));
 
     // idk?
     public static final StateFlag INVINCIBILITY = register(new StateFlag("invincible", false));
