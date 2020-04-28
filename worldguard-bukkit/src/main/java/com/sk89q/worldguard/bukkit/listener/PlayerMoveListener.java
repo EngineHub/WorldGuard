@@ -35,6 +35,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.plugin.PluginManager;
@@ -132,4 +133,16 @@ public class PlayerMoveListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        final Player player = event.getPlayer();
+        LocalPlayer localPlayer = plugin.wrapPlayer(player);
+
+        Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer);
+        com.sk89q.worldedit.util.Location loc = session.testMoveTo(localPlayer,
+            BukkitAdapter.adapt(event.getPlayer().getLocation()), MoveType.OTHER_CANCELLABLE); // white lie
+        if (loc != null) {
+            player.teleport(BukkitAdapter.adapt(loc));
+        }
+    }
 }
