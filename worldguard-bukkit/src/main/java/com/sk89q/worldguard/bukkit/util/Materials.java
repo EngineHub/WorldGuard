@@ -1292,7 +1292,8 @@ public final class Materials {
      */
     public static boolean isItemAppliedToBlock(Material item, Material block) {
         Integer flags = MATERIAL_FLAGS.get(item);
-        return flags == null || (flags & MODIFIES_BLOCKS) == MODIFIES_BLOCKS;
+        return flags == null
+            || (flags & MODIFIES_BLOCKS) == MODIFIES_BLOCKS && !isToolBypass(item, block);
     }
 
     /**
@@ -1364,4 +1365,110 @@ public final class Materials {
         }
     }
 
+    /**
+     * Check if the supplied tool should bypass use blocking for
+     * the specified material. Will conservatively return false
+     * for unknown materials, only returning true if it is a
+     * declared tool, and that tool's right-click function is
+     * not being used.
+     *
+     * @param toolMaterial the tool material being used
+     * @param targetMaterial the target material to check
+     * @return true if tool should ignore useage blocking
+     */
+    public static boolean isToolBypass(Material toolMaterial, Material targetMaterial) {
+        if (!isInteractTool(toolMaterial)) {
+            return false;
+        }
+        return !isToolApplicable(toolMaterial, targetMaterial);
+    }
+
+    /**
+     * Check if the material is tool with a usable right-click function.
+     *
+     * @param toolMaterial the tool material being used
+     * @return true if tool has an interact function
+     */
+    public static boolean isInteractTool(Material toolMaterial) {
+        switch (toolMaterial) {
+            case WOODEN_HOE:
+            case STONE_HOE:
+            case IRON_HOE:
+            case GOLDEN_HOE:
+            case DIAMOND_HOE:
+            case WOODEN_AXE:
+            case STONE_AXE:
+            case IRON_AXE:
+            case GOLDEN_AXE:
+            case DIAMOND_AXE:
+            case WOODEN_SHOVEL:
+            case STONE_SHOVEL:
+            case IRON_SHOVEL:
+            case GOLDEN_SHOVEL:
+            case DIAMOND_SHOVEL:
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if the material is usable via right-click on the target
+     * material. Returns false if the target material cannot be modified
+     * by the provided tool, or of the provided tool material isn't
+     * a tool material.
+     *
+     * @param toolMaterial the tool material being used
+     * @param targetMaterial the target material to check
+     * @return true if tool has an interact function with this material
+     */
+    public static boolean isToolApplicable(Material toolMaterial, Material targetMaterial) {
+        switch (toolMaterial) {
+            case WOODEN_HOE:
+            case STONE_HOE:
+            case IRON_HOE:
+            case GOLDEN_HOE:
+            case DIAMOND_HOE:
+                switch (targetMaterial) {
+                    case GRASS_BLOCK:
+                    case DIRT:
+                    case GRASS_PATH:
+                        return true;
+                }
+                return false;
+            case WOODEN_AXE:
+            case STONE_AXE:
+            case IRON_AXE:
+            case GOLDEN_AXE:
+            case DIAMOND_AXE:
+                switch (targetMaterial) {
+                    case OAK_LOG:
+                    case DARK_OAK_LOG:
+                    case ACACIA_LOG:
+                    case BIRCH_LOG:
+                    case SPRUCE_LOG:
+                    case JUNGLE_LOG:
+                    case OAK_WOOD:
+                    case DARK_OAK_WOOD:
+                    case ACACIA_WOOD:
+                    case BIRCH_WOOD:
+                    case SPRUCE_WOOD:
+                    case JUNGLE_WOOD:
+                        return true;
+                }
+                return false;
+            case WOODEN_SHOVEL:
+            case STONE_SHOVEL:
+            case IRON_SHOVEL:
+            case GOLDEN_SHOVEL:
+            case DIAMOND_SHOVEL:
+                switch (targetMaterial) {
+                    case GRASS_BLOCK:
+                    case CAMPFIRE:
+                        return true;
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
 }
