@@ -454,9 +454,9 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.STONECUTTER, 0);
         MATERIAL_FLAGS.put(Material.SWEET_BERRY_BUSH, MODIFIED_ON_RIGHT);
 
-        MATERIAL_FLAGS.put(Material.IRON_SHOVEL, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.IRON_SHOVEL, 0);
         MATERIAL_FLAGS.put(Material.IRON_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.IRON_AXE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.IRON_AXE, 0);
         MATERIAL_FLAGS.put(Material.FLINT_AND_STEEL, 0);
         MATERIAL_FLAGS.put(Material.APPLE, 0);
         MATERIAL_FLAGS.put(Material.BOW, 0);
@@ -467,32 +467,32 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.GOLD_INGOT, 0);
         MATERIAL_FLAGS.put(Material.IRON_SWORD, 0);
         MATERIAL_FLAGS.put(Material.WOODEN_SWORD, 0);
-        MATERIAL_FLAGS.put(Material.WOODEN_SHOVEL, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.WOODEN_SHOVEL, 0);
         MATERIAL_FLAGS.put(Material.WOODEN_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.WOODEN_AXE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.WOODEN_AXE, 0);
         MATERIAL_FLAGS.put(Material.STONE_SWORD, 0);
-        MATERIAL_FLAGS.put(Material.STONE_SHOVEL, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.STONE_SHOVEL, 0);
         MATERIAL_FLAGS.put(Material.STONE_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.STONE_AXE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.STONE_AXE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_SWORD, 0);
-        MATERIAL_FLAGS.put(Material.DIAMOND_SHOVEL, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.DIAMOND_SHOVEL, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.DIAMOND_AXE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.DIAMOND_AXE, 0);
         MATERIAL_FLAGS.put(Material.STICK, 0);
         MATERIAL_FLAGS.put(Material.BOWL, 0);
         MATERIAL_FLAGS.put(Material.MUSHROOM_STEW, 0);
         MATERIAL_FLAGS.put(Material.GOLDEN_SWORD, 0);
-        MATERIAL_FLAGS.put(Material.GOLDEN_SHOVEL, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.GOLDEN_SHOVEL, 0);
         MATERIAL_FLAGS.put(Material.GOLDEN_PICKAXE, 0);
-        MATERIAL_FLAGS.put(Material.GOLDEN_AXE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.GOLDEN_AXE, 0);
         MATERIAL_FLAGS.put(Material.STRING, 0);
         MATERIAL_FLAGS.put(Material.FEATHER, 0);
         MATERIAL_FLAGS.put(Material.GUNPOWDER, 0);
-        MATERIAL_FLAGS.put(Material.WOODEN_HOE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.STONE_HOE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.IRON_HOE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.DIAMOND_HOE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.GOLDEN_HOE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.WOODEN_HOE, 0);
+        MATERIAL_FLAGS.put(Material.STONE_HOE, 0);
+        MATERIAL_FLAGS.put(Material.IRON_HOE, 0);
+        MATERIAL_FLAGS.put(Material.DIAMOND_HOE, 0);
+        MATERIAL_FLAGS.put(Material.GOLDEN_HOE, 0);
         MATERIAL_FLAGS.put(Material.WHEAT_SEEDS, 0);
         MATERIAL_FLAGS.put(Material.BREAD, 0);
         MATERIAL_FLAGS.put(Material.LEATHER_HELMET, 0);
@@ -569,7 +569,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.SUGAR, 0);
         MATERIAL_FLAGS.put(Material.COOKIE, 0);
         MATERIAL_FLAGS.put(Material.MAP, 0);
-        MATERIAL_FLAGS.put(Material.SHEARS, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.SHEARS, 0);
         MATERIAL_FLAGS.put(Material.MELON_SLICE, 0);
         MATERIAL_FLAGS.put(Material.PUMPKIN_SEEDS, 0);
         MATERIAL_FLAGS.put(Material.MELON_SEEDS, 0);
@@ -1299,7 +1299,7 @@ public final class Materials {
      */
     public static boolean isItemAppliedToBlock(Material item, Material block) {
         Integer flags = MATERIAL_FLAGS.get(item);
-        return flags == null || (flags & MODIFIES_BLOCKS) == MODIFIES_BLOCKS;
+        return flags == null || (flags & MODIFIES_BLOCKS) == MODIFIES_BLOCKS || isToolApplicable(item, block);
     }
 
     /**
@@ -1366,6 +1366,75 @@ public final class Materials {
             case TURTLE_HELMET:
             case ELYTRA:
                 return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Check if the material is usable via right-click on the target
+     * material. Returns false if the target material cannot be modified
+     * by the provided tool, or of the provided tool material isn't
+     * a tool material.
+     *
+     * @param toolMaterial the tool material being used
+     * @param targetMaterial the target material to check
+     * @return true if tool has an interact function with this material
+     */
+    public static boolean isToolApplicable(Material toolMaterial, Material targetMaterial) {
+        switch (toolMaterial) {
+            case WOODEN_HOE:
+            case STONE_HOE:
+            case IRON_HOE:
+            case GOLDEN_HOE:
+            case DIAMOND_HOE:
+                switch (targetMaterial) {
+                    case GRASS_BLOCK:
+                    case DIRT:
+                    case GRASS_PATH:
+                        return true;
+                }
+                return false;
+            case WOODEN_AXE:
+            case STONE_AXE:
+            case IRON_AXE:
+            case GOLDEN_AXE:
+            case DIAMOND_AXE:
+                switch (targetMaterial) {
+                    case OAK_LOG:
+                    case DARK_OAK_LOG:
+                    case ACACIA_LOG:
+                    case BIRCH_LOG:
+                    case SPRUCE_LOG:
+                    case JUNGLE_LOG:
+                    case OAK_WOOD:
+                    case DARK_OAK_WOOD:
+                    case ACACIA_WOOD:
+                    case BIRCH_WOOD:
+                    case SPRUCE_WOOD:
+                    case JUNGLE_WOOD:
+                        return true;
+                }
+                return false;
+            case WOODEN_SHOVEL:
+            case STONE_SHOVEL:
+            case IRON_SHOVEL:
+            case GOLDEN_SHOVEL:
+            case DIAMOND_SHOVEL:
+                switch (targetMaterial) {
+                    case GRASS_BLOCK:
+                    case CAMPFIRE:
+                        return true;
+                }
+                return false;
+            case SHEARS:
+                switch (targetMaterial) {
+                    case PUMPKIN:
+                    case BEE_NEST:
+                    case BEEHIVE:
+                        return true;
+                }
+                return false;
             default:
                 return false;
         }
