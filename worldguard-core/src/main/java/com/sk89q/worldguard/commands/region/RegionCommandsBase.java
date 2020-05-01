@@ -340,6 +340,9 @@ class RegionCommandsBase {
      * @param region the region
      */
     protected static void warnAboutDimensions(Actor sender, ProtectedRegion region) {
+        if (region instanceof GlobalProtectedRegion) {
+            return;
+        }
         int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
         if (height <= 2) {
             sender.printDebug("(Warning: The height of the region was " + (height + 1) + " block(s).)");
