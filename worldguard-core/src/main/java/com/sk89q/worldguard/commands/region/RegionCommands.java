@@ -1110,8 +1110,16 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
+        String message = existing.getFlag(Flags.TELE_MESSAGE);
+
+        // If the flag isn't set, use the default message
+        // If message.isEmpty(), no message is sent by LocalPlayer#teleport(...)
+        if (message == null) {
+            message = Flags.TELE_MESSAGE.getDefault();
+        }
+
         player.teleport(teleportLocation,
-                "Телепортация в регион '" + existing.getId() + "'.",
+                message.replace("%id%", existing.getId()),
                 "Невозможно телепортироваться в регион '" + existing.getId() + "'.");
     }
 

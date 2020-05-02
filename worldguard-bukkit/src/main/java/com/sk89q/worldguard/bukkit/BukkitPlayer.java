@@ -25,6 +25,7 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.util.MessagingUtil;
 import io.papermc.lib.PaperLib;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
@@ -190,7 +191,10 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
         PaperLib.teleportAsync(getPlayer(), BukkitAdapter.adapt(location))
                 .thenApply(success -> {
                     if (success) {
-                        print(successMessage);
+                        // The success message can be cleared via flag
+                        if (!successMessage.isEmpty()) {
+                            MessagingUtil.sendStringToChat(this, successMessage);
+                        }
                     } else {
                         printError(failMessage);
                     }

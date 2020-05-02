@@ -202,7 +202,8 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (!hostname.equals(hostKey)
-                    && !(cfg.hostKeysAllowFMLClients && hostname.equals(hostKey + "\u0000FML\u0000"))) {
+                    && !(cfg.hostKeysAllowFMLClients &&
+                            (hostname.equals(hostKey + "\u0000FML\u0000") || hostname.equals(hostKey + "\u0000FML2\u0000")))) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
                         "Вы не присоединились к действительному ключу хоста!");
                 log.warning("Проверка ключа хоста WorldGuard: " +

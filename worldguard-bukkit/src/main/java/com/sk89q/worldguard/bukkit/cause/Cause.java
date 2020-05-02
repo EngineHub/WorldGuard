@@ -36,6 +36,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.metadata.Metadatable;
+import org.bukkit.projectiles.BlockProjectileSource;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -289,6 +290,8 @@ public final class Cause {
                     } else if (o instanceof Tameable) {
                         indirect = true;
                         addAll(((Tameable) o).getOwner());
+                    } else if (o instanceof BlockProjectileSource) {
+                        addAll(((BlockProjectileSource) o).getBlock());
                     }
 
                     // Add manually tracked parent causes
