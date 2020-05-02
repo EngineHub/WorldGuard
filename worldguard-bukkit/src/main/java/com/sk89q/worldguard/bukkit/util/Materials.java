@@ -1199,6 +1199,12 @@ public final class Materials {
         return Tag.BEDS.isTagged(material);
     }
 
+    public static boolean isCoral(Material material) {
+        return Tag.CORAL_BLOCKS.isTagged(material) ||
+                Tag.CORAL_PLANTS.isTagged(material) ||
+                Tag.CORAL_PLANTS.isTagged(material);
+    }
+
     /**
      * Test whether the material is a crop.
      * @param type the material
@@ -1363,5 +1369,4 @@ public final class Materials {
                 return false;
         }
     }
-
 }
