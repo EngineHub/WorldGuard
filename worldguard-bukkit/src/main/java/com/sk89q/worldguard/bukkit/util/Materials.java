@@ -1202,7 +1202,8 @@ public final class Materials {
     public static boolean isCoral(Material material) {
         return Tag.CORAL_BLOCKS.isTagged(material) ||
                 Tag.CORAL_PLANTS.isTagged(material) ||
-                Tag.CORAL_PLANTS.isTagged(material);
+                Tag.CORALS.isTagged(material) ||
+                Tag.WALL_CORALS.isTagged(material);
     }
 
     /**
