@@ -318,7 +318,7 @@ class FlagHelperBox extends PaginationBox {
         Component valType;
         if (inherited) {
             if (currVal == defVal) {
-                valType = TextComponent.of("Inherited & ")
+                valType = TextComponent.of("Унаследованный & ")
                         .append(TextComponent.of("default")
                                 .decoration(TextDecoration.UNDERLINED, true))
                         .append(TextComponent.of(" value"));
