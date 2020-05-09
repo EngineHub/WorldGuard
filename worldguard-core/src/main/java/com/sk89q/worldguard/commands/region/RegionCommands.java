@@ -491,7 +491,7 @@ public final class RegionCommands extends RegionCommandsBase {
      */
     @Command(aliases = {"flag", "f"},
              usage = "<id> <флаг> [-w мир] [-g группа] [значение]",
-             flags = "g:w:e",
+             flags = "g:w:eh:",
              desc = "Установить флаг",
              min = 2)
     public void flag(CommandContext args, Actor sender) throws CommandException {
