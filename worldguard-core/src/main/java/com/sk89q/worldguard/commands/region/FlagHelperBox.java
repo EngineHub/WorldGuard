@@ -83,7 +83,7 @@ class FlagHelperBox extends PaginationBox {
     private boolean monoSpace;
 
     FlagHelperBox(World world, ProtectedRegion region, RegionPermissionModel perms) {
-        super("Flags for " + region.getId(), "/rg flags -w \"" + world.getName() + "\" -p %page% " + region.getId());
+        super("Флаги региона " + region.getId(), "/rg flags -w \"" + world.getName() + "\" -p %page% " + region.getId());
         this.world = world;
         this.region = region;
         this.perms = perms;
@@ -318,7 +318,7 @@ class FlagHelperBox extends PaginationBox {
         Component valType;
         if (inherited) {
             if (currVal == defVal) {
-                valType = TextComponent.of("Унаследованный & ")
+                valType = TextComponent.of("Inherited & ")
                         .append(TextComponent.of("default")
                                 .decoration(TextDecoration.UNDERLINED, true))
                         .append(TextComponent.of(" value"));
