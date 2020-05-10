@@ -61,6 +61,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Hopper;
 import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.entity.AreaEffectCloud;
@@ -988,15 +989,18 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockDispense(BlockDispenseEvent event) {
-        Cause cause = create(event.getBlock());
         Block dispenserBlock = event.getBlock();
-        ItemStack item = event.getItem();
-
-        Events.fireToCancel(event, new UseItemEvent(event, cause, dispenserBlock.getWorld(), item));
 
         // Simulate right click event as players have it
-        if (dispenserBlock.getBlockData() instanceof Dispenser) {
-            Dispenser dispenser = (Dispenser) dispenserBlock.getBlockData();
+        if (dispenserBlock.getType() == Material.DISPENSER) {
+            Cause cause = create(event.getBlock());
+            ItemStack item = event.getItem();
+            if (Events.fireToCancel(event, new UseItemEvent(event, cause, dispenserBlock.getWorld(), item))) {
+                return;
+            }
+
+            BlockData blockData = dispenserBlock.getBlockData();
+            Dispenser dispenser = (Dispenser) blockData; // if this ClassCastExceptions it's a bukkit bug
             Block placed = dispenserBlock.getRelative(dispenser.getFacing());
             Block clicked = placed.getRelative(dispenser.getFacing());
             handleBlockRightClick(event, cause, item, clicked, placed);
