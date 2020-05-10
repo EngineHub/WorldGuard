@@ -35,7 +35,6 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
-import com.sk89q.worldguard.bukkit.internal.WGMetadata;
 import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonExtendKey;
 import com.sk89q.worldguard.bukkit.listener.debounce.BlockPistonRetractKey;
 import com.sk89q.worldguard.bukkit.listener.debounce.EventDebounce;
@@ -274,6 +273,8 @@ public class EventAbstractionListener extends AbstractListener {
             if (trample) {
                 breakDelagate.setSilent(true);
                 breakDelagate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
+            } else if (fromType == Material.REDSTONE_ORE) {
+                breakDelagate.setSilent(true);
             }
             boolean denied;
             if (!(denied = Events.fireToCancel(event, breakDelagate))) {
