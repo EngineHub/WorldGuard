@@ -547,22 +547,22 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.COD, 0);
         MATERIAL_FLAGS.put(Material.COOKED_COD, 0);
         MATERIAL_FLAGS.put(Material.INK_SAC, 0);
-        MATERIAL_FLAGS.put(Material.BLACK_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.BLUE_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.BROWN_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.CYAN_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.GRAY_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.GREEN_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.LIGHT_BLUE_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.LIGHT_GRAY_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.LIME_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.MAGENTA_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.ORANGE_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.PINK_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.PURPLE_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.RED_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.WHITE_DYE, MODIFIES_BLOCKS);
-        MATERIAL_FLAGS.put(Material.YELLOW_DYE, MODIFIES_BLOCKS);
+        MATERIAL_FLAGS.put(Material.BLACK_DYE, 0);
+        MATERIAL_FLAGS.put(Material.BLUE_DYE, 0);
+        MATERIAL_FLAGS.put(Material.BROWN_DYE, 0);
+        MATERIAL_FLAGS.put(Material.CYAN_DYE, 0);
+        MATERIAL_FLAGS.put(Material.GRAY_DYE, 0);
+        MATERIAL_FLAGS.put(Material.GREEN_DYE, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT_BLUE_DYE, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT_GRAY_DYE, 0);
+        MATERIAL_FLAGS.put(Material.LIME_DYE, 0);
+        MATERIAL_FLAGS.put(Material.MAGENTA_DYE, 0);
+        MATERIAL_FLAGS.put(Material.ORANGE_DYE, 0);
+        MATERIAL_FLAGS.put(Material.PINK_DYE, 0);
+        MATERIAL_FLAGS.put(Material.PURPLE_DYE, 0);
+        MATERIAL_FLAGS.put(Material.RED_DYE, 0);
+        MATERIAL_FLAGS.put(Material.WHITE_DYE, 0);
+        MATERIAL_FLAGS.put(Material.YELLOW_DYE, 0);
         MATERIAL_FLAGS.put(Material.COCOA_BEANS, 0);
         MATERIAL_FLAGS.put(Material.BONE_MEAL, MODIFIES_BLOCKS);
         MATERIAL_FLAGS.put(Material.BONE, 0);
@@ -1392,6 +1392,7 @@ public final class Materials {
                     case GRASS_BLOCK:
                     case DIRT:
                     case GRASS_PATH:
+                    // case COARSE_DIRT: // already handled by the server...
                         return true;
                 }
                 return false;
@@ -1435,6 +1436,23 @@ public final class Materials {
                         return true;
                 }
                 return false;
+            case BLACK_DYE:
+            case BLUE_DYE:
+            case BROWN_DYE:
+            case CYAN_DYE:
+            case GRAY_DYE:
+            case GREEN_DYE:
+            case LIGHT_BLUE_DYE:
+            case LIGHT_GRAY_DYE:
+            case LIME_DYE:
+            case MAGENTA_DYE:
+            case ORANGE_DYE:
+            case PINK_DYE:
+            case PURPLE_DYE:
+            case RED_DYE:
+            case WHITE_DYE:
+            case YELLOW_DYE:
+                return Tag.SIGNS.isTagged(targetMaterial);
             default:
                 return false;
         }

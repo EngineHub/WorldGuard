@@ -283,6 +283,8 @@ public class EventAbstractionListener extends AbstractListener {
                 if (trample) {
                     placeDelegate.setSilent(true);
                     placeDelegate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
+                } else if (fromType == Material.REDSTONE_ORE) {
+                    placeDelegate.setSilent(true);
                 }
                 denied = Events.fireToCancel(event, placeDelegate);
             }
