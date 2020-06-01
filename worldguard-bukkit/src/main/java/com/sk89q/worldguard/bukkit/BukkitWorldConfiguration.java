@@ -105,6 +105,13 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         if (inputs == null || inputs.isEmpty()) {
             parentConfig.setProperty(node, new ArrayList<String>());
+        }
+
+        if (config.getProperty(node) != null) {
+            inputs = config.getStringList(node, null);
+        }
+
+        if (inputs == null || inputs.isEmpty()) {
             return set;
         }
 
