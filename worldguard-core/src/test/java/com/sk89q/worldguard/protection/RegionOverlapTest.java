@@ -27,6 +27,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.TestPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.association.RegionOverlapAssociation;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
@@ -168,10 +169,6 @@ public abstract class RegionOverlapTest {
     public void testPlayer2BuildAccess() {
         ApplicableRegionSet appl;
 
-        HashSet<ProtectedRegion> test = new HashSet<>();
-        test.add(courtyard);
-        test.add(fountain);
-
         // Outside
         appl = manager.getApplicableRegions(outside);
         assertTrue(appl.testState(player2, Flags.BUILD));
@@ -181,5 +178,62 @@ public abstract class RegionOverlapTest {
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
         assertTrue(appl.testState(player2, Flags.BUILD));
+    }
+
+    @Test
+    public void testNonPlayerBuildAccessInOneRegion() {
+        ApplicableRegionSet appl;
+
+        HashSet<ProtectedRegion> source = new HashSet<>();
+        source.add(courtyard);
+        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source);
+
+        // Outside
+        appl = manager.getApplicableRegions(outside);
+        assertTrue(appl.testState(assoc, Flags.BUILD));
+        // Inside courtyard
+        appl = manager.getApplicableRegions(inCourtyard);
+        assertTrue(appl.testState(assoc, Flags.BUILD));
+        // Inside fountain
+        appl = manager.getApplicableRegions(inFountain);
+        assertFalse(appl.testState(assoc, Flags.BUILD));
+    }
+
+    @Test
+    public void testNonPlayerBuildAccessInBothRegions() {
+        ApplicableRegionSet appl;
+
+        HashSet<ProtectedRegion> source = new HashSet<>();
+        source.add(fountain);
+        source.add(courtyard);
+        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source);
+
+        // Outside
+        appl = manager.getApplicableRegions(outside);
+        assertTrue(appl.testState(assoc, Flags.BUILD));
+        // Inside courtyard
+        appl = manager.getApplicableRegions(inCourtyard);
+        assertTrue(appl.testState(assoc, Flags.BUILD));
+        // Inside fountain
+        appl = manager.getApplicableRegions(inFountain);
+        assertTrue(appl.testState(assoc, Flags.BUILD));
+    }
+
+    @Test
+    public void testNonPlayerBuildAccessInNoRegions() {
+        ApplicableRegionSet appl;
+
+        HashSet<ProtectedRegion> source = new HashSet<>();
+        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source);
+
+        // Outside
+        appl = manager.getApplicableRegions(outside);
+        assertTrue(appl.testState(assoc, Flags.BUILD));
+        // Inside courtyard
+        appl = manager.getApplicableRegions(inCourtyard);
+        assertFalse(appl.testState(assoc, Flags.BUILD));
+        // Inside fountain
+        appl = manager.getApplicableRegions(inFountain);
+        assertFalse(appl.testState(assoc, Flags.BUILD));
     }
 }
