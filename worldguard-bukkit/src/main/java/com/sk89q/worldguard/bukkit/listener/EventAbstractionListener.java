@@ -73,8 +73,10 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.Cancellable;
@@ -832,7 +834,11 @@ public class EventAbstractionListener extends AbstractListener {
             } else if (damager instanceof Creeper) {
                 eventToFire.getRelevantFlags().add(Flags.CREEPER_EXPLOSION);
             }
-            Events.fireToCancel(event, eventToFire);
+            if (Events.fireToCancel(event, eventToFire)) {
+                if (damager instanceof Tameable && damager instanceof Mob) {
+                    ((Mob) damager).setTarget(null);
+                }
+            }
 
             // Item use event with the item in hand
             // Older blacklist handler code used this, although it suffers from
