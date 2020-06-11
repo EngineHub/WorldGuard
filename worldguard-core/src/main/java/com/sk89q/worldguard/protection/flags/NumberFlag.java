@@ -21,6 +21,8 @@ package com.sk89q.worldguard.protection.flags;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.annotations.Beta;
+
 /**
  * Stores an Number.
  */
@@ -37,10 +39,20 @@ public abstract class NumberFlag<T extends Number> extends Flag<T> {
         super(name);
     }
 
+    /**
+     * Not recommended for public use. Will likely be moved when migrating to piston for commands.
+     * @param values suggested values
+     */
+    @Beta
     public void setSuggestedValues(Number[] values) {
         this.suggestions = checkNotNull(values);
     }
 
+    /**
+     * Not recommended for public use. Will likely be moved when migrating to piston for commands.
+     * @return suggested values
+     */
+    @Beta
     public Number[] getSuggestedValues() {
         return suggestions;
     }

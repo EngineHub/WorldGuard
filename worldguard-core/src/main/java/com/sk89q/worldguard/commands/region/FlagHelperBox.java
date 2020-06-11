@@ -199,7 +199,7 @@ class FlagHelperBox extends PaginationBox {
             if (maySet) {
                 if (isExplicitSet) {
                     hoverTexts.add(TextComponent.of("Click to unset", TextColor.GOLD));
-                } else if (DANGER_ZONE.contains(flag)) {
+                } else if (DANGER_ZONE.contains(flag) && !(ProtectedRegion.GLOBAL_REGION.equals(region.getId()) && flag == Flags.PASSTHROUGH)) {
                     hoverTexts.add(TextComponent.of("Setting this flag may have unintended consequences.", TextColor.RED)
                             .append(TextComponent.newline())
                             .append(TextComponent.of("Please read the documentation and set this flag manually if you really intend to.")
