@@ -170,6 +170,7 @@ public abstract class WorldConfiguration {
     public boolean disableObsidianGenerators;
     public boolean strictEntitySpawn;
     public boolean ignoreHopperMoveEvents;
+    public boolean breakDeniedHoppers;
     protected Map<String, Integer> maxRegionCounts;
 
     /**

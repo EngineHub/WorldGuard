@@ -938,19 +938,28 @@ public class EventAbstractionListener extends AbstractListener {
             causeHolder = event.getInitiator().getHolder();
         }
 
+        WorldConfiguration wcfg = null;
         if (causeHolder instanceof Hopper
-                && getWorldConfig(BukkitAdapter.adapt((((Hopper) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
+                && (wcfg = getWorldConfig(BukkitAdapter.adapt((((Hopper) causeHolder).getWorld())))).ignoreHopperMoveEvents) {
             return;
         } else if (causeHolder instanceof HopperMinecart
-                && getWorldConfig(BukkitAdapter.adapt((((HopperMinecart) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
+                && (wcfg = getWorldConfig(BukkitAdapter.adapt((((HopperMinecart) causeHolder).getWorld())))).ignoreHopperMoveEvents) {
             return;
         }
 
         Entry entry;
 
         if ((entry = moveItemDebounce.tryDebounce(event)) != null) {
-            InventoryHolder sourceHolder = event.getSource().getHolder();
-            InventoryHolder targetHolder = event.getDestination().getHolder();
+            InventoryHolder sourceHolder;
+            InventoryHolder targetHolder;
+            if (HAS_SNAPSHOT_INVHOLDER) {
+                sourceHolder = event.getSource().getHolder(false);
+                targetHolder = event.getDestination().getHolder(false);
+            } else {
+                sourceHolder = event.getSource().getHolder();
+                targetHolder = event.getDestination().getHolder();
+            }
+
             Cause cause;
 
             if (causeHolder instanceof Entity) {
@@ -967,7 +976,7 @@ public class EventAbstractionListener extends AbstractListener {
 
             handleInventoryHolderUse(event, cause, targetHolder);
 
-            if (event.isCancelled() && causeHolder instanceof Hopper) {
+            if (event.isCancelled() && causeHolder instanceof Hopper && wcfg.breakDeniedHoppers) {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(),
                         () -> ((Hopper) causeHolder).getBlock().breakNaturally());
             } else {
