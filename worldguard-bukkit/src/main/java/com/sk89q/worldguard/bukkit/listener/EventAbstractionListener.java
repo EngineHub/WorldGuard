@@ -139,6 +139,7 @@ import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
@@ -158,6 +159,17 @@ public class EventAbstractionListener extends AbstractListener {
     private final EventDebounce<BlockPistonRetractKey> pistonRetractDebounce = EventDebounce.create(5000);
     private final EventDebounce<BlockPistonExtendKey> pistonExtendDebounce = EventDebounce.create(5000);
 
+    private static final boolean HAS_SNAPSHOT_INVHOLDER;
+    static {
+        boolean temp;
+        try {
+            Inventory.class.getMethod("getHolder", boolean.class);
+            temp = true;
+        } catch (NoSuchMethodException e) {
+            temp = false;
+        }
+        HAS_SNAPSHOT_INVHOLDER = temp;
+    }
     /**
      * Construct the listener.
      *
@@ -919,7 +931,12 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
-        final InventoryHolder causeHolder = event.getInitiator().getHolder();
+        InventoryHolder causeHolder;
+        if (HAS_SNAPSHOT_INVHOLDER) {
+            causeHolder = event.getInitiator().getHolder(false);
+        } else {
+            causeHolder = event.getInitiator().getHolder();
+        }
 
         if (causeHolder instanceof Hopper
                 && getWorldConfig(BukkitAdapter.adapt((((Hopper) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
