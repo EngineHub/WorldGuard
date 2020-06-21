@@ -19,6 +19,7 @@
 
 package com.sk89q.worldguard.commands.region;
 
+import com.sk89q.worldguard.protection.flags.registry.UnknownFlag;
 import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -149,12 +150,16 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
                 if (FlagHelperBox.DANGER_ZONE.contains(flag)
                         && !(region.getId().equals(ProtectedRegion.GLOBAL_REGION) && flag == Flags.PASSTHROUGH)) {
                     flagColor = TextColor.DARK_RED;
-                } else {
+                } else if (Flags.INBUILT_FLAGS.contains(flag.getName())) {
                     flagColor = TextColor.GOLD;
+                } else if (flag instanceof UnknownFlag) {
+                    flagColor = TextColor.GRAY;
+                } else {
+                    flagColor = TextColor.LIGHT_PURPLE;
                 }
             }
             TextComponent flagText = TextComponent.of(flagString, flagColor)
-                    .append(TextComponent.of(String.valueOf(val), useColors? TextColor.YELLOW : TextColor.WHITE));
+                    .append(TextComponent.of(String.valueOf(val), useColors ? TextColor.YELLOW : TextColor.WHITE));
             if (perms != null && perms.maySetFlag(region, flag)) {
                 flagText = flagText.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to set flag")))
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND,
