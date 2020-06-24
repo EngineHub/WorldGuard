@@ -151,7 +151,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         allowAllInteract = getTargetMatchers("event-handling.interaction-whitelist");
         blockUseAtFeet = getTargetMatchers("event-handling.emit-block-use-at-feet");
         ignoreHopperMoveEvents = getBoolean("event-handling.ignore-hopper-item-move-events", false);
-        ignoreHopperMoveEvents = getBoolean("event-handling.break-hoppers-on-denied-move", true);
+        breakDeniedHoppers = getBoolean("event-handling.break-hoppers-on-denied-move", true);
 
         usePaperEntityOrigin = getBoolean("regions.use-paper-entity-origin", false);
 
