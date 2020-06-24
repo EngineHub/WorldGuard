@@ -80,6 +80,12 @@ public final class Flags {
     public static final StateFlag ITEM_DROP = register(new StateFlag("item-drop", true)); // Intentionally true
     public static final StateFlag EXP_DROPS = register(new StateFlag("exp-drops", true)); // Intentionally true
 
+    // These flags are similar to the ones above (used in tandem with BUILD),
+    // but they aren't checked at all if the player can build. Only if the
+    // player can't build thy are checked to see if the type is allowed
+    public static final SetFlag<EntityType> PLACE_ENTITY = register(new SetFlag<>("entity-place", new RegistryFlag<>(null, EntityType.REGISTRY)));
+    public static final SetFlag<EntityType> DESTROY_ENTITY = register(new SetFlag<>("entity-destroy", new RegistryFlag<>(null, EntityType.REGISTRY)));
+
     // These flags adjust behavior and are not checked in tandem with the
     // BUILD flag so they need to be TRUE for their defaults.
 

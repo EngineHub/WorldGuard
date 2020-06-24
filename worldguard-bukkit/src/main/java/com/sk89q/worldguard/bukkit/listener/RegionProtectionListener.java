@@ -65,6 +65,7 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Handle events that need to be processed by region protection.
@@ -299,6 +300,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         Location target = event.getTarget();
         EntityType type = event.getEffectiveType();
+        com.sk89q.worldedit.world.entity.EntityType weType = BukkitAdapter.adapt(type);
 
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
         RegionAssociable associable = createRegionAssociable(event.getCause());
@@ -311,7 +313,7 @@ public class RegionProtectionListener extends AbstractListener {
             canSpawn = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.PLACE_VEHICLE));
             what = "place vehicles";
 
-        /* Item pickup */
+        /* Item drops */
         } else if (event.getEntity() instanceof Item) {
             canSpawn = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_DROP));
             what = "drop items";
@@ -328,11 +330,13 @@ public class RegionProtectionListener extends AbstractListener {
         /* Everything else */
         } else {
             canSpawn = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
+            what = "place " + type.name().replace('_', ' ').toLowerCase() + "s";
+        }
 
-            if (event.getEntity() instanceof Item) {
-                what = "drop items";
-            } else {
-                what = "place things";
+        if (!canSpawn) {
+            Set<com.sk89q.worldedit.world.entity.EntityType> entityTypes = query.queryValue(BukkitAdapter.adapt(target), associable, Flags.PLACE_ENTITY);
+            if (entityTypes != null && weType != null && entityTypes.contains(weType)) {
+                canSpawn = true;
             }
         }
 
@@ -350,6 +354,7 @@ public class RegionProtectionListener extends AbstractListener {
 
         Location target = event.getTarget();
         EntityType type = event.getEntity().getType();
+        com.sk89q.worldedit.world.entity.EntityType weType = BukkitAdapter.adapt(type);
         RegionAssociable associable = createRegionAssociable(event.getCause());
 
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
@@ -369,7 +374,14 @@ public class RegionProtectionListener extends AbstractListener {
         /* Everything else */
         } else {
             canDestroy = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
-            what = "break things";
+            what = "break " + type.name().replace('_', ' ').toLowerCase() + "s";
+        }
+
+        if (!canDestroy) {
+            Set<com.sk89q.worldedit.world.entity.EntityType> entityTypes = query.queryValue(BukkitAdapter.adapt(target), associable, Flags.DESTROY_ENTITY);
+            if (entityTypes != null && weType != null && entityTypes.contains(weType)) {
+                canDestroy = true;
+            }
         }
 
         if (!canDestroy) {
