@@ -199,7 +199,7 @@ class FlagHelperBox extends PaginationBox {
             if (maySet) {
                 if (isExplicitSet) {
                     hoverTexts.add(TextComponent.of("Нажмите, чтобы сбросить", TextColor.GOLD));
-                } else if (DANGER_ZONE.contains(flag)) {
+                } else if (DANGER_ZONE.contains(flag) && !(ProtectedRegion.GLOBAL_REGION.equals(region.getId()) && flag == Flags.PASSTHROUGH)) {
                     hoverTexts.add(TextComponent.of("Установка этого флага может иметь непредсказуемые последствия.", TextColor.RED)
                             .append(TextComponent.newline())
                             .append(TextComponent.of("Пожалуйста, прочитайте документацию и установить этот флаг вручную, если вы действительно намерены это сделать.")

@@ -284,12 +284,12 @@ public final class Cause {
                     } else if (o instanceof AreaEffectCloud) {
                         indirect = true;
                         addAll(((AreaEffectCloud) o).getSource());
-                    } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
-                        indirect = true;
-                        addAll(((Creature) o).getTarget());
                     } else if (o instanceof Tameable) {
                         indirect = true;
                         addAll(((Tameable) o).getOwner());
+                    } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
+                        indirect = true;
+                        addAll(((Creature) o).getTarget());
                     } else if (o instanceof BlockProjectileSource) {
                         addAll(((BlockProjectileSource) o).getBlock());
                     }
