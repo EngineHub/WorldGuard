@@ -24,8 +24,8 @@ repositories {
 dependencies {
     "compile"(project(":worldguard-core"))
     //"compile"(project(":worldguard-libs:bukkit"))
-    "api"("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
-    "implementation"("io.papermc:paperlib:1.0.2")
+    "api"("com.destroystokyo.paper:paper-api:1.16.1-R0.1-SNAPSHOT")
+    "implementation"("io.papermc:paperlib:1.0.4")
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "implementation"("org.bstats:bstats-bukkit:1.7")
@@ -64,7 +64,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.bstats:bstats-bukkit:1.7"))
         }
         relocate ("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib:1.0.2"))
+            include(dependency("io.papermc:paperlib:1.0.4"))
         }
     }
 }

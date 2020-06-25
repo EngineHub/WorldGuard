@@ -261,8 +261,8 @@ public class RegionProtectionListener extends AbstractListener {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = "open that";
 
-            /* Beds */
-            } else if (Materials.isBed(type)) {
+            /* Beds or Respawn Anchor */
+            } else if (Materials.isBed(type) || type == Material.RESPAWN_ANCHOR) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.SLEEP));
                 what = "sleep";
 
