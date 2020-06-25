@@ -60,6 +60,7 @@ public final class Flags {
     public static final StateFlag DAMAGE_ANIMALS = register(new StateFlag("damage-animals", false));
     public static final StateFlag PVP = register(new StateFlag("pvp", false));
     public static final StateFlag SLEEP = register(new StateFlag("sleep", false));
+    public static final StateFlag RESPAWN_ANCHORS = register(new StateFlag("respawn-anchors", false));
     public static final StateFlag TNT = register(new StateFlag("tnt", false));
     public static final StateFlag CHEST_ACCESS = register(new StateFlag("chest-access", false));
     public static final StateFlag PLACE_VEHICLE = register(new StateFlag("vehicle-place", false));
