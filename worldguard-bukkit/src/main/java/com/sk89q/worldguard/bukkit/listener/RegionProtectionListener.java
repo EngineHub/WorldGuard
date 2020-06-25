@@ -328,12 +328,7 @@ public class RegionProtectionListener extends AbstractListener {
         /* Everything else */
         } else {
             canSpawn = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event));
-
-            if (event.getEntity() instanceof Item) {
-                what = "drop items";
-            } else {
-                what = "place things";
-            }
+            what = "place things";
         }
 
         if (!canSpawn) {
