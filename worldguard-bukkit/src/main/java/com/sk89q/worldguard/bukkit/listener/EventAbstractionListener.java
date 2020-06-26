@@ -244,7 +244,7 @@ public class EventAbstractionListener extends AbstractListener {
         boolean allowed = false;
 
         for (Block source : adjacent) {
-            if (source.getType() == Material.FIRE) {
+            if (Materials.isFire(source.getType())) {
                 found++;
                 if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(source), target))) {
                     source.setType(Material.AIR);
@@ -506,7 +506,7 @@ public class EventAbstractionListener extends AbstractListener {
                     }
 
                     // Special handling of putting out fires
-                    if (event.getAction() == Action.LEFT_CLICK_BLOCK && placed.getType() == Material.FIRE) {
+                    if (event.getAction() == Action.LEFT_CLICK_BLOCK && Materials.isFire(placed.getType())) {
                         if (Events.fireAndTestCancel(new BreakBlockEvent(event, create(event.getPlayer()), placed))) {
                             event.setUseInteractedBlock(Result.DENY);
                             break;
