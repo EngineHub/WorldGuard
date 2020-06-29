@@ -320,7 +320,7 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.fireSpreadDisableToggle) {
             Block block = event.getBlock();
             event.setCancelled(true);
-            checkAndDestroyAround(block.getWorld(), block.getX(), block.getY(), block.getZ(), Material.FIRE);
+            checkAndDestroyFireAround(block.getWorld(), block.getX(), block.getY(), block.getZ());
             return;
         }
 
@@ -329,7 +329,7 @@ public class WorldGuardBlockListener implements Listener {
 
             if (wcfg.disableFireSpreadBlocks.contains(BukkitAdapter.asBlockType(block.getType()).getId())) {
                 event.setCancelled(true);
-                checkAndDestroyAround(block.getWorld(), block.getX(), block.getY(), block.getZ(), Material.FIRE);
+                checkAndDestroyFireAround(block.getWorld(), block.getX(), block.getY(), block.getZ());
                 return;
             }
         }
@@ -348,24 +348,24 @@ public class WorldGuardBlockListener implements Listener {
                     WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation()));
 
             if (!set.testState(null, Flags.FIRE_SPREAD)) {
-                checkAndDestroyAround(block.getWorld(), x, y, z, Material.FIRE);
+                checkAndDestroyFireAround(block.getWorld(), x, y, z);
                 event.setCancelled(true);
             }
 
         }
     }
 
-    private void checkAndDestroyAround(World world, int x, int y, int z, Material required) {
-        checkAndDestroy(world, x, y, z + 1, required);
-        checkAndDestroy(world, x, y, z - 1, required);
-        checkAndDestroy(world, x, y + 1, z, required);
-        checkAndDestroy(world, x, y - 1, z, required);
-        checkAndDestroy(world, x + 1, y, z, required);
-        checkAndDestroy(world, x - 1, y, z, required);
+    private void checkAndDestroyFireAround(World world, int x, int y, int z) {
+        checkAndDestroyFire(world, x, y, z + 1);
+        checkAndDestroyFire(world, x, y, z - 1);
+        checkAndDestroyFire(world, x, y + 1, z);
+        checkAndDestroyFire(world, x, y - 1, z);
+        checkAndDestroyFire(world, x + 1, y, z);
+        checkAndDestroyFire(world, x - 1, y, z);
     }
 
-    private void checkAndDestroy(World world, int x, int y, int z, Material required) {
-        if (world.getBlockAt(x, y, z).getType() == required) {
+    private void checkAndDestroyFire(World world, int x, int y, int z) {
+        if (Materials.isFire(world.getBlockAt(x, y, z).getType())) {
             world.getBlockAt(x, y, z).setType(Material.AIR);
         }
     }
