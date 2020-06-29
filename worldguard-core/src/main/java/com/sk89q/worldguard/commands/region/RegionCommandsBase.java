@@ -106,7 +106,7 @@ class RegionCommandsBase {
             if (sender instanceof LocalPlayer) {
                 return ((LocalPlayer) sender).getWorld();
             } else {
-                throw new CommandException("Пожалуйста, укажите " + "название мира: -" + flag + " world_name.");
+                throw new CommandException("Please specify " + "the world with -" + flag + " world_name.");
             }
         }
     }
@@ -122,12 +122,12 @@ class RegionCommandsBase {
     protected static String checkRegionId(String id, boolean allowGlobal) throws CommandException {
         if (!ProtectedRegion.isValidId(id)) {
             throw new CommandException(
-                    "Название региона '" + id + "' содержит запрещенные символы.");
+                    "The region name of '" + id + "' contains characters that are not allowed.");
         }
 
         if (!allowGlobal && id.equalsIgnoreCase("__global__")) { // Sorry, no global
             throw new CommandException(
-                    "Вы не можете использовать глобальный регион.");
+                    "Sorry, you can't use __global__ here.");
         }
 
         return id;
@@ -160,7 +160,7 @@ class RegionCommandsBase {
             }
 
             throw new CommandException(
-                    "Регион '" + id + "' не найден.");
+                    "No region could be found with the name of '" + id + "'.");
         }
 
         return region;
@@ -203,18 +203,18 @@ class RegionCommandsBase {
         if (set.size() == 0) {
             if (allowGlobal) {
                 ProtectedRegion global = checkExistingRegion(regionManager, "__global__", true);
-                player.printDebug("Вы не состоите ни в одном из " +
-                        "регионов. Используем глобальный регион.");
+                player.printDebug("You're not standing in any " +
+                        "regions. Using the global region for this world instead.");
                 return global;
             }
             throw new CommandException(
-                    "Вы не состоите ни в одном из регионов." +
-                            "Укажите ID региона если хотите указать какой-то конкретный регион.");
+                    "You're not standing in a region." +
+                            "Specify an ID if you want to select a specific region.");
         } else if (set.size() > 1) {
             boolean first = true;
 
             final TextComponent.Builder builder = TextComponent.builder("");
-            builder.append(TextComponent.of("Текущие регионы: ", TextColor.GOLD));
+            builder.append(TextComponent.of("Current regions: ", TextColor.GOLD));
             for (ProtectedRegion region : set) {
                 if (!first) {
                     builder.append(TextComponent.of(", "));
@@ -222,13 +222,13 @@ class RegionCommandsBase {
                 first = false;
                 TextComponent regionComp = TextComponent.of(region.getId(), TextColor.AQUA);
                 if (rgCmd != null && rgCmd.contains("%id%")) {
-                    regionComp = regionComp.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы выбрать этот регион")))
+                    regionComp = regionComp.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to pick this region")))
                             .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, rgCmd.replace("%id%", region.getId())));
                 }
                 builder.append(regionComp);
             }
             player.print(builder.build());
-            throw new CommandException("Вы находитесь в нескольких регионах (пожалуйста, выберите один).");
+            throw new CommandException("Several regions affect your current location (please pick one).");
         }
 
         return set.iterator().next();
@@ -248,9 +248,9 @@ class RegionCommandsBase {
             return localSession.getRegionSelector(localSession.getSelectionWorld()).getRegion();
         } catch (IncompleteRegionException e) {
             throw new CommandException(
-                    "Вы не выделили область для привата региона. " +
-                            "Используйте WorldEdit, чтобы сделать выделение! " +
-                            "(смотрите: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).");
+                    "Please select an area first. " +
+                            "Use WorldEdit to make a selection! " +
+                            "(see: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).");
         }
     }
 
@@ -263,8 +263,8 @@ class RegionCommandsBase {
      */
     protected static void checkRegionDoesNotExist(RegionManager manager, String id, boolean mayRedefine) throws CommandException {
         if (manager.hasRegion(id)) {
-            throw new CommandException("Регион с таким именем уже существует. Пожалуйста, выберите другое имя." +
-                    (mayRedefine ? " Для изменения позиции используйте /region redefine " + id + "." : ""));
+            throw new CommandException("A region with that name already exists. Please choose another name." +
+                    (mayRedefine ? " To change the shape, use /region redefine " + id + "." : ""));
         }
     }
 
@@ -276,15 +276,15 @@ class RegionCommandsBase {
      */
     protected static RegionManager checkRegionManager(World world) throws CommandException {
         if (!WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).useRegions) {
-            throw new CommandException("Регионы отключены в данном мире. " +
-                    "Они могут быть включены для каждого мира в конфигурационных файлах WorldGuard. " +
-                    "Однако, возможно, вам придется перезагрузить сервер после этого.");
+            throw new CommandException("Region support is disabled in the target world. " +
+                    "It can be enabled per-world in WorldGuard's configuration files. " +
+                    "However, you may need to restart your server afterwards.");
         }
 
         RegionManager manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
         if (manager == null) {
-            throw new CommandException("Не удалось загрузить регион для данного мира. " +
-                    "Пожалуйста, сообщите администратору.");
+            throw new CommandException("Region data failed to load for this world. " +
+                    "Please ask a server administrator to read the logs to identify the reason.");
         }
         return manager;
     }
@@ -311,7 +311,7 @@ class RegionCommandsBase {
             BlockVector3 max = selection.getMaximumPoint();
             return new ProtectedCuboidRegion(id, min, max);
         } else {
-            throw new CommandException("Извините, только кубоиды и полигоны могут быть регионами в WorldGuard.");
+            throw new CommandException("Sorry, you can only use cuboids and polygons for WorldGuard regions.");
         }
     }
 
@@ -328,8 +328,8 @@ class RegionCommandsBase {
             String failingList = Joiner.on(", ").join(failures.stream()
                     .map(regionManager -> "'" + regionManager.getName() + "'").collect(Collectors.toList()));
 
-            sender.print(TextComponent.of("(Предупреждение: Не удается сохранить регион в этом мире: " + failingList + ". " +
-                    "Пожалуйста, сообщите администратору.)", TextColor.GOLD));
+            sender.print(TextComponent.of("(Warning: The background saving of region data is failing for these worlds: " + failingList + ". " +
+                    "Your changes are getting lost. See the server log for more information.)", TextColor.GOLD));
         }
     }
 
@@ -345,7 +345,7 @@ class RegionCommandsBase {
         }
         int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
         if (height <= 2) {
-            sender.printDebug("(Внимание: Высота региона составляет " + (height + 1) + " блок(ов).)");
+            sender.printDebug("(Warning: The height of the region was " + (height + 1) + " block(s).)");
         }
     }
 
@@ -358,7 +358,7 @@ class RegionCommandsBase {
      */
     protected static void informNewUser(Actor sender, RegionManager manager, ProtectedRegion region) {
         if (manager.size() <= 2) {
-            sender.print(SubtleFormat.wrap("(Теперь этот регион защищен от изменения другими игроками. Не хотите этого? Используйте ")
+            sender.print(SubtleFormat.wrap("(This region is NOW PROTECTED from modification from others. Don't want that? Use ")
                             .append(TextComponent.of("/rg flag " + region.getId() + " passthrough allow", TextColor.AQUA))
                             .append(TextComponent.of(")", TextColor.GRAY)));
         }
@@ -375,9 +375,9 @@ class RegionCommandsBase {
         ProtectedRegion spawn = WorldGuard.getInstance().getPlatform().getSpawnProtection(world);
         if (spawn != null) {
             if (!spawn.getIntersectingRegions(ImmutableList.of(region)).isEmpty()) {
-                sender.print(ErrorFormat.wrap("Предупреждение!")
-                        .append(TextComponent.of(" Эта область перекрывается ванильной защитой спавна. WorldGuard не может " +
-                                "переопределить это, и только администраторы сервера будут иметь возможность взаимодействовать с этой областью.", TextColor.WHITE)));
+                sender.print(ErrorFormat.wrap("Warning!")
+                        .append(TextComponent.of(" This region overlaps vanilla's spawn protection. WorldGuard cannot " +
+                                "override this, and only server operators will be able to interact with this area.", TextColor.WHITE)));
                 return true;
             }
         }
@@ -403,7 +403,7 @@ class RegionCommandsBase {
             CuboidRegionSelector selector = new CuboidRegionSelector(world, pt1, pt2);
             session.setRegionSelector(world, selector);
             selector.explainRegionAdjust(actor, session);
-            actor.print("Регион выбран как кубоид.");
+            actor.print("Region selected as a cuboid.");
 
         } else if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
@@ -413,15 +413,15 @@ class RegionCommandsBase {
                     poly2d.getMaximumPoint().getBlockY());
             session.setRegionSelector(world, selector);
             selector.explainRegionAdjust(actor, session);
-            actor.print("Регион выбран как полигон.");
+            actor.print("Region selected as a polygon.");
 
         } else if (region instanceof GlobalProtectedRegion) {
             throw new CommandException(
-                    "Нельзя выбрать глобальный регион. " +
-                            "Это позволит охватить весь мир.");
+                    "Can't select global regions! " +
+                            "That would cover the entire world.");
 
         } else {
-            throw new CommandException("Неизвестный тип региона: " +
+            throw new CommandException("Unknown region type: " +
                     region.getClass().getCanonicalName());
         }
     }

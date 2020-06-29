@@ -71,12 +71,12 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     @Override
     public void kick(String msg) {
-        System.out.println("TestPlayer{" + this.name + "} кикнут!");
+        System.out.println("TestPlayer{" + this.name + "} kicked!");
     }
 
     @Override
     public void ban(String msg) {
-        System.out.println("TestPlayer{" + this.name + "} забанен!");
+        System.out.println("TestPlayer{" + this.name + "} banned!");
     }
 
     @Override

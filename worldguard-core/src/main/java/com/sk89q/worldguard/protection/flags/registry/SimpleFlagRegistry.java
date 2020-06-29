@@ -57,7 +57,7 @@ public class SimpleFlagRegistry implements FlagRegistry {
     public void register(Flag<?> flag) throws FlagConflictException {
         synchronized (lock) {
             if (initialized) {
-                throw new IllegalStateException("Новые флаги не могут быть зарегистрированы в это время");
+                throw new IllegalStateException("New flags cannot be registered at this time");
             }
 
             forceRegister(flag);
@@ -84,7 +84,7 @@ public class SimpleFlagRegistry implements FlagRegistry {
         synchronized (lock) {
             String name = flag.getName().toLowerCase();
             if (flags.containsKey(name)) {
-            throw new FlagConflictException("Флаг с именем " + name + "уже существует с именем.");
+                throw new FlagConflictException("A flag already exists by the name " + name);
             }
 
             flags.put(name, flag);
@@ -142,10 +142,10 @@ public class SimpleFlagRegistry implements FlagRegistry {
                     if (unmarshalled != null) {
                         values.put(flag, unmarshalled);
                     } else {
-                        log.warning("Не удалось разобрать флаг '" + flag.getName() + "' со значением '" + entry.getValue() + "'");
+                        log.warning("Failed to parse flag '" + flag.getName() + "' with value '" + entry.getValue() + "'");
                     }
                 } catch (Exception e) {
-                    log.log(Level.WARNING, "Не удалось распаковать значение флага для " + flag, e);
+                    log.log(Level.WARNING, "Failed to unmarshal flag value for " + flag, e);
                 }
             }
         }

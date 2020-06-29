@@ -85,8 +85,8 @@ public class BlockedPotionsListener extends AbstractListener {
                         if (getPlugin().hasPermission(player, "worldguard.override.potions")) {
                             return;
                         }
-                        player.sendMessage(ChatColor.RED + "К сожалению, стрелы с "
-                                + blockedEffect.getName() + " в настоящее время отключены.");
+                        player.sendMessage(ChatColor.RED + "Sorry, arrows with "
+                                + blockedEffect.getName() + " are presently disabled.");
                     }
                     event.setCancelled(true);
                 }

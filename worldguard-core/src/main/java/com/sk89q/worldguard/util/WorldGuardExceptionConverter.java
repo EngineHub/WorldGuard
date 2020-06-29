@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 
 public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
 
-    private static final Pattern numberFormat = Pattern.compile("^Для входной строки: \"(.*)\"$");
+    private static final Pattern numberFormat = Pattern.compile("^For input string: \"(.*)\"$");
 
     private CommandException newCommandException(String message, Throwable cause) {
         return new CommandException(message, cause);
@@ -48,10 +48,10 @@ public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
         final Matcher matcher = numberFormat.matcher(e.getMessage());
 
         if (matcher.matches()) {
-            throw newCommandException("Ожидаемое количество; строка \"" + matcher.group(1)
-                    + "\" получено.", e);
+            throw newCommandException("Number expected; string \"" + matcher.group(1)
+                    + "\" given.", e);
         } else {
-            throw newCommandException("Ожидаемое количество; заданная строка.", e);
+            throw newCommandException("Number expected; string given.", e);
         }
     }
 
@@ -62,23 +62,23 @@ public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
 
     @ExceptionMatch
     public void convert(StorageException e) throws CommandException {
-        WorldGuard.logger.log(Level.WARNING, "Ошибка загрузки/сохранения регионов", e);
-        throw newCommandException("Данные региона не могут быть загружены/сохранены: " + e.getMessage(), e);
+        WorldGuard.logger.log(Level.WARNING, "Error loading/saving regions", e);
+        throw newCommandException("Region data could not be loaded/saved: " + e.getMessage(), e);
     }
 
     @ExceptionMatch
     public void convert(RejectedExecutionException e) throws CommandException {
-        throw newCommandException("В настоящее время в очереди слишком много задач, чтобы добавить ваши. Используйте /wg running, чтобы перечислить поставленные в очередь и выполняющиеся задачи.", e);
+        throw newCommandException("There are currently too many tasks queued to add yours. Use /wg running to list queued and running tasks.", e);
     }
 
     @ExceptionMatch
     public void convert(CancellationException e) throws CommandException {
-        throw newCommandException("Задача была отменена.", e);
+        throw newCommandException("Task was cancelled.", e);
     }
 
     @ExceptionMatch
     public void convert(InterruptedException e) throws CommandException {
-        throw newCommandException("Задача была отменена.", e);
+        throw newCommandException("Task was interrupted.", e);
     }
 
     @ExceptionMatch
@@ -93,6 +93,6 @@ public class WorldGuardExceptionConverter extends ExceptionConverterHelper {
 
     @ExceptionMatch
     public void convert(AuthorizationException e) throws CommandException {
-        throw newCommandException("У вас нет разрешения на это.", e);
+        throw newCommandException("You don't have permission to do that.", e);
     }
 }

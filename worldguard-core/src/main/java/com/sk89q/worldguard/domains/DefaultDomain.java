@@ -279,7 +279,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
         List<String> output = new ArrayList<>();
 
         for (String name : playerDomain.getPlayers()) {
-            output.add("имя:" + name);
+            output.add("name:" + name);
         }
 
         if (cache != null) {
@@ -411,8 +411,8 @@ public class DefaultDomain implements Domain, ChangeTracked {
             final UUID uuid = profileMap.get(name);
             final TextComponent component = TextComponent.of(name, TextColor.YELLOW)
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, uuid == null
-                            ? TextComponent.of("только имена", TextColor.GRAY)
-                            : TextComponent.of("Последнее известное UUID: ", TextColor.GRAY)
+                            ? TextComponent.of("Name only", TextColor.GRAY)
+                            : TextComponent.of("Last known name of uuid: ", TextColor.GRAY)
                             .append(TextComponent.of(uuid.toString(), TextColor.WHITE))));
             if (uuid == null) {
                 return component;
@@ -427,9 +427,9 @@ public class DefaultDomain implements Domain, ChangeTracked {
         }
 
         if (!uuids.isEmpty()) {
-            builder.append(TextComponent.of(uuids.size() + " неизвестное UUID" + (uuids.size() == 1 ? "" : "s"), TextColor.GRAY)
+            builder.append(TextComponent.of(uuids.size() + " unknown uuid" + (uuids.size() == 1 ? "" : "s"), TextColor.GRAY)
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(String.join("\n", uuids))
-                        .append(TextComponent.newline().append(TextComponent.of("Нажмите, чтобы выбрать")))))
+                        .append(TextComponent.newline().append(TextComponent.of("Click to select")))))
                     .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, String.join(",", uuids))));
         }
 
@@ -450,8 +450,8 @@ public class DefaultDomain implements Domain, ChangeTracked {
 
     @Override
     public String toString() {
-        return "{игроки=" + playerDomain +
-                ", группы=" + groupDomain +
+        return "{players=" + playerDomain +
+                ", groups=" + groupDomain +
                 '}';
     }
 

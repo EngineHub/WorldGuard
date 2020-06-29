@@ -80,8 +80,8 @@ public class RegionRemover implements Callable<Set<ProtectedRegion>> {
                 ProtectedRegion parent = test.getParent();
                 if (parent != null && parent.equals(region)) {
                     throw new CommandException(
-                            "Регион '" + region.getId() + "' имеет дочерние регионы. Используйте -f чтобы удалить дочерние регионы " +
-                                    "или -u деактивировать родительскую ценность этих дочерних регионов.");
+                            "The region '" + region.getId() + "' has child regions. Use -f to force removal of children " +
+                                    "or -u to unset the parent value of these children.");
                 }
             }
 

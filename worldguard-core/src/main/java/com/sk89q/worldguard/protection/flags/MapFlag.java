@@ -77,7 +77,7 @@ public class MapFlag<K, V> extends Flag<Map<K, V>> {
             final char split = str.indexOf('=') == -1 ? ':' : '=';
             final String[] keyVal = str.split(String.valueOf(split));
             if (keyVal.length != 2) {
-                throw new InvalidFlagFormat("Входные данные должны быть в формате 'key:value,key1=value1'. Можно использовать ':' или '='.");
+                throw new InvalidFlagFormat("Input must be in a 'key:value,key1=value1' format. Either ':' or '=' can be used.");
             }
 
             final FlagContext key = context.copyWith(null, keyVal[0], null);

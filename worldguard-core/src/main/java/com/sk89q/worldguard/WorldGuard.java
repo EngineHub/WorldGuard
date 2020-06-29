@@ -74,7 +74,7 @@ public final class WorldGuard {
 
     public void setup() {
         executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20,
-                "Исполнитель задач WorldGuard - %s"));
+                "WorldGuard Task Executor - %s"));
 
         File cacheDir = new File(getPlatform().getConfigDir().toFile(), "cache");
         cacheDir.mkdirs();
@@ -82,7 +82,7 @@ public final class WorldGuard {
         try {
             profileCache = new SQLiteCache(new File(cacheDir, "profiles.sqlite"));
         } catch (IOException | UnsatisfiedLinkError ignored) {
-            logger.log(Level.WARNING, "Не удалось инициализировать кэш SQLite профиля. Кэш является памятью.");
+            logger.log(Level.WARNING, "Failed to initialize SQLite profile cache. Cache is memory-only.");
             profileCache = new HashMapCache();
         }
 
@@ -172,7 +172,7 @@ public final class WorldGuard {
         if (sender instanceof LocalPlayer) {
             return (LocalPlayer) sender;
         } else {
-            throw new CommandException("Ожидается игрок.");
+            throw new CommandException("A player is expected.");
         }
     }
 
@@ -183,11 +183,11 @@ public final class WorldGuard {
         executorService.shutdown();
 
         try {
-            logger.log(Level.INFO, "Завершение работы исполнителя и отмена всех отложенных задач...");
+            logger.log(Level.INFO, "Shutting down executor and cancelling any pending tasks...");
 
             List<Task<?>> tasks = supervisor.getTasks();
             if (!tasks.isEmpty()) {
-                StringBuilder builder = new StringBuilder("Известные задачи:");
+                StringBuilder builder = new StringBuilder("Known tasks:");
                 for (Task<?> task : tasks) {
                     builder.append("\n");
                     builder.append(task.getName());
@@ -222,12 +222,12 @@ public final class WorldGuard {
         }
 
         if (p == null) {
-            version = "(неизвестно)";
+            version = "(unknown)";
         } else {
             version = p.getImplementationVersion();
 
             if (version == null) {
-                version = "(неизвестно)";
+                version = "(unknown)";
             }
         }
 

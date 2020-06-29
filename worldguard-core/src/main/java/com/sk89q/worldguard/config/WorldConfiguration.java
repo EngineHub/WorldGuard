@@ -49,14 +49,14 @@ public abstract class WorldConfiguration {
     public static final Logger log = Logger.getLogger(WorldConfiguration.class.getCanonicalName());
 
     public static final String CONFIG_HEADER = "#\r\n" +
-            "# Файл конфигурации мира WorldGuard\r\n" +
+            "# WorldGuard's world configuration file\r\n" +
             "#\r\n" +
-            "# Это файл конфигурации мира. Все, что находится здесь будет влиять\r\n" +
-            "# только на этот мир. Если файл будет пустой, то настройки будут\r\n" +
-            "# унаследованы от основного файла конфигурации.\r\n" +
+            "# This is a world configuration file. Anything placed into here will only\r\n" +
+            "# affect this world. If you don't put anything in this file, then the\r\n" +
+            "# settings will be inherited from the main configuration file.\r\n" +
             "#\r\n" +
-            "# Если вы видите {} ниже, это означает, что в этом файле нет записей.\r\n" +
-            "# Удалите {} и добавьте свои собственные записи.\r\n" +
+            "# If you see {} below, that means that there are NO entries in this file.\r\n" +
+            "# Remove the {} and add your own entries.\r\n" +
             "#\r\n";
 
     protected File blacklistFile;

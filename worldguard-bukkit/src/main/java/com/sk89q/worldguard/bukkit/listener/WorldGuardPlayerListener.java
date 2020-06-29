@@ -107,7 +107,7 @@ public class WorldGuardPlayerListener implements Listener {
                     localPlayer.getWorld())) {
                 GameMode expected = handler.getSetGameMode();
                 if (handler.getOriginalGameMode() != null && expected != null && expected != BukkitAdapter.adapt(event.getNewGameMode())) {
-                    log.info("Изменение режима игры для игрока " + player.getName() + " было заблокировано в связи с флагом GameMode данного региона");
+                    log.info("Game mode change on " + player.getName() + " has been blocked due to the region GAMEMODE flag");
                     event.setCancelled(true);
                 }
             }
@@ -125,7 +125,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (cfg.activityHaltToggle) {
             player.sendMessage(ChatColor.YELLOW
-                    + "Интенсивная активность сервера была ОСТАНОВЛЕНА.");
+                    + "Intensive server activity has been HALTED.");
 
             int removed = 0;
 
@@ -137,14 +137,14 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (removed > 10) {
-                log.info("Интенсивная активность: " + removed + " энтити (>10) автоматически удалены в мире "
+                log.info("Halt-Act: " + removed + " entities (>10) auto-removed from "
                         + player.getWorld());
             }
         }
 
         if (wcfg.fireSpreadDisableToggle) {
             player.sendMessage(ChatColor.YELLOW
-                    + "Распространение огня в настоящее время глобально отключено для этого мира.");
+                    + "Fire spread is currently globally disabled for this world.");
         }
 
         Events.fire(new ProcessPlayerEvent(player));
@@ -205,10 +205,10 @@ public class WorldGuardPlayerListener implements Listener {
                     && !(cfg.hostKeysAllowFMLClients &&
                             (hostname.equals(hostKey + "\u0000FML\u0000") || hostname.equals(hostKey + "\u0000FML2\u0000")))) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
-                        "Вы не присоединились к действительному ключу хоста!");
-                log.warning("Проверка ключа хоста WorldGuard: " +
-                        player.getName() + " присоединился с '" + hostname +
-                        "', но ожидался '" + hostKey + "'. Кикнут!");
+                        "You did not join with the valid host key!");
+                log.warning("WorldGuard host key check: " +
+                        player.getName() + " joined with '" + hostname +
+                        "' but '" + hostKey + "' was expected. Kicked!");
                 return;
             }
         }
@@ -238,7 +238,7 @@ public class WorldGuardPlayerListener implements Listener {
             ItemStack heldItem = player.getInventory().getItem(slot);
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(slot, null);
-                player.sendMessage(ChatColor.RED + "Бесконечный стак удален.");
+                player.sendMessage(ChatColor.RED + "Infinite stack removed.");
             }
         }
     }
@@ -270,7 +270,7 @@ public class WorldGuardPlayerListener implements Listener {
                 ItemStack heldItem = player.getInventory().getItem(slot);
                 if (heldItem != null && heldItem.getAmount() < 0) {
                     player.getInventory().setItem(slot, null);
-                    player.sendMessage(ChatColor.RED + "Бесконечный стак в слоте #" + slot + " удален.");
+                    player.sendMessage(ChatColor.RED + "Infinite stack in slot #" + slot + " removed.");
                 }
             }
         }
@@ -284,7 +284,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (item != null && item.getType().getKey().toString().equals(wcfg.regionWand) && plugin.hasPermission(player, "worldguard.region.wand")) {
                 if (set.size() > 0) {
-                    player.sendMessage(ChatColor.YELLOW + "Можно ли строить? " + (set.testState(localPlayer, Flags.BUILD) ? "Да" : "Нет"));
+                    player.sendMessage(ChatColor.YELLOW + "Can you build? " + (set.testState(localPlayer, Flags.BUILD) ? "Yes" : "No"));
 
                     StringBuilder str = new StringBuilder();
                     for (Iterator<ProtectedRegion> it = set.iterator(); it.hasNext();) {
@@ -294,9 +294,9 @@ public class WorldGuardPlayerListener implements Listener {
                         }
                     }
 
-                    localPlayer.print("Соответствующие регионы: " + str);
+                    localPlayer.print("Applicable regions: " + str);
                 } else {
-                    localPlayer.print("WorldGuard: Здесь нет определенных регионов!");
+                    localPlayer.print("WorldGuard: No defined regions here!");
                 }
 
                 event.setUseItemInHand(Event.Result.DENY);
@@ -359,7 +359,7 @@ public class WorldGuardPlayerListener implements Listener {
             ItemStack heldItem = player.getInventory().getItem(newSlot);
             if (heldItem != null && heldItem.getAmount() < 0) {
                 player.getInventory().setItem(newSlot, null);
-                player.sendMessage(ChatColor.RED + "Бесконечный стак удален.");
+                player.sendMessage(ChatColor.RED + "Infinite stack removed.");
             }
         }
     }
@@ -449,7 +449,7 @@ public class WorldGuardPlayerListener implements Listener {
 
         if (cfg.blockInGameOp) {
             if (opPattern.matcher(event.getMessage()).matches()) {
-                player.sendMessage(ChatColor.RED + "/op и / deop можно использовать только в консоли (в соответствии с настройкой WG).");
+                player.sendMessage(ChatColor.RED + "/op and /deop can only be used in console (as set by a WG setting).");
                 event.setCancelled(true);
                 return;
             }

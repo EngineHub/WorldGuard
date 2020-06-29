@@ -35,11 +35,11 @@ public class ProtectionCommands {
         this.worldGuard = worldGuard;
     }
 
-    @Command(aliases = {"region", "regions", "rg"}, desc = "Команды управления регионом")
+    @Command(aliases = {"region", "regions", "rg"}, desc = "Region management commands")
     @NestedCommand({RegionCommands.class, MemberCommands.class})
     public void region(CommandContext args, Actor sender) {}
 
-    @Command(aliases = {"worldguard", "wg"}, desc = "Команды WorldGuard")
+    @Command(aliases = {"worldguard", "wg"}, desc = "WorldGuard commands")
     @NestedCommand({WorldGuardCommands.class})
     public void worldGuard(CommandContext args, Actor sender) {}
 }

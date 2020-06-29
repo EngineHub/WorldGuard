@@ -122,15 +122,15 @@ public class RegionLister implements Callable<Integer> {
                     try {
                         profile = WorldGuard.getInstance().getProfileService().findByName(name);
                     } catch (IOException e) {
-                        log.log(Level.WARNING, "Ошибка поиска UUID из '" + name + "'", e);
-                        throw new CommandException("Не удалось найти UUID из '" + name + "'");
+                        log.log(Level.WARNING, "Failed UUID lookup of '" + name + "'", e);
+                        throw new CommandException("Failed to lookup the UUID of '" + name + "'");
                     } catch (InterruptedException e) {
-                        log.log(Level.WARNING, "Ошибка поиска UUID из '" + name + "'", e);
-                        throw new CommandException("Поиск UUID из '" + name + "' была прервана");
+                        log.log(Level.WARNING, "Failed UUID lookup of '" + name + "'", e);
+                        throw new CommandException("The lookup the UUID of '" + name + "' was interrupted");
                     }
 
                     if (profile == null) {
-                        throw new CommandException("Игрок '" + name + "' не найден.");
+                        throw new CommandException("A user by the name of '" + name + "' does not seem to exist.");
                     }
 
                     uniqueId = profile.getUniqueId();
@@ -175,7 +175,7 @@ public class RegionLister implements Callable<Integer> {
         }
 
         RegionPermissionModel perms = sender.isPlayer() ? new RegionPermissionModel(sender) : null;
-        String title = ownerMatcher == null ? "Регионы" : "Регионы игрока " + ownerMatcher.getName();
+        String title = ownerMatcher == null ? "Regions" : "Regions for " + ownerMatcher.getName();
         String cmd = "/rg list -w \"" + world + "\""
                 + (playerName != null ? " -p " + playerName : "")
                 + (nameOnly ? " -n" : "")
@@ -249,21 +249,21 @@ public class RegionLister implements Callable<Integer> {
             final TextComponent.Builder builder = TextComponent.builder(number + 1 + ".").color(TextColor.LIGHT_PURPLE);
             if (entry.isOwner()) {
                 builder.append(TextComponent.space()).append(TextComponent.of("+", TextColor.DARK_AQUA)
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Владелец региона", TextColor.GOLD))));
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Owner", TextColor.GOLD))));
             } else if (entry.isMember()) {
                 builder.append(TextComponent.space()).append(TextComponent.of("-", TextColor.AQUA)
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Участник региона", TextColor.GOLD))));
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Region Member", TextColor.GOLD))));
             }
             builder.append(TextComponent.space()).append(TextComponent.of(entry.getRegion().getId(), TextColor.GOLD));
             if (perms != null && perms.mayLookup(entry.region)) {
-                builder.append(TextComponent.space().append(TextComponent.of("[Информация]", TextColor.GRAY)
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите для информации")))
+                builder.append(TextComponent.space().append(TextComponent.of("[Info]", TextColor.GRAY)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click for info")))
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                                 "/rg info -w \"" + world + "\" " + entry.region.getId()))));
             }
             if (perms != null && entry.region.getFlag(Flags.TELE_LOC) != null && perms.mayTeleportTo(entry.region)) {
-                builder.append(TextComponent.space().append(TextComponent.of("[ТП]", TextColor.GRAY)
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Нажмите, чтобы телепортироваться")))
+                builder.append(TextComponent.space().append(TextComponent.of("[TP]", TextColor.GRAY)
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to teleport")))
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                                 "/rg tp -w \"" + world + "\" " + entry.region.getId()))));
             }

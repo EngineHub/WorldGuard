@@ -52,7 +52,7 @@ public class UUIDMigration extends AbstractMigration {
     private static final Logger log = Logger.getLogger(UUIDMigration.class.getCanonicalName());
     private static final int LOG_DELAY = 5000;
 
-    private final Timer timer = new Timer("Миграция UUID WorldGuard");
+    private final Timer timer = new Timer("WorldGuard UUID Migration");
     private final ProfileService profileService;
     private final FlagRegistry flagRegistry;
     private final ConcurrentMap<String, UUID> resolvedNames = new ConcurrentHashMap<>();
@@ -76,14 +76,14 @@ public class UUIDMigration extends AbstractMigration {
 
     @Override
     protected void migrate(RegionDatabase store) throws MigrationException {
-        log.log(Level.INFO, "Миграция архива в '" + store.getName() + "' для преобразования имен -> UUIDs...");
+        log.log(Level.INFO, "Migrating regions in '" + store.getName() + "' to convert names -> UUIDs...");
 
         Set<ProtectedRegion> regions;
 
         try {
             regions = store.loadAll(flagRegistry);
         } catch (StorageException e) {
-            throw new MigrationException("Не удалось загрузить данные по регионам для всего мира '" + store.getName() + "'", e);
+            throw new MigrationException("Failed to load region data for the world '" + store.getName() + "'", e);
         }
 
         migrate(regions);
@@ -91,7 +91,7 @@ public class UUIDMigration extends AbstractMigration {
         try {
             store.saveAll(regions);
         } catch (StorageException e) {
-            throw new MigrationException("Не удалось сохранить данные о регионах после миграции мира '" + store.getName() + "'", e);
+            throw new MigrationException("Failed to save region data after migration of the world '" + store.getName() + "'", e);
         }
     }
 

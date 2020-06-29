@@ -40,7 +40,7 @@ public final class ItemAcquireBlacklistEvent extends ItemBlacklistEvent {
 
     @Override
     public String getDescription() {
-        return "брать";
+        return "acquire";
     }
 
     @Override

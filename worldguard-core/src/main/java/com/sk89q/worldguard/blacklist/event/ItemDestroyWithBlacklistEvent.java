@@ -40,7 +40,7 @@ public final class ItemDestroyWithBlacklistEvent extends ItemBlacklistEvent {
 
     @Override
     public String getDescription() {
-        return "ломать";
+        return "destroy with";
     }
 
     @Override

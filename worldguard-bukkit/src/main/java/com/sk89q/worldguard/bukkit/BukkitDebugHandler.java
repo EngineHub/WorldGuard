@@ -77,11 +77,11 @@ public class BukkitDebugHandler implements DebugHandler {
 
         if (!receiver.equals(target)) {
             if (!isConsole) {
-                log.info(receiver.getName() + " имитирует событие на " + target.getName());
+                log.info(receiver.getName() + " is simulating an event on " + target.getName());
             }
 
             target.sendMessage(
-                    ChatColor.RED + "(Пожалуйста, игнорируйте любые сообщения, которые могут последовать немедленно.)");
+                    ChatColor.RED + "(Please ignore any messages that may immediately follow.)");
         }
 
         Bukkit.getPluginManager().callEvent(event);
@@ -124,7 +124,7 @@ public class BukkitDebugHandler implements DebugHandler {
                 return (Player) sender;
             } else {
                 throw new CommandException(
-                        "Если эта команда не будет использоваться в игре, используйте -t для выполнения теста с точки зрения данного игрока, а не себя.");
+                        "If this command is not to be used in-game, use -t to run the test from the viewpoint of the given player rather than yourself.");
             }
         }
     }
@@ -151,7 +151,7 @@ public class BukkitDebugHandler implements DebugHandler {
             i++;
         }
 
-        throw new CommandException("В настоящее время вы не смотрите на блок, который достаточно близко.");
+        throw new CommandException("Not currently looking at a block that is close enough.");
     }
 
     /**
@@ -182,7 +182,7 @@ public class BukkitDebugHandler implements DebugHandler {
             i++;
         }
 
-        throw new CommandException("В настоящее время вы не смотрите на сущность, которая достаточно близко.");
+        throw new CommandException("Not currently looking at an entity that is close enough.");
     }
 
     @Override
