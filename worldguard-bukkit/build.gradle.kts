@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.internal.HasConvention
 
 plugins {
     id("java-library")
@@ -28,6 +29,21 @@ dependencies {
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "implementation"("org.bstats:bstats-bukkit:1.7")
+}
+
+tasks.named<Upload>("install") {
+    (repositories as HasConvention).convention.getPlugin<MavenRepositoryHandlerConvention>().mavenInstaller {
+        pom.whenConfigured {
+            dependencies.firstOrNull { dep ->
+                dep!!.withGroovyBuilder {
+                    getProperty("groupId") == "com.destroystokyo.paper" && getProperty("artifactId") == "paper-api"
+                }
+            }?.withGroovyBuilder {
+                setProperty("groupId", "org.bukkit")
+                setProperty("artifactId", "bukkit")
+            }
+        }
+    }
 }
 
 tasks.named<Copy>("processResources") {
