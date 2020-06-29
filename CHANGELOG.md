@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.4 beta 1
+
+* Add support for MC 1.16. Dropped support for previous versions.
+* Add respawn-anchors flag mirroring the sleep flag (e.g. to prevent using respawn anchors to cause explosions in the overworld)
+
 ## 7.0.3
 
 * This is the last release supporting MC 1.14 and 1.15.
