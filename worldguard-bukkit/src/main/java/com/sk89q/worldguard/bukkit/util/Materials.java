@@ -932,7 +932,8 @@ public final class Materials {
      * @return true if a mushroom block
      */
     public static boolean isMushroom(Material material) {
-        return material == Material.RED_MUSHROOM || material == Material.BROWN_MUSHROOM;
+        return material == Material.RED_MUSHROOM || material == Material.BROWN_MUSHROOM
+                || material == Material.CRIMSON_FUNGUS || material == Material.WARPED_FUNGUS;
     }
 
     /**
@@ -1413,10 +1414,6 @@ public final class Materials {
             case GOLDEN_CHESTPLATE:
             case GOLDEN_LEGGINGS:
             case GOLDEN_BOOTS:
-            case NETHERITE_HELMET:
-            case NETHERITE_CHESTPLATE:
-            case NETHERITE_LEGGINGS:
-            case NETHERITE_BOOTS:
             case TURTLE_HELMET:
             case ELYTRA:
                 return true;
@@ -1442,7 +1439,6 @@ public final class Materials {
             case IRON_HOE:
             case GOLDEN_HOE:
             case DIAMOND_HOE:
-            case NETHERITE_HOE:
                 switch (targetMaterial) {
                     case GRASS_BLOCK:
                     case DIRT:
@@ -1456,7 +1452,6 @@ public final class Materials {
             case IRON_AXE:
             case GOLDEN_AXE:
             case DIAMOND_AXE:
-            case NETHERITE_AXE:
                 switch (targetMaterial) {
                     case OAK_LOG:
                     case DARK_OAK_LOG:
@@ -1470,10 +1465,6 @@ public final class Materials {
                     case BIRCH_WOOD:
                     case SPRUCE_WOOD:
                     case JUNGLE_WOOD:
-                    case CRIMSON_STEM:
-                    case WARPED_STEM:
-                    case CRIMSON_HYPHAE:
-                    case WARPED_HYPHAE:
                         return true;
                 }
                 return false;
@@ -1482,7 +1473,6 @@ public final class Materials {
             case IRON_SHOVEL:
             case GOLDEN_SHOVEL:
             case DIAMOND_SHOVEL:
-            case NETHERITE_SHOVEL:
                 switch (targetMaterial) {
                     case GRASS_BLOCK:
                     case CAMPFIRE:
@@ -1518,9 +1508,5 @@ public final class Materials {
             default:
                 return false;
         }
-    }
-
-    public static boolean isFire(Material type) {
-        return type == Material.FIRE || type == Material.SOUL_FIRE;
     }
 }
