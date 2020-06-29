@@ -135,6 +135,11 @@ public final class Flags {
     public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport", RegionGroup.MEMBERS));
     public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
 
+    /**
+     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
+     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
+     */
+    @Deprecated
     public static final StringFlag TELE_MESSAGE = register(new StringFlag("teleport-message",
             LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of(
                     "Teleported you to the region '%id%'.", TextColor.LIGHT_PURPLE)))));
@@ -154,9 +159,29 @@ public final class Flags {
     public static final StateFlag ENDERPEARL = register(new StateFlag("enderpearl", true));
     public static final StateFlag CHORUS_TELEPORT = register(new StateFlag("chorus-fruit-teleport", true));
 
+    /**
+     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
+     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
+     */
+    @Deprecated
     public static final StringFlag GREET_MESSAGE = register(new StringFlag("greeting"));
+    /**
+     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
+     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
+     */
+    @Deprecated
     public static final StringFlag FAREWELL_MESSAGE = register(new StringFlag("farewell"));
+    /**
+     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
+     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
+     */
+    @Deprecated
     public static final StringFlag GREET_TITLE = register(new StringFlag("greeting-title"));
+    /**
+     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
+     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
+     */
+    @Deprecated
     public static final StringFlag FAREWELL_TITLE = register(new StringFlag("farewell-title"));
 
     public static final BooleanFlag NOTIFY_ENTER = register(new BooleanFlag("notify-enter"));
@@ -180,14 +205,29 @@ public final class Flags {
     public static final IntegerFlag MAX_FOOD = register(new IntegerFlag("feed-max-hunger"), f -> f.setSuggestedValues(VITALS_MAXS));
 
     // deny messages
+    /**
+     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
+     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
+     */
+    @Deprecated
     public static final StringFlag DENY_MESSAGE = register(new StringFlag("deny-message",
             LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("§8[§c§l!§8]",
                     TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
                     .append(TextComponent.of(" Извините, но Вы не можете %what% в этом месте.", TextColor.GRAY)))));
+    /**
+     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
+     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
+     */
+    @Deprecated
     public static final StringFlag ENTRY_DENY_MESSAGE = register(new StringFlag("entry-deny-message",
             LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("§8[§c§l!§8]",
                     TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
                     .append(TextComponent.of(" Извините, но Вам не разрешено входить в эту область.", TextColor.GRAY)))));
+    /**
+     * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
+     *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
+     */
+    @Deprecated
     public static final StringFlag EXIT_DENY_MESSAGE = register(new StringFlag("exit-deny-message",
             LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("§8[§c§l!§8]",
                     TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))

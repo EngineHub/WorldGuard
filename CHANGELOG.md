@@ -1,5 +1,38 @@
 # Changelog
 
+## 7.0.3
+
+* This is the last release supporting MC 1.14 and 1.15.
+* Decouple chest-access flag from interact flag. IMPORTANT: If you relied on allowing players to access chests via setting
+    the interact flag to allow, you will now need to set the chest-access flag to allow instead (or as well). This does not
+    affect any setups where users were *not* supposed to be able to access chests and other inventories.
+* Add natural-health-regen and natural-hunger-drain flags. Unlike the heal/feed flags, these can not restore or deplete health/hunger.
+* Fix the interact flag allowing breaking of turtle eggs (now tied directly to block-trampling flag).
+* Fix a memory leak that could occur with many many explosives.
+* Add regions.titles-always-use-default-times config option. Set this to true if you use greeting/farewell titles and another plugin
+    makes the titles disappear too quickly.
+* Add protection for cauldrons water level changing.
+* Improve diagnostic hints and information, such as spawn protection warnings, flag colors in region info, etc.
+* Fix waterlogged blocks bypassing water-flow flag.
+* Workaround for a CraftBukkit change that made no-physics-sand/gravel non-functional.
+* Workaround for CraftBukkit throttling move events.
+* Track projectiles shot by dispensers.
+* Allowed setting passthrough allow on global to unprotect it if members/owners are added.
+* Add support for newer forge clients (FML2) in host keys.
+* Allow using WorldEdit's `//world <worldname>` command to select a world for region commands. This removes the need to
+    use `-w <worldname>` in every command when running commands from console.
+* Add a teleport-message flag, shown when using `/rg tp`.
+* Add coral-fade flag, which prevents corals from drying when out of water.
+* Fix spammy deny-message when walking over redstone ore with certain flag setups.
+* Improve handling of interacting with various tools in hand that didn't modify blocks. (eg opening a chest with an axe in hand)
+* Fix allow-all-interact option not being read from per-world configs.
+* Fix misattribution of pets (eg wolves) in PvP.
+* Improve performance of hopper checks when on recent builds of Paper.
+* Add event-handling.break-hoppers-on-denied-move config option to prevent hoppers from being broken (but items still won't be moved).
+* Note to developers using the WorldGuard API: If you specifically relied on flags such as greeting/farewell, deny-message, etc being
+    StringFlags, be warned that this will change in a future version to support JSON text components. Please plan accordingly.
+
+
 ## 7.0.2
 * Update to MC 1.15. Still compatible with 1.14, and incompatible with 1.13, as before.
 * Add an informational message when defining a region that overlaps vanilla spawn protection.
