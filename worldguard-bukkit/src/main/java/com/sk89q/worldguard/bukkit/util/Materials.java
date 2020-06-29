@@ -1287,19 +1287,6 @@ public final class Materials {
     }
 
     /**
-     * Test whether the material should be handled as vine. Used by the vine-growth flag
-     * @param newType the material
-     * @return true if the material should be handled as vine
-     */
-    public static boolean isVine(Material newType) {
-        return newType == Material.VINE ||
-                newType == Material.KELP ||
-                newType == Material.TWISTING_VINES ||
-                newType == Material.WEEPING_VINES;
-
-    }
-
-    /**
      * Test whether the given material is affected by
      * {@link Flags#USE}.
      *
