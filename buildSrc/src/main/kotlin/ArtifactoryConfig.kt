@@ -34,7 +34,7 @@ fun Project.applyRootArtifactoryConfig() {
 }
 
 fun Project.applyCommonArtifactoryConfig() {
-    val named = tasks.named<ArtifactoryTask>("artifactoryPublish") {
+    tasks.named<ArtifactoryTask>("artifactoryPublish") {
         publishConfigs("archives")
     }
 }
