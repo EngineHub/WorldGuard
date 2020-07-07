@@ -1084,7 +1084,6 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onTakeLecternBook(PlayerTakeLecternBookEvent event) {
         final UseBlockEvent useEvent = new UseBlockEvent(event, create(event.getPlayer()), event.getLectern().getBlock());
-        useEvent.getRelevantFlags().add(Flags.CHEST_ACCESS);
         Events.fireToCancel(event, useEvent);
     }
 
