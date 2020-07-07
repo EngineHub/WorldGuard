@@ -58,8 +58,10 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
+import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 
 import java.util.ArrayList;
@@ -260,6 +262,11 @@ public class RegionProtectionListener extends AbstractListener {
             } else if (Materials.isInventoryBlock(type)) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = "open that";
+
+            /* Inventory for blocks with the possibility to be only use, e.g. lectern */
+            } else if (handleAsInventoryUsage(event.getOriginalEvent())) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
+                what = "take that";
 
             /* Beds */
             } else if (Materials.isBed(type)) {
@@ -550,6 +557,16 @@ public class RegionProtectionListener extends AbstractListener {
             flags[flag.length + i] = extra.get(i);
         }
         return flags;
+    }
+
+    /**
+     * Check if that event should be handled as inventory usage, e.g. if a player takes a book from a lectern
+     *
+     * @param event the event to handle
+     * @return whether it should be handled as inventory usage
+     */
+    private static boolean handleAsInventoryUsage(Event event) {
+        return event instanceof PlayerTakeLecternBookEvent;
     }
 
 }
