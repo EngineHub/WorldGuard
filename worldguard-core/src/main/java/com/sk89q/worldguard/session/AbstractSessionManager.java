@@ -48,6 +48,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiPredicate;
 import java.util.logging.Level;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -57,11 +58,14 @@ public abstract class AbstractSessionManager implements SessionManager {
     public static final int RUN_DELAY = 20;
     public static final long SESSION_LIFETIME = 10;
 
+    private static final BiPredicate<World, LocalPlayer> BYPASS_PERMISSION_TEST = (world, player) -> {
+        return player.hasPermission("worldguard.region.bypass." + world.getName());
+    };
+
     private final LoadingCache<WorldPlayerTuple, Boolean> bypassCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .expireAfterWrite(2, TimeUnit.SECONDS)
-            .build(CacheLoader.from(tuple ->
-                    tuple.getPlayer().hasPermission("worldguard.region.bypass." + tuple.getWorld().getName())));
+            .build(CacheLoader.from(tuple -> BYPASS_PERMISSION_TEST.test(tuple.getWorld(), tuple.getPlayer())));
 
     private final LoadingCache<CacheKey, Session> sessions = CacheBuilder.newBuilder()
             .expireAfterAccess(SESSION_LIFETIME, TimeUnit.MINUTES)
@@ -134,8 +138,15 @@ public abstract class AbstractSessionManager implements SessionManager {
     @Override
     public boolean hasBypass(LocalPlayer player, World world) {
         Session sess = getIfPresent(player);
-        return sess != null && !sess.hasBypassDisabled()
-                && bypassCache.getUnchecked(new WorldPlayerTuple(world, player));
+        if (sess == null || sess.hasBypassDisabled()) {
+            return false;
+        }
+
+        if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().disablePermissionCache) {
+            return BYPASS_PERMISSION_TEST.test(world, player);
+        }
+
+        return bypassCache.getUnchecked(new WorldPlayerTuple(world, player));
     }
 
     @Override

@@ -7,12 +7,12 @@ fun Project.applyCommonConfiguration() {
 
     repositories {
         mavenCentral()
-        maven { url = uri("https://maven.sk89q.com/repo/") }
+        maven { url = uri("https://maven.enginehub.org/repo/") }
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
     }
     configurations.all {
         resolutionStrategy {
-            cacheChangingModulesFor(5, "minutes")
+            cacheChangingModulesFor(5, "MINUTES")
         }
     }
 }
