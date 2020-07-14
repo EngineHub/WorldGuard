@@ -57,7 +57,7 @@ public class BukkitStringMatcher implements StringMatcher {
                     }
                 }
 
-                throw new CommandException("No normal world found.");
+                throw new CommandException("Обычный мир не найден.");
 
                 // #nether for the first nether world
             } else if (filter.equalsIgnoreCase("#nether")) {
@@ -67,7 +67,7 @@ public class BukkitStringMatcher implements StringMatcher {
                     }
                 }
 
-                throw new CommandException("No nether world found.");
+                throw new CommandException("Нижний мир не найден.");
 
                 // #end for the first nether world
             } else if (filter.equalsIgnoreCase("#end")) {
@@ -77,7 +77,7 @@ public class BukkitStringMatcher implements StringMatcher {
                     }
                 }
 
-                throw new CommandException("No end world found.");
+                throw new CommandException("Мир дракона края не найден.");
 
                 // Handle getting a world from a player
             } else if (filter.matches("^#player$")) {
@@ -85,12 +85,12 @@ public class BukkitStringMatcher implements StringMatcher {
 
                 // They didn't specify an argument for the player!
                 if (parts.length == 1) {
-                    throw new CommandException("Argument expected for #player.");
+                    throw new CommandException("Аргумент ожидается для #player.");
                 }
 
                 return matchPlayers(sender, parts[1]).iterator().next().getWorld();
             } else {
-                throw new CommandException("Invalid identifier '" + filter + "'.");
+                throw new CommandException("Неверный идентификатор '" + filter + "'.");
             }
         }
 
@@ -100,7 +100,7 @@ public class BukkitStringMatcher implements StringMatcher {
             }
         }
 
-        throw new CommandException("No world by that exact name found.");
+        throw new CommandException("Не найдено мира с этим именем.");
     }
 
     @Override
@@ -153,7 +153,7 @@ public class BukkitStringMatcher implements StringMatcher {
     @Override
     public Iterable<? extends LocalPlayer> matchPlayers(Actor source, String filter) throws CommandException {
         if (Bukkit.getServer().getOnlinePlayers().isEmpty()) {
-            throw new CommandException("No players matched query.");
+            throw new CommandException("Ни один игрок не соответствует запросу.");
         }
 
         List<LocalPlayer> wgPlayers = Bukkit.getServer().getOnlinePlayers().stream().map(player -> WorldGuardPlugin.inst().wrapPlayer(player)).collect(Collectors.toList());
@@ -195,7 +195,7 @@ public class BukkitStringMatcher implements StringMatcher {
                 return checkPlayerMatch(players);
 
             } else {
-                throw new CommandException("Invalid group '" + filter + "'.");
+                throw new CommandException("Неверная группа '" + filter + "'.");
             }
         }
 

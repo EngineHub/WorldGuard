@@ -103,7 +103,7 @@ public class DatabaseHandler implements LoggerHandler {
             stmt.setString(9, comment);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Failed to log blacklist event to database: " + e.getMessage());
+            logger.log(Level.SEVERE, "Не удалось зарегистрировать событие черного списка в базе данных: " + e.getMessage());
         }
     }
 

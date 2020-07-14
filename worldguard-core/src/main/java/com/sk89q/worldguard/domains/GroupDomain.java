@@ -144,7 +144,7 @@ public class GroupDomain implements Domain, ChangeTracked {
     @Override
     public String toString() {
         return "{" +
-                "names=" + groups +
+                "имена=" + groups +
                 '}';
     }
 

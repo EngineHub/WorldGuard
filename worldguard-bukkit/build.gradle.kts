@@ -48,7 +48,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.bstats:bstats-bukkit:1.7"))
         }
         relocate ("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib:1.0.2"))
+            include(dependency("io.papermc:paperlib:1.0.4"))
         }
     }
 }

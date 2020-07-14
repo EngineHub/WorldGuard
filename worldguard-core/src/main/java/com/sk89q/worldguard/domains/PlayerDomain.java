@@ -203,8 +203,8 @@ public class PlayerDomain implements Domain, ChangeTracked {
     @Override
     public String toString() {
         return "{" +
-                "uuids=" + uniqueIds +
-                ", names=" + names +
+                "uuid=" + uniqueIds +
+                ", имена=" + names +
                 '}';
     }
 }
