@@ -212,7 +212,7 @@ public class GeneralCommands {
         }
     }
     
-    @Command(aliases = {"locate"}, usage = "[игрок]", desc = "Найти игрока"", max = 1)
+    @Command(aliases = {"locate"}, usage = "[игрок]", desc = "Найти игрока", max = 1)
     @CommandPermissions({"worldguard.locate"})
     public void locate(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
