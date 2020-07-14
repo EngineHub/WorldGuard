@@ -80,9 +80,9 @@ public class WorldGuardCommands {
     @Command(aliases = {"version"}, desc = "Версия WorldGuard", max = 0)
     public void version(CommandContext args, Actor sender) throws CommandException {
         sender.print("Версия WorldGuard " + WorldGuard.getVersion());
-		sender.print("http://www.enginehub.org");
+        sender.print("http://www.enginehub.org");
         sender.print("Перевел DarkFort");
-		sender.print("§9§lVK: §bhttps://vk.com/darkfortmc §8| §9§lTG: §bt.me/darkfort");
+        sender.print("§9§lVK: §bhttps://vk.com/darkfortmc §8| §9§lTG: §bt.me/darkfort");
 
         sender.printDebug("----------- Платформы -----------");
         sender.printDebug(String.format("* %s (%s)", worldGuard.getPlatform().getPlatformName(), worldGuard.getPlatform().getPlatformVersion()));
