@@ -37,6 +37,7 @@ import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.metadata.Metadatable;
 import org.bukkit.projectiles.BlockProjectileSource;
+import org.bukkit.projectiles.ProjectileSource;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -270,13 +271,15 @@ public final class Cause {
                     if (o instanceof TNTPrimed) {
                         addAll(((TNTPrimed) o).getSource());
                     } else if (o instanceof Projectile) {
-                        addAll(((Projectile) o).getShooter());
-                    } else if (o instanceof Firework && PaperLib.isPaper()) {
-                        UUID spawningUUID = ((Firework) o).getSpawningEntity();
-                        if (spawningUUID != null) {
-                            Entity spawningEntity = Bukkit.getEntity(spawningUUID);
-                            if (spawningEntity != null) {
-                                addAll(spawningEntity);
+                        ProjectileSource shooter = ((Projectile) o).getShooter();
+                        addAll(shooter);
+                        if (shooter == null && o instanceof Firework && PaperLib.isPaper()) {
+                            UUID spawningUUID = ((Firework) o).getSpawningEntity();
+                            if (spawningUUID != null) {
+                                Entity spawningEntity = Bukkit.getEntity(spawningUUID);
+                                if (spawningEntity != null) {
+                                    addAll(spawningEntity);
+                                }
                             }
                         }
                     } else if (o instanceof Vehicle) {
