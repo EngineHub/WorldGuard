@@ -30,6 +30,21 @@ dependencies {
     "implementation"("org.bstats:bstats-bukkit:1.7")
 }
 
+tasks.named<Upload>("install") {
+    (repositories as HasConvention).convention.getPlugin<MavenRepositoryHandlerConvention>().mavenInstaller {
+        pom.whenConfigured {
+            dependencies.firstOrNull { dep ->
+                dep!!.withGroovyBuilder {
+                    getProperty("groupId") == "com.destroystokyo.paper" && getProperty("artifactId") == "paper-api"
+                }
+            }?.withGroovyBuilder {
+                setProperty("groupId", "org.spigotmc")
+                setProperty("artifactId", "spigot-api")
+            }
+        }
+    }
+}
+
 tasks.named<Copy>("processResources") {
     filesMatching("plugin.yml") {
         expand("internalVersion" to project.ext["internalVersion"])
