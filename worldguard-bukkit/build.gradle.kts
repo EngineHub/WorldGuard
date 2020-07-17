@@ -27,6 +27,7 @@ dependencies {
     "api"("com.destroystokyo.paper:paper-api:1.16.1-R0.1-SNAPSHOT")
     "implementation"("io.papermc:paperlib:1.0.4")
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
+    "implementation"("com.google.guava:guava:${Versions.GUAVA}")
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "implementation"("org.bstats:bstats-bukkit:1.7")
 }
