@@ -140,7 +140,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.FIRE, 0);
         MATERIAL_FLAGS.put(Material.SPAWNER, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.CHEST, MODIFIED_ON_RIGHT);
-        MATERIAL_FLAGS.put(Material.REDSTONE_WIRE, 0);
+        MATERIAL_FLAGS.put(Material.REDSTONE_WIRE, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.DIAMOND_ORE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.CRAFTING_TABLE, 0);
