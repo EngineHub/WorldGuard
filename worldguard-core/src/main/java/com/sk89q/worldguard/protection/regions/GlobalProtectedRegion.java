@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.regions;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.RegionSelector;
 
 import java.awt.geom.Area;
 import java.util.ArrayList;
@@ -100,4 +101,8 @@ public class GlobalProtectedRegion extends ProtectedRegion {
         return null;
     }
 
+    @Override
+    public RegionSelector toRegionSelector() {
+        return null;
+    }
 }

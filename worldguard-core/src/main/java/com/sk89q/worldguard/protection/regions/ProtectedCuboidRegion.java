@@ -23,6 +23,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldguard.util.MathUtils;
 
 import java.awt.Rectangle;
@@ -141,6 +143,11 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
         int width = getMaximumPoint().getBlockX() - x + 1;
         int height = getMaximumPoint().getBlockZ() - z + 1;
         return new Area(new Rectangle(x, z, width, height));
+    }
+
+    @Override
+    public RegionSelector toRegionSelector() {
+        return new CuboidRegionSelector(null, getMinimumPoint(), getMaximumPoint());
     }
 
     @Override

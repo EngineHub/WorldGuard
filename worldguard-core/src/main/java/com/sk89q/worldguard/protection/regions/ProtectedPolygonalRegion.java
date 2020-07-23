@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 
 import java.awt.Polygon;
 import java.awt.geom.Area;
@@ -180,6 +182,11 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
         Polygon polygon = new Polygon(xCoords, yCoords, numPoints);
         return new Area(polygon);
+    }
+
+    @Override
+    public RegionSelector toRegionSelector() {
+        return new Polygonal2DRegionSelector(null, this.getPoints(), getMinimumPoint().getBlockY(), getMaximumPoint().getBlockY());
     }
 
     @Override
