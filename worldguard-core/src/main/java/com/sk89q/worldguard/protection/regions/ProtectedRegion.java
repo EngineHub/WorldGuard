@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.domains.DefaultDomain;
@@ -665,6 +666,15 @@ public abstract class ProtectedRegion implements ChangeTracked, Comparable<Prote
      * {@link #isPhysicalArea()} is false.
      *
      * @return the WorldEdit Region
+     */
+    @Nullable
+    public abstract Region toRegion();
+
+    /**
+     * Return the WorldEdit Region Selector, otherwise null if
+     * {@link #isPhysicalArea()} is false.
+     *
+     * @return the WorldEdit Region Selector
      */
     @Nullable
     public abstract RegionSelector toRegionSelector();
