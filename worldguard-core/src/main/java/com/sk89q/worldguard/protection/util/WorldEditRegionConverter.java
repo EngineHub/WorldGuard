@@ -29,7 +29,14 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-public class WorldEditRegionConverter {
+/**
+ * A helper class to convert regions from WorldGuard to WorldEdit
+ */
+public final class WorldEditRegionConverter {
+    private WorldEditRegionConverter() {
+
+    }
+
     /**
      * Converts a ProtectedRegion to a WorldEdit Region, otherwise null if
      * the ProtectedRegion can't be converted to a RegionSelector.
