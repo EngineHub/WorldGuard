@@ -31,6 +31,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
@@ -54,6 +55,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.util.WorldEditRegionConverter;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -394,35 +396,15 @@ class RegionCommandsBase {
     protected static void setPlayerSelection(Actor actor, ProtectedRegion region, World world) throws CommandException {
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
 
-        // Set selection
-        if (region instanceof ProtectedCuboidRegion) {
-            ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
-            BlockVector3 pt1 = cuboid.getMinimumPoint();
-            BlockVector3 pt2 = cuboid.getMaximumPoint();
-
-            CuboidRegionSelector selector = new CuboidRegionSelector(world, pt1, pt2);
+        RegionSelector selector = WorldEditRegionConverter.convertToSelector(region);
+        if (selector != null) {
+            selector.setWorld(world);
             session.setRegionSelector(world, selector);
             selector.explainRegionAdjust(actor, session);
-            actor.print("Region selected as a cuboid.");
-
-        } else if (region instanceof ProtectedPolygonalRegion) {
-            ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
-            Polygonal2DRegionSelector selector = new Polygonal2DRegionSelector(
-                    world, poly2d.getPoints(),
-                    poly2d.getMinimumPoint().getBlockY(),
-                    poly2d.getMaximumPoint().getBlockY());
-            session.setRegionSelector(world, selector);
-            selector.explainRegionAdjust(actor, session);
-            actor.print("Region selected as a polygon.");
-
-        } else if (region instanceof GlobalProtectedRegion) {
-            throw new CommandException(
-                    "Can't select global regions! " +
-                            "That would cover the entire world.");
-
+            actor.print("Region selected as " + region.getType().getName());
         } else {
-            throw new CommandException("Unknown region type: " +
-                    region.getClass().getCanonicalName());
+            throw new CommandException("Can't select that region! " +
+                    "The region type '" + region.getType().getName() + "' can't be selected.");
         }
     }
 
