@@ -20,11 +20,13 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldguard.protection.regions.RegionQuery;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.domains.Association;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -45,18 +47,21 @@ public class DelayedRegionOverlapAssociation implements RegionAssociable {
     private final Location location;
     @Nullable
     private Set<ProtectedRegion> source;
+    private boolean betterAssociationMode;
 
     /**
      * Create a new instance.
-     *
-     * @param query the query
+     *  @param query the query
+     * @param world the world
      * @param location the location
      */
-    public DelayedRegionOverlapAssociation(RegionQuery query, Location location) {
+    public DelayedRegionOverlapAssociation(RegionQuery query, World world, Location location) {
         checkNotNull(query);
         checkNotNull(location);
         this.query = query;
         this.location = location;
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        betterAssociationMode = cfg.get(world).useBetterAssociationMode;
     }
 
     @Override
@@ -67,8 +72,18 @@ public class DelayedRegionOverlapAssociation implements RegionAssociable {
         }
 
         for (ProtectedRegion region : regions) {
-            if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty()) || source.contains(region)) {
+            if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty())) {
                 return Association.OWNER;
+            }
+
+            if (source.contains(region)) {
+                if (betterAssociationMode) {
+                    int priority = region.getPriority();
+                    int maxPriority = source.stream().mapToInt(ProtectedRegion::getPriority).max().orElse(0);
+                    if (priority == maxPriority) return Association.OWNER;
+                } else {
+                    return Association.OWNER;
+                }
             }
         }
 
