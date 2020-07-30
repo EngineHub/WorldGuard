@@ -962,7 +962,8 @@ public final class Materials {
      * @return true if a water block
      */
     public static boolean isWater(Material material) {
-        return material == Material.WATER || material == Material.BUBBLE_COLUMN;
+        return material == Material.WATER || material == Material.BUBBLE_COLUMN
+            || material == Material.KELP_PLANT || material == Material.SEAGRASS || material == Material.TALL_SEAGRASS;
     }
 
     /**
