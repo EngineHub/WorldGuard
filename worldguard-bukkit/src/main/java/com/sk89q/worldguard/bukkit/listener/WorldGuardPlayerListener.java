@@ -314,13 +314,17 @@ public class WorldGuardPlayerListener implements Listener {
 
         Player player = event.getPlayer();
         Block block = event.getClickedBlock(); //not actually clicked but whatever
-        //int type = block.getTypeId();
+        Material type = block.getType();
         World world = player.getWorld();
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
 
-        if (block.getType() == Material.FARMLAND && wcfg.disablePlayerCropTrampling) {
+        if (type == Material.FARMLAND && wcfg.disablePlayerCropTrampling) {
+            event.setCancelled(true);
+            return;
+        }
+        if (type == Material.TURTLE_EGG && wcfg.disablePlayerTurtleEggTrampling) {
             event.setCancelled(true);
             return;
         }

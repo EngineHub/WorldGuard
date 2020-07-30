@@ -121,11 +121,13 @@ public class WorldGuardEntityListener implements Listener {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(entity.getWorld()));
 
-        if (block.getType() == Material.FARMLAND) {
-            if (/* entity instanceof Creature && // catch for any entity (not thrown for players) */
-                wcfg.disableCreatureCropTrampling) {
-                event.setCancelled(true);
-            }
+        if (block.getType() == Material.FARMLAND && wcfg.disableCreatureCropTrampling) {
+            event.setCancelled(true);
+            return;
+        }
+        if (block.getType() == Material.TURTLE_EGG && wcfg.disableCreatureTurtleEggTrampling) {
+            event.setCancelled(true);
+            return;
         }
     }
 
