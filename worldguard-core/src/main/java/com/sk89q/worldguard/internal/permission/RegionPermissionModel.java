@@ -106,6 +106,10 @@ public class RegionPermissionModel extends AbstractPermissionModel {
         return hasPatternPermission("teleport", region);
     }
 
+    public boolean mayTeleportOverrideTo(ProtectedRegion region) {
+        return hasPatternPermission("teleportoverride", region);
+    }
+
     public boolean mayOverrideLocationFlagBounds(ProtectedRegion region) {
         return hasPatternPermission("locationoverride", region);
     }
