@@ -245,14 +245,17 @@ class RegionCommandsBase {
      * @throws CommandException thrown on an error
      */
     protected static Region checkSelection(Actor actor) throws CommandException {
+        LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(actor);
+        if (localSession == null || localSession.getSelectionWorld() == null)
+            throw new CommandException("Please select an area first. " +
+                    "Use WorldEdit to make a selection! " +
+                    "(see: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).");
         try {
-            LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(actor);
             return localSession.getRegionSelector(localSession.getSelectionWorld()).getRegion();
         } catch (IncompleteRegionException e) {
-            throw new CommandException(
-                    "Please select an area first. " +
-                            "Use WorldEdit to make a selection! " +
-                            "(see: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).");
+            throw new CommandException("Please select an area first. " +
+                    "Use WorldEdit to make a selection! " +
+                    "(see: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).");
         }
     }
 
