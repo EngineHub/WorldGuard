@@ -133,7 +133,7 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     public boolean mayUseRegex() {
         return hasPluginPermission("region.list.useregex");
     }
-    
+
     public boolean maySetFlag(ProtectedRegion region) {
         return hasPatternPermission("flag.regions", region);
     }
