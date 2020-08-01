@@ -20,9 +20,6 @@
 package com.sk89q.worldguard.protection;
 
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.World;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -47,21 +44,30 @@ public class DelayedRegionOverlapAssociation implements RegionAssociable {
     private final Location location;
     @Nullable
     private Set<ProtectedRegion> source;
-    private boolean betterAssociationMode;
+    private boolean useMaxPriorityAssociation;
+    private int maxPriority; // only used for useMaxPriorityAssociation
 
     /**
      * Create a new instance.
      * @param query the query
-     * @param world the world
      * @param location the location
      */
-    public DelayedRegionOverlapAssociation(RegionQuery query, World world, Location location) {
+    public DelayedRegionOverlapAssociation(RegionQuery query, Location location) {
+        this(query, location, false);
+    }
+
+    /**
+     * Create a new instance.
+     * @param query the query
+     * @param location the location
+     * @param useMaxPriorityAssociation whether to use the max priority from regions to determine association
+     */
+    public DelayedRegionOverlapAssociation(RegionQuery query, Location location, boolean useMaxPriorityAssociation) {
         checkNotNull(query);
         checkNotNull(location);
         this.query = query;
         this.location = location;
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        betterAssociationMode = cfg.get(world).useBetterAssociationMode;
+        this.useMaxPriorityAssociation = useMaxPriorityAssociation;
     }
 
     @Override
@@ -69,8 +75,10 @@ public class DelayedRegionOverlapAssociation implements RegionAssociable {
         if (source == null) {
             ApplicableRegionSet result = query.getApplicableRegions(location);
             source = result.getRegions();
+            if (useMaxPriorityAssociation)
+                maxPriority = source.stream().mapToInt(ProtectedRegion::getPriority).max().orElse(0);
         }
-        int maxPriority = source.stream().mapToInt(ProtectedRegion::getPriority).max().orElse(0);
+
 
         for (ProtectedRegion region : regions) {
             if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty())) {
@@ -78,7 +86,7 @@ public class DelayedRegionOverlapAssociation implements RegionAssociable {
             }
 
             if (source.contains(region)) {
-                if (betterAssociationMode) {
+                if (useMaxPriorityAssociation) {
                     int priority = region.getPriority();
                     if (priority == maxPriority) return Association.OWNER;
                 } else {

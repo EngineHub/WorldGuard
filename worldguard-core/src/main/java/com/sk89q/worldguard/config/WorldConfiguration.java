@@ -171,7 +171,7 @@ public abstract class WorldConfiguration {
     public boolean strictEntitySpawn;
     public boolean ignoreHopperMoveEvents;
     public boolean breakDeniedHoppers;
-    public boolean useBetterAssociationMode;
+    public boolean useMaxPriorityAssociation;
     protected Map<String, Integer> maxRegionCounts;
 
     /**
