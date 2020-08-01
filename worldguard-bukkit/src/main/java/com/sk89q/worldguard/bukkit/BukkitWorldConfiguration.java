@@ -160,7 +160,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
         disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
 
-        useBetterAssociationMode = getBoolean("protection.useBetterAssociationMode", false);
+        useMaxPriorityAssociation = getBoolean("protection.use-max-priority-association", false);
 
         blockPotions = new HashSet<>();
         for (String potionName : getStringList("gameplay.block-potions", null)) {
