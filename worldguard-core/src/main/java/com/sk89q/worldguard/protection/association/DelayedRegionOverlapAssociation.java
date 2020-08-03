@@ -17,9 +17,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldguard.protection;
+package com.sk89q.worldguard.protection.association;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldguard.domains.Association;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 import java.util.List;
@@ -30,18 +35,44 @@ import java.util.List;
  *
  * <p>This class only performs a spatial query if its
  * {@link #getAssociation(List)} method is called.</p>
- *
- * @deprecated Use {@link com.sk89q.worldguard.protection.association.DelayedRegionOverlapAssociation} instead. This class is mis-packaged.
  */
-@Deprecated
-public class DelayedRegionOverlapAssociation extends com.sk89q.worldguard.protection.association.DelayedRegionOverlapAssociation {
+public class DelayedRegionOverlapAssociation extends AbstractRegionOverlapAssociation {
+
+    private final RegionQuery query;
+    private final Location location;
+
     /**
      * Create a new instance.
      * @param query the query
      * @param location the location
      */
     public DelayedRegionOverlapAssociation(RegionQuery query, Location location) {
-        super(query, location, false);
+        this(query, location, false);
+    }
+
+    /**
+     * Create a new instance.
+     * @param query the query
+     * @param location the location
+     * @param useMaxPriorityAssociation whether to use the max priority from regions to determine association
+     */
+    public DelayedRegionOverlapAssociation(RegionQuery query, Location location, boolean useMaxPriorityAssociation) {
+        super(null, useMaxPriorityAssociation);
+        checkNotNull(query);
+        checkNotNull(location);
+        this.query = query;
+        this.location = location;
+    }
+
+    @Override
+    public Association getAssociation(List<ProtectedRegion> regions) {
+        if (source == null) {
+            ApplicableRegionSet result = query.getApplicableRegions(location);
+            source = result.getRegions();
+            calcMaxPriority();
+        }
+
+        return super.getAssociation(regions);
     }
 
 }
