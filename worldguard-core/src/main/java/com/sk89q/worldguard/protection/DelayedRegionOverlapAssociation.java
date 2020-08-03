@@ -75,10 +75,19 @@ public class DelayedRegionOverlapAssociation implements RegionAssociable {
         if (source == null) {
             ApplicableRegionSet result = query.getApplicableRegions(location);
             source = result.getRegions();
-            if (useMaxPriorityAssociation)
-                maxPriority = source.stream().mapToInt(ProtectedRegion::getPriority).max().orElse(0);
-        }
+            assert source != null;
 
+            if (useMaxPriorityAssociation) {
+                int best = 0;
+                for (ProtectedRegion region : source) {
+                    int priority = region.getPriority();
+                    if (priority > best) {
+                        best = priority;
+                    }
+                }
+                maxPriority = best;
+            }
+        }
 
         for (ProtectedRegion region : regions) {
             if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty())) {
@@ -88,7 +97,9 @@ public class DelayedRegionOverlapAssociation implements RegionAssociable {
             if (source.contains(region)) {
                 if (useMaxPriorityAssociation) {
                     int priority = region.getPriority();
-                    if (priority == maxPriority) return Association.OWNER;
+                    if (priority == maxPriority) {
+                        return Association.OWNER;
+                    }
                 } else {
                     return Association.OWNER;
                 }

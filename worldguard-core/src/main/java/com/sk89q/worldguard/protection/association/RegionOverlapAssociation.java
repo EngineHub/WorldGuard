@@ -34,6 +34,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RegionOverlapAssociation implements RegionAssociable {
 
     private final Set<ProtectedRegion> source;
+    private boolean useMaxPriorityAssociation;
+    private int maxPriority; // only used for useMaxPriorityAssociation
 
     /**
      * Create a new instance.
@@ -41,15 +43,45 @@ public class RegionOverlapAssociation implements RegionAssociable {
      * @param source set of regions that input regions must be contained within
      */
     public RegionOverlapAssociation(Set<ProtectedRegion> source) {
+        this(source, false);
+    }
+
+    /**
+     * Create a new instance.
+     *
+     * @param source set of regions that input regions must be contained within
+     * @param useMaxPriorityAssociation whether to use the max priority from regions to determine association
+     */
+    public RegionOverlapAssociation(Set<ProtectedRegion> source, boolean useMaxPriorityAssociation) {
         checkNotNull(source);
         this.source = source;
+        this.useMaxPriorityAssociation = useMaxPriorityAssociation;
+        int best = 0;
+        for (ProtectedRegion region : source) {
+            int priority = region.getPriority();
+            if (priority > best) {
+                best = priority;
+            }
+        }
+        this.maxPriority = best;
     }
 
     @Override
     public Association getAssociation(List<ProtectedRegion> regions) {
         for (ProtectedRegion region : regions) {
-            if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty()) || source.contains(region)) {
+            if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty())) {
                 return Association.OWNER;
+            }
+
+            if (source.contains(region)) {
+                if (useMaxPriorityAssociation) {
+                    int priority = region.getPriority();
+                    if (priority == maxPriority) {
+                        return Association.OWNER;
+                    }
+                } else {
+                    return Association.OWNER;
+                }
             }
         }
 
