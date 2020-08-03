@@ -31,7 +31,7 @@ import com.sk89q.worldguard.bukkit.cause.Cause;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.domains.Association;
-import com.sk89q.worldguard.protection.DelayedRegionOverlapAssociation;
+import com.sk89q.worldguard.protection.association.DelayedRegionOverlapAssociation;
 import com.sk89q.worldguard.protection.association.Associables;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
