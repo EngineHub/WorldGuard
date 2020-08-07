@@ -323,18 +323,22 @@ public class EventAbstractionListener extends AbstractListener {
                 Events.fireToCancel(event, new PlaceBlockEvent(event, cause, block.getLocation(), toType));
 
                 if (entity instanceof FallingBlock) {
-                    if (event.isCancelled() && !wasCancelled) {
-                        FallingBlock fallingBlock = (FallingBlock) entity;
-                        final Material material = fallingBlock.getBlockData().getMaterial();
-                        if (!material.isItem()) return;
-                        ItemStack itemStack = new ItemStack(material, 1);
-                        Item item = block.getWorld().dropItem(fallingBlock.getLocation(), itemStack);
-                        item.setVelocity(new Vector());
-                        if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(block, entity), item))) {
-                            item.remove();
+                    try {
+                        if (event.isCancelled() && !wasCancelled) {
+                            FallingBlock fallingBlock = (FallingBlock) entity;
+                            if (!fallingBlock.getDropItem()) return;
+                            final Material material = fallingBlock.getBlockData().getMaterial();
+                            if (!material.isItem()) return;
+                            ItemStack itemStack = new ItemStack(material, 1);
+                            Item item = block.getWorld().dropItem(fallingBlock.getLocation(), itemStack);
+                            item.setVelocity(new Vector());
+                            if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(block, entity), item))) {
+                                item.remove();
+                            }
                         }
+                    } finally {
+                        Cause.untrackParentCause(entity);
                     }
-                    Cause.untrackParentCause(entity);
                 }
             }
         }
