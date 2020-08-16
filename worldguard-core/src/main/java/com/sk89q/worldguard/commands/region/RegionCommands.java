@@ -46,7 +46,6 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.commands.task.RegionAdder;
 import com.sk89q.worldguard.commands.task.RegionLister;
 import com.sk89q.worldguard.commands.task.RegionManagerLoader;
