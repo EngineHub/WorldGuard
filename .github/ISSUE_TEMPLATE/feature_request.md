@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for WorlGuard
+about: Suggest an idea for WorldGuard
 title: ''
 labels: type:feature-request, status:pending
 assignees: ''
