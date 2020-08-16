@@ -1088,6 +1088,7 @@ public final class Materials {
             case PANDA_SPAWN_EGG:
             case PARROT_SPAWN_EGG:
             case PHANTOM_SPAWN_EGG:
+            case PIGLIN_BRUTE_SPAWN_EGG:
             case PIGLIN_SPAWN_EGG:
             case PIG_SPAWN_EGG:
             case PILLAGER_SPAWN_EGG:
@@ -1190,6 +1191,8 @@ public final class Materials {
                 return EntityType.PARROT;
             case PHANTOM_SPAWN_EGG:
                 return EntityType.PHANTOM;
+            case PIGLIN_BRUTE_SPAWN_EGG:
+                return EntityType.PIGLIN_BRUTE;
             case PIGLIN_SPAWN_EGG:
                 return EntityType.PIGLIN;
             case PILLAGER_SPAWN_EGG:
