@@ -40,7 +40,7 @@ import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.config.YamlWorldConfiguration;
 import org.bukkit.potion.PotionEffectType;
-import org.yaml.snakeyaml.parser.ParserException;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -135,7 +135,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             config.load();
         } catch (IOException e) {
             log.log(Level.SEVERE, "Error reading configuration for world " + worldName + ": ", e);
-        } catch (ParserException e) {
+        } catch (YAMLException e) {
             log.severe("Error parsing configuration for world " + worldName + ". ");
             throw e;
         }
