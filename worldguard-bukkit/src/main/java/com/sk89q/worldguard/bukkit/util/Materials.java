@@ -839,7 +839,7 @@ public final class Materials {
                 MATERIAL_FLAGS.put(material, 0);
             }
             if (!MATERIAL_FLAGS.containsKey(material)) {
-                logger.fine("Missing material definition for " + (material.isBlock() ? "block " : "item ") + material.name());
+                logger.fine("Отсутствует определение материала для " + (material.isBlock() ? "block " : "item ") + material.name());
             }
         }
 

@@ -79,7 +79,7 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
      */
     private ListeningExecutorService createExecutor() {
         return MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 4, Integer.MAX_VALUE,
-                "WorldGuard Region Chunk Table - " + name));
+                "Таблица чанков региона WorldGuard - " + name));
     }
 
     /**
@@ -303,7 +303,7 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
 
         private EnumerateRegions(List<BlockVector2> positions) {
             checkNotNull(positions);
-            checkArgument(!positions.isEmpty(), "List of positions can't be empty");
+            checkArgument(!positions.isEmpty(), "Список позиций не может быть пустым");
             this.positions = positions;
         }
 

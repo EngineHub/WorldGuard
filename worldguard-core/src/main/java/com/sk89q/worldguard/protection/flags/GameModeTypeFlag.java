@@ -40,7 +40,7 @@ public class GameModeTypeFlag extends Flag<GameMode> {
         input = input.trim();
         GameMode gamemode = unmarshal(input);
         if (gamemode == null) {
-            throw new InvalidFlagFormat("Unknown game mode: " + input);
+            throw new InvalidFlagFormat("Неизвестный режим игры: " + input);
         }
         return gamemode;
     }

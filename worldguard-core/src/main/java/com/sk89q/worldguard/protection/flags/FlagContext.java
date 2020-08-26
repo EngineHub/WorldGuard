@@ -67,7 +67,7 @@ public final class FlagContext {
         if (sender.isPlayer() && sender instanceof LocalPlayer) {
             return (LocalPlayer) sender;
         } else {
-            throw new InvalidFlagFormat("Not a player");
+            throw new InvalidFlagFormat("Не игрок");
         }
     }
 
@@ -75,7 +75,7 @@ public final class FlagContext {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw new InvalidFlagFormat("Не число: " + input);
         }
     }
 
@@ -83,7 +83,7 @@ public final class FlagContext {
         try {
             return Double.parseDouble(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw new InvalidFlagFormat("Не число: " + input);
         }
     }
 

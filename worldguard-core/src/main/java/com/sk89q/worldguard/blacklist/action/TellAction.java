@@ -46,7 +46,7 @@ public class TellAction extends RepeatGuardedAction {
                 message = message.replaceAll("(?!<\\\\)\\\\n", "\n").replaceAll("\\\\\\\\n", "\\n");
                 event.getPlayer().print(String.format(message, event.getTarget().getFriendlyName()));
             } else {
-                event.getPlayer().printError("You're not allowed to " + event.getDescription() + " " + event.getTarget().getFriendlyName() + ".");
+                event.getPlayer().printError("Вам не разрешено " + event.getDescription() + " " + event.getTarget().getFriendlyName() + ".");
             }
         }
 

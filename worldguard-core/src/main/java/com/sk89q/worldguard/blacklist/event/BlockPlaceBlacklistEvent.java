@@ -40,7 +40,7 @@ public final class BlockPlaceBlacklistEvent extends BlockBlacklistEvent {
 
     @Override
     public String getDescription() {
-        return "place";
+        return "размещать";
     }
 
     @Override

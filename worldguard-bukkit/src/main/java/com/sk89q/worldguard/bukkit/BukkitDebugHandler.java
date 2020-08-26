@@ -77,11 +77,11 @@ public class BukkitDebugHandler implements DebugHandler {
 
         if (!receiver.equals(target)) {
             if (!isConsole) {
-                log.info(receiver.getName() + " is simulating an event on " + target.getName());
+                log.info(receiver.getName() + " имитирует событие на " + target.getName());
             }
 
             target.sendMessage(
-                    ChatColor.RED + "(Please ignore any messages that may immediately follow.)");
+                    ChatColor.RED + "(Пожалуйста, игнорируйте любые сообщения, которые могут последовать немедленно.)");
         }
 
         Bukkit.getPluginManager().callEvent(event);
@@ -91,18 +91,18 @@ public class BukkitDebugHandler implements DebugHandler {
         String result = report.toString();
 
         if (stacktraceMode) {
-            receiver.sendMessage(ChatColor.GRAY + "The report was printed to console.");
-            log.info("Event report for " + receiver.getName() + ":\n\n" + result);
+            receiver.sendMessage(ChatColor.GRAY + "Отчет был продублирован в консоли.");
+            log.info("Отчет о событии для " + receiver.getName() + ":\n\n" + result);
 
             plugin.checkPermission(receiver, "worldguard.debug.pastebin");
             ActorCallbackPaste.pastebin(WorldGuard.getInstance().getSupervisor(), plugin.wrapCommandSender(receiver),
-                    result, "Event debugging report: %s.txt");
+                    result, "Отчет об отладке событий: %s.txt");
         } else {
             receiver.sendMessage(result.replaceAll("(?m)^", ChatColor.AQUA.toString()));
 
             if (result.length() >= 500 && !isConsole) {
-                receiver.sendMessage(ChatColor.GRAY + "The report was also printed to console.");
-                log.info("Event report for " + receiver.getName() + ":\n\n" + result);
+                receiver.sendMessage(ChatColor.GRAY + "Отчет был продублирован в консоли.");
+                log.info("Отчет о событии для " + receiver.getName() + ":\n\n" + result);
             }
         }
     }
@@ -124,7 +124,7 @@ public class BukkitDebugHandler implements DebugHandler {
                 return (Player) sender;
             } else {
                 throw new CommandException(
-                        "If this command is not to be used in-game, use -t to run the test from the viewpoint of the given player rather than yourself.");
+                        "Если эта команда не будет использоваться в игре, используйте -t для выполнения теста с точки зрения данного игрока, а не себя.");
             }
         }
     }
@@ -151,7 +151,7 @@ public class BukkitDebugHandler implements DebugHandler {
             i++;
         }
 
-        throw new CommandException("Not currently looking at a block that is close enough.");
+        throw new CommandException("В настоящее время вы не смотрите на блок, который достаточно близко.");
     }
 
     /**
@@ -182,7 +182,7 @@ public class BukkitDebugHandler implements DebugHandler {
             i++;
         }
 
-        throw new CommandException("Not currently looking at an entity that is close enough.");
+        throw new CommandException("В настоящее время вы не смотрите на сущность, которая достаточно близко.");
     }
 
     @Override

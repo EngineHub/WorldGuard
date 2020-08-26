@@ -75,7 +75,7 @@ public class FileHandler implements LoggerHandler {
      */
     public FileHandler(String pathPattern, int cacheSize, String worldName, Logger logger) {
         if (cacheSize < 1) {
-            throw new IllegalArgumentException("Cache size cannot be less than 1");
+            throw new IllegalArgumentException("Размер кэша не может быть меньше, чем 1");
         }
         this.pathPattern = pathPattern;
         this.cacheSize = cacheSize;
@@ -206,7 +206,7 @@ public class FileHandler implements LoggerHandler {
             }
 
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to log blacklist event to '"
+            logger.log(Level.WARNING, "Не удалось зарегистрировать событие черного списка в '"
                     + path + "': " + e.getMessage());
         }
     }

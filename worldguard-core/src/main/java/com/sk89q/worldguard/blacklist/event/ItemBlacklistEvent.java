@@ -40,7 +40,7 @@ abstract class ItemBlacklistEvent extends AbstractBlacklistEvent {
 
     @Override
     public String getLoggerMessage() {
-        return getPlayerName() + " tried to " + getDescription() + " " + getTarget().getFriendlyName();
+        return getPlayerName() + " попытался " + getDescription() + " " + getTarget().getFriendlyName();
     }
 
     @Override

@@ -287,7 +287,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 throw t;
             }
         } catch (CommandPermissionsException e) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission.");
+            sender.sendMessage(ChatColor.RED + "У вас нет разрешения.");
         } catch (MissingNestedCommandException e) {
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (CommandUsageException e) {
@@ -384,13 +384,13 @@ public class WorldGuardPlugin extends JavaPlugin {
     public WorldEditPlugin getWorldEdit() throws CommandException {
         Plugin worldEdit = getServer().getPluginManager().getPlugin("WorldEdit");
         if (worldEdit == null) {
-            throw new CommandException("WorldEdit does not appear to be installed.");
+            throw new CommandException("WorldEdit, кажется, не установлен.");
         }
 
         if (worldEdit instanceof WorldEditPlugin) {
             return (WorldEditPlugin) worldEdit;
         } else {
-            throw new CommandException("WorldEdit detection failed (report error).");
+            throw new CommandException("Не удалось обнаружить WorldEdit (сообщите об ошибке).");
         }
     }
 
@@ -434,7 +434,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         } else if (sender instanceof BukkitCommandSender) {
             return Bukkit.getConsoleSender(); // TODO Fix
         } else {
-            throw new IllegalArgumentException("Unknown actor type. Please report");
+            throw new IllegalArgumentException("Неизвестный тип актера. Пожалуйста, сообщите об ошибке");
         }
     }
 
@@ -490,7 +490,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             if (stream == null) throw new FileNotFoundException();
             copyDefaultConfig(stream, actual, defaultName);
         } catch (IOException e) {
-            getLogger().severe("Unable to read default configuration: " + defaultName);
+            getLogger().severe("Не удается прочитать конфигурацию по умолчанию: " + defaultName);
         }
 
     }
@@ -502,9 +502,9 @@ public class WorldGuardPlugin extends JavaPlugin {
             while ((length = input.read(buf)) > 0) {
                 output.write(buf, 0, length);
             }
-            getLogger().info("Default configuration file written: " + name);
+            getLogger().info("Файл конфигурации по умолчанию записан: " + name);
         } catch (IOException e) {
-            getLogger().log(Level.WARNING, "Failed to write default config file", e);
+            getLogger().log(Level.WARNING, "Не удалось записать файл конфигурации по умолчанию", e);
         }
     }
 
