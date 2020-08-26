@@ -40,7 +40,7 @@ import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.config.YamlWorldConfiguration;
 import org.bukkit.potion.PotionEffectType;
-import org.yaml.snakeyaml.parser.ParserException;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -135,7 +135,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             config.load();
         } catch (IOException e) {
             log.log(Level.SEVERE, "Ошибка чтения конфигурации для мира " + worldName + ": ", e);
-        } catch (ParserException e) {
+        } catch (YAMLException e) {
             log.severe("Ошибка синтаксического анализа конфигурации для мира " + worldName + ". ");
             throw e;
         }
@@ -159,6 +159,8 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         removeInfiniteStacks = getBoolean("protection.remove-infinite-stacks", false);
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
         disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
+
+        useMaxPriorityAssociation = getBoolean("protection.use-max-priority-association", false);
 
         blockPotions = new HashSet<>();
         for (String potionName : getStringList("gameplay.block-potions", null)) {
@@ -237,6 +239,9 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
 
         disableCreatureCropTrampling = getBoolean("crops.disable-creature-trampling", false);
         disablePlayerCropTrampling = getBoolean("crops.disable-player-trampling", false);
+
+        disableCreatureTurtleEggTrampling = getBoolean("turtle-egg.disable-creature-trampling", false);
+        disablePlayerTurtleEggTrampling = getBoolean("turtle-egg.disable-player-trampling", false);
 
         disallowedLightningBlocks = new HashSet<>(convertLegacyBlocks(getStringList("weather.prevent-lightning-strike-blocks", null)));
         preventLightningFire = getBoolean("weather.disable-lightning-strike-fire", false);

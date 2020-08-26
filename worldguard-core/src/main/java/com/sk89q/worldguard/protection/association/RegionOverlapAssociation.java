@@ -19,41 +19,35 @@
 
 package com.sk89q.worldguard.protection.association;
 
-import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import java.util.List;
+import javax.annotation.Nonnull;
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Determines that the association to a region is {@code OWNER} if the input
  * region is in a set of source regions.
  */
-public class RegionOverlapAssociation implements RegionAssociable {
-
-    private final Set<ProtectedRegion> source;
+public class RegionOverlapAssociation extends AbstractRegionOverlapAssociation {
 
     /**
      * Create a new instance.
      *
      * @param source set of regions that input regions must be contained within
      */
-    public RegionOverlapAssociation(Set<ProtectedRegion> source) {
-        checkNotNull(source);
-        this.source = source;
+    public RegionOverlapAssociation(@Nonnull Set<ProtectedRegion> source) {
+        this(source, false);
     }
 
-    @Override
-    public Association getAssociation(List<ProtectedRegion> regions) {
-        for (ProtectedRegion region : regions) {
-            if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty()) || source.contains(region)) {
-                return Association.OWNER;
-            }
-        }
-
-        return Association.NON_MEMBER;
+    /**
+     * Create a new instance.
+     *
+     * @param source set of regions that input regions must be contained within
+     * @param useMaxPriorityAssociation whether to use the max priority from regions to determine association
+     */
+    public RegionOverlapAssociation(@Nonnull Set<ProtectedRegion> source, boolean useMaxPriorityAssociation) {
+        super(source, useMaxPriorityAssociation);
+        calcMaxPriority();
     }
 
 }

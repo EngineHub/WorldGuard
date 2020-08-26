@@ -38,10 +38,14 @@ import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
+@RunWith(Parameterized.class)
 public abstract class RegionOverlapTest {
     static String COURTYARD_ID = "courtyard";
     static String FOUNTAIN_ID = "fountain";
@@ -59,6 +63,14 @@ public abstract class RegionOverlapTest {
     ProtectedRegion fountain;
     TestPlayer player1;
     TestPlayer player2;
+
+    @Parameterized.Parameters(name = "{index}: useMaxPrio = {0}")
+    public static Iterable<Object[]> params() {
+        return Arrays.asList(new Object[][]{{true}, {false}});
+    }
+
+    @Parameterized.Parameter
+    public boolean useMaxPriorityAssociation;
 
     protected FlagRegistry getFlagRegistry() {
         return WorldGuard.getInstance().getFlagRegistry();
@@ -105,6 +117,7 @@ public abstract class RegionOverlapTest {
         ProtectedRegion region = new ProtectedPolygonalRegion(COURTYARD_ID, points, 0, 10);
 
         region.setOwners(domain);
+        region.setPriority(5);
         manager.addRegion(region);
 
         courtyard = region;
@@ -117,6 +130,7 @@ public abstract class RegionOverlapTest {
         ProtectedRegion region = new ProtectedCuboidRegion(FOUNTAIN_ID,
                 BlockVector3.ZERO, BlockVector3.at(5, 5, 5));
         region.setMembers(domain);
+        region.setPriority(10);
         manager.addRegion(region);
 
         fountain = region;
@@ -186,7 +200,7 @@ public abstract class RegionOverlapTest {
 
         HashSet<ProtectedRegion> source = new HashSet<>();
         source.add(courtyard);
-        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source);
+        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source, useMaxPriorityAssociation);
 
         // Outside
         appl = manager.getApplicableRegions(outside);
@@ -206,14 +220,14 @@ public abstract class RegionOverlapTest {
         HashSet<ProtectedRegion> source = new HashSet<>();
         source.add(fountain);
         source.add(courtyard);
-        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source);
+        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source, useMaxPriorityAssociation);
 
         // Outside
         appl = manager.getApplicableRegions(outside);
         assertTrue(appl.testState(assoc, Flags.BUILD));
         // Inside courtyard
         appl = manager.getApplicableRegions(inCourtyard);
-        assertTrue(appl.testState(assoc, Flags.BUILD));
+        assertTrue(useMaxPriorityAssociation ^ appl.testState(assoc, Flags.BUILD));
         // Inside fountain
         appl = manager.getApplicableRegions(inFountain);
         assertTrue(appl.testState(assoc, Flags.BUILD));
@@ -224,7 +238,7 @@ public abstract class RegionOverlapTest {
         ApplicableRegionSet appl;
 
         HashSet<ProtectedRegion> source = new HashSet<>();
-        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source);
+        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source, useMaxPriorityAssociation);
 
         // Outside
         appl = manager.getApplicableRegions(outside);

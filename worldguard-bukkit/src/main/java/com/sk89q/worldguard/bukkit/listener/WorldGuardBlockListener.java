@@ -132,9 +132,10 @@ public class WorldGuardBlockListener implements Listener {
         Block blockFrom = event.getBlock();
         Block blockTo = event.getToBlock();
 
-        boolean isWater = blockFrom.getType() == Material.WATER;
-        boolean isLava = blockFrom.getType() == Material.LAVA;
-        boolean isAir = blockFrom.getType() == Material.AIR;
+        Material fromType = blockFrom.getType();
+        boolean isWater = Materials.isWater(fromType);
+        boolean isLava = fromType == Material.LAVA;
+        boolean isAir = fromType == Material.AIR;
 
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());

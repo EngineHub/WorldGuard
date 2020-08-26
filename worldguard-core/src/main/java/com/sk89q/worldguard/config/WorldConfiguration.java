@@ -135,6 +135,8 @@ public abstract class WorldConfiguration {
     public boolean removeInfiniteStacks;
     public boolean disableCreatureCropTrampling;
     public boolean disablePlayerCropTrampling;
+    public boolean disableCreatureTurtleEggTrampling;
+    public boolean disablePlayerTurtleEggTrampling;
     public boolean preventLightningFire;
     public Set<String> disallowedLightningBlocks;
     public boolean disableThunder;
@@ -171,6 +173,7 @@ public abstract class WorldConfiguration {
     public boolean strictEntitySpawn;
     public boolean ignoreHopperMoveEvents;
     public boolean breakDeniedHoppers;
+    public boolean useMaxPriorityAssociation;
     protected Map<String, Integer> maxRegionCounts;
 
     /**

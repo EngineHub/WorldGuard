@@ -140,7 +140,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.FIRE, 0);
         MATERIAL_FLAGS.put(Material.SPAWNER, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.CHEST, MODIFIED_ON_RIGHT);
-        MATERIAL_FLAGS.put(Material.REDSTONE_WIRE, 0);
+        MATERIAL_FLAGS.put(Material.REDSTONE_WIRE, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.DIAMOND_ORE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.CRAFTING_TABLE, 0);
@@ -962,7 +962,8 @@ public final class Materials {
      * @return true if a water block
      */
     public static boolean isWater(Material material) {
-        return material == Material.WATER || material == Material.BUBBLE_COLUMN;
+        return material == Material.WATER || material == Material.BUBBLE_COLUMN
+            || material == Material.KELP_PLANT || material == Material.SEAGRASS || material == Material.TALL_SEAGRASS;
     }
 
     /**
@@ -1087,6 +1088,7 @@ public final class Materials {
             case PANDA_SPAWN_EGG:
             case PARROT_SPAWN_EGG:
             case PHANTOM_SPAWN_EGG:
+            case PIGLIN_BRUTE_SPAWN_EGG:
             case PIGLIN_SPAWN_EGG:
             case PIG_SPAWN_EGG:
             case PILLAGER_SPAWN_EGG:
@@ -1189,6 +1191,8 @@ public final class Materials {
                 return EntityType.PARROT;
             case PHANTOM_SPAWN_EGG:
                 return EntityType.PHANTOM;
+            case PIGLIN_BRUTE_SPAWN_EGG:
+                return EntityType.PIGLIN_BRUTE;
             case PIGLIN_SPAWN_EGG:
                 return EntityType.PIGLIN;
             case PILLAGER_SPAWN_EGG:

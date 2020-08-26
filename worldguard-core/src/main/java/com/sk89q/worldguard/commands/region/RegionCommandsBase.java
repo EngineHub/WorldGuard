@@ -31,6 +31,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
@@ -54,6 +55,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.util.WorldEditRegionConverter;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -243,12 +245,14 @@ class RegionCommandsBase {
      * @throws CommandException thrown on an error
      */
     protected static Region checkSelection(Actor actor) throws CommandException {
+        LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(actor);
         try {
-            LocalSession localSession = WorldEdit.getInstance().getSessionManager().get(actor);
+            if (localSession == null || localSession.getSelectionWorld() == null) {
+                throw new IncompleteRegionException();
+            }
             return localSession.getRegionSelector(localSession.getSelectionWorld()).getRegion();
         } catch (IncompleteRegionException e) {
-            throw new CommandException(
-                    "Вы не выделили область для привата региона. " +
+            throw new CommandException("Вы не выделили область для привата региона. " +
                             "Используйте WorldEdit, чтобы сделать выделение! " +
                             "(смотрите: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).");
         }
@@ -394,35 +398,15 @@ class RegionCommandsBase {
     protected static void setPlayerSelection(Actor actor, ProtectedRegion region, World world) throws CommandException {
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
 
-        // Set selection
-        if (region instanceof ProtectedCuboidRegion) {
-            ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
-            BlockVector3 pt1 = cuboid.getMinimumPoint();
-            BlockVector3 pt2 = cuboid.getMaximumPoint();
-
-            CuboidRegionSelector selector = new CuboidRegionSelector(world, pt1, pt2);
+        RegionSelector selector = WorldEditRegionConverter.convertToSelector(region);
+        if (selector != null) {
+            selector.setWorld(world);
             session.setRegionSelector(world, selector);
             selector.explainRegionAdjust(actor, session);
-            actor.print("Регион выбран как кубоид.");
-
-        } else if (region instanceof ProtectedPolygonalRegion) {
-            ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
-            Polygonal2DRegionSelector selector = new Polygonal2DRegionSelector(
-                    world, poly2d.getPoints(),
-                    poly2d.getMinimumPoint().getBlockY(),
-                    poly2d.getMaximumPoint().getBlockY());
-            session.setRegionSelector(world, selector);
-            selector.explainRegionAdjust(actor, session);
-            actor.print("Регион выбран как полигон.");
-
-        } else if (region instanceof GlobalProtectedRegion) {
-            throw new CommandException(
-                    "Нельзя выбрать глобальный регион. " +
-                            "Это позволит охватить весь мир.");
-
+            actor.print("Регион выбран как " + region.getType().getName());
         } else {
-            throw new CommandException("Неизвестный тип региона: " +
-                    region.getClass().getCanonicalName());
+            throw new CommandException("Нельзя выбрать этот регион! " +
+                    "Тип региона '" + region.getType().getName() + "' не может быть выбран.");
         }
     }
 

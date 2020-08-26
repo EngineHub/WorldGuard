@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.internal.HasConvention
 
 plugins {
     id("java-library")
@@ -23,11 +24,27 @@ repositories {
 dependencies {
     "compile"(project(":worldguard-core"))
     //"compile"(project(":worldguard-libs:bukkit"))
-    "api"("com.destroystokyo.paper:paper-api:1.16.1-R0.1-SNAPSHOT")
+    "api"("com.destroystokyo.paper:paper-api:1.16.2-R0.1-SNAPSHOT")
     "implementation"("io.papermc:paperlib:1.0.4")
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
+    "implementation"("com.google.guava:guava:${Versions.GUAVA}")
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "implementation"("org.bstats:bstats-bukkit:1.7")
+}
+
+tasks.named<Upload>("install") {
+    (repositories as HasConvention).convention.getPlugin<MavenRepositoryHandlerConvention>().mavenInstaller {
+        pom.whenConfigured {
+            dependencies.firstOrNull { dep ->
+                dep!!.withGroovyBuilder {
+                    getProperty("groupId") == "com.destroystokyo.paper" && getProperty("artifactId") == "paper-api"
+                }
+            }?.withGroovyBuilder {
+                setProperty("groupId", "org.spigotmc")
+                setProperty("artifactId", "spigot-api")
+            }
+        }
+    }
 }
 
 tasks.named<Copy>("processResources") {
