@@ -106,8 +106,8 @@ public class RegionPermissionModel extends AbstractPermissionModel {
         return hasPatternPermission("teleport", region);
     }
 
-    public boolean mayTeleportOverrideTo(ProtectedRegion region) {
-        return hasPatternPermission("teleportoverride", region);
+    public boolean mayTeleportToCenter(ProtectedRegion region) {
+        return hasPatternPermission("teleportcenter", region);
     }
 
     public boolean mayOverrideLocationFlagBounds(ProtectedRegion region) {
@@ -128,6 +128,10 @@ public class RegionPermissionModel extends AbstractPermissionModel {
         } else {
             return mayList();
         }
+    }
+
+    public boolean mayUseRegex() {
+        return hasPluginPermission("region.list.useregex");
     }
     
     public boolean maySetFlag(ProtectedRegion region) {
@@ -199,5 +203,4 @@ public class RegionPermissionModel extends AbstractPermissionModel {
 
         return hasPluginPermission(effectivePerm);
     }
-
 }

@@ -43,6 +43,7 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.commands.CommandUtils;
@@ -86,6 +87,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 /**
@@ -438,7 +441,7 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"list"},
-             usage = "[-w world] [-p owner [-n]] [-i id-filter] [page]",
+             usage = "[-w world] [-p owner [-n]] [-i id-filter [-r]] [page]",
              desc = "Get a list of regions",
              flags = "np:w:ri:",
              max = 1)
@@ -485,7 +488,20 @@ public final class RegionCommands extends RegionCommandsBase {
             task.filterOwnedByName(ownedBy, args.hasFlag('n'));
         }
         if (idFilter != null) {
-            task.filterIdByMatch(idFilter, args.hasFlag('r'));
+            if (args.hasFlag('r')) {
+                if (!getPermissionModel(sender).mayUseRegex()) {
+                    throw new CommandPermissionsException();
+                }
+                Pattern pattern;
+                try {
+                    pattern = Pattern.compile(idFilter);
+                } catch (PatternSyntaxException e) {
+                    throw new CommandException("The recevied regex pattern is invalid. Please validate your pattern.");
+                }
+                task.filterIdByRegex(pattern);
+            } else {
+                task.filterIdByMatch(idFilter);
+            }
         }
 
         AsyncCommandBuilder.wrap(task, sender)
@@ -1118,14 +1134,21 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         } else if (args.hasFlag('c')) {
             // Check permissions
-            if (!getPermissionModel(player).mayTeleportOverrideTo(existing)) {
+            if (!getPermissionModel(player).mayTeleportToCenter(existing)) {
                 throw new CommandPermissionsException();
             }
             Region region = WorldEditRegionConverter.convertToRegion(existing);
             if (region == null || region.getCenter() == null) {
                 throw new CommandException("The region has no center point.");
             }
-            teleportLocation = new Location(world, region.getCenter(), 0, 0);
+            if (player.getGameMode() == GameModes.SPECTATOR) {
+                teleportLocation = new Location(world, region.getCenter(), 0, 0);
+            } else {
+                // TODO: Add some method to create a safe teleport location.
+                // The method AbstractPlayerActor$findFreePoisition(Location loc) is no good way for this.
+                // It doesn't return the found location and it can't be checked if the location is inside the region.
+                throw new CommandException("Center teleport is only availible in Spectator gamemode.");
+            }
         } else {
             teleportLocation = existing.getFlag(Flags.TELE_LOC);
             

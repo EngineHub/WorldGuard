@@ -58,7 +58,7 @@ public class RegionLister implements Callable<Integer> {
     private final String world;
     private OwnerMatcher ownerMatcher;
     private String idFilter;
-    private boolean useRegex;
+    private Pattern regexPattern;
     private int page;
     private String playerName;
     private boolean nameOnly;
@@ -145,17 +145,12 @@ public class RegionLister implements Callable<Integer> {
         };
     }
 
-    public void filterIdByMatch(String idFilter, boolean useRegex) throws CommandException {
+    public void filterIdByMatch(String idFilter) {
         this.idFilter = idFilter;
-        this.useRegex = useRegex;
-        // validate regex pattern
-        if (useRegex) {
-            try {
-                Pattern.compile(idFilter);
-            } catch (PatternSyntaxException e) {
-                throw new CommandException("The recevied regex pattern is invalid. Please validate your pattern.");
-            }
-        }
+    }
+
+    public void filterIdByRegex(Pattern pattern) {
+        this.regexPattern = pattern;
     }
 
     @Override
@@ -172,7 +167,7 @@ public class RegionLister implements Callable<Integer> {
             final ProtectedRegion region = rg.getValue();
             final RegionListEntry entry = new RegionListEntry(region);
 
-            if (entry.matches(idFilter, useRegex) && entry.matches(ownerMatcher)) {
+            if (entry.matches(idFilter) && entry.matches(ownerMatcher)) {
                 entries.add(entry);
             }
         }
@@ -225,9 +220,12 @@ public class RegionLister implements Callable<Integer> {
                     || (isMember = matcher.isContainedWithin(region.getMembers()));
         }
 
-        public boolean matches(String idMatcher, boolean useRegex) {
-            return idMatcher == null ||
-                    (useRegex ? region.getId().matches(idMatcher) : region.getId().contains(idMatcher));
+        public boolean matches(String idMatcher) {
+            return idMatcher == null || region.getId().contains(idMatcher);
+        }
+
+        public boolean matches(Pattern pattern) {
+            return pattern == null || pattern.matcher(region.getId()).matches();
         }
 
         public ProtectedRegion getRegion() {
@@ -289,7 +287,7 @@ public class RegionLister implements Callable<Integer> {
                         .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to teleport")))
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                                 "/rg tp -w \"" + world + "\" " + entry.region.getId()))));
-            } else if (perms != null && perms.mayTeleportOverrideTo(entry.getRegion()) && entry.getRegion().isPhysicalArea()) {
+            } else if (perms != null && perms.mayTeleportToCenter(entry.getRegion()) && entry.getRegion().isPhysicalArea()) {
                 builder.append(TextComponent.space().append(TextComponent.of("[TP-Center]", TextColor.GRAY)
                         .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
                                 TextComponent.of("Click to teleport to the center")))
