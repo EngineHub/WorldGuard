@@ -325,7 +325,7 @@ public class RegionPrintoutBuilder implements Callable<TextComponent> {
                                             + teleFlag.getBlockZ()))))
                     .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                             "/rg tp -w \"" + world + "\" " + region.getId()))));
-        } else if (perms != null && perms.mayTeleportOverrideTo(region) && region.isPhysicalArea()) {
+        } else if (perms != null && perms.mayTeleportToCenter(region) && region.isPhysicalArea()) {
             builder.append(TextComponent.space().append(TextComponent.of("[Center Teleport]", TextColor.GRAY)
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT,
                             TextComponent.of("Click to teleport to the center of the region")))
