@@ -103,6 +103,8 @@ public class Session {
 
         lastValid = location;
         lastRegionSet = set.getRegions();
+        disableBypass = WorldGuard.getInstance().getPlatform().getGlobalStateManager()
+                .get(player.getWorld()).disableDefaultBypass;
 
         for (Handler handler : handlers.values()) {
             handler.initialize(player, location, set);
