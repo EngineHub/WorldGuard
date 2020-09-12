@@ -280,7 +280,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
         boundedLocationFlags = getBoolean("regions.location-flags-only-inside-regions", false);
-        disableDefaultBypass = getBoolean("regions.disable-default-bypass", false);
+        disableDefaultBypass = getBoolean("regions.disable-bypass-by-default", false);
 
         maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player.default", 7);
         maxRegionCounts = new HashMap<>();
