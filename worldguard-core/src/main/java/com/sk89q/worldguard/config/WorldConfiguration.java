@@ -175,6 +175,7 @@ public abstract class WorldConfiguration {
     public boolean breakDeniedHoppers;
     public boolean useMaxPriorityAssociation;
     public boolean disableDefaultBypass;
+    public boolean announceBypassStatus;
     protected Map<String, Integer> maxRegionCounts;
 
     /**
