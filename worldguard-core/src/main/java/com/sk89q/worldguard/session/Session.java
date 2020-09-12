@@ -22,8 +22,11 @@ package com.sk89q.worldguard.session;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -103,8 +106,14 @@ public class Session {
 
         lastValid = location;
         lastRegionSet = set.getRegions();
-        disableBypass = WorldGuard.getInstance().getPlatform().getGlobalStateManager()
-                .get(player.getWorld()).disableDefaultBypass;
+        WorldConfiguration cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(player.getWorld());
+        disableBypass = cfg.disableDefaultBypass;
+        if (cfg.announceBypassStatus && player.hasPermission("worldguard.region.toggle-bypass")) {
+            player.printInfo(TextComponent.of(
+                    "You are " + (disableBypass ? "not" : "") + " bypassing region protection. " +
+                    "You can toggle this with /rg bypass", TextColor.DARK_PURPLE));
+        }
+
 
         for (Handler handler : handlers.values()) {
             handler.initialize(player, location, set);
