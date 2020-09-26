@@ -13,6 +13,7 @@
 * Fix ride flag being checked on striders that didn't have saddles.
 * Add config option to have /rg bypass toggled off on login.
 * Developer changes: Methods taking names in Domains are now explicitly deprecated (was previously just a javadoc comment.); These will eventually be removed: there is no reason to use names over UUIDs. Offline players and NPCs alike have stable UUIDs.
+* Also for developers; The new `com.sk89q.worldguard.protection.util.WorldEditRegionConverter` class has some useful static methods to convert to and from WorldEdit's Region and WorldGuard's ProtectedRegion classes.
 
 
 ## 7.0.3
