@@ -49,6 +49,7 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -267,6 +268,11 @@ public class RegionProtectionListener extends AbstractListener {
             } else if (handleAsInventoryUsage(event.getOriginalEvent())) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = "take that";
+
+            /* Anvils */
+            } else if (Materials.isAnvil(type)) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.USE_ANVIL));
+                what = "use that";
 
             /* Beds */
             } else if (Materials.isBed(type)) {
