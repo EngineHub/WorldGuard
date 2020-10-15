@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.MapFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -106,6 +107,12 @@ public class RegionResultSet extends AbstractRegionSet {
     @Override
     public <V> Collection<V> queryAllValues(@Nullable RegionAssociable subject, Flag<V> flag) {
         return flagValueCalculator.queryAllValues(subject, flag);
+    }
+
+    @Override
+    @Nullable
+    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key) {
+        return flagValueCalculator.queryMapValue(subject, flag, key);
     }
 
     @Override
