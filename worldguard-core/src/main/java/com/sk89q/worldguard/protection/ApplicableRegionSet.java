@@ -23,6 +23,8 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.MapFlag;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -118,6 +120,28 @@ public interface ApplicableRegionSet extends Iterable<ProtectedRegion> {
      */
     @Nullable
     <V> V queryValue(@Nullable RegionAssociable subject, Flag<V> flag);
+
+    /**
+     * Get the effective value for a key in a {@link MapFlag}. If there are multiple values
+     * (for example, if there are multiple regions with the same priority
+     * but with different farewell messages set, there would be multiple
+     * completing values), then the selected (or "winning") value will be undefined.
+     *
+     * <p>A subject can be provided that is used to determine whether the value
+     * of a flag on a particular region should be used. For example, if a
+     * flag's region group is set to {@link RegionGroup#MEMBERS} and the given
+     * subject is not a member, then the region would be skipped when
+     * querying that flag. If {@code null} is provided for the subject, then
+     * only flags that use {@link RegionGroup#ALL},
+     * {@link RegionGroup#NON_MEMBERS}, etc. will apply.</p>
+     *
+     * @param subject an optional subject, which would be used to determine the region group to apply
+     * @param flag the flag of type {@link MapFlag}
+     * @param key the key for the map flag
+     * @return a value, which could be {@code null}
+     */
+    @Nullable
+    <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key);
 
     /**
      * Get the effective values for a flag, returning a collection of all
