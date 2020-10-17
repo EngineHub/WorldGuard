@@ -71,6 +71,7 @@ public final class Flags {
     public static final StateFlag ITEM_FRAME_ROTATE = register(new StateFlag("item-frame-rotation", false));
     public static final StateFlag TRAMPLE_BLOCKS = register(new StateFlag("block-trampling", false));
     public static final StateFlag FIREWORK_DAMAGE = register(new StateFlag("firework-damage", false));
+    public static final StateFlag USE_ANVIL = register(new StateFlag("use-anvil", false));
 
     // These flags are similar to the ones above (used in tandem with BUILD),
     // but their defaults are set to TRUE because it is more user friendly.
