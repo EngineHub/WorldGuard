@@ -112,7 +112,13 @@ public class RegionResultSet extends AbstractRegionSet {
     @Override
     @Nullable
     public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key) {
-        return flagValueCalculator.queryMapValue(subject, flag, key);
+        return flagValueCalculator.queryMapValue(subject, flag, key, null);
+    }
+
+    @Override
+    @Nullable
+    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, Flag<V> fallback) {
+        return flagValueCalculator.queryMapValue(subject, flag, key, fallback);
     }
 
     @Override
