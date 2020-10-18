@@ -245,11 +245,12 @@ public class FlagValueCalculator {
      * @return a value, which could be {@code null}
      */
     @Nullable
-    public <V, T> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<T, V> flag, T key) {
+    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, Flag<V> fallback) {
         checkNotNull(flag);
         checkNotNull(key);
 
-        V value = null;
+        Map<ProtectedRegion, V> consideredValues = new HashMap<>();
+        Map<ProtectedRegion, V> fallbackValues = new HashMap<>();
         int minimumPriority = Integer.MIN_VALUE;
         Set<ProtectedRegion> ignoredParents = new HashSet<>();
 
@@ -266,23 +267,31 @@ public class FlagValueCalculator {
 
             if (effectiveValue != null) {
                 minimumPriority = getPriority(region);
-                value = effectiveValue;
+                consideredValues.put(region, effectiveValue);
+            } else {
+                effectiveValue = getEffectiveFlag(region, fallback, subject);
+                if (effectiveValue != null) {
+                    minimumPriority = getPriority(region);
+                    fallbackValues.put(region, effectiveValue);
+                }
             }
 
             addParents(ignoredParents, region);
         }
-        return value;
+        V finalValue = flag.getValueFlag().chooseValue(consideredValues.values());
+        if (finalValue == null) return fallback.chooseValue(fallbackValues.values());
+        return finalValue;
     }
 
     @Nullable
-    private <V, T> V getEffectiveMapValue(ProtectedRegion region, MapFlag<T, V> mapFlag, T key, RegionAssociable subject) {
+    private <V, K> V getEffectiveMapValue(ProtectedRegion region, MapFlag<K, V> mapFlag, K key, RegionAssociable subject) {
         List<ProtectedRegion> seen = new ArrayList<>();
         ProtectedRegion current = region;
 
         while (current != null) {
             seen.add(current);
 
-            Map<T, V> mapValue = current.getFlag(mapFlag);
+            Map<K, V> mapValue = current.getFlag(mapFlag);
 
             if (mapValue != null && mapValue.containsKey(key)) {
                 boolean use = true;
