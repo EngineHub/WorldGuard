@@ -70,8 +70,14 @@ public class FailedLoadRegionSet extends AbstractRegionSet {
     @Nullable
     @Override
     public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key) {
+        return queryMapValue(subject, flag, key, null);
+    }
+
+    @Nullable
+    @Override
+    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, @Nullable Flag<V> fallback) {
         Map<K, V> defaultVal = flag.getDefault();
-        return defaultVal != null ? defaultVal.get(key) : null;
+        return defaultVal != null ? defaultVal.get(key) : fallback != null ? fallback.getDefault() : null;
     }
 
     @SuppressWarnings("unchecked")
