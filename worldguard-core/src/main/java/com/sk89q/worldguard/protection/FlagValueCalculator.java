@@ -268,7 +268,7 @@ public class FlagValueCalculator {
             if (effectiveValue != null) {
                 minimumPriority = getPriority(region);
                 consideredValues.put(region, effectiveValue);
-            } else {
+            } else if (fallback != null) {
                 effectiveValue = getEffectiveFlag(region, fallback, subject);
                 if (effectiveValue != null) {
                     minimumPriority = getPriority(region);
@@ -278,9 +278,17 @@ public class FlagValueCalculator {
 
             addParents(ignoredParents, region);
         }
-        V finalValue = flag.getValueFlag().chooseValue(consideredValues.values());
-        if (finalValue == null) return fallback.chooseValue(fallbackValues.values());
-        return finalValue;
+
+
+        if (consideredValues.isEmpty()) {
+            if (fallback != null && !fallbackValues.isEmpty()) {
+                return fallback.chooseValue(fallbackValues.values());
+            }
+            V defaultValue = flag.getValueFlag().getDefault();
+            return defaultValue != null ? defaultValue : fallback != null ? fallback.getDefault() : null;
+        }
+
+        return flag.getValueFlag().chooseValue(consideredValues.values());
     }
 
     @Nullable
