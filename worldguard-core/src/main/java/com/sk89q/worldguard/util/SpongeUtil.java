@@ -24,7 +24,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldguard.WorldGuard;
@@ -60,7 +60,7 @@ public final class SpongeUtil {
             for (int cy = -wcfg.spongeRadius; cy <= wcfg.spongeRadius; cy++) {
                 for (int cz = -wcfg.spongeRadius; cz <= wcfg.spongeRadius; cz++) {
                     BlockVector3 vector = BlockVector3.at(ox + cx, oy + cy, oz + cz);
-                    BlockState block = world.getBlock(vector);
+                    BaseBlock block = world.getFullBlock(vector);
                     BlockType blockType = block.getBlockType();
                     if (isReplacable(blockType)) {
                         try {
