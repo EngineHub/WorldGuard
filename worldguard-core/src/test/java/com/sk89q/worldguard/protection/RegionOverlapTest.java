@@ -200,7 +200,7 @@ public abstract class RegionOverlapTest {
 
         HashSet<ProtectedRegion> source = new HashSet<>();
         source.add(courtyard);
-        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source, useMaxPriorityAssociation);
+        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source, useMaxPriorityAssociation, false);
 
         // Outside
         appl = manager.getApplicableRegions(outside);
@@ -220,7 +220,7 @@ public abstract class RegionOverlapTest {
         HashSet<ProtectedRegion> source = new HashSet<>();
         source.add(fountain);
         source.add(courtyard);
-        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source, useMaxPriorityAssociation);
+        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source, useMaxPriorityAssociation, false);
 
         // Outside
         appl = manager.getApplicableRegions(outside);
@@ -238,7 +238,7 @@ public abstract class RegionOverlapTest {
         ApplicableRegionSet appl;
 
         HashSet<ProtectedRegion> source = new HashSet<>();
-        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source, useMaxPriorityAssociation);
+        RegionOverlapAssociation assoc = new RegionOverlapAssociation(source, useMaxPriorityAssociation, false);
 
         // Outside
         appl = manager.getApplicableRegions(outside);

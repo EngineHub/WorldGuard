@@ -41,7 +41,7 @@ public class DelayedRegionOverlapAssociation extends com.sk89q.worldguard.protec
      * @param location the location
      */
     public DelayedRegionOverlapAssociation(RegionQuery query, Location location) {
-        super(query, location, false);
+        super(query, location, false, false);
     }
 
 }

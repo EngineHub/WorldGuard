@@ -174,6 +174,7 @@ public abstract class WorldConfiguration {
     public boolean ignoreHopperMoveEvents;
     public boolean breakDeniedHoppers;
     public boolean useMaxPriorityAssociation;
+    public boolean useOwnerAssociation;
     protected Map<String, Integer> maxRegionCounts;
 
     /**
