@@ -48,7 +48,7 @@ public final class FlagUtil {
         for (Entry<Flag<?>, Object> entry : values.entrySet()) {
             try {
                 rawValues.put(entry.getKey().getName(), marshal(entry.getKey(), entry.getValue()));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.log(Level.WARNING, "Failed to marshal flag value for " + entry.getKey() + "; value is " + entry.getValue(), e);
             }
         }
