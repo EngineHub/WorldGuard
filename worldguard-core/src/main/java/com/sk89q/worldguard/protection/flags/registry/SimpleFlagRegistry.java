@@ -144,7 +144,7 @@ public class SimpleFlagRegistry implements FlagRegistry {
                     } else {
                         log.warning("Failed to parse flag '" + flag.getName() + "' with value '" + entry.getValue() + "'");
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.log(Level.WARNING, "Failed to unmarshal flag value for " + flag, e);
                 }
             }
