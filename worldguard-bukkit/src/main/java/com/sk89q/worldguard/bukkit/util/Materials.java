@@ -1292,7 +1292,8 @@ public final class Materials {
                 || type == Material.SUGAR_CANE
                 || type == Material.BAMBOO
                 || type == Material.BAMBOO_SAPLING
-                || type == Material.SWEET_BERRY_BUSH;
+                || type == Material.SWEET_BERRY_BUSH
+                || type == Material.NETHER_WART;
     }
 
     /**
