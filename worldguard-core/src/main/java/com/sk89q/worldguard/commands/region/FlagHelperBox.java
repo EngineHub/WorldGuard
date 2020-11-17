@@ -359,11 +359,9 @@ class FlagHelperBox extends PaginationBox {
         if (currVal == null) {
             currVal = getInheritedValue(region, flag);
         }
-        @SuppressWarnings("unchecked")
-        List<V> values = currVal == null ? Collections.emptyList() : (List<V>) flag.marshal(currVal);
         String display = (currVal == null ? "" : currVal.size() + "x ") + subName;
         final String stringValue = currVal == null ? ""
-                : values.stream().map(String::valueOf).collect(Collectors.joining(","));
+                : currVal.stream().map(String::valueOf).collect(Collectors.joining(","));
         TextComponent hoverComp = TextComponent.of("");
         if (currVal != null) {
             hoverComp = hoverComp.append(TextComponent.of("Current values:"))
