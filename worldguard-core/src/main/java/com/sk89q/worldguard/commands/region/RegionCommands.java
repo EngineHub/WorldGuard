@@ -1171,9 +1171,11 @@ public final class RegionCommands extends RegionCommandsBase {
 
     @Command(aliases = {"toggle-bypass", "bypass"},
              desc = "Toggle region bypassing, effectively ignoring bypass permissions.")
-    @CommandPermissions({"worldguard.region.toggle-bypass"})
     public void toggleBypass(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
+        if (!player.hasPermission("worldguard.region.toggle-bypass")) {
+            throw new CommandPermissionsException();
+        }
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
         if (session.hasBypassDisabled()) {
             session.setBypassDisabled(false);
