@@ -262,6 +262,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableGrassGrowth = getBoolean("dynamics.disable-grass-growth", false);
         disableMyceliumSpread = getBoolean("dynamics.disable-mycelium-spread", false);
         disableVineGrowth = getBoolean("dynamics.disable-vine-growth", false);
+        disableBambooGrowth = getBoolean("dynamics.disable-bamboo-growth", false);
         disableCropGrowth = getBoolean("dynamics.disable-crop-growth", false);
         disableSoilDehydration = getBoolean("dynamics.disable-soil-dehydration", false);
         disableCoralBlockFade = getBoolean("dynamics.disable-coral-block-fade", false);

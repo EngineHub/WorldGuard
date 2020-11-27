@@ -610,6 +610,20 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
         }
+
+        // Bamboo is called in spread event not grow event
+        if (newType == Material.BAMBOO || newType == Material.BAMBOO_SAPLING) {
+            if (wcfg.disableBambooGrowth) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.BAMBOO_GROWTH))) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

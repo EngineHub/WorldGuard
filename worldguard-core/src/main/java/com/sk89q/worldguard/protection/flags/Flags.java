@@ -118,6 +118,7 @@ public final class Flags {
     public static final StateFlag GRASS_SPREAD = register(new StateFlag("grass-growth", true));
     public static final StateFlag MYCELIUM_SPREAD = register(new StateFlag("mycelium-spread", true));
     public static final StateFlag VINE_GROWTH = register(new StateFlag("vine-growth", true));
+    public static final StateFlag BAMBOO_GROWTH = register(new StateFlag("bamboo-growth", true));
     public static final StateFlag CROP_GROWTH = register(new StateFlag("crop-growth", true));
     public static final StateFlag SOIL_DRY = register(new StateFlag("soil-dry", true));
     public static final StateFlag CORAL_FADE = register(new StateFlag("coral-fade", true));
