@@ -18,7 +18,7 @@ WorldGuard lets you and players guard areas of land against griefers and undesir
 WorldGuard is open source and is available under the GNU Lesser
 General Public License v3.
 
-Currently, Bukkit is required to use WorldGuard. You can get a release copy of WorldGuard from the [BukkitDev site](http://dev.bukkit.org/bukkit-plugins/worldguard/).
+A Bukkit server implementation (such as [Paper](https://papermc.io)) and the [WorldEdit plugin](https://dev.bukkit.org/projects/worldedit) are required to use WorldGuard. You can get a release copy of WorldGuard from the [BukkitDev site](https://dev.bukkit.org/projects/worldguard).
 
 Compiling
 ---------
@@ -42,7 +42,6 @@ Links
 
 * [Homepage](http://enginehub.org/worldguard)
 * [Discord](https://discord.gg/enginehub)
-* [IRC channel](https://webchat.esper.net/?join=sk89q) (#sk89q on irc.esper.net)
-* [Issue tracker](https://dev.enginehub.org/issues/WORLDGUARD)
+* [Issue tracker](https://github.com/EngineHub/WorldGuard/issues)
 * [Continuous integration](http://builds.enginehub.org) [![Build Status](https://ci.enginehub.org/app/rest/builds/buildType:bt11,branch:master/statusIcon.svg)](http://ci.enginehub.org/viewType.html?buildTypeId=bt11&guest=1)
 * [End-user documentation](https://worldguard.enginehub.org/en/latest/)
