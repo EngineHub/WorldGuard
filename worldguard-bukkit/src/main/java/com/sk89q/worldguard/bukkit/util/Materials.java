@@ -1263,6 +1263,10 @@ public final class Materials {
         return Tag.BEDS.isTagged(material);
     }
 
+    public static boolean isAnvil(Material material) {
+        return Tag.ANVIL.isTagged(material);
+    }
+
     public static boolean isCoral(Material material) {
         return Tag.CORAL_BLOCKS.isTagged(material) ||
                 Tag.CORAL_PLANTS.isTagged(material) ||
@@ -1287,7 +1291,9 @@ public final class Materials {
                 || type == Material.CACTUS
                 || type == Material.SUGAR_CANE
                 || type == Material.BAMBOO
-                || type == Material.BAMBOO_SAPLING;
+                || type == Material.BAMBOO_SAPLING
+                || type == Material.SWEET_BERRY_BUSH
+                || type == Material.NETHER_WART;
     }
 
     /**
@@ -1318,8 +1324,7 @@ public final class Materials {
                 || Tag.DOORS.isTagged(material)
                 || Tag.WOODEN_TRAPDOORS.isTagged(material)
                 || Tag.FENCE_GATES.isTagged(material)
-                || Tag.PRESSURE_PLATES.isTagged(material)
-                || Tag.ANVIL.isTagged(material)) {
+                || Tag.PRESSURE_PLATES.isTagged(material)) {
             return true;
         }
         switch (material) {

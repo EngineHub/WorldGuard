@@ -25,7 +25,6 @@ import com.google.common.collect.Sets;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
@@ -1123,12 +1122,25 @@ public final class RegionCommands extends RegionCommandsBase {
     }
 
     @Command(aliases = {"toggle-bypass", "bypass"},
+             usage = "[on|off]",
              desc = "Переключить обход защиты региона, игнорируя разрешение обхода.")
-    @CommandPermissions({"worldguard.region.toggle-bypass"})
     public void toggleBypass(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
+        if (!player.hasPermission("worldguard.region.toggle-bypass")) {
+            throw new CommandPermissionsException();
+        }
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
-        if (session.hasBypassDisabled()) {
+        boolean shouldEnableBypass;
+        if (args.argsLength() > 0) {
+            String arg1 = args.getString(0);
+            if (!arg1.equalsIgnoreCase("on") && !arg1.equalsIgnoreCase("off")) {
+                throw new CommandException("Allowed optional arguments are: on, off");
+            }
+            shouldEnableBypass = arg1.equalsIgnoreCase("on");
+        } else {
+            shouldEnableBypass = session.hasBypassDisabled();
+        }
+        if (shouldEnableBypass) {
             session.setBypassDisabled(false);
             player.print("Теперь вы можете обойти защиту региона (до тех пор, пока у вас есть разрешение).");
         } else {

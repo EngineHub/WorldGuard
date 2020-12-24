@@ -33,12 +33,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.NPC;
-import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Shulker;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.SpectralArrow;
+import org.bukkit.entity.Steerable;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
@@ -91,7 +91,7 @@ public final class Entities {
      * @return true if the entity can be ridden
      */
     public static boolean isRiddenOnUse(Entity entity) {
-        return entity instanceof Pig ? ((Pig) entity).hasSaddle() : entity instanceof Vehicle;
+        return entity instanceof Steerable ? ((Steerable) entity).hasSaddle() : entity instanceof Vehicle;
     }
 
     /**

@@ -144,7 +144,7 @@ public class SimpleFlagRegistry implements FlagRegistry {
                     } else {
                         log.warning("Не удалось разобрать флаг '" + flag.getName() + "' со значением '" + entry.getValue() + "'");
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.log(Level.WARNING, "Не удалось распаковать значение флага для " + flag, e);
                 }
             }

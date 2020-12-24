@@ -1,9 +1,20 @@
 # Changelog
 
-## 7.0.4 beta 1
+## 7.0.4 (including beta1)
 
 * Add support for MC 1.16. Dropped support for previous versions.
 * Add respawn-anchors flag mirroring the sleep flag (e.g. to prevent using respawn anchors to cause explosions in the overworld)
+* Add nether vines to vine-growth flag.
+* Add config option to disable the bypass permission cache.
+* Fix water-flow flags not checking waterlogged blocks.
+* Add config option to consider non-player causes (e.g. pistons, flowing water) to only be members of the highest priority region. This should be enabled for plots-within-city-like setups to prevent things in plots from modifying the city.
+* Fix items dropping from falling blocks that were suppressed by other plugins.
+* Add config option to block turtle egg trampling.
+* Fix ride flag being checked on striders that didn't have saddles.
+* Add config option to have /rg bypass toggled off on login.
+* Developer changes: Methods taking names in Domains are now explicitly deprecated (was previously just a javadoc comment.); These will eventually be removed: there is no reason to use names over UUIDs. Offline players and NPCs alike have stable UUIDs.
+* Also for developers; The new `com.sk89q.worldguard.protection.util.WorldEditRegionConverter` class has some useful static methods to convert to and from WorldEdit's Region and WorldGuard's ProtectedRegion classes.
+
 
 ## 7.0.3
 

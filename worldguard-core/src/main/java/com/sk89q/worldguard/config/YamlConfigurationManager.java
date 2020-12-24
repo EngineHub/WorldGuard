@@ -56,6 +56,9 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         migrateRegionsToUuid = config.getBoolean("regions.uuid-migration.perform-on-next-start", true);
         keepUnresolvedNames = config.getBoolean("regions.uuid-migration.keep-names-that-lack-uuids", true);
         useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
+        disableDefaultBypass = config.getBoolean("regions.disable-bypass-by-default", false);
+        announceBypassStatus = config.getBoolean("regions.announce-bypass-status", false);
+
         useGodPermission = config.getBoolean("auto-invincible", config.getBoolean("auto-invincible-permission", false));
         useGodGroup = config.getBoolean("auto-invincible-group", false);
         useAmphibiousGroup = config.getBoolean("auto-no-drowning-group", false);

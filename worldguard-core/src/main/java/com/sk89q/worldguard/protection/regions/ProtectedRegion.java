@@ -46,6 +46,10 @@ import javax.annotation.Nullable;
  * against it.
  *
  * <p>Instances can be modified and access from several threads at a time.</p>
+ *
+ * Note: this class has a natural ordering that is inconsistent with equals.
+ * Regions with identical ids (and also the same priority) may exist in different managers (or no manager at all),
+ * so care should be taken when comparing regions that have not been obtained from a single manager.
  */
 public abstract class ProtectedRegion implements ChangeTracked, Comparable<ProtectedRegion> {
 

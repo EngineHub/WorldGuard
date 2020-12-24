@@ -46,6 +46,7 @@ import com.sk89q.worldguard.protection.flags.RegistryFlag;
 import com.sk89q.worldguard.protection.flags.SetFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StringFlag;
+import com.sk89q.worldguard.protection.flags.registry.UnknownFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import javax.annotation.Nullable;
@@ -108,7 +109,7 @@ class FlagHelperBox extends PaginationBox {
     private Component createLine(Flag<?> flag, boolean thirdParty) {
         final TextComponent.Builder builder = TextComponent.builder("");
 
-        appendFlagName(builder, flag, thirdParty ? TextColor.LIGHT_PURPLE : TextColor.GOLD);
+        appendFlagName(builder, flag, flag instanceof UnknownFlag ? TextColor.GRAY : thirdParty ? TextColor.LIGHT_PURPLE : TextColor.GOLD);
         appendFlagValue(builder, flag);
         return builder.build();
     }
@@ -255,7 +256,7 @@ class FlagHelperBox extends PaginationBox {
 
         boolean isExplicitSet = currVal != null && !inherited;
 
-        boolean maySet = perms.maySetFlag(region, flag);
+        boolean maySet = !(flag instanceof UnknownFlag) && perms.maySetFlag(region, flag);
 
         TextColor col = isExplicitSet ? TextColor.WHITE : inherited ? TextColor.GRAY : TextColor.DARK_GRAY;
         Set<TextDecoration> styles = currVal == defVal ? ImmutableSet.of(TextDecoration.UNDERLINED) : Collections.emptySet();
@@ -359,11 +360,9 @@ class FlagHelperBox extends PaginationBox {
         if (currVal == null) {
             currVal = getInheritedValue(region, flag);
         }
-        @SuppressWarnings("unchecked")
-        List<V> values = currVal == null ? Collections.emptyList() : (List<V>) flag.marshal(currVal);
         String display = (currVal == null ? "" : currVal.size() + "x ") + subName;
         final String stringValue = currVal == null ? ""
-                : values.stream().map(String::valueOf).collect(Collectors.joining(","));
+                : currVal.stream().map(String::valueOf).collect(Collectors.joining(","));
         TextComponent hoverComp = TextComponent.of("");
         if (currVal != null) {
             hoverComp = hoverComp.append(TextComponent.of("Текущие значения:"))

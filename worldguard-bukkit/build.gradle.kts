@@ -48,14 +48,18 @@ tasks.named<Upload>("install") {
 }
 
 tasks.named<Copy>("processResources") {
+    val internalVersion = project.ext["internalVersion"]
+    inputs.property("internalVersion", internalVersion)
     filesMatching("plugin.yml") {
-        expand("internalVersion" to project.ext["internalVersion"])
+        expand("internalVersion" to internalVersion)
     }
 }
 
 tasks.named<Jar>("jar") {
+    val projectVersion = project.version
+    inputs.property("projectVersion", projectVersion)
     manifest {
-        attributes("Implementation-Version" to project.version)
+        attributes("Implementation-Version" to projectVersion)
     }
 }
 

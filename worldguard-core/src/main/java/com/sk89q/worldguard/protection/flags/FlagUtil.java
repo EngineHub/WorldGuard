@@ -48,7 +48,7 @@ public final class FlagUtil {
         for (Entry<Flag<?>, Object> entry : values.entrySet()) {
             try {
                 rawValues.put(entry.getKey().getName(), marshal(entry.getKey(), entry.getValue()));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.log(Level.WARNING, "Не удалось упаковать значение флага для " + entry.getKey() + "; значение " + entry.getValue(), e);
             }
         }

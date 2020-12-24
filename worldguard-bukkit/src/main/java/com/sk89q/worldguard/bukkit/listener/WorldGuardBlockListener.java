@@ -31,12 +31,14 @@ import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.util.SpongeUtil;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowman;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -610,13 +612,20 @@ public class WorldGuardBlockListener implements Listener {
                 return;
             }
         }
+
+        handleGrow(event, event.getBlock().getLocation(), newType);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockGrow(BlockGrowEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        Location loc = event.getBlock().getLocation();
         final Material type = event.getNewState().getType();
 
+        handleGrow(event, loc, type);
+    }
+
+    private void handleGrow(Cancellable event, Location loc, Material type) {
+        WorldConfiguration wcfg = getWorldConfig(loc.getWorld());
         if (Materials.isCrop(type)) {
             if (wcfg.disableCropGrowth) {
                 event.setCancelled(false);
@@ -624,7 +633,7 @@ public class WorldGuardBlockListener implements Listener {
             }
 
             if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
-                .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.CROP_GROWTH))) {
+                .queryState(BukkitAdapter.adapt(loc), (RegionAssociable) null, Flags.CROP_GROWTH))) {
                 event.setCancelled(true);
                 return;
             }

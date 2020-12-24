@@ -761,7 +761,7 @@ public class EventAbstractionListener extends AbstractListener {
                 event.setCancelled(true);
             }
         } else if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
-            if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getPlayer(), event.getHook()), event.getHook().getLocation(), EntityType.EXPERIENCE_ORB))) {
+            if (event.getExpToDrop() > 0 && Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getPlayer(), event.getHook()), event.getHook().getLocation(), EntityType.EXPERIENCE_ORB))) {
                 event.setExpToDrop(0);
             }
         } else if (event.getState() == PlayerFishEvent.State.CAUGHT_ENTITY) {
