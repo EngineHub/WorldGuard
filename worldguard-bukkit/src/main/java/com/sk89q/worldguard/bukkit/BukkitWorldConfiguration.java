@@ -218,6 +218,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         blockGroundSlimes = getBoolean("mobs.block-above-ground-slimes", false);
         blockOtherExplosions = getBoolean("mobs.block-other-explosions", false);
         blockZombieDoorDestruction = getBoolean("mobs.block-zombie-door-destruction", false);
+        blockEntityVehicleEntry = getBoolean("mobs.block-vehicle-entry", false);
 
         disableFallDamage = getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = getBoolean("player-damage.disable-lava-damage", false);
