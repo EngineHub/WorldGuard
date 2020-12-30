@@ -851,7 +851,7 @@ public class WorldGuardEntityListener implements Listener {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntered().getWorld()));
 
-        if(wcfg.blockEntityVehicleEntry && !(event.getEntered() instanceof Player)) {
+        if (wcfg.blockEntityVehicleEntry && !(event.getEntered() instanceof Player)) {
             event.setCancelled(true);
         }
     }
