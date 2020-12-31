@@ -82,6 +82,7 @@ import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
@@ -842,6 +843,16 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onVehicleEnter(VehicleEnterEvent event) {
+        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(event.getEntered().getWorld()));
+
+        if (wcfg.blockEntityVehicleEntry && !(event.getEntered() instanceof Player)) {
+            event.setCancelled(true);
         }
     }
 
