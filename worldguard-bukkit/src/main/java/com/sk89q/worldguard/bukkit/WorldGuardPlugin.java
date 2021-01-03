@@ -385,6 +385,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         Plugin worldEdit = getServer().getPluginManager().getPlugin("WorldEdit");
         if (worldEdit == null) {
             throw new CommandException("WorldEdit does not appear to be installed.");
+        } else if (!worldEdit.isEnabled()) {
+            throw new CommandException("WorldEdit does not appear to be enabled.");
         }
 
         if (worldEdit instanceof WorldEditPlugin) {
