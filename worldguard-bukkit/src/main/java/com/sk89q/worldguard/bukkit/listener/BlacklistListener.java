@@ -49,6 +49,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockDispenseArmorEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
@@ -58,6 +59,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import static com.sk89q.worldguard.bukkit.BukkitUtil.createTarget;
 
@@ -330,6 +332,9 @@ public class BlacklistListener extends AbstractListener {
                         return cursor;
                     }
                 case HOTBAR_SWAP:
+                    if (event.getClick() == ClickType.SWAP_OFFHAND) {
+                        return clickedInventory == null ? null : ((PlayerInventory) clickedInventory).getItemInOffHand();
+                    }
                     return clickedInventory == null ? null : clickedInventory.getItem(event.getHotbarButton());
                 default:
                     break;
