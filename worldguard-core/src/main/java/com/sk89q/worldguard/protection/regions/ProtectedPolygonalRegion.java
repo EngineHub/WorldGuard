@@ -29,12 +29,14 @@ import java.awt.Polygon;
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     private final ImmutableList<BlockVector2> points;
     private final int minY;
     private final int maxY;
+    private Integer volume;
 
     /**
      * Construct a new instance of this polygonal region.<br>
@@ -49,6 +51,7 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
      */
     public ProtectedPolygonalRegion(String id, List<BlockVector2> points, int minY, int maxY) {
         this(id, false, points, minY, maxY);
+        volume = null;
     }
 
     /**
@@ -184,8 +187,18 @@ public class ProtectedPolygonalRegion extends ProtectedRegion {
 
     @Override
     public int volume() {
-        // TODO: Fix this -- the previous algorithm returned incorrect results, but the current state of this method is even worse
-        return 0;
+        if(volume != null) {
+            return volume;
+        }
+        volume = 0;
+        final int minY = min.getY();
+        volume = IntStream.range(min.getX(), max.getX() + 1)
+                .parallel().map(xVec -> IntStream.range(min.getZ(), max.getZ() + 1)
+                .map(zVec -> contains(xVec, minY, zVec)? 1 : 0)
+                .sum()).sum();
+        // squareblocks * height
+        volume = volume * (maxY + 1 - minY);
+        return volume;
     }
 
 }
