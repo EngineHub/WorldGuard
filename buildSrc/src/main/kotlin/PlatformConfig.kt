@@ -111,6 +111,7 @@ fun Project.applyShadowConfiguration() {
                 include(dependency("org.flywaydb:flyway-core:3.0"))
             }
             relocate("com.sk89q.squirrelid", "com.sk89q.worldguard.util.profile")
+            relocate("co.aikar.timings.lib", "com.sk89q.worldguard.internal.timingslib")
         }
         exclude("GradleStart**")
         exclude(".cache")

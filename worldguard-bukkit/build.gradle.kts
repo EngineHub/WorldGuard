@@ -19,6 +19,10 @@ repositories {
         name = "bstats"
         url = uri("https://repo.codemc.org/repository/maven-public")
     }
+    maven {
+        name = "aikar-timings"
+        url = uri("http://repo.aikar.co/nexus/content/groups/aikar/")
+    }
 }
 
 dependencies {
@@ -30,6 +34,7 @@ dependencies {
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "implementation"("org.bstats:bstats-bukkit:1.7")
+    "implementation"("co.aikar:minecraft-timings:1.0.4")
 }
 
 tasks.named<Upload>("install") {

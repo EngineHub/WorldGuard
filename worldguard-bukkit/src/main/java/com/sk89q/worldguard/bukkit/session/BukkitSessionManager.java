@@ -27,6 +27,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.session.AbstractSessionManager;
 import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.session.handler.Handler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,11 @@ import java.util.Collection;
  * (flags, etc.).
  */
 public class BukkitSessionManager extends AbstractSessionManager implements Runnable, Listener {
+
+    @Override
+    protected Handler.Factory<? extends Handler> wrapForRegistration(Handler.Factory<? extends Handler> factory) {
+        return new TimedHandlerFactory(factory);
+    }
 
     /**
      * Re-initialize handlers and clear "last position," "last state," etc.
