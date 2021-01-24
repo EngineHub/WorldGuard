@@ -76,6 +76,9 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate ("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib:1.0.4"))
         }
+        relocate ("co.aikar.timings.lib", "com.sk89q.worldguard.bukkit.timingslib") {
+            include(dependency("co.aikar:minecraft-timings:1.0.4"))
+        }
     }
 }
 
