@@ -24,6 +24,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.MapFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -31,6 +32,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -57,6 +59,19 @@ public class PermissiveRegionSet extends AbstractRegionSet {
             return (V) State.DENY;
         }
         return flag.getDefault();
+    }
+
+    @Nullable
+    @Override
+    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key) {
+        return queryMapValue(subject, flag, key, null);
+    }
+
+    @Nullable
+    @Override
+    public <V, K> V queryMapValue(@Nullable RegionAssociable subject, MapFlag<K, V> flag, K key, @Nullable Flag<V> fallback) {
+        Map<K, V> defaultVal = flag.getDefault();
+        return defaultVal != null ? defaultVal.get(key) : fallback != null ? fallback.getDefault() : null;
     }
 
     @SuppressWarnings("unchecked")

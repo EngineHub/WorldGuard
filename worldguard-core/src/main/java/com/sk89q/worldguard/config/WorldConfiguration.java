@@ -105,6 +105,7 @@ public abstract class WorldConfiguration {
     public boolean blockEntityPaintingDestroy;
     public boolean blockEntityItemFrameDestroy;
     public boolean blockEntityArmorStandDestroy;
+    public boolean blockEntityVehicleEntry;
     public boolean blockPluginSpawning;
     public boolean blockGroundSlimes;
     public boolean blockZombieDoorDestruction;
