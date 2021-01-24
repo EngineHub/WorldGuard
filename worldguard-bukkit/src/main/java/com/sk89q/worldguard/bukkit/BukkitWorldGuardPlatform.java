@@ -67,7 +67,7 @@ import java.util.stream.Collectors;
 
 public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
 
-    private SessionManager sessionManager;
+    private BukkitSessionManager sessionManager;
     private BukkitConfigurationManager configuration;
     private BukkitRegionContainer regionContainer;
     private BukkitDebugHandler debugHandler;
@@ -138,6 +138,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
         sessionManager = new BukkitSessionManager();
         configuration = new BukkitConfigurationManager(WorldGuardPlugin.inst());
         configuration.load();
+        sessionManager.setUsingTimings(configuration.extraTimings);
         regionContainer = new BukkitRegionContainer(WorldGuardPlugin.inst());
         regionContainer.initialize();
         debugHandler = new BukkitDebugHandler(WorldGuardPlugin.inst());

@@ -41,9 +41,11 @@ import java.util.Collection;
  */
 public class BukkitSessionManager extends AbstractSessionManager implements Runnable, Listener {
 
+    private boolean useTimings;
+
     @Override
     protected Handler.Factory<? extends Handler> wrapForRegistration(Handler.Factory<? extends Handler> factory) {
-        return new TimedHandlerFactory(factory);
+        return useTimings ? new TimedHandlerFactory(factory) : factory;
     }
 
     /**
@@ -81,9 +83,17 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     public boolean hasBypass(LocalPlayer player, World world) {
         if (player instanceof BukkitPlayer) {
             if (((BukkitPlayer) player).getPlayer().hasMetadata("NPC")
-                    && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride)
+                && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride)
                 return true;
         }
         return super.hasBypass(player, world);
+    }
+
+    public boolean isUsingTimings() {
+        return useTimings;
+    }
+
+    public void setUsingTimings(boolean useTimings) {
+        this.useTimings = useTimings;
     }
 }
