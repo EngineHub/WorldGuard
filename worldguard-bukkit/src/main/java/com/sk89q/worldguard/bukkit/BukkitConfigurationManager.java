@@ -37,7 +37,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
 
     private boolean hasCommandBookGodMode;
     boolean extraStats;
-    boolean extraTimings;
+    boolean timedSessionHandlers;
 
     /**
      * Construct the object.
@@ -57,7 +57,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     public void load() {
         super.load();
         this.extraStats = getConfig().getBoolean("custom-metrics-charts", true);
-        this.extraTimings = getConfig().getBoolean("extra-timings", true);
+        this.timedSessionHandlers = getConfig().getBoolean("extra-timings.session-handlers", true);
     }
 
     @Override
