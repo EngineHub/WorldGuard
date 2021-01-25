@@ -45,13 +45,15 @@ class TimedHandlerFactory extends Handler.Factory<Handler> {
     private static final Map<CodeSource, TimingManager> PLUGIN_SOURCES = new HashMap<>();
 
     private final Handler.Factory<?> factory;
+    private final MCTiming timing;
 
     TimedHandlerFactory(Handler.Factory<?> factory) {
         this.factory = factory;
+        this.timing = makeTiming();
     }
 
-    private MCTiming getTiming(Handler handler) {
-        CodeSource codeSource = handler.getClass().getProtectionDomain().getCodeSource();
+    private MCTiming makeTiming() {
+        CodeSource codeSource = factory.getClass().getProtectionDomain().getCodeSource();
         TimingManager owner = PLUGIN_SOURCES.computeIfAbsent(codeSource, source -> {
             for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
                 CodeSource pluginSource = plugin.getClass().getProtectionDomain().getCodeSource();
@@ -61,24 +63,25 @@ class TimedHandlerFactory extends Handler.Factory<Handler> {
             }
             return null;
         });
+        String handlerName = factory.getClass().getEnclosingClass().getSimpleName();
         return owner == null
-            ? TIMINGS.of(handler.getClass().getSimpleName(), UNKNOWN_SOURCE)
-            : owner.of(handler.getClass().getSimpleName(), owner.of("Session Handlers"));
+            ? TIMINGS.of(handlerName, UNKNOWN_SOURCE)
+            : owner.of(handlerName, owner.of("Session Handlers"));
     }
 
     @Override
     public Handler create(Session session) {
-        return new TimedHandler(factory.create(session), session);
+        return new TimedHandler(factory.create(session), session, timing);
     }
 
-    class TimedHandler extends Handler {
+    static class TimedHandler extends Handler {
         private final Handler handler;
         private final MCTiming timing;
 
-        TimedHandler(Handler innerHandler, Session session) {
+        TimedHandler(Handler innerHandler, Session session, MCTiming timing) {
             super(session);
             this.handler = innerHandler;
-            this.timing = TimedHandlerFactory.this.getTiming(handler);
+            this.timing = timing;
         }
 
         @Override
