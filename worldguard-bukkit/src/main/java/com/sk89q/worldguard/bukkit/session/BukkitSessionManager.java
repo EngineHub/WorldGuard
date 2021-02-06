@@ -27,6 +27,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.player.ProcessPlayerEvent;
 import com.sk89q.worldguard.session.AbstractSessionManager;
 import com.sk89q.worldguard.session.Session;
+import com.sk89q.worldguard.session.handler.Handler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,13 @@ import java.util.Collection;
  * (flags, etc.).
  */
 public class BukkitSessionManager extends AbstractSessionManager implements Runnable, Listener {
+
+    private boolean useTimings;
+
+    @Override
+    protected Handler.Factory<? extends Handler> wrapForRegistration(Handler.Factory<? extends Handler> factory) {
+        return useTimings ? new TimedHandlerFactory(factory) : factory;
+    }
 
     /**
      * Re-initialize handlers and clear "last position," "last state," etc.
@@ -75,9 +83,17 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     public boolean hasBypass(LocalPlayer player, World world) {
         if (player instanceof BukkitPlayer) {
             if (((BukkitPlayer) player).getPlayer().hasMetadata("NPC")
-                    && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride)
+                && WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(world).fakePlayerBuildOverride)
                 return true;
         }
         return super.hasBypass(player, world);
+    }
+
+    public boolean isUsingTimings() {
+        return useTimings;
+    }
+
+    public void setUsingTimings(boolean useTimings) {
+        this.useTimings = useTimings;
     }
 }
