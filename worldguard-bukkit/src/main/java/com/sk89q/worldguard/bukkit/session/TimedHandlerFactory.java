@@ -25,12 +25,14 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.Handler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.security.CodeSource;
 import java.util.HashMap;
@@ -87,28 +89,36 @@ class TimedHandlerFactory extends Handler.Factory<Handler> {
         @Override
         public void initialize(LocalPlayer player, Location current, ApplicableRegionSet set) {
             try (MCTiming ignored = timing.startTiming()) {
-                super.initialize(player, current, set);
+                handler.initialize(player, current, set);
             }
         }
 
         @Override
         public boolean testMoveTo(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, MoveType moveType) {
             try (MCTiming ignored = timing.startTiming()) {
-                return super.testMoveTo(player, from, to, toSet, moveType);
+                return handler.testMoveTo(player, from, to, toSet, moveType);
             }
         }
 
         @Override
         public boolean onCrossBoundary(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
             try (MCTiming ignored = timing.startTiming()) {
-                return super.onCrossBoundary(player, from, to, toSet, entered, exited, moveType);
+                return handler.onCrossBoundary(player, from, to, toSet, entered, exited, moveType);
             }
         }
 
         @Override
         public void tick(LocalPlayer player, ApplicableRegionSet set) {
             try (MCTiming ignored = timing.startTiming()) {
-                super.tick(player, set);
+                handler.tick(player, set);
+            }
+        }
+
+        @Nullable
+        @Override
+        public StateFlag.State getInvincibility(LocalPlayer player) {
+            try (MCTiming ignored = timing.startTiming()) {
+                return handler.getInvincibility(player);
             }
         }
 
