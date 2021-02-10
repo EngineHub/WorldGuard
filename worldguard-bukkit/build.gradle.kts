@@ -33,8 +33,8 @@ dependencies {
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
-    "implementation"("org.bstats:bstats-bukkit:1.7")
-    "implementation"("co.aikar:minecraft-timings:1.0.4")
+    "compileOnly"("org.bstats:bstats-bukkit:1.7")
+    "compileOnly"("co.aikar:minecraft-timings:1.0.4")
 }
 
 tasks.named<Upload>("install") {
