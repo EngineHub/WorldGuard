@@ -32,8 +32,9 @@ import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.Handler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
 
+
+import javax.annotation.Nullable;
 import java.security.CodeSource;
 import java.util.HashMap;
 import java.util.Map;
