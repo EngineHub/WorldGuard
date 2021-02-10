@@ -25,6 +25,10 @@ repositories {
     }
 }
 
+configurations {
+    compileClasspath.extendsFrom(create("shade"))
+}
+
 dependencies {
     "compile"(project(":worldguard-core"))
     //"compile"(project(":worldguard-libs:bukkit"))
@@ -33,8 +37,8 @@ dependencies {
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
-    "compileOnly"("org.bstats:bstats-bukkit:1.7")
-    "compileOnly"("co.aikar:minecraft-timings:1.0.4")
+    "shade"("org.bstats:bstats-bukkit:1.7")
+    "shade"("co.aikar:minecraft-timings:1.0.4")
 }
 
 tasks.named<Upload>("install") {
@@ -69,15 +73,17 @@ tasks.named<Jar>("jar") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    configurations = listOf(project.configurations["shade"], project.configurations["runtimeClasspath"])
+
     dependencies {
         relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
-            include(dependency("org.bstats:bstats-bukkit:1.7"))
+            include(dependency("org.bstats:bstats-bukkit"))
         }
         relocate ("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib:1.0.4"))
+            include(dependency("io.papermc:paperlib"))
         }
         relocate ("co.aikar.timings.lib", "com.sk89q.worldguard.bukkit.timingslib") {
-            include(dependency("co.aikar:minecraft-timings:1.0.4"))
+            include(dependency("co.aikar:minecraft-timings"))
         }
     }
 }
