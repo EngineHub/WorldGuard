@@ -273,6 +273,30 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
+    private void handleFallingBlock(EntityChangeBlockEvent event, boolean dropItem) {
+        Entity entity = event.getEntity();
+        Block block = event.getBlock();
+
+        if (entity instanceof FallingBlock) {
+            try {
+                if (dropItem) {
+                    FallingBlock fallingBlock = (FallingBlock) entity;
+                    if (!fallingBlock.getDropItem()) return;
+                    final Material material = fallingBlock.getBlockData().getMaterial();
+                    if (!material.isItem()) return;
+                    ItemStack itemStack = new ItemStack(material, 1);
+                    Item item = block.getWorld().dropItem(fallingBlock.getLocation(), itemStack);
+                    item.setVelocity(new Vector());
+                    if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(block, entity), item))) {
+                        item.remove();
+                    }
+                }
+            } finally {
+                Cause.untrackParentCause(entity);
+            }
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         Block block = event.getBlock();
@@ -305,43 +329,24 @@ public class EventAbstractionListener extends AbstractListener {
             if (denied && entity instanceof Player) {
                 playDenyEffect((Player) entity, block.getLocation());
             }
-        } else {
-            if (toType == Material.AIR) {
-                // Track the source so later we can create a proper chain of causes
-                if (entity instanceof FallingBlock) {
-                    Cause.trackParentCause(entity, block);
 
-                    // Switch around the event
-                    Events.fireToCancel(event, new SpawnEntityEvent(event, create(block), entity));
-                } else {
-                    entityBreakBlockDebounce.debounce(
-                            block, event.getEntity(), event, new BreakBlockEvent(event, cause, block));
-                }
+            handleFallingBlock(event, denied);
+        } else if (toType == Material.AIR) {
+            // Track the source so later we can create a proper chain of causes
+            if (entity instanceof FallingBlock) {
+                Cause.trackParentCause(entity, block);
+
+                // Switch around the event
+                Events.fireToCancel(event, new SpawnEntityEvent(event, create(block), entity));
             } else {
-                boolean wasCancelled = event.isCancelled();
-
-                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, block.getLocation(), toType));
-
-                if (entity instanceof FallingBlock) {
-                    try {
-                        if (event.isCancelled() && !wasCancelled) {
-                            FallingBlock fallingBlock = (FallingBlock) entity;
-                            if (!fallingBlock.getDropItem()) return;
-                            final Material material = fallingBlock.getBlockData().getMaterial();
-                            if (!material.isItem()) return;
-                            ItemStack itemStack = new ItemStack(material, 1);
-                            Item item = block.getWorld().dropItem(fallingBlock.getLocation(), itemStack);
-                            item.setVelocity(new Vector());
-                            if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(block, entity), item))) {
-                                item.remove();
-                            }
-                        }
-                    } finally {
-                        Cause.untrackParentCause(entity);
-                    }
-                }
+                entityBreakBlockDebounce.debounce(
+                        block, event.getEntity(), event, new BreakBlockEvent(event, cause, block));
             }
+        } else { // toType != Material.AIR && fromType == Material.AIR
+            boolean denied = Events.fireToCancel(event, new PlaceBlockEvent(event, cause, block.getLocation(), toType));
+            handleFallingBlock(event, denied);
         }
+
     }
 
     @EventHandler(ignoreCancelled = true)
