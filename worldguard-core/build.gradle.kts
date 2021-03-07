@@ -31,3 +31,8 @@ sourceSets {
         }
     }
 }
+
+tasks.named<Jar>("jar") {
+    val projectVersion = project.properties["gitVersion"]
+    version = projectVersion.toString()
+}
