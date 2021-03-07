@@ -18,5 +18,7 @@ jobs:
         if: ${{ always() }}
         with:
           name: WorldGuard plugin
-          path: ./**/build/libs/*.jar
+          path: |
+            ./**/build/libs/*.jar
+            !buildSrc/build/libs/*.jar
           if-no-files-found: error
