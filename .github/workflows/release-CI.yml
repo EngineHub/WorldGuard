@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    name: Publish release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+      - name: Find Tag
+        id: tagger
+        uses: jimschubert/query-tag-action@v2
+        with:
+          skip-unshallow: 'true'
+          commit-ish: HEAD
+      - name: Build project
+        run: ./gradlew build -S
+#      - name: grab artifact
+#        uses: actions/upload-artifact@v2
+#        if: ${{ always() }}
+#        with:
+#          name: Worldguard plugin
+#          path: |
+#            ./**/build/libs/*.jar
+#            !buildSrc/build/libs/*.jar
+#          if-no-files-found: error
+      - run: |
+          find . -name "*${{steps.tagger.outputs.tag}}*.jar"
+          find . -name "*.jar"
+          assetsJar=$(find . -name "*${{steps.tagger.outputs.tag}}*.jar" | while read -r asset ; do echo "-a $asset" ; done)
+          hub release create ${assetsJar} -m "${{steps.tagger.outputs.tag}}" "${{steps.tagger.outputs.tag}}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.ref }}
