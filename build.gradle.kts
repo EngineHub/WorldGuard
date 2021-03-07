@@ -1,5 +1,3 @@
-import org.ajoberstar.grgit.Grgit
-
 logger.lifecycle("""
 *******************************************
  You are building WorldGuard!
@@ -14,13 +12,27 @@ logger.lifecycle("""
 
 applyRootArtifactoryConfig()
 
-if (!project.hasProperty("gitCommitHash")) {
-    apply(plugin = "org.ajoberstar.grgit")
-    ext["gitCommitHash"] = try {
-        (ext["grgit"] as Grgit?)?.head()?.abbreviatedId
-    } catch (e: Exception) {
-        logger.warn("Error getting commit hash", e)
-
-        "no.git.id"
+fun String.runCommand(
+    workingDir: File = File("."),
+    timeoutAmount: Long = 60,
+    timeoutUnit: TimeUnit = TimeUnit.SECONDS
+): String = ProcessBuilder(split("\\s(?=(?:[^'\"`]*(['\"`])[^'\"`]*\\1)*[^'\"`]*$)".toRegex()))
+    .directory(workingDir)
+    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+    .redirectError(ProcessBuilder.Redirect.PIPE)
+    .start()
+    .apply { waitFor(timeoutAmount, timeoutUnit) }
+    .run {
+        val error = errorStream.bufferedReader().readText().trim()
+        if (error.isNotEmpty()) {
+            throw Exception(error)
+        }
+        inputStream.bufferedReader().readText().trim()
     }
+
+ext["gitVersion"] = getTag()
+
+fun getTag(): String {
+    val process = "git describe --tags".runCommand(workingDir = rootDir)
+    return process.trim()
 }

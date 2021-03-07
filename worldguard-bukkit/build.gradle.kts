@@ -30,7 +30,7 @@ configurations {
 }
 
 dependencies {
-    "compile"(project(":worldguard-core"))
+    "implementation"(project(":worldguard-core"))
     //"compile"(project(":worldguard-libs:bukkit"))
     "api"("com.destroystokyo.paper:paper-api:1.16.2-R0.1-SNAPSHOT")
     "shade"("io.papermc:paperlib:1.0.4")
@@ -58,6 +58,7 @@ tasks.named<Upload>("install") {
 
 tasks.named<Copy>("processResources") {
     val internalVersion = project.ext["internalVersion"]
+    println("internalVersion=$internalVersion")
     inputs.property("internalVersion", internalVersion)
     filesMatching("plugin.yml") {
         expand("internalVersion" to internalVersion)
@@ -65,7 +66,10 @@ tasks.named<Copy>("processResources") {
 }
 
 tasks.named<Jar>("jar") {
-    val projectVersion = project.version
+    val projectVersion = project.properties["gitVersion"]
+    version = projectVersion.toString()
+    println("projectVersion=$projectVersion")
+    println("version=$version")
     inputs.property("projectVersion", projectVersion)
     manifest {
         attributes("Implementation-Version" to projectVersion)
@@ -79,10 +83,10 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
             include(dependency("org.bstats:bstats-bukkit"))
         }
-        relocate ("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
+        relocate("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib"))
         }
-        relocate ("co.aikar.timings.lib", "com.sk89q.worldguard.bukkit.timingslib") {
+        relocate("co.aikar.timings.lib", "com.sk89q.worldguard.bukkit.timingslib") {
             include(dependency("co.aikar:minecraft-timings"))
         }
     }
