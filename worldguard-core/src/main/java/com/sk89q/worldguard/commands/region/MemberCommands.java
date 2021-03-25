@@ -24,8 +24,8 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -50,6 +50,7 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "nw:",
             desc = "Add a member to a region",
             min = 2)
+    @CommandPermissions("worldguard.region.addmember")
     public void addMember(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -82,6 +83,7 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "nw:",
             desc = "Add an owner to a region",
             min = 2)
+    @CommandPermissions("worldguard.region.addowner")
     public void addOwner(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -149,6 +151,7 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "naw:",
             desc = "Remove an owner to a region",
             min = 1)
+    @CommandPermissions("worldguard.region.removemember")
     public void removeMember(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -192,6 +195,7 @@ public class MemberCommands extends RegionCommandsBase {
             flags = "naw:",
             desc = "Remove an owner to a region",
             min = 1)
+    @CommandPermissions("worldguard.region.removeowner")
     public void removeOwner(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 

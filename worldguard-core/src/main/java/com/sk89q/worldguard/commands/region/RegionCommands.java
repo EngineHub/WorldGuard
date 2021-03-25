@@ -28,6 +28,7 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.Location;
@@ -131,6 +132,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "ngw:",
              desc = "Defines a region",
              min = 1)
+    @CommandPermissions("worldguard.region.define")
     public void define(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -183,6 +185,7 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Re-defines the shape of a region",
              flags = "gw:",
              min = 1, max = 1)
+    @CommandPermissions("worldguard.region.redefine")
     public void redefine(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -239,6 +242,7 @@ public final class RegionCommands extends RegionCommandsBase {
              usage = "<id>",
              desc = "Claim a region",
              min = 1, max = 1)
+    @CommandPermissions("worldguard.region.claim")
     public void claim(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -337,6 +341,7 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Load a region as a WorldEdit selection",
              min = 0, max = 1,
              flags = "w:")
+    @CommandPermissions("worldguard.region.select")
     public void select(CommandContext args, Actor sender) throws CommandException {
         World world = checkWorld(args, sender, 'w');
         RegionManager manager = checkRegionManager(world);
@@ -375,6 +380,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "usw:",
              desc = "Get information about a region",
              min = 0, max = 1)
+    @CommandPermissions("worldguard.region.info")
     public void info(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -438,6 +444,7 @@ public final class RegionCommands extends RegionCommandsBase {
              desc = "Get a list of regions",
              flags = "np:w:",
              max = 1)
+    @CommandPermissions("worldguard.region.list")
     public void list(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -492,6 +499,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "g:w:eh:",
              desc = "Set flags",
              min = 2)
+    @CommandPermissions("worldguard.region.flag")
     public void flag(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -635,6 +643,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "p:w:",
              desc = "View region flags",
              min = 0, max = 2)
+    @CommandPermissions("worldguard.region.flag.flags")
     public void flagHelper(CommandContext args, Actor sender) throws CommandException {
         World world = checkWorld(args, sender, 'w'); // Get the world
 
@@ -690,6 +699,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "w:",
              desc = "Set the priority of a region",
              min = 2, max = 2)
+    @CommandPermissions("worldguard.region.setpriority")
     public void setPriority(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -723,6 +733,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "w:",
              desc = "Set the parent of a region",
              min = 1, max = 2)
+    @CommandPermissions("worldguard.region.setparent")
     public void setParent(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -787,6 +798,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "fuw:",
              desc = "Remove a region",
              min = 1, max = 1)
+    @CommandPermissions("worldguard.region.remove")
     public void remove(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -835,6 +847,7 @@ public final class RegionCommands extends RegionCommandsBase {
             usage = "[world]",
             desc = "Reload regions from file",
             flags = "w:")
+    @CommandPermissions("worldguard.region.load")
     public void load(CommandContext args, final Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -895,6 +908,7 @@ public final class RegionCommands extends RegionCommandsBase {
             usage = "[world]",
             desc = "Re-save regions to file",
             flags = "w:")
+    @CommandPermissions("worldguard.region.save")
     public void save(CommandContext args, final Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
 
@@ -955,6 +969,7 @@ public final class RegionCommands extends RegionCommandsBase {
     @Command(aliases = {"migratedb"}, usage = "<from> <to>",
              flags = "y",
              desc = "Migrate from one Protection Database to another.", min = 2, max = 2)
+    @CommandPermissions("worldguard.region.migratedb")
     public void migrateDB(CommandContext args, Actor sender) throws CommandException {
         // Check permissions
         if (!getPermissionModel(sender).mayMigrateRegionStore()) {
@@ -1032,6 +1047,7 @@ public final class RegionCommands extends RegionCommandsBase {
      */
     @Command(aliases = {"migrateuuid"},
             desc = "Migrate loaded databases to use UUIDs", max = 0)
+    @CommandPermissions("worldguard.region.migrateuuid")
     public void migrateUuid(CommandContext args, Actor sender) throws CommandException {
         // Check permissions
         if (!getPermissionModel(sender).mayMigrateRegionNames()) {
@@ -1079,6 +1095,7 @@ public final class RegionCommands extends RegionCommandsBase {
              flags = "sw:",
              desc = "Teleports you to the location associated with the region.",
              min = 1, max = 1)
+    @CommandPermissions("worldguard.region.teleport")
     public void teleport(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
         Location teleportLocation;
@@ -1125,6 +1142,7 @@ public final class RegionCommands extends RegionCommandsBase {
     @Command(aliases = {"toggle-bypass", "bypass"},
              usage = "[on|off]",
              desc = "Toggle region bypassing, effectively ignoring bypass permissions.")
+    @CommandPermissions("worldguard.region.toggle-bypass")
     public void toggleBypass(CommandContext args, Actor sender) throws CommandException {
         LocalPlayer player = worldGuard.checkPlayer(sender);
         if (!player.hasPermission("worldguard.region.toggle-bypass")) {
