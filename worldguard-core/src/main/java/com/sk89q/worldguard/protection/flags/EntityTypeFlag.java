@@ -26,7 +26,9 @@ import javax.annotation.Nullable;
 
 /**
  * Stores an entity type.
+ * @deprecated replaced by {@link RegistryFlag<EntityType>}, will be removed in WorldGuard 8
  */
+@Deprecated
 public class EntityTypeFlag extends Flag<EntityType> {
 
     protected EntityTypeFlag(String name, @Nullable RegionGroup defaultGroup) {
