@@ -24,6 +24,11 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 
 import javax.annotation.Nullable;
 
+/**
+ * Stores an gamemode type.
+ * @deprecated replaced by {@link RegistryFlag<GameMode>}, will be removed in WorldGuard 8
+ */
+@Deprecated
 public class GameModeTypeFlag extends Flag<GameMode> {
 
     protected GameModeTypeFlag(String name, @Nullable RegionGroup defaultGroup) {
