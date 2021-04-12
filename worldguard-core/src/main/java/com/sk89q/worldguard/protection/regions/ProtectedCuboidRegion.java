@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.util.MathUtils;
 
 import java.awt.Rectangle;
@@ -84,18 +85,24 @@ public class ProtectedCuboidRegion extends ProtectedRegion {
      * Set the lower point of the cuboid.
      *
      * @param position the point to set as the minimum point
+     * @deprecated ProtectedRegion bounds should never be mutated. Regions must be redefined to move them.
+     *              This method will be removed in a future release.
      */
+    @Deprecated
     public void setMinimumPoint(BlockVector3 position) {
-        setMinMaxPoints(position, max);
+        WorldGuard.logger.warning("ProtectedCuboidRegion#setMinimumPoint call ignored. Mutating regions leads to undefined behavior.");
     }
 
     /**
      * Set the upper point of the cuboid.
      *
      * @param position the point to set as the maximum point
+     * @deprecated ProtectedRegion bounds should never be mutated. Regions must be redefined to move them.
+     *              This method will be removed in a future release.
      */
+    @Deprecated
     public void setMaximumPoint(BlockVector3 position) {
-        setMinMaxPoints(min, position);
+        WorldGuard.logger.warning("ProtectedCuboidRegion#setMaximumPoint call ignored. Mutating regions leads to undefined behavior.");
     }
 
     @Override
