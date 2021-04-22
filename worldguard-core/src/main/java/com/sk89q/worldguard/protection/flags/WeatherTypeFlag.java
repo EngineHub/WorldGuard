@@ -24,6 +24,11 @@ import com.sk89q.worldedit.world.weather.WeatherTypes;
 
 import javax.annotation.Nullable;
 
+/**
+ * Stores an weather type.
+ * @deprecated replaced by {@link RegistryFlag<WeatherType>}, will be removed in WorldGuard 8
+ */
+@Deprecated
 public class WeatherTypeFlag extends Flag<WeatherType> {
 
     protected WeatherTypeFlag(String name, @Nullable RegionGroup defaultGroup) {

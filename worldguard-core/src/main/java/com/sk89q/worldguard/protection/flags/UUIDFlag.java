@@ -23,11 +23,12 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class UUIDFlag extends Flag<UUID> {
-    protected UUIDFlag(String name, @Nullable RegionGroup defaultGroup) {
+
+    public UUIDFlag(String name, @Nullable RegionGroup defaultGroup) {
         super(name, defaultGroup);
     }
 
-    protected UUIDFlag(String name) {
+    public UUIDFlag(String name) {
         super(name);
     }
 
