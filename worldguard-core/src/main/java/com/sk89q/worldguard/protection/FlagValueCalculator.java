@@ -90,13 +90,14 @@ public class FlagValueCalculator {
     /**
      * Return the membership status of the given subject, indicating
      * whether there are no (counted) regions in the list of regions,
-     * whether the subject is a member of all regions, or whether
-     * the region is not a member of all regions.
+     * whether the subject is a member of all (counted) regions, or
+     * whether the subject is not a member of all (counted) regions.
      *
      * <p>A region is "counted" if it doesn't have the
-     * {@link Flags#PASSTHROUGH} flag set to {@code ALLOW}. (The
-     * explicit purpose of the PASSTHROUGH flag is to have the region
-     * be skipped over in this check.)</p>
+     * {@link Flags#PASSTHROUGH} flag set to {@code ALLOW} and if
+     * there isn't another "counted" region with a higher priority.
+     * (The explicit purpose of the PASSTHROUGH flag is to have the
+     * region be skipped over in this check.)</p>
      *
      * <p>This method is mostly for internal use. It's not particularly
      * useful.</p>
