@@ -114,11 +114,13 @@ public class FlagValueCalculator {
         Set<ProtectedRegion> ignoredRegions = Sets.newHashSet();
 
         for (ProtectedRegion region : getApplicable()) {
+            int priority = getPriority(region);
+
             // Don't consider lower priorities below minimumPriority
             // (which starts at Integer.MIN_VALUE). A region that "counts"
             // (has the flag set OR has members) will raise minimumPriority
             // to its own priority.
-            if (getPriority(region) < minimumPriority) {
+            if (priority < minimumPriority) {
                 break;
             }
 
@@ -131,7 +133,7 @@ public class FlagValueCalculator {
                 continue;
             }
 
-            minimumPriority = getPriority(region);
+            minimumPriority = priority;
 
             boolean member = RegionGroup.MEMBERS.contains(subject.getAssociation(Collections.singletonList(region)));
 
@@ -256,7 +258,9 @@ public class FlagValueCalculator {
         Set<ProtectedRegion> ignoredParents = new HashSet<>();
 
         for(ProtectedRegion region : getApplicable()) {
-            if (getPriority(region) < minimumPriority) {
+            int priority = getPriority(region);
+
+            if (priority < minimumPriority) {
                 break;
             }
 
@@ -267,12 +271,12 @@ public class FlagValueCalculator {
             V effectiveValue = getEffectiveMapValue(region, flag, key, subject);
 
             if (effectiveValue != null) {
-                minimumPriority = getPriority(region);
+                minimumPriority = priority;
                 consideredValues.put(region, effectiveValue);
             } else if (fallback != null) {
                 effectiveValue = getEffectiveFlag(region, fallback, subject);
                 if (effectiveValue != null) {
-                    minimumPriority = getPriority(region);
+                    minimumPriority = priority;
                     fallbackValues.put(region, effectiveValue);
                 }
             }
@@ -389,7 +393,9 @@ public class FlagValueCalculator {
         Set<ProtectedRegion> ignoredParents = new HashSet<>();
 
         for (ProtectedRegion region : getApplicable()) {
-            if (getPriority(region) < minimumPriority) {
+            int priority = getPriority(region);
+
+            if (priority < minimumPriority) {
                 break;
             }
 
@@ -398,7 +404,6 @@ public class FlagValueCalculator {
             }
 
             V value = getEffectiveFlag(region, flag, subject);
-            int priority = getPriority(region);
 
             if (value != null) {
                 minimumPriority = priority;
@@ -416,7 +421,7 @@ public class FlagValueCalculator {
             // PASSTHROUGH is not set to ALLOW
             if (priority != minimumPriority && flag.implicitlySetWithMembership()
                     && getEffectiveFlag(region, Flags.PASSTHROUGH, subject) != State.ALLOW) {
-                minimumPriority = getPriority(region);
+                minimumPriority = priority;
             }
         }
 
