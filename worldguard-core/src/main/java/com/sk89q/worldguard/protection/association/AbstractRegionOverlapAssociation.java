@@ -22,9 +22,13 @@ package com.sk89q.worldguard.protection.association;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldguard.domains.Association;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +38,7 @@ public abstract class AbstractRegionOverlapAssociation implements RegionAssociab
     protected Set<ProtectedRegion> source;
     private boolean useMaxPriorityAssociation;
     private int maxPriority;
+    private Set<ProtectedRegion> maxPriorityRegions;
 
     protected AbstractRegionOverlapAssociation(@Nullable Set<ProtectedRegion> source, boolean useMaxPriorityAssociation) {
         this.source = source;
@@ -43,13 +48,39 @@ public abstract class AbstractRegionOverlapAssociation implements RegionAssociab
     protected void calcMaxPriority() {
         checkNotNull(source);
         int best = 0;
+        Set<ProtectedRegion> bestRegions = new HashSet<>();
         for (ProtectedRegion region : source) {
             int priority = region.getPriority();
             if (priority > best) {
                 best = priority;
+                bestRegions.clear();
+                bestRegions.add(region);
+            } else if (priority == best) {
+                bestRegions.add(region);
             }
         }
         this.maxPriority = best;
+        this.maxPriorityRegions = bestRegions;
+    }
+
+    private boolean checkNonplayerProtectionDomains(Iterable<? extends ProtectedRegion> source, Collection<?> domains) {
+        if (source == null || domains == null || domains.isEmpty()) {
+            return false;
+        }
+
+        for (ProtectedRegion region : source) {
+            Set<String> regionDomains = region.getFlag(Flags.NONPLAYER_PROTECTION_DOMAINS);
+
+            if (regionDomains == null || regionDomains.isEmpty()) {
+                continue;
+            }
+
+            if (!Collections.disjoint(regionDomains, domains)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -69,6 +100,18 @@ public abstract class AbstractRegionOverlapAssociation implements RegionAssociab
                 } else {
                     return Association.OWNER;
                 }
+            }
+
+            Set<ProtectedRegion> source;
+
+            if (useMaxPriorityAssociation) {
+                source = maxPriorityRegions;
+            } else {
+                source = this.source;
+            }
+
+            if (checkNonplayerProtectionDomains(source, region.getFlag(Flags.NONPLAYER_PROTECTION_DOMAINS))) {
+                return Association.OWNER;
             }
         }
 
