@@ -149,7 +149,7 @@ public class PlayerDomain implements Domain, ChangeTracked {
     @Override
     public boolean contains(LocalPlayer player) {
         checkNotNull(player);
-        return contains(player.getName().trim().toLowerCase()) || contains(player.getUniqueId());
+        return contains(player.getUniqueId()) || contains(player.getName().trim().toLowerCase());
     }
 
     /**
