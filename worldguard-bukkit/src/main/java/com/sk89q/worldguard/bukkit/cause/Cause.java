@@ -90,7 +90,7 @@ public final class Cause {
     }
 
     /**
-     * Return whether a cause is known. This method will return true if
+     * Return whether a cause is known. This method will return false if
      * the list of causes is empty or the list of causes only contains
      * objects that really are not root causes (i.e primed TNT).
      *
