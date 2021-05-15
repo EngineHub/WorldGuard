@@ -92,7 +92,7 @@ public final class Cause {
     /**
      * Return whether a cause is known. This method will return false if
      * the list of causes is empty or the root cause is really not known
-     * (i.e primed TNT).
+     * (e.g. primed TNT).
      *
      * @return true if known
      */
