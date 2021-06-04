@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.BukkitConfigurationManager;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.Materials;
@@ -93,7 +94,7 @@ public class WorldGuardBlockListener implements Listener {
      * @return The configuration for {@code world}
      */
     private WorldConfiguration getWorldConfig(World world) {
-        return WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(BukkitAdapter.adapt(world));
+        return ((BukkitConfigurationManager) WorldGuard.getInstance().getPlatform().getGlobalStateManager()).get(world);
     }
 
     /**
