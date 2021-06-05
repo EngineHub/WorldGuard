@@ -25,6 +25,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.BukkitConfigurationManager;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
@@ -81,8 +82,8 @@ class AbstractListener implements Listener {
      *
      * @return the configuration
      */
-    protected static ConfigurationManager getConfig() {
-        return WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+    protected static BukkitConfigurationManager getConfig() {
+        return (BukkitConfigurationManager) WorldGuard.getInstance().getPlatform().getGlobalStateManager();
     }
 
     /**
@@ -95,6 +96,10 @@ class AbstractListener implements Listener {
         return getConfig().get(world);
     }
 
+    protected static WorldConfiguration getWorldConfig(org.bukkit.World world) {
+        return getConfig().get(world);
+    }
+
     /**
      * Get the world configuration given a player.
      *
@@ -103,6 +108,16 @@ class AbstractListener implements Listener {
      */
     protected static WorldConfiguration getWorldConfig(LocalPlayer player) {
         return getWorldConfig((World) player.getExtent());
+    }
+
+    /**
+     * Get the world configuration given a Bukkit player.
+     *
+     * @param player - the player to get the world from
+     * @return The {@link WorldConfiguration} for the player's world
+     */
+    protected static WorldConfiguration getWorldConfig(Player player) {
+        return getWorldConfig(player.getWorld());
     }
 
     /**
