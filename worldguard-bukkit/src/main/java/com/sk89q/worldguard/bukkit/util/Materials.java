@@ -753,8 +753,11 @@ public final class Materials {
         }
 
         // Generated via tag
-        for (Material door : Tag.DOORS.getValues()) {
-            MATERIAL_FLAGS.put(door, MODIFIED_ON_RIGHT);
+        for (Material woodenDoor : Tag.WOODEN_DOORS.getValues()) {
+            MATERIAL_FLAGS.put(woodenDoor, MODIFIED_ON_RIGHT);
+        }
+        for (Material woodenTrapdoor : Tag.WOODEN_TRAPDOORS.getValues()) {
+            MATERIAL_FLAGS.put(woodenTrapdoor, MODIFIED_ON_RIGHT);
         }
         for (Material boat : Tag.ITEMS_BOATS.getValues()) {
             MATERIAL_FLAGS.put(boat, 0);
@@ -1321,7 +1324,7 @@ public final class Materials {
      */
     public static boolean isUseFlagApplicable(Material material) {
         if (Tag.BUTTONS.isTagged(material)
-                || Tag.DOORS.isTagged(material)
+                || Tag.WOODEN_DOORS.isTagged(material)
                 || Tag.WOODEN_TRAPDOORS.isTagged(material)
                 || Tag.FENCE_GATES.isTagged(material)
                 || Tag.PRESSURE_PLATES.isTagged(material)) {
