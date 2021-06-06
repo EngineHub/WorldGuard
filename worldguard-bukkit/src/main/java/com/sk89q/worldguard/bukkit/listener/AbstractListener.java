@@ -92,11 +92,11 @@ class AbstractListener implements Listener {
      * @param world The world to get the configuration for.
      * @return The configuration for {@code world}
      */
-    protected static WorldConfiguration getWorldConfig(World world) {
+    protected static BukkitWorldConfiguration getWorldConfig(World world) {
         return getConfig().get(world);
     }
 
-    protected static WorldConfiguration getWorldConfig(org.bukkit.World world) {
+    protected static BukkitWorldConfiguration getWorldConfig(org.bukkit.World world) {
         return getConfig().get(world);
     }
 
@@ -106,7 +106,7 @@ class AbstractListener implements Listener {
      * @param player The player to get the wold from
      * @return The {@link WorldConfiguration} for the player's world
      */
-    protected static WorldConfiguration getWorldConfig(LocalPlayer player) {
+    protected static BukkitWorldConfiguration getWorldConfig(LocalPlayer player) {
         return getWorldConfig((World) player.getExtent());
     }
 
@@ -116,7 +116,7 @@ class AbstractListener implements Listener {
      * @param player - the player to get the world from
      * @return The {@link WorldConfiguration} for the player's world
      */
-    protected static WorldConfiguration getWorldConfig(Player player) {
+    protected static BukkitWorldConfiguration getWorldConfig(Player player) {
         return getWorldConfig(player.getWorld());
     }
 

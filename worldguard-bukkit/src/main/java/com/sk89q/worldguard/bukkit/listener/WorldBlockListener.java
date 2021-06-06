@@ -350,10 +350,14 @@ public class WorldBlockListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPhysics(BlockPhysicsEvent event) {
         ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
+            return;
+        }
+
+        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
+        if (!wcfg.needsBlockListener) {
             return;
         }
 
@@ -374,7 +378,7 @@ public class WorldBlockListener extends AbstractListener {
             return;
         }
 
-        if (wcfg.ropeLadders && event.getBlock().getType() == Material.LADDER) {
+        if (id == Material.LADDER && wcfg.ropeLadders) {
             if (event.getBlock().getRelative(0, 1, 0).getType() == Material.LADDER) {
                 event.setCancelled(true);
                 return;
