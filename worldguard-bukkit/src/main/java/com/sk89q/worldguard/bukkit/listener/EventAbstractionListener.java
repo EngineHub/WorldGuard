@@ -1048,6 +1048,12 @@ public class EventAbstractionListener extends AbstractListener {
             Block placed = dispenserBlock.getRelative(dispenser.getFacing());
             Block clicked = placed.getRelative(dispenser.getFacing());
             handleBlockRightClick(event, cause, item, clicked, placed);
+
+            // handle special dispenser behavior
+            if (item != null && Materials.isShulkerBox(item.getType())) {
+                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(), item.getType()));
+                return;
+            }
         }
     }
 
