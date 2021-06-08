@@ -1,5 +1,25 @@
 # Changelog
 
+## 7.0.5
+
+* Add a use-anvil flag and exclude it from the use flag (since they can break on use.)
+* Expand crop-related options (crop-growth, etc) to sweet berry bushes, nether wart, and bamboo.
+* Add a config option (`mobs.block-vehicle-entry`) to prevent non-players from entering vehicles.
+* Add a UUID flag (for developers/API usage).
+* Add map query methods with fallback flag (for developers/API usage).
+* Add `on` and `off` optional arguments for `/rg toggle-bypass` command.
+* Add additional timings info for session handlers.
+* Fix sponge-simulation clearing NBT from blocks. Note that if you are using sponge simulation you should switch to something like CraftBook as the feature will be removed from WorldGuard in a future (major) version.
+* Fix the `/rg` command showing up as unknown client-side to players without bypass perms.
+* Fix error propagation from third-party flag loading causing WG to error.
+* Fix a (harmless) exception that occurred when swapping armor slots to the offhand slot.
+* Fix empty lines being sent on enderpearl/chorus-fruit teleport if the deny messages were empty.
+* Fix an issue with falling blocks when using max-priority-association.
+* Fix performance issues with third-party plugins querying protection for offline players.
+* Fix dispensing shulkers over region boundaries.
+* Fix iron door interaction being denied as if it were a regular door.
+* Fix being able to enter/exit regions with the flag denied by using entity mounting functions in other plugins.
+
 ## 7.0.4 (including beta1)
 
 * Add support for MC 1.16. Dropped support for previous versions.
