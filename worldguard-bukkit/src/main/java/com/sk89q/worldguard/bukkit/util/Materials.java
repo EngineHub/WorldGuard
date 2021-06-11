@@ -235,7 +235,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.ACACIA_DOOR, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR, MODIFIED_ON_RIGHT);
 
-        MATERIAL_FLAGS.put(Material.GRASS_PATH, 0);
+        MATERIAL_FLAGS.put(Material.DIRT_PATH, 0);
         MATERIAL_FLAGS.put(Material.CHORUS_PLANT, 0);
         MATERIAL_FLAGS.put(Material.CHORUS_FLOWER, 0);
         MATERIAL_FLAGS.put(Material.BEETROOTS, 0);

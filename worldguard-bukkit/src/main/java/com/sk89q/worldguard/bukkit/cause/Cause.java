@@ -263,13 +263,13 @@ public final class Cause {
                         ProjectileSource shooter = ((Projectile) o).getShooter();
                         addAll(shooter);
                         if (shooter == null && o instanceof Firework && PaperLib.isPaper()) {
-                            UUID spawningUUID = ((Firework) o).getSpawningEntity();
+                           /* UUID spawningUUID = ((Firework) o).getSpawningEntity();
                             if (spawningUUID != null) {
                                 Entity spawningEntity = Bukkit.getEntity(spawningUUID);
                                 if (spawningEntity != null) {
                                     addAll(spawningEntity);
                                 }
-                            }
+                            }*/
                         }
                     } else if (o instanceof Vehicle) {
                         ((Vehicle) o).getPassengers().forEach(this::addAll);
