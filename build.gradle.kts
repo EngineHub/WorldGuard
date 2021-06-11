@@ -17,7 +17,7 @@ applyRootArtifactoryConfig()
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")
     ext["gitCommitHash"] = try {
-        (ext["grgit"] as Grgit?)?.head()?.abbreviatedId
+        Grgit.open(mapOf("currentDir" to project.rootDir))?.head()?.abbreviatedId
     } catch (e: Exception) {
         logger.warn("Error getting commit hash", e)
 
