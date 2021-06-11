@@ -942,11 +942,11 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         InventoryHolder causeHolder;
-        if (HAS_SNAPSHOT_INVHOLDER) {
+       /* if (HAS_SNAPSHOT_INVHOLDER) {
             causeHolder = event.getInitiator().getHolder(false);
-        } else {
+        } else {*/
             causeHolder = event.getInitiator().getHolder();
-        }
+        //}
 
         WorldConfiguration wcfg = null;
         if (causeHolder instanceof Hopper
@@ -962,13 +962,13 @@ public class EventAbstractionListener extends AbstractListener {
         if ((entry = moveItemDebounce.tryDebounce(event)) != null) {
             InventoryHolder sourceHolder;
             InventoryHolder targetHolder;
-            if (HAS_SNAPSHOT_INVHOLDER) {
+            /*if (HAS_SNAPSHOT_INVHOLDER) {
                 sourceHolder = event.getSource().getHolder(false);
                 targetHolder = event.getDestination().getHolder(false);
-            } else {
+            } else {*/
                 sourceHolder = event.getSource().getHolder();
                 targetHolder = event.getDestination().getHolder();
-            }
+            //}
 
             Cause cause;
 
