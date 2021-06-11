@@ -725,7 +725,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.CALCITE, 0);
         MATERIAL_FLAGS.put(Material.TUFF, 0);
         MATERIAL_FLAGS.put(Material.DRIPSTONE_BLOCK, 0);
-        // TODO: Maybe MODIFIED_ON_RIGHTT (using bonemeal)
         MATERIAL_FLAGS.put(Material.ROOTED_DIRT, 0);
 
         MATERIAL_FLAGS.put(Material.RAW_IRON_BLOCK, 0);
@@ -1571,7 +1570,7 @@ public final class Materials {
                     case GRASS_BLOCK:
                     case DIRT:
                     case DIRT_PATH:
-                    // case ROOTED_DIRT: // TODO: already handled by the server?
+                    case ROOTED_DIRT:
                     // case COARSE_DIRT: // already handled by the server...
                         return true;
                 }
@@ -1582,6 +1581,8 @@ public final class Materials {
             case GOLDEN_AXE:
             case DIAMOND_AXE:
             case NETHERITE_AXE:
+                if (isWaxedCopper(targetMaterial))
+                    return true;
                 switch (targetMaterial) {
                     case OAK_LOG:
                     case DARK_OAK_LOG:
@@ -1640,6 +1641,8 @@ public final class Materials {
             case WHITE_DYE:
             case YELLOW_DYE:
                 return Tag.SIGNS.isTagged(targetMaterial);
+            case HONEYCOMB:
+                return isUnwaxedCopper(targetMaterial);
             default:
                 return false;
         }
@@ -1647,5 +1650,51 @@ public final class Materials {
 
     public static boolean isFire(Material type) {
         return type == Material.FIRE || type == Material.SOUL_FIRE;
+    }
+    
+    public static boolean isWaxedCopper(Material type) {
+        switch (type) {
+            case WAXED_COPPER_BLOCK:
+            case WAXED_EXPOSED_COPPER:
+            case WAXED_WEATHERED_COPPER:
+            case WAXED_OXIDIZED_COPPER:
+            case WAXED_CUT_COPPER:
+            case WAXED_EXPOSED_CUT_COPPER:
+            case WAXED_WEATHERED_CUT_COPPER:
+            case WAXED_OXIDIZED_CUT_COPPER:
+            case WAXED_CUT_COPPER_STAIRS:
+            case WAXED_EXPOSED_CUT_COPPER_STAIRS:
+            case WAXED_WEATHERED_CUT_COPPER_STAIRS:
+            case WAXED_OXIDIZED_CUT_COPPER_STAIRS:
+            case WAXED_CUT_COPPER_SLAB:
+            case WAXED_EXPOSED_CUT_COPPER_SLAB:
+            case WAXED_WEATHERED_CUT_COPPER_SLAB:
+            case WAXED_OXIDIZED_CUT_COPPER_SLAB:
+                return true;
+        }
+        return false;
+    }
+    
+    public static boolean isUnwaxedCopper(Material type) {
+        switch (type) {
+            case COPPER_BLOCK:
+            case EXPOSED_COPPER:
+            case WEATHERED_COPPER:
+            case OXIDIZED_COPPER:
+            case CUT_COPPER:
+            case EXPOSED_CUT_COPPER:
+            case WEATHERED_CUT_COPPER:
+            case OXIDIZED_CUT_COPPER:
+            case CUT_COPPER_STAIRS:
+            case EXPOSED_CUT_COPPER_STAIRS:
+            case WEATHERED_CUT_COPPER_STAIRS:
+            case OXIDIZED_CUT_COPPER_STAIRS:
+            case CUT_COPPER_SLAB:
+            case EXPOSED_CUT_COPPER_SLAB:
+            case WEATHERED_CUT_COPPER_SLAB:
+            case OXIDIZED_CUT_COPPER_SLAB:
+                return true;
+        }
+        return false;
     }
 }
