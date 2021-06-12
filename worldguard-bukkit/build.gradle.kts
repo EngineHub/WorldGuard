@@ -3,8 +3,6 @@ import org.gradle.api.internal.HasConvention
 
 plugins {
     id("java-library")
-    id("net.ltgt.apt-eclipse")
-    id("net.ltgt.apt-idea")
 }
 
 applyPlatformAndCoreConfiguration()
@@ -44,21 +42,6 @@ dependencies {
     "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
     "shade"("org.bstats:bstats-bukkit:1.7")
     "shade"("co.aikar:minecraft-timings:1.0.4")
-}
-
-tasks.named<Upload>("install") {
-    (repositories as HasConvention).convention.getPlugin<MavenRepositoryHandlerConvention>().mavenInstaller {
-        pom.whenConfigured {
-            dependencies.firstOrNull { dep ->
-                dep!!.withGroovyBuilder {
-                    getProperty("groupId") == "com.destroystokyo.paper" && getProperty("artifactId") == "paper-api"
-                }
-            }?.withGroovyBuilder {
-                setProperty("groupId", "org.spigotmc")
-                setProperty("artifactId", "spigot-api")
-            }
-        }
-    }
 }
 
 tasks.named<Copy>("processResources") {

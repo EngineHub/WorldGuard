@@ -28,12 +28,14 @@ import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.flags.StringFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Set;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static com.google.common.collect.ImmutableSet.of;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings({"UnusedAssignment", "UnusedDeclaration"})
 public class FlagValueCalculatorTest {
@@ -45,7 +47,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.NO_REGIONS));
+        assertEquals(result.getMembership(player), Result.NO_REGIONS);
     }
 
     @Test
@@ -57,7 +59,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.NO_REGIONS));
+        assertEquals(result.getMembership(player), Result.NO_REGIONS);
     }
 
     @Test
@@ -69,7 +71,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.NO_REGIONS));
+        assertEquals(result.getMembership(player), Result.NO_REGIONS);
     }
 
     @Test
@@ -83,7 +85,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.FAIL));
+        assertEquals(result.getMembership(player), Result.FAIL);
     }
 
     @Test
@@ -99,7 +101,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.NO_REGIONS));
+        assertEquals(result.getMembership(player), Result.NO_REGIONS);
     }
 
     @Test
@@ -114,7 +116,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.FAIL));
+        assertEquals(result.getMembership(player), Result.FAIL);
     }
 
     @Test
@@ -130,7 +132,7 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.SUCCESS));
+        assertEquals(result.getMembership(player), Result.SUCCESS);
     }
 
     @Test
@@ -148,13 +150,13 @@ public class FlagValueCalculatorTest {
         region = mock.add(0);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.FAIL));
+        assertEquals(result.getMembership(player), Result.FAIL);
 
         // Add another player (should still fail)
         region.getMembers().addPlayer(mock.createPlayer());
 
         result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.FAIL));
+        assertEquals(result.getMembership(player), Result.FAIL);
     }
 
     @Test
@@ -172,7 +174,7 @@ public class FlagValueCalculatorTest {
         region = mock.add(10);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.FAIL));
+        assertEquals(result.getMembership(player), Result.FAIL);
     }
 
     @Test
@@ -190,7 +192,7 @@ public class FlagValueCalculatorTest {
         region = mock.add(0);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.SUCCESS));
+        assertEquals(result.getMembership(player), Result.SUCCESS);
     }
 
     @Test
@@ -209,7 +211,7 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.SUCCESS));
+        assertEquals(result.getMembership(player), Result.SUCCESS);
     }
 
     @Test
@@ -228,7 +230,7 @@ public class FlagValueCalculatorTest {
         parent.getMembers().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.SUCCESS));
+        assertEquals(result.getMembership(player), Result.SUCCESS);
     }
 
     @Test
@@ -249,7 +251,7 @@ public class FlagValueCalculatorTest {
         parent.getMembers().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.FAIL));
+        assertEquals(result.getMembership(player), Result.FAIL);
     }
 
     @Test
@@ -271,7 +273,7 @@ public class FlagValueCalculatorTest {
         parent.getMembers().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getMembership(player), is(Result.SUCCESS));
+        assertEquals(result.getMembership(player), Result.SUCCESS);
     }
 
     // ========================================================================
@@ -285,8 +287,8 @@ public class FlagValueCalculatorTest {
         StateFlag flag2 = new StateFlag("test2", true);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryState(null, flag1), is((State) null));
-        assertThat(result.queryState(null, flag2), is(State.ALLOW));
+        assertNull(result.queryState(null, flag1));
+        assertEquals(result.queryState(null, flag2), State.ALLOW);
     }
 
     // ========================================================================
@@ -303,8 +305,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(flag2, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag1), is((State) null));
-        assertThat(result.queryValue(null, flag2), is(State.DENY));
+        assertNull(result.queryValue(null, flag1));
+        assertEquals(result.queryValue(null, flag2), State.DENY);
     }
 
     @Test
@@ -321,8 +323,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(flag2, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag1), is((State) null));
-        assertThat(result.queryValue(null, flag2), is(State.DENY));
+        assertNull(result.queryValue(null, flag1));
+        assertEquals(result.queryValue(null, flag2), State.DENY);
     }
 
     @Test
@@ -338,8 +340,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(flag2, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag1), is((State) null));
-        assertThat(result.queryValue(null, flag2), is(State.ALLOW));
+        assertNull(result.queryValue(null, flag1));
+        assertEquals(result.queryValue(null, flag2), State.ALLOW);
     }
 
     @Test
@@ -358,9 +360,9 @@ public class FlagValueCalculatorTest {
         region.setFlag(flag2, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag1), is(State.DENY));
-        assertThat(result.queryValue(null, flag2), is(State.DENY));
-        assertThat(result.queryValue(null, flag3), is((State) null));
+        assertEquals(result.queryValue(null, flag1), State.DENY);
+        assertEquals(result.queryValue(null, flag2), State.DENY);
+        assertNull(result.queryValue(null, flag3));
     }
 
     @Test
@@ -381,8 +383,8 @@ public class FlagValueCalculatorTest {
         region.setParent(parent);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, flag1), is(State.DENY));
-        assertThat(result.queryValue(member, flag1), is((State) null));
+        assertEquals(result.queryValue(nonMember, flag1), State.DENY);
+        assertNull(result.queryValue(member, flag1));
     }
 
     @Test
@@ -405,9 +407,9 @@ public class FlagValueCalculatorTest {
         region.setParent(parent);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, flag1), is(State.DENY));
-        assertThat(result.queryValue(memberOne, flag1), is((State) null));
-        assertThat(result.queryValue(memberTwo, flag1), is(State.DENY));
+        assertEquals(result.queryValue(nonMember, flag1), State.DENY);
+        assertNull(result.queryValue(memberOne, flag1));
+        assertEquals(result.queryValue(memberTwo, flag1), State.DENY);
     }
 
     @Test
@@ -427,8 +429,8 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, flag1), is(State.DENY));
-        assertThat(result.queryValue(member, flag1), is(State.DENY));
+        assertEquals(result.queryValue(nonMember, flag1), State.DENY);
+        assertEquals(result.queryValue(member, flag1), State.DENY);
     }
 
     @Test
@@ -450,8 +452,8 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, flag1), is(State.DENY));
-        assertThat(result.queryValue(member, flag1), is(State.ALLOW));
+        assertEquals(result.queryValue(nonMember, flag1), State.DENY);
+        assertEquals(result.queryValue(member, flag1), State.ALLOW);
     }
 
     @Test
@@ -469,9 +471,9 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, stringFlag1), isOneOf("test1", "test2"));
-        assertThat(result.queryValue(null, stringFlag2), is((String) null));
-        assertThat(result.queryValue(null, flag1), is((State) null));
+        assertTrue(List.of("test1", "test2").contains(result.queryValue(null, stringFlag1)));
+        assertNull(result.queryValue(null, stringFlag2));
+        assertNull(result.queryValue(null, flag1));
     }
 
     @Test
@@ -483,7 +485,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag), is(State.ALLOW));
+        assertEquals(result.queryValue(null, flag), State.ALLOW);
     }
 
     @Test
@@ -496,7 +498,7 @@ public class FlagValueCalculatorTest {
         global.setFlag(flag, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag), is(State.ALLOW));
+        assertEquals(result.queryValue(null, flag), State.ALLOW);
     }
 
     @Test
@@ -509,7 +511,7 @@ public class FlagValueCalculatorTest {
         global.setFlag(flag, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag), is(State.DENY));
+        assertEquals(result.queryValue(null, flag), State.DENY);
     }
 
     @Test
@@ -521,7 +523,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag), is((String) null));
+        assertNull(result.queryValue(null, flag));
     }
 
     @Test
@@ -534,7 +536,7 @@ public class FlagValueCalculatorTest {
         global.setFlag(flag, "hello");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag), is("hello"));
+        assertEquals(result.queryValue(null, flag), "hello");
     }
 
     @Test
@@ -549,7 +551,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion region = mock.add(0);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag), is("hello"));
+        assertEquals(result.queryValue(null, flag), "hello");
     }
 
     @Test
@@ -565,7 +567,7 @@ public class FlagValueCalculatorTest {
         region.setFlag(flag, "beep");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag), is("beep"));
+        assertEquals(result.queryValue(null, flag), "beep");
     }
 
     @Test
@@ -591,9 +593,9 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(null, flag), is("ello there"));
-        assertThat(result.queryValue(nonMember, flag), is("ello there"));
-        assertThat(result.queryValue(member, flag), is("beep beep"));
+        assertEquals(result.queryValue(null, flag), "ello there");
+        assertEquals(result.queryValue(nonMember, flag), "ello there");
+        assertEquals(result.queryValue(member, flag), "beep beep");
     }
 
     @Test
@@ -603,7 +605,7 @@ public class FlagValueCalculatorTest {
         LocalPlayer nonMember = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.ALLOW));
+        assertEquals(result.queryValue(nonMember, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -615,7 +617,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.ALLOW));
+        assertEquals(result.queryValue(nonMember, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -628,7 +630,7 @@ public class FlagValueCalculatorTest {
         global.setFlag(Flags.BUILD, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.DENY));
+        assertEquals(result.queryValue(nonMember, Flags.BUILD), State.DENY);
     }
 
     @Test
@@ -641,7 +643,7 @@ public class FlagValueCalculatorTest {
         global.setFlag(Flags.BUILD, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.ALLOW));
+        assertEquals(result.queryValue(nonMember, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -655,8 +657,8 @@ public class FlagValueCalculatorTest {
         global.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(member, Flags.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertEquals(result.queryValue(member, Flags.BUILD), State.ALLOW);
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -671,8 +673,8 @@ public class FlagValueCalculatorTest {
         global.setFlag(Flags.BUILD, State.DENY);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(member, Flags.BUILD), is(State.DENY));
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.DENY));
+        assertEquals(result.queryValue(member, Flags.BUILD), State.DENY);
+        assertEquals(result.queryValue(nonMember, Flags.BUILD), State.DENY);
     }
 
     @Test
@@ -689,8 +691,8 @@ public class FlagValueCalculatorTest {
         // Cannot set ALLOW on BUILD
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(member, Flags.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
+        assertEquals(result.queryValue(member, Flags.BUILD), State.ALLOW);
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -704,8 +706,8 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(member);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(member, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(nonMember, Flags.BUILD)); 
+        assertEquals(result.queryValue(member, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -724,9 +726,9 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertNull(result.queryValue(memberOne, Flags.BUILD));
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -746,9 +748,9 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertEquals(result.queryValue(memberOne, Flags.BUILD), State.ALLOW);
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -768,9 +770,9 @@ public class FlagValueCalculatorTest {
         region.setParent(parent);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertEquals(result.queryValue(memberOne, Flags.BUILD), State.ALLOW);
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -790,9 +792,9 @@ public class FlagValueCalculatorTest {
         region.setParent(parent);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertEquals(result.queryValue(memberOne, Flags.BUILD), State.ALLOW);
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -814,9 +816,9 @@ public class FlagValueCalculatorTest {
         ProtectedRegion priority = mock.add(10);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is((State) null));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertNull(result.queryValue(memberOne, Flags.BUILD));
+        assertNull(result.queryValue(memberBoth, Flags.BUILD));
     }
 
     @Test
@@ -839,9 +841,9 @@ public class FlagValueCalculatorTest {
         priority.setFlag(Flags.PASSTHROUGH, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertEquals(result.queryValue(memberOne, Flags.BUILD), State.ALLOW);
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -862,9 +864,9 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertNull(result.queryValue(memberOne, Flags.BUILD));
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -887,9 +889,9 @@ public class FlagValueCalculatorTest {
         region.setFlag(Flags.BUILD, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.ALLOW));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertEquals(result.queryValue(nonMember, Flags.BUILD), State.ALLOW);
+        assertEquals(result.queryValue(memberOne, Flags.BUILD), State.ALLOW);
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -913,9 +915,9 @@ public class FlagValueCalculatorTest {
         region.setFlag(Flags.BUILD, State.ALLOW);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is(State.DENY));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is(State.DENY));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.DENY));
+        assertEquals(result.queryValue(nonMember, Flags.BUILD), State.DENY);
+        assertEquals(result.queryValue(memberOne, Flags.BUILD), State.DENY);
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.DENY);
     }
 
     @Test
@@ -939,9 +941,9 @@ public class FlagValueCalculatorTest {
         // Disable setting ALLOW for safety reasons
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertNull(result.queryValue(memberOne, Flags.BUILD));
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -964,10 +966,10 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(globalMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(globalMember, Flags.BUILD));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertNull(result.queryValue(memberOne, Flags.BUILD));
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -992,10 +994,10 @@ public class FlagValueCalculatorTest {
 
         FlagValueCalculator result = mock.getFlagCalculator();
         // Inconsistent due to legacy reasons
-        assertThat(result.queryValue(globalMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(globalMember, Flags.BUILD));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertNull(result.queryValue(memberOne, Flags.BUILD));
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     @Test
@@ -1019,10 +1021,10 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(memberBoth);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.queryValue(globalMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(nonMember, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberOne, Flags.BUILD), is((State) null));
-        assertThat(result.queryValue(memberBoth, Flags.BUILD), is(State.ALLOW));
+        assertNull(result.queryValue(globalMember, Flags.BUILD));
+        assertNull(result.queryValue(nonMember, Flags.BUILD));
+        assertNull(result.queryValue(memberOne, Flags.BUILD));
+        assertEquals(result.queryValue(memberBoth, Flags.BUILD), State.ALLOW);
     }
 
     // ========================================================================
@@ -1046,8 +1048,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test1", "test2")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test1", "test2"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1068,8 +1070,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1, "test");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test", "test")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1090,8 +1092,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test1")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test1"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1115,8 +1117,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test1", "test3")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test1", "test3"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1141,8 +1143,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test1")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test1"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1167,8 +1169,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test3")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test3"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1193,8 +1195,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test1")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test1"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1219,8 +1221,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1, "test2");
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test2")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test2"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1248,8 +1250,8 @@ public class FlagValueCalculatorTest {
         region.setParent(parent2);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test2", "test3")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test2", "test3"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1277,8 +1279,8 @@ public class FlagValueCalculatorTest {
         region = mock.add(30);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test2")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test2"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     @Test
@@ -1306,8 +1308,8 @@ public class FlagValueCalculatorTest {
         region = mock.add(30);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(copyOf(result.queryAllValues(null, stringFlag1)), equalTo(of("test1")));
-        assertThat(result.queryAllValues(null, stringFlag2), is(Matchers.<String>empty()));
+        assertEquals(copyOf(result.queryAllValues(null, stringFlag1)), Set.of("test1"));
+        assertTrue(result.queryAllValues(null, stringFlag2).isEmpty());
     }
 
     // ========================================================================
@@ -1320,7 +1322,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion region = mock.add(30);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getPriority(region), is(30));
+        assertEquals(result.getPriority(region), 30);
     }
 
     @Test
@@ -1330,7 +1332,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion region = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getPriority(region), is(Integer.MIN_VALUE));
+        assertEquals(result.getPriority(region), Integer.MIN_VALUE);
     }
 
     // ========================================================================
@@ -1352,8 +1354,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1.getRegionGroupFlag(), RegionGroup.ALL);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1374,8 +1376,8 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1394,8 +1396,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1.getRegionGroupFlag(), RegionGroup.ALL);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1416,8 +1418,8 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1436,8 +1438,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1.getRegionGroupFlag(), RegionGroup.NON_MEMBERS);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1458,8 +1460,8 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1480,8 +1482,8 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo(null));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertNull(result.getEffectiveFlag(region, stringFlag1, player));
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1500,8 +1502,8 @@ public class FlagValueCalculatorTest {
         region.setFlag(stringFlag1.getRegionGroupFlag(), RegionGroup.MEMBERS);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo(null));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertNull(result.getEffectiveFlag(region, stringFlag1, null));
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1523,8 +1525,8 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1546,8 +1548,8 @@ public class FlagValueCalculatorTest {
         region.getOwners().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1569,8 +1571,8 @@ public class FlagValueCalculatorTest {
         region.getOwners().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1592,8 +1594,8 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo(null));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertNull(result.getEffectiveFlag(region, stringFlag1, player));
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1615,8 +1617,8 @@ public class FlagValueCalculatorTest {
         region.getOwners().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo(null));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertNull(result.getEffectiveFlag(region, stringFlag1, player));
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1638,8 +1640,8 @@ public class FlagValueCalculatorTest {
         region.getOwners().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo(null));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertNull(result.getEffectiveFlag(region, stringFlag1, player));
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1661,8 +1663,8 @@ public class FlagValueCalculatorTest {
         region.getMembers().addPlayer(player);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1683,8 +1685,8 @@ public class FlagValueCalculatorTest {
         LocalPlayer player = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1709,8 +1711,8 @@ public class FlagValueCalculatorTest {
         region.setParent(parent2);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("test1"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "test1");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1737,8 +1739,8 @@ public class FlagValueCalculatorTest {
         region.setParent(parent2);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("test2"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "test2");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1765,8 +1767,8 @@ public class FlagValueCalculatorTest {
         parent1.setFlag(stringFlag1.getRegionGroupFlag(), RegionGroup.ALL);
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("test3"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "test3");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1798,10 +1800,10 @@ public class FlagValueCalculatorTest {
         LocalPlayer player2 = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player1), equalTo("members"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player2), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player1), "members");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player2), "everyone");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "everyone");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1833,10 +1835,10 @@ public class FlagValueCalculatorTest {
         LocalPlayer player2 = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player1), equalTo("members"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player2), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player1), "members");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player2), "everyone");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "everyone");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1864,10 +1866,10 @@ public class FlagValueCalculatorTest {
         LocalPlayer player2 = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player1), equalTo("members"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player2), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player1), "members");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player2), "everyone");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "everyone");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1895,10 +1897,10 @@ public class FlagValueCalculatorTest {
         LocalPlayer player2 = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player1), equalTo("members"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player2), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player1), "members");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player2), "everyone");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "everyone");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1926,10 +1928,10 @@ public class FlagValueCalculatorTest {
         LocalPlayer player2 = mock.createPlayer();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player1), equalTo("members"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, player2), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag1, null), equalTo("everyone"));
-        assertThat(result.getEffectiveFlag(region, stringFlag2, null), equalTo(null));
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player1), "members");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, player2), "everyone");
+        assertEquals(result.getEffectiveFlag(region, stringFlag1, null), "everyone");
+        assertNull(result.getEffectiveFlag(region, stringFlag2, null));
     }
 
     @Test
@@ -1939,7 +1941,7 @@ public class FlagValueCalculatorTest {
         ProtectedRegion global = mock.global();
 
         FlagValueCalculator result = mock.getFlagCalculator();
-        assertThat(result.getEffectiveFlag(global, Flags.BUILD, null), equalTo(null));
+        assertNull(result.getEffectiveFlag(global, Flags.BUILD, null));
     }
 
     @Test
@@ -1951,7 +1953,7 @@ public class FlagValueCalculatorTest {
 
         FlagValueCalculator result = mock.getFlagCalculator();
         // Cannot let users override BUILD on GLOBAL
-        assertThat(result.getEffectiveFlag(global, Flags.BUILD, null), equalTo(State.DENY));
+        assertEquals(result.getEffectiveFlag(global, Flags.BUILD, null), State.DENY);
     }
 
     @Test
@@ -1963,6 +1965,6 @@ public class FlagValueCalculatorTest {
 
         FlagValueCalculator result = mock.getFlagCalculator();
         // Cannot let users override BUILD on GLOBAL
-        assertThat(result.getEffectiveFlag(global, Flags.BUILD, null), equalTo(null));
+        assertNull(result.getEffectiveFlag(global, Flags.BUILD, null));
     }
 }

@@ -1,9 +1,10 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import net.minecrell.gradle.licenser.LicenseExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.quality.CheckstyleExtension
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
@@ -22,11 +23,10 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "java")
     apply(plugin = "eclipse")
     apply(plugin = "idea")
-    apply(plugin = "maven")
+    apply(plugin = "maven-publish")
     apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "com.jfrog.artifactory")
-    apply(plugin = "net.minecrell.licenser")
 
     ext["internalVersion"] = "$version+${rootProject.ext["gitCommitHash"]}"
 
@@ -37,18 +37,19 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     configure<CheckstyleExtension> {
         configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-        toolVersion = "7.6.1"
+        toolVersion = "8.34"
     }
 
     tasks.withType<Test>().configureEach {
-        useJUnit()
+        useJUnitPlatform()
     }
 
     dependencies {
-        "testCompile"("junit:junit:${Versions.JUNIT}")
-        // TODO switch to jupiter - doesn't support abstract test classes so tests need rewriting
-        //"testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
-        //"testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
+        "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
+        "testImplementation"("org.mockito:mockito-junit-jupiter:${Versions.MOCKITO}")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
     }
 
     // Java 8 turns on doclint which we fail
@@ -90,13 +91,23 @@ fun Project.applyPlatformAndCoreConfiguration() {
         dependsOn("checkstyleMain", "checkstyleTest")
     }
 
-    applyCommonArtifactoryConfig()
-
-    configure<LicenseExtension> {
-        header = rootProject.file("HEADER.txt")
-        include("**/*.java")
+    configure<PublishingExtension> {
+        publications {
+            register<MavenPublication>("maven") {
+                from(components["java"])
+                versionMapping {
+                    usage("java-api") {
+                        fromResolutionOf("runtimeClasspath")
+                    }
+                    usage("java-runtime") {
+                        fromResolutionResult()
+                    }
+                }
+            }
+        }
     }
 
+    applyCommonArtifactoryConfig()
 }
 
 fun Project.applyShadowConfiguration() {

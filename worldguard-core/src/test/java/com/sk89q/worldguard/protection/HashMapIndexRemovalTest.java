@@ -29,14 +29,14 @@ import com.sk89q.worldguard.protection.managers.storage.MemoryRegionDatabase;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HashMapIndexRemovalTest {
     private static final String ORPHAN_ID = "orphan";
@@ -52,7 +52,7 @@ public class HashMapIndexRemovalTest {
         return new RegionManager(new MemoryRegionDatabase(), new HashMapIndex.Factory(), getFlagRegistry());
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         manager = createRegionManager();
 

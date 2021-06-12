@@ -24,13 +24,12 @@ import com.sk89q.worldguard.protection.flags.MapFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StringFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public class FlagValueCalculatorMapFlagTest {
@@ -48,18 +47,18 @@ public class FlagValueCalculatorMapFlagTest {
         global.setFlag(mapFlag, map);
 
         ApplicableRegionSet applicableSet = mock.getApplicableSet();
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "allow", Flags.BUILD),
-                equalTo(StateFlag.State.ALLOW));
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "deny", Flags.BUILD),
-                equalTo(StateFlag.State.DENY));
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "undefined", Flags.BUILD),
-                equalTo(StateFlag.State.DENY));
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "allow", null),
-                equalTo(StateFlag.State.ALLOW));
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "deny", null),
-                equalTo(StateFlag.State.DENY));
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "undefined", null),
-                equalTo(StateFlag.State.ALLOW));
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "allow", Flags.BUILD),
+                StateFlag.State.ALLOW);
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "deny", Flags.BUILD),
+                StateFlag.State.DENY);
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "undefined", Flags.BUILD),
+                StateFlag.State.DENY);
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "allow", null),
+                StateFlag.State.ALLOW);
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "deny", null),
+                StateFlag.State.DENY);
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "undefined", null),
+                StateFlag.State.ALLOW);
     }
 
     @Test
@@ -86,12 +85,12 @@ public class FlagValueCalculatorMapFlagTest {
         region2.setFlag(mapFlag, map2);
 
         ApplicableRegionSet applicableSet = mock.getApplicableSet();
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "should-deny", null),
-                equalTo(StateFlag.State.DENY));
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "should-allow", null),
-                equalTo(StateFlag.State.ALLOW));
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "should-allow2", null),
-                equalTo(StateFlag.State.ALLOW));
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "should-deny", null),
+                StateFlag.State.DENY);
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "should-allow", null),
+                StateFlag.State.ALLOW);
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "should-allow2", null),
+                StateFlag.State.ALLOW);
     }
 
 
@@ -116,9 +115,9 @@ public class FlagValueCalculatorMapFlagTest {
         child.setFlag(mapFlag, childMap);
 
         ApplicableRegionSet applicableSet = mock.getApplicableSet();
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "useChildValue", null),
-                equalTo(StateFlag.State.DENY));
-        assertThat(applicableSet.queryMapValue(null, mapFlag, "useParentValue", null),
-                equalTo(StateFlag.State.ALLOW));
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "useChildValue", null),
+                StateFlag.State.DENY);
+        assertEquals(applicableSet.queryMapValue(null, mapFlag, "useParentValue", null),
+                StateFlag.State.ALLOW);
     }
 }

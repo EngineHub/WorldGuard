@@ -1,7 +1,5 @@
 plugins {
     id("java-library")
-    id("net.ltgt.apt-eclipse")
-    id("net.ltgt.apt-idea")
 }
 
 applyPlatformAndCoreConfiguration()
