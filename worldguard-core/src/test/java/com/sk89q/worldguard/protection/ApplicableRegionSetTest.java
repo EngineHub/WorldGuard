@@ -25,13 +25,15 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.StringFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.command.CommandFilter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ApplicableRegionSetTest {
 
@@ -42,7 +44,7 @@ public class ApplicableRegionSetTest {
         LocalPlayer player = mock.createPlayer();
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertThat(set.testState(player, Flags.BUILD), is(true));
+        assertTrue(set.testState(player, Flags.BUILD));
     }
 
     @Test
@@ -54,7 +56,7 @@ public class ApplicableRegionSetTest {
         ProtectedRegion global = mock.global();
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertThat(set.testState(player, Flags.BUILD), is(true));
+        assertTrue(set.testState(player, Flags.BUILD));
     }
 
     @Test
@@ -68,8 +70,8 @@ public class ApplicableRegionSetTest {
         region.getMembers().addPlayer(member);
 
         ApplicableRegionSet set = mock.getApplicableSet();
-        assertThat(set.testState(member, Flags.BUILD), is(true));
-        assertThat(set.testState(nonMember, Flags.BUILD), is(false));
+        assertTrue(set.testState(member, Flags.BUILD));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -80,15 +82,15 @@ public class ApplicableRegionSetTest {
 
         ApplicableRegionSet set = mock.getApplicableSet();
 
-        assertThat(set.testState(player, Flags.MOB_DAMAGE), is(true));
-        assertThat(set.testState(player, Flags.ENTRY), is(true));
-        assertThat(set.testState(player, Flags.EXIT), is(true));
-        assertThat(set.testState(player, Flags.LEAF_DECAY), is(true));
-        assertThat(set.testState(player, Flags.RECEIVE_CHAT), is(true));
-        assertThat(set.testState(player, Flags.SEND_CHAT), is(true));
-        assertThat(set.testState(player, Flags.INVINCIBILITY), is(false));
+        assertTrue(set.testState(player, Flags.MOB_DAMAGE));
+        assertTrue(set.testState(player, Flags.ENTRY));
+        assertTrue(set.testState(player, Flags.EXIT));
+        assertTrue(set.testState(player, Flags.LEAF_DECAY));
+        assertTrue(set.testState(player, Flags.RECEIVE_CHAT));
+        assertTrue(set.testState(player, Flags.SEND_CHAT));
+        assertFalse(set.testState(player, Flags.INVINCIBILITY));
 
-        assertThat(set.testState(player, Flags.BUILD), is(true));
+        assertTrue(set.testState(player, Flags.BUILD));
     }
 
     @Test
@@ -101,15 +103,15 @@ public class ApplicableRegionSetTest {
 
         ApplicableRegionSet set = mock.getApplicableSet();
 
-        assertThat(set.testState(player, Flags.MOB_DAMAGE), is(true));
-        assertThat(set.testState(player, Flags.ENTRY), is(true));
-        assertThat(set.testState(player, Flags.EXIT), is(true));
-        assertThat(set.testState(player, Flags.LEAF_DECAY), is(true));
-        assertThat(set.testState(player, Flags.RECEIVE_CHAT), is(true));
-        assertThat(set.testState(player, Flags.SEND_CHAT), is(true));
-        assertThat(set.testState(player, Flags.INVINCIBILITY), is(false));
+        assertTrue(set.testState(player, Flags.MOB_DAMAGE));
+        assertTrue(set.testState(player, Flags.ENTRY));
+        assertTrue(set.testState(player, Flags.EXIT));
+        assertTrue(set.testState(player, Flags.LEAF_DECAY));
+        assertTrue(set.testState(player, Flags.RECEIVE_CHAT));
+        assertTrue(set.testState(player, Flags.SEND_CHAT));
+        assertFalse(set.testState(player, Flags.INVINCIBILITY));
 
-        assertThat(set.testState(player, Flags.BUILD), is(true));
+        assertTrue(set.testState(player, Flags.BUILD));
     }
 
     @Test
@@ -124,25 +126,25 @@ public class ApplicableRegionSetTest {
 
         ApplicableRegionSet set = mock.getApplicableSet();
 
-        assertThat(set.testState(member, Flags.MOB_DAMAGE), is(true));
-        assertThat(set.testState(member, Flags.ENTRY), is(true));
-        assertThat(set.testState(member, Flags.EXIT), is(true));
-        assertThat(set.testState(member, Flags.LEAF_DECAY), is(true));
-        assertThat(set.testState(member, Flags.RECEIVE_CHAT), is(true));
-        assertThat(set.testState(member, Flags.SEND_CHAT), is(true));
-        assertThat(set.testState(member, Flags.INVINCIBILITY), is(false));
+        assertTrue(set.testState(member, Flags.MOB_DAMAGE));
+        assertTrue(set.testState(member, Flags.ENTRY));
+        assertTrue(set.testState(member, Flags.EXIT));
+        assertTrue(set.testState(member, Flags.LEAF_DECAY));
+        assertTrue(set.testState(member, Flags.RECEIVE_CHAT));
+        assertTrue(set.testState(member, Flags.SEND_CHAT));
+        assertFalse(set.testState(member, Flags.INVINCIBILITY));
 
-        assertThat(set.testState(member, Flags.BUILD), is(true));
+        assertTrue(set.testState(member, Flags.BUILD));
 
-        assertThat(set.testState(nonMember, Flags.MOB_DAMAGE), is(true));
-        assertThat(set.testState(nonMember, Flags.ENTRY), is(true));
-        assertThat(set.testState(nonMember, Flags.EXIT), is(true));
-        assertThat(set.testState(nonMember, Flags.LEAF_DECAY), is(true));
-        assertThat(set.testState(nonMember, Flags.RECEIVE_CHAT), is(true));
-        assertThat(set.testState(nonMember, Flags.SEND_CHAT), is(true));
-        assertThat(set.testState(nonMember, Flags.INVINCIBILITY), is(false));
+        assertTrue(set.testState(nonMember, Flags.MOB_DAMAGE));
+        assertTrue(set.testState(nonMember, Flags.ENTRY));
+        assertTrue(set.testState(nonMember, Flags.EXIT));
+        assertTrue(set.testState(nonMember, Flags.LEAF_DECAY));
+        assertTrue(set.testState(nonMember, Flags.RECEIVE_CHAT));
+        assertTrue(set.testState(nonMember, Flags.SEND_CHAT));
+        assertFalse(set.testState(nonMember, Flags.INVINCIBILITY));
 
-        assertThat(set.testState(nonMember, Flags.BUILD), is(false));
+        assertFalse(set.testState(nonMember, Flags.BUILD));
     }
 
     @Test
@@ -623,19 +625,19 @@ public class ApplicableRegionSetTest {
         test = new CommandFilter(
                 set.queryValue(nonMember, Flags.ALLOWED_CMDS),
                 set.queryValue(nonMember, Flags.BLOCKED_CMDS));
-        assertThat(test.apply("/permit"), is(true));
-        assertThat(test.apply("/strange"), is(true));
-        assertThat(test.apply("/other"), is(false));
-        assertThat(test.apply("/deny"), is(false));
+        assertTrue(test.apply("/permit"));
+        assertTrue(test.apply("/strange"));
+        assertFalse(test.apply("/other"));
+        assertFalse(test.apply("/deny"));
 
         set = mock.getApplicableSetInWilderness();
         test = new CommandFilter(
                 set.queryValue(nonMember, Flags.ALLOWED_CMDS),
                 set.queryValue(nonMember, Flags.BLOCKED_CMDS));
-        assertThat(test.apply("/permit"), is(true));
-        assertThat(test.apply("/strange"), is(false));
-        assertThat(test.apply("/other"), is(true));
-        assertThat(test.apply("/deny"), is(false));
+        assertTrue(test.apply("/permit"));
+        assertFalse(test.apply("/strange"));
+        assertTrue(test.apply("/other"));
+        assertFalse(test.apply("/deny"));
     }
 
     @Test

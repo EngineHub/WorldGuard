@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.protection;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.TestPlayer;
@@ -34,8 +32,11 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class RegionEntryExitTest {
 
@@ -60,7 +61,7 @@ public abstract class RegionEntryExitTest {
 
     protected abstract RegionManager createRegionManager() throws Exception;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         setUpGlobalRegion();
 
@@ -129,8 +130,8 @@ public abstract class RegionEntryExitTest {
 //        System.out.println("flag " + appl.getFlag(Flags.ENTRY));
 //        System.out.println("grp  " + appl.getFlag(Flags.ENTRY.getRegionGroupFlag()));
 //        System.out.println("===");
-        assertTrue("Allowed Entry", appl.testState(vipPlayer, Flags.ENTRY));
-        assertFalse("Forbidden Entry", appl.testState(builderPlayer, Flags.ENTRY));
+        assertTrue(appl.testState(vipPlayer, Flags.ENTRY), "Allowed Entry");
+        assertFalse(appl.testState(builderPlayer, Flags.ENTRY), "Forbidden Entry");
     }
 
     @Test
@@ -144,8 +145,8 @@ public abstract class RegionEntryExitTest {
 //        System.out.println("flag " + appl.getFlag(Flags.EXIT));
 //        System.out.println("grp  " + appl.getFlag(Flags.EXIT.getRegionGroupFlag()));
 //        System.out.println("===");
-        assertTrue("Allowed Exit", appl.testState(builderPlayer, Flags.EXIT));
-        assertFalse("Forbidden Exit", appl.testState(vipPlayer, Flags.EXIT));
+        assertTrue(appl.testState(builderPlayer, Flags.EXIT), "Allowed Exit");
+        assertFalse(appl.testState(vipPlayer, Flags.EXIT), "Forbidden Exit");
     }
 
 }

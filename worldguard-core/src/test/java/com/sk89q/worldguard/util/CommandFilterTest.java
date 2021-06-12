@@ -21,15 +21,15 @@ package com.sk89q.worldguard.util;
 
 import com.sk89q.worldguard.util.command.CommandFilter;
 import com.sk89q.worldguard.util.command.CommandFilter.Builder;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CommandFilterTest extends TestCase {
+public class CommandFilterTest {
 
     private static final String[] COMMAND_SEPARATORS = new String[] {" ", "  ", "\t", " \t", "\n", "\r\n"};
 
+    @Test
     public void testApply() throws Exception {
         CommandFilter filter;
 
@@ -187,9 +187,9 @@ public class CommandFilterTest extends TestCase {
 
     private void assertSubcommands(CommandFilter filter, final String root, boolean expected) {
         for (String separator : COMMAND_SEPARATORS) {
-            assertThat(filter.apply(root.replaceAll(" ", separator)), is(expected));
-            assertThat(filter.apply((root + " _subcmd").replaceAll(" ", separator)), is(expected));
-            assertThat(filter.apply((root + " _subcmd _another").replaceAll(" ", separator)), is(expected));
+            assertEquals(filter.apply(root.replaceAll(" ", separator)), expected);
+            assertEquals(filter.apply((root + " _subcmd").replaceAll(" ", separator)), expected);
+            assertEquals(filter.apply((root + " _subcmd _another").replaceAll(" ", separator)), expected);
         }
     }
 
