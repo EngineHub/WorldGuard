@@ -19,9 +19,6 @@
 
 package com.sk89q.worldguard.protection;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.TestPlayer;
@@ -36,16 +33,20 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-@RunWith(Parameterized.class)
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class RegionOverlapTest {
     static String COURTYARD_ID = "courtyard";
     static String FOUNTAIN_ID = "fountain";
@@ -64,13 +65,13 @@ public abstract class RegionOverlapTest {
     TestPlayer player1;
     TestPlayer player2;
 
-    @Parameterized.Parameters(name = "{index}: useMaxPrio = {0}")
+   /* @Parameterized.Parameters(name = "{index}: useMaxPrio = {0}")
     public static Iterable<Object[]> params() {
         return Arrays.asList(new Object[][]{{true}, {false}});
-    }
+    }*/
 
-    @Parameterized.Parameter
-    public boolean useMaxPriorityAssociation;
+
+    // public boolean useMaxPriorityAssociation;
 
     protected FlagRegistry getFlagRegistry() {
         return WorldGuard.getInstance().getFlagRegistry();
@@ -78,7 +79,7 @@ public abstract class RegionOverlapTest {
     
     protected abstract RegionManager createRegionManager() throws Exception;
 
-    @Before
+    @BeforeAll
     public void setUp() throws Exception {
         setUpGlobalRegion();
         
@@ -194,8 +195,9 @@ public abstract class RegionOverlapTest {
         assertTrue(appl.testState(player2, Flags.BUILD));
     }
 
-    @Test
-    public void testNonPlayerBuildAccessInOneRegion() {
+    @ParameterizedTest(name = "useMaxPriorityAssociation={0}")
+    @ValueSource(booleans = { false, true })
+    public void testNonPlayerBuildAccessInOneRegion(boolean useMaxPriorityAssociation) {
         ApplicableRegionSet appl;
 
         HashSet<ProtectedRegion> source = new HashSet<>();
@@ -213,8 +215,9 @@ public abstract class RegionOverlapTest {
         assertFalse(appl.testState(assoc, Flags.BUILD));
     }
 
-    @Test
-    public void testNonPlayerBuildAccessInBothRegions() {
+    @ParameterizedTest(name = "useMaxPriorityAssociation={0}")
+    @ValueSource(booleans = { false, true })
+    public void testNonPlayerBuildAccessInBothRegions(boolean useMaxPriorityAssociation) {
         ApplicableRegionSet appl;
 
         HashSet<ProtectedRegion> source = new HashSet<>();
@@ -233,8 +236,9 @@ public abstract class RegionOverlapTest {
         assertTrue(appl.testState(assoc, Flags.BUILD));
     }
 
-    @Test
-    public void testNonPlayerBuildAccessInNoRegions() {
+    @ParameterizedTest(name = "useMaxPriorityAssociation={0}")
+    @ValueSource(booleans = { false, true })
+    public void testNonPlayerBuildAccessInNoRegions(boolean useMaxPriorityAssociation) {
         ApplicableRegionSet appl;
 
         HashSet<ProtectedRegion> source = new HashSet<>();
