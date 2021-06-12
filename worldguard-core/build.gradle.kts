@@ -1,5 +1,5 @@
 plugins {
-    id("java-library")
+    `java-library`
 }
 
 applyPlatformAndCoreConfiguration()
@@ -17,15 +17,4 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
     dependsOn(":worldguard-libs:build")
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir("src/main/java")
-        }
-        resources {
-            srcDir("src/main/resources")
-        }
-    }
 }
