@@ -20,6 +20,10 @@ fun Project.applyLibrariesConfiguration() {
 
     group = "${rootProject.group}.worldguard-libs"
 
+    val relocations = mapOf(
+        "com.sk89q.squirrelid" to "com.sk89q.worldguard.util.profile"
+    )
+
     tasks.register<ShadowJar>("jar") {
         configurations = listOf(project.configurations["shade"])
         archiveClassifier.set("")
@@ -28,7 +32,9 @@ fun Project.applyLibrariesConfiguration() {
             exclude(dependency("com.google.code.findbugs:jsr305:1.3.9"))
         }
 
-        relocate("com.sk89q.squirrelid", "com.sk89q.worldguard.util.profile")
+        relocations.forEach { (from, to) ->
+            relocate(from, to)
+        }
     }
     val altConfigFiles = { artifactType: String ->
         val deps = configurations["shade"].incoming.dependencies
@@ -53,13 +59,15 @@ fun Project.applyLibrariesConfiguration() {
         from({
             altConfigFiles("sources")
         })
-        val filePattern = Regex("(.*)com/sk89q/squirrelid((?:/|$).*)")
-        val textPattern = Regex("com\\.sk89q\\.squirrelid")
-        eachFile {
-            filter {
-                it.replaceFirst(textPattern, "com.sk89q.worldguard.util.profile")
+        relocations.forEach { (from, to) ->
+            val filePattern = Regex("(.*)${from.replace('.', '/')}((?:/|$).*)")
+            val textPattern = Regex.fromLiteral(from)
+            eachFile {
+                filter {
+                    it.replaceFirst(textPattern, to)
+                }
+                path = path.replaceFirst(filePattern, "$1${to.replace('.', '/')}$2")
             }
-            path = path.replaceFirst(filePattern, "$1com/sk89q/worldguard/util/profile$2")
         }
         archiveClassifier.set("sources")
     }
@@ -72,10 +80,6 @@ fun Project.applyLibrariesConfiguration() {
         val jar = tasks.named("jar")
         add("default", jar) {
             builtBy(jar)
-        }
-        val sourcesJar = tasks.named("sourcesJar")
-        add("archives", sourcesJar) {
-            builtBy(sourcesJar)
         }
     }
 

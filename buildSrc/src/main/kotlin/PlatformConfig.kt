@@ -1,22 +1,20 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.quality.CheckstyleExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
-import org.gradle.external.javadoc.CoreJavadocOptions
+import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import org.gradle.kotlin.dsl.the
 
 fun Project.applyPlatformAndCoreConfiguration() {
     applyCommonConfiguration()
@@ -29,11 +27,6 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "com.jfrog.artifactory")
 
     ext["internalVersion"] = "$version+${rootProject.ext["gitCommitHash"]}"
-
-    configure<JavaPluginConvention> {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
 
     configure<CheckstyleExtension> {
         configFile = rootProject.file("config/checkstyle/checkstyle.xml")
@@ -54,37 +47,20 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     // Java 8 turns on doclint which we fail
     tasks.withType<Javadoc>().configureEach {
-        (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
+        (options as StandardJavadocDocletOptions).apply {
+            addStringOption("Xdoclint:none", "-quiet")
+            tags(
+                "apiNote:a:API Note:",
+                "implSpec:a:Implementation Requirements:",
+                "implNote:a:Implementation Note:"
+            )
+        }
     }
 
-    tasks.register<Jar>("javadocJar") {
-        dependsOn("javadoc")
-        archiveClassifier.set("javadoc")
-        from(tasks.getByName<Javadoc>("javadoc").destinationDir)
-    }
-
-    tasks.named("assemble").configure {
-        dependsOn("javadocJar")
-    }
-
-    artifacts {
-        add("archives", tasks.named("jar"))
-        add("archives", tasks.named("javadocJar"))
-    }
+    the<JavaPluginExtension>().withJavadocJar()
 
     if (name == "worldguard-core" || name == "worldguard-bukkit") {
-        tasks.register<Jar>("sourcesJar") {
-            dependsOn("classes")
-            archiveClassifier.set("sources")
-            from(sourceSets["main"].allSource)
-        }
-
-        artifacts {
-            add("archives", tasks.named("sourcesJar"))
-        }
-        tasks.named("assemble").configure {
-            dependsOn("sourcesJar")
-        }
+        the<JavaPluginExtension>().withSourcesJar()
     }
 
     tasks.named("check").configure {
@@ -122,6 +98,7 @@ fun Project.applyShadowConfiguration() {
                 include(dependency("org.flywaydb:flyway-core:3.0"))
             }
             relocate("com.sk89q.squirrelid", "com.sk89q.worldguard.util.profile")
+            exclude("com.google.code.findbugs:jsr305")
         }
         exclude("GradleStart**")
         exclude(".cache")
