@@ -31,7 +31,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.util.profile.resolver.PaperProfileService;
+import com.sk89q.worldguard.util.profile.resolver.PaperPlayerService;
 import com.sk89q.worldguard.bukkit.protection.events.flags.FlagContextCreateEvent;
 import com.sk89q.worldguard.bukkit.session.BukkitSessionManager;
 import com.sk89q.worldguard.bukkit.util.report.PerformanceReport;
@@ -251,7 +251,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
         List<ProfileService> services = new ArrayList<>();
         if (PaperLib.isPaper()) {
             // Paper has a shared cache
-            services.add(PaperProfileService.getInstance());
+            services.add(PaperPlayerService.getInstance());
         } else {
             services.add(BukkitPlayerService.getInstance());
         }

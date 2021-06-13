@@ -35,7 +35,7 @@ fun Project.applyLibrariesConfiguration() {
     group = "${rootProject.group}.worldguard-libs"
 
     val relocations = mapOf(
-        "com.sk89q.squirrelid" to "com.sk89q.worldguard.util.profile"
+        "org.enginehub.squirrelid" to "com.sk89q.worldguard.util.profile"
     )
 
     tasks.register<ShadowJar>("jar") {
