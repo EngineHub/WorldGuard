@@ -26,19 +26,22 @@ repositories {
     }
 }
 
+configurations {
+    compileClasspath.get().extendsFrom(create("shadeOnly"))
+}
+
 dependencies {
     "api"(project(":worldguard-core"))
-    //"api"(project(":worldguard-libs:bukkit"))
-    // "api"("com.destroystokyo.paper:paper-api:1.16.2-R0.1-SNAPSHOT")
-    "api"("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") {
+    // "compileOnly"("com.destroystokyo.paper:paper-api:1.16.2-R0.1-SNAPSHOT")
+    /*"runtimeOnly"*/"api"("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
     }
-    "implementation"("io.papermc:paperlib:1.0.6")
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
-    "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
-    "implementation"("org.bstats:bstats-bukkit:2.1.0")
-    "implementation"("co.aikar:minecraft-timings:1.0.4")
+    "compileOnly"("com.sk89q:commandbook:2.3") { isTransitive = false }
+    "shadeOnly"("io.papermc:paperlib:1.0.6")
+    "shadeOnly"("org.bstats:bstats-bukkit:2.1.0")
+    "shadeOnly"("co.aikar:minecraft-timings:1.0.4")
 }
 
 tasks.named<Copy>("processResources") {
@@ -58,6 +61,8 @@ tasks.named<Jar>("jar") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    configurations = listOf(project.configurations["shadeOnly"], project.configurations["runtimeClasspath"])
+
     dependencies {
         include(dependency(":worldguard-core"))
         relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
