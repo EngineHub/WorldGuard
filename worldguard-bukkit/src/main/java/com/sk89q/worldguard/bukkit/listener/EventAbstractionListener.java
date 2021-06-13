@@ -1050,9 +1050,14 @@ public class EventAbstractionListener extends AbstractListener {
             handleBlockRightClick(event, cause, item, clicked, placed);
 
             // handle special dispenser behavior
-            if (item != null && Materials.isShulkerBox(item.getType())) {
-                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(), item.getType()));
-                return;
+            if (Materials.isShulkerBox(item.getType())) {
+                if (Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(), item.getType()))) {
+                    playDenyEffect(placed.getLocation());
+                }
+            } else if (isItemAppliedToBlock(item, placed)) {
+                if (Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(), placed.getType()))) {
+                    playDenyEffect(placed.getLocation());
+                }
             }
         }
     }
