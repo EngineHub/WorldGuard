@@ -98,7 +98,6 @@ fun Project.applyShadowConfiguration() {
             relocate("org.flywaydb", "com.sk89q.worldguard.internal.flywaydb") {
                 include(dependency("org.flywaydb:flyway-core:3.0"))
             }
-            relocate("org.enginehub.squirrelid", "com.sk89q.worldguard.util.profile")
             exclude("com.google.code.findbugs:jsr305")
         }
         exclude("GradleStart**")
