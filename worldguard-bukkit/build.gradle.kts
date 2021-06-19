@@ -20,10 +20,6 @@ repositories {
         name = "aikar-timings"
         url = uri("https://repo.aikar.co/nexus/content/groups/aikar/")
     }
-    maven {
-        name = "spigot"
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    }
 }
 
 configurations {
@@ -32,7 +28,8 @@ configurations {
 
 dependencies {
     "api"(project(":worldguard-core"))
-    "api"("io.papermc.paper:paper-aPI:1.17-R0.1-SNAPSHOT") {
+    "compileOnly"("io.papermc.paper:paper-api:1.17-R0.1-SNAPSHOT")
+    "runtimeOnly"("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
     }
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
