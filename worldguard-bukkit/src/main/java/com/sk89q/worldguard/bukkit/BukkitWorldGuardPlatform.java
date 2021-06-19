@@ -173,7 +173,6 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     @Override
     public void stackPlayerInventory(LocalPlayer localPlayer) {
         boolean ignoreMax = localPlayer.hasPermission("worldguard.stack.illegitimate");
-        boolean ignoreDamaged = localPlayer.hasPermission("worldguard.stack.damaged");
 
         Player player = ((BukkitPlayer) localPlayer).getPlayer();
 
@@ -207,12 +206,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
                     }
 
                     // Same type?
-                    // Blocks store their color in the damage value
-                    if (item2.getType() == item.getType() &&
-                            (ignoreDamaged || item.getDurability() == item2.getDurability()) &&
-                            ((item.getItemMeta() == null && item2.getItemMeta() == null)
-                                    || (item.getItemMeta() != null &&
-                                    item.getItemMeta().equals(item2.getItemMeta())))) {
+                    if (item2.isSimilar(item)) {
                         // This stack won't fit in the parent stack
                         if (item2.getAmount() > needed) {
                             item.setAmount(max);
