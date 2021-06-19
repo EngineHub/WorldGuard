@@ -942,11 +942,11 @@ public class EventAbstractionListener extends AbstractListener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         InventoryHolder causeHolder;
-       /* if (HAS_SNAPSHOT_INVHOLDER) {
+        if (HAS_SNAPSHOT_INVHOLDER) {
             causeHolder = event.getInitiator().getHolder(false);
-        } else {*/
+        } else {
             causeHolder = event.getInitiator().getHolder();
-        //}
+        }
 
         WorldConfiguration wcfg = null;
         if (causeHolder instanceof Hopper

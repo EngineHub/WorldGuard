@@ -131,12 +131,10 @@ class AbstractListener implements Listener {
                     (BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(entity.getWorld()));
             Location loc;
             if (PaperLib.isPaper()  && config.usePaperEntityOrigin) {
-                /*
                 loc = entity.getOrigin();
                 if (loc == null) {
                     loc = entity.getLocation();
-                }*/
-                loc = entity.getLocation();
+                }
             } else {
                 loc = entity.getLocation();
             }

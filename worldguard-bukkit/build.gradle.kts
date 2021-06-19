@@ -32,8 +32,7 @@ configurations {
 
 dependencies {
     "api"(project(":worldguard-core"))
-    // "compileOnly"("com.destroystokyo.paper:paper-api:1.16.2-R0.1-SNAPSHOT")
-    /*"runtimeOnly"*/"api"("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") {
+    "api"("io.papermc.paper:paper-aPI:1.17-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
     }
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
