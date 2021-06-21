@@ -788,8 +788,8 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.AMETHYST_CLUSTER, 0);
         MATERIAL_FLAGS.put(Material.POWDER_SNOW, 0);
 
-        MATERIAL_FLAGS.put(Material.CAVE_VINES, 0);
-        MATERIAL_FLAGS.put(Material.CAVE_VINES_PLANT, 0);
+        MATERIAL_FLAGS.put(Material.CAVE_VINES, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.CAVE_VINES_PLANT, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.MOSS_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.HANGING_ROOTS, 0);
         MATERIAL_FLAGS.put(Material.POINTED_DRIPSTONE, 0);
@@ -1380,20 +1380,26 @@ public final class Materials {
      * @return true if the material is a crop
      */
     public static boolean isCrop(Material type) {
-        return type == Material.WHEAT
-                || type == Material.CARROTS
-                || type == Material.POTATOES
-                || type == Material.BEETROOTS
-                || type == Material.MELON_STEM
-                || type == Material.PUMPKIN_STEM
-                || type == Material.PUMPKIN
-                || type == Material.MELON
-                || type == Material.CACTUS
-                || type == Material.SUGAR_CANE
-                || type == Material.BAMBOO
-                || type == Material.BAMBOO_SAPLING
-                || type == Material.SWEET_BERRY_BUSH
-                || type == Material.NETHER_WART;
+        switch (type) {
+            case WHEAT:
+            case CARROTS:
+            case POTATOES:
+            case BEETROOTS:
+            case MELON_STEM:
+            case PUMPKIN_STEM:
+            case PUMPKIN:
+            case MELON:
+            case CACTUS:
+            case SUGAR_CANE:
+            case BAMBOO:
+            case BAMBOO_SAPLING:
+            case SWEET_BERRY_BUSH:
+            case NETHER_WART:
+            case CAVE_VINES:
+            case CAVE_VINES_PLANT:
+                return true;
+        }
+        return false;
     }
 
     /**
