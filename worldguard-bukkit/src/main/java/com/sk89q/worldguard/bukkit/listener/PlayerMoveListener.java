@@ -25,6 +25,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -40,6 +41,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
+import org.spigotmc.event.entity.EntityMountEvent;
 
 public class PlayerMoveListener implements Listener {
 
@@ -53,6 +55,9 @@ public class PlayerMoveListener implements Listener {
         if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().usePlayerMove) {
             PluginManager pm = plugin.getServer().getPluginManager();
             pm.registerEvents(this, plugin);
+            if (PaperLib.isSpigot()) {
+                pm.registerEvents(new EntityMountListener(), plugin);
+            }
         }
     }
 
@@ -143,6 +148,20 @@ public class PlayerMoveListener implements Listener {
             BukkitAdapter.adapt(event.getPlayer().getLocation()), MoveType.OTHER_CANCELLABLE); // white lie
         if (loc != null) {
             player.teleport(BukkitAdapter.adapt(loc));
+        }
+    }
+
+    private class EntityMountListener implements Listener {
+        @EventHandler
+        public void onEntityMount(EntityMountEvent event) {
+            Entity entity = event.getEntity();
+            if (entity instanceof Player) {
+                LocalPlayer player = plugin.wrapPlayer((Player) entity);
+                Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
+                if (null != session.testMoveTo(player, BukkitAdapter.adapt(event.getMount().getLocation()), MoveType.EMBARK, true)) {
+                    event.setCancelled(true);
+                }
+            }
         }
     }
 }

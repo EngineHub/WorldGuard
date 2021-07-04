@@ -46,6 +46,7 @@ public final class Flags {
 
     // Overrides membership check
     public static final StateFlag PASSTHROUGH = register(new StateFlag("passthrough", false));
+    public static final SetFlag<String> NONPLAYER_PROTECTION_DOMAINS = register(new SetFlag<>("nonplayer-protection-domains", new StringFlag(null)));
 
     // This flag is unlike the others. It forces the checking of region membership
     public static final StateFlag BUILD = register(new BuildFlag("build", true));
@@ -134,7 +135,7 @@ public final class Flags {
     public static final SetFlag<String> ALLOWED_CMDS = register(new SetFlag<>("allowed-cmds", new CommandStringFlag(null)));
 
     // locations
-    public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport", RegionGroup.MEMBERS));
+    public static final LocationFlag TELE_LOC = register(new LocationFlag("teleport"));
     public static final LocationFlag SPAWN_LOC = register(new LocationFlag("spawn", RegionGroup.MEMBERS));
 
     /**

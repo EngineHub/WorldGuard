@@ -52,27 +52,7 @@ public final class Materials {
     private static final Map<Material, Integer> MATERIAL_FLAGS = new EnumMap<>(Material.class);
     private static final Set<PotionEffectType> DAMAGE_EFFECTS = new HashSet<>();
 
-    private static Set<Material> shulkerBoxes = new HashSet<>();
-
     static {
-        shulkerBoxes.add(Material.SHULKER_BOX);
-        shulkerBoxes.add(Material.WHITE_SHULKER_BOX);
-        shulkerBoxes.add(Material.ORANGE_SHULKER_BOX);
-        shulkerBoxes.add(Material.MAGENTA_SHULKER_BOX);
-        shulkerBoxes.add(Material.LIGHT_BLUE_SHULKER_BOX);
-        shulkerBoxes.add(Material.YELLOW_SHULKER_BOX);
-        shulkerBoxes.add(Material.LIME_SHULKER_BOX);
-        shulkerBoxes.add(Material.PINK_SHULKER_BOX);
-        shulkerBoxes.add(Material.GRAY_SHULKER_BOX);
-        shulkerBoxes.add(Material.LIGHT_GRAY_SHULKER_BOX);
-        shulkerBoxes.add(Material.CYAN_SHULKER_BOX);
-        shulkerBoxes.add(Material.PURPLE_SHULKER_BOX);
-        shulkerBoxes.add(Material.BLUE_SHULKER_BOX);
-        shulkerBoxes.add(Material.BROWN_SHULKER_BOX);
-        shulkerBoxes.add(Material.GREEN_SHULKER_BOX);
-        shulkerBoxes.add(Material.RED_SHULKER_BOX);
-        shulkerBoxes.add(Material.BLACK_SHULKER_BOX);
-
         ENTITY_ITEMS.put(EntityType.PAINTING, Material.PAINTING);
         ENTITY_ITEMS.put(EntityType.ARROW, Material.ARROW);
         ENTITY_ITEMS.put(EntityType.SNOWBALL, Material.SNOWBALL);
@@ -747,14 +727,15 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.WEEPING_VINES_PLANT, 0);
 
 
-        // Fake tags
-        for (Material m : shulkerBoxes) {
-            MATERIAL_FLAGS.put(m, MODIFIED_ON_RIGHT);
-        }
-
         // Generated via tag
-        for (Material door : Tag.DOORS.getValues()) {
-            MATERIAL_FLAGS.put(door, MODIFIED_ON_RIGHT);
+        for (Material woodenDoor : Tag.WOODEN_DOORS.getValues()) {
+            MATERIAL_FLAGS.put(woodenDoor, MODIFIED_ON_RIGHT);
+        }
+        for (Material woodenTrapdoor : Tag.WOODEN_TRAPDOORS.getValues()) {
+            MATERIAL_FLAGS.put(woodenTrapdoor, MODIFIED_ON_RIGHT);
+        }
+        for (Material shulkerBox : Tag.SHULKER_BOXES.getValues()) {
+            MATERIAL_FLAGS.put(shulkerBox, MODIFIED_ON_RIGHT);
         }
         for (Material boat : Tag.ITEMS_BOATS.getValues()) {
             MATERIAL_FLAGS.put(boat, 0);
@@ -1035,6 +1016,16 @@ public final class Materials {
     }
 
     /**
+     * Test whether the given material is a Shulker Box.
+     *
+     * @param material the material
+     * @return true if a Shulker Box block
+     */
+    public static boolean isShulkerBox(Material material) {
+        return Tag.SHULKER_BOXES.isTagged(material);
+    }
+
+    /**
      * Test whether the given material is an inventory block.
      *
      * @param material the material
@@ -1052,7 +1043,7 @@ public final class Materials {
                 || material == Material.BARREL
                 || material == Material.BLAST_FURNACE
                 || material == Material.SMOKER
-                || shulkerBoxes.contains(material);
+                || Tag.SHULKER_BOXES.isTagged(material);
     }
 
     public static boolean isSpawnEgg(Material material) {
@@ -1321,7 +1312,7 @@ public final class Materials {
      */
     public static boolean isUseFlagApplicable(Material material) {
         if (Tag.BUTTONS.isTagged(material)
-                || Tag.DOORS.isTagged(material)
+                || Tag.WOODEN_DOORS.isTagged(material)
                 || Tag.WOODEN_TRAPDOORS.isTagged(material)
                 || Tag.FENCE_GATES.isTagged(material)
                 || Tag.PRESSURE_PLATES.isTagged(material)) {
