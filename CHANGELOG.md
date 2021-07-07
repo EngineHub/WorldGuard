@@ -1,5 +1,13 @@
 # Changelog
 
+## 7.0.6 beta 1
+
+* Add support for 1.17 blocks/items, drop support for 1.16.
+* Add use-dripleaf flag for "toggling" big dripleaf blocks.
+* Fix support for fully negative-height regions.
+* Fix crop-growth config option.
+* Be more rigorous with protecting blocks against dispenser behaviors.
+
 ## 7.0.5
 
 * Add a use-anvil flag and exclude it from the use flag (since they can break on use.)
