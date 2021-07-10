@@ -1646,6 +1646,8 @@ public final class Materials {
             case RED_DYE:
             case WHITE_DYE:
             case YELLOW_DYE:
+            case GLOW_INK_SAC:
+            case INK_SAC:
                 return Tag.SIGNS.isTagged(targetMaterial);
             case HONEYCOMB:
                 return isUnwaxedCopper(targetMaterial);
