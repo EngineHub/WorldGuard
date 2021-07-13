@@ -20,13 +20,14 @@
 package com.sk89q.worldguard.domains;
 
 import com.sk89q.worldguard.TestPlayer;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DefaultDomainTest extends TestCase {
+public class DefaultDomainTest {
 
+    @Test
     public void testContains() throws Exception {
         TestPlayer player1 = new TestPlayer("test1");
         TestPlayer player2 = new TestPlayer("test2");
@@ -40,81 +41,76 @@ public class DefaultDomainTest extends TestCase {
 
         domain = new DefaultDomain();
         domain.addGroup("group1");
-        assertThat(domain.contains(player1), is(false));
-        assertThat(domain.contains(player2), is(true));
-        assertThat(domain.contains(player3), is(true));
+        assertFalse(domain.contains(player1));
+        assertTrue(domain.contains(player2));
+        assertTrue(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addGroup("group1");
         domain.addGroup("group2");
-        assertThat(domain.contains(player1), is(false));
-        assertThat(domain.contains(player2), is(true));
-        assertThat(domain.contains(player3), is(true));
+        assertFalse(domain.contains(player1));
+        assertTrue(domain.contains(player2));
+        assertTrue(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addGroup("group1");
         domain.addGroup("group3");
-        assertThat(domain.contains(player1), is(false));
-        assertThat(domain.contains(player2), is(true));
-        assertThat(domain.contains(player3), is(true));
+        assertFalse(domain.contains(player1));
+        assertTrue(domain.contains(player2));
+        assertTrue(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addGroup("group3");
-        assertThat(domain.contains(player1), is(false));
-        assertThat(domain.contains(player2), is(false));
-        assertThat(domain.contains(player3), is(true));
+        assertFalse(domain.contains(player1));
+        assertFalse(domain.contains(player2));
+        assertTrue(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addPlayer(player1.getName());
-        assertThat(domain.contains(player1), is(true));
-        assertThat(domain.contains(player2), is(false));
-        assertThat(domain.contains(player3), is(false));
+        assertTrue(domain.contains(player1));
+        assertFalse(domain.contains(player2));
+        assertFalse(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addGroup("group3");
         domain.addPlayer(player1.getName());
-        assertThat(domain.contains(player1), is(true));
-        assertThat(domain.contains(player2), is(false));
-        assertThat(domain.contains(player3), is(true));
+        assertTrue(domain.contains(player1));
+        assertFalse(domain.contains(player2));
+        assertTrue(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addGroup("group3");
         domain.addPlayer(player1.getUniqueId());
-        assertThat(domain.contains(player1), is(true));
-        assertThat(domain.contains(player2), is(false));
-        assertThat(domain.contains(player3), is(true));
+        assertTrue(domain.contains(player1));
+        assertFalse(domain.contains(player2));
+        assertTrue(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addGroup("group3");
         domain.addPlayer(player1.getName());
         domain.addPlayer(player1.getUniqueId());
-        assertThat(domain.contains(player1), is(true));
-        assertThat(domain.contains(player2), is(false));
-        assertThat(domain.contains(player3), is(true));
+        assertTrue(domain.contains(player1));
+        assertFalse(domain.contains(player2));
+        assertTrue(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addGroup("group3");
         domain.addPlayer(player1);
-        assertThat(domain.contains(player1), is(true));
-        assertThat(domain.contains(player2), is(false));
-        assertThat(domain.contains(player3), is(true));
+        assertTrue(domain.contains(player1));
+        assertFalse(domain.contains(player2));
+        assertTrue(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addPlayer(player1);
-        assertThat(domain.contains(player1), is(true));
-        assertThat(domain.contains(player2), is(false));
-        assertThat(domain.contains(player3), is(false));
+        assertTrue(domain.contains(player1));
+        assertFalse(domain.contains(player2));
+        assertFalse(domain.contains(player3));
 
         domain = new DefaultDomain();
         domain.addPlayer(player2);
         domain.addPlayer(player3);
-        assertThat(domain.contains(player1), is(false));
-        assertThat(domain.contains(player2), is(true));
-        assertThat(domain.contains(player3), is(true));
+        assertFalse(domain.contains(player1));
+        assertTrue(domain.contains(player2));
+        assertTrue(domain.contains(player3));
     }
-
-    public void testSize() throws Exception {
-
-    }
-
 }

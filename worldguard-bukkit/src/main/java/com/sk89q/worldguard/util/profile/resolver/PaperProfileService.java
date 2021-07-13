@@ -19,14 +19,19 @@
 
 package com.sk89q.worldguard.util.profile.resolver;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
 import com.sk89q.worldguard.util.profile.Profile;
 import io.papermc.lib.PaperLib;
-import org.bukkit.Bukkit;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.UUID;
 
+/**
+ * @deprecated Use {@link com.sk89q.worldguard.util.profile.resolver.PaperPlayerService} instead
+ */
+@Deprecated(forRemoval = true)
 public final class PaperProfileService extends SingleRequestService {
+    private static final PaperPlayerService SUPER = PaperPlayerService.getInstance();
     private static final PaperProfileService INSTANCE = new PaperProfileService();
 
     private PaperProfileService() {
@@ -37,18 +42,19 @@ public final class PaperProfileService extends SingleRequestService {
 
     @Override
     public int getIdealRequestLimit() {
-        return Integer.MAX_VALUE;
+        return SUPER.getIdealRequestLimit();
     }
 
     @Override
     @Nullable
-    public Profile findByName(String name) {
-        PlayerProfile profile = Bukkit.createProfile(name);
-        if (profile.completeFromCache()) {
-            //noinspection ConstantConditions - completeFromCache guarantees non-null on success
-            return new Profile(profile.getId(), profile.getName());
-        }
-        return null;
+    public Profile findByName(String name) throws IOException, InterruptedException {
+        return SUPER.findByName(name);
+    }
+
+    @Nullable
+    @Override
+    public Profile findByUuid(UUID uuid) throws IOException, InterruptedException {
+        return SUPER.findByUuid(uuid);
     }
 
     public static PaperProfileService getInstance() {

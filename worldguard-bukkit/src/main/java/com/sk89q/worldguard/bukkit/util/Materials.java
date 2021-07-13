@@ -60,6 +60,7 @@ public final class Materials {
         ENTITY_ITEMS.put(EntityType.ENDER_PEARL, Material.ENDER_PEARL);
         ENTITY_ITEMS.put(EntityType.THROWN_EXP_BOTTLE, Material.EXPERIENCE_BOTTLE);
         ENTITY_ITEMS.put(EntityType.ITEM_FRAME, Material.ITEM_FRAME);
+        ENTITY_ITEMS.put(EntityType.GLOW_ITEM_FRAME, Material.GLOW_ITEM_FRAME);
         ENTITY_ITEMS.put(EntityType.PRIMED_TNT, Material.TNT);
         ENTITY_ITEMS.put(EntityType.FIREWORK, Material.FIREWORK_ROCKET);
         ENTITY_ITEMS.put(EntityType.MINECART_COMMAND, Material.COMMAND_BLOCK_MINECART);
@@ -84,12 +85,8 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.LAVA, 0);
         MATERIAL_FLAGS.put(Material.SAND, 0);
         MATERIAL_FLAGS.put(Material.GRAVEL, 0);
-        MATERIAL_FLAGS.put(Material.GOLD_ORE, 0);
-        MATERIAL_FLAGS.put(Material.IRON_ORE, 0);
-        MATERIAL_FLAGS.put(Material.COAL_ORE, 0);
         MATERIAL_FLAGS.put(Material.SPONGE, 0);
         MATERIAL_FLAGS.put(Material.GLASS, 0);
-        MATERIAL_FLAGS.put(Material.LAPIS_ORE, 0);
         MATERIAL_FLAGS.put(Material.LAPIS_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.DISPENSER, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.SANDSTONE, 0);
@@ -121,7 +118,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.SPAWNER, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.CHEST, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.REDSTONE_WIRE, MODIFIED_ON_RIGHT);
-        MATERIAL_FLAGS.put(Material.DIAMOND_ORE, 0);
         MATERIAL_FLAGS.put(Material.DIAMOND_BLOCK, 0);
         MATERIAL_FLAGS.put(Material.CRAFTING_TABLE, 0);
         MATERIAL_FLAGS.put(Material.WHEAT, 0);
@@ -132,7 +128,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.COBBLESTONE_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.LEVER, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.STONE_PRESSURE_PLATE, 0);
-        MATERIAL_FLAGS.put(Material.REDSTONE_ORE, 0);
         MATERIAL_FLAGS.put(Material.REDSTONE_WALL_TORCH, 0);
         MATERIAL_FLAGS.put(Material.REDSTONE_TORCH, 0);
         MATERIAL_FLAGS.put(Material.SNOW, 0);
@@ -181,7 +176,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.NETHER_BRICK_STAIRS, 0);
         MATERIAL_FLAGS.put(Material.ENCHANTING_TABLE, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.BREWING_STAND, MODIFIED_ON_RIGHT);
-        MATERIAL_FLAGS.put(Material.CAULDRON, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.END_PORTAL, 0);
         MATERIAL_FLAGS.put(Material.END_PORTAL_FRAME, 0);
         MATERIAL_FLAGS.put(Material.END_STONE, 0);
@@ -189,7 +183,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.REDSTONE_LAMP, 0);
         MATERIAL_FLAGS.put(Material.COCOA, 0);
         MATERIAL_FLAGS.put(Material.SANDSTONE_STAIRS, 0);
-        MATERIAL_FLAGS.put(Material.EMERALD_ORE, 0);
         MATERIAL_FLAGS.put(Material.ENDER_CHEST, 0);
         MATERIAL_FLAGS.put(Material.TRIPWIRE_HOOK, 0);
         MATERIAL_FLAGS.put(Material.TRIPWIRE, 0);
@@ -235,7 +228,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.ACACIA_DOOR, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.DARK_OAK_DOOR, MODIFIED_ON_RIGHT);
 
-        MATERIAL_FLAGS.put(Material.GRASS_PATH, 0);
+        MATERIAL_FLAGS.put(Material.DIRT_PATH, 0);
         MATERIAL_FLAGS.put(Material.CHORUS_PLANT, 0);
         MATERIAL_FLAGS.put(Material.CHORUS_FLOWER, 0);
         MATERIAL_FLAGS.put(Material.BEETROOTS, 0);
@@ -697,7 +690,6 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.NETHERITE_SHOVEL, 0);
         MATERIAL_FLAGS.put(Material.NETHERITE_SWORD, 0);
 
-        MATERIAL_FLAGS.put(Material.NETHER_GOLD_ORE, 0);
         MATERIAL_FLAGS.put(Material.NETHER_SPROUTS, 0);
         MATERIAL_FLAGS.put(Material.PIGLIN_BANNER_PATTERN, 0);
         MATERIAL_FLAGS.put(Material.POLISHED_BASALT, 0);
@@ -726,6 +718,81 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.WEEPING_VINES, 0);
         MATERIAL_FLAGS.put(Material.WEEPING_VINES_PLANT, 0);
 
+        // 1.17
+        MATERIAL_FLAGS.put(Material.DEEPSLATE, 0);
+        MATERIAL_FLAGS.put(Material.COBBLED_DEEPSLATE, 0);
+        MATERIAL_FLAGS.put(Material.POLISHED_DEEPSLATE, 0);
+        MATERIAL_FLAGS.put(Material.CALCITE, 0);
+        MATERIAL_FLAGS.put(Material.TUFF, 0);
+        MATERIAL_FLAGS.put(Material.DRIPSTONE_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.ROOTED_DIRT, 0);
+
+        MATERIAL_FLAGS.put(Material.RAW_IRON_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.RAW_COPPER_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.RAW_GOLD_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.AMETHYST_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.BUDDING_AMETHYST, 0);
+
+        MATERIAL_FLAGS.put(Material.EXPOSED_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.WEATHERED_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.OXIDIZED_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.CUT_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.EXPOSED_CUT_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.WEATHERED_CUT_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.OXIDIZED_CUT_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.WAXED_COPPER_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.WAXED_EXPOSED_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.WAXED_WEATHERED_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.WAXED_OXIDIZED_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.AZALEA, 0);
+        MATERIAL_FLAGS.put(Material.FLOWERING_AZALEA, 0);
+
+        MATERIAL_FLAGS.put(Material.COPPER_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.WAXED_CUT_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.WAXED_EXPOSED_CUT_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.WAXED_WEATHERED_CUT_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.WAXED_OXIDIZED_CUT_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.TINTED_GLASS, 0);
+        MATERIAL_FLAGS.put(Material.SPORE_BLOSSOM, 0);
+        MATERIAL_FLAGS.put(Material.MOSS_CARPET, 0);
+        MATERIAL_FLAGS.put(Material.BIG_DRIPLEAF, 0);
+        MATERIAL_FLAGS.put(Material.BIG_DRIPLEAF_STEM, 0);
+        MATERIAL_FLAGS.put(Material.SMALL_DRIPLEAF, 0);
+        MATERIAL_FLAGS.put(Material.SMOOTH_BASALT, 0);
+        MATERIAL_FLAGS.put(Material.INFESTED_DEEPSLATE, 0);
+        MATERIAL_FLAGS.put(Material.DEEPSLATE_BRICKS, 0);
+        MATERIAL_FLAGS.put(Material.CRACKED_DEEPSLATE_BRICKS, 0);
+        MATERIAL_FLAGS.put(Material.DEEPSLATE_TILES, 0);
+        MATERIAL_FLAGS.put(Material.CRACKED_DEEPSLATE_TILES, 0);
+        MATERIAL_FLAGS.put(Material.CHISELED_DEEPSLATE, 0);
+        MATERIAL_FLAGS.put(Material.GLOW_LICHEN, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT, 0);
+        MATERIAL_FLAGS.put(Material.LIGHTNING_ROD, 0);
+        MATERIAL_FLAGS.put(Material.SCULK_SENSOR, 0);
+        MATERIAL_FLAGS.put(Material.AMETHYST_SHARD, 0);
+        MATERIAL_FLAGS.put(Material.RAW_IRON, 0);
+        MATERIAL_FLAGS.put(Material.RAW_COPPER, 0);
+        MATERIAL_FLAGS.put(Material.COPPER_INGOT, 0);
+        MATERIAL_FLAGS.put(Material.RAW_GOLD, 0);
+        MATERIAL_FLAGS.put(Material.POWDER_SNOW_BUCKET, 0);
+        MATERIAL_FLAGS.put(Material.AXOLOTL_BUCKET, 0);
+        MATERIAL_FLAGS.put(Material.BUNDLE, 0);
+        MATERIAL_FLAGS.put(Material.SPYGLASS, 0);
+        MATERIAL_FLAGS.put(Material.GLOW_INK_SAC, 0);
+        MATERIAL_FLAGS.put(Material.GLOW_ITEM_FRAME, 0);
+        MATERIAL_FLAGS.put(Material.GLOW_BERRIES, 0);
+
+        MATERIAL_FLAGS.put(Material.SMALL_AMETHYST_BUD, 0);
+        MATERIAL_FLAGS.put(Material.MEDIUM_AMETHYST_BUD, 0);
+        MATERIAL_FLAGS.put(Material.LARGE_AMETHYST_BUD, 0);
+        MATERIAL_FLAGS.put(Material.AMETHYST_CLUSTER, 0);
+        MATERIAL_FLAGS.put(Material.POWDER_SNOW, 0);
+
+        MATERIAL_FLAGS.put(Material.CAVE_VINES, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.CAVE_VINES_PLANT, MODIFIED_ON_RIGHT);
+        MATERIAL_FLAGS.put(Material.MOSS_BLOCK, 0);
+        MATERIAL_FLAGS.put(Material.HANGING_ROOTS, 0);
+        MATERIAL_FLAGS.put(Material.POINTED_DRIPSTONE, 0);
 
         // Generated via tag
         for (Material woodenDoor : Tag.WOODEN_DOORS.getValues()) {
@@ -799,7 +866,40 @@ public final class Materials {
         }
         for (Material fence : Tag.FENCES.getValues()) {
             MATERIAL_FLAGS.put(fence, 0);
+        }        for (Material coalOre : Tag.COAL_ORES.getValues()) {
+            MATERIAL_FLAGS.put(coalOre, 0);
         }
+        for (Material ironOre : Tag.IRON_ORES.getValues()) {
+            MATERIAL_FLAGS.put(ironOre, 0);
+        }
+        for (Material goldOre : Tag.GOLD_ORES.getValues()) {
+            MATERIAL_FLAGS.put(goldOre, 0);
+        }
+        for (Material diamondOre : Tag.DIAMOND_ORES.getValues()) {
+            MATERIAL_FLAGS.put(diamondOre, 0);
+        }
+        for (Material redstoneOre : Tag.REDSTONE_ORES.getValues()) {
+            MATERIAL_FLAGS.put(redstoneOre, 0);
+        }
+        for (Material copperOre : Tag.COPPER_ORES.getValues()) {
+            MATERIAL_FLAGS.put(copperOre, 0);
+        }
+        for (Material emeraldOre : Tag.EMERALD_ORES.getValues()) {
+            MATERIAL_FLAGS.put(emeraldOre, 0);
+        }
+        for (Material lapisOre : Tag.LAPIS_ORES.getValues()) {
+            MATERIAL_FLAGS.put(lapisOre, 0);
+        }
+        for (Material candle : Tag.CANDLES.getValues()) {
+            MATERIAL_FLAGS.put(candle, MODIFIED_ON_RIGHT);
+        }
+        for (Material candleCakes : Tag.CANDLE_CAKES.getValues()) {
+            MATERIAL_FLAGS.put(candleCakes, MODIFIED_ON_RIGHT);
+        }
+        for (Material cauldron : Tag.CAULDRONS.getValues()) {
+            MATERIAL_FLAGS.put(cauldron, MODIFIED_ON_RIGHT);
+        }
+
         Stream.concat(Stream.concat(
                 Tag.CORAL_BLOCKS.getValues().stream(),
                 Tag.CORALS.getValues().stream()),
@@ -1048,7 +1148,7 @@ public final class Materials {
 
     public static boolean isSpawnEgg(Material material) {
         switch (material) {
-            case SPIDER_SPAWN_EGG:
+            case AXOLOTL_SPAWN_EGG:
             case BAT_SPAWN_EGG:
             case BEE_SPAWN_EGG:
             case BLAZE_SPAWN_EGG:
@@ -1067,6 +1167,8 @@ public final class Materials {
             case EVOKER_SPAWN_EGG:
             case FOX_SPAWN_EGG:
             case GHAST_SPAWN_EGG:
+            case GLOW_SQUID_SPAWN_EGG:
+            case GOAT_SPAWN_EGG:
             case GUARDIAN_SPAWN_EGG:
             case HOGLIN_SPAWN_EGG:
             case HORSE_SPAWN_EGG:
@@ -1094,6 +1196,7 @@ public final class Materials {
             case SKELETON_HORSE_SPAWN_EGG:
             case SKELETON_SPAWN_EGG:
             case SLIME_SPAWN_EGG:
+            case SPIDER_SPAWN_EGG:
             case SQUID_SPAWN_EGG:
             case STRAY_SPAWN_EGG:
             case STRIDER_SPAWN_EGG:
@@ -1120,6 +1223,8 @@ public final class Materials {
 
     public static EntityType getEntitySpawnEgg(Material material) {
         switch (material) {
+            case AXOLOTL_SPAWN_EGG:
+                return EntityType.AXOLOTL;
             case SPIDER_SPAWN_EGG:
                 return EntityType.SPIDER;
             case BAT_SPAWN_EGG:
@@ -1158,6 +1263,10 @@ public final class Materials {
                 return EntityType.FOX;
             case GHAST_SPAWN_EGG:
                 return EntityType.GHAST;
+            case GLOW_SQUID_SPAWN_EGG:
+                return EntityType.GLOW_SQUID;
+            case GOAT_SPAWN_EGG:
+                return EntityType.GOAT;
             case GUARDIAN_SPAWN_EGG:
                 return EntityType.GUARDIAN;
             case HOGLIN_SPAWN_EGG:
@@ -1271,20 +1380,26 @@ public final class Materials {
      * @return true if the material is a crop
      */
     public static boolean isCrop(Material type) {
-        return type == Material.WHEAT
-                || type == Material.CARROTS
-                || type == Material.POTATOES
-                || type == Material.BEETROOTS
-                || type == Material.MELON_STEM
-                || type == Material.PUMPKIN_STEM
-                || type == Material.PUMPKIN
-                || type == Material.MELON
-                || type == Material.CACTUS
-                || type == Material.SUGAR_CANE
-                || type == Material.BAMBOO
-                || type == Material.BAMBOO_SAPLING
-                || type == Material.SWEET_BERRY_BUSH
-                || type == Material.NETHER_WART;
+        switch (type) {
+            case WHEAT:
+            case CARROTS:
+            case POTATOES:
+            case BEETROOTS:
+            case MELON_STEM:
+            case PUMPKIN_STEM:
+            case PUMPKIN:
+            case MELON:
+            case CACTUS:
+            case SUGAR_CANE:
+            case BAMBOO:
+            case BAMBOO_SAPLING:
+            case SWEET_BERRY_BUSH:
+            case NETHER_WART:
+            case CAVE_VINES:
+            case CAVE_VINES_PLANT:
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -1296,7 +1411,8 @@ public final class Materials {
         return newType == Material.VINE ||
                 newType == Material.KELP ||
                 newType == Material.TWISTING_VINES ||
-                newType == Material.WEEPING_VINES;
+                newType == Material.WEEPING_VINES ||
+                Tag.CAVE_VINES.isTagged(newType);
 
     }
 
@@ -1459,7 +1575,8 @@ public final class Materials {
                 switch (targetMaterial) {
                     case GRASS_BLOCK:
                     case DIRT:
-                    case GRASS_PATH:
+                    case DIRT_PATH:
+                    case ROOTED_DIRT:
                     // case COARSE_DIRT: // already handled by the server...
                         return true;
                 }
@@ -1470,6 +1587,8 @@ public final class Materials {
             case GOLDEN_AXE:
             case DIAMOND_AXE:
             case NETHERITE_AXE:
+                if (isWaxedCopper(targetMaterial))
+                    return true;
                 switch (targetMaterial) {
                     case OAK_LOG:
                     case DARK_OAK_LOG:
@@ -1527,7 +1646,11 @@ public final class Materials {
             case RED_DYE:
             case WHITE_DYE:
             case YELLOW_DYE:
+            case GLOW_INK_SAC:
+            case INK_SAC:
                 return Tag.SIGNS.isTagged(targetMaterial);
+            case HONEYCOMB:
+                return isUnwaxedCopper(targetMaterial);
             default:
                 return false;
         }
@@ -1535,5 +1658,51 @@ public final class Materials {
 
     public static boolean isFire(Material type) {
         return type == Material.FIRE || type == Material.SOUL_FIRE;
+    }
+    
+    public static boolean isWaxedCopper(Material type) {
+        switch (type) {
+            case WAXED_COPPER_BLOCK:
+            case WAXED_EXPOSED_COPPER:
+            case WAXED_WEATHERED_COPPER:
+            case WAXED_OXIDIZED_COPPER:
+            case WAXED_CUT_COPPER:
+            case WAXED_EXPOSED_CUT_COPPER:
+            case WAXED_WEATHERED_CUT_COPPER:
+            case WAXED_OXIDIZED_CUT_COPPER:
+            case WAXED_CUT_COPPER_STAIRS:
+            case WAXED_EXPOSED_CUT_COPPER_STAIRS:
+            case WAXED_WEATHERED_CUT_COPPER_STAIRS:
+            case WAXED_OXIDIZED_CUT_COPPER_STAIRS:
+            case WAXED_CUT_COPPER_SLAB:
+            case WAXED_EXPOSED_CUT_COPPER_SLAB:
+            case WAXED_WEATHERED_CUT_COPPER_SLAB:
+            case WAXED_OXIDIZED_CUT_COPPER_SLAB:
+                return true;
+        }
+        return false;
+    }
+    
+    public static boolean isUnwaxedCopper(Material type) {
+        switch (type) {
+            case COPPER_BLOCK:
+            case EXPOSED_COPPER:
+            case WEATHERED_COPPER:
+            case OXIDIZED_COPPER:
+            case CUT_COPPER:
+            case EXPOSED_CUT_COPPER:
+            case WEATHERED_CUT_COPPER:
+            case OXIDIZED_CUT_COPPER:
+            case CUT_COPPER_STAIRS:
+            case EXPOSED_CUT_COPPER_STAIRS:
+            case WEATHERED_CUT_COPPER_STAIRS:
+            case OXIDIZED_CUT_COPPER_STAIRS:
+            case CUT_COPPER_SLAB:
+            case EXPOSED_CUT_COPPER_SLAB:
+            case WEATHERED_CUT_COPPER_SLAB:
+            case OXIDIZED_CUT_COPPER_SLAB:
+                return true;
+        }
+        return false;
     }
 }

@@ -19,8 +19,6 @@
 
 package com.sk89q.worldguard.protection;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -35,11 +33,16 @@ import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.ArrayList;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class RegionPriorityTest {
     static String COURTYARD_ID = "courtyard";
     static String FOUNTAIN_ID = "fountain";
@@ -63,7 +66,7 @@ public abstract class RegionPriorityTest {
     
     protected abstract RegionManager createRegionManager() throws Exception;
 
-    @Before
+    @BeforeAll
     public void setUp() throws Exception {
         setUpGlobalRegion();
         

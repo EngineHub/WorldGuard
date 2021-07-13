@@ -316,7 +316,7 @@ public class ChunkHashTable implements ConcurrentRegionIndex {
                     List<ProtectedRegion> regions = new ArrayList<>();
                     ProtectedRegion chunkRegion = new ProtectedCuboidRegion(
                             "_",
-                            position.multiply(16).toBlockVector3(0),
+                            position.multiply(16).toBlockVector3(Integer.MIN_VALUE),
                             position.add(1, 1).multiply(16).toBlockVector3(Integer.MAX_VALUE));
                     index.applyIntersecting(chunkRegion, new RegionCollectionConsumer(regions, false));
                     Collections.sort(regions);

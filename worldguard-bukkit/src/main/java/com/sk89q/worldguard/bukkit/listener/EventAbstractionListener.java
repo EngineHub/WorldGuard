@@ -53,6 +53,7 @@ import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -297,6 +298,18 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
+    private void setDelegateEventMaterialOptions(DelegateEvent event, Material fromType, Material toType) {
+        if (fromType == Material.FARMLAND && toType == Material.DIRT) {
+            event.setSilent(true);
+            event.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
+        } else if (Tag.REDSTONE_ORES.isTagged(fromType)) {
+            event.setSilent(true);
+        } else if (fromType == Material.BIG_DRIPLEAF && toType == Material.BIG_DRIPLEAF) {
+            event.setSilent(true);
+            event.getRelevantFlags().add(Flags.USE_DRIPLEAF);
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         Block block = event.getBlock();
@@ -307,23 +320,12 @@ public class EventAbstractionListener extends AbstractListener {
 
         // Fire two events: one as BREAK and one as PLACE
         if (toType != Material.AIR && fromType != Material.AIR) {
-            boolean trample = fromType == Material.FARMLAND && toType == Material.DIRT;
             BreakBlockEvent breakDelagate = new BreakBlockEvent(event, cause, block);
-            if (trample) {
-                breakDelagate.setSilent(true);
-                breakDelagate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
-            } else if (fromType == Material.REDSTONE_ORE) {
-                breakDelagate.setSilent(true);
-            }
+            setDelegateEventMaterialOptions(breakDelagate, fromType, toType);
             boolean denied;
             if (!(denied = Events.fireToCancel(event, breakDelagate))) {
                 PlaceBlockEvent placeDelegate = new PlaceBlockEvent(event, cause, block.getLocation(), toType);
-                if (trample) {
-                    placeDelegate.setSilent(true);
-                    placeDelegate.getRelevantFlags().add(Flags.TRAMPLE_BLOCKS);
-                } else if (fromType == Material.REDSTONE_ORE) {
-                    placeDelegate.setSilent(true);
-                }
+                setDelegateEventMaterialOptions(placeDelegate, fromType, toType);
                 denied = Events.fireToCancel(event, placeDelegate);
             }
             if (denied && entity instanceof Player) {
@@ -467,7 +469,11 @@ public class EventAbstractionListener extends AbstractListener {
                         return;
                     }
                     DelegateEvent firedEvent = new UseBlockEvent(event, cause, clicked).setAllowed(hasInteractBypass(clicked));
-                    if (clicked.getType() == Material.REDSTONE_ORE) {
+                    if (Tag.REDSTONE_ORES.isTagged(clicked.getType())) {
+                        firedEvent.setSilent(true);
+                    }
+                    if (clicked.getType() == Material.BIG_DRIPLEAF) {
+                        firedEvent.getRelevantFlags().add(Flags.USE_DRIPLEAF);
                         firedEvent.setSilent(true);
                     }
                     interactDebounce.debounce(clicked, event.getPlayer(), event, firedEvent);
@@ -962,13 +968,13 @@ public class EventAbstractionListener extends AbstractListener {
         if ((entry = moveItemDebounce.tryDebounce(event)) != null) {
             InventoryHolder sourceHolder;
             InventoryHolder targetHolder;
-            if (HAS_SNAPSHOT_INVHOLDER) {
+            /*if (HAS_SNAPSHOT_INVHOLDER) {
                 sourceHolder = event.getSource().getHolder(false);
                 targetHolder = event.getDestination().getHolder(false);
-            } else {
+            } else {*/
                 sourceHolder = event.getSource().getHolder();
                 targetHolder = event.getDestination().getHolder();
-            }
+            //}
 
             Cause cause;
 
@@ -1050,9 +1056,14 @@ public class EventAbstractionListener extends AbstractListener {
             handleBlockRightClick(event, cause, item, clicked, placed);
 
             // handle special dispenser behavior
-            if (item != null && Materials.isShulkerBox(item.getType())) {
-                Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(), item.getType()));
-                return;
+            if (Materials.isShulkerBox(item.getType())) {
+                if (Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(), item.getType()))) {
+                    playDenyEffect(placed.getLocation());
+                }
+            } else if (isItemAppliedToBlock(item, placed)) {
+                if (Events.fireToCancel(event, new PlaceBlockEvent(event, cause, placed.getLocation(), placed.getType()))) {
+                    playDenyEffect(placed.getLocation());
+                }
             }
         }
     }

@@ -30,7 +30,6 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.weather.WeatherType;
-import org.junit.Ignore;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -39,7 +38,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-@Ignore
+
 public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
 
     private final UUID uuid = UUID.randomUUID();
@@ -250,6 +249,7 @@ public class TestPlayer extends AbstractPlayerActor implements LocalPlayer {
     }
 
     @Override
+    @Deprecated
     public void setPosition(Vector3 pos, float pitch, float yaw) {
 
     }

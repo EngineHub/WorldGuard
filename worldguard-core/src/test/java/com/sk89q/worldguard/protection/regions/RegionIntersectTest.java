@@ -19,16 +19,17 @@
 
 package com.sk89q.worldguard.protection.regions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RegionIntersectTest {
 
@@ -96,7 +97,7 @@ public class RegionIntersectTest {
             e.printStackTrace();
         }
 
-        assertEquals("Check for '" + region2.getId() + "' region failed.", expected, actual);
+        assertEquals(expected, actual, "Check for '" + region2.getId() + "' region failed.");
     }
 
     private static final BlockVector2[] polygon = {
@@ -117,8 +118,8 @@ public class RegionIntersectTest {
 
             final ProtectedPolygonalRegion polygonalRegion = new ProtectedPolygonalRegion("polygonalRegion", Arrays.asList(rotatedPolygon), -3, 3);
 
-            assertTrue(String.format("%s не пересекается (cuboid.intersectsEdges(polygonal)", Arrays.asList(rotatedPolygon)), cuboidRegion.intersectsEdges(polygonalRegion));
-            assertTrue(String.format("%s не пересекается (polygonal.intersectsEdges(cuboid)", Arrays.asList(rotatedPolygon)), polygonalRegion.intersectsEdges(cuboidRegion));
+            assertTrue(cuboidRegion.intersectsEdges(polygonalRegion), String.format("%s не пересекается (cuboid.intersectsEdges(polygonal)", Arrays.asList(rotatedPolygon)));
+            assertTrue(polygonalRegion.intersectsEdges(cuboidRegion), String.format("%s не пересекается (polygonal.intersectsEdges(cuboid)", Arrays.asList(rotatedPolygon)));
         }
     }
 }

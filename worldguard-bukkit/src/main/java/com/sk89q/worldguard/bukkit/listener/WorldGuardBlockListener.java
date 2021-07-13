@@ -628,7 +628,7 @@ public class WorldGuardBlockListener implements Listener {
         WorldConfiguration wcfg = getWorldConfig(loc.getWorld());
         if (Materials.isCrop(type)) {
             if (wcfg.disableCropGrowth) {
-                event.setCancelled(false);
+                event.setCancelled(true);
                 return;
             }
 

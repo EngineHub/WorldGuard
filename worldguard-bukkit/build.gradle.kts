@@ -1,10 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.api.internal.HasConvention
 
 plugins {
-    id("java-library")
-    id("net.ltgt.apt-eclipse")
-    id("net.ltgt.apt-idea")
+    `java-library`
 }
 
 applyPlatformAndCoreConfiguration()
@@ -21,39 +18,26 @@ repositories {
     }
     maven {
         name = "aikar-timings"
-        url = uri("http://repo.aikar.co/nexus/content/groups/aikar/")
+        url = uri("https://repo.aikar.co/nexus/content/groups/aikar/")
     }
 }
 
 configurations {
-    compileClasspath.extendsFrom(create("shade"))
+    compileClasspath.get().extendsFrom(create("shadeOnly"))
 }
 
 dependencies {
-    "compile"(project(":worldguard-core"))
-    //"compile"(project(":worldguard-libs:bukkit"))
-    "api"("com.destroystokyo.paper:paper-api:1.16.2-R0.1-SNAPSHOT")
-    "shade"("io.papermc:paperlib:1.0.4")
+    "api"(project(":worldguard-core"))
+    "compileOnly"("io.papermc.paper:paper-api:1.17-R0.1-SNAPSHOT")
+    "runtimeOnly"("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") {
+        exclude("junit", "junit")
+    }
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
-    "implementation"("com.sk89q:commandbook:2.3") { isTransitive = false }
-    "shade"("org.bstats:bstats-bukkit:1.7")
-    "shade"("co.aikar:minecraft-timings:1.0.4")
-}
-
-tasks.named<Upload>("install") {
-    (repositories as HasConvention).convention.getPlugin<MavenRepositoryHandlerConvention>().mavenInstaller {
-        pom.whenConfigured {
-            dependencies.firstOrNull { dep ->
-                dep!!.withGroovyBuilder {
-                    getProperty("groupId") == "com.destroystokyo.paper" && getProperty("artifactId") == "paper-api"
-                }
-            }?.withGroovyBuilder {
-                setProperty("groupId", "org.spigotmc")
-                setProperty("artifactId", "spigot-api")
-            }
-        }
-    }
+    "compileOnly"("com.sk89q:commandbook:2.3") { isTransitive = false }
+    "shadeOnly"("io.papermc:paperlib:1.0.6")
+    "shadeOnly"("org.bstats:bstats-bukkit:2.1.0")
+    "shadeOnly"("co.aikar:minecraft-timings:1.0.4")
 }
 
 tasks.named<Copy>("processResources") {
@@ -73,11 +57,12 @@ tasks.named<Jar>("jar") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
-    configurations = listOf(project.configurations["shade"], project.configurations["runtimeClasspath"])
+    configurations = listOf(project.configurations["shadeOnly"], project.configurations["runtimeClasspath"])
 
     dependencies {
+        include(dependency(":worldguard-core"))
         relocate("org.bstats", "com.sk89q.worldguard.bukkit.bstats") {
-            include(dependency("org.bstats:bstats-bukkit"))
+            include(dependency("org.bstats:"))
         }
         relocate ("io.papermc.lib", "com.sk89q.worldguard.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib"))
