@@ -143,6 +143,8 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
@@ -1087,7 +1089,16 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLingeringApply(AreaEffectCloudApplyEvent event) {
-        if (!Materials.hasDamageEffect(event.getEntity().getCustomEffects())) {
+        AreaEffectCloud entity = event.getEntity();
+        List<PotionEffect> effects = new ArrayList<>();
+        PotionEffectType baseEffectType = entity.getBasePotionData().getType().getEffectType();
+        if (baseEffectType != null) {
+            effects.add(new PotionEffect(baseEffectType, 0, 0));
+        }
+        if (entity.hasCustomEffects()) {
+            effects.addAll(entity.getCustomEffects());
+        }
+        if (!Materials.hasDamageEffect(effects)) {
             return;
         }
         Cause cause = create(event.getEntity());
