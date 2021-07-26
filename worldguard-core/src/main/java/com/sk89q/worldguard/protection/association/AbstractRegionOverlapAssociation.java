@@ -87,35 +87,31 @@ public abstract class AbstractRegionOverlapAssociation implements RegionAssociab
     public Association getAssociation(List<ProtectedRegion> regions) {
         checkNotNull(source);
         for (ProtectedRegion region : regions) {
-            while (region != null) {
-                if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty())) {
-                    return Association.OWNER;
-                }
+            if ((region.getId().equals(ProtectedRegion.GLOBAL_REGION) && source.isEmpty())) {
+                return Association.OWNER;
+            }
 
-                if (source.contains(region)) {
-                    if (useMaxPriorityAssociation) {
-                        int priority = region.getPriority();
-                        if (priority == maxPriority) {
-                            return Association.OWNER;
-                        }
-                    } else {
+            if (source.contains(region)) {
+                if (useMaxPriorityAssociation) {
+                    int priority = region.getPriority();
+                    if (priority == maxPriority) {
                         return Association.OWNER;
                     }
-                }
-
-                Set<ProtectedRegion> source;
-
-                if (useMaxPriorityAssociation) {
-                    source = maxPriorityRegions;
                 } else {
-                    source = this.source;
-                }
-
-                if (checkNonplayerProtectionDomains(source, region.getFlag(Flags.NONPLAYER_PROTECTION_DOMAINS))) {
                     return Association.OWNER;
                 }
+            }
 
-                region = region.getParent();
+            Set<ProtectedRegion> source;
+
+            if (useMaxPriorityAssociation) {
+                source = maxPriorityRegions;
+            } else {
+                source = this.source;
+            }
+
+            if (checkNonplayerProtectionDomains(source, region.getFlag(Flags.NONPLAYER_PROTECTION_DOMAINS))) {
+                return Association.OWNER;
             }
         }
 
