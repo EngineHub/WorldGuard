@@ -22,7 +22,6 @@ package com.sk89q.worldguard.bukkit.listener;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.association.RegionAssociable;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -38,7 +37,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
@@ -46,35 +44,18 @@ import org.bukkit.projectiles.ProjectileSource;
 
 /**
  * Listener for painting related events.
- *
- * @author BangL <henno.rickowski@gmail.com>
  */
-public class WorldGuardHangingListener implements Listener {
+public class WorldGuardHangingListener extends AbstractListener {
 
-    private WorldGuardPlugin plugin;
-
-    /**
-     * Construct the object;
-     *
-     * @param plugin The plugin instance
-     */
     public WorldGuardHangingListener(WorldGuardPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    /**
-     * Register events.
-     */
-    public void registerEvents() {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        super(plugin);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onHangingBreak(HangingBreakEvent event) {
         Hanging hanging = event.getEntity();
         World world = hanging.getWorld();
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         if (event instanceof HangingBreakByEntityEvent) {
             HangingBreakByEntityEvent entityEvent = (HangingBreakByEntityEvent) event;
