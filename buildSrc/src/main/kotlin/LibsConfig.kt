@@ -43,7 +43,7 @@ fun Project.applyLibrariesConfiguration() {
         archiveClassifier.set("")
 
         dependencies {
-            exclude(dependency("com.google.code.findbugs:jsr305:1.3.9"))
+            exclude(dependency("com.google.code.findbugs:jsr305"))
         }
 
         relocations.forEach { (from, to) ->
