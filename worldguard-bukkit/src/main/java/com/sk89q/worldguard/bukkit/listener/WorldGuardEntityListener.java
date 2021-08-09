@@ -181,7 +181,7 @@ public class WorldGuardEntityListener extends AbstractListener {
             // handled anywhere else
             if (type == DamageCause.BLOCK_EXPLOSION
                     && (wcfg.blockOtherExplosions
-                            || (wcfg.explosionFlagCancellation
+                            || ((wcfg.explosionFlagCancellation || Entities.isConsideredBuildingIfUsed(defender))
                                 && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                     .queryState(BukkitAdapter.adapt(defender.getLocation()), (RegionAssociable) null, Flags.OTHER_EXPLOSION))))) {
                 event.setCancelled(true);
