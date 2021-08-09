@@ -297,7 +297,12 @@ public class FlagValueCalculator {
     }
 
     @Nullable
-    private <V, K> V getEffectiveMapValue(ProtectedRegion region, MapFlag<K, V> mapFlag, K key, RegionAssociable subject) {
+    public <V, K> V getEffectiveMapValue(ProtectedRegion region, MapFlag<K, V> mapFlag, K key, RegionAssociable subject) {
+        return getEffectiveMapValueOf(region, mapFlag, key, subject);
+    }
+
+    @Nullable
+    public static <V, K> V getEffectiveMapValueOf(ProtectedRegion region, MapFlag<K, V> mapFlag, K key, RegionAssociable subject) {
         List<ProtectedRegion> seen = new ArrayList<>();
         ProtectedRegion current = region;
 
@@ -450,7 +455,11 @@ public class FlagValueCalculator {
      * @return the priority
      */
     public int getPriority(final ProtectedRegion region) {
-        if (region == globalRegion) {
+        return getPriorityOf(region);
+    }
+
+    public static int getPriorityOf(final ProtectedRegion region) {
+        if (region.getId().equals(ProtectedRegion.GLOBAL_REGION)) {
             return Integer.MIN_VALUE;
         } else {
             return region.getPriority();
@@ -466,9 +475,15 @@ public class FlagValueCalculator {
      * @param subject an subject object
      * @return the value
      */
-    @SuppressWarnings("unchecked")
+    @Nullable
     public <V> V getEffectiveFlag(final ProtectedRegion region, Flag<V> flag, @Nullable RegionAssociable subject) {
-        if (region == globalRegion) {
+        return getEffectiveFlagOf(region, flag, subject);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public static <V> V getEffectiveFlagOf(final ProtectedRegion region, Flag<V> flag, @Nullable RegionAssociable subject) {
+        if (region.getId().equals(ProtectedRegion.GLOBAL_REGION)) {
             if (flag == Flags.PASSTHROUGH) {
                 // Has members/owners -> the global region acts like
                 // a regular region without PASSTHROUGH
