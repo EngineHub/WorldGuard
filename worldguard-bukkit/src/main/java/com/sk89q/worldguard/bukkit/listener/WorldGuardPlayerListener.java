@@ -48,7 +48,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -61,45 +60,31 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.PluginManager;
 
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 
 /**
  * Handles all events thrown in relation to a player.
  */
-public class WorldGuardPlayerListener implements Listener {
+public class WorldGuardPlayerListener extends AbstractListener {
 
     private static final Logger log = Logger.getLogger(WorldGuardPlayerListener.class.getCanonicalName());
     private static final Pattern opPattern = Pattern.compile("^/(?:minecraft:)?(?:bukkit:)?(?:de)?op(?:\\s.*)?$", Pattern.CASE_INSENSITIVE);
-    private WorldGuardPlugin plugin;
 
-    /**
-     * Construct the object;
-     *
-     * @param plugin
-     */
     public WorldGuardPlayerListener(WorldGuardPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
-    /**
-     * Register events.
-     */
-    public void registerEvents() {
-        PluginManager pm = plugin.getServer().getPluginManager();
-        pm.registerEvents(this, plugin);
-    }
 
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
+        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+        WorldConfiguration wcfg = getWorldConfig(player.getWorld());
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().getIfPresent(localPlayer);
         if (session != null) {
             GameModeFlag handler = session.getHandler(GameModeFlag.class);
@@ -117,11 +102,10 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
         World world = player.getWorld();
 
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
+        ConfigurationManager cfg = getConfig();
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         if (cfg.activityHaltToggle) {
             player.sendMessage(ChatColor.YELLOW
@@ -155,9 +139,8 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        WorldConfiguration wcfg =
-                WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(localPlayer.getWorld());
+        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+        WorldConfiguration wcfg = getWorldConfig(player.getWorld());
         if (wcfg.useRegions) {
             RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
             ApplicableRegionSet chatFrom = query.getApplicableRegions(localPlayer.getLocation());
@@ -172,7 +155,7 @@ public class WorldGuardPlayerListener implements Listener {
             boolean anyRemoved = false;
             for (Iterator<Player> i = event.getRecipients().iterator(); i.hasNext();) {
                 Player rPlayer = i.next();
-                LocalPlayer rLocal = plugin.wrapPlayer(rPlayer);
+                LocalPlayer rLocal = getPlugin().wrapPlayer(rPlayer);
                 if (!query.testState(rLocal.getLocation(), rLocal, Flags.RECEIVE_CHAT)) {
                     i.remove();
                     anyRemoved = true;
@@ -187,7 +170,7 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        ConfigurationManager cfg = getConfig();
 
         String hostKey = cfg.hostKeys.get(player.getUniqueId().toString());
         if (hostKey == null) {
@@ -229,11 +212,11 @@ public class WorldGuardPlayerListener implements Listener {
             handlePhysicalInteract(event);
         }
 
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
+        ConfigurationManager cfg = getConfig();
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.removeInfiniteStacks
-                && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
+                && !getPlugin().hasPermission(player, "worldguard.override.infinite-stack")) {
             int slot = player.getInventory().getHeldItemSlot();
             ItemStack heldItem = player.getInventory().getItem(slot);
             if (heldItem != null && heldItem.getAmount() < 0) {
@@ -259,13 +242,12 @@ public class WorldGuardPlayerListener implements Listener {
         Player player = event.getPlayer();
         @Nullable ItemStack item = event.getItem();
 
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         // Infinite stack removal
         if (Materials.isInventoryBlock(type)
                 && wcfg.removeInfiniteStacks
-                && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
+                && !getPlugin().hasPermission(player, "worldguard.override.infinite-stack")) {
             for (int slot = 0; slot < 40; slot++) {
                 ItemStack heldItem = player.getInventory().getItem(slot);
                 if (heldItem != null && heldItem.getAmount() < 0) {
@@ -280,9 +262,9 @@ public class WorldGuardPlayerListener implements Listener {
             ApplicableRegionSet set =
                     WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(block.getLocation()));
             //ApplicableRegionSet placedInSet = plugin.getRegionContainer().createQuery().getApplicableRegions(placedIn.getLocation());
-            LocalPlayer localPlayer = plugin.wrapPlayer(player);
+            LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
-            if (item != null && item.getType().getKey().toString().equals(wcfg.regionWand) && plugin.hasPermission(player, "worldguard.region.wand")) {
+            if (item != null && item.getType().getKey().toString().equals(wcfg.regionWand) && getPlugin().hasPermission(player, "worldguard.region.wand")) {
                 if (set.size() > 0) {
                     player.sendMessage(ChatColor.YELLOW + "Can you build? " + (set.testState(localPlayer, Flags.BUILD) ? "Yes" : "No"));
 
@@ -317,8 +299,7 @@ public class WorldGuardPlayerListener implements Listener {
         Material type = block.getType();
         World world = player.getWorld();
 
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         if (type == Material.FARMLAND && wcfg.disablePlayerCropTrampling) {
             event.setCancelled(true);
@@ -333,12 +314,10 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
+        WorldConfiguration wcfg = getWorldConfig(player.getWorld());
 
         if (wcfg.useRegions) {
+            LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
             ApplicableRegionSet set =
                     WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(localPlayer.getLocation());
 
@@ -353,12 +332,10 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemHeldChange(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
-
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(player.getWorld()));
+        WorldConfiguration wcfg = getWorldConfig(player.getWorld());
 
         if (wcfg.removeInfiniteStacks
-                && !plugin.hasPermission(player, "worldguard.override.infinite-stack")) {
+                && !getPlugin().hasPermission(player, "worldguard.override.infinite-stack")) {
             int newSlot = event.getNewSlot();
             ItemStack heldItem = player.getInventory().getItem(newSlot);
             if (heldItem != null && heldItem.getAmount() < 0) {
@@ -371,15 +348,14 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         Player player = event.getPlayer();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
+        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+        ConfigurationManager cfg = getConfig();
+        WorldConfiguration wcfg = getWorldConfig(player.getWorld());
 
         if (wcfg.useRegions && cfg.usePlayerTeleports) {
-            ApplicableRegionSet set =
-                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(event.getTo()));
-            ApplicableRegionSet setFrom =
-                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(event.getFrom()));
+            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+            ApplicableRegionSet set = query.getApplicableRegions(BukkitAdapter.adapt(event.getTo()));
+            ApplicableRegionSet setFrom = query.getApplicableRegions(BukkitAdapter.adapt(event.getFrom()));
 
             if (event.getCause() == TeleportCause.ENDER_PEARL) {
                 if (!WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
@@ -431,9 +407,9 @@ public class WorldGuardPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(localPlayer.getWorld());
+        LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+        ConfigurationManager cfg = getConfig();
+        WorldConfiguration wcfg = getWorldConfig(player.getWorld());
 
         if (wcfg.useRegions && !WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
             ApplicableRegionSet set =

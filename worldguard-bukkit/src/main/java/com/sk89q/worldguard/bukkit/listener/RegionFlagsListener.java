@@ -57,8 +57,7 @@ public class RegionFlagsListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
-        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(event.getWorld());
-        if (!isRegionSupportEnabled(weWorld)) return; // Region support disabled
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
 
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
@@ -80,10 +79,9 @@ public class RegionFlagsListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        com.sk89q.worldedit.world.World weWorld = BukkitAdapter.adapt(event.getWorld());
-        if (!isRegionSupportEnabled(weWorld)) return; // Region support disabled
+        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
 
-        WorldConfiguration config = getWorldConfig(weWorld);
+        WorldConfiguration config = getWorldConfig(event.getWorld());
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
         Block block;
@@ -118,8 +116,8 @@ public class RegionFlagsListener extends AbstractListener {
     public void onEntityDamage(EntityDamageEvent event) {
         Entity entity = event.getEntity();
         World world = entity.getWorld();
+        if (!isRegionSupportEnabled(world)) return; // Region support disabled
 
-        if (!isRegionSupportEnabled(BukkitAdapter.adapt(world))) return; // Region support disabled
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
         if (entity instanceof Player && event.getCause() == DamageCause.FALL) {

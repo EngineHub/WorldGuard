@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.BreakBlockEvent;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
@@ -52,7 +51,7 @@ public class BuildPermissionListener extends AbstractListener {
     }
 
     private void tellErrorMessage(CommandSender sender, World world) {
-        String message = getWorldConfig(BukkitAdapter.adapt(world)).buildPermissionDenyMessage;
+        String message = getWorldConfig(world).buildPermissionDenyMessage;
         if (!message.isEmpty()) {
             sender.sendMessage(message);
         }
@@ -60,7 +59,7 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
-        if (!getWorldConfig(BukkitAdapter.adapt(event.getWorld())).buildPermissions) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -78,7 +77,7 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        if (!getWorldConfig(BukkitAdapter.adapt(event.getWorld())).buildPermissions) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -96,7 +95,7 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
-        if (!getWorldConfig(BukkitAdapter.adapt(event.getWorld())).buildPermissions) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -114,7 +113,7 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
-        if (!getWorldConfig(BukkitAdapter.adapt(event.getWorld())).buildPermissions) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -132,7 +131,7 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
-        if (!getWorldConfig(BukkitAdapter.adapt(event.getWorld())).buildPermissions) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -150,7 +149,7 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
-        if (!getWorldConfig(BukkitAdapter.adapt(event.getWorld())).buildPermissions) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -168,7 +167,7 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDamageEntity(DamageEntityEvent event) {
-        if (!getWorldConfig(BukkitAdapter.adapt(event.getWorld())).buildPermissions) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -186,7 +185,7 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseItem(UseItemEvent event) {
-        if (!getWorldConfig(BukkitAdapter.adapt(event.getWorld())).buildPermissions) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
