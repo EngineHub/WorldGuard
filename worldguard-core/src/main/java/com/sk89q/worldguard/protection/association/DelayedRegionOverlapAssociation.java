@@ -26,6 +26,7 @@ import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import com.sk89q.worldguard.protection.regions.RegionQuery.QueryOption;
 
 import java.util.List;
 
@@ -67,7 +68,7 @@ public class DelayedRegionOverlapAssociation extends AbstractRegionOverlapAssoci
     @Override
     public Association getAssociation(List<ProtectedRegion> regions) {
         if (source == null) {
-            ApplicableRegionSet result = query.getApplicableRegions(location);
+            ApplicableRegionSet result = query.getApplicableRegions(location, QueryOption.NONE);
             source = result.getRegions();
             calcMaxPriority();
         }
