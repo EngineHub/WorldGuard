@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RegionCollectionConsumer implements Predicate<ProtectedRegion> {
 
-    private final Collection<ProtectedRegion> collection;
+    private final Collection<? super ProtectedRegion> collection;
     private final boolean addParents;
 
     /**
@@ -44,7 +44,7 @@ public class RegionCollectionConsumer implements Predicate<ProtectedRegion> {
      * @param collection the collection to add regions to
      * @param addParents true to also add the parents to the collection
      */
-    public RegionCollectionConsumer(Collection<ProtectedRegion> collection, boolean addParents) {
+    public RegionCollectionConsumer(Collection<? super ProtectedRegion> collection, boolean addParents) {
         checkNotNull(collection);
 
         this.collection = collection;

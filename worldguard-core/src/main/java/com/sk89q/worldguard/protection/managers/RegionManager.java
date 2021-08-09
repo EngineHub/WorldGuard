@@ -34,7 +34,7 @@ import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.util.RegionCollectionConsumer;
+import com.sk89q.worldguard.protection.regions.RegionQuery.QueryOption;
 import com.sk89q.worldguard.util.Normal;
 
 import javax.annotation.Nullable;
@@ -293,32 +293,60 @@ public final class RegionManager {
     }
 
     /**
-     * Query for effective flags and owners for the given positive.
+     * Query for effective flags and members for the given position.
+     *
+     * <p>{@link QueryOption#COMPUTE_PARENTS} is used.</p>
      *
      * @param position the position
      * @return the query object
      */
     public ApplicableRegionSet getApplicableRegions(BlockVector3 position) {
-        checkNotNull(position);
-
-        Set<ProtectedRegion> regions = Sets.newHashSet();
-        index.applyContaining(position, new RegionCollectionConsumer(regions, true));
-        return new RegionResultSet(regions, index.get("__global__"));
+        return getApplicableRegions(position, QueryOption.COMPUTE_PARENTS);
     }
 
     /**
-     * Query for effective flags and owners for the area represented
+     * Return a region set for the given position.
+     *
+     * @param position the position
+     * @param option the option
+     * @return a region set
+     */
+    public ApplicableRegionSet getApplicableRegions(BlockVector3 position, QueryOption option) {
+        checkNotNull(position);
+        checkNotNull(option);
+
+        Set<ProtectedRegion> regions = Sets.newHashSet();
+        index.applyContaining(position, option.createIndexConsumer(regions));
+        return new RegionResultSet(option.constructResult(regions), index.get("__global__"), true);
+    }
+
+    /**
+     * Query for effective flags and members for the area represented
      * by the given region.
+     *
+     * <p>{@link QueryOption#COMPUTE_PARENTS} is used.</p>
      *
      * @param region the region
      * @return the query object
      */
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion region) {
+        return getApplicableRegions(region, QueryOption.COMPUTE_PARENTS);
+    }
+
+    /**
+     * Return a region set for the area represented by the given region.
+     *
+     * @param region the region
+     * @param option the option
+     * @return a region set
+     */
+    public ApplicableRegionSet getApplicableRegions(ProtectedRegion region, QueryOption option) {
         checkNotNull(region);
+        checkNotNull(option);
 
         Set<ProtectedRegion> regions = Sets.newHashSet();
-        index.applyIntersecting(region, new RegionCollectionConsumer(regions, true));
-        return new RegionResultSet(regions, index.get("__global__"));
+        index.applyIntersecting(region, option.createIndexConsumer(regions));
+        return new RegionResultSet(option.constructResult(regions), index.get("__global__"), true);
     }
 
     /**
