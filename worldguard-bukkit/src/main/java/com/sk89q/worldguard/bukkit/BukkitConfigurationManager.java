@@ -94,6 +94,10 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
     @Override
     public BukkitWorldConfiguration get(World world) {
         String worldName = world.getName();
+        return get(worldName);
+    }
+
+    public BukkitWorldConfiguration get(String worldName) {
         BukkitWorldConfiguration config = worlds.get(worldName);
         BukkitWorldConfiguration newConfig = null;
 
@@ -101,8 +105,8 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
             if (newConfig == null) {
                 newConfig = new BukkitWorldConfiguration(plugin, worldName, this.getConfig());
             }
-            worlds.putIfAbsent(world.getName(), newConfig);
-            config = worlds.get(world.getName());
+            worlds.putIfAbsent(worldName, newConfig);
+            config = worlds.get(worldName);
         }
 
         return config;

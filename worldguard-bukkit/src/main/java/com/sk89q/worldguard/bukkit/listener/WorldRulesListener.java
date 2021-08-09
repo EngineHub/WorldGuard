@@ -19,7 +19,6 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.config.WorldConfiguration;
@@ -42,7 +41,7 @@ public class WorldRulesListener extends AbstractListener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onSpawnEntity(final SpawnEntityEvent event) {
         if (event.getEffectiveType() == EntityType.EXPERIENCE_ORB) {
-            WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getWorld()));
+            WorldConfiguration config = getWorldConfig(event.getWorld());
 
             if (config.disableExpDrops) {
                 event.setCancelled(true);
@@ -53,7 +52,7 @@ public class WorldRulesListener extends AbstractListener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPotionEffect(EntityPotionEffectEvent event) {
         if (event.getCause() == EntityPotionEffectEvent.Cause.CONDUIT) {
-            WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getEntity().getWorld()));
+            WorldConfiguration config = getWorldConfig(event.getEntity().getWorld());
 
             if (config.disableConduitEffects) {
                 event.setCancelled(true);

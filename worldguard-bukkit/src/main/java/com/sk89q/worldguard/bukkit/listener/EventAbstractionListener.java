@@ -22,7 +22,6 @@ package com.sk89q.worldguard.bukkit.listener;
 import static com.sk89q.worldguard.bukkit.cause.Cause.create;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
@@ -547,7 +546,7 @@ public class EventAbstractionListener extends AbstractListener {
                 // emit a "use block here" event where the player is
                 // standing, which is a hack to protect items that don't
                 // throw events
-                if (item != null && ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(player.getWorld()))).blockUseAtFeet.test(item)) {
+                if (item != null && getWorldConfig(player.getWorld()).blockUseAtFeet.test(item)) {
                     if (Events.fireAndTestCancel(new UseBlockEvent(event, cause, player.getLocation().getBlock()))) {
                         event.setUseInteractedBlock(Result.DENY);
                     }
@@ -668,7 +667,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent event) {
-        WorldConfiguration config = getWorldConfig(BukkitAdapter.adapt(event.getBlock().getWorld()));
+        WorldConfiguration config = getWorldConfig(event.getBlock().getWorld());
 
         // This only applies to regions but nothing else cares about high
         // frequency events at the moment
@@ -714,7 +713,7 @@ public class EventAbstractionListener extends AbstractListener {
             case DISPENSE_EGG:
             case EGG:
             case SPAWNER_EGG:
-                if (getWorldConfig(BukkitAdapter.adapt(event.getEntity().getWorld())).strictEntitySpawn) {
+                if (getWorldConfig(event.getEntity().getWorld()).strictEntitySpawn) {
                     Events.fireToCancel(event, new SpawnEntityEvent(event, Cause.unknown(), event.getEntity()));
                 }
                 break;
@@ -958,10 +957,10 @@ public class EventAbstractionListener extends AbstractListener {
 
         WorldConfiguration wcfg = null;
         if (causeHolder instanceof Hopper
-                && (wcfg = getWorldConfig(BukkitAdapter.adapt((((Hopper) causeHolder).getWorld())))).ignoreHopperMoveEvents) {
+                && (wcfg = getWorldConfig((((Hopper) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
             return;
         } else if (causeHolder instanceof HopperMinecart
-                && (wcfg = getWorldConfig(BukkitAdapter.adapt((((HopperMinecart) causeHolder).getWorld())))).ignoreHopperMoveEvents) {
+                && (wcfg = getWorldConfig((((HopperMinecart) causeHolder).getWorld()))).ignoreHopperMoveEvents) {
             return;
         }
 
@@ -1231,15 +1230,15 @@ public class EventAbstractionListener extends AbstractListener {
     }
 
     private static boolean hasInteractBypass(Block block) {
-        return ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(block.getWorld()))).allowAllInteract.test(block);
+        return getWorldConfig(block.getWorld()).allowAllInteract.test(block);
     }
 
     private static boolean hasInteractBypass(World world, Material material) {
-        return ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(world))).allowAllInteract.test(material);
+        return getWorldConfig(world).allowAllInteract.test(material);
     }
 
     private static boolean hasInteractBypass(World world, ItemStack item) {
-        return ((BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(world))).allowAllInteract.test(item);
+        return getWorldConfig(world).allowAllInteract.test(item);
     }
 
     private static boolean isBlockModifiedOnClick(Block block, boolean rightClick) {
@@ -1254,13 +1253,13 @@ public class EventAbstractionListener extends AbstractListener {
 
     private static void playDenyEffect(Player player, Location location) {
         //player.playSound(location, Sound.SUCCESSFUL_HIT, 0.2f, 0.4f);
-        if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().particleEffects) {
+        if (getConfig().particleEffects) {
             player.playEffect(location, Effect.SMOKE, BlockFace.UP);
         }
     }
 
     private static void playDenyEffect(Location location) {
-        if (WorldGuard.getInstance().getPlatform().getGlobalStateManager().particleEffects) {
+        if (getConfig().particleEffects) {
             location.getWorld().playEffect(location, Effect.SMOKE, BlockFace.UP);
         }
     }

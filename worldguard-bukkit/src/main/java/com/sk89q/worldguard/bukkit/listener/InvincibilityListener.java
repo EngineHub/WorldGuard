@@ -19,10 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -64,9 +62,6 @@ public class InvincibilityListener extends AbstractListener {
             Player player = (Player) victim;
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
-            BukkitWorldConfiguration worldConfig =
-                    (BukkitWorldConfiguration) WorldGuard.getInstance().getPlatform().getGlobalStateManager().get((World) localPlayer.getExtent());
-
             if (isInvincible(localPlayer)) {
                 player.setFireTicks(0);
                 event.setCancelled(true);
@@ -79,7 +74,7 @@ public class InvincibilityListener extends AbstractListener {
                         attacker = (Entity) ((Projectile) attacker).getShooter();
                     }
 
-                    if (worldConfig.regionInvinciblityRemovesMobs
+                    if (getWorldConfig(player.getWorld()).regionInvinciblityRemovesMobs
                             && attacker instanceof LivingEntity && !(attacker instanceof Player)
                             && !(attacker instanceof Tameable && ((Tameable) attacker).isTamed())) {
                         attacker.remove();

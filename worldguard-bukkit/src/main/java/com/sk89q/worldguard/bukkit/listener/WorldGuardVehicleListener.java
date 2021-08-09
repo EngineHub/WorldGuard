@@ -24,7 +24,6 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.util.Locations;
@@ -32,31 +31,16 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class WorldGuardVehicleListener implements Listener {
+public class WorldGuardVehicleListener extends AbstractListener {
 
-    private WorldGuardPlugin plugin;
-
-    /**
-     * Construct the object;
-     *
-     * @param plugin
-     */
     public WorldGuardVehicleListener(WorldGuardPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    /**
-     * Register events.
-     */
-    public void registerEvents() {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        super(plugin);
     }
 
     @EventHandler
@@ -69,14 +53,13 @@ public class WorldGuardVehicleListener implements Listener {
             return;
         }
         World world = vehicle.getWorld();
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.useRegions) {
             // Did we move a block?
             if (Locations.isDifferentBlock(BukkitAdapter.adapt(event.getFrom()), BukkitAdapter.adapt(event.getTo()))) {
                 for (Player player : playerPassengers) {
-                    LocalPlayer localPlayer = plugin.wrapPlayer(player);
+                    LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
                     Location lastValid;
                     if ((lastValid = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer)
                             .testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE)) != null) {
