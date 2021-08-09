@@ -34,7 +34,7 @@ import com.sk89q.worldguard.protection.managers.storage.DifferenceSaveException;
 import com.sk89q.worldguard.protection.managers.storage.RegionDatabase;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionQuery.Option;
+import com.sk89q.worldguard.protection.regions.RegionQuery.QueryOption;
 import com.sk89q.worldguard.util.Normal;
 
 import javax.annotation.Nullable;
@@ -295,13 +295,13 @@ public final class RegionManager {
     /**
      * Query for effective flags and members for the given position.
      *
-     * <p>{@link Option#COMPUTE_PARENTS} is used.</p>
+     * <p>{@link QueryOption#COMPUTE_PARENTS} is used.</p>
      *
      * @param position the position
      * @return the query object
      */
     public ApplicableRegionSet getApplicableRegions(BlockVector3 position) {
-        return getApplicableRegions(position, Option.COMPUTE_PARENTS);
+        return getApplicableRegions(position, QueryOption.COMPUTE_PARENTS);
     }
 
     /**
@@ -311,7 +311,7 @@ public final class RegionManager {
      * @param option the option
      * @return a region set
      */
-    public ApplicableRegionSet getApplicableRegions(BlockVector3 position, Option option) {
+    public ApplicableRegionSet getApplicableRegions(BlockVector3 position, QueryOption option) {
         checkNotNull(position);
         checkNotNull(option);
 
@@ -324,13 +324,13 @@ public final class RegionManager {
      * Query for effective flags and members for the area represented
      * by the given region.
      *
-     * <p>{@link Option#COMPUTE_PARENTS} is used.</p>
+     * <p>{@link QueryOption#COMPUTE_PARENTS} is used.</p>
      *
      * @param region the region
      * @return the query object
      */
     public ApplicableRegionSet getApplicableRegions(ProtectedRegion region) {
-        return getApplicableRegions(region, Option.COMPUTE_PARENTS);
+        return getApplicableRegions(region, QueryOption.COMPUTE_PARENTS);
     }
 
     /**
@@ -340,7 +340,7 @@ public final class RegionManager {
      * @param option the option
      * @return a region set
      */
-    public ApplicableRegionSet getApplicableRegions(ProtectedRegion region, Option option) {
+    public ApplicableRegionSet getApplicableRegions(ProtectedRegion region, QueryOption option) {
         checkNotNull(region);
         checkNotNull(option);
 

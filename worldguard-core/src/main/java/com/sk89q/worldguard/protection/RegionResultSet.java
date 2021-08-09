@@ -31,6 +31,7 @@ import com.sk89q.worldguard.protection.util.NormativeOrders;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -87,7 +88,7 @@ public class RegionResultSet extends AbstractRegionSet {
         if (!sorted) {
             NormativeOrders.sort(applicable);
         }
-        this.applicable = applicable;
+        this.applicable = Collections.unmodifiableList(applicable);
         this.flagValueCalculator = new FlagValueCalculator(applicable, globalRegion);
     }
 

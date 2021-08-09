@@ -21,6 +21,7 @@ package com.sk89q.worldguard.protection.regions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
@@ -43,8 +44,12 @@ import com.sk89q.worldguard.protection.managers.index.RegionIndex;
 import com.sk89q.worldguard.protection.util.NormativeOrders;
 import com.sk89q.worldguard.protection.util.RegionCollectionConsumer;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -78,7 +83,7 @@ public class RegionQuery {
     /**
      * Query for regions containing the given location.
      *
-     * <p>{@link Option#COMPUTE_PARENTS} is used.</p>
+     * <p>{@link QueryOption#COMPUTE_PARENTS} is used.</p>
      *
      * <p>An instance of {@link ApplicableRegionSet} will always be returned,
      * even if regions are disabled or region data failed to load. An
@@ -90,7 +95,7 @@ public class RegionQuery {
      * @return a region set
      */
     public ApplicableRegionSet getApplicableRegions(Location location) {
-        return getApplicableRegions(location, Option.COMPUTE_PARENTS);
+        return getApplicableRegions(location, QueryOption.COMPUTE_PARENTS);
     }
 
     /**
@@ -106,7 +111,7 @@ public class RegionQuery {
      * @param option the option
      * @return a region set
      */
-    public ApplicableRegionSet getApplicableRegions(Location location, Option option) {
+    public ApplicableRegionSet getApplicableRegions(Location location, QueryOption option) {
         checkNotNull(location);
         checkNotNull(option);
 
@@ -491,59 +496,135 @@ public class RegionQuery {
 
     /**
      * Options for constructing a region set via
-     * {@link #getApplicableRegions(Location, Option)} for example.
+     * {@link #getApplicableRegions(Location, QueryOption)} for example.
      */
-    public enum Option {
+    public enum QueryOption {
         /**
-         * Constructs a region set that does not include parent regions and is
-         * not sorted.
+         * Constructs a region set that does not include parent regions and
+         * may be left unsorted (but a cached, sorted set of the same regions
+         * may be returned).
          */
-        NONE(c -> new RegionCollectionConsumer(c, false), ArrayList::new, CacheCreator.NONE),
+        NONE(false) {
+            @Override
+            public List<ProtectedRegion> constructResult(Set<ProtectedRegion> applicable) {
+                return ImmutableList.copyOf(applicable);
+            }
+
+            @Override
+            Map<QueryOption, ApplicableRegionSet> createCache(RegionManager manager, Location location, Map<QueryOption, ApplicableRegionSet> cache) {
+                if (cache == null) {
+                    cache = new EnumMap<>(QueryOption.class);
+                    cache.put(QueryOption.NONE, manager.getApplicableRegions(location.toVector().toBlockPoint(), QueryOption.NONE));
+                }
+
+                // If c != null, we can assume that Option.NONE is present.
+                return cache;
+            }
+        },
 
         /**
          * Constructs a region set that does not include parent regions and is
          * sorted by {@link NormativeOrders}.
          */
-        SORT(c -> new RegionCollectionConsumer(c, false), NormativeOrders::fromSet, CacheCreator.SORT),
+        SORT(false) {
+            @Override
+            Map<QueryOption, ApplicableRegionSet> createCache(RegionManager manager, Location location, Map<QueryOption, ApplicableRegionSet> cache) {
+                if (cache == null) {
+                    Map<QueryOption, ApplicableRegionSet> newCache = new EnumMap<>(QueryOption.class);
+                    ApplicableRegionSet result = manager.getApplicableRegions(location.toVector().toBlockPoint(), QueryOption.SORT);
+                    newCache.put(QueryOption.NONE, result);
+                    newCache.put(QueryOption.SORT, result);
+                    return newCache;
+                } else {
+                    // If c != null, we can assume that Option.NONE is present.
+                    cache.computeIfAbsent(QueryOption.SORT, k -> new RegionResultSet(cache.get(QueryOption.NONE).getRegions(), manager.getRegion("__global__")));
+                    return cache;
+                }
+            }
+        },
 
         /**
          * Constructs a region set that includes parent regions and is sorted by
          * {@link NormativeOrders}.
          */
-        COMPUTE_PARENTS(c -> new RegionCollectionConsumer(c, true), NormativeOrders::fromSet, CacheCreator.COMPUTE_PARENTS);
+        COMPUTE_PARENTS(true) {
+            @Override
+            Map<QueryOption, ApplicableRegionSet> createCache(RegionManager manager, Location location, Map<QueryOption, ApplicableRegionSet> cache) {
+                if (cache == null) {
+                    Map<QueryOption, ApplicableRegionSet> newCache = new EnumMap<>(QueryOption.class);
+                    ApplicableRegionSet noParResult = manager.getApplicableRegions(location.toVector().toBlockPoint(), QueryOption.NONE);
+                    Set<ProtectedRegion> noParRegions = noParResult.getRegions();
+                    Set<ProtectedRegion> regions = new HashSet<>();
+                    noParRegions.forEach(new RegionCollectionConsumer(regions, true)::apply);
+                    ApplicableRegionSet result = new RegionResultSet(regions, manager.getRegion("__global__"));
 
-        private final Function<Collection<? super ProtectedRegion>, RegionCollectionConsumer> indexConsumerFactory;
-        private final Function<Set<ProtectedRegion>, List<ProtectedRegion>> resultConstructor;
-        private final CacheCreator cacheCreator;
+                    if (regions.size() == noParRegions.size()) {
+                        newCache.put(QueryOption.NONE, result);
+                        newCache.put(QueryOption.SORT, result);
+                    } else {
+                        newCache.put(QueryOption.NONE, noParResult);
+                    }
 
-        Option(Function<Collection<? super ProtectedRegion>, RegionCollectionConsumer> indexConsumerFactory,
-               Function<Set<ProtectedRegion>, List<ProtectedRegion>> resultConstructor,
-               CacheCreator cacheCreator) {
-            this.indexConsumerFactory = indexConsumerFactory;
-            this.resultConstructor = resultConstructor;
-            this.cacheCreator = cacheCreator;
+                    newCache.put(QueryOption.COMPUTE_PARENTS, result);
+                    return newCache;
+                }
+
+                cache.computeIfAbsent(QueryOption.COMPUTE_PARENTS, k -> {
+                    Set<ProtectedRegion> regions = new HashSet<>();
+                    ApplicableRegionSet result = cache.get(QueryOption.SORT);
+                    boolean sorted = true;
+
+                    if (result == null) {
+                        // If c != null, we can assume that Option.NONE is present.
+                        result = cache.get(QueryOption.NONE);
+                        sorted = false;
+                    }
+
+                    Set<ProtectedRegion> noParRegions = result.getRegions();
+                    noParRegions.forEach(new RegionCollectionConsumer(regions, true)::apply);
+
+                    if (sorted && regions.size() == noParRegions.size()) {
+                        return result;
+                    }
+
+                    result = new RegionResultSet(regions, manager.getRegion("__global__"));
+
+                    if (regions.size() == noParRegions.size()) {
+                        cache.put(QueryOption.SORT, result);
+                    }
+
+                    return result;
+                });
+                return cache;
+            }
+        };
+
+        private final boolean collectParents;
+
+        QueryOption(boolean collectParents) {
+            this.collectParents = collectParents;
         }
 
         /**
          * Create a {@link RegionCollectionConsumer} with the given collection
-         * used for the {@link RegionIndex}.
+         * used for the {@link RegionIndex}. Internal API.
          *
          * @param collection the collection
          * @return a region collection consumer
          */
         public RegionCollectionConsumer createIndexConsumer(Collection<? super ProtectedRegion> collection) {
-            return indexConsumerFactory.apply(collection);
+            return new RegionCollectionConsumer(collection, collectParents);
         }
 
         /**
          * Convert the set of regions to a list. Sort and add parents if
-         * necessary.
+         * necessary. Internal API.
          *
          * @param applicable the set of regions
          * @return a list of regions
          */
         public List<ProtectedRegion> constructResult(Set<ProtectedRegion> applicable) {
-            return resultConstructor.apply(applicable);
+            return NormativeOrders.fromSet(applicable);
         }
 
         /**
@@ -555,86 +636,8 @@ public class RegionQuery {
          * @param cache the cache map
          * @return a cache map
          */
-        public Map<Option, ApplicableRegionSet> createCache(RegionManager manager, Location location, Map<Option, ApplicableRegionSet> cache) {
-            return cacheCreator.createCache(manager, location, cache);
-        }
+        abstract Map<QueryOption, ApplicableRegionSet> createCache(RegionManager manager, Location location, Map<QueryOption, ApplicableRegionSet> cache);
 
-        private interface CacheCreator {
-            static final CacheCreator NONE = (m, l, c) -> {
-                if (c == null) {
-                    c = new EnumMap<>(Option.class);
-                    c.put(Option.NONE, m.getApplicableRegions(l.toVector().toBlockPoint(), Option.NONE));
-                    return c;
-                }
-
-                // If c != null, we can assume that Option.NONE is present.
-                // c.computeIfAbsent(Option.NONE, k -> m.getApplicableRegions(l.toVector().toBlockPoint(), Option.NONE));
-                return c;
-            };
-            static final CacheCreator SORT = (m, l, c) -> {
-                if (c == null) {
-                    Map<Option, ApplicableRegionSet> cache = new EnumMap<>(Option.class);
-                    ApplicableRegionSet result = m.getApplicableRegions(l.toVector().toBlockPoint(), Option.SORT);
-                    cache.put(Option.NONE, result);
-                    cache.put(Option.SORT, result);
-                    return cache;
-                }
-
-                // If c != null, we can assume that Option.NONE is present.
-                c.computeIfAbsent(Option.SORT, k -> new RegionResultSet(c.get(Option.NONE).getRegions(), m.getRegion("__global__")));
-                return c;
-            };
-            static final CacheCreator COMPUTE_PARENTS = (m, l, c) -> {
-                if (c == null) {
-                    Map<Option, ApplicableRegionSet> cache = new EnumMap<>(Option.class);
-                    ApplicableRegionSet noParResult = m.getApplicableRegions(l.toVector().toBlockPoint(), Option.NONE);
-                    Set<ProtectedRegion> regions = new HashSet<>();
-                    Set<ProtectedRegion> noParRegions = noParResult.getRegions();
-                    noParRegions.forEach(new RegionCollectionConsumer(regions, true)::test);
-                    ApplicableRegionSet result = new RegionResultSet(regions, m.getRegion("__global__"));
-
-                    if (regions.size() == noParRegions.size()) {
-                        cache.put(Option.NONE, result);
-                        cache.put(Option.SORT, result);
-                    } else {
-                        cache.put(Option.NONE, noParResult);
-                    }
-
-                    cache.put(Option.COMPUTE_PARENTS, result);
-                    return cache;
-                }
-
-                c.computeIfAbsent(Option.COMPUTE_PARENTS, k -> {
-                    Set<ProtectedRegion> regions = new HashSet<>();
-                    ApplicableRegionSet result = c.get(Option.SORT);
-                    boolean sorted = true;
-
-                    if (result == null) {
-                        // If c != null, we can assume that Option.NONE is present.
-                        result = c.get(Option.NONE);
-                        sorted = false;
-                    }
-
-                    Set<ProtectedRegion> noParRegions = result.getRegions();
-                    noParRegions.forEach(new RegionCollectionConsumer(regions, true)::test);
-
-                    if (sorted && regions.size() == noParRegions.size()) {
-                        return result;
-                    }
-
-                    result = new RegionResultSet(regions, m.getRegion("__global__"));
-
-                    if (regions.size() == noParRegions.size()) {
-                        c.put(Option.SORT, result);
-                    }
-
-                    return result;
-                });
-                return c;
-            };
-
-            Map<Option, ApplicableRegionSet> createCache(RegionManager manager, Location location, Map<Option, ApplicableRegionSet> cache);
-        }
     }
 
 }
