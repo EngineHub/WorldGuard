@@ -93,11 +93,12 @@ public final class WorldGuard {
 
     /**
      * The WorldGuard Platform.
+     * The Platform is only available after WorldGuard is enabled.
      *
      * @return The platform
      */
     public WorldGuardPlatform getPlatform() {
-        checkNotNull(platform);
+        checkNotNull(platform, "WorldGuard is not enabled, unable to access the platform.");
         return platform;
     }
 

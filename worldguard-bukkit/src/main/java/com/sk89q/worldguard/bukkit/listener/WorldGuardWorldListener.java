@@ -34,30 +34,17 @@ import org.bukkit.event.world.WorldLoadEvent;
 
 import java.util.logging.Logger;
 
-public class WorldGuardWorldListener implements Listener {
+public class WorldGuardWorldListener extends AbstractListener {
 
     private static final Logger log = Logger.getLogger(WorldGuardWorldListener.class.getCanonicalName());
-    private WorldGuardPlugin plugin;
 
-    /**
-     * Construct the object;
-     *
-     * @param plugin The plugin instance
-     */
     public WorldGuardWorldListener(WorldGuardPlugin plugin) {
-        this.plugin = plugin;
-    }
-
-    /**
-     * Register events.
-     */
-    public void registerEvents() {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        super(plugin);
     }
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+        ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
             int removed = 0;
@@ -89,8 +76,7 @@ public class WorldGuardWorldListener implements Listener {
      * @param world The specified world
      */
     public void initWorld(World world) {
-        ConfigurationManager cfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(BukkitAdapter.adapt(world));
+        WorldConfiguration wcfg = getWorldConfig(world);
         if (wcfg.alwaysRaining && !wcfg.disableWeather) {
             world.setStorm(true);
         } else if (wcfg.disableWeather && !wcfg.alwaysRaining) {

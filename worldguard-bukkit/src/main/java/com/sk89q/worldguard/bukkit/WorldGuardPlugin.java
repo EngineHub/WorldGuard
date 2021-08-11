@@ -458,6 +458,13 @@ public class WorldGuardPlugin extends JavaPlugin {
     }
 
     /**
+     * Internal method. Do not use as API.
+     */
+    public BukkitConfigurationManager getConfigManager() {
+        return platform.getGlobalStateManager();
+    }
+
+    /**
      * Return a protection query helper object that can be used by another
      * plugin to test whether WorldGuard permits an action at a particular
      * place.

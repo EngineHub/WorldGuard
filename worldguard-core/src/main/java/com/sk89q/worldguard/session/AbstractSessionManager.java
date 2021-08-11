@@ -128,7 +128,7 @@ public abstract class AbstractSessionManager implements SessionManager {
             int index = handlers.indexOf(wrappedAfter != null ? wrappedAfter : after);
             if (index == -1) return false;
 
-            handlers.add(index, factory); // shifts "after" right one, and everything after "after" right one
+            handlers.add(index + 1, factory); // shifts "after" right one, and everything after "after" right one
         }
         wrappedHandlers.put(factory, wrappedFactory);
         return true;

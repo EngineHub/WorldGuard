@@ -38,6 +38,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
     }
 
     dependencies {
+        "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
+        "testCompileOnly"("com.google.code.findbugs:jsr305:3.0.2")
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
         "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")

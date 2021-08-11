@@ -22,13 +22,13 @@ package com.sk89q.worldguard.bukkit.listener;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.BukkitConfigurationManager;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.cause.Cause;
-import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.domains.Association;
 import com.sk89q.worldguard.protection.association.DelayedRegionOverlapAssociation;
@@ -72,8 +72,8 @@ class AbstractListener implements Listener {
      *
      * @return the plugin
      */
-    protected WorldGuardPlugin getPlugin() {
-        return plugin;
+    protected static WorldGuardPlugin getPlugin() {
+        return WorldGuardPlugin.inst();
     }
 
     /**
@@ -81,8 +81,8 @@ class AbstractListener implements Listener {
      *
      * @return the configuration
      */
-    protected static ConfigurationManager getConfig() {
-        return WorldGuard.getInstance().getPlatform().getGlobalStateManager();
+    protected static BukkitConfigurationManager getConfig() {
+        return getPlugin().getConfigManager();
     }
 
     /**
@@ -91,8 +91,12 @@ class AbstractListener implements Listener {
      * @param world The world to get the configuration for.
      * @return The configuration for {@code world}
      */
-    protected static WorldConfiguration getWorldConfig(World world) {
+    protected static BukkitWorldConfiguration getWorldConfig(String world) {
         return getConfig().get(world);
+    }
+
+    protected static BukkitWorldConfiguration getWorldConfig(org.bukkit.World world) {
+        return getWorldConfig(world.getName());
     }
 
     /**
@@ -101,8 +105,8 @@ class AbstractListener implements Listener {
      * @param player The player to get the wold from
      * @return The {@link WorldConfiguration} for the player's world
      */
-    protected static WorldConfiguration getWorldConfig(LocalPlayer player) {
-        return getWorldConfig((World) player.getExtent());
+    protected static BukkitWorldConfiguration getWorldConfig(LocalPlayer player) {
+        return getWorldConfig(((BukkitPlayer) player).getPlayer().getWorld());
     }
 
     /**
@@ -111,7 +115,7 @@ class AbstractListener implements Listener {
      * @param world the world
      * @return true if region support is enabled
      */
-    protected static boolean isRegionSupportEnabled(World world) {
+    protected static boolean isRegionSupportEnabled(org.bukkit.World world) {
         return getWorldConfig(world).useRegions;
     }
 
@@ -127,8 +131,7 @@ class AbstractListener implements Listener {
         } else if (rootCause instanceof Entity) {
             RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
             final Entity entity = (Entity) rootCause;
-            BukkitWorldConfiguration config =
-                    (BukkitWorldConfiguration) getWorldConfig(BukkitAdapter.adapt(entity.getWorld()));
+            BukkitWorldConfiguration config = getWorldConfig(entity.getWorld());
             Location loc;
             if (PaperLib.isPaper()  && config.usePaperEntityOrigin) {
                 loc = entity.getOrigin();
@@ -144,7 +147,7 @@ class AbstractListener implements Listener {
             RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
             Location loc = ((Block) rootCause).getLocation();
             return new DelayedRegionOverlapAssociation(query, BukkitAdapter.adapt(loc),
-                    getWorldConfig(BukkitAdapter.adapt(loc.getWorld())).useMaxPriorityAssociation);
+                    getWorldConfig(loc.getWorld()).useMaxPriorityAssociation);
         } else {
             return Associables.constant(Association.NON_MEMBER);
         }

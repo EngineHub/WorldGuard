@@ -24,7 +24,9 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.RegionResultSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.RegionQuery.QueryOption;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -38,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class QueryCache {
 
-    private final ConcurrentMap<CacheKey, ApplicableRegionSet> cache = new ConcurrentHashMap<>(16, 0.75f, 2);
+    private final ConcurrentMap<CacheKey, Map<QueryOption, ApplicableRegionSet>> cache = new ConcurrentHashMap<>(16, 0.75f, 2);
 
     /**
      * Get from the cache a {@code ApplicableRegionSet} if an entry exists;
@@ -46,20 +48,16 @@ public class QueryCache {
      *
      * @param manager the region manager
      * @param location the location
+     * @param option the option
      * @return a result
      */
-    public ApplicableRegionSet queryContains(RegionManager manager, Location location) {
+    public ApplicableRegionSet queryContains(RegionManager manager, Location location, QueryOption option) {
         checkNotNull(manager);
         checkNotNull(location);
+        checkNotNull(option);
 
         CacheKey key = new CacheKey(location);
-        ApplicableRegionSet result = cache.get(key);
-        if (result == null) {
-            result = manager.getApplicableRegions(location.toVector().toBlockPoint());
-            cache.put(key, result);
-        }
-
-        return result;
+        return cache.compute(key, (k, v) -> option.createCache(manager, location, v)).get(option);
     }
 
     /**
