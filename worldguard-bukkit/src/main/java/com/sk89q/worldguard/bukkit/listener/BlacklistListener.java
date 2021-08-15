@@ -332,7 +332,8 @@ public class BlacklistListener extends AbstractListener {
                     break;
             }
         } else if (clickedInventory != null && clickedInventory.getType() == InventoryType.PLAYER
-                && event.getView().getTopInventory().getType() == InventoryType.PLAYER
+                && (event.getView().getTopInventory().getType() == InventoryType.PLAYER
+                    || event.getView().getTopInventory().getType() == InventoryType.CRAFTING)
                 && event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
             return event.getCurrentItem();
         }
