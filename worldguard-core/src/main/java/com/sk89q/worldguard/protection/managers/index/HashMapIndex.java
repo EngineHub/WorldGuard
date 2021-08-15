@@ -24,9 +24,11 @@ import static com.sk89q.worldguard.util.Normal.normalize;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionDifference;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -38,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 
 /**
  * An index that stores regions in a hash map, which allows for fast lookup
@@ -74,9 +77,13 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
 
             ProtectedRegion existing = regions.get(normalId);
 
-            // Casing / form of ID has changed
-            if (existing != null && !existing.getId().equals(region.getId())) {
-                removed.add(existing);
+            if (existing != null) {
+                removeAndReplaceParents(existing.getId(), RemovalStrategy.UNSET_PARENT_IN_CHILDREN, region, false);
+
+                // Casing / form of ID has not changed
+                if (existing.getId().equals(region.getId())) {
+                    removed.remove(existing);
+                }
             }
 
             regions.put(normalId, region);
@@ -134,6 +141,10 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
 
     @Override
     public Set<ProtectedRegion> remove(String id, RemovalStrategy strategy) {
+        return removeAndReplaceParents(id, strategy, null, true);
+    }
+
+    private Set<ProtectedRegion> removeAndReplaceParents(String id, RemovalStrategy strategy, @Nullable ProtectedRegion replacement, boolean rebuildIndex) {
         checkNotNull(id);
         checkNotNull(strategy);
 
@@ -161,7 +172,12 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
                                     it.remove();
                                     break;
                                 case UNSET_PARENT_IN_CHILDREN:
-                                    current.clearParent();
+                                    try {
+                                        current.setParent(replacement);
+                                    } catch (CircularInheritanceException e) {
+                                        WorldGuard.logger.log(Level.WARNING, "Failed to replace parent '" + parent.getId() + "' of child '" + current.getId() + "' with replacement '" + replacement.getId() + "'", e);
+                                        current.clearParent();
+                                    }
                             }
                         }
                     }
@@ -174,7 +190,9 @@ public class HashMapIndex extends AbstractRegionIndex implements ConcurrentRegio
 
             this.removed.addAll(removedSet);
 
-            rebuildIndex();
+            if (rebuildIndex) {
+                rebuildIndex();
+            }
         }
 
         return removedSet;
