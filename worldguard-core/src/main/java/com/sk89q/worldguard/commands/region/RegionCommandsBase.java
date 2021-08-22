@@ -55,6 +55,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.regions.RegionQuery.QueryOption;
 import com.sk89q.worldguard.protection.util.WorldEditRegionConverter;
 
 import java.util.Set;
@@ -200,7 +201,7 @@ class RegionCommandsBase {
      * @throws CommandException thrown if no region was found
      */
     protected static ProtectedRegion checkRegionStandingIn(RegionManager regionManager, LocalPlayer player, boolean allowGlobal, String rgCmd) throws CommandException {
-        ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation().toVector().toBlockPoint());
+        ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation().toVector().toBlockPoint(), QueryOption.SORT);
 
         if (set.size() == 0) {
             if (allowGlobal) {
@@ -230,7 +231,7 @@ class RegionCommandsBase {
                 builder.append(regionComp);
             }
             player.print(builder.build());
-            throw new CommandException("Several regions affect your current location (please pick one).");
+            throw new CommandException("You're standing in several regions (please pick one).");
         }
 
         return set.iterator().next();
