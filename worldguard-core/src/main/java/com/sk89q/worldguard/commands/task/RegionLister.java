@@ -264,7 +264,7 @@ public class RegionLister implements Callable<Integer> {
                         .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND,
                                 "/rg info -w \"" + world + "\" " + entry.region.getId()))));
             }
-            final Location teleFlag = FlagValueCalculator.getEffectiveFlagOf(entry.region, Flags.TELE_LOC, perms.getSender() instanceof RegionAssociable ? (RegionAssociable) perms.getSender() : null);
+            final Location teleFlag = FlagValueCalculator.getEffectiveFlagOf(entry.region, Flags.TELE_LOC, perms != null && perms.getSender() instanceof RegionAssociable ? (RegionAssociable) perms.getSender() : null);
             if (perms != null && teleFlag != null && perms.mayTeleportTo(entry.region)) {
                 builder.append(TextComponent.space().append(TextComponent.of("[TP]", TextColor.GRAY)
                         .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to teleport")))
