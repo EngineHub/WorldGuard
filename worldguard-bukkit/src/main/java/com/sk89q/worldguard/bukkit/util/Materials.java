@@ -1651,6 +1651,8 @@ public final class Materials {
                 return Tag.SIGNS.isTagged(targetMaterial);
             case HONEYCOMB:
                 return isUnwaxedCopper(targetMaterial);
+            case LIGHT:
+                return targetMaterial == Material.LIGHT;
             default:
                 return false;
         }
