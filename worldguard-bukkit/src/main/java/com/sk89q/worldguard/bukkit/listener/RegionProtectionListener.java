@@ -411,7 +411,8 @@ public class RegionProtectionListener extends AbstractListener {
             what = "use that";
         /* Paintings, item frames, etc. */
         } else if (Entities.isConsideredBuildingIfUsed(entity)) {
-            if (type == EntityType.ITEM_FRAME && event.getCause().getFirstPlayer() != null
+            if ((type == EntityType.ITEM_FRAME || type == EntityType.GLOW_ITEM_FRAME)
+                    && event.getCause().getFirstPlayer() != null
                     && ((ItemFrame) entity).getItem().getType() != Material.AIR) {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.ITEM_FRAME_ROTATE));
                 what = "change that";
