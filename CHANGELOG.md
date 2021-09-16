@@ -1,16 +1,22 @@
 # Changelog
 
-## 7.0.6 beta 1
+## 7.0.6
 
 * Add support for 1.17 blocks/items, drop support for 1.16.
 * Add use-dripleaf flag for "toggling" big dripleaf blocks.
 * Fix support for fully negative-height regions.
 * Fix crop-growth config option.
 * Be more rigorous with protecting blocks against dispenser behaviors.
+* Fix handling of lingering splash potion effects.
+* Handle other-explosion flag consistently for block-like entities (armor frames etc.)
+* Allow inheriting values for all flags (previously wasn't used for things like teleport.)
+* Region commands that defaulted to the region the player was standing in no longer check parents.
+* Fix child regions being unlinked when redefining a parent region.
 
 ## 7.0.5
 
 * Add a use-anvil flag and exclude it from the use flag (since they can break on use.)
+* Add nonplayer-protection-domains flag which allows merging region borders from the perspective of pistons, saplings, etc.
 * Expand crop-related options (crop-growth, etc) to sweet berry bushes, nether wart, and bamboo.
 * Add a config option (`mobs.block-vehicle-entry`) to prevent non-players from entering vehicles.
 * Add a UUID flag (for developers/API usage).
