@@ -766,7 +766,7 @@ public final class Materials {
         MATERIAL_FLAGS.put(Material.CRACKED_DEEPSLATE_TILES, 0);
         MATERIAL_FLAGS.put(Material.CHISELED_DEEPSLATE, 0);
         MATERIAL_FLAGS.put(Material.GLOW_LICHEN, 0);
-        MATERIAL_FLAGS.put(Material.LIGHT, 0);
+        MATERIAL_FLAGS.put(Material.LIGHT, MODIFIED_ON_RIGHT);
         MATERIAL_FLAGS.put(Material.LIGHTNING_ROD, 0);
         MATERIAL_FLAGS.put(Material.SCULK_SENSOR, 0);
         MATERIAL_FLAGS.put(Material.AMETHYST_SHARD, 0);
