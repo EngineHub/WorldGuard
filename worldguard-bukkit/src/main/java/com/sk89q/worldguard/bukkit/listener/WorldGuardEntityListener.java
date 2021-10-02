@@ -461,7 +461,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                 return;
             }
         } else if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
-            if (wcfg.blockTNTExplosions) {
+            if (!wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
             }
