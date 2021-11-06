@@ -32,6 +32,7 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
@@ -269,56 +270,61 @@ public final class Cause {
         }
 
         private void addAll(@Nullable Object... element) {
-            if (element != null) {
-                for (Object o : element) {
-                    if (o == null || seen.contains(o)) {
-                        continue;
-                    }
+            if (element == null) {
+                return;
+            }
+            for (Object o : element) {
+                if (o == null || seen.contains(o)) {
+                    continue;
+                }
 
-                    seen.add(o);
+                seen.add(o);
 
-                    if (o instanceof TNTPrimed) {
-                        addAll(((TNTPrimed) o).getSource());
-                    } else if (o instanceof Projectile) {
-                        ProjectileSource shooter = ((Projectile) o).getShooter();
-                        addAll(shooter);
-                        if (shooter == null && o instanceof Firework && PaperLib.isPaper()) {
-                            UUID spawningUUID = ((Firework) o).getSpawningEntity();
-                            if (spawningUUID != null) {
-                                Entity spawningEntity = Bukkit.getEntity(spawningUUID);
-                                if (spawningEntity != null) {
-                                    addAll(spawningEntity);
-                                }
+                if (o instanceof TNTPrimed) {
+                    addAll(((TNTPrimed) o).getSource());
+                } else if (o instanceof Projectile) {
+                    ProjectileSource shooter = ((Projectile) o).getShooter();
+                    addAll(shooter);
+                    if (shooter == null && o instanceof Firework && PaperLib.isPaper()) {
+                        UUID spawningUUID = ((Firework) o).getSpawningEntity();
+                        if (spawningUUID != null) {
+                            Entity spawningEntity = Bukkit.getEntity(spawningUUID);
+                            if (spawningEntity != null) {
+                                addAll(spawningEntity);
                             }
                         }
-                    } else if (o instanceof Vehicle) {
-                        ((Vehicle) o).getPassengers().forEach(this::addAll);
-                    } else if (o instanceof AreaEffectCloud) {
-                        indirect = true;
-                        addAll(((AreaEffectCloud) o).getSource());
-                    } else if (o instanceof Tameable) {
-                        indirect = true;
-                        addAll(((Tameable) o).getOwner());
-                    } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
-                        indirect = true;
-                        addAll(((Creature) o).getTarget());
-                    } else if (o instanceof BlockProjectileSource) {
-                        addAll(((BlockProjectileSource) o).getBlock());
                     }
-
-                    // Add manually tracked parent causes
-                    Object source = o;
-                    int index = causes.size();
-                    while (source instanceof Metadatable && !(source instanceof Block)) {
-                        source = WGMetadata.getIfPresent((Metadatable) source, CAUSE_KEY, Object.class);
-                        if (source != null) {
-                            causes.add(index, source);
-                            seen.add(source);
-                        }
-                    }
-
-                    causes.add(o);
+                } else if (o instanceof Vehicle) {
+                    ((Vehicle) o).getPassengers().forEach(this::addAll);
+                } else if (o instanceof AreaEffectCloud) {
+                    indirect = true;
+                    addAll(((AreaEffectCloud) o).getSource());
+                } else if (o instanceof Tameable) {
+                    indirect = true;
+                    addAll(((Tameable) o).getOwner());
+                } else if (o instanceof Creature && ((Creature) o).getTarget() != null) {
+                    indirect = true;
+                    addAll(((Creature) o).getTarget());
+                } else if (o instanceof BlockProjectileSource) {
+                    addAll(((BlockProjectileSource) o).getBlock());
+                } else if (o instanceof LightningStrike && PaperLib.isPaper() &&
+                        ((LightningStrike) o).getCausingEntity() != null) {
+                    indirect = true;
+                    addAll(((LightningStrike) o).getCausingEntity());
                 }
+
+                // Add manually tracked parent causes
+                Object source = o;
+                int index = causes.size();
+                while (source instanceof Metadatable && !(source instanceof Block)) {
+                    source = WGMetadata.getIfPresent((Metadatable) source, CAUSE_KEY, Object.class);
+                    if (source != null) {
+                        causes.add(index, source);
+                        seen.add(source);
+                    }
+                }
+
+                causes.add(o);
             }
         }
 

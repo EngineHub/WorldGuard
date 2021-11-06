@@ -21,6 +21,7 @@ package com.sk89q.worldguard.bukkit.listener;
 
 import static com.sk89q.worldguard.bukkit.cause.Cause.create;
 
+import com.destroystokyo.paper.event.entity.EntityZapEvent;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -47,6 +48,7 @@ import com.sk89q.worldguard.bukkit.util.Events;
 import com.sk89q.worldguard.bukkit.util.Materials;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.flags.Flags;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
@@ -83,6 +85,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
@@ -142,6 +145,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
@@ -180,6 +184,17 @@ public class EventAbstractionListener extends AbstractListener {
     public EventAbstractionListener(WorldGuardPlugin plugin) {
         super(plugin);
     }
+
+    @Override
+    public void registerEvents() {
+        super.registerEvents();
+
+        if (PaperLib.isPaper()) {
+            PluginManager pm = getPlugin().getServer().getPluginManager();
+            pm.registerEvents(new EventAbstractionListener.PaperListener(), getPlugin());
+        }
+    }
+
 
     //-------------------------------------------------------------------------
     // Block break / place
@@ -1264,4 +1279,10 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
+    private class PaperListener implements Listener {
+        @EventHandler(ignoreCancelled = true)
+        public void onEntityTransform(EntityZapEvent event) {
+            Events.fireToCancel(event, new DamageEntityEvent(event, create(event.getBolt()), event.getEntity()));
+        }
+    }
 }
