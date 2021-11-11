@@ -24,6 +24,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.event.BlacklistEvent;
 import com.sk89q.worldguard.blacklist.target.Target;
 
+import javax.annotation.Nullable;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -87,13 +88,13 @@ public class FileHandler implements LoggerHandler {
      * Build the path.
      *
      * @param playerName The name of the player
-     * @return The path for the logfile
+     * @return The path for the logfile, null when no applicable path could be found
      */
-    private String buildPath(String playerName) {
+    private @Nullable String buildPath(@Nullable String playerName) {
         GregorianCalendar calendar = new GregorianCalendar();
 
         Matcher m = pattern.matcher(pathPattern);
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         // Pattern replacements
         while (m.find()) {
@@ -103,12 +104,13 @@ public class FileHandler implements LoggerHandler {
             if (group.matches("%%")) {
                 rep = "%";
             } else if (group.matches("%u")) {
+                if (playerName == null) return null; // Unable to create a path for non player logging events
                 rep = playerName.toLowerCase().replaceAll("[^A-Za-z0-9_]", "_");
                 if (rep.length() > 32) { // Actual max length is 16
                     rep = rep.substring(0, 32);
                 }
 
-            }else if (group.matches("%w")) {
+            } else if (group.matches("%w")) {
                 rep = worldName.toLowerCase().replaceAll("[^A-Za-z0-9_]", "_");
                 if (rep.length() > 32) { // Actual max length is 16
                     rep = rep.substring(0, 32);
@@ -148,11 +150,12 @@ public class FileHandler implements LoggerHandler {
      * @param message The message to log
      * @param comment The comment associated with the logged event
      */
-    private void log(LocalPlayer player, String message, String comment) {
-        String path = buildPath(player.getName());
+    private void log(@Nullable LocalPlayer player, String message, String comment) {
+        String path = buildPath(player != null ? player.getName() : null);
+        if (path == null) return;
         try {
             String date = dateFormat.format(new Date());
-            String line = "[" + date + "] " + player.getName() + ": " + message
+            String line = "[" + date + "] " + (player != null ? player.getName() : "Unknown Source") + ": " + message
                     + (comment != null ? " (" + comment + ")" : "") + "\r\n";
 
             LogFileWriter writer = writers.get(path);
@@ -190,7 +193,7 @@ public class FileHandler implements LoggerHandler {
                         writers.entrySet().iterator();
 
                 // Remove some entries
-                for (; it.hasNext(); ) {
+                while (it.hasNext()) {
                     Map.Entry<String,LogFileWriter> entry = it.next();
                     try {
                         entry.getValue().getWriter().close();
