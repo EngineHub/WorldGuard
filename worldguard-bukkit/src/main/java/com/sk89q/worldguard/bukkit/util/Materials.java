@@ -1412,6 +1412,7 @@ public final class Materials {
                 newType == Material.KELP ||
                 newType == Material.TWISTING_VINES ||
                 newType == Material.WEEPING_VINES ||
+                newType == Material.POINTED_DRIPSTONE ||
                 Tag.CAVE_VINES.isTagged(newType);
 
     }
