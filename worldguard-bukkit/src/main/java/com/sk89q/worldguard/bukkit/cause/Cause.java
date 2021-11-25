@@ -21,6 +21,8 @@ package com.sk89q.worldguard.bukkit.cause;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+import com.sk89q.worldguard.bukkit.BukkitWorldConfiguration;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.internal.WGMetadata;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
@@ -98,7 +100,25 @@ public final class Cause {
      */
     public boolean isKnown() {
         Object object = getRootCause();
-        return !(object == null || object instanceof TNTPrimed || object instanceof Vehicle);
+
+        if (object == null) {
+            return false;
+        }
+
+        if (object instanceof TNTPrimed || object instanceof Vehicle) {
+            if (!PaperLib.isPaper()) {
+                return false;
+            }
+
+            Entity entity = (Entity) object;
+            BukkitWorldConfiguration config = WorldGuardPlugin.inst().getConfigManager().get(entity.getWorld().getName());
+
+            if (!config.usePaperEntityOrigin || entity.getOrigin() == null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Nullable
