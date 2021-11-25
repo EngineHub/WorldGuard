@@ -27,7 +27,7 @@ body:
 
 - type: input
   attributes:
-    label: WorldGuard Version
+    label: Platform Version
     description: |
       The version of the platform you are on, i.e. Spigot or Paper.
       Please ensure you are running up-to-date software before making a bug report.
