@@ -157,6 +157,7 @@ public abstract class WorldConfiguration {
     public boolean disableGrassGrowth;
     public boolean disableMyceliumSpread;
     public boolean disableVineGrowth;
+    public boolean disableRockGrowth;
     public boolean disableCropGrowth;
     public boolean disableEndermanGriefing;
     public boolean disableSnowmanTrails;
