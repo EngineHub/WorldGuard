@@ -72,7 +72,7 @@ abstract class AbstractMigration implements Migration {
      * @param store the region store
      * @throws MigrationException on migration error
      */
-    protected abstract void migrate(RegionDatabase store)throws MigrationException;
+    protected abstract void migrate(RegionDatabase store) throws MigrationException;
 
     /**
      * Called after migration has successfully completed.

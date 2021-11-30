@@ -63,7 +63,11 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     public boolean mayMigrateRegionNames() {
         return hasPluginPermission("region.migrateuuid");
     }
-    
+
+    public boolean mayMigrateRegionHeights() {
+        return hasPluginPermission("region.migrateheights");
+    }
+
     public boolean mayDefine() {
         return hasPluginPermission("region.define");
     }
