@@ -588,6 +588,19 @@ public class WorldGuardBlockListener extends AbstractListener {
             }
         }
 
+        if (newType == Material.BUDDING_AMETHYST || newType == Material.POINTED_DRIPSTONE) {
+            if (wcfg.disableRockGrowth) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (wcfg.useRegions && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    .queryState(BukkitAdapter.adapt(event.getBlock().getLocation()), (RegionAssociable) null, Flags.ROCK_GROWTH))) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         handleGrow(event, event.getBlock().getLocation(), newType);
     }
 

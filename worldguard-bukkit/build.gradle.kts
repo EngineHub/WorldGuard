@@ -35,7 +35,7 @@ dependencies {
     "api"("com.sk89q.worldedit:worldedit-bukkit:${Versions.WORLDEDIT}") { isTransitive = false }
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
     "compileOnly"("com.sk89q:commandbook:2.3") { isTransitive = false }
-    "shadeOnly"("io.papermc:paperlib:1.0.6")
+    "shadeOnly"("io.papermc:paperlib:1.0.7")
     "shadeOnly"("org.bstats:bstats-bukkit:2.1.0")
     "shadeOnly"("co.aikar:minecraft-timings:1.0.4")
 }

@@ -228,7 +228,7 @@ public class WorldGuardCommands {
             }
         }, MoreExecutors.directExecutor());
 
-        Futures.addCallback(sampler.getFuture(), new FutureCallback<Sampler>() {
+        Futures.addCallback(sampler.getFuture(), new FutureCallback<>() {
             @Override
             public void onSuccess(Sampler result) {
                 String output = result.toString();
@@ -249,7 +249,7 @@ public class WorldGuardCommands {
             @Override
             public void onFailure(Throwable throwable) {
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     @Command(aliases = {"stopprofile"}, usage = "",desc = "Stop a running profile", min = 0, max = 0)
