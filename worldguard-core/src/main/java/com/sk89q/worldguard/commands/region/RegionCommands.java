@@ -65,6 +65,7 @@ import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.managers.migration.DriverMigration;
 import com.sk89q.worldguard.protection.managers.migration.MigrationException;
 import com.sk89q.worldguard.protection.managers.migration.UUIDMigration;
+import com.sk89q.worldguard.protection.managers.migration.WorldHeightMigration;
 import com.sk89q.worldguard.protection.managers.storage.DriverType;
 import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
@@ -1066,6 +1067,62 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
     }
+
+
+    /**
+     * Migrate regions that went from 0-255 to new world heights.
+     *
+     * @param args the arguments
+     * @param sender the sender
+     * @throws CommandException any error
+     */
+    @Command(aliases = {"migrateheights"},
+            usage = "[world]", max = 1,
+            flags = "yw:",
+            desc = "Migrate regions from old height limits to new height limits")
+    public void migrateHeights(CommandContext args, Actor sender) throws CommandException {
+        // Check permissions
+        if (!getPermissionModel(sender).mayMigrateRegionHeights()) {
+            throw new CommandPermissionsException();
+        }
+
+        if (!args.hasFlag('y')) {
+            throw new CommandException("This command is potentially dangerous.\n" +
+                    "Please ensure you have made a backup of your data, and then re-enter the command with -y tacked on at the end to proceed.");
+        }
+
+        World world = null;
+        try {
+            world = checkWorld(args, sender, 'w');
+        } catch (CommandException ignored) {
+        }
+
+        LoggerToChatHandler handler = null;
+        Logger minecraftLogger = null;
+
+        if (sender instanceof LocalPlayer) {
+            handler = new LoggerToChatHandler(sender);
+            handler.setLevel(Level.ALL);
+            minecraftLogger = Logger.getLogger("com.sk89q.worldguard");
+            minecraftLogger.addHandler(handler);
+        }
+
+        try {
+            RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+            RegionDriver driver = container.getDriver();
+            WorldHeightMigration migration = new WorldHeightMigration(driver, WorldGuard.getInstance().getFlagRegistry(), world);
+            container.migrate(migration);
+            sender.print("Migration complete!");
+        } catch (MigrationException e) {
+            log.log(Level.WARNING, "Failed to migrate", e);
+            throw new CommandException("Error encountered while migrating: " + e.getMessage());
+        } finally {
+            if (minecraftLogger != null) {
+                minecraftLogger.removeHandler(handler);
+            }
+        }
+    }
+
 
     /**
      * Teleport to a region
