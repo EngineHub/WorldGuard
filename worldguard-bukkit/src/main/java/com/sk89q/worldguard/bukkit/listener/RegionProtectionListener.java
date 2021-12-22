@@ -262,10 +262,15 @@ public class RegionProtectionListener extends AbstractListener {
                 canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
                 what = "open that";
 
-            /* Inventory for blocks with the possibility to be only use, e.g. lectern */
-            } else if (handleAsInventoryUsage(event.getOriginalEvent())) {
-                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.CHEST_ACCESS));
+            /* Take from lectern */
+            } else if (event.getOriginalEvent() instanceof PlayerTakeLecternBookEvent) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.LECTERN_ACCESS, Flags.LECTERN_TAKE));
                 what = "take that";
+
+            /* Read book on lectern */
+            } else if (type == Material.LECTERN) {
+                canUse = query.testBuild(BukkitAdapter.adapt(target), associable, combine(event, Flags.INTERACT, Flags.LECTERN_ACCESS));
+                what = "use that";
 
             /* Anvils */
             } else if (Materials.isAnvil(type)) {
@@ -558,16 +563,6 @@ public class RegionProtectionListener extends AbstractListener {
             flags[flag.length + i] = extra.get(i);
         }
         return flags;
-    }
-
-    /**
-     * Check if that event should be handled as inventory usage, e.g. if a player takes a book from a lectern
-     *
-     * @param event the event to handle
-     * @return whether it should be handled as inventory usage
-     */
-    private static boolean handleAsInventoryUsage(Event event) {
-        return event instanceof PlayerTakeLecternBookEvent;
     }
 
 }
