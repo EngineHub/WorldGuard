@@ -281,7 +281,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        // We have to check whether this region violates the space of any other reion
+        // We have to check whether this region violates the space of any other region
         ApplicableRegionSet regions = manager.getApplicableRegions(region);
 
         // Check if this region overlaps any other region
@@ -311,6 +311,18 @@ public final class RegionCommands extends RegionCommandsBase {
                 player.printError("This region is too large to claim.");
                 player.printError("Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
                 return;
+            }
+        }
+
+        // Inherit from a template region
+        if (wcfg.templateWhenClaiming != "") {
+            ProtectedRegion templateRegion = manager.getRegion(wcfg.templateWhenClaiming);
+            if (templateRegion != null) {
+                try {
+                    region.setParent(templateRegion);
+                } catch (CircularInheritanceException e) {
+                    throw new CommandException(e.getMessage());
+                }
             }
         }
 
