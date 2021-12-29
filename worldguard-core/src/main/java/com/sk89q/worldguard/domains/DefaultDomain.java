@@ -22,8 +22,6 @@ package com.sk89q.worldguard.domains;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sk89q.worldguard.util.profile.Profile;
-import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
@@ -31,9 +29,14 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.util.ChangeTracked;
+import com.sk89q.worldguard.util.profile.Profile;
+import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,8 @@ public class DefaultDomain implements Domain, ChangeTracked {
 
     private PlayerDomain playerDomain = new PlayerDomain();
     private GroupDomain groupDomain = new GroupDomain();
+
+    private Set<ApiDomain> apiDomains = new HashSet<>();
 
     /**
      * Create a new domain.
@@ -102,6 +107,35 @@ public class DefaultDomain implements Domain, ChangeTracked {
     public void setGroupDomain(GroupDomain groupDomain) {
         checkNotNull(groupDomain);
         this.groupDomain = new GroupDomain(groupDomain);
+    }
+
+    /**
+     * Add new api domains
+     *
+     * @param apiDomain a domain
+     */
+    public void addApiDomain(ApiDomain apiDomain) {
+        checkNotNull(apiDomain);
+        this.apiDomains.add(apiDomain);
+    }
+
+    /**
+     * Set the api domains to a specified value
+     *
+     * @param apiDomains the domains
+     */
+    public void setApiDomains(Collection<ApiDomain> apiDomains) {
+        checkNotNull(apiDomains);
+        this.apiDomains = new HashSet<>(apiDomains);
+    }
+
+    /**
+     * Get all api domains
+     *
+     * @return a unmodifiable copy of the domains
+     */
+    public Set<ApiDomain> getApiDomains() {
+        return Collections.unmodifiableSet(this.apiDomains);
     }
 
     /**
@@ -242,12 +276,12 @@ public class DefaultDomain implements Domain, ChangeTracked {
 
     @Override
     public boolean contains(LocalPlayer player) {
-        return playerDomain.contains(player) || groupDomain.contains(player);
+        return playerDomain.contains(player) || groupDomain.contains(player) || apiDomains.stream().anyMatch(d -> d.contains(player));
     }
 
     @Override
     public boolean contains(UUID uniqueId) {
-        return playerDomain.contains(uniqueId);
+        return playerDomain.contains(uniqueId) || apiDomains.stream().anyMatch(d -> d.contains(uniqueId));
     }
 
     @Override

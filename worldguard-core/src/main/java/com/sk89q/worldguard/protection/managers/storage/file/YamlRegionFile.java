@@ -27,6 +27,8 @@ import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.domains.ApiDomain;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.FlagUtil;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
@@ -284,6 +286,12 @@ public class YamlRegionFile implements RegionDatabase {
             }
         }
 
+        YAMLNode apiDomains = node.getNode("api");
+        if (apiDomains != null) {
+            List<ApiDomain> parsedDomains = WorldGuard.getInstance().getDomainRegistry().unmarshal(apiDomains.getMap(), true);
+            domain.setApiDomains(parsedDomains);
+        }
+
         return domain;
     }
 
@@ -303,6 +311,14 @@ public class YamlRegionFile implements RegionDatabase {
         setDomainData(domainData, "players", domain.getPlayers());
         setDomainData(domainData, "unique-ids", domain.getUniqueIds());
         setDomainData(domainData, "groups", domain.getGroups());
+
+        if (!domain.getApiDomains().isEmpty()) {
+            Map<String, Object> values = new HashMap<>();
+            for (ApiDomain apiDomain : domain.getApiDomains()) {
+                values.put(apiDomain.getName(), apiDomain.marshal());
+            }
+            domainData.put("api", values);
+        }
 
         return domainData;
     }
