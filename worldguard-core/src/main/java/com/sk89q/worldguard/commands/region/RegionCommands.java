@@ -160,7 +160,7 @@ public final class RegionCommands extends RegionCommandsBase {
             region = checkRegionFromSelection(sender, id);
         }
 
-        RegionAdder task = new RegionAdder(manager, region);
+        RegionAdder task = new RegionAdder(manager, region, sender);
         task.addOwnersFromCommand(args, 2);
 
         final String description = String.format("Adding region '%s'", region.getId());
@@ -214,7 +214,7 @@ public final class RegionCommands extends RegionCommandsBase {
 
         region.copyFrom(existing);
 
-        RegionAdder task = new RegionAdder(manager, region);
+        RegionAdder task = new RegionAdder(manager, region, sender);
 
         final String description = String.format("Updating region '%s'", region.getId());
         AsyncCommandBuilder.wrap(task, sender)

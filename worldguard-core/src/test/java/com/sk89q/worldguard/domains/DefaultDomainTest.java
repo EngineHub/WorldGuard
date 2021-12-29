@@ -112,5 +112,11 @@ public class DefaultDomainTest {
         assertFalse(domain.contains(player1));
         assertTrue(domain.contains(player2));
         assertTrue(domain.contains(player3));
+
+        domain = new DefaultDomain();
+        domain.addCustomDomain(new CustomUUIDDomain("test", player2.getUniqueId()));
+        assertTrue(domain.contains(player2));
+        assertFalse(domain.contains(player2.getName()));
+        assertFalse(domain.contains(player3));
     }
 }
