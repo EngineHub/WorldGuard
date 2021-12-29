@@ -440,9 +440,9 @@ public final class RegionCommands extends RegionCommandsBase {
      * @throws CommandException any error
      */
     @Command(aliases = {"list"},
-             usage = "[-w world] [-p owner [-n]] [-i id-filter [-r]] [page]",
+             usage = "[-w world] [-p owner [-n]] [-s] [-i id-filter [-r]] [page]",
              desc = "Get a list of regions",
-             flags = "np:w:ri:",
+             flags = "np:w:ri:s",
              max = 1)
     public void list(CommandContext args, Actor sender) throws CommandException {
         warnAboutSaveFailures(sender);
@@ -486,6 +486,12 @@ public final class RegionCommands extends RegionCommandsBase {
         if (ownedBy != null) {
             task.filterOwnedByName(ownedBy, args.hasFlag('n'));
         }
+
+        if (args.hasFlag('s')) {
+            ProtectedRegion existing = checkRegionFromSelection(sender, "tmp");
+            task.filterByIntersecting(existing);
+        }
+
         if (idFilter != null) {
             if (args.hasFlag('r')) {
                 if (!getPermissionModel(sender).mayUseRegex()) {

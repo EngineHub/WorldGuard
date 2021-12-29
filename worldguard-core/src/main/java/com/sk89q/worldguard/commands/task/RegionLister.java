@@ -42,6 +42,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,7 @@ public class RegionLister implements Callable<Integer> {
     private final String world;
     private OwnerMatcher ownerMatcher;
     private String idFilter;
+    private ProtectedRegion filterByIntersecting;
     private Pattern regexPattern;
     private int page;
     private String playerName;
@@ -82,6 +84,10 @@ public class RegionLister implements Callable<Integer> {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    public void filterByIntersecting(ProtectedRegion region) {
+        this.filterByIntersecting = region;
     }
 
     public void filterOwnedByName(String name, boolean nameOnly) {
@@ -159,16 +165,20 @@ public class RegionLister implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         Map<String, ProtectedRegion> regions = manager.getRegions();
+        Collection<ProtectedRegion> iterableRegions = manager.getRegions().values();
+
+        if (filterByIntersecting != null) {
+            iterableRegions = filterByIntersecting.getIntersectingRegions(iterableRegions);
+        }
 
         // Build a list of regions to show
         List<RegionListEntry> entries = new ArrayList<>();
 
-        for (Map.Entry<String, ProtectedRegion> rg : regions.entrySet()) {
-            if (rg.getKey().equals("__global__")) {
+        for (ProtectedRegion rg : iterableRegions) {
+            if (rg.getId().equals("__global__")) {
                 continue;
             }
-            final ProtectedRegion region = rg.getValue();
-            final RegionListEntry entry = new RegionListEntry(region);
+            final RegionListEntry entry = new RegionListEntry(rg);
 
             if (entry.matches(idFilter) && entry.matches(ownerMatcher)) {
                 entries.add(entry);
