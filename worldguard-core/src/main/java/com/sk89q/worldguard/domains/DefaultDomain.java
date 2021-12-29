@@ -22,8 +22,6 @@ package com.sk89q.worldguard.domains;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sk89q.worldguard.util.profile.Profile;
-import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
@@ -31,9 +29,14 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.util.ChangeTracked;
+import com.sk89q.worldguard.util.profile.Profile;
+import com.sk89q.worldguard.util.profile.cache.ProfileCache;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +53,9 @@ public class DefaultDomain implements Domain, ChangeTracked {
     private PlayerDomain playerDomain = new PlayerDomain();
     private GroupDomain groupDomain = new GroupDomain();
 
+    private Set<CustomDomain> customDomains = new HashSet<>();
+    private boolean customDomainsChanged = false;
+
     /**
      * Create a new domain.
      */
@@ -64,6 +70,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
     public DefaultDomain(DefaultDomain existing) {
         setPlayerDomain(existing.getPlayerDomain());
         setGroupDomain(existing.getGroupDomain());
+        setCustomDomains(existing.getCustomDomains());
     }
 
     /**
@@ -102,6 +109,62 @@ public class DefaultDomain implements Domain, ChangeTracked {
     public void setGroupDomain(GroupDomain groupDomain) {
         checkNotNull(groupDomain);
         this.groupDomain = new GroupDomain(groupDomain);
+    }
+
+    /**
+     * Add new custom domains
+     *
+     * @param customDomain a domain
+     */
+    public void addCustomDomain(CustomDomain customDomain) {
+        checkNotNull(customDomain);
+        removeCustomDomain(customDomain.getName());
+        this.customDomains.add(customDomain);
+        customDomainsChanged = true;
+    }
+
+    /**
+     * Remove a custom domain matched by the name
+     *
+     * @param name the name
+     */
+    public void removeCustomDomain(String name) {
+        checkNotNull(name);
+        if (this.customDomains.removeIf(d -> d.getName().equalsIgnoreCase(name))) {
+            customDomainsChanged = true;
+        }
+    }
+
+    /**
+     * Remove a custom domain
+     *
+     * @param customDomain a domain
+     */
+    public void removeCustomDomain(CustomDomain customDomain) {
+        checkNotNull(customDomain);
+        if (this.customDomains.remove(customDomain)) {
+            customDomainsChanged = true;
+        }
+    }
+
+    /**
+     * Set the api domains to a specified value
+     *
+     * @param customDomains the domains
+     */
+    public void setCustomDomains(Collection<CustomDomain> customDomains) {
+        checkNotNull(customDomains);
+        this.customDomains = new HashSet<>(customDomains);
+        customDomainsChanged = true;
+    }
+
+    /**
+     * Get all api domains
+     *
+     * @return a unmodifiable copy of the domains
+     */
+    public Set<CustomDomain> getCustomDomains() {
+        return Collections.unmodifiableSet(this.customDomains);
     }
 
     /**
@@ -175,6 +238,9 @@ public class DefaultDomain implements Domain, ChangeTracked {
         for (String group : other.getGroups()) {
             addGroup(group);
         }
+        for (CustomDomain domain : other.getCustomDomains()) {
+            addCustomDomain(domain);
+        }
     }
 
     /**
@@ -192,6 +258,9 @@ public class DefaultDomain implements Domain, ChangeTracked {
         }
         for (String group : other.getGroups()) {
             removeGroup(group);
+        }
+        for (CustomDomain domain : other.getCustomDomains()) {
+            removeCustomDomain(domain.getName());
         }
     }
 
@@ -242,12 +311,12 @@ public class DefaultDomain implements Domain, ChangeTracked {
 
     @Override
     public boolean contains(LocalPlayer player) {
-        return playerDomain.contains(player) || groupDomain.contains(player);
+        return playerDomain.contains(player) || groupDomain.contains(player) || customDomains.stream().anyMatch(d -> d.contains(player));
     }
 
     @Override
     public boolean contains(UUID uniqueId) {
-        return playerDomain.contains(uniqueId);
+        return playerDomain.contains(uniqueId) || customDomains.stream().anyMatch(d -> d.contains(uniqueId));
     }
 
     @Override
@@ -257,7 +326,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
 
     @Override
     public int size() {
-        return groupDomain.size() + playerDomain.size();
+        return groupDomain.size() + playerDomain.size() + customDomains.size();
     }
 
     @Override
@@ -275,7 +344,6 @@ public class DefaultDomain implements Domain, ChangeTracked {
     }
 
     public String toPlayersString(@Nullable ProfileCache cache) {
-        StringBuilder str = new StringBuilder();
         List<String> output = new ArrayList<>();
 
         for (String name : playerDomain.getPlayers()) {
@@ -299,13 +367,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
         }
 
         output.sort(String.CASE_INSENSITIVE_ORDER);
-        for (Iterator<String> it = output.iterator(); it.hasNext();) {
-            str.append(it.next());
-            if (it.hasNext()) {
-                str.append(", ");
-            }
-        }
-        return str.toString();
+        return String.join(", ", output);
     }
     
     public String toGroupsString() {
@@ -320,25 +382,20 @@ public class DefaultDomain implements Domain, ChangeTracked {
         return str.toString();
     }
 
-    public String toUserFriendlyString() {
-        StringBuilder str = new StringBuilder();
-
-        if (playerDomain.size() > 0) {
-            str.append(toPlayersString());
+    public String toCustomDomainsString() {
+        List<String> output = new ArrayList<>();
+        for (CustomDomain customDomain : customDomains) {
+            output.add(customDomain.getName() + ":" + customDomain.toString());
         }
-
-        if (groupDomain.size() > 0) {
-            if (str.length() > 0) {
-                str.append("; ");
-            }
-
-            str.append(toGroupsString());
-        }
-
-        return str.toString();
+        output.sort(String.CASE_INSENSITIVE_ORDER);
+        return String.join(", ", output);
     }
 
-    public String toUserFriendlyString(ProfileCache cache) {
+    public String toUserFriendlyString() {
+        return toUserFriendlyString(null);
+    }
+
+    public String toUserFriendlyString(@Nullable ProfileCache cache) {
         StringBuilder str = new StringBuilder();
 
         if (playerDomain.size() > 0) {
@@ -351,6 +408,12 @@ public class DefaultDomain implements Domain, ChangeTracked {
             }
 
             str.append(toGroupsString());
+        }
+        if (!customDomains.isEmpty()) {
+            if (str.length() > 0) {
+                str.append("; ");
+            }
+            str.append(toCustomDomainsString());
         }
 
         return str.toString();
@@ -366,6 +429,12 @@ public class DefaultDomain implements Domain, ChangeTracked {
                 builder.append(TextComponent.of("; "));
             }
             builder.append(toGroupsComponent());
+        }
+        if (!customDomains.isEmpty()) {
+            if (playerDomain.size() > 0 || groupDomain.size() > 0) {
+                builder.append(TextComponent.of("; "));
+            }
+            builder.append(toCustomDomainsComponent());
         }
         return builder.build();
     }
@@ -442,21 +511,39 @@ public class DefaultDomain implements Domain, ChangeTracked {
         return builder.build();
     }
 
+    private Component toCustomDomainsComponent() {
+        final TextComponent.Builder builder = TextComponent.builder("");
+        for (Iterator<CustomDomain> it = customDomains.iterator(); it.hasNext(); ) {
+            CustomDomain domain = it.next();
+            builder.append(TextComponent.of(domain.getName() + ":", TextColor.LIGHT_PURPLE))
+                    .append(TextComponent.of(domain.toString(), TextColor.GOLD));
+            if (it.hasNext()) {
+                builder.append(TextComponent.of(", "));
+            }
+        }
+        return builder.build().hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("CustomDomain")));
+    }
+
+
     @Override
     public boolean isDirty() {
-        return playerDomain.isDirty() || groupDomain.isDirty();
+        return playerDomain.isDirty() || groupDomain.isDirty() ||
+                customDomainsChanged ||  customDomains.stream().anyMatch(ChangeTracked::isDirty);
     }
 
     @Override
     public void setDirty(boolean dirty) {
         playerDomain.setDirty(dirty);
         groupDomain.setDirty(dirty);
+        customDomainsChanged = dirty;
+        customDomains.forEach(d -> d.setDirty(dirty));
     }
 
     @Override
     public String toString() {
         return "{players=" + playerDomain +
                 ", groups=" + groupDomain +
+                ", custom=" + customDomains +
                 '}';
     }
 

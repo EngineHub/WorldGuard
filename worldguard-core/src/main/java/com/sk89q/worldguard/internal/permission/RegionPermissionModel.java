@@ -176,13 +176,14 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     public boolean mayRemoveOwners(ProtectedRegion region) {
         return hasPatternPermission("removeowner", region);
     }
-    
+
     /**
      * Checks to see if the given sender has permission to modify the given region
      * using the region permission pattern.
      * 
      * @param perm the name of the node
      * @param region the region
+     * @return whether the actor has the permission
      */
     private boolean hasPatternPermission(String perm, ProtectedRegion region) {
         if (!(getSender() instanceof Player)) {
