@@ -25,10 +25,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
-public interface DomainRegistry extends Iterable<DomainRegistry.Factory<?>> {
-    abstract static class Factory<T extends ApiDomain> {
-        public abstract T create(String name, Object values);
-    }
+public interface DomainRegistry extends Iterable<DomainFactory<?>> {
 
     /**
      * Register a new Domain
@@ -40,7 +37,7 @@ public interface DomainRegistry extends Iterable<DomainRegistry.Factory<?>> {
      * @throws DomainConflictException Thrown when already an existing domain exists with the same name
      * @throws IllegalStateException If it is not the right time to register new domains
      */
-    void register(String name, Factory<?> domain) throws DomainConflictException;
+    void register(String name, DomainFactory<?> domain) throws DomainConflictException;
 
     /**
      * Register a collection of domains.
@@ -51,10 +48,10 @@ public interface DomainRegistry extends Iterable<DomainRegistry.Factory<?>> {
      * <p>If there is a domain conflict, then an error will be logged but
      * no exception will be thrown.</p>
      *
-     * @param flags a collection of flags
+     * @param domains a collection of domain factories
      * @throws IllegalStateException If it is not the right time to register new flags
      */
-    void registerAll(Map<String, Factory<?>> domains);
+    void registerAll(Map<String, DomainFactory<?>> domains);
 
     /**
      * Get the domain by its name.
@@ -63,14 +60,14 @@ public interface DomainRegistry extends Iterable<DomainRegistry.Factory<?>> {
      * @return The domain, if it has been registered
      */
     @Nullable
-    Factory<?> get(String name);
+    DomainFactory<?> get(String name);
 
     /**
      * Get all domains
      *
      * @return All domains
      */
-    List<Factory<?>> getAll();
+    List<DomainFactory<?>> getAll();
 
     /**
      * Unmarshal a raw map of values into a list of domains with their

@@ -17,46 +17,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 package com.sk89q.worldguard.domains.registry;
 
 import com.sk89q.worldguard.domains.ApiDomain;
 
-import javax.annotation.Nullable;
-import java.util.UUID;
-
-public class UnknownDomain extends ApiDomain {
-    public static DomainFactory<UnknownDomain> FACTORY = UnknownDomain::new;
-
-    Object o;
-
-    public UnknownDomain(String name, Object values) {
-        super(name);
-        this.o = values;
-    }
-
-
-    @Override
-    public Object marshal() {
-        return o;
-    }
-
-    @Override
-    public boolean contains(UUID uniqueId) {
-        return false;
-    }
-
-    @Override
-    public boolean contains(String playerName) {
-        return false;
-    }
-
-    @Override
-    public int size() {
-        return 0;
-    }
-
-    @Override
-    public void clear() {
-        o = null;
-    }
+@FunctionalInterface
+public interface DomainFactory<T extends ApiDomain> {
+    T create(String name, Object values);
 }

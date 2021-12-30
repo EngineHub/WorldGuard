@@ -40,7 +40,7 @@ public class SimpleDomainRegistry implements DomainRegistry {
     private static final Logger log = Logger.getLogger(SimpleDomainRegistry.class.getCanonicalName());
 
     private final Object lock = new Object();
-    private final ConcurrentMap<String, Factory<?>> domains = Maps.newConcurrentMap();
+    private final ConcurrentMap<String, DomainFactory<?>> domains = Maps.newConcurrentMap();
     private boolean initialized = false;
 
     public boolean isInitialized() {
@@ -52,7 +52,7 @@ public class SimpleDomainRegistry implements DomainRegistry {
     }
 
     @Override
-    public void register(String name, Factory<?> domain) throws DomainConflictException {
+    public void register(String name, DomainFactory<?> domain) throws DomainConflictException {
         synchronized (lock) {
             if (initialized) {
                 throw new IllegalStateException("New flags cannot be registered at this time");
@@ -63,9 +63,9 @@ public class SimpleDomainRegistry implements DomainRegistry {
     }
 
     @Override
-    public void registerAll(Map<String, Factory<?>> domains) {
+    public void registerAll(Map<String, DomainFactory<?>> domains) {
         synchronized (lock) {
-            for (Map.Entry<String, Factory<?>> entry : domains.entrySet()) {
+            for (Map.Entry<String, DomainFactory<?>> entry : domains.entrySet()) {
                 try {
                     register(entry.getKey(), entry.getValue());
                 } catch (DomainConflictException e) {
@@ -75,7 +75,7 @@ public class SimpleDomainRegistry implements DomainRegistry {
         }
     }
 
-    private <T extends Factory<?>> T forceRegister(String name, T domain) throws DomainConflictException {
+    private <T extends DomainFactory<?>> T forceRegister(String name, T domain) throws DomainConflictException {
         checkNotNull(domain, "domain");
         checkNotNull(name, "name");
 
@@ -92,18 +92,18 @@ public class SimpleDomainRegistry implements DomainRegistry {
 
     @Nullable
     @Override
-    public Factory<?> get(String name) {
+    public DomainFactory<?> get(String name) {
         checkNotNull(name, "name");
         return domains.get(name.toLowerCase());
     }
 
     @Override
-    public List<Factory<?>> getAll() {
+    public List<DomainFactory<?>> getAll() {
         return ImmutableList.copyOf(domains.values());
     }
 
     private ApiDomain getOrCreate(String name, Object value, boolean createUnknown) {
-        Factory<? extends ApiDomain> domain = get(name);
+        DomainFactory<? extends ApiDomain> domain = get(name);
 
         if (domain != null) {
             return domain.create(name, value);
@@ -115,7 +115,7 @@ public class SimpleDomainRegistry implements DomainRegistry {
                 return domain.create(name, value);
             }
             if (createUnknown) {
-                Factory<UnknownDomain> unknownFactory = forceRegister(name, UnknownDomain.FACTORY);
+                DomainFactory<UnknownDomain> unknownFactory = forceRegister(name, UnknownDomain.FACTORY);
                 return unknownFactory.create(name, value);
             }
         }
@@ -144,7 +144,7 @@ public class SimpleDomainRegistry implements DomainRegistry {
     }
 
     @Override
-    public Iterator<DomainRegistry.Factory<?>> iterator() {
+    public Iterator<DomainFactory<?>> iterator() {
         return Iterators.unmodifiableIterator(domains.values().iterator());
     }
 }
