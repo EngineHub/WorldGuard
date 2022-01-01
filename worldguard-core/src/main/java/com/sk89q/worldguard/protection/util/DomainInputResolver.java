@@ -102,7 +102,7 @@ public class DomainInputResolver implements Callable<DefaultDomain> {
                 UUID uuid = parseUUID(s);
                 if (uuid != null) {
                     // Try to add any UUIDs given
-                    domain.addPlayer(UUID.fromString(UUIDs.addDashes(s.replaceAll("^uuid:", ""))));
+                    domain.addPlayer(uuid);
                 } else {
                     switch (locatorPolicy) {
                         case NAME_ONLY:

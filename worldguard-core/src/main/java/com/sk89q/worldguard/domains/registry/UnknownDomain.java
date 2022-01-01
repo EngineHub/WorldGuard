@@ -19,21 +19,29 @@
 
 package com.sk89q.worldguard.domains.registry;
 
-import com.sk89q.worldguard.domains.ApiDomain;
+import com.sk89q.worldguard.domains.CustomDomain;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class UnknownDomain extends ApiDomain {
+public class UnknownDomain extends CustomDomain {
     public static DomainFactory<UnknownDomain> FACTORY = UnknownDomain::new;
 
-    Object o;
+    private boolean isDirty = false;
+    private Object o;
 
-    public UnknownDomain(String name, Object values) {
+    public UnknownDomain(String name) {
         super(name);
-        this.o = values;
     }
 
+    @Override
+    public void parseInput(CustomDomainContext c) throws InvalidDomainFormat {
+        throw new InvalidDomainFormat("The plugin that registered this flag is not currently installed");
+    }
+
+    @Override
+    public void unmarshal(Object o) {
+        this.o = o;
+    }
 
     @Override
     public Object marshal() {
@@ -57,6 +65,24 @@ public class UnknownDomain extends ApiDomain {
 
     @Override
     public void clear() {
+        isDirty = true;
         o = null;
+    }
+
+    @Override
+    public void setDirty(boolean dirty) {
+        isDirty = dirty;
+    }
+
+    @Override
+    public boolean isDirty() {
+        return isDirty;
+    }
+
+    @Override
+    public String toString() {
+        return "UnknownDomain{" +
+                "o=" + o +
+                '}';
     }
 }

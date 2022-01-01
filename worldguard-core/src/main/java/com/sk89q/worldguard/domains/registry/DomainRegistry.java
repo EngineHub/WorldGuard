@@ -19,7 +19,7 @@
 
 package com.sk89q.worldguard.domains.registry;
 
-import com.sk89q.worldguard.domains.ApiDomain;
+import com.sk89q.worldguard.domains.CustomDomain;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -63,11 +63,11 @@ public interface DomainRegistry extends Iterable<DomainFactory<?>> {
     DomainFactory<?> get(String name);
 
     /**
-     * Get all domains
+     * Get all domains keyed by the registered name
      *
      * @return All domains
      */
-    List<DomainFactory<?>> getAll();
+    Map<String, DomainFactory<?>> getAll();
 
     /**
      * Unmarshal a raw map of values into a list of domains with their
@@ -77,7 +77,7 @@ public interface DomainRegistry extends Iterable<DomainFactory<?>> {
      * @param createUnknown Whether "just in time" domains should be created for unknown domains
      * @return The unmarshalled domain list
      */
-    List<ApiDomain> unmarshal(Map<String, Object> rawValues, boolean createUnknown);
+    List<CustomDomain> unmarshal(Map<String, Object> rawValues, boolean createUnknown);
 
     /**
      * Get the number of registered domains.

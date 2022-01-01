@@ -17,12 +17,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package com.sk89q.worldguard.domains.registry;
 
-import com.sk89q.worldguard.domains.CustomDomain;
+public class InvalidDomainFormat extends Exception {
+    private static final long serialVersionUID = 8101615074524004172L;
 
-@FunctionalInterface
-public interface DomainFactory<T extends CustomDomain> {
-    T create(String name);
+    public InvalidDomainFormat(String msg) {
+        super(msg);
+    }
 }

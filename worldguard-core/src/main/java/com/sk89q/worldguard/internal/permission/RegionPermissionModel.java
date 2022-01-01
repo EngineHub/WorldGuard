@@ -27,6 +27,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -176,6 +177,24 @@ public class RegionPermissionModel extends AbstractPermissionModel {
     public boolean mayRemoveOwners(ProtectedRegion region) {
         return hasPatternPermission("removeowner", region);
     }
+
+    /**
+     * Checks to see if the given sender has permission to modify a custom region
+     *
+     * @param region the region
+     * @param isOwnerLevel whether the domain level is owner (else member)
+     * @param domainName the name of the domain
+     * @return whether the actor has the permission
+     */
+    public boolean mayModifyCustomDomain(ProtectedRegion region, boolean isOwnerLevel, @Nonnull String domainName) {
+
+        String sanitizedValue = domainName.trim().toLowerCase().replaceAll("[^a-z0-9]", "");
+        if (sanitizedValue.length() > 20) {
+            sanitizedValue = sanitizedValue.substring(0, 20);
+        }
+
+        return hasPatternPermission("flag.flags." + sanitizedValue + "." + (isOwnerLevel ? "owner" : "member"), region);
+    }
     
     /**
      * Checks to see if the given sender has permission to modify the given region
@@ -183,6 +202,7 @@ public class RegionPermissionModel extends AbstractPermissionModel {
      * 
      * @param perm the name of the node
      * @param region the region
+     * @return whether the actor has the permission
      */
     private boolean hasPatternPermission(String perm, ProtectedRegion region) {
         if (!(getSender() instanceof Player)) {

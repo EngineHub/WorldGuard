@@ -19,14 +19,13 @@
 
 package com.sk89q.worldguard.domains.registry;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
-import com.sk89q.worldguard.domains.ApiDomain;
+import com.sk89q.worldguard.domains.CustomDomain;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -98,38 +97,46 @@ public class SimpleDomainRegistry implements DomainRegistry {
     }
 
     @Override
-    public List<DomainFactory<?>> getAll() {
-        return ImmutableList.copyOf(domains.values());
+    public Map<String, DomainFactory<?>> getAll() {
+        return ImmutableMap.copyOf(domains);
     }
 
-    private ApiDomain getOrCreate(String name, Object value, boolean createUnknown) {
-        DomainFactory<? extends ApiDomain> domain = get(name);
+    private CustomDomain getOrCreate(String name, Object value, boolean createUnknown) {
+        DomainFactory<? extends CustomDomain> domainFactory = get(name);
 
-        if (domain != null) {
-            return domain.create(name, value);
+        if (domainFactory != null) {
+            CustomDomain customDomain = domainFactory.create(name);
+            if (customDomain != null) customDomain.unmarshal(value);
+            return customDomain;
         }
 
         synchronized (lock) {
-            domain = get(name); // Load again because the previous load was not synchronized
-            if (domain != null) {
-                return domain.create(name, value);
+            domainFactory = get(name); // Load again because the previous load was not synchronized
+            if (domainFactory != null) {
+                CustomDomain customDomain = domainFactory.create(name);
+                if (customDomain != null) customDomain.unmarshal(value);
+                return customDomain;
             }
             if (createUnknown) {
                 DomainFactory<UnknownDomain> unknownFactory = forceRegister(name, UnknownDomain.FACTORY);
-                return unknownFactory.create(name, value);
+                if (unknownFactory != null) {
+                    CustomDomain customDomain = unknownFactory.create(name);
+                    if (customDomain != null) customDomain.unmarshal(value);
+                    return customDomain;
+                }
             }
         }
         return null;
     }
 
-    public List<ApiDomain> unmarshal(Map<String, Object> rawValues, boolean createUnknown) {
+    public List<CustomDomain> unmarshal(Map<String, Object> rawValues, boolean createUnknown) {
         checkNotNull(rawValues, "rawValues");
 
-        List<ApiDomain> domainList = new ArrayList<>();
+        List<CustomDomain> domainList = new ArrayList<>();
 
         for (Map.Entry<String, Object> entry : rawValues.entrySet()) {
             try {
-                ApiDomain domain = getOrCreate(entry.getKey(), entry.getValue(), createUnknown);
+                CustomDomain domain = getOrCreate(entry.getKey(), entry.getValue(), createUnknown);
                 domainList.add(domain);
             } catch (Throwable e) {
                 log.log(Level.WARNING, "Failed to unmarshal domain for " + entry.getKey(), e);

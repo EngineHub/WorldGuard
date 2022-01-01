@@ -20,17 +20,20 @@
 package com.sk89q.worldguard.domains;
 
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.domains.registry.CustomDomainContext;
+import com.sk89q.worldguard.domains.registry.InvalidDomainFormat;
+import com.sk89q.worldguard.util.ChangeTracked;
 
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class ApiDomain implements Domain {
-    private static final Pattern VALID_NAME = Pattern.compile("^[:A-Za-z0-9\\-]{1,40}$");
+public abstract class CustomDomain implements Domain, ChangeTracked {
+    private static final Pattern VALID_NAME = Pattern.compile("^[A-Za-z0-9\\-]{1,40}$");
 
-    private String name;
+    private final String name;
 
-    public ApiDomain(String name) {
+    public CustomDomain(String name) {
         this.name = name;
     }
 
@@ -42,6 +45,22 @@ public abstract class ApiDomain implements Domain {
     public String getName() {
         return name;
     }
+
+    /**
+     * Parse a given input to fill the context of the CustomDomain.
+     *
+     * @param context the {@link CustomDomainContext}
+     * @throws InvalidDomainFormat Raised if the input is invalid
+     */
+    public abstract void parseInput(CustomDomainContext context) throws InvalidDomainFormat;
+
+    /**
+     * Convert a raw type that was loaded (from a YAML file, for example)
+     * into the custom domain.
+     *
+     * @param o The object
+     */
+    public abstract void unmarshal(Object o);
 
     /**
      * Convert the current Domain to a storable foramt
