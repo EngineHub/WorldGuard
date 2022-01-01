@@ -281,7 +281,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         regionWand = convertLegacyItem(getString("regions.wand", ItemTypes.LEATHER.getId()));
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
-        templateWhenClaiming = getString("regions.template-when-claiming", "");
+        setParentOnClaim = getString("regions.set-parent-on-claim", "");
         boundedLocationFlags = getBoolean("regions.location-flags-only-inside-regions", false);
 
         maxRegionCountPerPlayer = getInt("regions.max-region-count-per-player.default", 7);

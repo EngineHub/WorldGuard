@@ -129,7 +129,7 @@ public abstract class WorldConfiguration {
     public boolean allowTamedSpawns;
     public int maxClaimVolume;
     public boolean claimOnlyInsideExistingRegions;
-    public String templateWhenClaiming;
+    public String setParentOnClaim;
     public int maxRegionCountPerPlayer;
     public boolean antiWolfDumbness;
     public boolean signChestProtection;

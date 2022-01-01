@@ -315,8 +315,8 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Inherit from a template region
-        if (wcfg.templateWhenClaiming != "") {
-            ProtectedRegion templateRegion = manager.getRegion(wcfg.templateWhenClaiming);
+        if (wcfg.setParentOnClaim != "")  {
+            ProtectedRegion templateRegion = manager.getRegion(wcfg.setParentOnClaim);
             if (templateRegion != null) {
                 try {
                     region.setParent(templateRegion);
