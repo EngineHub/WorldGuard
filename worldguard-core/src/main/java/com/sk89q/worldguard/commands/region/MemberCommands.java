@@ -327,7 +327,8 @@ public class MemberCommands extends RegionCommandsBase {
         }
 
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(world.getName(), existing, null, sender);
-        printout.append(SubtleFormat.wrap("(Current domains: "));
+        printout.append(SubtleFormat.wrap("(Current domains:"));
+        printout.newline();
         printout.appendDomain();
         printout.append(SubtleFormat.wrap(")"));
         printout.send(sender);
