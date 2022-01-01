@@ -286,7 +286,7 @@ public class YamlRegionFile implements RegionDatabase {
             }
         }
 
-        YAMLNode apiDomains = node.getNode("api");
+        YAMLNode apiDomains = node.getNode("custom");
         if (apiDomains != null) {
             List<CustomDomain> parsedDomains = WorldGuard.getInstance().getDomainRegistry().unmarshal(apiDomains.getMap(), true);
             domain.setCustomDomains(parsedDomains);
@@ -317,7 +317,7 @@ public class YamlRegionFile implements RegionDatabase {
             for (CustomDomain customDomain : domain.getCustomDomains()) {
                 values.put(customDomain.getName(), customDomain.marshal());
             }
-            domainData.put("api", values);
+            domainData.put("custom", values);
         }
 
         return domainData;

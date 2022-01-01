@@ -78,6 +78,10 @@ public class SimpleDomainRegistry implements DomainRegistry {
         checkNotNull(domain, "domain");
         checkNotNull(name, "name");
 
+        if (!CustomDomain.isValidName(name)) {
+            throw new IllegalArgumentException("Invalid Domain name used.");
+        }
+
         synchronized (lock) {
             if (domains.containsKey(name)) {
                 throw new DomainConflictException("A domain already exists by the name " + name);

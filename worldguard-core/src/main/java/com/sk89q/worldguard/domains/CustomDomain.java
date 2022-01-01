@@ -34,6 +34,9 @@ public abstract class CustomDomain implements Domain, ChangeTracked {
     private final String name;
 
     public CustomDomain(String name) {
+        if (name == null ||!isValidName(name)) {
+            throw new IllegalArgumentException("Invalid Domain name used.");
+        }
         this.name = name;
     }
 
@@ -84,5 +87,10 @@ public abstract class CustomDomain implements Domain, ChangeTracked {
     @Override
     public boolean contains(LocalPlayer player) {
         return contains(player.getUniqueId());
+    }
+
+    @Override
+    public int size() {
+        return 1;
     }
 }

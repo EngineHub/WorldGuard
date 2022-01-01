@@ -69,6 +69,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
     public DefaultDomain(DefaultDomain existing) {
         setPlayerDomain(existing.getPlayerDomain());
         setGroupDomain(existing.getGroupDomain());
+        setCustomDomains(existing.getCustomDomains());
     }
 
     /**
@@ -318,7 +319,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
 
     @Override
     public int size() {
-        return groupDomain.size() + playerDomain.size();
+        return groupDomain.size() + playerDomain.size() + customDomains.size();
     }
 
     @Override
@@ -440,7 +441,7 @@ public class DefaultDomain implements Domain, ChangeTracked {
             if (playerDomain.size() > 0 || groupDomain.size() > 0) {
                 builder.append(TextComponent.of("; "));
             }
-            builder.append(toCustomDomainsString());
+            builder.append(toCustomDomainsComponent());
         }
         return builder.build();
     }
@@ -517,11 +518,11 @@ public class DefaultDomain implements Domain, ChangeTracked {
         return builder.build();
     }
 
-    private Component toCustomDomainsComponent(ProfileCache cache) {
+    private Component toCustomDomainsComponent() {
         final TextComponent.Builder builder = TextComponent.builder("");
         for (Iterator<CustomDomain> it = customDomains.iterator(); it.hasNext(); ) {
             CustomDomain domain = it.next();
-            builder.append(TextComponent.of(domain.getName() + ":", TextColor.GRAY))
+            builder.append(TextComponent.of(domain.getName() + ":", TextColor.LIGHT_PURPLE))
                     .append(TextComponent.of(domain.toString(), TextColor.GOLD));
             if (it.hasNext()) {
                 builder.append(TextComponent.of(", "));
