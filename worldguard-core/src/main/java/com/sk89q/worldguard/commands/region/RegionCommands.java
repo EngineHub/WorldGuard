@@ -21,6 +21,7 @@ package com.sk89q.worldguard.commands.region;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -315,7 +316,7 @@ public final class RegionCommands extends RegionCommandsBase {
         }
 
         // Inherit from a template region
-        if (wcfg.setParentOnClaim != "")  {
+        if (!Strings.isNullOrEmpty(wcfg.setParentOnClaim)) {
             ProtectedRegion templateRegion = manager.getRegion(wcfg.setParentOnClaim);
             if (templateRegion != null) {
                 try {
