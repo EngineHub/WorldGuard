@@ -21,6 +21,7 @@ package com.sk89q.worldguard.commands.region;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -281,7 +282,7 @@ public final class RegionCommands extends RegionCommandsBase {
             }
         }
 
-        // We have to check whether this region violates the space of any other reion
+        // We have to check whether this region violates the space of any other region
         ApplicableRegionSet regions = manager.getApplicableRegions(region);
 
         // Check if this region overlaps any other region
@@ -311,6 +312,18 @@ public final class RegionCommands extends RegionCommandsBase {
                 player.printError("This region is too large to claim.");
                 player.printError("Max. volume: " + wcfg.maxClaimVolume + ", your volume: " + region.volume());
                 return;
+            }
+        }
+
+        // Inherit from a template region
+        if (!Strings.isNullOrEmpty(wcfg.setParentOnClaim)) {
+            ProtectedRegion templateRegion = manager.getRegion(wcfg.setParentOnClaim);
+            if (templateRegion != null) {
+                try {
+                    region.setParent(templateRegion);
+                } catch (CircularInheritanceException e) {
+                    throw new CommandException(e.getMessage());
+                }
             }
         }
 
