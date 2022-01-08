@@ -7,7 +7,7 @@ ask that you make note of the following guidelines.
 * **Follow the [Oracle coding conventions](https://www.oracle.com/technetwork/java/javase/documentation/codeconvtoc-136057.html).**
   We can't stress this enough; if your code has notable issues, it may delay
   the process significantly.
-* **Target Java 8 for source and compilation.** Make sure to mark methods with
+* **Target Java 16 for source and compilation.** Make sure to mark methods with
   ` @Override` that override methods of parent classes, or that implement
   methods of interfaces.
 * **Use only spaces for indentation.** Our indents are 4-spaces long, and tabs
