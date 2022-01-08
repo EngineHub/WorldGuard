@@ -7,7 +7,7 @@ but it needs some version of Java to bootstrap from.
 Note that if you have JRE 16 installed, Gradle will currently attempt to use that to compile, which will not work. It is easiest to uninstall JRE 16 and
 replace it with JDK 16.
 
-The build process uses Gradle, which you do *not* need to download. WorldGuard is a multi-module project with four modules:
+The build process uses Gradle, which you do *not* need to download. WorldGuard is a multi-module project with three modules:
 
 * `worldguard-core` contains the WorldGuard API
 * `worldguard-bukkit` is the Bukkit plugin
@@ -17,7 +17,7 @@ The build process uses Gradle, which you do *not* need to download. WorldGuard i
 
 ### On Windows
 
-1. Shift + right click the folder with WorldGuard's files and click "Open command prompt".
+1. **Shift** + **right click** the folder with WorldGuard's files and click "Open PowerShell window here".
 2. `gradlew build`
 
 ### On Linux, BSD, or Mac OS X
